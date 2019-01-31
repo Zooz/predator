@@ -1,6 +1,8 @@
 'use strict';
 
 const schedulerSequlizeConnector = require('../../scheduler/models/database/sequelize/sequelizeConnector');
+const repoterSequlizeConnector = require('../../reporter/models/database/sequelize/sequelizeConnector');
+
 const databaseConfig = require('../../config/databaseConfig');
 const Sequelize = require('sequelize');
 let sequlizeClient;
@@ -8,6 +10,7 @@ let sequlizeClient;
 module.exports.init = async () => {
     sequlizeClient = await createClient();
     await schedulerSequlizeConnector.init(sequlizeClient);
+    await repoterSequlizeConnector.init(sequlizeClient);
 };
 
 module.exports.ping = async () => {

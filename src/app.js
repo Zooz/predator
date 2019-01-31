@@ -4,6 +4,7 @@ let express = require('express');
 let logger = require('./common/logger');
 let healthRouter = require('./common/routes/healthRoute.js');
 let jobsRouter = require('./scheduler/routes/jobsRoute.js');
+let reportsRouter = require('./reporter/routes/reportsRoute.js');
 
 let swaggerValidator = require('express-ajv-swagger-validation');
 let audit = require('express-requests-logger');
@@ -35,6 +36,7 @@ module.exports = () => {
             }));
 
             app.use('/health', healthRouter);
+            app.use('/', reportsRouter);
             app.use('/', jobsRouter);
 
             app.use(function (err, req, res, next) {
