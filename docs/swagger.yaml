@@ -1,31 +1,335 @@
-swagger: "2.0"
+swagger: '2.0'
 schemes:
-- http
+  - http
 info:
   version: 1.0.0
-  title: "Predator Scheduler"
+  title: 'Predator'
   description: |
-    A scheduler to run predator tests.
-    Manages the resource job which is responsible for triggering tests run
-    Supports cron expression and one time test runs.
+    Predator is an open-source performance framework. It manages the entire lifecycle of load testing a server, from creating a test file, running scheduled and on-demand tests, and finally viewing the test results. Developers who want to load their system end-to-end or test a specific service will benefit from this framework. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator simplifies the performance testing regime. (edited)
 consumes:
-- application/json
+  - application/json
 produces:
-- application/json
+  - application/json
 paths:
+  /v1/dsl/{dsl_name}/definitions:
+    post:
+      tags:
+        - dsl
+      description: Create new definition
+      parameters:
+        - in: path
+          name: dsl_name
+          required: true
+          type: string
+        - in: body
+          name: test
+          description: The definition to create
+          required: true
+          schema:
+            $ref: '#/definitions/definition'
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/definition'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_response'
+        422:
+          description: Unprocessable entity.
+          schema:
+            $ref: '#/definitions/error_response'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/error_response'
+    get:
+      tags:
+        - dsl
+      description: Get definitions.
+      parameters:
+        - in: path
+          name: dsl_name
+          required: true
+          type: string
+
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/definitions_response'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_response'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error_response'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/error_response'
+  /v1/dsl/{dsl_name}/definitions/{definition_name}:
+    get:
+      tags:
+        - dsl
+      description: Get definition.
+      parameters:
+        - in: path
+          name: dsl_name
+          required: true
+          type: string
+        - in: path
+          name: definition_name
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/definition'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_response'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error_response'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/error_response'
+    put:
+      tags:
+        - dsl
+      description: update specific definition.
+      parameters:
+        - name: definition
+          in: body
+          description: The dsl to update
+          required: true
+          schema:
+            $ref: "#/definitions/update_definition"
+        - in: path
+          name: dsl_name
+          required: true
+          type: string
+        - in: path
+          name: definition_name
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/definition"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        404:
+          description: Not found
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+    delete:
+      tags:
+        - dsl
+      description: delete a specific definition.
+      parameters:
+        - in: path
+          name: dsl_name
+          required: true
+          type: string
+        - in: path
+          name: definition_name
+          required: true
+          type: string
+      responses:
+        204:
+          description: Success
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/tests:
+    get:
+      tags:
+        - tests
+      description: Get list of all test and there descriptions.
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/tests_response'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_response'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/error_response'
+    post:
+      tags:
+        - tests
+      description: Create new test
+      parameters:
+        - name: test
+          in: body
+          description: The test to add
+          required: true
+          schema:
+            $ref: '#/definitions/test'
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/create_test_response'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_response'
+        422:
+          description: Unprocessable entity.
+          schema:
+            $ref: '#/definitions/error_response'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/error_response'
+  /v1/tests/{test_id}:
+    get:
+      tags:
+        - tests
+      description: Get specific test.
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/tests_response'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_response'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error_response'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/error_response'
+    put:
+      tags:
+        - tests
+      description: update specific test.
+      parameters:
+        - name: test
+          in: body
+          description: The test to update
+          required: true
+          schema:
+            $ref: "#/definitions/test"
+        - in: path
+          name: test_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/create_test_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        404:
+          description: Not found
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+    delete:
+      tags:
+        - tests
+      description: delete a specific test.
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/tests/{test_id}/revisions:
+    get:
+      tags:
+        - tests
+      description: Get list of all test revision of a specific test.
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/tests_response'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_response'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error_response'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/error_response'
   /v1/jobs:
     get:
+      tags:
+        - jobs
       description: Get list of all jobs.
       parameters:
-      - in: query
-        name: one_time
-        type: boolean
-        description: Should return the one time tests (no cron expression)
-      - name: x-zooz-request-id
-        description: The ID of incoming request.
-        in: header
-        required: true
-        type: string
+        - in: query
+          name: one_time
+          type: boolean
+          description: Should return the one time tests (no cron expression)
       responses:
         200:
           description: Success
@@ -42,19 +346,16 @@ paths:
           schema:
             $ref: "#/definitions/error_response"
     post:
+      tags:
+        - jobs
       description: Create a new job that will trigger test run
       parameters:
-      - name: job
-        in: body
-        description: The job to add
-        required: true
-        schema:
-          $ref: "#/definitions/create_job_response"
-      - name: x-zooz-request-id
-        description: The ID of incoming request.
-        in: header
-        required: true
-        type: string
+        - name: job
+          in: body
+          description: The job to add
+          required: true
+          schema:
+            $ref: "#/definitions/create_job_response"
       responses:
         201:
           description: Success
@@ -72,17 +373,14 @@ paths:
             $ref: "#/definitions/error_response"
   /v1/jobs/{job_id}:
     get:
+      tags:
+        - jobs
       description: Get specific job.
       parameters:
-      - in: path
-        name: job_id
-        required: true
-        type: string
-      - name: x-zooz-request-id
-        description: The ID of incoming request.
-        in: header
-        required: true
-        type: string
+        - in: path
+          name: job_id
+          required: true
+          type: string
       responses:
         200:
           description: Success
@@ -101,23 +399,20 @@ paths:
           schema:
             $ref: "#/definitions/error_response"
     put:
+      tags:
+        - jobs
       description: update specific job.
       parameters:
-      - name: job
-        in: body
-        description: The job to add
-        required: true
-        schema:
-          $ref: "#/definitions/job_update"
-      - in: path
-        name: job_id
-        required: true
-        type: string
-      - name: x-zooz-request-id
-        description: The ID of incoming request.
-        in: header
-        required: true
-        type: string
+        - name: job
+          in: body
+          description: The job to add
+          required: true
+          schema:
+            $ref: "#/definitions/job_update"
+        - in: path
+          name: job_id
+          required: true
+          type: string
       responses:
         200:
           description: Success
@@ -136,17 +431,14 @@ paths:
           schema:
             $ref: "#/definitions/error_response"
     delete:
+      tags:
+        - jobs
       description: delete a specific job.
       parameters:
-      - in: path
-        name: job_id
-        required: true
-        type: string
-      - name: x-zooz-request-id
-        description: The ID of incoming request.
-        in: header
-        required: true
-        type: string
+        - in: path
+          name: job_id
+          required: true
+          type: string
       responses:
         200:
           description: Success
@@ -160,23 +452,20 @@ paths:
             $ref: "#/definitions/error_response"
   /v1/jobs/{job_id}/runs/{run_id}/stop:
     post:
+      tags:
+        - jobs
       description: stop a specific run of specific job.
       parameters:
-      - in: path
-        description: The ID of the job.
-        name: job_id
-        required: true
-        type: string
-      - in: path
-        description: The id of a specific run in metronome which is also the report id.
-        name: run_id
-        required: true
-        type: string
-      - name: x-zooz-request-id
-        description: The ID of incoming request.
-        in: header
-        required: true
-        type: string
+        - in: path
+          description: The ID of the job.
+          name: job_id
+          required: true
+          type: string
+        - in: path
+          description: The id of a specific run in metronome which is also the report id.
+          name: run_id
+          required: true
+          type: string
       responses:
         200:
           description: Success
@@ -188,14 +477,328 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/error_response"
+  /v1/jobs/{job_id}/history:
+    get:
+      tags:
+        - jobs
+      description: Get Historic data of the jobs run
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          type: string
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/job_history_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        404:
+          description: Not found
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/tests/{test_id}/reports:
+    get:
+      tags:
+        - tests
+      description: Get all summary reports for specific test.
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/report_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/tests/last_reports:
+    get:
+      tags:
+        - tests
+      description: Get all last reports limited by a query param
+      parameters:
+        - in: query
+          name: limit
+          type: number
+          description: How many last reports show
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/report_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/tests/{test_id}/reports/{report_id}:
+    get:
+      tags:
+        - tests
+      description: Get specific report for specific test
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          type: string
+        - in: path
+          name: report_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/report_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        404:
+          description: Not found
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/tests/{test_id}/reports/{report_id}/html:
+    get:
+      tags:
+        - tests
+      description: Get list of the history of this specific job id
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          type: string
+        - in: path
+          name: report_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success.
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        404:
+          description: Not found
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+
 
 definitions:
+  definition:
+    type: object
+    required:
+      - name
+      - request
+    properties:
+      name:
+        type: string
+      request:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/artillery_request_schema'
+
+  update_definition:
+    required:
+      - request
+    properties:
+      request:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/artillery_request_schema'
+
+
+  definitions_response:
+    type: array
+    items:
+      $ref: '#/definitions/definition'
+  test:
+    type: object
+    discriminator: type
+    required:
+      - name
+      - description
+      - type
+    properties:
+      name:
+        type: string
+        description: The name of the test.
+      description:
+        type: string
+        description: A description of the test.
+      type:
+        type: string
+        enum: ['paymentsos', 'custom']
+  paymentsos:
+    description: A test that is made of scenarios in paymentsOs domain language
+    allOf:
+      - $ref: '#/definitions/test'
+      - type: object
+        required:
+          - scenarios
+        properties:
+          scenarios:
+            type: array
+            items:
+              $ref: '#/definitions/scenario'
+  artillery_request_schema:
+    description: The request schema used in test scenarios
+    type: object
+    properties:
+      capture:
+        type: object
+        additionalProperties:
+          type: string
+      url:
+        type: string
+      headers:
+        additionalProperties:
+          type: string
+      json:
+        type: object
+  key_value_string_object:
+    type: object
+    additionalProperties:
+      type: string
+  custom:
+    description: A test that is made of artillery json
+    allOf:
+      - $ref: '#/definitions/test'
+    required:
+      - artillery_test
+    properties:
+      artillery_test:
+        type: object
+  test_id:
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: The id of the test.
+  create_test_response:
+    allOf:
+      - $ref: '#/definitions/test_id'
+    required:
+      - revision_id
+    properties:
+      revision_id:
+        type: string
+        format: uuid
+        description: The id of the revision.
+  tests_response:
+    allOf:
+      - $ref: '#/definitions/create_test_response'
+      - $ref: '#/definitions/test_id'
+    required:
+      - name
+      - description
+      - type
+      - raw_data
+      - artillery_test
+      - updated_at
+    properties:
+      updated_at:
+        type: string
+        format: date_time
+        description: The time the test was created/updated
+      name:
+        type: string
+        description: The name of the test.
+      description:
+        type: string
+        description: The description of the test
+      type:
+        type: string
+        enum: [paymentsos, custom]
+        description: the type of the test, custom - an artillery json created by the client, paymentsos - a test with the payments os api.
+      raw_data:
+        type: array
+        items:
+          $ref: '#/definitions/scenario'
+      artillery_test:
+        type: object
+        description: The artillery json that represents the test created from the raw data.
+  error_response:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  scenario:
+    required:
+      - scenario_name
+      - steps
+    properties:
+      scenario_name:
+        type: string
+        description: The name of the scenario
+      steps:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+            - action
+          properties:
+            action:
+              type: string
+              enum: ['assignTokenToCustomer', 'createAuthorize', 'createCharge', 'createCustomer', 'createPayment', 'createRefund', 'createToken', 'createVoid', 'getPayment', 'getToken', 'createCapture']
+            properties:
+              type: object
+              description: Any additional properties in the body request that should be changed.
+            wait:
+              type: integer
+              description: To wait 'x' seconds before starting the request.
+          description: An object that represent an action.
+        description: An array of the steps in the scenario
+      weight:
+        type: number
+        description: The weight (in percentage) of the scenario in the test. If not specified, will be calculated.
   job:
     required:
-    - test_id
-    - arrival_rate
-    - duration
-    - environment
+      - test_id
+      - arrival_rate
+      - duration
+      - environment
+      - is_use_akamai
     properties:
       variables:
         type: object
@@ -234,6 +837,12 @@ definitions:
         type: string
         enum: ['test', 'live']
         description: In which environment the test will run
+      is_use_akamai:
+        type: boolean
+        description: is use external akamai url or kong dcos urls
+      notes:
+        type: string
+        description: General notes related to the test
   job_update:
     properties:
       test_id:
@@ -255,7 +864,7 @@ definitions:
         type: number
         description: For how many seconds the test should run
       ramp_to:
-        type: number
+        type: string
         description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
       emails:
         type: array
@@ -264,25 +873,139 @@ definitions:
           description: The url of where to send the the email with the report information
       environment:
         type: string
+        enum: ['test', 'live']
         description: In which environment the test will run
+      is_use_akamai:
+        type: boolean
+        description: is use external akamai url or kong dcos urls
+  job_history_response:
+    required:
+      - success_count
+      - failure_count
+      - last_success_at
+      - last_failure_at
+      - successful_finished_runs
+      - failed_finished_runs
+    properties:
+      successCount:
+        type: integer
+        description: The number of successful runs
+      failureCount:
+        type: integer
+        description: The number of successful runs
+      lastSuccessAt:
+        type: string
+        description: The last time successful job ran
+      lastFailureAt:
+        type: string
+        description: The last time failure job ran
+      successfulFinishedRuns:
+        type: array
+        items:
+          $ref: "#/definitions/run_history"
+      failedFinishedRuns:
+        type: array
+        items:
+          $ref: "#/definitions/run_history"
+      runningJobs:
+        type: array
+        items:
+          $ref: "#/definitions/run_details"
+  run_history:
+    required:
+      - id
+      - created_at
+      - finished_at
+    properties:
+      id:
+        type: string
+        description: The id of the run (Determent by Metronome)
+      createdAt:
+        type: string
+        description: The time the run was created
+      finishedAt:
+        type: string
+        description: The time the run finished running
+  run_details:
+    required:
+      - id
+      - created_at
+      - status
+    properties:
+      id:
+        type: string
+        description: The id of the run (Determent by Metronome)
+      createdAt:
+        type: string
+        description: The time the run was created
+      status:
+        type: string
+        description: The status of the run.
   job_response:
     allOf:
-    - $ref: "#/definitions/job"
-    - properties:
-        id:
-          type: string
-          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-          description: Uuid that identifies the job
+      - $ref: "#/definitions/job"
+      - properties:
+          id:
+            type: string
+            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+            description: Uuid that identifies the job
   create_job_response:
     allOf:
-    - $ref: "#/definitions/job_response"
-    - properties:
-        run_id:
-          type: string
-          description: If the job is ran immediately, will show the run id.
-  error_response:
+      - $ref: "#/definitions/job_response"
+      - properties:
+          run_id:
+            type: string
+            description: If the job is ran immediately, will show the run id.
+  report_response:
     required:
-    - message
+      - test_id
+      - revision_id
+      - report_id
+      - job_id
+      - test_type
+      - status
+      - start_time
+      - end_time
+      - duration_seconds
+      - avg_response_time_ms
+      - arrival_rate
     properties:
-      message:
+      test_id:
         type: string
+        description: The id of the test we would like to schedule.
+      revision_id:
+        type: string
+        description: The revision id of the test
+      report_id:
+        type: string
+        description: The id of the report/same as run_id
+      job_id:
+        type: string
+        description: The id of the job in the scheduler
+      test_type:
+        type: string
+        description: The type of the test, can be paymentsos or custom
+      status:
+        type: string
+        description: The status of the running test
+      start_time:
+        type: date
+        description: When the test started
+      end_time:
+        type: date
+        description: when the tests finished
+      duration_seconds:
+        type: number
+        description: The length of test in seconds
+      avg_response_time_ms:
+        type: number
+        description: The average response time of the requests
+      arrival_rate:
+        type: number
+        description: Arrival rate set for the test (how many requests send per second)
+      last_stats:
+        type: string
+        description: How many of the requests ended in error (not 2xx)
+      notes:
+        type: string
+        description: notes about the test
