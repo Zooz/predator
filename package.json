@@ -63,6 +63,7 @@
     "chai": "^4.2.0",
     "chai-sinon": "^2.8.1",
     "commitlint": "^7.4.0",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^12.0.0-alpha.0",
     "eslint-plugin-import": "^2.11.0",
@@ -83,6 +84,11 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
     }
   }
 }
