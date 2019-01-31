@@ -1,36 +1,32 @@
 swagger: '2.0'
 schemes:
-  - http
+- http
 info:
   version: 1.0.0
   title: 'Predator'
   description: |
-    Predator is an open-source performance framework.
-    It manages the entire lifecycle of load testing a server, from creating a test file,
-    running scheduled and on-demand tests, and finally viewing the test results.
-    Developers who want to load their system end-to-end or test a specific service will benefit from this framework.
-    Bootstrapped with a user-friendly UI alongside a simple REST API, Predator simplifies the performance testing regime.
+    Predator is an open-source performance framework. It manages the entire lifecycle of load testing a server, from creating a test file, running scheduled and on-demand tests, and finally viewing the test results. Developers who want to load their system end-to-end or test a specific service will benefit from this framework. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator simplifies the performance testing regime.
 consumes:
-  - application/json
+- application/json
 produces:
-  - application/json
+- application/json
 paths:
   /v1/dsl/{dsl_name}/definitions:
     post:
       tags:
-        - dsl
+      - dsl
       description: Create new definition
       parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
-        - in: body
-          name: test
-          description: The definition to create
-          required: true
-          schema:
-            $ref: '#/definitions/definition'
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
+      - in: body
+        name: test
+        description: The definition to create
+        required: true
+        schema:
+          $ref: '#/definitions/definition'
       responses:
         201:
           description: Success
@@ -50,13 +46,13 @@ paths:
             $ref: '#/definitions/error_response'
     get:
       tags:
-        - dsl
+      - dsl
       description: Get definitions.
       parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
 
       responses:
         200:
@@ -78,17 +74,17 @@ paths:
   /v1/dsl/{dsl_name}/definitions/{definition_name}:
     get:
       tags:
-        - dsl
+      - dsl
       description: Get definition.
       parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
-        - in: path
-          name: definition_name
-          required: true
-          type: string
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
+      - in: path
+        name: definition_name
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -108,23 +104,23 @@ paths:
             $ref: '#/definitions/error_response'
     put:
       tags:
-        - dsl
+      - dsl
       description: update specific definition.
       parameters:
-        - name: definition
-          in: body
-          description: The dsl to update
-          required: true
-          schema:
-            $ref: "#/definitions/update_definition"
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
-        - in: path
-          name: definition_name
-          required: true
-          type: string
+      - name: definition
+        in: body
+        description: The dsl to update
+        required: true
+        schema:
+          $ref: "#/definitions/update_definition"
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
+      - in: path
+        name: definition_name
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -144,17 +140,17 @@ paths:
             $ref: "#/definitions/error_response"
     delete:
       tags:
-        - dsl
+      - dsl
       description: delete a specific definition.
       parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
-        - in: path
-          name: definition_name
-          required: true
-          type: string
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
+      - in: path
+        name: definition_name
+        required: true
+        type: string
       responses:
         204:
           description: Success
@@ -169,7 +165,7 @@ paths:
   /v1/tests:
     get:
       tags:
-        - tests
+      - tests
       description: Get list of all test and there descriptions.
       responses:
         200:
@@ -188,15 +184,15 @@ paths:
             $ref: '#/definitions/error_response'
     post:
       tags:
-        - tests
+      - tests
       description: Create new test
       parameters:
-        - name: test
-          in: body
-          description: The test to add
-          required: true
-          schema:
-            $ref: '#/definitions/test'
+      - name: test
+        in: body
+        description: The test to add
+        required: true
+        schema:
+          $ref: '#/definitions/test'
       responses:
         201:
           description: Success
@@ -217,14 +213,14 @@ paths:
   /v1/tests/{test_id}:
     get:
       tags:
-        - tests
+      - tests
       description: Get specific test.
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-          format: uuid
+      - in: path
+        name: test_id
+        required: true
+        type: string
+        format: uuid
       responses:
         200:
           description: Success
@@ -244,19 +240,19 @@ paths:
             $ref: '#/definitions/error_response'
     put:
       tags:
-        - tests
+      - tests
       description: update specific test.
       parameters:
-        - name: test
-          in: body
-          description: The test to update
-          required: true
-          schema:
-            $ref: "#/definitions/test"
-        - in: path
-          name: test_id
-          required: true
-          type: string
+      - name: test
+        in: body
+        description: The test to update
+        required: true
+        schema:
+          $ref: "#/definitions/test"
+      - in: path
+        name: test_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -276,13 +272,13 @@ paths:
             $ref: "#/definitions/error_response"
     delete:
       tags:
-        - tests
+      - tests
       description: delete a specific test.
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
+      - in: path
+        name: test_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -297,14 +293,14 @@ paths:
   /v1/tests/{test_id}/revisions:
     get:
       tags:
-        - tests
+      - tests
       description: Get list of all test revision of a specific test.
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-          format: uuid
+      - in: path
+        name: test_id
+        required: true
+        type: string
+        format: uuid
       responses:
         200:
           description: Success
@@ -327,13 +323,13 @@ paths:
   /v1/jobs:
     get:
       tags:
-        - jobs
+      - jobs
       description: Get list of all jobs.
       parameters:
-        - in: query
-          name: one_time
-          type: boolean
-          description: Should return the one time tests (no cron expression)
+      - in: query
+        name: one_time
+        type: boolean
+        description: Should return the one time tests (no cron expression)
       responses:
         200:
           description: Success
@@ -351,15 +347,15 @@ paths:
             $ref: "#/definitions/error_response"
     post:
       tags:
-        - jobs
+      - jobs
       description: Create a new job that will trigger test run
       parameters:
-        - name: job
-          in: body
-          description: The job to add
-          required: true
-          schema:
-            $ref: "#/definitions/create_job_response"
+      - name: job
+        in: body
+        description: The job to add
+        required: true
+        schema:
+          $ref: "#/definitions/create_job_response"
       responses:
         201:
           description: Success
@@ -378,13 +374,13 @@ paths:
   /v1/jobs/{job_id}:
     get:
       tags:
-        - jobs
+      - jobs
       description: Get specific job.
       parameters:
-        - in: path
-          name: job_id
-          required: true
-          type: string
+      - in: path
+        name: job_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -404,19 +400,19 @@ paths:
             $ref: "#/definitions/error_response"
     put:
       tags:
-        - jobs
+      - jobs
       description: update specific job.
       parameters:
-        - name: job
-          in: body
-          description: The job to add
-          required: true
-          schema:
-            $ref: "#/definitions/job_update"
-        - in: path
-          name: job_id
-          required: true
-          type: string
+      - name: job
+        in: body
+        description: The job to add
+        required: true
+        schema:
+          $ref: "#/definitions/job_update"
+      - in: path
+        name: job_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -436,13 +432,13 @@ paths:
             $ref: "#/definitions/error_response"
     delete:
       tags:
-        - jobs
+      - jobs
       description: delete a specific job.
       parameters:
-        - in: path
-          name: job_id
-          required: true
-          type: string
+      - in: path
+        name: job_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -457,19 +453,19 @@ paths:
   /v1/jobs/{job_id}/runs/{run_id}/stop:
     post:
       tags:
-        - jobs
+      - jobs
       description: stop a specific run of specific job.
       parameters:
-        - in: path
-          description: The ID of the job.
-          name: job_id
-          required: true
-          type: string
-        - in: path
-          description: The id of a specific run in metronome which is also the report id.
-          name: run_id
-          required: true
-          type: string
+      - in: path
+        description: The ID of the job.
+        name: job_id
+        required: true
+        type: string
+      - in: path
+        description: The id of a specific run in metronome which is also the report id.
+        name: run_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -481,22 +477,110 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/error_response"
-  /v1/jobs/{job_id}/history:
+  /v1/tests/{test_id}/reports:
+    post:
+      tags:
+      - tests
+      description: Create new report for specific test.
+      parameters:
+      - in: path
+        name: test_id
+        required: true
+        type: string
+      - in: body
+        name: report_body
+        description: report data
+        required: true
+        schema:
+          $ref: '#/definitions/post_report'
+      responses:
+        201:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/post_report_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
     get:
       tags:
-        - jobs
-      description: Get Historic data of the jobs run
+      - tests
+      description: Get all summary reports for specific test.
       parameters:
-        - in: path
-          name: job_id
-          required: true
-          type: string
-          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+      - in: path
+        name: test_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/job_history_response"
+            type: array
+            items:
+              $ref: "#/definitions/report_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/tests/last_reports:
+    get:
+      tags:
+      - tests
+      description: Get all last reports limited by a query param
+      parameters:
+      - in: query
+        name: limit
+        type: number
+        description: How many last reports show
+        required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/report_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/tests/{test_id}/reports/{report_id}/stats:
+    post:
+      tags:
+      - tests
+      description: Insert a new stats object for a specific report
+      parameters:
+      - in: path
+        name: test_id
+        required: true
+        type: string
+      - in: path
+        name: report_id
+        required: true
+        type: string
+      - name: stats_body
+        in: body
+        description: stats data
+        required: true
+        schema:
+          $ref: '#/definitions/stats'
+      responses:
+        204:
+          description: Success
         400:
           description: Bad request
           schema:
@@ -509,73 +593,20 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/error_response"
-  /v1/tests/{test_id}/reports:
-    get:
-      tags:
-        - tests
-      description: Get all summary reports for specific test.
-      parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/report_response"
-        400:
-          description: Bad request
-          schema:
-            $ref: "#/definitions/error_response"
-
-        500:
-          description: Internal server error
-          schema:
-            $ref: "#/definitions/error_response"
-  /v1/tests/last_reports:
-    get:
-      tags:
-        - tests
-      description: Get all last reports limited by a query param
-      parameters:
-        - in: query
-          name: limit
-          type: number
-          description: How many last reports show
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/report_response"
-        400:
-          description: Bad request
-          schema:
-            $ref: "#/definitions/error_response"
-
-        500:
-          description: Internal server error
-          schema:
-            $ref: "#/definitions/error_response"
   /v1/tests/{test_id}/reports/{report_id}:
     get:
       tags:
-        - tests
+      - tests
       description: Get specific report for specific test
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-        - in: path
-          name: report_id
-          required: true
-          type: string
+      - in: path
+        name: test_id
+        required: true
+        type: string
+      - in: path
+        name: report_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -596,17 +627,17 @@ paths:
   /v1/tests/{test_id}/reports/{report_id}/html:
     get:
       tags:
-        - tests
+      - tests
       description: Get list of the history of this specific job id
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-        - in: path
-          name: report_id
-          required: true
-          type: string
+      - in: path
+        name: test_id
+        required: true
+        type: string
+      - in: path
+        name: report_id
+        required: true
+        type: string
       responses:
         200:
           description: Success.
@@ -624,12 +655,13 @@ paths:
             $ref: "#/definitions/error_response"
 
 
+
 definitions:
   definition:
     type: object
     required:
-      - name
-      - request
+    - name
+    - request
     properties:
       name:
         type: string
@@ -640,7 +672,7 @@ definitions:
 
   update_definition:
     required:
-      - request
+    - request
     properties:
       request:
         type: object
@@ -656,9 +688,9 @@ definitions:
     type: object
     discriminator: type
     required:
-      - name
-      - description
-      - type
+    - name
+    - description
+    - type
     properties:
       name:
         type: string
@@ -668,19 +700,19 @@ definitions:
         description: A description of the test.
       type:
         type: string
-        enum: ['paymentsos', 'custom']
-  paymentsos:
-    description: A test that is made of scenarios in paymentsOs domain language
+        enum: ['dsl', 'custom']
+  dsl:
+    description: A test that is made of scenarios base on domain specific language
     allOf:
-      - $ref: '#/definitions/test'
-      - type: object
-        required:
-          - scenarios
-        properties:
-          scenarios:
-            type: array
-            items:
-              $ref: '#/definitions/scenario'
+    - $ref: '#/definitions/test'
+    - type: object
+      required:
+      - scenarios
+      properties:
+        scenarios:
+          type: array
+          items:
+            $ref: '#/definitions/scenario'
   artillery_request_schema:
     description: The request schema used in test scenarios
     type: object
@@ -703,15 +735,15 @@ definitions:
   custom:
     description: A test that is made of artillery json
     allOf:
-      - $ref: '#/definitions/test'
+    - $ref: '#/definitions/test'
     required:
-      - artillery_test
+    - artillery_test
     properties:
       artillery_test:
         type: object
   test_id:
     required:
-      - id
+    - id
     properties:
       id:
         type: string
@@ -719,9 +751,9 @@ definitions:
         description: The id of the test.
   create_test_response:
     allOf:
-      - $ref: '#/definitions/test_id'
+    - $ref: '#/definitions/test_id'
     required:
-      - revision_id
+    - revision_id
     properties:
       revision_id:
         type: string
@@ -729,15 +761,15 @@ definitions:
         description: The id of the revision.
   tests_response:
     allOf:
-      - $ref: '#/definitions/create_test_response'
-      - $ref: '#/definitions/test_id'
+    - $ref: '#/definitions/create_test_response'
+    - $ref: '#/definitions/test_id'
     required:
-      - name
-      - description
-      - type
-      - raw_data
-      - artillery_test
-      - updated_at
+    - name
+    - description
+    - type
+    - raw_data
+    - artillery_test
+    - updated_at
     properties:
       updated_at:
         type: string
@@ -751,8 +783,8 @@ definitions:
         description: The description of the test
       type:
         type: string
-        enum: [paymentsos, custom]
-        description: the type of the test, custom - an artillery json created by the client, paymentsos - a test with the payments os api.
+        enum: [dsl, custom]
+        description: the type of the test, custom - an artillery json created by the client, dsl - a test with saved request definitions api.
       raw_data:
         type: array
         items:
@@ -762,14 +794,14 @@ definitions:
         description: The artillery json that represents the test created from the raw data.
   error_response:
     required:
-      - message
+    - message
     properties:
       message:
         type: string
   scenario:
     required:
-      - scenario_name
-      - steps
+    - scenario_name
+    - steps
     properties:
       scenario_name:
         type: string
@@ -780,11 +812,10 @@ definitions:
         items:
           type: object
           required:
-            - action
+          - action
           properties:
             action:
               type: string
-              enum: ['assignTokenToCustomer', 'createAuthorize', 'createCharge', 'createCustomer', 'createPayment', 'createRefund', 'createToken', 'createVoid', 'getPayment', 'getToken', 'createCapture']
             properties:
               type: object
               description: Any additional properties in the body request that should be changed.
@@ -798,11 +829,10 @@ definitions:
         description: The weight (in percentage) of the scenario in the test. If not specified, will be calculated.
   job:
     required:
-      - test_id
-      - arrival_rate
-      - duration
-      - environment
-      - is_use_akamai
+    - test_id
+    - arrival_rate
+    - duration
+    - environment
     properties:
       variables:
         type: object
@@ -841,12 +871,6 @@ definitions:
         type: string
         enum: ['test', 'live']
         description: In which environment the test will run
-      is_use_akamai:
-        type: boolean
-        description: is use external akamai url or kong dcos urls
-      notes:
-        type: string
-        description: General notes related to the test
   job_update:
     properties:
       test_id:
@@ -868,7 +892,7 @@ definitions:
         type: number
         description: For how many seconds the test should run
       ramp_to:
-        type: string
+        type: number
         description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
       emails:
         type: array
@@ -877,102 +901,115 @@ definitions:
           description: The url of where to send the the email with the report information
       environment:
         type: string
-        enum: ['test', 'live']
         description: In which environment the test will run
-      is_use_akamai:
-        type: boolean
-        description: is use external akamai url or kong dcos urls
-  job_history_response:
-    required:
-      - success_count
-      - failure_count
-      - last_success_at
-      - last_failure_at
-      - successful_finished_runs
-      - failed_finished_runs
-    properties:
-      successCount:
-        type: integer
-        description: The number of successful runs
-      failureCount:
-        type: integer
-        description: The number of successful runs
-      lastSuccessAt:
-        type: string
-        description: The last time successful job ran
-      lastFailureAt:
-        type: string
-        description: The last time failure job ran
-      successfulFinishedRuns:
-        type: array
-        items:
-          $ref: "#/definitions/run_history"
-      failedFinishedRuns:
-        type: array
-        items:
-          $ref: "#/definitions/run_history"
-      runningJobs:
-        type: array
-        items:
-          $ref: "#/definitions/run_details"
-  run_history:
-    required:
-      - id
-      - created_at
-      - finished_at
-    properties:
-      id:
-        type: string
-        description: The id of the run (Determent by Metronome)
-      createdAt:
-        type: string
-        description: The time the run was created
-      finishedAt:
-        type: string
-        description: The time the run finished running
-  run_details:
-    required:
-      - id
-      - created_at
-      - status
-    properties:
-      id:
-        type: string
-        description: The id of the run (Determent by Metronome)
-      createdAt:
-        type: string
-        description: The time the run was created
-      status:
-        type: string
-        description: The status of the run.
   job_response:
     allOf:
-      - $ref: "#/definitions/job"
-      - properties:
-          id:
-            type: string
-            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-            description: Uuid that identifies the job
+    - $ref: "#/definitions/job"
+    - properties:
+        id:
+          type: string
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+          description: Uuid that identifies the job
   create_job_response:
     allOf:
-      - $ref: "#/definitions/job_response"
-      - properties:
-          run_id:
-            type: string
-            description: If the job is ran immediately, will show the run id.
+    - $ref: "#/definitions/job_response"
+    - properties:
+        run_id:
+          type: string
+          description: If the job is ran immediately, will show the run id.
+  post_report:
+    required:
+    - report_id
+    - job_id
+    - revision_id
+    - test_type
+    - test_name
+    - test_description
+    - test_configuration
+    - start_time
+    - webhooks
+    - emails
+    properties:
+      report_id:
+        type: string
+        description: The id of the report/same as run_id
+      test_id:
+        type: string
+        description: The id of the test we would like to schedule.
+      revision_id:
+        type: string
+        description: The revision id of the test
+      job_id:
+        type: string
+        description: The id of the job in the scheduler
+      test_name:
+        type: string
+        description: The test name
+      test_description:
+        type: string
+        description: The test description
+      start_time:
+        type: string
+        description: When the test started
+      test_configuration:
+        type: object
+        description: test configuration
+      last_stats:
+        type: string
+        description: How many of the requests ended in error (not 2xx)
+      notes:
+        type: string
+        description: notes about the test
+      webhooks:
+        type: array
+        description: urls to send live report webhooks to
+      emails:
+        type: array
+        description: addresses to send finished report email to
+
+  post_report_response:
+    required:
+    - report_id
+    properties:
+      report_id:
+        type: string
+        description: The id of the report/same as run_id
+
+  stats:
+    required:
+    - stats_time
+    - phase_status
+    - data
+    properties:
+      stats_time:
+        type: string
+        description: The time the stats were taken of the test
+      phase_status:
+        type: string
+        description: The phase status of the test
+      phase_index:
+        type: string
+        description: The phase number the test is running
+      data:
+        type: string
+        description: The stats data
+      error:
+        type: object
+        description: Error thrown while running test
+
   report_response:
     required:
-      - test_id
-      - revision_id
-      - report_id
-      - job_id
-      - test_type
-      - status
-      - start_time
-      - end_time
-      - duration_seconds
-      - avg_response_time_ms
-      - arrival_rate
+    - test_id
+    - revision_id
+    - report_id
+    - job_id
+    - test_type
+    - status
+    - start_time
+    - end_time
+    - duration_seconds
+    - avg_response_time_ms
+    - arrival_rate
     properties:
       test_id:
         type: string
@@ -993,10 +1030,12 @@ definitions:
         type: string
         description: The status of the running test
       start_time:
-        type: date
+        type: string
+        format: date
         description: When the test started
       end_time:
-        type: date
+        type: string
+        format: date
         description: when the tests finished
       duration_seconds:
         type: number
@@ -1013,3 +1052,5 @@ definitions:
       notes:
         type: string
         description: notes about the test
+
+
