@@ -5,7 +5,7 @@ let path = require('path');
 let _ = require('lodash');
 let nodemailer = require('nodemailer');
 
-let smtpConfig = require('../config/smtpConfig');
+let smtpConfig = require('../../config/smtpConfig');
 let logger = require('../../common/logger');
 let reportModel = require('./reports');
 

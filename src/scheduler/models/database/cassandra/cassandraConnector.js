@@ -1,7 +1,6 @@
 let logger = require('../../../../common/logger');
-let cassandra = require('cassandra-driver');
 let databaseConfig = require('../../../../config/databaseConfig');
-let client = {};
+let client;
 
 const INSERT_JOB = 'INSERT INTO jobs(id, test_id, arrival_rate, cron_expression, duration, emails, environment, ramp_to, webhooks) values(?,?,?,?,?,?,?,?,?)';
 const GET_JOBS = 'SELECT * FROM jobs';
@@ -21,17 +20,17 @@ module.exports = {
 };
 
 let queryOptions = {
-    consistency: cassandra.types.consistencies.localQuorum,
+    consistency: databaseConfig.cassandraConsistency,
     prepare: true
 };
 
-function deleteJob(jobId) {
-    return executeQuery(DELETE_JOB, [jobId]);
-}
-
 async function init(cassandraClient) {
     client = cassandraClient;
-    logger.info('Cassandra client initialized');
+    logger.info('Scheduler cassandra client initialized');
+}
+
+function deleteJob(jobId) {
+    return executeQuery(DELETE_JOB, [jobId]);
 }
 
 function getJobs() {

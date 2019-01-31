@@ -1,7 +1,7 @@
 'use strict';
 
 let databaseConnector = require('./databaseConnector');
-let serviceConfig = require('../config/serviceConfig');
+let serviceConfig = require('../../config/serviceConfig');
 let statsConsumer = require('./statsConsumer');
 
 module.exports.getReport = async (testId, reportId) => {

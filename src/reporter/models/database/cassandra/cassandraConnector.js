@@ -1,9 +1,8 @@
 'use strict';
+let databaseConfig = require('../../../../config/databaseConfig');
 
-let cassandra = require('cassandra-driver');
-
-let logger = require('../../../common/logger');
-let client = {};
+let logger = require('../../../../common/logger');
+let client;
 
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_type, report_id, job_id, test_type, status, phase, start_time, test_name, test_description, test_configuration, emails, webhooks, notes) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET status=?, phase=?, last_stats=?, end_time=? WHERE test_id=? AND report_id=? AND report_type=?';
@@ -14,6 +13,7 @@ const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(test_id, report_id, state
 const GET_REPORT_STATS = 'SELECT * FROM reports_stats WHERE test_id=? AND report_id=?';
 
 module.exports = {
+    init,
     insertReport,
     updateReport,
     getReport,
@@ -24,9 +24,14 @@ module.exports = {
 };
 
 let queryOptions = {
-    consistency: cassandra.types.consistencies.quorum,
+    consistency: databaseConfig.cassandraConsistency,
     prepare: true
 };
+
+async function init(cassandraClient) {
+    client = cassandraClient;
+    logger.info('Reporter cassandra client initialized');
+}
 
 function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, emails, webhooks, notes) {
     let params;

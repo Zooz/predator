@@ -1,8 +1,8 @@
 'use strict';
-let logger = require('../../../../common/logger');
-let client;
-let uuid = require('uuid/v4');
+const logger = require('../../../../common/logger');
+const uuid = require('uuid/v4');
 const Sequelize = require('sequelize');
+let client;
 
 module.exports = {
     init,
@@ -17,6 +17,7 @@ async function init(sequlizeClient) {
     client = sequlizeClient;
     await initSchemas();
 }
+
 async function insertJob(jobId, jobInfo) {
     const job = client.model('job');
     let params = {

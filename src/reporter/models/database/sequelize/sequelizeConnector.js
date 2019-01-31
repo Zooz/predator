@@ -1,12 +1,11 @@
 'use strict';
 
-let uuid = require('uuid/v4');
+const uuid = require('uuid/v4');
 const Sequelize = require('sequelize');
-
 let client;
 
 module.exports = {
-    initSchemas,
+    init,
     insertReport,
     insertStats,
     updateReport,
@@ -15,6 +14,11 @@ module.exports = {
     getLastReports,
     getStats
 };
+
+async function init(sequlizeClient) {
+    client = sequlizeClient;
+    await initSchemas();
+}
 
 async function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, emails, webhooks, notes) {
     const report = client.model('report');

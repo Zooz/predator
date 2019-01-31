@@ -1,14 +1,11 @@
 'use strict';
 
-let databaseConfig = require('../config/databaseConfig');
-let cassandraConnector = require('./cassandra/cassandraConnector');
-let sequelizeConnector = require('./sequelize/sequelizeConnector');
+let databaseConfig = require('../../config/databaseConfig');
+let cassandraConnector = require('./database/cassandra/cassandraConnector');
+let sequelizeConnector = require('./database/sequelize/sequelizeConnector');
 let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
 
 module.exports = {
-    init,
-    ping,
-    closeConnection,
     insertReport,
     insertStats,
     updateReport,
@@ -44,16 +41,4 @@ function getReport(testId, reportId) {
 
 function getStats(testId, reportId) {
     return databaseConnector.getStats(testId, reportId);
-}
-
-function init() {
-    return databaseConnector.init();
-}
-
-async function ping() {
-    return databaseConnector.ping();
-}
-
-function closeConnection() {
-    return databaseConnector.closeConnection();
 }

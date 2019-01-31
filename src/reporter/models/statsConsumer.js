@@ -7,7 +7,7 @@ let reportEmailSender = require('./reportEmailSender');
 let reportWebhookSender = require('./reportWebhookSender');
 let reports = require('./reports');
 let statsFromatter = require('./statsFormatter');
-let serviceConfig = require('../config/serviceConfig');
+let serviceConfig = require('../../config/serviceConfig');
 let logger = require('../../common/logger');
 
 module.exports.handleMessage = async (testId, reportId, stats) => {

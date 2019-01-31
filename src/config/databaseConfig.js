@@ -6,7 +6,7 @@ let config = {
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     cassandraReplicationFactor: process.env.CASSANDRA_REPLICATION_FACTOR || 1,
-    cassandraConsistency: process.env.CASSANDRA_CONSISTENCY || cassandra.types.consistencies.localOne,
+    cassandraConsistency: process.env.CASSANDRA_CONSISTENCY || cassandra.types.consistencies.localQuorum,
     sqlite_storage: process.env.SQLITE_STORAGE || 'predator'
 };
 
