@@ -1,0 +1,131 @@
+{
+	"config": {
+		"target": "",
+		"http": {
+			"pool": 100
+		},
+		"phases": [{
+			"duration": 0,
+			"arrivalRate": 0,
+			"rampTo": 0
+		}],
+		"variables": {
+			"privateKey": [],
+			"publicKey": [],
+			"customerId": [],
+			"tokenId": [],
+			"appId": [],
+			"merchantId": []
+		}
+	},
+	"scenarios": [{
+		"name": "Scenario",
+		"flow": [{
+			"post": {
+				"url": "/tokens",
+				"gateway": "pci",
+				"gzip": true,
+				"forever": true,
+				"capture": {
+					"json": "$.token",
+					"as": "tokenId"
+				},
+				"headers": {
+					"x-payments-os-env": "test",
+					"Content-Type": "application/json"
+				},
+				"json": {
+					"token_type": "credit_card",
+					"holder_name": "MY NAME",
+					"expiration_date": "11/2020",
+					"card_number": "4580458045804580",
+					"identity_document": {
+						"number": "5415668464654",
+						"type": "ID"
+					},
+					"billing_address": {
+						"first_name": "FN",
+						"last_name": "LN",
+						"country": "ARG",
+						"line1": "Viamonte",
+						"line2": "1366",
+						"city": "Plata",
+						"phone": "7563126",
+						"state": "Buenos Aires",
+						"zip_code": "64000"
+					}
+				}
+			}
+		}, {
+			"post": {
+				"url": "/customers",
+				"gateway": "payments",
+				"gzip": true,
+				"forever": true,
+				"capture": {
+					"json": "$.id",
+					"as": "customerId"
+				},
+				"headers": {
+					"x-payments-os-env": "test",
+					"Content-Type": "application/json"
+				},
+				"json": {
+					"customer_reference": "{{ $randomString() }}",
+					"email": "test@gmail.com"
+				}
+			}
+		}],
+		"weight": 90
+	}, {
+		"name": "Scenario",
+		"flow": [{
+			"post": {
+				"url": "/tokens",
+				"gateway": "pci",
+				"gzip": true,
+				"forever": true,
+				"capture": {
+					"json": "$.token",
+					"as": "tokenId"
+				},
+				"headers": {
+					"x-payments-os-env": "test",
+					"Content-Type": "application/json"
+				},
+				"json": {
+					"token_type": "credit_card",
+					"holder_name": "MY NAME",
+					"expiration_date": "11/2020",
+					"card_number": "4580458045804580",
+					"identity_document": {
+						"number": "5415668464654",
+						"type": "ID"
+					},
+					"billing_address": {
+						"first_name": "FN",
+						"last_name": "LN",
+						"country": "ARG",
+						"line1": "Viamonte",
+						"line2": "1366",
+						"city": "Plata",
+						"phone": "7563126",
+						"state": "Buenos Aires",
+						"zip_code": "64000"
+					}
+				}
+			}
+		}, {
+			"get": {
+				"url": "/tokens/{{ tokenId }}",
+				"gateway": "pci",
+				"forever": true,
+				"headers": {
+					"x-payments-os-env": "test",
+					"Content-Type": "application/json"
+				}
+			}
+		}],
+		"weight": 10
+	}]
+}

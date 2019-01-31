@@ -1,0 +1,36 @@
+{
+    "name": "Create token and create customer",
+    "description": "This test is a simple test that creates token and then creates customer.",
+    "type": "custom",
+    "artillery_test": {
+        "config": {
+                      "target": "",
+                      "http": {
+                          "pool": 100
+                      },
+                      "phases": [{
+                          "duration": 0,
+                          "arrivalRate": 0 }]
+                  },
+                  "scenarios": [{
+                      "name": "Assign token to customer",
+                      "flow": [{
+                          "post": {
+                              "url": "/payments",
+                              "gateway": "payments",
+                              "capture": {
+                                  "json": "$.id",
+                                  "as": "paymentId"
+                              },
+                              "headers": {
+                                  "Content-Type": "application/json"
+                              },
+                              "json": {
+                                  "currency": "USD",
+                                  "amount": 5
+                              }
+                          }
+                      }]
+                  }]
+    }
+  }

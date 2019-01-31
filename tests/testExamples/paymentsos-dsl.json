@@ -1,0 +1,107 @@
+{
+  "dsl_list": [
+    {
+      "name": "createAuthorize",
+      "request": {
+        "post": {
+          "url": "/payments/{{ paymentId }}/authorizations",
+          "gateway": "payments",
+          "gzip": true,
+          "forever": true,
+          "capture": {
+            "json": "$.id",
+            "as": "authorizeId"
+          },
+          "headers": {
+            "x-payments-os-env": "test",
+            "Content-Type": "application/json"
+          },
+          "json": {
+            "payment_method": {
+              "type": "tokenized",
+              "token": "{{ tokenId }}",
+              "credit_card_cvv": "123"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "getToken",
+      "request": {
+        "get": {
+          "url": "/tokens/{{ tokenId }}",
+          "gateway": "pci",
+          "forever": true,
+          "headers": {
+            "x-payments-os-env": "test",
+            "Content-Type": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "name": "createToken",
+      "request": {
+        "post": {
+          "url": "/tokens",
+          "gateway": "pci",
+          "gzip": true,
+          "forever": true,
+          "capture": {
+            "json": "$.token",
+            "as": "tokenId"
+          },
+          "headers": {
+            "x-payments-os-env": "test",
+            "Content-Type": "application/json"
+          },
+          "json": {
+            "token_type": "credit_card",
+            "holder_name": "MY NAME",
+            "expiration_date": "11/2020",
+            "card_number": "4580458045804580",
+            "identity_document": {
+              "number": "5415668464654",
+              "type": "ID"
+            },
+            "billing_address": {
+              "first_name": "FN",
+              "last_name": "LN",
+              "country": "ARG",
+              "line1": "Viamonte",
+              "line2": "1366",
+              "city": "Plata",
+              "phone": "7563126",
+              "state": "Buenos Aires",
+              "zip_code": "64000"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "createCustomer",
+      "request": {
+        "post": {
+          "url": "/customers",
+          "gateway": "payments",
+          "forever": true,
+          "gzip": true,
+          "capture": {
+            "json": "$.id",
+            "as": "customerId"
+          },
+          "headers": {
+            "x-payments-os-env": "test",
+            "Content-Type": "application/json"
+          },
+          "json": {
+            "customer_reference": "{{ $randomString() }}",
+            "email": "test@gmail.com"
+          }
+        }
+      }
+    }
+  ]
+}

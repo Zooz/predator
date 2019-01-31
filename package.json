@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "nyc --check-coverage --lines 95 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
-    "lint": "eslint src/**"
+    "lint": "eslint src/**",
+    "integration-tests": "./tests/integration-tests/run.sh"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
   },
   "homepage": "https://github.com/Zooz/predator#readme",
   "dependencies": {
+    "artillery": "^1.6.0-26",
     "body-parser": "^1.18.2",
     "bunyan": "^1.8.12",
     "cassandra-driver": "^3.5.0",
@@ -43,6 +45,7 @@
     "fs-extra": "^5.0.0",
     "global-request-logger": "^0.1.1",
     "graceful-shutdown-express": "^2.0.1",
+    "jsck": "^0.3.2",
     "lodash": "^4.17.10",
     "mysql2": "^1.6.4",
     "node-cmd": "^3.0.0",

@@ -1,0 +1,55 @@
+{
+  "name": "weights: token and customer with properties",
+  "description": "Half create token -> get token, half create customer -> create 2 tokens -> assign tokens to customer",
+  "type": "dsl",
+  "scenarios": [
+    {
+      "scenario_name": "Create token and get token",
+      "weight": 50,
+      "steps": [
+        {
+          "action": "paymentsos.createToken",
+          "properties": {
+            "holder_name": ["mickey mick", "dina din"],
+            "expiration_date": ["12/2021"],
+            "identity_document": {
+              "type": "passport",
+              "number": "01234567890"
+            }
+          }
+        },
+        {
+          "action": "paymentsos.getToken",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "scenario_name": "Create two tokens, create customer and assign both tokens to customer",
+      "steps": [
+        {
+          "action": "paymentsos.createToken",
+          "properties": {}
+        },
+        {
+          "action": "paymentsos.createCustomer",
+          "properties": {
+            "email": ["haim@cohen.com", "lala@zooz.com"]
+          }
+        },
+        {
+          "action": "paymentsos.assignTokenToCustomer",
+          "properties": {}
+        },
+        {
+          "action": "paymentsos.createToken",
+          "properties": {}
+        },
+        {
+          "action": "paymentsos.assignTokenToCustomer",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

@@ -58,7 +58,6 @@ function postgres() {
                     --name $APP \
                     -e POSTGRES_PASSWORD=password \
                     -e POSTGRES_USER=root \
-                    --network=system-tests \
                     -p 5432:5432 \
                     $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
@@ -82,7 +81,6 @@ function cassandra() {
                     -d \
                     --name $APP \
                     -p 9042:9042 \
-                    --network=system-tests \
                     $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
@@ -104,7 +102,6 @@ function mailhog() {
                     --name $APP \
                     -p 8025:8025 \
                     -p 1025:1025 \
-                    --network=system-tests \
                     $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
@@ -134,7 +131,6 @@ function reporter() {
                     -e GRAFANA_URL=$GRAFANA_URL \
                     -e REPLICATION_FACTOR=$REPLICATION_FACTOR \
                     -e DATABASE_TYPE=$DATABASE_TYPE \
-                    --network=system-tests \
                     --name $APP \
                     -p 8080:8080 \
                     $IMAGE_NAME"

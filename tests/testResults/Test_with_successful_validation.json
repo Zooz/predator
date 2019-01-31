@@ -1,0 +1,101 @@
+{
+  "config": {
+    "target": "",
+    "http": {
+      "pool": 100
+    },
+    "phases": [
+      {
+        "duration": 0,
+        "arrivalRate": 0,
+        "rampTo": 0
+      }
+    ],
+    "variables": {}
+  },
+  "scenarios": [
+    {
+      "name": "Scenario",
+      "flow": [
+        {
+          "post": {
+            "url": "/payments",
+            "gateway": "payments",
+            "gzip": true,
+            "forever": true,
+            "capture": {
+              "json": "$.id",
+              "as": "paymentId"
+            },
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            },
+            "json": {
+              "currency": "USD",
+              "amount": 5,
+              "shipping_address": {
+                "country": "USA",
+                "state": "TX",
+                "city": "Greenville",
+                "zip_code": "75402-3435",
+                "phone": "095090941",
+                "salutation": "Dr",
+                "line1": "10705 Old Mill Rd"
+              },
+              "billing_address": {
+                "country": "USA",
+                "state": "TX",
+                "city": "Greenville",
+                "title": "Mr",
+                "gender": "Male",
+                "first_name": "John",
+                "last_name": "Adams",
+                "zip_code": "75402-3435",
+                "line1": "10705 Old Mill Rd",
+                "email": "pm_billing@a.com"
+              }
+            }
+          }
+        },
+        {
+          "post": {
+            "url": "/payments/{{ paymentId }}/authorizations",
+            "gateway": "payments",
+            "gzip": true,
+            "forever": true,
+            "capture": {
+              "json": "$.id",
+              "as": "authorizeId"
+            },
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            },
+            "json": {
+              "payment_method": {
+                "type": "tokenized",
+                "token": "{{ tokenId }}",
+                "credit_card_cvv": "123"
+              }
+            }
+          }
+        },
+        {
+          "post": {
+            "url": "/payments/{{ paymentId }}/voids",
+            "gateway": "payments",
+            "gzip": true,
+            "forever": true,
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            },
+            "json": {}
+          }
+        }
+      ],
+      "weight": 100
+    }
+  ]
+}

@@ -7,7 +7,6 @@ let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cass
 
 module.exports = {
     init,
-    ping,
     closeConnection,
     insertJob,
     getJobs,
@@ -38,10 +37,6 @@ async function deleteJob(jobId) {
 
 async function init() {
     return databaseConnector.init();
-}
-
-async function ping() {
-    return databaseConnector.ping();
 }
 
 function closeConnection() {

@@ -1,0 +1,17 @@
+{
+    "config": {
+      "target": "",
+      "http": {
+        "pool": 100
+      },
+      "phases": [
+        {
+          "duration": 0,
+          "arrivalRate": 0,
+          "rampTo": 0
+        }
+      ],
+      "variables": {}
+    },
+    "scenarios": []
+  }

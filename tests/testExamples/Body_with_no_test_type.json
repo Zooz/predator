@@ -1,0 +1,17 @@
+{
+    "name": "test",
+    "description": "description",
+    "scenarios": [
+      {
+        "scenario_name": "Scenario",
+        "steps": [
+          {
+            "action": "paymentsos.createToken"
+          },
+          {
+            "action": "paymentsos.createCustomer"
+          }
+        ]
+      }
+    ]
+  }

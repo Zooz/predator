@@ -1,0 +1,209 @@
+{
+  "config": {
+    "target": "",
+    "http": {
+      "pool": 100
+    },
+    "phases": [
+      {
+        "duration": 0,
+        "arrivalRate": 0,
+        "rampTo": 0
+      }
+    ],
+    "variables": {
+      "0_0_paymentsos.createToken_holder_name": [
+        "mickey mick",
+        "dina din"
+      ],
+      "0_0_paymentsos.createToken_expiration_date": [
+        "12/2021"
+      ],
+      "0_0_paymentsos.createToken_identity_document": {
+        "type": "passport",
+        "number": "01234567890"
+      },
+      "1_1_paymentsos.createCustomer_email": [
+        "haim@cohen.com",
+        "lala@zooz.com"
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "name": "Create token and get token",
+      "flow": [
+        {
+          "post": {
+            "url": "/tokens",
+            "gateway": "pci",
+            "gzip": true,
+            "forever": true,
+            "capture": {
+              "json": "$.token",
+              "as": "tokenId"
+            },
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            },
+            "json": {
+              "token_type": "credit_card",
+              "holder_name": "{{ 0_0_paymentsos.createToken_holder_name }}",
+              "expiration_date": "{{ 0_0_paymentsos.createToken_expiration_date }}",
+              "card_number": "4580458045804580",
+              "identity_document": "{{ 0_0_paymentsos.createToken_identity_document }}",
+              "billing_address": {
+                "first_name": "FN",
+                "last_name": "LN",
+                "country": "ARG",
+                "line1": "Viamonte",
+                "line2": "1366",
+                "city": "Plata",
+                "phone": "7563126",
+                "state": "Buenos Aires",
+                "zip_code": "64000"
+              }
+            }
+          }
+        },
+        {
+          "get": {
+            "url": "/tokens/{{ tokenId }}",
+            "gateway": "pci",
+            "forever": true,
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            }
+          }
+        }
+      ],
+      "weight": 50
+    },
+    {
+      "name": "Create two tokens, create customer and assign both tokens to customer",
+      "flow": [
+        {
+          "post": {
+            "url": "/tokens",
+            "gateway": "pci",
+            "gzip": true,
+            "forever": true,
+            "capture": {
+              "json": "$.token",
+              "as": "tokenId"
+            },
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            },
+            "json": {
+              "token_type": "credit_card",
+              "holder_name": "MY NAME",
+              "expiration_date": "11/2020",
+              "card_number": "4580458045804580",
+              "identity_document": {
+                "number": "5415668464654",
+                "type": "ID"
+              },
+              "billing_address": {
+                "first_name": "FN",
+                "last_name": "LN",
+                "country": "ARG",
+                "line1": "Viamonte",
+                "line2": "1366",
+                "city": "Plata",
+                "phone": "7563126",
+                "state": "Buenos Aires",
+                "zip_code": "64000"
+              }
+            }
+          }
+        },
+        {
+          "post": {
+            "url": "/customers",
+            "gateway": "payments",
+            "gzip": true,
+            "forever": true,
+            "capture": {
+              "json": "$.id",
+              "as": "customerId"
+            },
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            },
+            "json": {
+              "customer_reference": "{{ $randomString() }}",
+              "email": "{{ 1_1_paymentsos.createCustomer_email }}"
+            }
+          }
+        },
+        {
+          "post": {
+            "url": "/customers/{{ customerId }}/payment-methods/{{ tokenId }}",
+            "gateway": "payments",
+            "gzip": true,
+            "forever": true,
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            }
+          }
+        },
+        {
+          "post": {
+            "url": "/tokens",
+            "gateway": "pci",
+            "gzip": true,
+            "forever": true,
+            "capture": {
+              "json": "$.token",
+              "as": "tokenId"
+            },
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            },
+            "json": {
+              "token_type": "credit_card",
+              "holder_name": "MY NAME",
+              "expiration_date": "11/2020",
+              "card_number": "4580458045804580",
+              "identity_document": {
+                "number": "5415668464654",
+                "type": "ID"
+              },
+              "billing_address": {
+                "first_name": "FN",
+                "last_name": "LN",
+                "country": "ARG",
+                "line1": "Viamonte",
+                "line2": "1366",
+                "city": "Plata",
+                "phone": "7563126",
+                "state": "Buenos Aires",
+                "zip_code": "64000"
+              }
+            }
+          }
+        },
+        {
+          "post": {
+            "url": "/customers/{{ customerId }}/payment-methods/{{ tokenId }}",
+            "gateway": "payments",
+            "gzip": true,
+            "forever": true,
+            "headers": {
+              "x-payments-os-env": "test",
+              "Content-Type": "application/json"
+            }
+          }
+        }
+      ],
+      "weight": 50
+    }
+  ]
+}

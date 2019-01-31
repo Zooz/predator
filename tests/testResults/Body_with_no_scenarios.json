@@ -1,0 +1,4 @@
+{
+	"message": "Input validation error",
+	"validation_errors": ["body should have required property 'scenarios'"]
+}
