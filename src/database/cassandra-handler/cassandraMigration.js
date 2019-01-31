@@ -1,15 +1,15 @@
 'use strict';
 
 let cassandra = require('cassandra-driver'),
-    cassandraConfig = require('../config/databaseConfig'),
+    cassandraConfig = require('../../config/databaseConfig'),
     client;
 let args;
 let fs = require('fs-extra');
 let cmd = require('node-cmd');
-let logger = require('../helpers/logger');
+let logger = require('../../common/logger');
 let path = require('path');
 let CREATE_KEY_SPACE_QUERY;
-const CONSISTENCY_POLICY = cassandra.types.consistencies.localOne;
+const CONSISTENCY_POLICY = cassandra.types.consistencies.localQuorum;
 const MAX_FETCH_SIZE = 1000;
 const isDevMode = process.env.DEV_MODE === 'true';
 
@@ -25,14 +25,14 @@ let cassandraHandlerLogContext = {
 
 const options = {
     prepare: true,
-    consistency: cassandra.types.consistencies.quorum
+    consistency: cassandra.types.consistencies.localQuorum
 };
 
 module.exports.initArgs = initArgs;
 module.exports.closeCassandraConnection = closeCassandraConnection;
 module.exports.initCassandraConnection = initCassandraConnection;
 
-module.exports.initializeCassandraEnvironment = function () {
+module.exports.runMigration = function () {
     initArgs();
 
     return initCassandraConnection()
@@ -122,8 +122,8 @@ function closeCassandraConnection() {
 
 function runCassandraScripts() {
     return new Promise(function (resolve, reject) {
-        let initCmd = path.join(args.root_dir, '/node_modules/.bin/cassandra-migration');
-        let initConfigPath = path.join(args.root_dir, '/src/cassandra-handler', initFileName);
+        let initCmd = path.join(args.root_dir, '../node_modules/.bin/cassandra-migration');
+        let initConfigPath = path.join(args.root_dir, '/database/cassandra-handler', initFileName);
         logger.info(cassandraHandlerLogContext, 'Cassandra handler: running migration scripts');
 
         cmd.get(
@@ -147,7 +147,7 @@ function runCassandraScripts() {
 function removeConfigFile() {
     return new Promise(function (resolve, reject) {
         logger.trace(cassandraHandlerLogContext, 'Cassandra handler: removiung cassandra migration config file');
-        fs.remove(path.join(args.root_dir, '/src/cassandra-handler/', initFileName), function (err) {
+        fs.remove(path.join(args.root_dir, '/database/cassandra-handler/', initFileName), function (err) {
             if (err) {
                 cassandraHandlerLogContext.remove_config_file_err = err;
                 logger.error(cassandraHandlerLogContext, 'Cassandra handler: could not remove cassandra migration config file');
@@ -164,7 +164,7 @@ function createConfigTemplateFile() {
     return new Promise(function (resolve, reject) {
         let templateJsonFile = require('./' + initFileNameTemplate);
 
-        templateJsonFile.migrationsDir = path.join(args.root_dir, 'src/cassandra-handler/init-scripts');
+        templateJsonFile.migrationsDir = path.join(args.root_dir, '/database/cassandra-handler/init-scripts');
         templateJsonFile.cassandra.contactPoints = args.cassandra_url.split(',');
         templateJsonFile.cassandra.keyspace = args.key_space_name;
         templateJsonFile.auth.username = args.cassandra_username;
@@ -172,7 +172,7 @@ function createConfigTemplateFile() {
 
         logger.trace(cassandraHandlerLogContext, 'Cassandra handler: set init templateJsonFile');
 
-        fs.writeFile(path.join(args.root_dir, '/src/cassandra-handler/', initFileName), JSON.stringify(templateJsonFile, null, 2), function (err) {
+        fs.writeFile(path.join(args.root_dir, 'database/cassandra-handler/', initFileName), JSON.stringify(templateJsonFile, null, 2), function (err) {
             if (err) {
                 cassandraHandlerLogContext.remove_config_template_file_err = err;
                 logger.error(cassandraHandlerLogContext, 'Cassandra handler: could not write to cassandra init file');
