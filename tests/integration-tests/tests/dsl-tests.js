@@ -28,7 +28,7 @@ describe('Testing dsl tests api', function () {
             createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(400, JSON.stringify(createDslResponse.body));
             should(createDslResponse.body).eql({
-                'message': 'Definition already exists'
+                'message': 'definition already exists'
             });
         });
 
@@ -71,7 +71,7 @@ describe('Testing dsl tests api', function () {
 
             const getResponse = await requestSender.getDsl(dslName, 'create_payment');
             should(getResponse.statusCode).eql(404, JSON.stringify(getResponse.body));
-            should(getResponse.body).eql({ message: 'Not found' });
+            should(getResponse.body).eql({ message: 'not found' });
         });
 
         it('succeed post two dsl definition with same name under two different dsl name and get them', async function () {
@@ -95,7 +95,7 @@ describe('Testing dsl tests api', function () {
         it('when delete non exist definition - should return 404', async function () {
             let deleteResponse = await requestSender.deleteDsl(dslName, 'create_payment');
             should(deleteResponse.statusCode).eql(404, JSON.stringify(deleteResponse.body));
-            should(deleteResponse.body).eql({'message': 'Not found'}, JSON.stringify(deleteResponse.body));
+            should(deleteResponse.body).eql({'message': 'definition does not exists'}, JSON.stringify(deleteResponse.body));
         });
 
         it('when update non exist definition  - should return 404', async function () {
