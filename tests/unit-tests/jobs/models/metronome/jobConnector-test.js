@@ -5,7 +5,7 @@ let rewire = require('rewire');
 let requestSender = require('../../../../../src/common/requestSender');
 let config = require('../../../../../src/config/serviceConfig');
 config.kubernetesNamespace = 'default';
-let jobConnector = rewire('../../../../../src/scheduler/models/metronome/jobConnector');
+let jobConnector = rewire('../../../../../src/jobs/models/metronome/jobConnector');
 
 describe('Metronome job connector tests', function () {
     let sandbox;
@@ -27,14 +27,14 @@ describe('Metronome job connector tests', function () {
 
     describe('Run a job', () => {
         it('Success to create a job and running it, no job with id the exists', async () => {
-            requestSenderSendStub.withArgs(sinon.match({method: 'GET'})).rejects({statusCode: 404});
-            requestSenderSendStub.withArgs(sinon.match({method: 'POST'}))
+            requestSenderSendStub.withArgs(sinon.match({ method: 'GET' })).rejects({ statusCode: 404 });
+            requestSenderSendStub.withArgs(sinon.match({ method: 'POST' }))
                 .onCall(0)
-                .resolves({id: 'predator.d651ba1d-79fa-4970-b078-6f9dc4ae43e6'})
+                .resolves({ id: 'predator.d651ba1d-79fa-4970-b078-6f9dc4ae43e6' })
                 .onCall(1)
-                .resolves({id: '20190115084416zH0Ta'});
+                .resolves({ id: '20190115084416zH0Ta' });
 
-            let jobResponse = await jobConnector.runJob({id: 'predator.id'});
+            let jobResponse = await jobConnector.runJob({ id: 'predator.id' });
 
             jobResponse.should.eql({
                 'id': '20190115084416zH0Ta',
@@ -63,11 +63,11 @@ describe('Metronome job connector tests', function () {
         });
 
         it('Success to create a job and running it, job already exists, just update it and run', async () => {
-            requestSenderSendStub.withArgs(sinon.match({method: 'GET'})).resolves({});
-            requestSenderSendStub.withArgs(sinon.match({method: 'PUT'})).resolves({id: 'predator.d651ba1d-79fa-4970-b078-6f9dc4ae43e6'});
-            requestSenderSendStub.withArgs(sinon.match({method: 'POST'})).resolves({id: '20190115084416zH0Ta'});
+            requestSenderSendStub.withArgs(sinon.match({ method: 'GET' })).resolves({});
+            requestSenderSendStub.withArgs(sinon.match({ method: 'PUT' })).resolves({ id: 'predator.d651ba1d-79fa-4970-b078-6f9dc4ae43e6' });
+            requestSenderSendStub.withArgs(sinon.match({ method: 'POST' })).resolves({ id: '20190115084416zH0Ta' });
 
-            let jobResponse = await jobConnector.runJob({id: 'predator.id'});
+            let jobResponse = await jobConnector.runJob({ id: 'predator.id' });
 
             jobResponse.should.eql({
                 'id': '20190115084416zH0Ta',
@@ -97,11 +97,11 @@ describe('Metronome job connector tests', function () {
 
         describe('Fail to run job', () => {
             it('Fail to POST new job', async () => {
-                requestSenderSendStub.withArgs(sinon.match({method: 'GET'})).rejects({statusCode: 404});
-                requestSenderSendStub.withArgs(sinon.match({method: 'POST'})).rejects(new Error('Metronome Error'));
+                requestSenderSendStub.withArgs(sinon.match({ method: 'GET' })).rejects({ statusCode: 404 });
+                requestSenderSendStub.withArgs(sinon.match({ method: 'POST' })).rejects(new Error('Metronome Error'));
 
                 try {
-                    await jobConnector.runJob({id: 'predator.id'});
+                    await jobConnector.runJob({ id: 'predator.id' });
                     throw new Error('Should not get here');
                 } catch (error) {
                     error.message.should.eql('Metronome Error');
@@ -109,11 +109,11 @@ describe('Metronome job connector tests', function () {
             });
 
             it('Fail to PUT existing job', async () => {
-                requestSenderSendStub.withArgs(sinon.match({method: 'GET'})).resolves();
-                requestSenderSendStub.withArgs(sinon.match({method: 'PUT'})).rejects(new Error('Metronome Error'));
+                requestSenderSendStub.withArgs(sinon.match({ method: 'GET' })).resolves();
+                requestSenderSendStub.withArgs(sinon.match({ method: 'PUT' })).rejects(new Error('Metronome Error'));
 
                 try {
-                    await jobConnector.runJob({id: 'predator.id'});
+                    await jobConnector.runJob({ id: 'predator.id' });
                     throw new Error('Should not get here');
                 } catch (error) {
                     error.message.should.eql('Metronome Error');
@@ -121,12 +121,12 @@ describe('Metronome job connector tests', function () {
             });
 
             it('Fail to run job', async () => {
-                requestSenderSendStub.withArgs(sinon.match({method: 'GET'})).resolves({});
-                requestSenderSendStub.withArgs(sinon.match({method: 'PUT'})).resolves({id: 'predator.d651ba1d-79fa-4970-b078-6f9dc4ae43e6'});
-                requestSenderSendStub.withArgs(sinon.match({method: 'POST'})).rejects(new Error('Metronome run job error'));
+                requestSenderSendStub.withArgs(sinon.match({ method: 'GET' })).resolves({});
+                requestSenderSendStub.withArgs(sinon.match({ method: 'PUT' })).resolves({ id: 'predator.d651ba1d-79fa-4970-b078-6f9dc4ae43e6' });
+                requestSenderSendStub.withArgs(sinon.match({ method: 'POST' })).rejects(new Error('Metronome run job error'));
 
                 try {
-                    await jobConnector.runJob({id: 'predator.id'});
+                    await jobConnector.runJob({ id: 'predator.id' });
                     throw new Error('Should not get here');
                 } catch (error) {
                     error.message.should.eql('Metronome run job error');
@@ -136,7 +136,7 @@ describe('Metronome job connector tests', function () {
 
         describe('Stop running job', () => {
             it('Stop a running run of specific job', async () => {
-                requestSenderSendStub.resolves({statusCode: 200});
+                requestSenderSendStub.resolves({ statusCode: 200 });
                 await jobConnector.stopRun('jobPlatformName', 'runId');
                 requestSenderSendStub.calledOnce.should.eql(true);
                 requestSenderSendStub.args[0][0].should.eql({

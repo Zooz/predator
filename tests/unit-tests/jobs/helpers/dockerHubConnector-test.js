@@ -2,7 +2,7 @@ let sinon = require('sinon');
 let should = require('should');
 
 let logger = require('../../../../src/common/logger');
-let dockerHubConnector = require('../../../../src/scheduler/models/dockerHubConnector');
+let dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector');
 let requestSender = require('../../../../src/common/requestSender');
 let config = require('../../../../src/config/serviceConfig');
 
@@ -25,10 +25,9 @@ describe('Docker hub connector tests', () => {
         sandbox.restore();
     });
 
-
-    [{results: [{name: '1.0.0'}, {name: '0.9.9'}, {name: '1.0.1'}, {name: 'latest'}], expected: 'runner:1.0.1'},
-        {results: [{name: '0.2.0'}, {name: '0.1.1'}, {name: '0.1.0'}, {name: 'latest'}], expected: 'runner:0.2.0'},
-        {results: [{name: '5.0.2'}, {name: '5.2.1'}, {name: 'xyz'}, {name: 'latest'}], expected: 'runner:5.2.1'}
+    [{ results: [{ name: '1.0.0' }, { name: '0.9.9' }, { name: '1.0.1' }, { name: 'latest' }], expected: 'runner:1.0.1' },
+        { results: [{ name: '0.2.0' }, { name: '0.1.1' }, { name: '0.1.0' }, { name: 'latest' }], expected: 'runner:0.2.0' },
+        { results: [{ name: '5.0.2' }, { name: '5.2.1' }, { name: 'xyz' }, { name: 'latest' }], expected: 'runner:5.2.1' }
     ].forEach(testData => {
         it(`Should get newest tag: ${JSON.stringify(testData)}`, async () => {
             requestSenderSendStub.resolves({
@@ -50,7 +49,7 @@ describe('Docker hub connector tests', () => {
             await dockerHubConnector.getMostRecentRunnerTag();
             throw new Error('Should not get here');
         } catch (error) {
-            error.message.should.eql('No docker found for runner')
+            error.message.should.eql('No docker found for runner');
         }
     });
 
@@ -61,7 +60,7 @@ describe('Docker hub connector tests', () => {
             await dockerHubConnector.getMostRecentRunnerTag();
             throw new Error('Should not get here');
         } catch (error) {
-            error.message.should.eql('timeout')
+            error.message.should.eql('timeout');
         }
     });
 });

@@ -4,26 +4,21 @@ let logger = require('../../../../src/common/logger');
 let driver = require('cassandra-driver');
 let rewire = require('rewire');
 let should = require('should');
-let cassandraClient = rewire('../../../../src/scheduler/models/database/cassandra/cassandraConnector');
+let cassandraClient = rewire('../../../../src/jobs/models/database/cassandra/cassandraConnector');
 
 let uuid = require('uuid');
 
-describe.skip('Cassandra client tests', function() {
+describe('Cassandra client tests', function() {
     let sandbox;
     let clientExecuteStub;
     let revert;
     let loggerErrorStub;
-    let clientShutdownStub;
-    let clientNewStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
-        revert = cassandraClient.__set__('configuration', { contactPoints: 'localhost:9042'.split(',') });
-        cassandraClient.init({});
         clientExecuteStub = sandbox.stub(driver.Client.prototype, 'execute');
+        revert = cassandraClient.__set__('client', { execute: clientExecuteStub });
         loggerErrorStub = sandbox.stub(logger, 'error');
-        clientShutdownStub = sandbox.stub(driver.Client.prototype, 'shutdown');
-        clientNewStub = sandbox.stub(driver.Client.prototype.constructor.super_, 'init');
     });
 
     afterEach(() => {
@@ -38,97 +33,12 @@ describe.skip('Cassandra client tests', function() {
     describe('Init and shutdown tests', function(){
         it('it should initialize cassandra client successfully', (done) => {
             try {
-                cassandraClient.init();
+                cassandraClient.init({ execute: clientExecuteStub });
             } catch (e) {
                 e.should.be.equal(undefined);
                 e.should.not.be.instanceOf(Error);
             }
             done();
-        });
-
-        it('it should fail to initialize cassandra client', (done) => {
-            clientNewStub.throws();
-            try {
-                cassandraClient.init();
-            } catch (e) {
-                e.should.not.be.equal(undefined);
-                e.should.be.instanceOf(Error);
-            }
-            done();
-        });
-
-        it('it should shutdown cassandra client successfully with initialized client', async () => {
-            clientShutdownStub.returns();
-            clientNewStub.resolves();
-            cassandraClient.init();
-            try {
-                await cassandraClient.closeConnection();
-            } catch (e){
-                e.should.be.equal(undefined);
-                e.should.not.be.instanceOf(Error);
-            }
-        });
-
-        it('it should shutdown cassandra client successfully with uninitialized client', async () => {
-            let revertClient = cassandraClient.__set__('client', undefined);
-            try {
-                await cassandraClient.closeConnection();
-            } catch (e){
-                e.should.be.equal(undefined);
-                e.should.not.be.instanceOf(Error);
-            }
-            revertClient();
-        });
-
-        it('cassandra client should fail to shutdown', async () => {
-            clientShutdownStub.throws();
-            try {
-                await cassandraClient.closeConnection();
-            } catch (e){
-                e.should.not.be.equal(undefined);
-                e.should.be.instanceOf(Error);
-            }
-        });
-    });
-
-    describe('Ping tests', function() {
-        it('ping is ok, cassandra is up', function (done) {
-            clientExecuteStub.resolves({ rows: [{}] });
-
-            cassandraClient.init();
-            cassandraClient.ping('keyspace')
-                .then(function (result) {
-                    result.should.eql(true);
-                    done();
-                }).catch(function (error) {
-                    done(error);
-                });
-        });
-
-        it('ping rejects as no schema, cassandra is down', function (done) {
-            clientExecuteStub.resolves({ rows: [] });
-
-            cassandraClient.init();
-            cassandraClient.ping('keyspace')
-                .then(function () {
-                    done(new Error('Expecting test to fail'));
-                }).catch(function (error) {
-                    error.message.should.be.eql('Error occurred in communication with cassandra');
-                    done();
-                });
-        });
-
-        it('cassandra rejects with error, cassandra is down', function (done) {
-            clientExecuteStub.rejects();
-
-            cassandraClient.init();
-            cassandraClient.ping('keyspace')
-                .then(function () {
-                    done(new Error('Expecting test to fail'));
-                }).catch(function (error) {
-                    error.message.should.be.eql('Error occurred in communication with cassandra');
-                    done();
-                });
         });
     });
 

@@ -4,18 +4,18 @@ databaseConfig.type = 'CASSANDRA';
 let should = require('should');
 let rewire = require('rewire');
 let sinon = require('sinon');
-let databaseConnector = require('../../../../src/scheduler/models/database/databaseConnector');
+let databaseConnector = require('../../../../src/jobs/models/database/databaseConnector');
 let logger = require('../../../../src/common/logger');
 let uuid = require('uuid');
-let jobConnector = require('../../../../src/scheduler/models/kubernetes/jobConnector');
-let jobTemplate = require('../../../../src/scheduler/models/kubernetes/jobTemplate');
+let jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector');
+let jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate');
 
 let config = require('../../../../src/config/serviceConfig');
 
 config.jobPlatform = 'Kubernetes';
 let manager;
 
-let dockerHubConnector = require('../../../../src/scheduler/models/dockerHubConnector');
+let dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector');
 
 const TEST_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaa';
 const JOB_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaf';
@@ -105,7 +105,7 @@ describe('Manager tests', function () {
         uuidStub = sandbox.stub(uuid, 'v4');
         jobTemplateCreateJobRequestStub = sandbox.spy(jobTemplate, 'createJobRequest');
 
-        manager = rewire('../../../../src/scheduler/models/jobManager');
+        manager = rewire('../../../../src/jobs/models/jobManager');
         manager.__set__('config.concurrencyLimit', '100');
         manager.__set__('config.jobPlatform', 'Kubernetes');
     });

@@ -1,6 +1,6 @@
 'use strict';
 
-const schedulerSequlizeConnector = require('../../scheduler/models/database/sequelize/sequelizeConnector');
+const schedulerSequlizeConnector = require('../../jobs/models/database/sequelize/sequelizeConnector');
 const repoterSequlizeConnector = require('../../reporter/models/database/sequelize/sequelizeConnector');
 
 const databaseConfig = require('../../config/databaseConfig');
