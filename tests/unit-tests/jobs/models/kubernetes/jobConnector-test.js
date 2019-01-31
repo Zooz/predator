@@ -5,7 +5,7 @@ let rewire = require('rewire');
 let requestSender = require('../../../../../src/common/requestSender');
 let config = require('../../../../../src/config/kubernetesConfig');
 config.kubernetesNamespace = 'default';
-let jobConnector = rewire('../../../../../src/scheduler/models/kubernetes/jobConnector');
+let jobConnector = rewire('../../../../../src/jobs/models/kubernetes/jobConnector');
 
 describe('Kubernetes job connector tests', function () {
     let sandbox;
@@ -27,8 +27,8 @@ describe('Kubernetes job connector tests', function () {
 
     describe('Run new job', () => {
         it('Success to create a job and running it immediately', async () => {
-            requestSenderSendStub.resolves({metadata: {name: 'Predator', uid: 'some_uuid'}, namespace: 'default'});
-            let jobResponse = await jobConnector.runJob({metadata: {name: 'predator'}});
+            requestSenderSendStub.resolves({ metadata: { name: 'Predator', uid: 'some_uuid' }, namespace: 'default' });
+            let jobResponse = await jobConnector.runJob({ metadata: { name: 'predator' } });
             jobResponse.should.eql({
                 'id': 'some_uuid',
                 'jobName': 'Predator',
@@ -38,7 +38,7 @@ describe('Kubernetes job connector tests', function () {
             requestSenderSendStub.args[0][0].should.eql({
                 url: 'localhost:8080/apis/batch/v1/namespaces/default/jobs',
                 method: 'POST',
-                body: {metadata: {name: 'predator'}},
+                body: { metadata: { name: 'predator' } },
                 headers: {}
             });
         });
@@ -47,7 +47,7 @@ describe('Kubernetes job connector tests', function () {
             requestSenderSendStub.rejects(new Error('Error deploying job'));
 
             try {
-                await jobConnector.runJob({metadata: {name: 'predator'}});
+                await jobConnector.runJob({ metadata: { name: 'predator' } });
                 throw new Error('Should not get here');
             } catch (error) {
                 error.should.eql(new Error('Error deploying job'));
@@ -56,9 +56,8 @@ describe('Kubernetes job connector tests', function () {
     });
 
     describe('Stop running job', () => {
-
         it('Stop a running run of specific job', async () => {
-            requestSenderSendStub.resolves({statusCode: 200});
+            requestSenderSendStub.resolves({ statusCode: 200 });
             await jobConnector.stopRun('jobPlatformName', 'runId');
             requestSenderSendStub.calledOnce.should.eql(true);
             requestSenderSendStub.args[0][0].should.eql({

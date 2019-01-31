@@ -9,8 +9,8 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "nyc --check-coverage --lines 95 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
-    "lint": "eslint src/**",
-    "integration-tests": "./tests/integration-tests/run.sh"
+    "integration-tests": "./tests/integration-tests/jobs/run.sh",
+    "lint": "eslint src/**"
   },
   "repository": {
     "type": "git",
@@ -78,6 +78,7 @@
     "jsdom": "^13.2.0",
     "mocha": "^5.1.1",
     "mochawesome": "^3.0.2",
+    "nock": "^10.0.6",
     "nyc": "^11.7.1",
     "rewire": "^4.0.1",
     "should": "^13.2.1",

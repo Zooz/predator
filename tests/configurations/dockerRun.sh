@@ -11,7 +11,7 @@ function waitForApp() {
     HEALTH_CHECK_INTERVAL=1;
     started=
     while [[ -z $started && $HEALTH_CHECK_TIMEOUT -gt 0 ]]; do
-        started=$(docker logs "$container" 2>&1 | grep "$grepBy" 2>/dev/null)
+        started=$(docker logs "$container" | grep "$grepBy" 2>/dev/null)
         let HEALTH_CHECK_TIMEOUT=$HEALTH_CHECK_TIMEOUT-1
         sleep $HEALTH_CHECK_INTERVAL
     done
@@ -50,26 +50,28 @@ function mysql() {
 }
 
 function postgres() {
-  IMAGE_NAME=postgres:11-alpine
-  APP=postgres
-  deleteContainer $APP
-  COMMAND="docker run \
-          -d \
-          --name $APP \
-          -e POSTGRES_PASSWORD=password \
-          -e POSTGRES_USER=root \
-          -p 5432:5432 \
-          $IMAGE_NAME"
-  echo -e "Starting $APP\n"${COMMAND/\s+/ }
-  $COMMAND
+    IMAGE_NAME=postgres:11-alpine
+    APP=postgres
+    deleteContainer $APP
+    COMMAND="docker run \
+                    -d \
+                    --name $APP \
+                    -e POSTGRES_PASSWORD=password \
+                    -e POSTGRES_USER=root \
+                    --network=system-tests \
+                    -p 5432:5432 \
+                    $IMAGE_NAME"
+    echo -e "Starting $APP\n"${COMMAND/\s+/ }
+    $COMMAND
 
-  COMMAND_EXIT_CODE=$?
-  if [ ${COMMAND_EXIT_CODE} != 0 ]; then
-    printf "Error when executing: '${APP}'\n"
-    exit ${COMMAND_EXIT_CODE}
-  fi
-  waitForApp $APP "database system is ready to accept connections"
-  echo "$APP is ready"
+    COMMAND_EXIT_CODE=$?
+    if [ ${COMMAND_EXIT_CODE} != 0 ]; then
+        printf "Error when executing: '${APP}'\n"
+        exit ${COMMAND_EXIT_CODE}
+    fi
+
+    waitForApp $APP "database system is ready to accept connections"
+    echo "$APP is ready"
 }
 
 function cassandra() {
@@ -80,6 +82,7 @@ function cassandra() {
                     -d \
                     --name $APP \
                     -p 9042:9042 \
+                    --network=system-tests \
                     $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
@@ -101,6 +104,7 @@ function mailhog() {
                     --name $APP \
                     -p 8025:8025 \
                     -p 1025:1025 \
+                    --network=system-tests \
                     $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
@@ -130,6 +134,7 @@ function reporter() {
                     -e GRAFANA_URL=$GRAFANA_URL \
                     -e REPLICATION_FACTOR=$REPLICATION_FACTOR \
                     -e DATABASE_TYPE=$DATABASE_TYPE \
+                    --network=system-tests \
                     --name $APP \
                     -p 8080:8080 \
                     $IMAGE_NAME"

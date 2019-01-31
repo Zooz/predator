@@ -13,8 +13,8 @@ module.exports = {
     updateJob
 };
 
-async function init(sequlizeClient) {
-    client = sequlizeClient;
+async function init(sequelizeClient) {
+    client = sequelizeClient;
     await initSchemas();
 }
 
