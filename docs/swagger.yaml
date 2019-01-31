@@ -5,7 +5,11 @@ info:
   version: 1.0.0
   title: 'Predator'
   description: |
-    Predator is an open-source performance framework. It manages the entire lifecycle of load testing a server, from creating a test file, running scheduled and on-demand tests, and finally viewing the test results. Developers who want to load their system end-to-end or test a specific service will benefit from this framework. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator simplifies the performance testing regime. (edited)
+    Predator is an open-source performance framework.
+    It manages the entire lifecycle of load testing a server, from creating a test file,
+    running scheduled and on-demand tests, and finally viewing the test results.
+    Developers who want to load their system end-to-end or test a specific service will benefit from this framework.
+    Bootstrapped with a user-friendly UI alongside a simple REST API, Predator simplifies the performance testing regime.
 consumes:
   - application/json
 produces:
