@@ -1,0 +1,288 @@
+swagger: "2.0"
+schemes:
+- http
+info:
+  version: 1.0.0
+  title: "Predator Scheduler"
+  description: |
+    A scheduler to run predator tests.
+    Manages the resource job which is responsible for triggering tests run
+    Supports cron expression and one time test runs.
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /v1/jobs:
+    get:
+      description: Get list of all jobs.
+      parameters:
+      - in: query
+        name: one_time
+        type: boolean
+        description: Should return the one time tests (no cron expression)
+      - name: x-zooz-request-id
+        description: The ID of incoming request.
+        in: header
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/job_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+    post:
+      description: Create a new job that will trigger test run
+      parameters:
+      - name: job
+        in: body
+        description: The job to add
+        required: true
+        schema:
+          $ref: "#/definitions/create_job_response"
+      - name: x-zooz-request-id
+        description: The ID of incoming request.
+        in: header
+        required: true
+        type: string
+      responses:
+        201:
+          description: Success
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        409:
+          description: Conflict
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/jobs/{job_id}:
+    get:
+      description: Get specific job.
+      parameters:
+      - in: path
+        name: job_id
+        required: true
+        type: string
+      - name: x-zooz-request-id
+        description: The ID of incoming request.
+        in: header
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/job_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        404:
+          description: Not found
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+    put:
+      description: update specific job.
+      parameters:
+      - name: job
+        in: body
+        description: The job to add
+        required: true
+        schema:
+          $ref: "#/definitions/job_update"
+      - in: path
+        name: job_id
+        required: true
+        type: string
+      - name: x-zooz-request-id
+        description: The ID of incoming request.
+        in: header
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/job_response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        404:
+          description: Not found
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+    delete:
+      description: delete a specific job.
+      parameters:
+      - in: path
+        name: job_id
+        required: true
+        type: string
+      - name: x-zooz-request-id
+        description: The ID of incoming request.
+        in: header
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+  /v1/jobs/{job_id}/runs/{run_id}/stop:
+    post:
+      description: stop a specific run of specific job.
+      parameters:
+      - in: path
+        description: The ID of the job.
+        name: job_id
+        required: true
+        type: string
+      - in: path
+        description: The id of a specific run in metronome which is also the report id.
+        name: run_id
+        required: true
+        type: string
+      - name: x-zooz-request-id
+        description: The ID of incoming request.
+        in: header
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success
+        404:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+
+definitions:
+  job:
+    required:
+    - test_id
+    - arrival_rate
+    - duration
+    - environment
+    properties:
+      variables:
+        type: object
+        description: "Variables that the artillery uses and can be defined by the user. Supported variables: 1) appId - if specifed merchantId must be a variable too."
+        example: {appId: 'App-name', merchantId: 'cd44fc7a-7719-4383-9981-427ff1210553'}
+      test_id:
+        type: string
+        pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+        description: The id of the test we would like to schedule.
+      cron_expression:
+        type: string
+        description: A cron expression describes when the test should be triggered, mandatory if run_immediately is not true
+      run_immediately:
+        type: boolean
+        description: Should the test be triggered immediately, regarding the cron expression
+      webhooks:
+        type: array
+        items:
+          type: string
+          description: The url of where to send the webhook with the report information
+      arrival_rate:
+        type: number
+        description: How many requests per second to create
+      duration:
+        type: number
+        description: For how many seconds the test should run
+      ramp_to:
+        type: number
+        description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
+      emails:
+        type: array
+        items:
+          type: string
+          description: The url of where to send the the email with the report information
+      environment:
+        type: string
+        enum: ['test', 'live']
+        description: In which environment the test will run
+  job_update:
+    properties:
+      test_id:
+        type: string
+        pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+        description: The id of the test we would like to schedule.
+      cron_expression:
+        type: string
+        description: A cron expression describes when the test should be triggered, mandatory if run_immediately is not true
+      webhooks:
+        type: array
+        items:
+          type: string
+          description: The url of where to send the webhook with the report information
+      arrival_rate:
+        type: number
+        description: How many requests per second to create
+      duration:
+        type: number
+        description: For how many seconds the test should run
+      ramp_to:
+        type: number
+        description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
+      emails:
+        type: array
+        items:
+          type: string
+          description: The url of where to send the the email with the report information
+      environment:
+        type: string
+        description: In which environment the test will run
+  job_response:
+    allOf:
+    - $ref: "#/definitions/job"
+    - properties:
+        id:
+          type: string
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+          description: Uuid that identifies the job
+  create_job_response:
+    allOf:
+    - $ref: "#/definitions/job_response"
+    - properties:
+        run_id:
+          type: string
+          description: If the job is ran immediately, will show the run id.
+  error_response:
+    required:
+    - message
+    properties:
+      message:
+        type: string
