@@ -1,6 +1,6 @@
 
 const request = require('supertest'),
-    expressApp = require('../../src/app'),
+    expressApp = require('../../../../src/app'),
     should = require('should');
 let app;
 module.exports = {

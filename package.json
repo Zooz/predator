@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "nyc --check-coverage --lines 95 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
-    "integration-tests": "./tests/integration-tests/jobs/run.sh",
+    "integration-tests": "./tests/integration-tests/run.sh",
     "lint": "eslint src/**"
   },
   "repository": {

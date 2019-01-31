@@ -1,31 +1,31 @@
 
 const should = require('should'),
-    testUtils = require('./utils');
+    requestSender = require('./helpers/requestCreator');
 
 describe('Testing dsl tests api', function () {
     let dslName;
     before(async function f() {
-        await testUtils.init();
+        await requestSender.init();
     });
     beforeEach(function () {
-        dslName = testUtils.generateUniqueDslName('paymentsOs');
+        dslName = requestSender.generateUniqueDslName('paymentsOs');
     });
     describe('success scenarios', function () {
         it('succeed post dsl definition', async function () {
-            const createDslResponse = await testUtils.createDsl(dslName, 'create_payment', createPaymentRequest);
+            const createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
             should(createDslResponse.body).eql(expectedCreatePaymentBody);
 
-            const getResponse = await testUtils.getDsl(dslName, 'create_payment');
+            const getResponse = await requestSender.getDsl(dslName, 'create_payment');
             should(getResponse.statusCode).eql(200, JSON.stringify(getResponse.body));
             should(getResponse.body).eql(expectedCreatePaymentBody);
         });
 
         it('create dsl which already exist - should return 400', async function () {
-            let createDslResponse = await testUtils.createDsl(dslName, 'create_payment', createPaymentRequest);
+            let createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
 
-            createDslResponse = await testUtils.createDsl(dslName, 'create_payment', createPaymentRequest);
+            createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(400, JSON.stringify(createDslResponse.body));
             should(createDslResponse.body).eql({
                 'message': 'definition already exists'
@@ -33,59 +33,59 @@ describe('Testing dsl tests api', function () {
         });
 
         it('succeed post two dsl definition and get them by same dsl name', async function () {
-            let createDslResponse = await testUtils.createDsl(dslName, 'create_payment', createPaymentRequest);
+            let createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
-            createDslResponse = await testUtils.createDsl(dslName, 'register', registerRequest);
+            createDslResponse = await requestSender.createDsl(dslName, 'register', registerRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
 
-            const getDefinitions = await testUtils.getDslDefinitions(dslName);
+            const getDefinitions = await requestSender.getDslDefinitions(dslName);
             should(getDefinitions.statusCode).eql(200, JSON.stringify(getDefinitions.body));
             should(getDefinitions.body).eql(expectedGetDefinitionsResponse);
         });
 
         it('when get definitions of not exist dsl name - should return 200 with empty array', async function () {
-            const getDefinitions = await testUtils.getDslDefinitions(dslName);
+            const getDefinitions = await requestSender.getDslDefinitions(dslName);
             should(getDefinitions.statusCode).eql(200, JSON.stringify(getDefinitions.body));
             should(getDefinitions.body).eql([]);
         });
 
         it('succeed update definition', async function () {
-            const createDslResponse = await testUtils.createDsl(dslName, 'create_payment', createPaymentRequest);
+            const createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
 
-            const updateResponse = await testUtils.updateDsl(dslName, 'create_payment', registerRequest);
+            const updateResponse = await requestSender.updateDsl(dslName, 'create_payment', registerRequest);
             should(updateResponse.statusCode).eql(200, JSON.stringify(updateResponse.body));
 
-            const getResponse = await testUtils.getDsl(dslName, 'create_payment');
+            const getResponse = await requestSender.getDsl(dslName, 'create_payment');
             should(getResponse.statusCode).eql(200, JSON.stringify(getResponse.body));
             should(getResponse.body.request).eql(registerRequest);
         });
 
         it('succeed delete existing definition', async function () {
-            const createDslResponse = await testUtils.createDsl(dslName, 'create_payment', createPaymentRequest);
+            const createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
 
-            const deleteResponse = await testUtils.deleteDsl(dslName, 'create_payment');
+            const deleteResponse = await requestSender.deleteDsl(dslName, 'create_payment');
             should(deleteResponse.statusCode).eql(204, JSON.stringify(deleteResponse.body));
             should(deleteResponse.body).eql({}, JSON.stringify(deleteResponse.body));
 
-            const getResponse = await testUtils.getDsl(dslName, 'create_payment');
+            const getResponse = await requestSender.getDsl(dslName, 'create_payment');
             should(getResponse.statusCode).eql(404, JSON.stringify(getResponse.body));
             should(getResponse.body).eql({ message: 'not found' });
         });
 
         it('succeed post two dsl definition with same name under two different dsl name and get them', async function () {
             const otherDsl = dslName + '2';
-            let createDslResponse = await testUtils.createDsl(dslName, 'create_payment', createPaymentRequest);
+            let createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
-            createDslResponse = await testUtils.createDsl(otherDsl, 'create_payment', registerRequest);
+            createDslResponse = await requestSender.createDsl(otherDsl, 'create_payment', registerRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
 
-            let getDefinition = await testUtils.getDsl(dslName, 'create_payment');
+            let getDefinition = await requestSender.getDsl(dslName, 'create_payment');
             should(getDefinition.statusCode).eql(200, JSON.stringify(getDefinition.body));
             should(getDefinition.body).eql(expectedCreatePaymentBody);
 
-            getDefinition = await testUtils.getDsl(otherDsl, 'create_payment');
+            getDefinition = await requestSender.getDsl(otherDsl, 'create_payment');
             should(getDefinition.statusCode).eql(200, JSON.stringify(getDefinition.body));
             should(getDefinition.body).eql({...expectedRegisterBody, name: 'create_payment'});
         });
@@ -93,23 +93,23 @@ describe('Testing dsl tests api', function () {
 
     describe('validations', function () {
         it('when delete non exist definition - should return 404', async function () {
-            let deleteResponse = await testUtils.deleteDsl(dslName, 'create_payment');
+            let deleteResponse = await requestSender.deleteDsl(dslName, 'create_payment');
             should(deleteResponse.statusCode).eql(404, JSON.stringify(deleteResponse.body));
             should(deleteResponse.body).eql({'message': 'definition does not exists'}, JSON.stringify(deleteResponse.body));
         });
 
         it('when update non exist definition  - should return 404', async function () {
-            const updateResponse = await testUtils.updateDsl(dslName, 'not-exist', registerRequest);
+            const updateResponse = await requestSender.updateDsl(dslName, 'not-exist', registerRequest);
             should(updateResponse.statusCode).eql(404, JSON.stringify(updateResponse.body));
         });
 
         it('when get non exist definition  - should return 404', async function () {
-            const updateResponse = await testUtils.getDsl(dslName, 'not-exist');
+            const updateResponse = await requestSender.getDsl(dslName, 'not-exist');
             should(updateResponse.statusCode).eql(404, JSON.stringify(updateResponse.body));
         });
 
-        [{name: 'create', func: testUtils.createDsl},
-            {name: 'put', func: testUtils.updateDsl}]
+        [{name: 'create', func: requestSender.createDsl},
+            {name: 'put', func: requestSender.updateDsl}]
             .forEach(function (scenario) {
                 describe(`${scenario.name} definition`, function () {
                     if (scenario.name === 'create'){

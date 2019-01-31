@@ -4,7 +4,6 @@ const Sequelize = require('sequelize'),
 
 module.exports = {
     init,
-    ping,
     insertTest,
     getTest,
     getTests,
@@ -18,40 +17,10 @@ module.exports = {
 };
 
 let client;
-// async function init() {
-//     const databaseType = process.env.DATABASE_TYPE,
-//         databaseName = process.env.DATABASE_NAME,
-//         databaseUsername = process.env.DATABASE_USERNAME,
-//         databasePassword = process.env.DATABASE_PASSWORD,
-//         sqliteStorage = process.env.SQLITE_STORAGE;
-//
-//     let options = {
-//         dialect: databaseType.toLowerCase(),
-//         define: {
-//             underscored: true
-//         }
-//     };
-//
-//     if (databaseType.toLowerCase() === 'sqlite') {
-//         options.storage = sqliteStorage;
-//     }
-//     client = new Sequelize(databaseName.toLowerCase(), databaseUsername, databasePassword, options);
-//     await client.authenticate();
-//     await initSchemas();
-//     logger.info('Data client initialized');
-// }
 
 async function init(sequlizeClient) {
     client = sequlizeClient;
     await initSchemas();
-}
-
-async function ping() {
-    try {
-        await client.authenticate();
-    } catch (error) {
-        throw new Error('Error occurred in communication with database: ' + error.message);
-    }
 }
 
 async function initSchemas() {
