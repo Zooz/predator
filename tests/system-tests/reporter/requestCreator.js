@@ -3,7 +3,7 @@
 const request = require('supertest');
 
 const URL = process.env.URL || 'http://localhost:8080';
-const HEADERS = {'x-zooz-request-id': 'mickey', 'Content-Type': 'application/json'};
+const HEADERS = {'Content-Type': 'application/json'};
 
 module.exports = {
     createReport,

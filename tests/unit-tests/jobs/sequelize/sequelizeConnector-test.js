@@ -3,17 +3,17 @@ let sinon = require('sinon');
 let rewire = require('rewire');
 let should = require('should');
 let databaseConfig = require('../../../../src/config/databaseConfig');
-let sequelizeConnector = rewire('../../../../src/scheduler/models/database/sequelize/sequelizeConnector');
+let sequelizeConnector = rewire('../../../../src/jobs/models/database/sequelize/sequelizeConnector');
 
 let uuid = require('uuid');
 
-describe.skip('Sequelize client tests', function () {
+describe('Sequelize client tests', function () {
     let sandbox;
     let sequelizeStub;
-    let sequlizeAuthenticateStub;
-    let sequlizeDefineStub;
-    let sequlizeModelStub;
-    let sequlizeCloseStub;
+    let sequelizeAuthenticateStub;
+    let sequelizeDefineStub;
+    let sequelizeModelStub;
+    let sequelizeCloseStub;
     let sequelizeCreateStub;
     let sequelizeUpdateStub;
     let sequelizeGetStub;
@@ -29,26 +29,26 @@ describe.skip('Sequelize client tests', function () {
         databaseConfig.username = 'username';
         databaseConfig.password = 'password';
 
-        sequlizeAuthenticateStub = sandbox.stub();
-        sequlizeDefineStub = sandbox.stub();
+        sequelizeAuthenticateStub = sandbox.stub();
+        sequelizeDefineStub = sandbox.stub();
         sequelizeCreateStub = sandbox.stub();
         sequelizeUpdateStub = sandbox.stub();
         sequelizeGetStub = sandbox.stub();
         sequelizeDestroyStub = sandbox.stub();
-        sequlizeModelStub = sandbox.stub();
-        sequlizeCloseStub = sandbox.stub();
+        sequelizeModelStub = sandbox.stub();
+        sequelizeCloseStub = sandbox.stub();
         sequelizeStub = sandbox.stub();
-        sequlizeCloseStub = sandbox.stub();
+        sequelizeCloseStub = sandbox.stub();
         sequelizeStub = sandbox.stub();
 
-        sequlizeDefineStub.returns({
+        sequelizeDefineStub.returns({
             hasMany: () => {
             },
             sync: () => {
             }
         });
 
-        sequlizeModelStub.returns({
+        sequelizeModelStub.returns({
             email: {},
             webhook: {},
             create: sequelizeCreateStub,
@@ -58,10 +58,10 @@ describe.skip('Sequelize client tests', function () {
         });
 
         sequelizeStub.returns({
-            authenticate: sequlizeAuthenticateStub,
-            model: sequlizeModelStub,
-            define: sequlizeDefineStub,
-            close: sequlizeCloseStub
+            authenticate: sequelizeAuthenticateStub,
+            model: sequelizeModelStub,
+            define: sequelizeDefineStub,
+            close: sequelizeCloseStub
         });
         sequelizeStub.DataTypes = {};
         sequelizeConnector.__set__('Sequelize', sequelizeStub);
@@ -77,55 +77,16 @@ describe.skip('Sequelize client tests', function () {
         sandbox.restore();
     });
 
-    describe('Init and shutdown tests', () => {
+    describe('Init tests', () => {
         it('it should initialize sequelize with mysql client successfully', async () => {
-            await sequelizeConnector.init();
-            should(sequlizeAuthenticateStub.called).eql(true);
-        });
-
-        it('it should fail to initialize sequelize client', async () => {
-            sequelizeStub.throws(new Error('Failed to init DB'));
-            try {
-                await sequelizeConnector.init();
-            } catch (error) {
-                should(error.message).equal('Failed to init DB');
-            }
-        });
-
-        it('it should close sequelize client successfully with initialized client', async () => {
-            sequlizeCloseStub.returns({});
-            await sequelizeConnector.init();
-
-            sequelizeConnector.closeConnection();
-
-            should(sequlizeCloseStub.called).eql(true);
-        });
-    });
-
-    describe('Ping tests', function () {
-        it('ping is ok, sequelize is up', async () => {
-            await sequelizeConnector.init();
-            await sequelizeConnector.ping();
-            should(sequlizeAuthenticateStub.called).eql(true);
-        });
-
-        it('ping rejects as auth failed, sequelize is down', async () => {
-            await sequelizeConnector.init();
-
-            sequlizeAuthenticateStub.rejects(new Error('Auth failed'));
-
-            try {
-                await sequelizeConnector.ping();
-                throw new Error('Should not get here');
-            } catch (error) {
-                should(error.message).eql('Error occurred in communication with database: Auth failed');
-            }
+            await sequelizeConnector.init(sequelizeStub());
+            should(sequelizeDefineStub.calledThrice).eql(true);
         });
     });
 
     describe('Insert new jobs', () => {
         it('should succeed full insert', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             let id = uuid.v4();
             let testId = uuid.v4();
@@ -167,7 +128,7 @@ describe.skip('Sequelize client tests', function () {
         });
 
         it('should succeed insert without webhooks and emails', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             let id = uuid.v4();
             let testId = uuid.v4();
@@ -197,7 +158,7 @@ describe.skip('Sequelize client tests', function () {
         it('should log error for failing inserting new test', async () => {
             sequelizeCreateStub.rejects(new Error('Sequelize Error'));
 
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             try {
                 await sequelizeConnector.insertJob(uuid.v4(), {
@@ -217,7 +178,7 @@ describe.skip('Sequelize client tests', function () {
 
     describe('Get jobs', () => {
         it('should get multiple jobs', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             let sequelizeResponse = [{
                 dataValues: {
@@ -310,7 +271,7 @@ describe.skip('Sequelize client tests', function () {
         });
 
         it('should get multiple jobs - no jobs exists', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             let sequelizeResponse = [];
 
@@ -321,7 +282,7 @@ describe.skip('Sequelize client tests', function () {
         });
 
         it('should get failure from sequelize', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             sequelizeGetStub.rejects(new Error('db error'));
 
@@ -336,7 +297,7 @@ describe.skip('Sequelize client tests', function () {
 
     describe('Get single job', async () => {
         it('should get single job', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             let sequelizeResponse = [{
                 dataValues: {
@@ -423,7 +384,7 @@ describe.skip('Sequelize client tests', function () {
         });
 
         it('should return empty response as no such job id exists', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             let sequelizeResponse = [];
 
@@ -434,7 +395,7 @@ describe.skip('Sequelize client tests', function () {
         });
 
         it('should get failure from sequelize', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             sequelizeGetStub.rejects(new Error('db error'));
 
@@ -449,7 +410,7 @@ describe.skip('Sequelize client tests', function () {
 
     describe('Delete job', function () {
         it('should delete single job', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
             sequelizeDestroyStub.resolves();
             await sequelizeConnector.deleteJob('jobId');
 
@@ -461,7 +422,7 @@ describe.skip('Sequelize client tests', function () {
         });
 
         it('should get failure from sequelize', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
             sequelizeDestroyStub.rejects(new Error('delete error'));
             try {
                 await sequelizeConnector.deleteJob('jobId');
@@ -474,7 +435,7 @@ describe.skip('Sequelize client tests', function () {
 
     describe('Update new jobs', () => {
         it('should succeed updating job', async () => {
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             let id = uuid.v4();
             let testId = uuid.v4();
@@ -507,7 +468,7 @@ describe.skip('Sequelize client tests', function () {
         it('should log error for failing updating  test', async () => {
             sequelizeUpdateStub.rejects(new Error('Sequelize Error'));
 
-            await sequelizeConnector.init();
+            await sequelizeConnector.init(sequelizeStub());
 
             try {
                 await sequelizeConnector.updateJob(uuid.v4(), {

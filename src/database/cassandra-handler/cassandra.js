@@ -1,6 +1,6 @@
 'use strict';
 
-const schedulerCassandraConnector = require('../../scheduler/models/database/cassandra/cassandraConnector');
+const schedulerCassandraConnector = require('../../jobs/models/database/cassandra/cassandraConnector');
 const reporterCassandraConnector = require('../../reporter/models/database/cassandra/cassandraConnector');
 const databaseConfig = require('../../config/databaseConfig');
 const cassandraMigration = require('./cassandraMigration');

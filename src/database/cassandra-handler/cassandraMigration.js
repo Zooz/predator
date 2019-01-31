@@ -17,7 +17,6 @@ let initFileNameTemplate = 'cassandra_config_template.json',
     initFileName = 'cassandra_config.json';
 
 let cassandraHandlerLogContext = {
-    'x-zooz-request-id': 'service-startup',
     'key_space_name': cassandraConfig.name,
     'initFileNameTemplate': initFileNameTemplate,
     'init_file_name': initFileName
@@ -60,7 +59,6 @@ module.exports.runMigration = function () {
         .then(function () {
             initKeyspaceCassandraConnection(args.key_space_name);
             cassandraHandlerLogContext = {
-                'x-zooz-request-id': 'service-startup',
                 'key_space_name': cassandraConfig.name
             };
         })

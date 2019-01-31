@@ -1,4 +1,4 @@
-let config = require('../../config/serviceConfig');
+let config = require('../../../config/serviceConfig');
 
 module.exports.createJobRequest = (jobName, runId, environmentVariables, dockerImage) => {
     return {

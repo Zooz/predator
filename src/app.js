@@ -1,16 +1,16 @@
 'use strict';
-// let env = require('./env').init();
+require('./env').init();
 let express = require('express');
 let logger = require('./common/logger');
 let healthRouter = require('./common/routes/healthRoute.js');
-let jobsRouter = require('./scheduler/routes/jobsRoute.js');
+let jobsRouter = require('./jobs/routes/jobsRoute.js');
 let reportsRouter = require('./reporter/routes/reportsRoute.js');
 
 let swaggerValidator = require('express-ajv-swagger-validation');
 let audit = require('express-requests-logger');
 let bodyParser = require('body-parser');
 let database = require('./database/database');
-let schedulerJobManager = require('./scheduler/models/jobManager');
+let schedulerJobManager = require('./jobs/models/jobManager');
 
 module.exports = () => {
     return swaggerValidator.init('./docs/swagger.yaml', { beautifyErrors: true })
