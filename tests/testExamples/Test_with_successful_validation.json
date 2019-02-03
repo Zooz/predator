@@ -1,0 +1,21 @@
+{
+  "name": "test",
+  "description": "TEST",
+  "type": "dsl",
+  "scenarios": [
+    {
+      "scenario_name": "Scenario",
+      "steps": [
+        {
+          "action": "paymentsos.createPayment"
+        },
+        {
+          "action": "paymentsos.createAuthorize"
+        },
+        {
+          "action": "paymentsos.createVoid"
+        }
+      ]
+    }
+  ]
+}

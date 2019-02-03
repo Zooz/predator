@@ -1,0 +1,19 @@
+{
+    "name": "test",
+    "description": "test",
+    "type": "dsl",
+    "scenarios": [
+      {
+        "scenario_name": "Scenario",
+        "steps": [
+          {
+            "action": "paymentsos.createToken",
+            "wait": 5
+          },
+          {
+            "action": "paymentsos.createCustomer"
+          }
+        ]
+      }
+    ]
+  }

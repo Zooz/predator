@@ -1,0 +1,8 @@
+{
+  "name": "Create token and create customer",
+  "description": "This test is a simple test that creates token and then creates customer.",
+  "type": "custom",
+  "artillery_test": {
+      "config": {}
+  }
+}

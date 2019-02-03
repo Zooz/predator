@@ -1,0 +1,12 @@
+{
+  "name": "test",
+  "description": "test",
+  "type": "dsl",
+  "scenarios": [
+    {
+      "scenario_name": "Scenario",
+      "steps": [
+      ]
+    }
+  ]
+}

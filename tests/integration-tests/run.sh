@@ -14,7 +14,20 @@ source ./tests/configurations/kubernetesConfiguration.sh
 ./scripts/dockerRun.sh mysql
 node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
 
-echo running integration tests with postgres db and metronome integration
+echo running integration tests with sqlite db and kubernetes integration
+source ./tests/configurations/commonConfiguration.sh
+source ./tests/configurations/sqliteConfiguration.sh
+source ./tests/configurations/kubernetesConfiguration.sh
+./scripts/dockerRun.sh postgres
+node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
+
+echo running integration tests with sqlite db and kubernetes integration
+source ./tests/configurations/commonConfiguration.sh
+source ./tests/configurations/postgresConfiguration.sh
+source ./tests/configurations/metronomeConfiguration.sh
+node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
+
+echo running specific integration tests with postgres db and metronome integration
 source ./tests/configurations/commonConfiguration.sh
 source ./tests/configurations/postgresConfiguration.sh
 source ./tests/configurations/metronomeConfiguration.sh

@@ -1,0 +1,4 @@
+{
+	"message": "Input validation error",
+	"validation_errors": ["body/scenarios[0] should have required property 'steps'"]
+}
