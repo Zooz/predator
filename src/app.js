@@ -39,7 +39,7 @@ module.exports = () => {
 
             app.use('/health', healthRouter);
             app.use('/v1/tests', reportsRouter);
-            app.use('v1/jobs', jobsRouter);
+            app.use('/v1/jobs', jobsRouter);
             app.use('/v1/dsl', dslRouter);
             app.use('/v1/tests', testsRouter);
 

@@ -16,7 +16,7 @@ node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 -
 
 echo running integration tests with sqlite db and kubernetes integration
 source ./tests/configurations/commonConfiguration.sh
-source ./scripts/sqliteConfiguration.sh
+source ./tests/configurations/sqliteConfiguration.sh
 source ./tests/configurations/kubernetesConfiguration.sh
 ./scripts/dockerRun.sh postgres
 node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit

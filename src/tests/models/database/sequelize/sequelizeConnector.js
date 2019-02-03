@@ -86,7 +86,7 @@ async function insertTest(testInfo, testJson, id, revisionId){
         revision_id: revisionId
     };
 
-    const result = test.create(params);
+    const result = await test.create(params);
     return result;
 }
 
@@ -157,7 +157,8 @@ async function updateDslDefinition(dslName, definitionName, data){
 }
 async function deleteDefinition(dslName, definitionName){
     const dslDefinition = client.model('dsl_definition');
-    return dslDefinition.destroy({ where: { dsl_name: dslName, definition_name: definitionName } });
+    const result = await dslDefinition.destroy({ where: { dsl_name: dslName, definition_name: definitionName } });
+    return result;
 }
 
 function sanitizeDslResult(data) {
