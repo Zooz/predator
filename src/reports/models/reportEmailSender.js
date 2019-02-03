@@ -60,11 +60,12 @@ function createSMTPClient() {
         host: smtpConfig.host,
         connectionTimeout: smtpConfig.timeout,
         auth: {
-            user: smtpConfig.user,
+            user: smtpConfig.username,
             pass: smtpConfig.password
         }
     };
 
+    console.log(options)
     return nodemailer.createTransport(options);
 }
 

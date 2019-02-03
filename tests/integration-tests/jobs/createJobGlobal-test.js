@@ -3,7 +3,7 @@ let uuid = require('uuid');
 let schedulerRequestCreator = require('./helpers/requestCreator');
 let nock = require('nock');
 
-describe('Create job global tests', () => {
+describe.skip('Create job global tests', () => {
     before(async () => {
         await schedulerRequestCreator.init();
     });

@@ -5,7 +5,7 @@ let should = require('should');
 let nock = require('nock');
 let kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
-describe('Update scheduled job', function () {
+describe.skip('Update scheduled job', function () {
     this.timeout(5000);
     let testId = '56ccc314-8c92-4002-839d-8424909ff475';
 

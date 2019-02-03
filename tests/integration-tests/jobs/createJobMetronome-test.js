@@ -5,7 +5,7 @@ let nock = require('nock');
 let serviceConfig = require('../../../src/config/serviceConfig');
 let metronomeConfig = require('../../../src/config/metronomeConfig');
 
-describe('Create job specific metronome tests', () => {
+describe.skip('Create job specific metronome tests', () => {
     before(async () => {
         await schedulerRequestCreator.init();
     });

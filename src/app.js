@@ -4,7 +4,7 @@ let express = require('express');
 let logger = require('./common/logger');
 let healthRouter = require('./common/routes/healthRoute.js');
 let jobsRouter = require('./jobs/routes/jobsRoute.js');
-let reportsRouter = require('./reporter/routes/reportsRoute.js');
+let reportsRouter = require('./reports/routes/reportsRoute.js');
 let dslRouter = require('./tests/routes/dslRoute.js');
 let testsRouter = require('./tests/routes/testsRoute.js');
 
@@ -38,7 +38,7 @@ module.exports = () => {
             }));
 
             app.use('/health', healthRouter);
-            app.use('/', reportsRouter);
+            app.use('/v1/tests', reportsRouter);
             app.use('/', jobsRouter);
             app.use('/v1/dsl', dslRouter);
             app.use('/v1/tests', testsRouter);
