@@ -86,7 +86,8 @@ async function insertTest(testInfo, testJson, id, revisionId){
         revision_id: revisionId
     };
 
-    return test.create(params);
+    const result = test.create(params);
+    return result;
 }
 
 async function getTest(id) {
@@ -98,15 +99,17 @@ async function getTest(id) {
 async function getTests() {
     const test = client.model('test');
     let allTests = await test.findAll({ order: [['updated_at', 'DESC'], ['id', 'DESC']] });
-    return sanitizeTestResult(allTests);
+    allTests = sanitizeTestResult(allTests);
+    return allTests;
 }
 
 async function deleteTest(testId){
     const test = client.model('test');
-    return test.destroy(
+    const result = test.destroy(
         {
             where: { test_id: testId }
         });
+    return result;
 }
 
 async function insertDslDefinition(dslName, definitionName, data){
@@ -117,15 +120,15 @@ async function insertDslDefinition(dslName, definitionName, data){
         definition_name: definitionName,
         artillery_json: JSON.stringify(data)
     };
-    return dslDefinition.create(params)
-        .then(function () {
-            return true; /// applied.
-        }).catch(function (err) {
-            if (err.message === 'Validation error'){
-                return false;
-            }
-            throw err;
-        });
+    try {
+        await dslDefinition.create(params);
+        return true;
+    } catch (err){
+        if (err.message === 'Validation error'){
+            return false;
+        }
+        throw err;
+    }
 }
 
 async function getDslDefinition(dslName, definitionName){
@@ -157,19 +160,21 @@ async function deleteDefinition(dslName, definitionName){
     return dslDefinition.destroy({ where: { dsl_name: dslName, definition_name: definitionName } });
 }
 
-function sanitizeDslResult(result) {
-    return result.map(function (dslDefinition) {
+function sanitizeDslResult(data) {
+    const result = data.map(function (dslDefinition) {
         const dataValues = dslDefinition.dataValues;
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
         return dataValues;
     });
+    return result;
 }
 
-function sanitizeTestResult(result) {
-    return result.map(function (test) {
+function sanitizeTestResult(data) {
+    const result = data.map(function (test) {
         const dataValues = test.dataValues;
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
         dataValues.id = dataValues.test_id;
         return dataValues;
     });
+    return result;
 }

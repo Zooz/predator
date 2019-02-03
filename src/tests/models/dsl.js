@@ -1,6 +1,7 @@
 
 const database = require('./database'),
-    logger = require('../../common/logger');
+    logger = require('../../common/logger'),
+    { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
     createDefinition,
@@ -26,7 +27,7 @@ async function getDefinition(dslName, definitionName) {
             request: result.artillery_json
         };
     } else {
-        const error = new Error('not found');
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
         throw error;
     }
@@ -41,7 +42,7 @@ async function createDefinition(dslName, body) {
             request: body.request
         };
     } else {
-        const error = new Error('definition already exists');
+        const error = new Error(ERROR_MESSAGES.DSL_DEF_ALREADY_EXIST);
         error.statusCode = 400;
         throw error;
     }
@@ -56,7 +57,7 @@ async function updateDefinition(dslName, definitionName, body) {
             request: body.request
         };
     } else {
-        const error = new Error('definition does not exists');
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
         throw error;
     }
@@ -66,7 +67,7 @@ async function deleteDefinition(dslName, definitionName, body) {
     if (result){
         logger.info(body, 'Definition deleted successfully and saved to Cassandra');
     } else {
-        const error = new Error('definition does not exists');
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
         throw error;
     }

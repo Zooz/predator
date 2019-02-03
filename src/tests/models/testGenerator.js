@@ -2,7 +2,7 @@
 let _ = require('lodash');
 let consts = require('./../../common/consts');
 const database = require('./database');
-const {get, cloneDeep} = require('lodash');
+const { get, cloneDeep } = require('lodash');
 
 module.exports.createTest = async function(testDetails) {
     if (testDetails.type === consts.TEST_TYPE_CUSTOM) {
@@ -107,12 +107,12 @@ async function createSteps(scenarioIndex, steps, variables) {
         }
         stepDefinition = cloneDeep(stepDefinition);
         if (step.wait) {
-            stepDefinition = {loop: [ {
+            stepDefinition = { loop: [ {
                 think: step.wait
             },
             stepDefinition
             ],
-            count: 1};
+            count: 1 };
         }
 
         if (step.properties && Object.keys(step.properties).length > 0) {

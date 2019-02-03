@@ -36,66 +36,51 @@ let queryOptions = {
 
 function init(cassandraClient) {
     client = cassandraClient;
-    logger.info('Tests cassandra client initialized');
 }
 
-function getTest(id) {
+async function getTest(id) {
     id = uuid.fromString(id);
-    return executeQuery(GET_TEST, [id], queryOptions)
-        .then(function(result) {
-            return Promise.resolve(sanitizeTestResult(result.rows)[0]);
-        });
+    const result = await executeQuery(GET_TEST, [id], queryOptions);
+    const sanitizedResult = sanitizeTestResult(result.rows)[0];
+    return sanitizedResult;
 }
 
-function getTests() {
-    let tests = [];
-    return executeQuery(GET_TESTS, [], queryOptions)
-        .then(function(result){
-            result.rows.forEach(function(row) {
-                if (!tests.find(test => test.id.toString() === row.id.toString())) {
-                    tests.push(row);
-                }
-            });
-
-            return Promise.resolve(sanitizeTestResult(tests));
-        });
+async function getTests() {
+    const result = await executeQuery(GET_TESTS, [], queryOptions);
+    const sanitizedResult = sanitizeTestResult(result.rows);
+    return sanitizedResult;
 }
 
-function deleteTest(testId){
-    return executeQuery(DELETE_TEST, [testId]);
+async function deleteTest(testId){
+    const result = await executeQuery(DELETE_TEST, [testId]);
+    return result;
 }
 
-function getAllTestRevisions(id) {
+async function getAllTestRevisions(id) {
     id = uuid.fromString(id);
-    return executeQuery(GET_TEST_REVISIONS, [id], queryOptions)
-        .then(function(result) {
-            return Promise.resolve(sanitizeTestResult(result.rows));
-        });
+    const result = await executeQuery(GET_TEST_REVISIONS, [id], queryOptions);
+    const sanitizedResult = await sanitizeTestResult(result.rows);
+    return sanitizedResult;
 }
 
 async function insertTest(testInfo, testJson, id, revisionId) {
     let params;
     params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo.scenarios), JSON.stringify(testJson), revisionId];
-    return executeQuery(INSERT_TEST_DETAILS, params, queryOptions);
+    const result = await executeQuery(INSERT_TEST_DETAILS, params, queryOptions);
+    return result;
 }
 
 async function getDslDefinition(dslName, definitionName) {
     const params = [dslName, definitionName];
     const result = await executeQuery(GET_DSL_DEFINITION, params, queryOptions);
-    if (result.rows.length === 0){
-        return;
-    }
-    result.rows[0].artillery_json = JSON.parse(result.rows[0].artillery_json);
-    return result.rows[0];
+    const sanitizedResult = sanitizeDslResult(result.rows);
+    return sanitizedResult[0];
 }
 async function getDslDefinitions(dslName) {
     const params = [dslName];
     const result = await executeQuery(GET_DSL_DEFINITIONS, params, queryOptions);
-
-    result.rows.forEach(function (row) {
-        row.artillery_json = JSON.parse(row.artillery_json);
-    });
-    return result.rows;
+    const sanitizedResult = sanitizeDslResult(result.rows);
+    return sanitizedResult;
 }
 
 async function insertDslDefinition(dslName, definitionName, data) {
@@ -115,24 +100,33 @@ async function deleteDefinition(dslName, definitionName) {
     return result.rows[0]['[applied]'];
 }
 
-function executeQuery(query, params, queryOptions) {
-    return client.execute(query, params, queryOptions).then((result) => {
+async function executeQuery(query, params, queryOptions) {
+    try {
+        const result = await client.execute(query, params, queryOptions);
         logger.trace('Query result', {
             query: query,
             params: params,
             rows_returned: result.rowLength
         });
-        return Promise.resolve(result);
-    }).catch((exception) => {
-        logger.error(`Cassandra query failed \n ${JSON.stringify({ query, params, queryOptions })}`, exception);
-        return Promise.reject(new Error('Error occurred in communication with cassandra'));
-    });
+        return result;
+    } catch (err){
+        logger.error(`Cassandra query failed \n ${JSON.stringify({ query, params, queryOptions })}`, err);
+        throw new Error('Error occurred in communication with cassandra');
+    }
 }
 
-function sanitizeTestResult(rows) {
-    return rows.map(function (row) {
+function sanitizeTestResult(data) {
+    const result = data.map(function (row) {
         row.artillery_json = JSON.parse(row.artillery_json);
         row.raw_data = JSON.parse(row.raw_data);
         return row;
     });
+    return result;
+}
+function sanitizeDslResult(data) {
+    const result = data.map(function (row) {
+        row.artillery_json = JSON.parse(row.artillery_json);
+        return row;
+    });
+    return result;
 }

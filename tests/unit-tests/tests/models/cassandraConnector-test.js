@@ -170,53 +170,6 @@ describe('Cassandra client tests', function() {
                 });
         });
 
-        it('Should get all tests with no duplicated ids', function(){
-            let query = 'SELECT * FROM tests';
-            let date = new Date();
-            let laterDate = new Date();
-            let cassandraResponse = {
-                rows: [
-                    { id: 'c1656c48-e028-11e7-80c1-9a214cf093aa', updated_at: date, raw_data: '{"name":"Test1","description":"Test1"}', artillery_json: '{"json":"artillery"}', revision_id: 'c1656c48-e028-11e7-80c1-9a214cf093ab' },
-                    { id: 'c1656c48-e028-11e7-80c1-9a214cf093ab', updated_at: laterDate, raw_data: '{"name":"Test2","description":"Test2"}', artillery_json: '{"json":"artillery"}', revision_id: 'c1656c48-e028-11e7-80c1-9a214cf093ac' },
-                    { id: 'c1656c48-e028-11e7-80c1-9a214cf093ab', updated_at: laterDate, raw_data: '{"name":"Test3","description":"Test3"}', artillery_json: '{"json":"artillery"}', revision_id: 'c1656c48-e028-11e7-80c1-9a214cf09311' }
-                ]
-            };
-
-            let expectedResult = [
-                {
-                    'artillery_json': {
-                        'json': 'artillery'
-                    },
-                    'id': 'c1656c48-e028-11e7-80c1-9a214cf093aa',
-                    'raw_data': {
-                        'description': 'Test1',
-                        'name': 'Test1'
-                    },
-                    'revision_id': 'c1656c48-e028-11e7-80c1-9a214cf093ab',
-                    'updated_at': date
-                },
-                {
-                    'artillery_json': {
-                        'json': 'artillery'
-                    },
-                    'id': 'c1656c48-e028-11e7-80c1-9a214cf093ab',
-                    'raw_data': {
-                        'description': 'Test2',
-                        'name': 'Test2'
-                    },
-                    'revision_id': 'c1656c48-e028-11e7-80c1-9a214cf093ac',
-                    'updated_at': laterDate
-                }
-            ];
-
-            clientExecuteStub.resolves(cassandraResponse);
-            return cassandraClient.getTests()
-                .then(function(res) {
-                    clientExecuteStub.getCall(0).args[0].should.eql(query);
-                    res.should.eql(expectedResult);
-                });
-        });
-
         it('Should get error because of cassandra error', function(){
             let query = 'SELECT * FROM tests';
             clientExecuteStub.rejects();

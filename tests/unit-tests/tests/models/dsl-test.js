@@ -47,7 +47,7 @@ describe('Testing dsl model', function () {
             } catch (err){
                 should(getDslDefinitionStub.args).eql([['dslName', 'definitionName']]);
                 should(err.statusCode).eql(404);
-                should(err.message).eql('not found');
+                should(err.message).eql('Not found');
             }
         });
     });
@@ -65,7 +65,7 @@ describe('Testing dsl model', function () {
                 throw new Error('should not get here');
             } catch (err){
                 should(insertDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
-                should(err.message).eql('definition already exists');
+                should(err.message).eql('Definition already exists');
                 should(err.statusCode).eql(400);
             }
         });
@@ -83,7 +83,7 @@ describe('Testing dsl model', function () {
                 throw new Error('should not get here');
             } catch (err){
                 should(updateDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
-                should(err.message).eql('definition does not exists');
+                should(err.message).eql('Not found');
                 should(err.statusCode).eql(404);
             }
         });
@@ -101,7 +101,7 @@ describe('Testing dsl model', function () {
                 throw new Error('should not get here');
             } catch (err){
                 should(deleteDefinitionStub.args).eql([['dslName', 'dsl-name']]);
-                should(err.message).eql('definition does not exists');
+                should(err.message).eql('Not found');
                 should(err.statusCode).eql(404);
             }
         });

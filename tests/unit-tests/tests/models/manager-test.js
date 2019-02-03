@@ -40,7 +40,7 @@ describe('Scenario generator tests', function () {
             insertStub.resolves();
 
             return manager.upsertTest({
-                testInfo: 'info'})
+                testInfo: 'info' })
                 .then(function (result) {
                     insertStub.calledOnce.should.eql(true);
                     result.should.have.keys('id', 'revision_id');
@@ -58,7 +58,7 @@ describe('Scenario generator tests', function () {
 
             let existingTestId = uuid();
             return manager.upsertTest({
-                testInfo: 'info'}, existingTestId)
+                testInfo: 'info' }, existingTestId)
                 .then(function (result) {
                     insertStub.calledOnce.should.eql(true);
                     result.should.have.keys('id', 'revision_id');
@@ -81,18 +81,10 @@ describe('Scenario generator tests', function () {
     });
 
     describe('Get single test', function () {
-        it('Database returns undefined, should return undefined', function () {
-            getTestStub.resolves();
-            return manager.getTest(uuid.v4())
-                .then(function (res) {
-                    should.not.exist(res);
-                });
-        });
-
         it('Database returns one row, should return the test', function () {
             getTestStub.resolves({
-                artillery_json: {id: '1', name: '1'},
-                raw_data: {id: '1', name: '1'}
+                artillery_json: { id: '1', name: '1' },
+                raw_data: { id: '1', name: '1' }
             });
             return manager.getTest(uuid.v4())
                 .then(function (res) {
@@ -212,11 +204,14 @@ describe('Scenario generator tests', function () {
     });
 
     describe('Get all test revisions', function () {
-        it('Database returns empty row array, should return undefined', function () {
+        it('Database returns empty row array, throw an error with 404', function () {
             getTestRevisionsStub.resolves([]);
             return manager.getAllTestRevision(uuid.v4())
                 .then(function (res) {
-                    should.not.exist(res);
+                    throw new Error('should not get here');
+                }).catch(function (err) {
+                    should(err.statusCode).eql(404);
+                    should(err.message).eql('Not found');
                 });
         });
 
