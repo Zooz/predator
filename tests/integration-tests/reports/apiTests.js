@@ -5,14 +5,18 @@ const uuid = require('uuid/v4');
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 
-const statsGenerator = require('./statsGenerator');
-const requestCreator = require('./requestCreator');
+const statsGenerator = require('./helpers/statsGenerator');
+const reportsRequestCreator = require('./helpers/requestCreator');
 const mailhogHelper = require('./mailhog/mailhogHelper');
 
 let testId, reportId, minimalReportBody;
 
-describe('System tests for the reporter api', function() {
+describe('System tests for the reports api', function() {
     this.timeout(10000);
+
+    before(async () => {
+        await reportsRequestCreator.init();
+    });
 
     beforeEach(async function () {
         testId = uuid();
@@ -44,10 +48,10 @@ describe('System tests for the reporter api', function() {
         describe('Create report', function () {
             it('Create report with minimal fields and notes', async () => {
                 let reportBody = Object.assign({ notes: 'My first performance test' }, minimalReportBody);
-                const reportResponse = await requestCreator.createReport(testId, reportBody);
+                const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                 should(reportResponse.statusCode).be.eql(201);
 
-                let getReportResponse = await requestCreator.getReport(testId, reportId);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 let report = getReportResponse.body;
 
                 should(report.status).eql('initialized');
@@ -58,10 +62,10 @@ describe('System tests for the reporter api', function() {
             it('Create report with minimal fields and webhooks', async () => {
                 let reportBody = Object.assign({}, minimalReportBody);
                 reportBody.webhooks.push('https://webhook.to.here.com');
-                const reportResponse = await requestCreator.createReport(testId, reportBody);
+                const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                 should(reportResponse.statusCode).be.eql(201);
 
-                let getReportResponse = await requestCreator.getReport(testId, reportId);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 let report = getReportResponse.body;
 
                 should(report.status).eql('initialized');
@@ -73,10 +77,10 @@ describe('System tests for the reporter api', function() {
             it('Create report with minimal fields and emails', async () => {
                 let reportBody = Object.assign({}, minimalReportBody);
                 reportBody.emails.push('mickey@dog.com');
-                const reportResponse = await requestCreator.createReport(testId, reportBody);
+                const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                 should(reportResponse.statusCode).be.eql(201);
 
-                let getReportResponse = await requestCreator.getReport(testId, reportId);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 let report = getReportResponse.body;
 
                 should(report.status).eql('initialized');
@@ -92,24 +96,24 @@ describe('System tests for the reporter api', function() {
                 fullReportBody.webhooks = ['https://webhook.here.com'];
                 fullReportBody.emails = ['mickey@dog.com'];
                 fullReportBody.notes = 'My first performance test';
-                const reportResponse = await requestCreator.createReport(testId, fullReportBody);
+                const reportResponse = await reportsRequestCreator.createReport(testId, fullReportBody);
                 should(reportResponse.statusCode).be.eql(201);
 
-                const phaseStartedStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
+                const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
                 should(phaseStartedStatsResponse.statusCode).be.eql(204);
-                let getReportResponse = await requestCreator.getReport(testId, reportId);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 let report = getReportResponse.body;
                 should(report.status).eql('started');
 
-                const intermediateStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
+                const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
                 should(intermediateStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                const doneStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('done'));
+                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done'));
                 should(doneStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 should(getReportResponse.statusCode).be.eql(200);
                 report = getReportResponse.body;
                 validateReport(report, {
@@ -118,7 +122,7 @@ describe('System tests for the reporter api', function() {
                     notes: 'My first performance test'
                 });
 
-                let getHTMLReportResponse = await requestCreator.getHTMLReport(testId, reportId);
+                let getHTMLReportResponse = await reportsRequestCreator.getHTMLReport(testId, reportId);
                 getHTMLReportResponse.statusCode.should.eql(200);
                 const htmlReportText = getHTMLReportResponse.text;
                 validateHTMLReport(htmlReportText);
@@ -147,22 +151,22 @@ describe('System tests for the reporter api', function() {
                 emails: []
             };
             before(async function () {
-                let createReportResponse = await requestCreator.createReport(getReportsTestId, reportBody);
+                let createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
                 reportId = uuid();
                 reportBody.report_id = reportId;
-                createReportResponse = await requestCreator.createReport(getReportsTestId, reportBody);
+                createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
                 reportId = uuid();
                 reportBody.report_id = reportId;
-                createReportResponse = await requestCreator.createReport(getReportsTestId, reportBody);
+                createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
             });
 
             it('Get all reports for specific testId', async () => {
-                let getReportsResponse = await requestCreator.getReports(getReportsTestId);
+                let getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId);
                 const reports = getReportsResponse.body;
 
                 should(reports.length).eql(3);
@@ -172,13 +176,13 @@ describe('System tests for the reporter api', function() {
                 let lastReportsIdtestId = uuid();
                 reportId = uuid();
                 reportBody.report_id = reportId;
-                await requestCreator.createReport(lastReportsIdtestId, reportBody);
+                await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
 
                 reportId = uuid();
                 reportBody.report_id = reportId;
-                await requestCreator.createReport(lastReportsIdtestId, reportBody);
+                await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
 
-                let getLastReportsResponse = await requestCreator.getLastReports(5);
+                let getLastReportsResponse = await reportsRequestCreator.getLastReports(5);
                 const lastReports = getLastReportsResponse.body;
 
                 should(lastReports.length).eql(5);
@@ -206,82 +210,82 @@ describe('System tests for the reporter api', function() {
                     webhooks: [],
                     emails: []
                 };
-                const reportResponse = await requestCreator.createReport(testId, minimalReportBody);
+                const reportResponse = await reportsRequestCreator.createReport(testId, minimalReportBody);
                 should(reportResponse.statusCode).be.eql(201);
             });
 
             it('Post full cycle stats', async () => {
-                const phaseStartedStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
+                const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
                 should(phaseStartedStatsResponse.statusCode).be.eql(204);
-                let getReportResponse = await requestCreator.getReport(testId, reportId);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 let report = getReportResponse.body;
                 should(report.status).eql('started');
 
-                let intermediateStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
+                let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
                 should(intermediateStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                intermediateStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
+                intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
                 should(intermediateStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                const doneStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('done'));
+                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done'));
                 should(doneStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 should(getReportResponse.statusCode).be.eql(200);
                 report = getReportResponse.body;
                 validateReport(report);
             });
 
             it('Post only "done" phase stats', async () => {
-                const doneStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('done'));
+                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done'));
                 should(doneStatsResponse.statusCode).be.eql(204);
-                let getReportResponse = await requestCreator.getReport(testId, reportId);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 should(getReportResponse.statusCode).be.eql(200);
                 let report = getReportResponse.body;
                 validateReport(report);
             });
 
             it('Post "error" stats', async () => {
-                const phaseStartedStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
+                const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
                 should(phaseStartedStatsResponse.statusCode).be.eql(204);
-                let getReportResponse = await requestCreator.getReport(testId, reportId);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 let report = getReportResponse.body;
                 should(report.status).eql('started');
 
-                const intermediateStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
+                const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
                 should(intermediateStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                const errorStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('error'));
+                const errorStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('error'));
                 should(errorStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('failed');
             });
 
             it('Post "aborted" stats', async () => {
-                const phaseStartedStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
+                const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
                 should(phaseStartedStatsResponse.statusCode).be.eql(204);
-                let getReportResponse = await requestCreator.getReport(testId, reportId);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 let report = getReportResponse.body;
                 should(report.status).eql('started');
 
-                const intermediateStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
+                const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
                 should(intermediateStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                const abortedStatsResponse = await requestCreator.postStats(testId, reportId, statsGenerator.generateStats('aborted'));
+                const abortedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('aborted'));
                 should(abortedStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await requestCreator.getReport(testId, reportId);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('aborted');
             });
@@ -291,7 +295,7 @@ describe('System tests for the reporter api', function() {
     describe('Sad flow', function(){
         describe('400 error codes', function () {
             it('POST report with bad request body', async function() {
-                const createReportResponse = await requestCreator.createReport(testId, {});
+                const createReportResponse = await reportsRequestCreator.createReport(testId, {});
                 createReportResponse.statusCode.should.eql(400);
                 createReportResponse.body.should.eql({message: 'Input validation error',
                     validation_errors: [
@@ -309,7 +313,7 @@ describe('System tests for the reporter api', function() {
             });
 
             it('POST stats with bad request body', async function() {
-                const postStatsResponse = await requestCreator.postStats(testId, reportId, {});
+                const postStatsResponse = await reportsRequestCreator.postStats(testId, reportId, {});
                 postStatsResponse.statusCode.should.eql(400);
                 postStatsResponse.body.should.eql({message: 'Input validation error',
                     validation_errors: [
@@ -320,7 +324,7 @@ describe('System tests for the reporter api', function() {
             });
 
             it('GET last reports without limit query param', async function() {
-                const lastReportsResponse = await requestCreator.getLastReports();
+                const lastReportsResponse = await reportsRequestCreator.getLastReports();
                 lastReportsResponse.statusCode.should.eql(400);
                 lastReportsResponse.body.should.eql({message: 'Input validation error',
                     validation_errors: [
@@ -331,7 +335,7 @@ describe('System tests for the reporter api', function() {
 
         describe('404 error codes', function () {
             it('GET not existing report', async function() {
-                const getReportResponse = await requestCreator.getReport(testId, uuid());
+                const getReportResponse = await reportsRequestCreator.getReport(testId, uuid());
                 should(getReportResponse.statusCode).be.eql(404);
                 getReportResponse.body.should.eql({
                     message: 'Report not found'
@@ -339,7 +343,7 @@ describe('System tests for the reporter api', function() {
             });
 
             it('POST stats on not existing report', async function() {
-                const postStatsresponse = await requestCreator.postStats(testId, uuid(), statsGenerator.generateStats('started_phase'));
+                const postStatsresponse = await reportsRequestCreator.postStats(testId, uuid(), statsGenerator.generateStats('started_phase'));
                 postStatsresponse.statusCode.should.eql(404);
                 postStatsresponse.body.should.eql({
                     message: 'Report not found'

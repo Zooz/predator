@@ -1,7 +1,6 @@
 #!/bin/bash
 LOGS_DIRECTORY_PATH=tests/system-tests/logs
 
-
 mkdir $LOGS_DIRECTORY_PATH
 
 function waitForApp() {
@@ -128,7 +127,7 @@ function reporter() {
                     -e DATABASE_PASSWORD=$DATABASE_PASSWORD \
                     -e SMTP_HOST=$SMTP_HOST\
                     -e SMTP_PASSWORD=$SMTP_PASSWORD \
-                    -e SMTP_USER=$SMTP_USER \
+                    -e SMTP_USERNAME=$SMTP_USERNAME \
                     -e SMTP_PORT=$SMTP_PORT \
                     -e MY_ADDRESS=$URL \
                     -e GRAFANA_URL=$GRAFANA_URL \

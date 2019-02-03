@@ -5,7 +5,7 @@ let nock = require('nock');
 let serviceConfig = require('../../../src/config/serviceConfig');
 let kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
-describe('Create job specific kubernetes tests', () => {
+describe.skip('Create job specific kubernetes tests', () => {
     before(async () => {
         await schedulerRequestCreator.init();
     });

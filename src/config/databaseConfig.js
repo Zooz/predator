@@ -7,7 +7,7 @@ let config = {
     password: process.env.DATABASE_PASSWORD,
     cassandraReplicationFactor: process.env.CASSANDRA_REPLICATION_FACTOR || 1,
     cassandraConsistency: process.env.CASSANDRA_CONSISTENCY || cassandra.types.consistencies.localQuorum,
-    sqlite_storage: process.env.SQLITE_STORAGE || 'predator'
+    sqliteStorage: process.env.SQLITE_STORAGE || 'predator'
 };
 
 module.exports = config;
