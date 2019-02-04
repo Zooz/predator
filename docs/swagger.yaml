@@ -927,8 +927,6 @@ definitions:
     - test_description
     - test_configuration
     - start_time
-    - webhooks
-    - emails
     properties:
       report_id:
         type: string
@@ -960,12 +958,6 @@ definitions:
       notes:
         type: string
         description: notes about the test
-      webhooks:
-        type: array
-        description: urls to send live report webhooks to
-      emails:
-        type: array
-        description: addresses to send finished report email to
 
   post_report_response:
     required:

@@ -20,7 +20,7 @@ const SMTP_MANDATORY_VARS = [
     'SMTP_PASSWORD'
 ];
 
-describe.skip('Env Suite', function () {
+describe('Env Suite', function () {
     before(() => {
         sandbox = sinon.sandbox.create();
         processExitStub = sandbox.stub(process, 'exit');

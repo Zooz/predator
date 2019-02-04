@@ -33,7 +33,7 @@ describe('Jobs verifier tests', function () {
         sandbox.restore();
     });
 
-    describe.skip('verifyTestExists tests', () => {
+    describe('verifyTestExists tests', () => {
         it('Should pass test id validation', async () => {
             req = { body: { test_id: 'id' } };
             config.testsApiUrl = 'http://perf.zooz.com';

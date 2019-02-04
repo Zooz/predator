@@ -15,8 +15,8 @@ module.exports = {
     getStats
 };
 
-function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, emails, webhooks, notes) {
-    return databaseConnector.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, emails, webhooks, notes);
+function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
+    return databaseConnector.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes);
 }
 
 function insertStats(testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {

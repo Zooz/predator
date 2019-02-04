@@ -2,7 +2,7 @@
 const should = require('should'),
     requestSender = require('./helpers/requestCreator');
 
-describe.skip('Testing dsl tests api', function () {
+describe('Testing dsl tests api', function () {
     let dslName;
     before(async function f() {
         await requestSender.init();

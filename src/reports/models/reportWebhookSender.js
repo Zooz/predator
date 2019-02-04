@@ -3,7 +3,7 @@
 let request = require('request-promise-native');
 
 let logger = require('../../common/logger');
-let reportModel = require('./reports');
+let reportModel = require('./reportsManager');
 
 module.exports.send = async (testId, reportId, message, webhooks) => {
     let options = {
