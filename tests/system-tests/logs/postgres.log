@@ -21,9 +21,9 @@ Success. You can now start the database server using:
 
     pg_ctl -D /var/lib/postgresql/data -l logfile start
 
-waiting for server to start....2019-01-31 17:36:11.278 UTC [30] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
-2019-01-31 17:36:11.289 UTC [31] LOG:  database system was shut down at 2019-01-31 17:36:11 UTC
-2019-01-31 17:36:11.292 UTC [30] LOG:  database system is ready to accept connections
+waiting for server to start....2019-02-04 11:34:26.623 UTC [31] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2019-02-04 11:34:26.638 UTC [32] LOG:  database system was shut down at 2019-02-04 11:34:26 UTC
+2019-02-04 11:34:26.644 UTC [31] LOG:  database system is ready to accept connections
  done
 server started
 CREATE DATABASE
@@ -31,11 +31,11 @@ CREATE DATABASE
 
 /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
 
-waiting for server to shut down....2019-01-31 17:36:11.690 UTC [30] LOG:  received fast shutdown request
-2019-01-31 17:36:11.692 UTC [30] LOG:  aborting any active transactions
-2019-01-31 17:36:11.694 UTC [30] LOG:  background worker "logical replication launcher" (PID 37) exited with exit code 1
-2019-01-31 17:36:11.694 UTC [32] LOG:  shutting down
-2019-01-31 17:36:11.708 UTC [30] LOG:  database system is shut down
+waiting for server to shut down....2019-02-04 11:34:27.027 UTC [31] LOG:  received fast shutdown request
+2019-02-04 11:34:27.031 UTC [31] LOG:  aborting any active transactions
+2019-02-04 11:34:27.032 UTC [31] LOG:  background worker "logical replication launcher" (PID 38) exited with exit code 1
+2019-02-04 11:34:27.032 UTC [33] LOG:  shutting down
+2019-02-04 11:34:27.046 UTC [31] LOG:  database system is shut down
  done
 server stopped
 

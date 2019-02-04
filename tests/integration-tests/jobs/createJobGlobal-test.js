@@ -124,8 +124,7 @@ describe('Create job global tests', () => {
                 });
         });
 
-        // todo waiting for tests api integration
-        it.skip('Create a job with non existing test_id', () => {
+        it('Create a job with non existing test_id', () => {
             let illegalBody = {
                 test_id: '56ccc314-8c92-4002-839d-8424909ff475',
                 arrival_rate: 1,
