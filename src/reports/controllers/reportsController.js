@@ -1,7 +1,7 @@
 
 'use strict';
 let artilleryReportGenerator = require('../models/artilleryReportGenerator');
-let reports = require('../models/reports');
+let reports = require('../models/reportsManager');
 
 module.exports.getHtmlReport = async function (req, res) {
     let report;
@@ -19,7 +19,6 @@ module.exports.getReport = async (req, res) => {
     try {
         reportSummary = await reports.getReport(req.params.test_id, req.params.report_id);
     } catch (error) {
-        console.log(error)
         return res.status(error.statusCode).json({ message: error.message });
     }
 
@@ -53,7 +52,6 @@ module.exports.postReport = async (req, res) => {
     try {
         report = await reports.postReport(req.params.test_id, req.body);
     } catch (error) {
-        console.log(error)
         return res.status(error.statusCode).json({ message: error.message });
     }
 
@@ -64,7 +62,6 @@ module.exports.postStats = async (req, res) => {
     try {
         await reports.postStats(req.params.test_id, req.params.report_id, req.body);
     } catch (error) {
-        console.log(error)
         return res.status(error.statusCode).json({ message: error.message });
     }
     return res.status(204).json();

@@ -6,7 +6,7 @@ JSCK.Draft4 = JSCK.draft4;
 let artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const requestSender = require('./helpers/requestCreator');
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
-describe.skip('System tests for the api', function() {
+describe('System tests for the api', function() {
     let simpleTest;
     let dslName;
     before(async function () {

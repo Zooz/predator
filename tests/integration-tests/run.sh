@@ -6,11 +6,11 @@ source ./tests/configurations/commonConfiguration.sh
 echo initializing mailhog
 ./scripts/dockerRun.sh mailhog
 
-#echo running integration tests with cassandra db and kubernetes integration
-#source ./tests/configurations/cassandraConfiguration.sh
-#source ./tests/configurations/kubernetesConfiguration.sh
-#./scripts/dockerRun.sh cassandra
-#node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
+echo running integration tests with cassandra db and kubernetes integration
+source ./tests/configurations/cassandraConfiguration.sh
+source ./tests/configurations/kubernetesConfiguration.sh
+./scripts/dockerRun.sh cassandra
+node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
 
 echo running integration tests with mysql db and kubernetes integration
 source ./tests/configurations/mysqlConfiguration.sh

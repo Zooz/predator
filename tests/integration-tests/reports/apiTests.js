@@ -7,9 +7,10 @@ const { JSDOM } = jsdom;
 
 const statsGenerator = require('./helpers/statsGenerator');
 const reportsRequestCreator = require('./helpers/requestCreator');
+const jobCreator = require('./helpers/jobCreator');
 const mailhogHelper = require('./mailhog/mailhogHelper');
 
-let testId, reportId, minimalReportBody;
+let testId, reportId, jobId, minimalReportBody;
 
 describe('System tests for the reports api', function() {
     this.timeout(10000);
@@ -25,8 +26,8 @@ describe('System tests for the reports api', function() {
         minimalReportBody = {
             test_type: 'custom',
             report_id: reportId,
+            job_id: undefined,
             revision_id: uuid(),
-            job_id: uuid(),
             test_name: 'system-test',
             test_description: 'doing some system testing',
             start_time: Date.now().toString(),
@@ -34,9 +35,7 @@ describe('System tests for the reports api', function() {
                 enviornment: 'test',
                 duration: 10,
                 arrival_rate: 20
-            },
-            webhooks: [],
-            emails: []
+            }
         };
     });
 
@@ -46,88 +45,114 @@ describe('System tests for the reports api', function() {
 
     describe('Happy flow', function () {
         describe('Create report', function () {
-            it('Create report with minimal fields and notes', async () => {
-                let reportBody = Object.assign({ notes: 'My first performance test' }, minimalReportBody);
-                const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
-                should(reportResponse.statusCode).be.eql(201);
+            describe('Create report with minimal fields and notes', async () => {
+                before(async () => {
+                    const job = await jobCreator.createJob();
+                    jobId = job.id;
+                });
 
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                let report = getReportResponse.body;
+                it('should successfully create report', async () => {
+                    let reportBody = Object.assign({ notes: 'My first performance test' }, minimalReportBody);
+                    reportBody.job_id = jobId;
+                    const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
+                    should(reportResponse.statusCode).be.eql(201);
 
-                should(report.status).eql('initialized');
-                should(report.last_stats).eql({});
-                should(report.notes).eql(reportBody.notes);
+                    let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    let report = getReportResponse.body;
+                    should(report.status).eql('initialized');
+                    should(report.last_stats).eql({});
+                    should(report.notes).eql(reportBody.notes);
+                });
             });
 
-            it('Create report with minimal fields and webhooks', async () => {
-                let reportBody = Object.assign({}, minimalReportBody);
-                reportBody.webhooks.push('https://webhook.to.here.com');
-                const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
-                should(reportResponse.statusCode).be.eql(201);
+            describe('Create report with minimal fields and webhooks', async () => {
+                before(async () => {
+                    const job = await jobCreator.createJob(undefined, ['https://webhook.to.here.com']);
+                    jobId = job.id;
+                });
 
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                let report = getReportResponse.body;
+                it('should successfully create report', async () => {
+                    let reportBody = Object.assign({}, minimalReportBody);
+                    reportBody.job_id = jobId;
 
-                should(report.status).eql('initialized');
-                should(report.last_stats).eql({});
-                should(report.webhooks).eql(reportBody.webhooks);
-                should(report.notes).eql('');
+                    const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
+                    should(reportResponse.statusCode).be.eql(201);
+
+                    let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    let report = getReportResponse.body;
+
+                    should(report.status).eql('initialized');
+                    should(report.last_stats).eql({});
+                    should(report.webhooks).eql(reportBody.webhooks);
+                    should(report.notes).eql('');
+                });
             });
 
-            it('Create report with minimal fields and emails', async () => {
-                let reportBody = Object.assign({}, minimalReportBody);
-                reportBody.emails.push('mickey@dog.com');
-                const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
-                should(reportResponse.statusCode).be.eql(201);
+            describe('Create report with minimal fields and emails', async () => {
+                before(async () => {
+                    const job = await jobCreator.createJob(['mickey@dog.com']);
+                    jobId = job.id;
+                });
 
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                let report = getReportResponse.body;
+                it('should successfully create report', async () => {
+                    let reportBody = Object.assign({}, minimalReportBody);
+                    reportBody.job_id = jobId;
+                    const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
+                    should(reportResponse.statusCode).be.eql(201);
 
-                should(report.status).eql('initialized');
-                should(report.last_stats).eql({});
-                should(report.emails).eql(reportBody.emails);
-                should(report.notes).eql('');
+                    let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    let report = getReportResponse.body;
+
+                    should(report.status).eql('initialized');
+                    should(report.last_stats).eql({});
+                    should(report.emails).eql(reportBody.emails);
+                    should(report.notes).eql('');
+                });
             });
         });
 
         describe('Create report, post stats, and get final html report', function () {
-            it('Create report with all fields, and post full cycle stats', async () => {
-                let fullReportBody = Object.assign({}, minimalReportBody);
-                fullReportBody.webhooks = ['https://webhook.here.com'];
-                fullReportBody.emails = ['mickey@dog.com'];
-                fullReportBody.notes = 'My first performance test';
-                const reportResponse = await reportsRequestCreator.createReport(testId, fullReportBody);
-                should(reportResponse.statusCode).be.eql(201);
-
-                const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
-                should(phaseStartedStatsResponse.statusCode).be.eql(204);
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                let report = getReportResponse.body;
-                should(report.status).eql('started');
-
-                const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
-                should(intermediateStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                report = getReportResponse.body;
-                should(report.status).eql('in_progress');
-
-                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done'));
-                should(doneStatsResponse.statusCode).be.eql(204);
-                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                should(getReportResponse.statusCode).be.eql(200);
-                report = getReportResponse.body;
-                validateReport(report, {
-                    webhooks: ['https://webhook.here.com'],
-                    emails: ['mickey@dog.com'],
-                    notes: 'My first performance test'
+            describe('Create report with all fields, and post full cycle stats', async () => {
+                before(async () => {
+                    const job = await jobCreator.createJob(['mickey@dog.com'], ['https://webhook.here.com']);
+                    jobId = job.id;
                 });
 
-                let getHTMLReportResponse = await reportsRequestCreator.getHTMLReport(testId, reportId);
-                getHTMLReportResponse.statusCode.should.eql(200);
-                const htmlReportText = getHTMLReportResponse.text;
-                validateHTMLReport(htmlReportText);
+                it('should successfully create report', async () => {
+                    let fullReportBody = Object.assign({}, minimalReportBody);
+                    fullReportBody.notes = 'My first performance test';
+                    fullReportBody.job_id = jobId;
+                    const reportResponse = await reportsRequestCreator.createReport(testId, fullReportBody);
+                    should(reportResponse.statusCode).be.eql(201);
 
-                await mailhogHelper.validateEmail();
+                    const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase'));
+                    should(phaseStartedStatsResponse.statusCode).be.eql(204);
+                    let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    let report = getReportResponse.body;
+                    should(report.status).eql('started');
+
+                    const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate'));
+                    should(intermediateStatsResponse.statusCode).be.eql(204);
+                    getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    report = getReportResponse.body;
+                    should(report.status).eql('in_progress');
+
+                    const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done'));
+                    should(doneStatsResponse.statusCode).be.eql(204);
+                    getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    should(getReportResponse.statusCode).be.eql(200);
+                    report = getReportResponse.body;
+                    validateReport(report, {
+                        notes: 'My first performance test'
+                    });
+
+                    let getHTMLReportResponse = await reportsRequestCreator.getHTMLReport(testId, reportId);
+                    getHTMLReportResponse.statusCode.should.eql(200);
+                    const htmlReportText = getHTMLReportResponse.text;
+                    validateHTMLReport(htmlReportText);
+
+                    await mailhogHelper.validateEmail();
+                });
             });
         });
 
@@ -137,7 +162,6 @@ describe('System tests for the reports api', function() {
             let reportBody = {
                 report_id: reportId,
                 revision_id: uuid(),
-                job_id: uuid(),
                 test_type: 'custom',
                 test_name: 'system-test',
                 test_description: 'doing some system testing',
@@ -151,6 +175,9 @@ describe('System tests for the reports api', function() {
                 emails: []
             };
             before(async function () {
+                const job = await jobCreator.createJob();
+                reportBody.job_id = job.id;
+
                 let createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
@@ -190,6 +217,11 @@ describe('System tests for the reports api', function() {
         });
 
         describe('Post stats', function () {
+            before(async function () {
+                const job = await jobCreator.createJob();
+                jobId = job.id;
+            });
+
             beforeEach(async function () {
                 testId = uuid();
                 reportId = uuid();
@@ -198,7 +230,7 @@ describe('System tests for the reports api', function() {
                     test_type: 'custom',
                     report_id: reportId,
                     revision_id: uuid(),
-                    job_id: uuid(),
+                    job_id: jobId,
                     test_name: 'system-test',
                     test_description: 'doing some system testing',
                     start_time: Date.now().toString(),
@@ -307,8 +339,6 @@ describe('System tests for the reports api', function() {
                         'body should have required property \'test_description\'',
                         'body should have required property \'start_time\'',
                         'body should have required property \'test_configuration\'',
-                        'body should have required property \'webhooks\'',
-                        'body should have required property \'emails\''
                     ]});
             });
 
@@ -364,7 +394,7 @@ function validateLastStats(stats) {
 
 function validateReport(report, expectedValues = {}) {
     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
-        'end_time', 'phase', 'last_stats', 'status', 'html_report', 'webhooks', 'emails'];
+        'end_time', 'phase', 'last_stats', 'status', 'html_report'];
 
     REPORT_KEYS.forEach((key) => {
         should(report).hasOwnProperty(key);
