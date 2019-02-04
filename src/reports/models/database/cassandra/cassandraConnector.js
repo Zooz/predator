@@ -30,7 +30,6 @@ let queryOptions = {
 
 async function init(cassandraClient) {
     client = cassandraClient;
-    logger.info('Reports cassandra client initialized');
 }
 
 function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {

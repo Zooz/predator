@@ -26,7 +26,7 @@ function waitForApp() {
 function mysql() {
     IMAGE_NAME=mysql:5.7
     APP=mysql
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     --name $APP \
@@ -43,7 +43,6 @@ function mysql() {
         exit ${COMMAND_EXIT_CODE}
     fi
 
-    waitForApp $APP "ready for connections"
     sleep 5
     echo "$APP is ready"
 }
@@ -51,7 +50,7 @@ function mysql() {
 function postgres() {
     IMAGE_NAME=postgres:11-alpine
     APP=postgres
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     --name $APP \
@@ -76,7 +75,7 @@ function postgres() {
 function cassandra() {
     IMAGE_NAME=cassandra:3.11
     APP=cassandra
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     --name $APP \
@@ -97,7 +96,7 @@ function cassandra() {
 function mailhog() {
     IMAGE_NAME=mailhog/mailhog
     APP=mailhog
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     --name $APP \
@@ -118,7 +117,7 @@ function mailhog() {
 function reporter() {
     IMAGE_NAME=$IMAGE
     APP=reporter
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     -e DATABASE_ADDRESS=$DATABASE_ADDRESS\
@@ -148,7 +147,7 @@ function reporter() {
     echo "$APP is ready"
 }
 
-function deleteContainer() {
+function stop() {
     NAME=$1
     isExists=$(docker ps -af name=$NAME | grep -v IMAGE)
     if [ ! -z isExists ];then
@@ -178,7 +177,9 @@ for option in ${@}; do
     mysql)
         mysql
         ;;
-
+    stop)
+        stop
+        ;;
     *)
         echo "Usage: ./dockerRun.sh <cassandra|postgres|reporter|mailhog|mysql>"
         ;;

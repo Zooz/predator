@@ -15,6 +15,7 @@ module.exports.init = async () => {
     await reportsCassandraConnector.init(cassandraClient);
     await schedulerCassandraConnector.init(cassandraClient);
     await testsCassandraConnector.init(cassandraClient);
+    logger.info('cassandra client initialized');
 };
 
 module.exports.ping = () => {

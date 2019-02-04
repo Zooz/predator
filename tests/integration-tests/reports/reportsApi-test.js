@@ -7,6 +7,7 @@ const { JSDOM } = jsdom;
 
 const statsGenerator = require('./helpers/statsGenerator');
 const reportsRequestCreator = require('./helpers/requestCreator');
+const jobRequestCreator = require('../jobs/helpers/requestCreator');
 const mailhogHelper = require('./mailhog/mailhogHelper');
 
 let testId, reportId, jobId, minimalReportBody;
@@ -46,7 +47,7 @@ describe('Integration tests for the reports api', function() {
         describe('Create report', function () {
             describe('Create report with minimal fields and notes', async () => {
                 before(async () => {
-                    const jobResponse = await reportsRequestCreator.createJob();
+                    const jobResponse = await createJob();
                     jobId = jobResponse.body.id;
                 });
 
@@ -66,7 +67,7 @@ describe('Integration tests for the reports api', function() {
 
             describe('Create report with minimal fields and webhooks', async () => {
                 before(async () => {
-                    const jobResponse = await reportsRequestCreator.createJob(undefined, ['https://webhook.to.here.com']);
+                    const jobResponse = await createJob(undefined, ['https://webhook.to.here.com']);
                     jobId = jobResponse.body.id;
                 });
 
@@ -88,7 +89,7 @@ describe('Integration tests for the reports api', function() {
 
             describe('Create report with minimal fields and emails', async () => {
                 before(async () => {
-                    const jobResponse = await reportsRequestCreator.createJob(['mickey@dog.com']);
+                    const jobResponse = await createJob(['mickey@dog.com']);
                     jobId = jobResponse.body.id;
                 });
 
@@ -111,7 +112,7 @@ describe('Integration tests for the reports api', function() {
         describe('Create report, post stats, and get final html report', function () {
             describe('Create report with all fields, and post full cycle stats', async () => {
                 before(async () => {
-                    const jobResponse = await reportsRequestCreator.createJob(['mickey@dog.com'], ['https://webhook.here.com']);
+                    const jobResponse = await createJob(['mickey@dog.com'], ['https://webhook.here.com']);
                     jobId = jobResponse.body.id;
                 });
 
@@ -170,7 +171,7 @@ describe('Integration tests for the reports api', function() {
                 }
             };
             before(async function () {
-                const jobResponse = await reportsRequestCreator.createJob();
+                const jobResponse = await createJob();
                 jobId = jobResponse.body.id;
                 reportBody.job_id = jobId;
 
@@ -214,7 +215,7 @@ describe('Integration tests for the reports api', function() {
 
         describe('Post stats', function () {
             before(async function () {
-                const jobResponse = await reportsRequestCreator.createJob();
+                const jobResponse = await createJob();
                 jobId = jobResponse.body.id;
             });
 
@@ -423,4 +424,26 @@ function validateReport(report, expectedValues = {}) {
 
 function validateHTMLReport(text) {
     const parsedHTMLReport = new JSDOM(text);
+}
+
+function createJob(emails, webhooks) {
+    let jobOptions = {
+        test_id: uuid(),
+        arrival_rate: 10,
+        duration: 10,
+        environment: 'test',
+        cron_expression: '0 0 1 * *'
+    };
+
+    if (emails) {
+        jobOptions.emails = emails;
+    }
+
+    if (webhooks) {
+        jobOptions.webhooks = webhooks;
+    }
+
+    return jobRequestCreator.createJob(jobOptions, {
+        'Content-Type': 'application/json'
+    });
 }

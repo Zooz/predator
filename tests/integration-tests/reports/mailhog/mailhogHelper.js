@@ -25,7 +25,7 @@ module.exports.validateEmail = async () => {
                 console.log(email);
                 resolve(email);
             }
-        }, 2000);
+        }, 1000);
     });
 };
 

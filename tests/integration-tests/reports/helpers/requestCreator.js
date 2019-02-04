@@ -1,17 +1,14 @@
 'use strict';
 
 const request = require('supertest');
-const uuid = require('uuid');
 
 const app = require('../../../../src/app');
-const jobRequestCreator = require('../../jobs/helpers/requestCreator');
 
 let testApp;
 const HEADERS = { 'Content-Type': 'application/json' };
 
 module.exports = {
     init,
-    createJob,
     createReport,
     postStats,
     getReport,
@@ -22,26 +19,6 @@ module.exports = {
 
 async function init() {
     testApp = await app();
-}
-
-function createJob(emails, webhooks) {
-    let jobOptions = {
-        test_id: uuid(),
-        arrival_rate: 10,
-        duration: 10,
-        environment: 'test',
-        cron_expression: '0 0 1 * *'
-    };
-
-    if (emails) {
-        jobOptions.emails = emails;
-    }
-
-    if (webhooks) {
-        jobOptions.webhooks = webhooks;
-    }
-
-    return jobRequestCreator.createJob(jobOptions, HEADERS);
 }
 
 function createReport(testId, body) {

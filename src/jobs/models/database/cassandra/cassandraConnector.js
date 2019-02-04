@@ -26,7 +26,6 @@ let queryOptions = {
 
 async function init(cassandraClient) {
     client = cassandraClient;
-    logger.info('Scheduler cassandra client initialized');
 }
 
 function deleteJob(jobId) {
