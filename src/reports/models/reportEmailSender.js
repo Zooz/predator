@@ -7,12 +7,14 @@ let nodemailer = require('nodemailer');
 
 let smtpConfig = require('../../config/smtpConfig');
 let logger = require('../../common/logger');
-let reportModel = require('./reports');
+let reportsManager = require('./reportsManager');
+let jobsManager = require('../../jobs/models/jobManager');
 
 module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafanaUrl) => {
-    let report;
+    let report, job;
     try {
-        report = await reportModel.getReport(testId, reportId);
+        report = await reportsManager.getReport(testId, reportId);
+        job = await jobsManager.getJob(report.job_id);
     } catch (error) {
         let errorMessage = `Failed to retrieve summary for testId: ${testId}, reportId: ${reportId}`;
         logger.error(error, errorMessage);
@@ -20,7 +22,7 @@ module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafana
     }
 
     let testName = report.test_name;
-    let emails = report.emails;
+    let emails = job.emails;
     let endTime = report.end_time;
     let startTime = report.start_time;
     let testRunTime = timeConversion(endTime - startTime);
@@ -60,7 +62,7 @@ function createSMTPClient() {
         host: smtpConfig.host,
         connectionTimeout: smtpConfig.timeout,
         auth: {
-            user: smtpConfig.user,
+            user: smtpConfig.username,
             pass: smtpConfig.password
         }
     };

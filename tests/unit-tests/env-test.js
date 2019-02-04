@@ -16,11 +16,11 @@ const MANDATORY_VARS = [
 const SMTP_MANDATORY_VARS = [
     'SMTP_HOST',
     'SMTP_PORT',
-    'SMTP_USER',
+    'SMTP_USERNAME',
     'SMTP_PASSWORD'
 ];
 
-describe.skip('Env Suite', function () {
+describe('Env Suite', function () {
     before(() => {
         sandbox = sinon.sandbox.create();
         processExitStub = sandbox.stub(process, 'exit');
@@ -87,7 +87,7 @@ describe.skip('Env Suite', function () {
                     beforeEach(() => {
                         process.env.SMTP_HOST = 'SMTP_HOST';
                         process.env.SMTP_PORT = 'SMTP_PORT';
-                        process.env.SMTP_USER = 'SMTP_USER';
+                        process.env.SMTP_USERNAME = 'SMTP_USERNAME';
                         process.env.SMTP_PASSWORD = 'SMTP_PASSWORD';
 
                         delete process.env[varb];

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 export JOB_PLATFORM=KUBERNETES
 export KUBERNETES_URL=https://kubernetes
 export KUBERNETES_TOKEN=ya29.GluRBoPSEzMUXPArNwQbp_GDsGvB6ysA5F0fRo3gY1WbiOcJ6rGxKx35Yh6Zax9TL9rJhqJK4iJ8jsAvuiOFMQvH-1spYdLhvZv-JVzNVdUpQVJDJahTYXl-nrM_

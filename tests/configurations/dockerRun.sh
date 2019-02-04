@@ -1,7 +1,6 @@
 #!/bin/bash
 LOGS_DIRECTORY_PATH=tests/system-tests/logs
 
-
 mkdir $LOGS_DIRECTORY_PATH
 
 function waitForApp() {
@@ -11,7 +10,7 @@ function waitForApp() {
     HEALTH_CHECK_INTERVAL=1;
     started=
     while [[ -z $started && $HEALTH_CHECK_TIMEOUT -gt 0 ]]; do
-        started=$(docker logs "$container" | grep "$grepBy" 2>/dev/null)
+        started=$(docker logs "$container" 2>&1 | grep "$grepBy" 2>/dev/null)
         let HEALTH_CHECK_TIMEOUT=$HEALTH_CHECK_TIMEOUT-1
         sleep $HEALTH_CHECK_INTERVAL
     done
@@ -27,7 +26,7 @@ function waitForApp() {
 function mysql() {
     IMAGE_NAME=mysql:5.7
     APP=mysql
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     --name $APP \
@@ -52,13 +51,12 @@ function mysql() {
 function postgres() {
     IMAGE_NAME=postgres:11-alpine
     APP=postgres
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     --name $APP \
                     -e POSTGRES_PASSWORD=password \
                     -e POSTGRES_USER=root \
-                    --network=system-tests \
                     -p 5432:5432 \
                     $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
@@ -77,12 +75,11 @@ function postgres() {
 function cassandra() {
     IMAGE_NAME=cassandra:3.11
     APP=cassandra
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     --name $APP \
                     -p 9042:9042 \
-                    --network=system-tests \
                     $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
@@ -98,13 +95,12 @@ function cassandra() {
 function mailhog() {
     IMAGE_NAME=mailhog/mailhog
     APP=mailhog
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     --name $APP \
                     -p 8025:8025 \
                     -p 1025:1025 \
-                    --network=system-tests \
                     $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
@@ -119,7 +115,7 @@ function mailhog() {
 function reporter() {
     IMAGE_NAME=$IMAGE
     APP=reporter
-    deleteContainer $APP
+    stop $APP
     COMMAND="docker run \
                     -d \
                     -e DATABASE_ADDRESS=$DATABASE_ADDRESS\
@@ -128,13 +124,12 @@ function reporter() {
                     -e DATABASE_PASSWORD=$DATABASE_PASSWORD \
                     -e SMTP_HOST=$SMTP_HOST\
                     -e SMTP_PASSWORD=$SMTP_PASSWORD \
-                    -e SMTP_USER=$SMTP_USER \
+                    -e SMTP_USERNAME=$SMTP_USERNAME \
                     -e SMTP_PORT=$SMTP_PORT \
                     -e MY_ADDRESS=$URL \
                     -e GRAFANA_URL=$GRAFANA_URL \
                     -e REPLICATION_FACTOR=$REPLICATION_FACTOR \
                     -e DATABASE_TYPE=$DATABASE_TYPE \
-                    --network=system-tests \
                     --name $APP \
                     -p 8080:8080 \
                     $IMAGE_NAME"
@@ -149,7 +144,7 @@ function reporter() {
     echo "$APP is ready"
 }
 
-function deleteContainer() {
+function stop() {
     NAME=$1
     isExists=$(docker ps -af name=$NAME | grep -v IMAGE)
     if [ ! -z isExists ];then
@@ -179,7 +174,9 @@ for option in ${@}; do
     mysql)
         mysql
         ;;
-
+    stop)
+        stop
+        ;;
     *)
         echo "Usage: ./dockerRun.sh <cassandra|postgres|reporter|mailhog|mysql>"
         ;;

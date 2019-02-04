@@ -7,3 +7,5 @@ coverage/*
 mochawesome-report/*
 .idea/*
 .nyc_output
+*.log
+*.sqlite

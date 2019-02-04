@@ -33,7 +33,7 @@ module.exports.postReport = async (testId, reportBody) => {
     const startTime = new Date(Number(reportBody.start_time));
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, startTime, reportBody.test_name,
-        reportBody.test_description, JSON.stringify(reportBody.test_configuration), reportBody.emails, reportBody.webhooks, reportBody.notes);
+        reportBody.test_description, JSON.stringify(reportBody.test_configuration), reportBody.notes);
     return reportBody;
 };
 
@@ -75,8 +75,6 @@ function getReportResponse(summaryRow) {
         html_report: htmlReportUrl,
         grafana_report: grafanaReportUrl,
         notes: summaryRow.notes,
-        webhooks: summaryRow.webhooks,
-        emails: summaryRow.emails,
         environment: testConfiguration.environment
     };
 

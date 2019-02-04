@@ -1,6 +1,5 @@
 'use strict';
 
-const uuid = require('uuid/v4');
 const Sequelize = require('sequelize');
 let client;
 
@@ -20,7 +19,7 @@ async function init(sequlizeClient) {
     await initSchemas();
 }
 
-async function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, emails, webhooks, notes) {
+async function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
     const report = client.model('report');
     const params = {
         report_id: reportId,
@@ -37,24 +36,10 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, start
         end_time: null,
         notes: notes || '',
         phase: '0',
-        status: 'initialized',
-        webhooks: (webhooks && webhooks.length > 0) ? webhooks.map(webhookUrl => {
-            return { id: uuid(), url: webhookUrl };
-        }) : undefined,
-        emails: (emails && emails.length > 0) ? emails.map(emailAddress => {
-            return { id: uuid(), address: emailAddress };
-        }) : undefined
+        status: 'initialized'
     };
 
-    let include = [];
-    if (params.webhooks) {
-        include.push({ association: report.webhook });
-    }
-    if (params.emails) {
-        include.push({ association: report.email });
-    }
-
-    return report.create(params, { include });
+    return report.create(params);
 }
 
 async function insertStats(testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
@@ -93,19 +78,13 @@ async function getReportsAndParse(query) {
     const report = client.model('report');
 
     let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] },
-        include: [report.webhook, report.email]
+        attributes: { exclude: ['updated_at', 'created_at'] }
     };
 
     Object.assign(options, query);
 
     const allReportsRawResponse = await report.findAll(options);
     let allReports = allReportsRawResponse.map(rawReport => rawReport.dataValues);
-
-    allReports.forEach(report => {
-        report.emails = report.emails ? report.emails.map(sqlReport => sqlReport.dataValues.address) : undefined;
-        report.webhooks = report.webhooks ? report.webhooks.map(sqlReport => sqlReport.dataValues.url) : undefined;
-    });
 
     return allReports;
 }
@@ -174,26 +153,6 @@ async function initSchemas() {
         }
     });
 
-    const webhook = client.define('webhook', {
-        id: {
-            type: Sequelize.DataTypes.UUID,
-            primaryKey: true
-        },
-        url: {
-            type: Sequelize.DataTypes.STRING
-        }
-    });
-
-    const email = client.define('email', {
-        id: {
-            type: Sequelize.DataTypes.UUID,
-            primaryKey: true
-        },
-        address: {
-            type: Sequelize.DataTypes.STRING
-        }
-    });
-
     const report = client.define('report', {
         report_id: {
             type: Sequelize.DataTypes.STRING,
@@ -243,11 +202,6 @@ async function initSchemas() {
         }
     });
 
-    report.webhook = report.hasMany(webhook);
-    report.email = report.hasMany(email);
-
     await report.sync();
     await stats.sync();
-    await webhook.sync();
-    await email.sync();
 }
