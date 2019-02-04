@@ -8,7 +8,7 @@ const testGenerator = require('./testGenerator'),
 module.exports = {
     upsertTest,
     getTest,
-    getAllTestRevision,
+    getAllTestRevisions,
     getTests,
     deleteTest
 };
@@ -35,7 +35,7 @@ async function getTest(testId) {
     }
 }
 
-async function getAllTestRevision(testId) {
+async function getAllTestRevisions(testId) {
     const rows = await database.getAllTestRevisions(testId);
     const tests = [];
     rows.forEach(function(row) {

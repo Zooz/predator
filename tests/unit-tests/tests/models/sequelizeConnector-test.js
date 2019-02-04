@@ -171,6 +171,109 @@ describe('Testing sequelize connector', function () {
             }
         });
     });
+    describe('get all test revisions', function () {
+        it('when succeed get all revisions', async function () {
+            findAllStub.returns([
+                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), test_id: 'test_id1' } },
+                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), test_id: 'test_id1' } }
+            ]);
+            const result = await sequelizeConnector.getAllTestRevisions('id');
+            const client = sequelizeConnector.__get__('client');
+            should(client.model.args).eql([['test']]);
+            should(findAllStub.args).eql([
+                [
+                    {
+                        'order': [
+                            [
+                                'updated_at',
+                                'DESC'
+                            ],
+                            [
+                                'id',
+                                'DESC'
+                            ]
+                        ],
+                        'where': {
+                            'test_id': 'id'
+                        }
+                    }
+                ]
+            ]);
+            should(result).eql([
+                {
+                    'artillery_json': {
+                        'art': '1'
+                    },
+                    'id': 'test_id1',
+                    'test_id': 'test_id1'
+                },
+                {
+                    'artillery_json': {
+                        'art': '2'
+                    },
+                    'id': 'test_id1',
+                    'test_id': 'test_id1'
+                }
+            ]);
+        });
+        it('when getAllTestRevisions not found - should return empty array', async function () {
+            findAllStub.returns([]);
+            const result = await sequelizeConnector.getAllTestRevisions('id');
+            const client = sequelizeConnector.__get__('client');
+            should(client.model.args).eql([['test']]);
+            should(findAllStub.args).eql([
+                [
+                    {
+                        'order': [
+                            [
+                                'updated_at',
+                                'DESC'
+                            ],
+                            [
+                                'id',
+                                'DESC'
+                            ]
+                        ],
+                        'where': {
+                            'test_id': 'id'
+                        }
+                    }
+                ]
+            ]);
+            should(result).eql([]);
+        });
+        it('when fail to getAllTestRevisions - should throw an error', async function () {
+            const error = new Error('test');
+            findAllStub.rejects(error);
+            try {
+                await sequelizeConnector.getAllTestRevisions('id');
+                throw new Error('should not get here');
+            } catch (err){
+                const client = sequelizeConnector.__get__('client');
+                should(client.model.args).eql([['test']]);
+                should(findAllStub.args).eql([
+                    [
+                        {
+                            'order': [
+                                [
+                                    'updated_at',
+                                    'DESC'
+                                ],
+                                [
+                                    'id',
+                                    'DESC'
+                                ]
+                            ],
+                            'where': {
+                                'test_id': 'id'
+                            }
+                        }
+                    ]
+                ]);
+                should(err).eql(error);
+            }
+        });
+    });
     describe('getTests', function () {
         it('when succeed getTests', async function () {
             findAllStub.returns([

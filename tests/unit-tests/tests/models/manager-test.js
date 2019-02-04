@@ -206,7 +206,7 @@ describe('Scenario generator tests', function () {
     describe('Get all test revisions', function () {
         it('Database returns empty row array, throw an error with 404', function () {
             getTestRevisionsStub.resolves([]);
-            return manager.getAllTestRevision(uuid.v4())
+            return manager.getAllTestRevisions(uuid.v4())
                 .then(function (res) {
                     throw new Error('should not get here');
                 }).catch(function (err) {
@@ -236,7 +236,7 @@ describe('Scenario generator tests', function () {
                 revision_id: expectedResult[0].revision_id,
                 updated_at: expectedResult[0].updated_at
             }]);
-            return manager.getAllTestRevision(uuid.v4())
+            return manager.getAllTestRevisions(uuid.v4())
                 .then(function (res) {
                     res.should.eql(expectedResult);
                 });

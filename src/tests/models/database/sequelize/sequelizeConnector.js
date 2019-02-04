@@ -8,6 +8,7 @@ module.exports = {
     getTest,
     getTests,
     deleteTest,
+    getAllTestRevisions,
     insertDslDefinition,
     getDslDefinitions,
     getDslDefinition,
@@ -99,6 +100,12 @@ async function getTest(id) {
 async function getTests() {
     const test = client.model('test');
     let allTests = await test.findAll({ order: [['updated_at', 'DESC'], ['id', 'DESC']] });
+    allTests = sanitizeTestResult(allTests);
+    return allTests;
+}
+async function getAllTestRevisions(id){
+    const test = client.model('test');
+    let allTests = await test.findAll({ where: { test_id: id }, order: [['updated_at', 'DESC'], ['id', 'DESC']] });
     allTests = sanitizeTestResult(allTests);
     return allTests;
 }
