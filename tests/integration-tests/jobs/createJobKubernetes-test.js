@@ -1,13 +1,24 @@
 let should = require('should');
 let uuid = require('uuid');
 let schedulerRequestCreator = require('./helpers/requestCreator');
+let testsRequestCreator = require('../tests/helpers/requestCreator');
+
 let nock = require('nock');
 let serviceConfig = require('../../../src/config/serviceConfig');
 let kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
 describe('Create job specific kubernetes tests', () => {
+    let testId;
+
     before(async () => {
         await schedulerRequestCreator.init();
+        await testsRequestCreator.init();
+
+        let requestBody = require('../../testExamples/Custom_test');
+        let response = await testsRequestCreator.createTest(requestBody, {});
+        should(response.statusCode).eql(201);
+        should(response.body).have.key('id');
+        testId = response.body.id;
     });
 
     beforeEach(async () => {
@@ -18,14 +29,6 @@ describe('Create job specific kubernetes tests', () => {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
                 let jobId;
-                let testId = '56ccc314-8c92-4002-839d-8424909ff475';
-                let expectedResult = {
-                    environment: 'test',
-                    test_id: testId,
-                    duration: 1,
-                    arrival_rate: 1
-                };
-
                 describe('Create two jobs, one is one time, second one is cron and get them', () => {
                     let createJobResponse;
                     let getJobsFromService;
@@ -83,7 +86,6 @@ describe('Create job specific kubernetes tests', () => {
                         let relevantJobs = getJobsFromService = getJobsFromService.body.filter(job => job.id === cronJobId || job.id === oneTimeJobId);
                         should(relevantJobs.length).eql(1);
                         should(relevantJobs[0].id).eql(cronJobId);
-
                     });
 
                     it('Get the jobs, with one_time query param, two jobs should be returned', async () => {
@@ -122,15 +124,23 @@ describe('Create job specific kubernetes tests', () => {
                 describe('Create one time job, should create job with the right parameters and run it, finally stop and delete it', () => {
                     let createJobResponse;
                     let getJobsFromService;
-                    let validBody = {
-                        test_id: testId,
-                        arrival_rate: 1,
-                        duration: 1,
-                        environment: 'test',
-                        run_immediately: true
-                    };
-
+                    let expectedResult;
                     it('Create the job', async () => {
+                        let validBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true
+                        };
+
+                        expectedResult = {
+                            environment: 'test',
+                            test_id: testId,
+                            duration: 1,
+                            arrival_rate: 1
+                        };
+
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
                             .reply(200, {
                                 metadata: { name: 'jobName', uid: 'uid' },
@@ -199,7 +209,7 @@ describe('Create job specific kubernetes tests', () => {
 
                         it('Create the job, then get the runs, then get the job from kubernetes and service', async () => {
                             date = new Date();
-                            date.setSeconds(date.getSeconds() + 3);
+                            date.setSeconds(date.getSeconds() + 2);
                             let validBody = {
                                 test_id: testId,
                                 arrival_rate: 1,

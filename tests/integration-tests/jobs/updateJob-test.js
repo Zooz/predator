@@ -1,16 +1,30 @@
 'use strict';
 
 let schedulerRequestCreator = require('./helpers/requestCreator');
+let testsRequestCreator = require('../tests/helpers/requestCreator');
+
 let should = require('should');
 let nock = require('nock');
 let kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
 describe('Update scheduled job', function () {
-    this.timeout(5000);
-    let testId = '56ccc314-8c92-4002-839d-8424909ff475';
+    let testId;
+    let updatedTestId;
 
     before(async () => {
         await schedulerRequestCreator.init();
+        await testsRequestCreator.init();
+
+        let requestBody = require('../../testExamples/Custom_test');
+        let response = await testsRequestCreator.createTest(requestBody, {});
+        should(response.statusCode).eql(201);
+        should(response.body).have.key('id');
+        testId = response.body.id;
+
+        response = await testsRequestCreator.createTest(requestBody, {});
+        should(response.statusCode).eql(201);
+        should(response.body).have.key('id');
+        updatedTestId = response.body.id;
     });
 
     describe('Update test id', () => {
@@ -20,11 +34,12 @@ describe('Update scheduled job', function () {
 
         let jobId;
         let runsWithUpdatedTestId = 0;
-        let updatedTestId = '56ccc314-8c92-4002-839d-8424909ff476';
 
         before(async () => {
             nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
-                return body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === updatedTestId;
+                let result =  body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === updatedTestId;
+                console.log('result is:' + result)
+                return result;
             }).reply(200,
                 () => {
                     runsWithUpdatedTestId++;
@@ -72,8 +87,8 @@ describe('Update scheduled job', function () {
             getJobResponseAfterUpdate.body.should.eql(expectedResponseBodyAfterUpdate);
         });
 
-        it('Wait for 4 seconds', (done) => {
-            setTimeout(done, 4000);
+        it('Wait for 5 seconds', (done) => {
+            setTimeout(done, 5000);
         });
 
         it('Validate test updated', async () => {
@@ -175,11 +190,13 @@ describe('Update scheduled job', function () {
             updatedCronExpression = `* ${date.getHours()} * * * * *`;
 
             let updateJobResponse = await schedulerRequestCreator.updateJob(jobId,
-                { cron_expression: updatedCronExpression,
+                {
+                    cron_expression: updatedCronExpression,
                     arrival_rate: 10,
                     ramp_to: 20,
                     duration: 30,
-                    environment: 'updated env' },
+                    environment: 'updated env'
+                },
                 {
                     'Content-Type': 'application/json'
                 });
@@ -191,15 +208,17 @@ describe('Update scheduled job', function () {
                 'Content-Type': 'application/json'
             });
 
-            should(getJobResponseAfterUpdate.body).eql({ id: jobId,
-                test_id: '56ccc314-8c92-4002-839d-8424909ff475',
+            should(getJobResponseAfterUpdate.body).eql({
+                id: jobId,
+                test_id: testId,
                 cron_expression: updatedCronExpression,
                 webhooks: ['a@webhooks.com'],
                 emails: ['b@emails.com'],
                 ramp_to: 20,
                 arrival_rate: 10,
                 duration: 30,
-                environment: 'updated env' });
+                environment: 'updated env'
+            });
         });
 
         it('Delete job', async () => {
@@ -235,8 +254,7 @@ describe('Update scheduled job', function () {
             updateJobResponse.statusCode.should.eql(200);
         });
 
-        // todo waiting for tests api integration
-        it.skip('Update job with non existing test id', async () => {
+        it('Update job with non existing test id', async () => {
             let nonExistingTestId = '56ccc314-8c92-4002-839d-8424909ff475';
             let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { test_id: nonExistingTestId }, {
                 'Content-Type': 'application/json'
