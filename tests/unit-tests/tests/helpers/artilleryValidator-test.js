@@ -65,7 +65,7 @@ describe('Artillery validator tests', function () {
                 }]
             };
 
-            req = {body: {type: consts.TEST_TYPE_CUSTOM, artillery_test: validArtilleryJson}};
+            req = { body: { type: consts.TEST_TYPE_CUSTOM, artillery_test: validArtilleryJson } };
             await artilleryValidator.verifyArtillery(req, res, nextStub);
             should(nextStub.calledOnce).eql(true);
         });
@@ -73,15 +73,14 @@ describe('Artillery validator tests', function () {
         it('The artillery json is not a valid json', async () => {
             let invalidArtilleryJson = {};
 
-            req = {body: {type: consts.TEST_TYPE_CUSTOM, artillery_test: invalidArtilleryJson}};
+            req = { body: { type: consts.TEST_TYPE_CUSTOM, artillery_test: invalidArtilleryJson } };
             await artilleryValidator.verifyArtillery(req, res, nextStub);
-            should(resJsonStub.args[0][0]).eql({message: 'The artillery json is not valid. Errors: Required property \'scenarios\' is missing'});
-            should(resStatusStub.args[0][0]).eql(400);
-            should(nextStub.calledOnce).eql(false);
+            should(nextStub.args[0][0].message).eql('The artillery json is not valid. Errors: Required property \'scenarios\' is missing');
+            should(nextStub.args[0][0].statusCode).eql(400);
         });
 
         it('The request is not a custom test', async () => {
-            req = {body: {type: consts.TEST_TYPE_PAYMENTSOS, scenarios: {}}};
+            req = { body: { type: consts.TEST_TYPE_PAYMENTSOS, scenarios: {} } };
             await artilleryValidator.verifyArtillery(req, res, nextStub);
             should(nextStub.calledOnce).eql(true);
         });

@@ -6,7 +6,7 @@ JSCK.Draft4 = JSCK.draft4;
 let artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const requestSender = require('./helpers/requestCreator');
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
-describe('System tests for the api', function() {
+describe('the tests api', function() {
     let simpleTest;
     let dslName;
     before(async function () {
@@ -32,7 +32,6 @@ describe('System tests for the api', function() {
                     res.body.should.eql({ message: 'action must be this pattern: {dsl_name}.{definition_name}.' });
                 });
         });
-
         let badBodyScenarios = ['Body_with_illegal_artillery', 'Body_with_no_artillery_schema', 'Body_with_no_test_type', 'Body_with_no_description', 'Body_with_no_name', 'Body_with_no_scenarios', 'Body_with_no_step_action',
             'Body_with_no_steps'];
 
@@ -110,36 +109,62 @@ describe('System tests for the api', function() {
         });
 
         it('creates two simple tests, get a specific test, and than get list of all tests', async function(){
-            try {
-                let requestBody = require('../../testExamples/Simple_test')(dslName).test;
-                let expectedResult = require('../../testResults/Simple_test.json');
-                let createTestResponse = await requestSender.createTest(requestBody, validHeaders);
-                let createSecondTestResponse = await requestSender.createTest(requestBody, validHeaders);
-                createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
-                createSecondTestResponse.statusCode.should.eql(201);
-                let getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
-                let getTestsResponse = await requestSender.getTests(validHeaders);
-                let testsIds = [];
-                getTestsResponse.body.forEach(test => {
-                    test.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'raw_data', 'type', 'updated_at');
-                });
-                testsIds = getTestsResponse.body.map(function(test){
-                    return test.id;
-                });
-                let validatedResponse = validate(getTestResponse.body.artillery_test);
+            let requestBody = require('../../testExamples/Simple_test')(dslName).test;
+            let expectedResult = require('../../testResults/Simple_test.json');
+            let createTestResponse = await requestSender.createTest(requestBody, validHeaders);
+            let createSecondTestResponse = await requestSender.createTest(requestBody, validHeaders);
+            createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
+            createSecondTestResponse.statusCode.should.eql(201);
+            let getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
+            let getTestsResponse = await requestSender.getTests(validHeaders);
+            let testsIds = [];
+            getTestsResponse.body.forEach(test => {
+                test.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'raw_data', 'type', 'updated_at');
+            });
+            testsIds = getTestsResponse.body.map(function(test){
+                return test.id;
+            });
+            let validatedResponse = validate(getTestResponse.body.artillery_test);
 
-                validatedResponse.errors.length.should.eql(0);
-                validatedResponse.valid.should.eql(true);
-                getTestResponse.statusCode.should.eql(200);
-                getTestsResponse.statusCode.should.eql(200);
-                testsIds.should.containEql(createTestResponse.body.id);
-                testsIds.should.containEql(createSecondTestResponse.body.id);
-                getTestResponse.body.id.should.eql(createTestResponse.body.id);
-                getTestResponse.body.revision_id.should.eql(createTestResponse.body.revision_id);
-                getTestResponse.body.artillery_test.should.eql(expectedResult);
-            } catch (error) {
-                return Promise.reject(error);
-            }
+            validatedResponse.errors.length.should.eql(0);
+            validatedResponse.valid.should.eql(true);
+            getTestResponse.statusCode.should.eql(200);
+            getTestsResponse.statusCode.should.eql(200);
+            testsIds.should.containEql(createTestResponse.body.id);
+            testsIds.should.containEql(createSecondTestResponse.body.id);
+            getTestResponse.body.id.should.eql(createTestResponse.body.id);
+            getTestResponse.body.revision_id.should.eql(createTestResponse.body.revision_id);
+            getTestResponse.body.artillery_test.should.eql(expectedResult);
+        });
+        it('create test with several revisions  and get all test revisions', async function () {
+            const testVer1 = require('../../testExamples/Simple_test')(dslName).test;
+            const testVer2 = require('../../testExamples/Simple_test')(dslName).test;
+            const getAllRevisionResult = require('../../testResults/getAllRevisionResult')(dslName);
+            testVer2.scenarios = [testVer2.scenarios[0], testVer2.scenarios[0]];
+            const createTestResponse = await requestSender.createTest(testVer1, validHeaders);
+            should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
+            const testId = createTestResponse.body.id;
+            const createSecondTestResponse = await requestSender.updateTest(testVer2, validHeaders, testId);
+            should(createSecondTestResponse.statusCode).eql(201, JSON.stringify(createSecondTestResponse.body));
+
+            const getAllRevisionsResponse = await requestSender.getAllRevisions(testId, validHeaders);
+            should(getAllRevisionsResponse.statusCode).eql(200, JSON.stringify(getAllRevisionsResponse.body));
+            getAllRevisionsResponse.body.forEach(function (testVer) {
+                should.exist(testVer.revision_id);
+                should.exist(testVer.updated_at);
+                should(testVer.id).eql(testId);
+                delete testVer.revision_id;
+                delete testVer.id;
+                delete testVer.updated_at;
+            });
+            should(getAllRevisionsResponse.body).eql(getAllRevisionResult);
+        });
+        it('when get test all revision - should return 404 on non exist test id', async function () {
+            const getAllRevisionsResponse = await requestSender.getAllRevisions(uuid.v4(), validHeaders);
+            should(getAllRevisionsResponse.statusCode).eql(404);
+            should(getAllRevisionsResponse.body).eql({
+                'message': 'Not found'
+            });
         });
 
         describe('Valid json request for creating tests with illegal body (logically)', function() {
