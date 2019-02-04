@@ -81,6 +81,7 @@ async function insertTest(testInfo, testJson, id, revisionId){
         test_id: id,
         name: testInfo.name,
         type: testInfo.type,
+        description: testInfo.description,
         updated_at: Date.now(),
         raw_data: JSON.stringify(testInfo.scenarios),
         artillery_json: JSON.stringify(testJson),
@@ -105,7 +106,7 @@ async function getTests() {
 }
 async function getAllTestRevisions(id){
     const test = client.model('test');
-    let allTests = await test.findAll({ where: { test_id: id }, order: [['updated_at', 'DESC'], ['id', 'DESC']] });
+    let allTests = await test.findAll({ where: { test_id: id }, order: [['updated_at', 'ASC'], ['id', 'ASC']] });
     allTests = sanitizeTestResult(allTests);
     return allTests;
 }
@@ -181,7 +182,10 @@ function sanitizeTestResult(data) {
     const result = data.map(function (test) {
         const dataValues = test.dataValues;
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
+        dataValues.raw_data = JSON.parse(dataValues.raw_data);
         dataValues.id = dataValues.test_id;
+        delete dataValues.test_id;
+        delete dataValues.created_at;
         return dataValues;
     });
     return result;

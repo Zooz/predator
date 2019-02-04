@@ -1,7 +1,6 @@
 'use strict';
 const testGenerator = require('./testGenerator'),
     database = require('./database'),
-    logger = require('../../common/logger'),
     uuid = require('uuid'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
@@ -17,8 +16,7 @@ async function upsertTest(testRawData, existingTestId) {
     const testArtilleryJson = await testGenerator.createTest(testRawData);
     let id = existingTestId || uuid();
     let revisionId = uuid.v4();
-    const result = await database.insertTest(testRawData, testArtilleryJson, id, revisionId);
-    logger.info(result, 'Test created successfully and saved to Cassandra');
+    await database.insertTest(testRawData, testArtilleryJson, id, revisionId);
     return { id: id, revision_id: revisionId };
 }
 
