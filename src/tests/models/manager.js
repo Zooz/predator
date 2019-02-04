@@ -37,14 +37,14 @@ async function getTest(testId) {
 
 async function getAllTestRevisions(testId) {
     const rows = await database.getAllTestRevisions(testId);
-    const tests = [];
+    const testRevisions = [];
     rows.forEach(function(row) {
         row.artillery_test = row.artillery_json;
         delete row.artillery_json;
-        tests.push(row);
+        testRevisions.push(row);
     });
-    if (tests.length !== 0){
-        return tests;
+    if (testRevisions.length !== 0){
+        return testRevisions;
     } else {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
