@@ -40,8 +40,8 @@ module.exports = () => {
             app.use('/health', healthRouter);
             app.use('/v1/jobs', jobsRouter);
             app.use('/v1/dsl', dslRouter);
-            app.use('/v1/tests', testsRouter);
             app.use('/v1/tests', reportsRouter);
+            app.use('/v1/tests', testsRouter);
 
             app.use(function (err, req, res, next) {
                 if (err instanceof swaggerValidator.InputValidationError) {

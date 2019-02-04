@@ -11,7 +11,7 @@ const mailhogHelper = require('./mailhog/mailhogHelper');
 
 let testId, reportId, jobId, minimalReportBody;
 
-describe('System tests for the reports api', function() {
+describe('Integration tests for the reports api', function() {
     this.timeout(10000);
 
     before(async () => {
@@ -27,8 +27,8 @@ describe('System tests for the reports api', function() {
             report_id: reportId,
             job_id: undefined,
             revision_id: uuid(),
-            test_name: 'system-test',
-            test_description: 'doing some system testing',
+            test_name: 'integration-test',
+            test_description: 'doing some integration testing',
             start_time: Date.now().toString(),
             test_configuration: {
                 enviornment: 'test',
@@ -160,8 +160,8 @@ describe('System tests for the reports api', function() {
                 report_id: reportId,
                 revision_id: uuid(),
                 test_type: 'custom',
-                test_name: 'system-test',
-                test_description: 'doing some system testing',
+                test_name: 'integration-test',
+                test_description: 'doing some integration testing',
                 start_time: Date.now().toString(),
                 test_configuration: {
                     enviornment: 'test',
@@ -227,8 +227,8 @@ describe('System tests for the reports api', function() {
                     report_id: reportId,
                     revision_id: uuid(),
                     job_id: jobId,
-                    test_name: 'system-test',
-                    test_description: 'doing some system testing',
+                    test_name: 'integration-test',
+                    test_description: 'doing some integration testing',
                     start_time: Date.now().toString(),
                     test_configuration: {
                         enviornment: 'test',
@@ -321,7 +321,7 @@ describe('System tests for the reports api', function() {
     describe('Sad flow', function(){
         describe('400 error codes', function () {
             it('POST report with bad request body', async function() {
-                const createReportResponse = await reportsRequestCreator.createReport(testId, {});
+                const createReportResponse = await reportsRequestCreator.createReport(uuid(), {});
                 createReportResponse.statusCode.should.eql(400);
                 createReportResponse.body.should.eql({
                     message: 'Input validation error',
@@ -339,7 +339,7 @@ describe('System tests for the reports api', function() {
             });
 
             it('POST stats with bad request body', async function() {
-                const postStatsResponse = await reportsRequestCreator.postStats(testId, reportId, {});
+                const postStatsResponse = await reportsRequestCreator.postStats(uuid(), uuid(), {});
                 postStatsResponse.statusCode.should.eql(400);
                 postStatsResponse.body.should.eql({
                     message: 'Input validation error',
