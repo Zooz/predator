@@ -140,7 +140,7 @@ describe('Integration tests for the reports api', function() {
                     getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                     should(getReportResponse.statusCode).be.eql(200);
                     report = getReportResponse.body;
-                    validateReport(report, {
+                    validateFinishedReport(report, {
                         notes: 'My first performance test'
                     });
 
@@ -194,6 +194,19 @@ describe('Integration tests for the reports api', function() {
                 const reports = getReportsResponse.body;
 
                 should(reports.length).eql(3);
+
+                reports.forEach((report) => {
+                    const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
+                        'phase', 'status', 'html_report'];
+
+                    REPORT_KEYS.forEach((key) => {
+                        should(report).hasOwnProperty(key);
+                    });
+
+                    should(report.status).eql('initialized');
+                    should.not.exist(report.end_time);
+                    should(report.last_stats).eql({});
+                });
             });
 
             it('Get last reports', async () => {
@@ -265,7 +278,7 @@ describe('Integration tests for the reports api', function() {
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 should(getReportResponse.statusCode).be.eql(200);
                 report = getReportResponse.body;
-                validateReport(report);
+                validateFinishedReport(report);
             });
 
             it('Post only "done" phase stats', async () => {
@@ -274,7 +287,7 @@ describe('Integration tests for the reports api', function() {
                 let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 should(getReportResponse.statusCode).be.eql(200);
                 let report = getReportResponse.body;
-                validateReport(report);
+                validateFinishedReport(report);
             });
 
             it('Post "error" stats', async () => {
@@ -393,7 +406,7 @@ function validateLastStats(stats) {
     });
 }
 
-function validateReport(report, expectedValues = {}) {
+function validateFinishedReport(report, expectedValues = {}) {
     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
         'end_time', 'phase', 'last_stats', 'status', 'html_report'];
 
