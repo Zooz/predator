@@ -61,7 +61,6 @@ async function getAllTestRevisions(id) {
     const result = await executeQuery(GET_TEST_REVISIONS, [id], queryOptions);
     const sanitizedResult = await sanitizeTestResult(result.rows);
     return sanitizedResult;
-
 }
 
 async function insertTest(testInfo, testJson, id, revisionId) {
