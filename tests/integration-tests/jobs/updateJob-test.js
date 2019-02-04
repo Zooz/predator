@@ -37,9 +37,8 @@ describe('Update scheduled job', function () {
 
         before(async () => {
             nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
-                let result =  body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === updatedTestId;
-                console.log('result is:' + result)
-                return result;
+                let isMatch = body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === updatedTestId;
+                return isMatch;
             }).reply(200,
                 () => {
                     runsWithUpdatedTestId++;
@@ -110,7 +109,8 @@ describe('Update scheduled job', function () {
 
         before(async () => {
             nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
-                return body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === testId;
+                let isMatch = body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === testId;
+                return isMatch;
             }).reply(200,
                 () => {
                     runsWithTestId++;
