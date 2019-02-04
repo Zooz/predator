@@ -7,7 +7,6 @@ const { JSDOM } = jsdom;
 
 const statsGenerator = require('./helpers/statsGenerator');
 const reportsRequestCreator = require('./helpers/requestCreator');
-const jobCreator = require('./helpers/jobCreator');
 const mailhogHelper = require('./mailhog/mailhogHelper');
 
 let testId, reportId, jobId, minimalReportBody;
@@ -47,8 +46,8 @@ describe('System tests for the reports api', function() {
         describe('Create report', function () {
             describe('Create report with minimal fields and notes', async () => {
                 before(async () => {
-                    const job = await jobCreator.createJob();
-                    jobId = job.id;
+                    const jobResponse = await reportsRequestCreator.createJob();
+                    jobId = jobResponse.body.id;
                 });
 
                 it('should successfully create report', async () => {
@@ -67,8 +66,8 @@ describe('System tests for the reports api', function() {
 
             describe('Create report with minimal fields and webhooks', async () => {
                 before(async () => {
-                    const job = await jobCreator.createJob(undefined, ['https://webhook.to.here.com']);
-                    jobId = job.id;
+                    const jobResponse = await reportsRequestCreator.createJob(undefined, ['https://webhook.to.here.com']);
+                    jobId = jobResponse.body.id;
                 });
 
                 it('should successfully create report', async () => {
@@ -83,15 +82,14 @@ describe('System tests for the reports api', function() {
 
                     should(report.status).eql('initialized');
                     should(report.last_stats).eql({});
-                    should(report.webhooks).eql(reportBody.webhooks);
                     should(report.notes).eql('');
                 });
             });
 
             describe('Create report with minimal fields and emails', async () => {
                 before(async () => {
-                    const job = await jobCreator.createJob(['mickey@dog.com']);
-                    jobId = job.id;
+                    const jobResponse = await reportsRequestCreator.createJob(['mickey@dog.com']);
+                    jobId = jobResponse.body.id;
                 });
 
                 it('should successfully create report', async () => {
@@ -105,7 +103,6 @@ describe('System tests for the reports api', function() {
 
                     should(report.status).eql('initialized');
                     should(report.last_stats).eql({});
-                    should(report.emails).eql(reportBody.emails);
                     should(report.notes).eql('');
                 });
             });
@@ -114,8 +111,8 @@ describe('System tests for the reports api', function() {
         describe('Create report, post stats, and get final html report', function () {
             describe('Create report with all fields, and post full cycle stats', async () => {
                 before(async () => {
-                    const job = await jobCreator.createJob(['mickey@dog.com'], ['https://webhook.here.com']);
-                    jobId = job.id;
+                    const jobResponse = await reportsRequestCreator.createJob(['mickey@dog.com'], ['https://webhook.here.com']);
+                    jobId = jobResponse.body.id;
                 });
 
                 it('should successfully create report', async () => {
@@ -170,13 +167,12 @@ describe('System tests for the reports api', function() {
                     enviornment: 'test',
                     duration: 10,
                     arrival_rate: 20
-                },
-                webhooks: [],
-                emails: []
+                }
             };
             before(async function () {
-                const job = await jobCreator.createJob();
-                reportBody.job_id = job.id;
+                const jobResponse = await reportsRequestCreator.createJob();
+                jobId = jobResponse.body.id;
+                reportBody.job_id = jobId;
 
                 let createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
@@ -218,8 +214,8 @@ describe('System tests for the reports api', function() {
 
         describe('Post stats', function () {
             before(async function () {
-                const job = await jobCreator.createJob();
-                jobId = job.id;
+                const jobResponse = await reportsRequestCreator.createJob();
+                jobId = jobResponse.body.id;
             });
 
             beforeEach(async function () {
@@ -238,9 +234,7 @@ describe('System tests for the reports api', function() {
                         enviornment: 'test',
                         duration: 10,
                         arrival_rate: 20
-                    },
-                    webhooks: [],
-                    emails: []
+                    }
                 };
                 const reportResponse = await reportsRequestCreator.createReport(testId, minimalReportBody);
                 should(reportResponse.statusCode).be.eql(201);
@@ -329,7 +323,8 @@ describe('System tests for the reports api', function() {
             it('POST report with bad request body', async function() {
                 const createReportResponse = await reportsRequestCreator.createReport(testId, {});
                 createReportResponse.statusCode.should.eql(400);
-                createReportResponse.body.should.eql({message: 'Input validation error',
+                createReportResponse.body.should.eql({
+                    message: 'Input validation error',
                     validation_errors: [
                         'body should have required property \'test_type\'',
                         'body should have required property \'report_id\'',
@@ -338,28 +333,33 @@ describe('System tests for the reports api', function() {
                         'body should have required property \'test_name\'',
                         'body should have required property \'test_description\'',
                         'body should have required property \'start_time\'',
-                        'body should have required property \'test_configuration\'',
-                    ]});
+                        'body should have required property \'test_configuration\''
+                    ]
+                });
             });
 
             it('POST stats with bad request body', async function() {
                 const postStatsResponse = await reportsRequestCreator.postStats(testId, reportId, {});
                 postStatsResponse.statusCode.should.eql(400);
-                postStatsResponse.body.should.eql({message: 'Input validation error',
+                postStatsResponse.body.should.eql({
+                    message: 'Input validation error',
                     validation_errors: [
                         'body should have required property \'stats_time\'',
                         'body should have required property \'phase_status\'',
                         'body should have required property \'data\''
-                    ]});
+                    ]
+                });
             });
 
             it('GET last reports without limit query param', async function() {
                 const lastReportsResponse = await reportsRequestCreator.getLastReports();
                 lastReportsResponse.statusCode.should.eql(400);
-                lastReportsResponse.body.should.eql({message: 'Input validation error',
+                lastReportsResponse.body.should.eql({
+                    message: 'Input validation error',
                     validation_errors: [
                         'query/limit should be number'
-                    ]});
+                    ]
+                });
             });
         });
 
