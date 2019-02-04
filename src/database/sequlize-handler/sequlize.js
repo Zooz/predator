@@ -1,7 +1,7 @@
 'use strict';
 
 const schedulerSequlizeConnector = require('../../jobs/models/database/sequelize/sequelizeConnector');
-const repoterSequlizeConnector = require('../../reporter/models/database/sequelize/sequelizeConnector');
+const reportsSequlizeConnector = require('../../reports/models/database/sequelize/sequelizeConnector');
 const testsSequlizeConnector = require('../../tests/models/database/sequelize/sequelizeConnector');
 
 const databaseConfig = require('../../config/databaseConfig');
@@ -11,7 +11,7 @@ let sequlizeClient;
 module.exports.init = async () => {
     sequlizeClient = await createClient();
     await schedulerSequlizeConnector.init(sequlizeClient);
-    await repoterSequlizeConnector.init(sequlizeClient);
+    await reportsSequlizeConnector.init(sequlizeClient);
     await testsSequlizeConnector.init(sequlizeClient);
 };
 
@@ -32,7 +32,8 @@ async function createClient() {
         dialect: databaseConfig.type.toLowerCase(),
         define: {
             underscored: true
-        }
+        },
+        logging: false
     };
 
     if (databaseConfig.type === 'SQLITE') {

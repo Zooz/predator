@@ -12,7 +12,9 @@ function verifyArtillery(req, res, next) {
     if (body.type === consts.TEST_TYPE_CUSTOM) {
         let validationOutput = artilleryCheck.validate(body.artillery_test);
         if (!validationOutput.valid) {
-            return res.status(400).json({message: 'The artillery json is not valid. Errors: ' + validationOutput.errors.map(error => error.description)});
+            const error = new Error('The artillery json is not valid. Errors: ' + validationOutput.errors.map(error => error.description));
+            error.statusCode = 400;
+            return next(error);
         }
     }
 

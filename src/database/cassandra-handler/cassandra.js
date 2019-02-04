@@ -1,7 +1,7 @@
 'use strict';
 
 const schedulerCassandraConnector = require('../../jobs/models/database/cassandra/cassandraConnector');
-const reporterCassandraConnector = require('../../reporter/models/database/cassandra/cassandraConnector');
+const reportsCassandraConnector = require('../../reports/models/database/cassandra/cassandraConnector');
 const testsCassandraConnector = require('../../tests/models/database/cassandra/cassandraConnector');
 const databaseConfig = require('../../config/databaseConfig');
 const cassandraMigration = require('./cassandraMigration');
@@ -12,9 +12,10 @@ let cassandraClient;
 module.exports.init = async () => {
     cassandraClient = await createClient();
     await cassandraMigration.runMigration();
-    await reporterCassandraConnector.init(cassandraClient);
+    await reportsCassandraConnector.init(cassandraClient);
     await schedulerCassandraConnector.init(cassandraClient);
     await testsCassandraConnector.init(cassandraClient);
+    logger.info('cassandra client initialized');
 };
 
 module.exports.ping = () => {

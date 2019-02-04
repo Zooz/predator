@@ -4,7 +4,7 @@ let express = require('express');
 let logger = require('./common/logger');
 let healthRouter = require('./common/routes/healthRoute.js');
 let jobsRouter = require('./jobs/routes/jobsRoute.js');
-let reportsRouter = require('./reporter/routes/reportsRoute.js');
+let reportsRouter = require('./reports/routes/reportsRoute.js');
 let dslRouter = require('./tests/routes/dslRoute.js');
 let testsRouter = require('./tests/routes/testsRoute.js');
 
@@ -38,19 +38,22 @@ module.exports = () => {
             }));
 
             app.use('/health', healthRouter);
-            app.use('/v1/tests', reportsRouter);
             app.use('/v1/jobs', jobsRouter);
             app.use('/v1/dsl', dslRouter);
+            app.use('/v1/tests', reportsRouter);
             app.use('/v1/tests', testsRouter);
 
             app.use(function (err, req, res, next) {
                 if (err instanceof swaggerValidator.InputValidationError) {
                     res.status(400).json({ message: 'Input validation error', validation_errors: err.errors });
+                } else if (err.statusCode){
+                    return res.status(err.statusCode).json({ message: err.message });
                 } else {
-                    logger.error('Failure', err);
+                    logger.error(err, 'Failure');
                     res.status(500).json({ message: 'Internal server error' });
                 }
             });
+
             return app;
         });
 };

@@ -51,10 +51,9 @@ describe('Jobs verifier tests', function () {
             testsManagerStub.rejects({ statusCode: 404 });
 
             await jobVerifier.verifyTestExists(req, res, nextStub);
-            should(nextStub.called).eql(false);
-            should(testsManagerStub.calledOnce).eql(true);
-            should(resJsonStub.args[0][0]).eql({ message: 'test with id: id does not exist' });
-            should(resStatusStub.args[0][0]).eql(400);
+            should(nextStub.called).eql(true);
+            should(nextStub.args[0][0].message).eql('test with id: id does not exist');
+            should(nextStub.args[0][0].statusCode).eql(400);
         });
 
         it('Should fail on test id validation when error from performance framework api', async () => {
@@ -63,10 +62,9 @@ describe('Jobs verifier tests', function () {
             testsManagerStub.rejects({ statusCode: 500, message: 'failure' });
 
             await jobVerifier.verifyTestExists(req, res, nextStub);
-            should(nextStub.called).eql(false);
-            should(testsManagerStub.calledOnce).eql(true);
-            should(resJsonStub.args[0][0]).eql({ message: 'failure' });
-            should(resStatusStub.args[0][0]).eql(500);
+            should(nextStub.called).eql(true);
+            should(nextStub.args[0][0].message).eql('failure');
+            should(nextStub.args[0][0].statusCode).eql(500);
         });
     });
 

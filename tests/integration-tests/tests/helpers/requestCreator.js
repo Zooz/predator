@@ -16,7 +16,8 @@ module.exports = {
     updateTest,
     deleteTest,
     getTests,
-    getTest
+    getTest,
+    getAllRevisions
 };
 async function init() {
     try {
@@ -101,6 +102,13 @@ function deleteTest(headers, testId) {
 
 function getTest(id, headers) {
     return request(app).get('/v1/tests/' + id)
+        .set(headers)
+        .expect(function(res){
+            return res;
+        });
+}
+function getAllRevisions(id, headers) {
+    return request(app).get(`/v1/tests/${id}/revisions`)
         .set(headers)
         .expect(function(res){
             return res;

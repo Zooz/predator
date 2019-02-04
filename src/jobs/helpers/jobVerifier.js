@@ -10,17 +10,20 @@ module.exports.verifyJobBody = (req, res, next) => {
 };
 
 module.exports.verifyTestExists = async (req, res, next) => {
+    let errorToThrow;
     let jobBody = req.body;
     if (jobBody.test_id) {
         try {
             await testsManager.getTest(jobBody.test_id);
         } catch (error) {
             if (error.statusCode === 404) {
-                return res.status(400).json({ message: `test with id: ${jobBody.test_id} does not exist` });
+                errorToThrow = new Error(`test with id: ${jobBody.test_id} does not exist`);
+                errorToThrow.statusCode = 400;
             } else {
-                return res.status(500).json({ message: error.message });
+                errorToThrow = new Error(error.message);
+                errorToThrow.statusCode = 500;
             }
         }
     }
-    next();
+    next(errorToThrow);
 };

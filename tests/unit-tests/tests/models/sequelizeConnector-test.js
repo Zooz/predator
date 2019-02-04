@@ -49,14 +49,15 @@ describe('Testing sequelize connector', function () {
 
     describe('insertTest', function () {
         it('when succeed insert test', async function () {
-            await sequelizeConnector.insertTest({ name: 'name', type: 'type', scenarios: { s: '1' } }, { name: 'name', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId');
+            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId');
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['test']]);
             should(createStub.args).eql([
                 [
                     {
-                        'artillery_json': '{"name":"name","type":"type","scenarios":{"s":"1"}}',
+                        'artillery_json': '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"}}',
                         'name': 'name',
+                        'description': 'desc',
                         'raw_data': '{"s":"1"}',
                         'revision_id': 'revisionId',
                         'test_id': 'id',
@@ -80,8 +81,8 @@ describe('Testing sequelize connector', function () {
     describe('getTest', function () {
         it('when succeed getTest', async function () {
             findAllStub.returns([
-                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), test_id: 'test_id1' } },
-                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), test_id: 'test_id2' } }
+                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), raw_data: JSON.stringify({ raw: '1' }), test_id: 'test_id1' } },
+                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), raw_data: JSON.stringify({ raw: '1' }), test_id: 'test_id2' } }
             ]);
             const result = await sequelizeConnector.getTest('id');
             const client = sequelizeConnector.__get__('client');
@@ -110,7 +111,9 @@ describe('Testing sequelize connector', function () {
                     'art': '1'
                 },
                 'id': 'test_id1',
-                'test_id': 'test_id1'
+                'raw_data': {
+                    'raw': '1'
+                }
             });
         });
         it('when getTest not found - should return undefined', async function () {
@@ -171,11 +174,118 @@ describe('Testing sequelize connector', function () {
             }
         });
     });
+    describe('get all test revisions', function () {
+        it('when succeed get all revisions', async function () {
+            findAllStub.returns([
+                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), raw_data: JSON.stringify({ raw: '1' }), test_id: 'test_id1' } },
+                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), raw_data: JSON.stringify({ raw: '2' }), test_id: 'test_id1' } }
+            ]);
+            const result = await sequelizeConnector.getAllTestRevisions('id');
+            const client = sequelizeConnector.__get__('client');
+            should(client.model.args).eql([['test']]);
+            should(findAllStub.args).eql([
+                [
+                    {
+                        'order': [
+                            [
+                                'updated_at',
+                                'ASC'
+                            ],
+                            [
+                                'id',
+                                'ASC'
+                            ]
+                        ],
+                        'where': {
+                            'test_id': 'id'
+                        }
+                    }
+                ]
+            ]);
+            should(result).eql([
+                {
+                    'artillery_json': {
+                        'art': '1'
+                    },
+                    'id': 'test_id1',
+                    'raw_data': {
+                        'raw': '1'
+                    }
+                },
+                {
+                    'artillery_json': {
+                        'art': '2'
+                    },
+                    'id': 'test_id1',
+                    'raw_data': {
+                        'raw': '2'
+                    }
+                }
+            ]);
+        });
+        it('when getAllTestRevisions not found - should return empty array', async function () {
+            findAllStub.returns([]);
+            const result = await sequelizeConnector.getAllTestRevisions('id');
+            const client = sequelizeConnector.__get__('client');
+            should(client.model.args).eql([['test']]);
+            should(findAllStub.args).eql([
+                [
+                    {
+                        'order': [
+                            [
+                                'updated_at',
+                                'ASC'
+                            ],
+                            [
+                                'id',
+                                'ASC'
+                            ]
+                        ],
+                        'where': {
+                            'test_id': 'id'
+                        }
+                    }
+                ]
+            ]);
+            should(result).eql([]);
+        });
+        it('when fail to getAllTestRevisions - should throw an error', async function () {
+            const error = new Error('test');
+            findAllStub.rejects(error);
+            try {
+                await sequelizeConnector.getAllTestRevisions('id');
+                throw new Error('should not get here');
+            } catch (err){
+                const client = sequelizeConnector.__get__('client');
+                should(client.model.args).eql([['test']]);
+                should(findAllStub.args).eql([
+                    [
+                        {
+                            'order': [
+                                [
+                                    'updated_at',
+                                    'ASC'
+                                ],
+                                [
+                                    'id',
+                                    'ASC'
+                                ]
+                            ],
+                            'where': {
+                                'test_id': 'id'
+                            }
+                        }
+                    ]
+                ]);
+                should(err).eql(error);
+            }
+        });
+    });
     describe('getTests', function () {
         it('when succeed getTests', async function () {
             findAllStub.returns([
-                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), test_id: 'test_id1' } },
-                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), test_id: 'test_id2' } }
+                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), raw_data: JSON.stringify({ raw: '1' }), test_id: 'test_id1' } },
+                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), raw_data: JSON.stringify({ raw: '2' }), test_id: 'test_id2' } }
             ]);
             const result = await sequelizeConnector.getTests();
             const client = sequelizeConnector.__get__('client');
@@ -202,14 +312,18 @@ describe('Testing sequelize connector', function () {
                         'art': '1'
                     },
                     'id': 'test_id1',
-                    'test_id': 'test_id1'
+                    'raw_data': {
+                        'raw': '1'
+                    }
                 },
                 {
                     'artillery_json': {
                         'art': '2'
                     },
                     'id': 'test_id2',
-                    'test_id': 'test_id2'
+                    'raw_data': {
+                        'raw': '2'
+                    }
                 }
             ]);
         });
