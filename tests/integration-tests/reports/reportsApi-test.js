@@ -8,19 +8,25 @@ const { JSDOM } = jsdom;
 const statsGenerator = require('./helpers/statsGenerator');
 const reportsRequestCreator = require('./helpers/requestCreator');
 const jobRequestCreator = require('../jobs/helpers/requestCreator');
+const testsRequestCreator = require('../tests/helpers/requestCreator');
+
 const mailhogHelper = require('./mailhog/mailhogHelper');
 
 let testId, reportId, jobId, minimalReportBody;
 
 describe('Integration tests for the reports api', function() {
     this.timeout(10000);
-
     before(async () => {
         await reportsRequestCreator.init();
+
+        let requestBody = require('../../testExamples/Custom_test');
+        let response = await testsRequestCreator.createTest(requestBody, {});
+        should(response.statusCode).eql(201);
+        should(response.body).have.key('id');
+        testId = response.body.id;
     });
 
     beforeEach(async function () {
-        testId = uuid();
         reportId = uuid();
 
         minimalReportBody = {
@@ -47,7 +53,7 @@ describe('Integration tests for the reports api', function() {
         describe('Create report', function () {
             describe('Create report with minimal fields and notes', async () => {
                 before(async () => {
-                    const jobResponse = await createJob();
+                    const jobResponse = await createJob(testId);
                     jobId = jobResponse.body.id;
                 });
 
@@ -67,7 +73,7 @@ describe('Integration tests for the reports api', function() {
 
             describe('Create report with minimal fields and webhooks', async () => {
                 before(async () => {
-                    const jobResponse = await createJob(undefined, ['https://webhook.to.here.com']);
+                    const jobResponse = await createJob(testId, undefined, ['https://webhook.to.here.com']);
                     jobId = jobResponse.body.id;
                 });
 
@@ -89,7 +95,7 @@ describe('Integration tests for the reports api', function() {
 
             describe('Create report with minimal fields and emails', async () => {
                 before(async () => {
-                    const jobResponse = await createJob(['mickey@dog.com']);
+                    const jobResponse = await createJob(testId, ['mickey@dog.com']);
                     jobId = jobResponse.body.id;
                 });
 
@@ -112,7 +118,7 @@ describe('Integration tests for the reports api', function() {
         describe('Create report, post stats, and get final html report', function () {
             describe('Create report with all fields, and post full cycle stats', async () => {
                 before(async () => {
-                    const jobResponse = await createJob(['mickey@dog.com'], ['https://webhook.here.com']);
+                    const jobResponse = await createJob(testId, ['mickey@dog.com'], ['https://webhook.here.com']);
                     jobId = jobResponse.body.id;
                 });
 
@@ -171,7 +177,7 @@ describe('Integration tests for the reports api', function() {
                 }
             };
             before(async function () {
-                const jobResponse = await createJob();
+                const jobResponse = await createJob(testId);
                 jobId = jobResponse.body.id;
                 reportBody.job_id = jobId;
 
@@ -228,7 +234,7 @@ describe('Integration tests for the reports api', function() {
 
         describe('Post stats', function () {
             before(async function () {
-                const jobResponse = await createJob();
+                const jobResponse = await createJob(testId);
                 jobId = jobResponse.body.id;
             });
 
@@ -439,9 +445,9 @@ function validateHTMLReport(text) {
     const parsedHTMLReport = new JSDOM(text);
 }
 
-function createJob(emails, webhooks) {
+function createJob(testId, emails, webhooks) {
     let jobOptions = {
-        test_id: uuid(),
+        test_id: testId,
         arrival_rate: 10,
         duration: 10,
         environment: 'test',

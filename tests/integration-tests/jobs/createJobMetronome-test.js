@@ -1,13 +1,30 @@
 let should = require('should');
 let uuid = require('uuid');
 let schedulerRequestCreator = require('./helpers/requestCreator');
+let testsRequestCreator = require('../tests/helpers/requestCreator');
 let nock = require('nock');
 let serviceConfig = require('../../../src/config/serviceConfig');
 let metronomeConfig = require('../../../src/config/metronomeConfig');
 
 describe('Create job specific metronome tests', () => {
+    let testId;
+    let expectedResult;
     before(async () => {
         await schedulerRequestCreator.init();
+        await testsRequestCreator.init();
+
+        let requestBody = require('../../testExamples/Custom_test');
+        let response = await testsRequestCreator.createTest(requestBody, {});
+        should(response.statusCode).eql(201);
+        should(response.body).have.key('id');
+        testId = response.body.id;
+
+        expectedResult = {
+            environment: 'test',
+            test_id: testId,
+            duration: 1,
+            arrival_rate: 1
+        };
     });
 
     beforeEach(async () => {
@@ -18,27 +35,21 @@ describe('Create job specific metronome tests', () => {
         describe('Metronome', () => {
             describe('Good requests', () => {
                 let jobId;
-                let testId = '56ccc314-8c92-4002-839d-8424909ff475';
-                let expectedResult = {
-                    environment: 'test',
-                    test_id: testId,
-                    duration: 1,
-                    arrival_rate: 1
-                };
 
                 describe('Create one time job, job not yet exists, should create job with the right parameters and run it, finally stop and delete it', () => {
                     let createJobResponse;
                     let getJobsFromService;
                     let jobResponseBody;
-                    let validBody = {
-                        test_id: testId,
-                        arrival_rate: 1,
-                        duration: 1,
-                        environment: 'test',
-                        run_immediately: true
-                    };
 
                     it('Create the job', async () => {
+                        let validBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true
+                        };
+
                         nock(metronomeConfig.metronomeUrl)
                             .get(url => {
                                 return url.startsWith('/v1/jobs/predator.');
@@ -104,15 +115,17 @@ describe('Create job specific metronome tests', () => {
                     let createJobResponse;
                     let getJobsFromService;
                     let jobResponseBody;
-                    let validBody = {
-                        test_id: testId,
-                        arrival_rate: 1,
-                        duration: 1,
-                        environment: 'test',
-                        run_immediately: true
-                    };
 
                     it('Create the job', async () => {
+
+                        let validBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true
+                        };
+
                         nock(metronomeConfig.metronomeUrl)
                             .get(url => {
                                 return url.startsWith('/v1/jobs/predator.');

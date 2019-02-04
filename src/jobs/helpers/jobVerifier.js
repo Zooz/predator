@@ -1,7 +1,5 @@
 'use strict';
-let request = require('request-promise-native');
-let config = require('../../config/serviceConfig');
-let uuid = require('uuid/v4');
+let testsManager = require('../../tests/models/manager');
 module.exports.verifyJobBody = (req, res, next) => {
     let jobBody = req.body;
     if (!(jobBody.run_immediately || jobBody.cron_expression)) {
@@ -11,30 +9,21 @@ module.exports.verifyJobBody = (req, res, next) => {
     next();
 };
 
-// Todo rewrite
 module.exports.verifyTestExists = async (req, res, next) => {
-    return next();
-    // let jobBody = req.body;
-    // if (jobBody.test_id) {
-    //     try {
-    //         await request.get({
-    //             url: config.testsApiUrl + '/v1/tests/' + jobBody.test_id,
-    //             json: true,
-    //             forever: true,
-    //             headers: {'x-zooz-request-id': uuid()}
-    //         });
-    //
-    //         if (!req.context) {
-    //             req.context = {};
-    //         }
-    //
-    //     } catch (error) {
-    //         if (error.statusCode === 404) {
-    //             return res.status(400).json({message: `test with id: ${jobBody.test_id} does not exist`});
-    //         } else {
-    //             return res.status(500).json({message: error.message});
-    //         }
-    //     }
-    // }
-    // next();
+    let errorToThrow;
+    let jobBody = req.body;
+    if (jobBody.test_id) {
+        try {
+            await testsManager.getTest(jobBody.test_id);
+        } catch (error) {
+            if (error.statusCode === 404) {
+                errorToThrow = new Error(`test with id: ${jobBody.test_id} does not exist`);
+                errorToThrow.statusCode = 400;
+            } else {
+                errorToThrow = new Error(error.message);
+                errorToThrow.statusCode = 500;
+            }
+        }
+    }
+    next(errorToThrow);
 };
