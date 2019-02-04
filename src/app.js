@@ -46,7 +46,7 @@ module.exports = () => {
             app.use(function (err, req, res, next) {
                 if (err instanceof swaggerValidator.InputValidationError) {
                     res.status(400).json({ message: 'Input validation error', validation_errors: err.errors });
-                } if (err.statusCode){
+                } else if (err.statusCode){
                     return res.status(err.statusCode).json({ message: err.message });
                 } else {
                     logger.error(err, 'Failure');
