@@ -8,19 +8,26 @@ const { JSDOM } = jsdom;
 const statsGenerator = require('./helpers/statsGenerator');
 const reportsRequestCreator = require('./helpers/requestCreator');
 const jobRequestCreator = require('../jobs/helpers/requestCreator');
+const testsRequestCreator = require('../tests/helpers/requestCreator');
+
 const mailhogHelper = require('./mailhog/mailhogHelper');
 
 let testId, reportId, jobId, minimalReportBody;
 
 describe('Integration tests for the reports api', function() {
     this.timeout(10000);
-
     before(async () => {
         await reportsRequestCreator.init();
+        await testsRequestCreator.init();
+
+        let requestBody = require('../../testExamples/Custom_test');
+        let response = await testsRequestCreator.createTest(requestBody, {});
+        should(response.statusCode).eql(201);
+        should(response.body).have.key('id');
+        testId = response.body.id;
     });
 
     beforeEach(async function () {
-        testId = uuid();
         reportId = uuid();
 
         minimalReportBody = {
