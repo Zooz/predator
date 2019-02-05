@@ -1,6 +1,6 @@
 let config = require('../../../config/serviceConfig');
 
-module.exports.createJobRequest = (jobName, runId, environmentVariables, dockerImage) => {
+module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage) => {
     return {
         id: jobName,
         description: 'Runs a performance test',

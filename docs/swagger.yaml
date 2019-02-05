@@ -862,6 +862,12 @@ definitions:
       ramp_to:
         type: number
         description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
+      max_virtual_users:
+          type: number
+          description: The number of concurrent users that can execute requests. the arrival rate will split between them
+      parallelism:
+        type: number
+        description: The number of runners to deploy upon start of the test. the arrival rate, ramp to and the max virtual users will be split by this value
       emails:
         type: array
         items:
@@ -1044,5 +1050,3 @@ definitions:
       notes:
         type: string
         description: notes about the test
-
-

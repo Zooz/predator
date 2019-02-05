@@ -23,7 +23,8 @@ describe('Create job specific metronome tests', () => {
             environment: 'test',
             test_id: testId,
             duration: 1,
-            arrival_rate: 1
+            arrival_rate: 1,
+            max_virtual_users: 100
         };
     });
 
@@ -47,7 +48,8 @@ describe('Create job specific metronome tests', () => {
                             arrival_rate: 1,
                             duration: 1,
                             environment: 'test',
-                            run_immediately: true
+                            run_immediately: true,
+                            max_virtual_users: 100
                         };
 
                         nock(metronomeConfig.metronomeUrl)
@@ -123,7 +125,8 @@ describe('Create job specific metronome tests', () => {
                             arrival_rate: 1,
                             duration: 1,
                             environment: 'test',
-                            run_immediately: true
+                            run_immediately: true,
+                            max_virtual_users: 100
                         };
 
                         nock(metronomeConfig.metronomeUrl)

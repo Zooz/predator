@@ -12,7 +12,7 @@ let jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate');
 
 let config = require('../../../../src/config/serviceConfig');
 
-config.jobPlatform = 'Kubernetes';
+config.jobPlatform = 'KUBERNETES';
 let manager;
 
 let dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector');
@@ -53,6 +53,19 @@ let jobBodyWithoutCron = {
     ramp_to: '1',
     webhooks: ['dina', 'niv', 'eli']
 };
+
+let jobBodyWithoutCronWith99ArrivalRate = {
+    test_id: TEST_ID,
+    arrival_rate: 99,
+    duration: 1,
+    run_immediately: true,
+    emails: ['dina@niv.eli'],
+    environment: 'test',
+    ramp_to: '150',
+    parallelism: 3,
+    webhooks: ['dina', 'niv', 'eli']
+};
+
 let jobBodyWithoutRampTo = {
     test_id: TEST_ID,
     arrival_rate: 1,
@@ -71,7 +84,8 @@ let jobBodyWithCustomEnvVars = {
     emails: ['dina@niv.eli'],
     environment: 'test',
     webhooks: ['dina', 'niv', 'eli'],
-    custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' }
+    custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' },
+    max_virtual_users: 100
 };
 
 describe('Manager tests', function () {
@@ -107,7 +121,7 @@ describe('Manager tests', function () {
 
         manager = rewire('../../../../src/jobs/models/jobManager');
         manager.__set__('config.concurrencyLimit', '100');
-        manager.__set__('config.jobPlatform', 'Kubernetes');
+        manager.__set__('config.jobPlatform', 'KUBERNETES');
     });
 
     beforeEach(() => {
@@ -178,6 +192,7 @@ describe('Manager tests', function () {
                 webhooks: ['dina', 'niv', 'eli'],
                 arrival_rate: 1,
                 duration: 1,
+                max_virtual_users: 100,
                 'custom_env_vars':
                     {
                         'KEY1': 'A',
@@ -189,22 +204,20 @@ describe('Manager tests', function () {
             jobResponse.should.containEql(expectedResult);
             cassandraInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
-            jobTemplateCreateJobRequestStub.args[0][2].should.containEql({
+            jobTemplateCreateJobRequestStub.args[0][3].should.containEql({
                 JOB_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ENVIRONMENT: 'test',
                 TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 TESTS_API_URL: 'localhost:8080',
                 ARRIVAL_RATE: '1',
                 DURATION: '1',
-                PUSH_GATEWAY_URL: undefined,
-                CONCURRENCY_LIMIT: '100',
                 EMAILS: 'dina@niv.eli',
                 WEBHOOKS: 'dina;niv;eli',
                 CUSTOM_KEY1: 'A',
                 CUSTOM_KEY2: 'B'
             });
 
-            jobTemplateCreateJobRequestStub.args[0][2].should.have.key('RUN_ID');
+            jobTemplateCreateJobRequestStub.args[0][3].should.have.key('RUN_ID');
         });
 
         it('Simple request, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
@@ -225,6 +238,38 @@ describe('Manager tests', function () {
             jobResponse.should.containEql(expectedResult);
             cassandraInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
+        });
+
+        it('Simple request, with parallelism, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
+            jobConnectorRunJobStub.resolves({});
+            cassandraInsertStub.resolves({ success: 'success' });
+            let expectedResult = {
+                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                ramp_to: '150',
+                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                environment: 'test',
+                emails: ['dina@niv.eli'],
+                parallelism: 3,
+                webhooks: ['dina', 'niv', 'eli'],
+                arrival_rate: 99,
+                duration: 1
+            };
+
+            let jobResponse = await manager.createJob(jobBodyWithoutCronWith99ArrivalRate);
+            jobResponse.should.containEql(expectedResult);
+            cassandraInsertStub.callCount.should.eql(1);
+            jobConnectorRunJobStub.callCount.should.eql(1);
+
+            should(jobConnectorRunJobStub.args[0][0].spec.parallelism).eql(3);
+
+            let rampTo = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'RAMP_TO');
+            should.exists(rampTo);
+
+            let arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
+            should.exists(arrivalRate);
+
+            should(rampTo.value).eql('50');
+            should(arrivalRate.value).eql('33');
         });
 
         it('Simple request without ramp to, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {

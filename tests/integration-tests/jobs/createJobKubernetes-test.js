@@ -121,7 +121,7 @@ describe('Create job specific kubernetes tests', () => {
                     });
                 });
 
-                describe('Create one time job, should create job with the right parameters and run it, finally stop and delete it', () => {
+                describe('Create one time job with max virtual users, should create job with the right parameters and run it, finally stop and delete it', () => {
                     let createJobResponse;
                     let getJobsFromService;
                     let expectedResult;
@@ -131,14 +131,17 @@ describe('Create job specific kubernetes tests', () => {
                             arrival_rate: 1,
                             duration: 1,
                             environment: 'test',
-                            run_immediately: true
+                            run_immediately: true,
+                            max_virtual_users: 500
+
                         };
 
                         expectedResult = {
                             environment: 'test',
                             test_id: testId,
                             duration: 1,
-                            arrival_rate: 1
+                            arrival_rate: 1,
+                            max_virtual_users: 500
                         };
 
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
@@ -153,6 +156,89 @@ describe('Create job specific kubernetes tests', () => {
 
                         should(createJobResponse.status).eql(201);
                         should(createJobResponse.body).containEql(expectedResult);
+                    });
+
+                    it('Get the job', async () => {
+                        jobId = createJobResponse.body.id;
+                        getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(200);
+                        should(getJobsFromService.body).containEql(expectedResult);
+                    });
+
+                    it('Stop run', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}`)
+                            .reply(200);
+
+                        let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(stopRunResponse.status).eql(200);
+                    });
+
+                    it('Delete job', async () => {
+                        let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
+                        should(deleteJobResponse.status).eql(200);
+
+                        jobId = createJobResponse.body.id;
+                        getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(404);
+                    });
+                });
+
+                describe('Create one time job with parallelism, should create job with the right parameters and run it, finally stop and delete it', () => {
+                    let createJobResponse;
+                    let getJobsFromService;
+                    let expectedResult;
+                    it('Create the job', async () => {
+                        let validBody = {
+                            test_id: testId,
+                            arrival_rate: 100,
+                            ramp_to: 150,
+                            duration: 1,
+                            parallelism: 5,
+                            environment: 'test',
+                            run_immediately: true
+                        };
+
+                        expectedResult = {
+                            environment: 'test',
+                            test_id: testId,
+                            arrival_rate: 100,
+                            ramp_to: 150,
+                            duration: 1,
+                            parallelism: 5
+                        };
+                        let actualJobEnvVars = {};
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
+                            actualJobEnvVars = body.spec.template.spec.containers['0'].env;
+                            return true;
+                        }).reply(200, {
+                            metadata: { name: 'jobName', uid: 'uid' },
+                            namespace: kubernetesConfig.kubernetesNamespace
+                        });
+
+                        createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                        should(createJobResponse.body).containEql(expectedResult);
+
+                        let rampTo = actualJobEnvVars.find(env => env.name === 'RAMP_TO');
+                        should.exists(rampTo);
+
+                        let arrivalRate = actualJobEnvVars.find(env => env.name === 'ARRIVAL_RATE');
+                        should.exists(arrivalRate);
+
+                        should(rampTo.value).eql('30');
+                        should(arrivalRate.value).eql('20');
                     });
 
                     it('Get the job', async () => {

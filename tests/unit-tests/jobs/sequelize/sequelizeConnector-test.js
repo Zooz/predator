@@ -99,7 +99,9 @@ describe('Sequelize client tests', function () {
                 emails: ['hello@zooz.com', 'hello@payu.com'],
                 environment: 'test',
                 ramp_to: '1',
-                webhooks: ['http://zooz.com', 'http://payu.com']
+                webhooks: ['http://zooz.com', 'http://payu.com'],
+                parallelism: 4,
+                max_virtual_users: 100
             });
 
             should(sequelizeCreateStub.args[0][0]).eql({
@@ -110,6 +112,8 @@ describe('Sequelize client tests', function () {
                 'duration': 1,
                 'environment': 'test',
                 'ramp_to': '1',
+                'parallelism': 4,
+                'max_virtual_users': 100,
                 'webhooks': [{
                     'id': 'UUIDSTUB',
                     'url': 'http://zooz.com'
@@ -139,7 +143,10 @@ describe('Sequelize client tests', function () {
                 duration: 1,
                 cron_expression: '* * * *',
                 environment: 'test',
-                ramp_to: '1'
+                ramp_to: '1',
+                parallelism: 4,
+                max_virtual_users: 100
+
             });
 
             should(sequelizeCreateStub.args[0][0]).eql({
@@ -151,7 +158,9 @@ describe('Sequelize client tests', function () {
                 'environment': 'test',
                 'ramp_to': '1',
                 'webhooks': undefined,
-                'emails': undefined
+                'emails': undefined,
+                'parallelism': 4,
+                'max_virtual_users': 100
             });
         });
 
@@ -446,7 +455,9 @@ describe('Sequelize client tests', function () {
                 duration: 1,
                 cron_expression: '* * * *',
                 environment: 'test',
-                ramp_to: '1'
+                ramp_to: '1',
+                max_virtual_users: 500,
+                parallelism: 3
             });
 
             should(sequelizeUpdateStub.args[0][0]).eql({
@@ -455,7 +466,9 @@ describe('Sequelize client tests', function () {
                 'cron_expression': '* * * *',
                 'duration': 1,
                 'environment': 'test',
-                'ramp_to': '1'
+                'ramp_to': '1',
+                'max_virtual_users': 500,
+                'parallelism': 3
             });
 
             should(sequelizeUpdateStub.args[0][1]).eql({

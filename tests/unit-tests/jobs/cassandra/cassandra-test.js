@@ -48,8 +48,8 @@ describe('Cassandra client tests', function() {
             let id = uuid.v4();
             let testId = uuid.v4();
 
-            let query = 'INSERT INTO jobs(id, test_id, arrival_rate, cron_expression, duration, emails, environment, ramp_to, webhooks) values(?,?,?,?,?,?,?,?,?)';
-            return cassandraClient.insertJob(id, { test_id: testId, arrival_rate: 1, duration: 1, cron_expression: '* * * *', emails: {}, environment: 'test', ramp_to: '1', webhooks: 1 })
+            let query = 'INSERT INTO jobs(id, test_id, arrival_rate, cron_expression, duration, emails, environment, ramp_to, webhooks, parallelism, max_virtual_users) values(?,?,?,?,?,?,?,?,?,?,?)';
+            return cassandraClient.insertJob(id, { test_id: testId, arrival_rate: 1, duration: 1, cron_expression: '* * * *', emails: {}, environment: 'test', ramp_to: '1', webhooks: 1, parallelism: 3, max_virtual_users: 500 })
                 .then(function(){
                     loggerErrorStub.callCount.should.eql(0);
                     clientExecuteStub.getCall(0).args[0].should.eql(query);
