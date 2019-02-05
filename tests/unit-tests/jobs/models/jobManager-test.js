@@ -568,7 +568,7 @@ describe('Manager tests', function () {
             await manager.createJob(jobBodyWithCron);
             await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
             cassandraDeleteStub.callCount.should.eql(1);
-            loggerInfoStub.args[2].should.eql(['Job: 5a9eee73-cf56-47aa-ac77-fad59e961aaa completed.']);
+            loggerInfoStub.args[2].should.eql(['Job: 5a9eee73-cf56-47aa-ac77-fad59e961aaf completed.']);
         });
     });
 
@@ -617,7 +617,11 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                custom_env_vars: undefined,
+                max_virtual_users: undefined,
+                parallelism: undefined,
+                run_id: undefined
             }, {
                 id: 'id2',
                 test_id: 'test_id2',
@@ -625,7 +629,11 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                custom_env_vars: undefined,
+                max_virtual_users: undefined,
+                parallelism: undefined,
+                run_id: undefined
             }];
             let jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
@@ -642,7 +650,7 @@ describe('Manager tests', function () {
                 cron_expression: '* * * * *',
                 emails: null,
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1'
+                ramp_to: '1',
             },
             {
                 id: 'id2',
@@ -665,7 +673,11 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                custom_env_vars: undefined,
+                max_virtual_users: undefined,
+                parallelism: undefined,
+                run_id: undefined
             }];
             let jobs = await manager.getJobs();
             jobs.should.eql(expectedResult);
@@ -716,7 +728,11 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                custom_env_vars: undefined,
+                max_virtual_users: undefined,
+                parallelism: undefined,
+                run_id: undefined
             };
 
             let job = await manager.getJob('id');

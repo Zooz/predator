@@ -118,7 +118,7 @@ describe('Jobs verifier tests', function () {
             req = { body: { run_immediately: true, parallelism: 2 } };
             config.jobPlatform = consts.METRONOME;
             await jobVerifier.verifyJobBody(req, res, nextStub);
-            should(nextStub.args[0][0].message).eql('parallelism is only support for JOB_PLATFORM: KUBERNETES');
+            should(nextStub.args[0][0].message).eql('parallelism is only supported in JOB_PLATFORM: KUBERNETES');
             should(nextStub.args[0][0].statusCode).eql(400);
         });
 

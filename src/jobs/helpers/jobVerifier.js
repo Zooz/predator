@@ -10,8 +10,8 @@ module.exports.verifyJobBody = (req, res, next) => {
         errorToThrow = new Error('Please provide run_immediately or cron_expression in order to schedule a job');
         errorToThrow.statusCode = 400;
     }
-    else if (serviceConfig.jobPlatform !== consts.KUBERNETES && jobBody.parallelism && jobBody.parallelism > 1) {
-        errorToThrow = new Error(`parallelism is only support for JOB_PLATFORM: ${consts.KUBERNETES}`);
+    else if (serviceConfig.jobPlatform !== consts.KUBERNETES && jobBody.parallelism > 1) {
+        errorToThrow = new Error(`parallelism is only supported in JOB_PLATFORM: ${consts.KUBERNETES}`);
         errorToThrow.statusCode = 400;
     }
 
