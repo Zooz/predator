@@ -12,7 +12,7 @@ let jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate');
 
 let config = require('../../../../src/config/serviceConfig');
 
-config.jobPlatform = 'Kubernetes';
+config.jobPlatform = 'KUBERNETES';
 let manager;
 
 let dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector');
@@ -53,6 +53,33 @@ let jobBodyWithoutCron = {
     ramp_to: '1',
     webhooks: ['dina', 'niv', 'eli']
 };
+
+let jobBodyWithParallelismThatSplitsNicely = {
+    test_id: TEST_ID,
+    arrival_rate: 99,
+    duration: 1,
+    run_immediately: true,
+    emails: ['dina@niv.eli'],
+    environment: 'test',
+    ramp_to: '150',
+    parallelism: 3,
+    webhooks: ['dina', 'niv', 'eli'],
+    max_virtual_users: 198
+};
+
+let jobBodyWithParallelismThatSplitsWithDecimal = {
+    test_id: TEST_ID,
+    arrival_rate: 99,
+    duration: 1,
+    run_immediately: true,
+    emails: ['dina@niv.eli'],
+    environment: 'test',
+    ramp_to: '150',
+    parallelism: 20,
+    webhooks: ['dina', 'niv', 'eli'],
+    max_virtual_users: 510
+};
+
 let jobBodyWithoutRampTo = {
     test_id: TEST_ID,
     arrival_rate: 1,
@@ -71,7 +98,8 @@ let jobBodyWithCustomEnvVars = {
     emails: ['dina@niv.eli'],
     environment: 'test',
     webhooks: ['dina', 'niv', 'eli'],
-    custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' }
+    custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' },
+    max_virtual_users: 100
 };
 
 describe('Manager tests', function () {
@@ -107,7 +135,7 @@ describe('Manager tests', function () {
 
         manager = rewire('../../../../src/jobs/models/jobManager');
         manager.__set__('config.concurrencyLimit', '100');
-        manager.__set__('config.jobPlatform', 'Kubernetes');
+        manager.__set__('config.jobPlatform', 'KUBERNETES');
     });
 
     beforeEach(() => {
@@ -161,7 +189,7 @@ describe('Manager tests', function () {
     describe('Create new job', function () {
         before(() => {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.testsApiUrl', 'localhost:8080');
+            manager.__set__('config.myAddress', 'localhost:8080');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -178,6 +206,7 @@ describe('Manager tests', function () {
                 webhooks: ['dina', 'niv', 'eli'],
                 arrival_rate: 1,
                 duration: 1,
+                max_virtual_users: 100,
                 'custom_env_vars':
                     {
                         'KEY1': 'A',
@@ -189,22 +218,20 @@ describe('Manager tests', function () {
             jobResponse.should.containEql(expectedResult);
             cassandraInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
-            jobTemplateCreateJobRequestStub.args[0][2].should.containEql({
+            jobTemplateCreateJobRequestStub.args[0][3].should.containEql({
                 JOB_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ENVIRONMENT: 'test',
                 TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
-                TESTS_API_URL: 'localhost:8080',
+                PREDATOR_URL: 'localhost:8080',
                 ARRIVAL_RATE: '1',
                 DURATION: '1',
-                PUSH_GATEWAY_URL: undefined,
-                CONCURRENCY_LIMIT: '100',
                 EMAILS: 'dina@niv.eli',
                 WEBHOOKS: 'dina;niv;eli',
                 CUSTOM_KEY1: 'A',
                 CUSTOM_KEY2: 'B'
             });
 
-            jobTemplateCreateJobRequestStub.args[0][2].should.have.key('RUN_ID');
+            jobTemplateCreateJobRequestStub.args[0][3].should.have.key('RUN_ID');
         });
 
         it('Simple request, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
@@ -225,6 +252,80 @@ describe('Manager tests', function () {
             jobResponse.should.containEql(expectedResult);
             cassandraInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
+        });
+
+        it('Simple request, with parallelism, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
+            jobConnectorRunJobStub.resolves({});
+            cassandraInsertStub.resolves({ success: 'success' });
+            let expectedResult = {
+                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                ramp_to: '150',
+                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                environment: 'test',
+                emails: ['dina@niv.eli'],
+                parallelism: 3,
+                webhooks: ['dina', 'niv', 'eli'],
+                arrival_rate: 99,
+                duration: 1,
+                max_virtual_users: 198
+            };
+
+            let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsNicely);
+            jobResponse.should.containEql(expectedResult);
+            cassandraInsertStub.callCount.should.eql(1);
+            jobConnectorRunJobStub.callCount.should.eql(1);
+
+            should(jobConnectorRunJobStub.args[0][0].spec.parallelism).eql(3);
+
+            let rampTo = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'RAMP_TO');
+            should.exists(rampTo);
+
+            let arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
+            should.exists(arrivalRate);
+
+            let maxVirtualUsers = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'MAX_VIRTUAL_USERS');
+            should.exists(maxVirtualUsers);
+
+            should(rampTo.value).eql('50');
+            should(arrivalRate.value).eql('33');
+            should(maxVirtualUsers.value).eql('66');
+        });
+
+        it('Simple request, with parallelism, and arrival rate splits with decimal point, should round up', async () => {
+            jobConnectorRunJobStub.resolves({});
+            cassandraInsertStub.resolves({ success: 'success' });
+            let expectedResult = {
+                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                ramp_to: '150',
+                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                environment: 'test',
+                emails: ['dina@niv.eli'],
+                parallelism: 20,
+                webhooks: ['dina', 'niv', 'eli'],
+                arrival_rate: 99,
+                duration: 1,
+                max_virtual_users: 510
+            };
+
+            let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsWithDecimal);
+            jobResponse.should.containEql(expectedResult);
+            cassandraInsertStub.callCount.should.eql(1);
+            jobConnectorRunJobStub.callCount.should.eql(1);
+
+            should(jobConnectorRunJobStub.args[0][0].spec.parallelism).eql(20);
+
+            let rampTo = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'RAMP_TO');
+            should.exists(rampTo);
+
+            let arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
+            should.exists(arrivalRate);
+
+            let maxVirtualUsers = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'MAX_VIRTUAL_USERS');
+            should.exists(maxVirtualUsers);
+
+            should(rampTo.value).eql('8');
+            should(arrivalRate.value).eql('5');
+            should(maxVirtualUsers.value).eql('26');
         });
 
         it('Simple request without ramp to, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
@@ -408,7 +509,7 @@ describe('Manager tests', function () {
     describe('Update job', function () {
         before(() => {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.testsApiUrl', 'localhost:8080');
+            manager.__set__('config.predatorUrl', 'localhost:8080');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -456,7 +557,7 @@ describe('Manager tests', function () {
     describe('Delete scheduled job', function () {
         it('Deletes an existing job', async function () {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.testsApiUrl', 'localhost:8080');
+            manager.__set__('config.predatorUrl', 'localhost:8080');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -467,7 +568,7 @@ describe('Manager tests', function () {
             await manager.createJob(jobBodyWithCron);
             await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
             cassandraDeleteStub.callCount.should.eql(1);
-            loggerInfoStub.args[2].should.eql(['Job: 5a9eee73-cf56-47aa-ac77-fad59e961aaa completed.']);
+            loggerInfoStub.args[2].should.eql(['Job: 5a9eee73-cf56-47aa-ac77-fad59e961aaf completed.']);
         });
     });
 
@@ -516,7 +617,11 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                custom_env_vars: undefined,
+                max_virtual_users: undefined,
+                parallelism: undefined,
+                run_id: undefined
             }, {
                 id: 'id2',
                 test_id: 'test_id2',
@@ -524,7 +629,11 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                custom_env_vars: undefined,
+                max_virtual_users: undefined,
+                parallelism: undefined,
+                run_id: undefined
             }];
             let jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
@@ -541,7 +650,7 @@ describe('Manager tests', function () {
                 cron_expression: '* * * * *',
                 emails: null,
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1'
+                ramp_to: '1',
             },
             {
                 id: 'id2',
@@ -564,7 +673,11 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                custom_env_vars: undefined,
+                max_virtual_users: undefined,
+                parallelism: undefined,
+                run_id: undefined
             }];
             let jobs = await manager.getJobs();
             jobs.should.eql(expectedResult);
@@ -615,7 +728,11 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                custom_env_vars: undefined,
+                max_virtual_users: undefined,
+                parallelism: undefined,
+                run_id: undefined
             };
 
             let job = await manager.getJob('id');

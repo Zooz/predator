@@ -1,4 +1,4 @@
-module.exports.createJobRequest = (jobName, runId, environmentVariables, dockerImage) => {
+module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage) => {
     return {
         'apiVersion': 'batch/v1',
         'kind': 'Job',
@@ -6,6 +6,7 @@ module.exports.createJobRequest = (jobName, runId, environmentVariables, dockerI
             'name': jobName + '-' + runId
         },
         'spec': {
+            'parallelism': parallelism,
             'template': {
                 'spec': {
                     'containers': [

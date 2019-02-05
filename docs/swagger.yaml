@@ -832,7 +832,6 @@ definitions:
     - test_id
     - arrival_rate
     - duration
-    - environment
     properties:
       variables:
         type: object
@@ -855,13 +854,24 @@ definitions:
           description: The url of where to send the webhook with the report information
       arrival_rate:
         type: number
+        minimum: 1
         description: How many requests per second to create
       duration:
         type: number
+        minimum: 1
         description: For how many seconds the test should run
       ramp_to:
         type: number
+        minimum: 1
         description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
+      max_virtual_users:
+          type: number
+          minimum: 1
+          description: The number of concurrent users that can execute requests. The arrival rate will split between them
+      parallelism:
+        type: number
+        minimum: 1
+        description: The number of runners to deploy upon start of the test. The arrival rate, ramp to and the max virtual users will be split by this value
       emails:
         type: array
         items:
@@ -869,7 +879,6 @@ definitions:
           description: The url of where to send the the email with the report information
       environment:
         type: string
-        enum: ['test', 'live']
         description: In which environment the test will run
   job_update:
     properties:
@@ -887,13 +896,24 @@ definitions:
           description: The url of where to send the webhook with the report information
       arrival_rate:
         type: number
+        minimum: 1
         description: How many requests per second to create
       duration:
         type: number
+        minimum: 1
         description: For how many seconds the test should run
       ramp_to:
         type: number
+        minimum: 1
         description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
+      max_virtual_users:
+        type: number
+        minimum: 1
+        description: The number of concurrent users that can execute requests. The arrival rate will split between them
+      parallelism:
+        type: number
+        minimum: 1
+        description: The number of runners to deploy upon start of the test. The arrival rate, ramp to and the max virtual users will be split by this value
       emails:
         type: array
         items:
@@ -1044,5 +1064,3 @@ definitions:
       notes:
         type: string
         description: notes about the test
-
-

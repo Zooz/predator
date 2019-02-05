@@ -4,5 +4,7 @@ module.exports = {
     ERROR_MESSAGES: {
         NOT_FOUND: 'Not found',
         DSL_DEF_ALREADY_EXIST: 'Definition already exists'
-    }
+    },
+    KUBERNETES: 'KUBERNETES',
+    METRONOME: 'METRONOME'
 };

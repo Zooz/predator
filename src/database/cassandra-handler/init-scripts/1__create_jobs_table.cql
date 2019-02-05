@@ -8,5 +8,7 @@ duration int,
 ramp_to int,
 webhooks list<text>,
 emails list<text>,
+parallelism int,
+max_virtual_users int,
 PRIMARY KEY (id)
 );

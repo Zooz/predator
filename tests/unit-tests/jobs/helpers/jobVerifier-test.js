@@ -3,6 +3,7 @@ let should = require('should');
 let jobVerifier = require('../../../../src/jobs/helpers/jobVerifier');
 let testsManager = require('../../../../src/tests/models/manager');
 let config = require('../../../../src/config/serviceConfig');
+let consts = require('../../../../src/common/consts');
 
 describe('Jobs verifier tests', function () {
     let req, res, sandbox, nextStub, resJsonStub, resStatusStub, testsManagerStub;
@@ -71,44 +72,61 @@ describe('Jobs verifier tests', function () {
     describe('verifyJobBody tests', () => {
         it('Run immediately is true and cron expression does not exist, should pass', async () => {
             req = { body: { run_immediately: true } };
-            config.testsApiUrl = 'http://perf.zooz.com';
             await jobVerifier.verifyJobBody(req, res, nextStub);
-            should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0]).eql(undefined);
         });
 
         it('Run immediately is true and cron expression exist, should pass', async () => {
             req = { body: { run_immediately: true, cron_expression: '* * *' } };
-            config.testsApiUrl = 'http://perf.zooz.com';
             await jobVerifier.verifyJobBody(req, res, nextStub);
-            should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0]).eql(undefined);
         });
 
         it('Run immediately is false and cron expression does not exist, should fail', async () => {
             req = { body: { run_immediately: false } };
-            config.testsApiUrl = 'http://perf.zooz.com';
             await jobVerifier.verifyJobBody(req, res, nextStub);
-            should(nextStub.calledOnce).eql(false);
+            should(nextStub.args[0][0].message).eql('Please provide run_immediately or cron_expression in order to schedule a job');
+            should(nextStub.args[0][0].statusCode).eql(400);
         });
 
         it('Run immediately is false and cron expression exist, should pass', async () => {
             req = { body: { run_immediately: false, cron_expression: '* * *' } };
-            config.testsApiUrl = 'http://perf.zooz.com';
             await jobVerifier.verifyJobBody(req, res, nextStub);
-            should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0]).eql(undefined);
         });
-
         it('Run immediately does not exits and cron expression exist, should pass', async () => {
             req = { body: { cron_expression: '* * *' } };
-            config.testsApiUrl = 'http://perf.zooz.com';
             await jobVerifier.verifyJobBody(req, res, nextStub);
-            should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0]).eql(undefined);
         });
 
         it('Run immediately does not exits and cron expression does not exist, should pass', async () => {
             req = { body: {} };
-            config.testsApiUrl = 'http://perf.zooz.com';
             await jobVerifier.verifyJobBody(req, res, nextStub);
-            should(nextStub.calledOnce).eql(false);
+            should(nextStub.args[0][0].message).eql('Please provide run_immediately or cron_expression in order to schedule a job');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+
+        it('Run immediately is true and parallelism is set to 1 with metronome as job platform, should pass', async () => {
+            req = { body: { run_immediately: true, parallelism: 1 } };
+            config.jobPlatform = consts.METRONOME;
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('Run immediately is true and parallelism is set to 2 with metronome as job platform, should fail', async () => {
+            req = { body: { run_immediately: true, parallelism: 2 } };
+            config.jobPlatform = consts.METRONOME;
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0].message).eql('parallelism is only supported in JOB_PLATFORM: KUBERNETES');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+
+        it('Run immediately is true and parallelism is set to 2 with kubernetes as job platform, should pass', async () => {
+            req = { body: { run_immediately: true, parallelism: 2 } };
+            config.jobPlatform = consts.KUBERNETES;
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
         });
     });
 });
