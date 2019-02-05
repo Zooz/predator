@@ -128,37 +128,28 @@ module.exports.updateJob = function (jobId, jobConfig) {
 };
 
 function createResponse(jobId, jobBody, runId) {
-    let response = {};
-    response.id = jobId;
-    response.test_id = jobBody.test_id;
+    let response = {
+        id: jobId,
+        test_id: jobBody.test_id,
+        cron_expression: jobBody.cron_expression,
+        webhooks: jobBody.webhooks,
+        emails: jobBody.emails,
+        ramp_to: jobBody.ramp_to,
+        parallelism: jobBody.parallelism,
+        max_virtual_users: jobBody.max_virtual_users,
+        custom_env_vars: jobBody.custom_env_vars,
+        run_id: runId,
+        arrival_rate: jobBody.arrival_rate,
+        duration: jobBody.duration,
+        environment: jobBody.environment
+    };
 
-    if (jobBody.cron_expression) {
-        response.cron_expression = jobBody.cron_expression;
-    }
-    if (jobBody.webhooks) {
-        response.webhooks = jobBody.webhooks;
-    }
-    if (jobBody.emails) {
-        response.emails = jobBody.emails;
-    }
-    if (jobBody.ramp_to) {
-        response.ramp_to = jobBody.ramp_to;
-    }
-    if (jobBody.parallelism) {
-        response.parallelism = jobBody.parallelism;
-    }
-    if (jobBody.max_virtual_users) {
-        response.max_virtual_users = jobBody.max_virtual_users;
-    }
-    if (jobBody.custom_env_vars) {
-        response.custom_env_vars = jobBody.custom_env_vars;
-    }
-    if (runId) {
-        response.run_id = runId;
-    }
-    response.arrival_rate = jobBody.arrival_rate;
-    response.duration = jobBody.duration;
-    response.environment = jobBody.environment;
+    Object.keys(response).forEach(key => {
+        if (response[key] === null) {
+            delete response[key];
+        }
+    });
+
     return response;
 }
 
@@ -171,12 +162,12 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
 
     if (consts.KUBERNETES === config.jobPlatform) {
         parallelism = jobBody.parallelism || 1;
-        arrivalRatePerRunner = jobBody.arrival_rate / parallelism;
+        arrivalRatePerRunner = Math.ceil(jobBody.arrival_rate / parallelism);
         if (jobBody.ramp_to) {
-            rampToPerRunner = jobBody.ramp_to / parallelism;
+            rampToPerRunner = Math.ceil(jobBody.ramp_to / parallelism);
         }
         if (jobBody.max_virtual_users) {
-            maxVirtualUsersPerRunner = jobBody.max_virtual_users / parallelism;
+            maxVirtualUsersPerRunner = Math.ceil(jobBody.max_virtual_users / parallelism);
         }
     }
 
@@ -185,7 +176,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
         RUN_ID: runId.toString(),
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
-        TESTS_API_URL: config.testsApiUrl,
+        PREDATOR_URL: config.myAddress,
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
         DURATION: jobBody.duration.toString(),
         METRICS_PLUGIN_NAME: config.metricsPluginName,
@@ -229,10 +220,10 @@ function addCron(jobId, job, cronExpression) {
             let jobSpecificPlatformConfig = createJobRequest(jobId, runId, job, latestDockerImage);
             await jobConnector.runJob(jobSpecificPlatformConfig);
         } catch (error) {
-            logger.error({ id: jobId, error: error }, 'Unable to run scheduled job.');
+            logger.error({id: jobId, error: error}, 'Unable to run scheduled job.');
         }
     }, function () {
-        logger.info('Job: ' + job.id + ' completed.');
+        logger.info('Job: ' + jobId + ' completed.');
     }, true);
     cronJobs[jobId] = scheduledJob;
 }

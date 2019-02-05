@@ -51,7 +51,7 @@ describe('Update scheduled job', function () {
 
         it('Create a job then update it', async () => {
             let date = new Date();
-            date.setSeconds(date.getSeconds() + 2);
+            date.setSeconds(date.getSeconds() + 4);
             let validBody = {
                 test_id: testId,
                 arrival_rate: 1,
@@ -84,10 +84,11 @@ describe('Update scheduled job', function () {
             let expectedResponseBodyAfterUpdate = JSON.parse(JSON.stringify(getJobResponseBeforeUpdate.body));
             expectedResponseBodyAfterUpdate.test_id = updatedTestId;
             getJobResponseAfterUpdate.body.should.eql(expectedResponseBodyAfterUpdate);
+
         });
 
-        it('Wait for 5 seconds', (done) => {
-            setTimeout(done, 5000);
+        it('Wait for 6 seconds', (done) => {
+            setTimeout(done, 6000);
         });
 
         it('Validate test updated', async () => {
@@ -137,15 +138,15 @@ describe('Update scheduled job', function () {
             });
             jobId = createJobResponse.body.id;
             date = new Date();
-            date.setSeconds(date.getSeconds() + 2);
+            date.setSeconds(date.getSeconds() + 4);
             let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { cron_expression: date.getSeconds() + ' * * * * *' }, {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(200);
         });
 
-        it('Wait for 4 seconds', (done) => {
-            setTimeout(done, 4000);
+        it('Wait for 6000 seconds', (done) => {
+            setTimeout(done, 6000);
         });
 
         it('Validate test updated', async () => {

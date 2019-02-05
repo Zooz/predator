@@ -119,7 +119,6 @@ describe('Create job specific metronome tests', () => {
                     let jobResponseBody;
 
                     it('Create the job', async () => {
-
                         let validBody = {
                             test_id: testId,
                             arrival_rate: 1,
@@ -188,6 +187,29 @@ describe('Create job specific metronome tests', () => {
                         });
 
                         should(getJobsFromService.status).eql(404);
+                    });
+                });
+            });
+
+            describe('Bad requests', () => {
+                describe('Create job with parallelism > 1 should return 400', () => {
+                    it('Create the job', async () => {
+                        let validBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            max_virtual_users: 100,
+                            parallelism: 2
+                        };
+
+                        let response = await schedulerRequestCreator.createJob(validBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(response.statusCode).eql(400);
+                        should(response.body.message).eql('parallelism is only support for JOB_PLATFORM: KUBERNETES');
                     });
                 });
             });

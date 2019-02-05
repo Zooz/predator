@@ -54,7 +54,7 @@ let jobBodyWithoutCron = {
     webhooks: ['dina', 'niv', 'eli']
 };
 
-let jobBodyWithoutCronWith99ArrivalRate = {
+let jobBodyWithParallelismThatSplitsNicely = {
     test_id: TEST_ID,
     arrival_rate: 99,
     duration: 1,
@@ -63,7 +63,21 @@ let jobBodyWithoutCronWith99ArrivalRate = {
     environment: 'test',
     ramp_to: '150',
     parallelism: 3,
-    webhooks: ['dina', 'niv', 'eli']
+    webhooks: ['dina', 'niv', 'eli'],
+    max_virtual_users: 198
+};
+
+let jobBodyWithParallelismThatSplitsWithDecimal = {
+    test_id: TEST_ID,
+    arrival_rate: 99,
+    duration: 1,
+    run_immediately: true,
+    emails: ['dina@niv.eli'],
+    environment: 'test',
+    ramp_to: '150',
+    parallelism: 20,
+    webhooks: ['dina', 'niv', 'eli'],
+    max_virtual_users: 510
 };
 
 let jobBodyWithoutRampTo = {
@@ -175,7 +189,7 @@ describe('Manager tests', function () {
     describe('Create new job', function () {
         before(() => {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.testsApiUrl', 'localhost:8080');
+            manager.__set__('config.myAddress', 'localhost:8080');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -208,7 +222,7 @@ describe('Manager tests', function () {
                 JOB_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ENVIRONMENT: 'test',
                 TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
-                TESTS_API_URL: 'localhost:8080',
+                PREDATOR_URL: 'localhost:8080',
                 ARRIVAL_RATE: '1',
                 DURATION: '1',
                 EMAILS: 'dina@niv.eli',
@@ -252,10 +266,11 @@ describe('Manager tests', function () {
                 parallelism: 3,
                 webhooks: ['dina', 'niv', 'eli'],
                 arrival_rate: 99,
-                duration: 1
+                duration: 1,
+                max_virtual_users: 198
             };
 
-            let jobResponse = await manager.createJob(jobBodyWithoutCronWith99ArrivalRate);
+            let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsNicely);
             jobResponse.should.containEql(expectedResult);
             cassandraInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
@@ -268,8 +283,49 @@ describe('Manager tests', function () {
             let arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
             should.exists(arrivalRate);
 
+            let maxVirtualUsers = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'MAX_VIRTUAL_USERS');
+            should.exists(maxVirtualUsers);
+
             should(rampTo.value).eql('50');
             should(arrivalRate.value).eql('33');
+            should(maxVirtualUsers.value).eql('66');
+        });
+
+        it('Simple request, with parallelism, and arrival rate splits with decimal point, should round up', async () => {
+            jobConnectorRunJobStub.resolves({});
+            cassandraInsertStub.resolves({ success: 'success' });
+            let expectedResult = {
+                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                ramp_to: '150',
+                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                environment: 'test',
+                emails: ['dina@niv.eli'],
+                parallelism: 20,
+                webhooks: ['dina', 'niv', 'eli'],
+                arrival_rate: 99,
+                duration: 1,
+                max_virtual_users: 510
+            };
+
+            let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsWithDecimal);
+            jobResponse.should.containEql(expectedResult);
+            cassandraInsertStub.callCount.should.eql(1);
+            jobConnectorRunJobStub.callCount.should.eql(1);
+
+            should(jobConnectorRunJobStub.args[0][0].spec.parallelism).eql(20);
+
+            let rampTo = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'RAMP_TO');
+            should.exists(rampTo);
+
+            let arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
+            should.exists(arrivalRate);
+
+            let maxVirtualUsers = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'MAX_VIRTUAL_USERS');
+            should.exists(maxVirtualUsers);
+
+            should(rampTo.value).eql('8');
+            should(arrivalRate.value).eql('5');
+            should(maxVirtualUsers.value).eql('26');
         });
 
         it('Simple request without ramp to, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
@@ -453,7 +509,7 @@ describe('Manager tests', function () {
     describe('Update job', function () {
         before(() => {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.testsApiUrl', 'localhost:8080');
+            manager.__set__('config.predatorUrl', 'localhost:8080');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -501,7 +557,7 @@ describe('Manager tests', function () {
     describe('Delete scheduled job', function () {
         it('Deletes an existing job', async function () {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.testsApiUrl', 'localhost:8080');
+            manager.__set__('config.predatorUrl', 'localhost:8080');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');

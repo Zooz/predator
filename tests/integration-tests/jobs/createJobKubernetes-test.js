@@ -201,8 +201,9 @@ describe('Create job specific kubernetes tests', () => {
                             test_id: testId,
                             arrival_rate: 100,
                             ramp_to: 150,
+                            max_virtual_users: 200,
                             duration: 1,
-                            parallelism: 5,
+                            parallelism: 7,
                             environment: 'test',
                             run_immediately: true
                         };
@@ -213,7 +214,7 @@ describe('Create job specific kubernetes tests', () => {
                             arrival_rate: 100,
                             ramp_to: 150,
                             duration: 1,
-                            parallelism: 5
+                            parallelism: 7
                         };
                         let actualJobEnvVars = {};
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
@@ -237,8 +238,13 @@ describe('Create job specific kubernetes tests', () => {
                         let arrivalRate = actualJobEnvVars.find(env => env.name === 'ARRIVAL_RATE');
                         should.exists(arrivalRate);
 
-                        should(rampTo.value).eql('30');
-                        should(arrivalRate.value).eql('20');
+                        let maxVirtualUsers = actualJobEnvVars.find(env => env.name === 'MAX_VIRTUAL_USERS');
+                        should.exists(maxVirtualUsers);
+
+                        should(rampTo.value).eql('22');
+                        should(arrivalRate.value).eql('15');
+                        should(maxVirtualUsers.value).eql('29');
+
                     });
 
                     it('Get the job', async () => {
@@ -295,7 +301,7 @@ describe('Create job specific kubernetes tests', () => {
 
                         it('Create the job, then get the runs, then get the job from kubernetes and service', async () => {
                             date = new Date();
-                            date.setSeconds(date.getSeconds() + 2);
+                            date.setSeconds(date.getSeconds() + 4);
                             let validBody = {
                                 test_id: testId,
                                 arrival_rate: 1,
@@ -312,8 +318,8 @@ describe('Create job specific kubernetes tests', () => {
                             should(createJobResponse.status).eql(201);
                         });
 
-                        it('Wait 4 seconds to let scheduler run the job', (done) => {
-                            setTimeout(done, 4000);
+                        it('Wait 6 seconds to let scheduler run the job', (done) => {
+                            setTimeout(done, 6000);
                         });
 
                         it('Verify job was deployed as supposed to', () => {

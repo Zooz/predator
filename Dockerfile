@@ -23,4 +23,4 @@ COPY /src /usr/src
 COPY /docs /usr/docs
 
 EXPOSE 8080
-CMD [ "node","--max_old_space_size=196","./src/app.js" ]
+CMD [ "node","--max_old_space_size=196","./src/server.js" ]
