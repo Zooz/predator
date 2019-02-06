@@ -209,7 +209,7 @@ describe('Create job specific metronome tests', () => {
                         });
 
                         should(response.statusCode).eql(400);
-                        should(response.body.message).eql('parallelism is only support for JOB_PLATFORM: KUBERNETES');
+                        should(response.body.message).eql('parallelism is only supported in JOB_PLATFORM: KUBERNETES');
                     });
                 });
             });

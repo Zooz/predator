@@ -20,7 +20,6 @@
         {
           "post": {
             "url": "/payments",
-            "gateway": "payments",
             "gzip": true,
             "forever": true,
             "capture": {
@@ -61,7 +60,6 @@
         {
           "post": {
             "url": "/payments/{{ paymentId }}/authorizations",
-            "gateway": "payments",
             "gzip": true,
             "forever": true,
             "capture": {
@@ -84,7 +82,6 @@
         {
           "post": {
             "url": "/payments/{{ paymentId }}/voids",
-            "gateway": "payments",
             "gzip": true,
             "forever": true,
             "headers": {

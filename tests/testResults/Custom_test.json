@@ -14,7 +14,6 @@
 		"flow": [{
 			"post": {
 				"url": "/payments",
-				"gateway": "payments",
 				"capture": {
 					"json": "$.id",
 					"as": "paymentId"

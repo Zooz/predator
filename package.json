@@ -1,6 +1,6 @@
 {
   "name": "predator",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Framework that manages the entire lifecycle of load testing a server, from creating test files, running scheduled and on-demand tests, and viewing test results.",
   "main": "server.js",
   "directories": {
@@ -69,7 +69,7 @@
     "cz-conventional-changelog": "^2.1.0",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^12.0.0-alpha.0",
-    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.1.0",

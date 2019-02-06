@@ -244,7 +244,6 @@ describe('Create job specific kubernetes tests', () => {
                         should(rampTo.value).eql('22');
                         should(arrivalRate.value).eql('15');
                         should(maxVirtualUsers.value).eql('29');
-
                     });
 
                     it('Get the job', async () => {
@@ -301,7 +300,7 @@ describe('Create job specific kubernetes tests', () => {
 
                         it('Create the job, then get the runs, then get the job from kubernetes and service', async () => {
                             date = new Date();
-                            date.setSeconds(date.getSeconds() + 4);
+                            date.setSeconds(date.getSeconds() + 2);
                             let validBody = {
                                 test_id: testId,
                                 arrival_rate: 1,
@@ -318,8 +317,8 @@ describe('Create job specific kubernetes tests', () => {
                             should(createJobResponse.status).eql(201);
                         });
 
-                        it('Wait 6 seconds to let scheduler run the job', (done) => {
-                            setTimeout(done, 6000);
+                        it('Wait 4 seconds to let scheduler run the job', (done) => {
+                            setTimeout(done, 4000);
                         });
 
                         it('Verify job was deployed as supposed to', () => {

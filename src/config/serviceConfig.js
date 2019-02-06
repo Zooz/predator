@@ -1,7 +1,6 @@
 let config = {
     grafanaUrl: process.env.GRAFANA_URL,
     myAddress: process.env.MY_ADDRESS,
-    pushGatewayUrl: process.env.PUSH_GATEWAY_URL,
     concurrencyLimit: process.env.CONCURRENCY_LIMIT || 500,
     dockerName: process.env.DOCKER_NAME || 'enudler/predator-runner',
     jobPlatform: process.env.JOB_PLATFORM,

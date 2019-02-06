@@ -84,7 +84,7 @@ function executeQuery(query, params, queryOptions) {
         });
         return Promise.resolve(result.rows ? result.rows : []);
     }).catch((exception) => {
-        logger.error(`Cassandra query failed \n ${JSON.stringify({query, params, queryOptions})}`, exception);
+        logger.error(`Cassandra query failed \n ${JSON.stringify({ query, params, queryOptions })}`, exception);
         return Promise.reject(new Error('Error occurred in communication with cassandra'));
     });
 }

@@ -189,7 +189,7 @@ describe('Manager tests', function () {
     describe('Create new job', function () {
         before(() => {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.myAddress', 'localhost:8080');
+            manager.__set__('config.myAddress', 'localhost:80');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -222,7 +222,7 @@ describe('Manager tests', function () {
                 JOB_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ENVIRONMENT: 'test',
                 TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
-                PREDATOR_URL: 'localhost:8080',
+                PREDATOR_URL: 'localhost:80',
                 ARRIVAL_RATE: '1',
                 DURATION: '1',
                 EMAILS: 'dina@niv.eli',
@@ -509,7 +509,7 @@ describe('Manager tests', function () {
     describe('Update job', function () {
         before(() => {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.predatorUrl', 'localhost:8080');
+            manager.__set__('config.predatorUrl', 'localhost:80');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -557,7 +557,7 @@ describe('Manager tests', function () {
     describe('Delete scheduled job', function () {
         it('Deletes an existing job', async function () {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.predatorUrl', 'localhost:8080');
+            manager.__set__('config.predatorUrl', 'localhost:80');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');

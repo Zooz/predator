@@ -25,7 +25,7 @@ module.exports.createArtilleryReport = async (testId, reportId) => {
         return Promise.reject(error);
     }
 
-    let reportInput = {intermediate: []};
+    let reportInput = { intermediate: [] };
     stats.forEach(stat => {
         switch (stat.phase_status) {
         case 'intermediate':
@@ -49,7 +49,7 @@ module.exports.createArtilleryReport = async (testId, reportId) => {
 };
 
 function createAggregateManually(intermediateStats) {
-    let result = {requestsCompleted: 0, scenariosCreated: 0, scenariosAvoided: 0, scenariosCompleted: 0, pendingRequests: 0, scenarioCounts: {}, errors: {}, codes: {}, latency: {median: 0, max: 0, min: 9999999 }};
+    let result = { requestsCompleted: 0, scenariosCreated: 0, scenariosAvoided: 0, scenariosCompleted: 0, pendingRequests: 0, scenarioCounts: {}, errors: {}, codes: {}, latency: { median: 0, max: 0, min: 9999999 } };
     _.each(intermediateStats, function(stats) {
         result.latency.median += stats.latency.median;
         if (stats.latency.max >= result.latency.max) {
@@ -99,6 +99,6 @@ function generateReportFromTemplate(reportInput) {
         './templates/index.html.ejs');
     let template = fs.readFileSync(templateFn, 'utf-8');
     let compiledTemplate = _.template(template);
-    let html = compiledTemplate({report: JSON.stringify(reportInput, null, 2)});
+    let html = compiledTemplate({ report: JSON.stringify(reportInput, null, 2) });
     return html;
 }

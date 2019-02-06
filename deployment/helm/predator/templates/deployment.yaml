@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "predator.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "predator.name" . }}
+    helm.sh/chart: {{ include "predator.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "predator.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "predator.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: "DATABASE_USERNAME"
+            valueFrom:
+              secretKeyRef:
+                key:  DATABASE_USERNAME
+                name: {{ .Release.Name }}-auth
+          - name: "DATABASE_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                key:  DATABASE_PASSWORD
+                name: {{ .Release.Name }}-auth
+          - name: DATABASE_TYPE
+            value: {{ .Values.DATABASE_TYPE }}
+          - name: DATABASE_NAME
+            value: {{ .Values.DATABASE_NAME }}
+          - name: DATABASE_ADDRESS
+            value: {{ .Values.DATABASE_ADDRESS }}
+          - name: JOB_PLATFORM
+            value: {{ .Values.JOB_PLATFORM }}
+          - name: KUBERNETES_URL
+            value: {{ .Values.KUBERNETES_URL }}
+          - name: KUBERNETES_NAMESPACE
+            value: {{ .Values.KUBERNETES_NAMESPACE }}
+          - name: GRAFANA_URL
+            value: {{ .Values.GRAFANA_URL }}
+          - name: METRICS_PLUGIN_NAME
+            value: {{ .Values.METRICS_PLUGIN_NAME }}
+          - name: METRICS_EXPORT_CONFIG
+            value: {{ .Values.METRICS_EXPORT_CONFIG }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

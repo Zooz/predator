@@ -220,7 +220,7 @@ function addCron(jobId, job, cronExpression) {
             let jobSpecificPlatformConfig = createJobRequest(jobId, runId, job, latestDockerImage);
             await jobConnector.runJob(jobSpecificPlatformConfig);
         } catch (error) {
-            logger.error({id: jobId, error: error}, 'Unable to run scheduled job.');
+            logger.error({ id: jobId, error: error }, 'Unable to run scheduled job.');
         }
     }, function () {
         logger.info('Job: ' + jobId + ' completed.');

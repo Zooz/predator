@@ -26,7 +26,6 @@ module.exports = (dslName) => {
                                         'json': '$.token'
                                     },
                                     'forever': true,
-                                    'gateway': 'pci',
                                     'gzip': true,
                                     'headers': {
                                         'Content-Type': 'application/json',
@@ -63,7 +62,6 @@ module.exports = (dslName) => {
                                         'json': '$.id'
                                     },
                                     'forever': true,
-                                    'gateway': 'payments',
                                     'gzip': true,
                                     'headers': {
                                         'Content-Type': 'application/json',
@@ -125,7 +123,6 @@ module.exports = (dslName) => {
                                         'json': '$.token'
                                     },
                                     'forever': true,
-                                    'gateway': 'pci',
                                     'gzip': true,
                                     'headers': {
                                         'Content-Type': 'application/json',
@@ -162,7 +159,6 @@ module.exports = (dslName) => {
                                         'json': '$.id'
                                     },
                                     'forever': true,
-                                    'gateway': 'payments',
                                     'gzip': true,
                                     'headers': {
                                         'Content-Type': 'application/json',
@@ -188,7 +184,6 @@ module.exports = (dslName) => {
                                         'json': '$.token'
                                     },
                                     'forever': true,
-                                    'gateway': 'pci',
                                     'gzip': true,
                                     'headers': {
                                         'Content-Type': 'application/json',
@@ -225,7 +220,6 @@ module.exports = (dslName) => {
                                         'json': '$.id'
                                     },
                                     'forever': true,
-                                    'gateway': 'payments',
                                     'gzip': true,
                                     'headers': {
                                         'Content-Type': 'application/json',

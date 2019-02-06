@@ -13,7 +13,7 @@ let logger = require('../../common/logger');
 
 module.exports.handleMessage = async (testId, reportId, stats) => {
     let grafanaReportUrl;
-    const metadata = {testId: testId, reportId: reportId};
+    const metadata = { testId: testId, reportId: reportId };
     const report = await reportsManager.getReport(testId, reportId);
     const job = await jobsManager.getJob(report.job_id);
     const statsData = JSON.parse(stats.data);
