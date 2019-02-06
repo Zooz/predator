@@ -12,7 +12,7 @@ describe('Metronome job connector tests', function () {
     let requestSenderSendStub;
 
     before(() => {
-        jobConnector.__set__('metronomeUrl', 'localhost:8080');
+        jobConnector.__set__('metronomeUrl', 'localhost:80');
         sandbox = sinon.sandbox.create();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
     });
@@ -45,7 +45,7 @@ describe('Metronome job connector tests', function () {
             requestSenderSendStub.args[0][0].should.eql({
                 'headers': {},
                 'method': 'GET',
-                'url': 'localhost:8080/v1/jobs/predator.id'
+                'url': 'localhost:80/v1/jobs/predator.id'
             });
             requestSenderSendStub.args[1][0].should.eql({
                 'body': {
@@ -53,12 +53,12 @@ describe('Metronome job connector tests', function () {
                 },
                 'headers': {},
                 'method': 'POST',
-                'url': 'localhost:8080/v1/jobs'
+                'url': 'localhost:80/v1/jobs'
             });
             requestSenderSendStub.args[2][0].should.eql({
                 'headers': {},
                 'method': 'POST',
-                'url': 'localhost:8080/v1/jobs/predator.id/runs'
+                'url': 'localhost:80/v1/jobs/predator.id/runs'
             });
         });
 
@@ -78,7 +78,7 @@ describe('Metronome job connector tests', function () {
             requestSenderSendStub.args[0][0].should.eql({
                 'headers': {},
                 'method': 'GET',
-                'url': 'localhost:8080/v1/jobs/predator.id'
+                'url': 'localhost:80/v1/jobs/predator.id'
             });
             requestSenderSendStub.args[1][0].should.eql({
                 'body': {
@@ -86,12 +86,12 @@ describe('Metronome job connector tests', function () {
                 },
                 'headers': {},
                 'method': 'PUT',
-                'url': 'localhost:8080/v1/jobs/predator.id'
+                'url': 'localhost:80/v1/jobs/predator.id'
             });
             requestSenderSendStub.args[2][0].should.eql({
                 'headers': {},
                 'method': 'POST',
-                'url': 'localhost:8080/v1/jobs/predator.id/runs'
+                'url': 'localhost:80/v1/jobs/predator.id/runs'
             });
         });
 
@@ -140,7 +140,7 @@ describe('Metronome job connector tests', function () {
                 await jobConnector.stopRun('jobPlatformName', 'runId');
                 requestSenderSendStub.calledOnce.should.eql(true);
                 requestSenderSendStub.args[0][0].should.eql({
-                    'url': 'localhost:8080/v1/jobs/jobPlatformName/runs/runId/actions/stop',
+                    'url': 'localhost:80/v1/jobs/jobPlatformName/runs/runId/actions/stop',
                     method: 'POST',
                     headers: {}
                 });

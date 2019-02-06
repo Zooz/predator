@@ -12,7 +12,7 @@ describe('Kubernetes job connector tests', function () {
     let requestSenderSendStub;
 
     before(() => {
-        jobConnector.__set__('kubernetesUrl', 'localhost:8080');
+        jobConnector.__set__('kubernetesUrl', 'localhost:80');
         sandbox = sinon.sandbox.create();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
     });
@@ -36,7 +36,7 @@ describe('Kubernetes job connector tests', function () {
             });
             requestSenderSendStub.callCount.should.eql(1);
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:8080/apis/batch/v1/namespaces/default/jobs',
+                url: 'localhost:80/apis/batch/v1/namespaces/default/jobs',
                 method: 'POST',
                 body: { metadata: { name: 'predator' } },
                 headers: {}
@@ -61,7 +61,7 @@ describe('Kubernetes job connector tests', function () {
             await jobConnector.stopRun('jobPlatformName', 'runId');
             requestSenderSendStub.calledOnce.should.eql(true);
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:8080/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId',
+                url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId',
                 method: 'DELETE',
                 headers: {}
             });

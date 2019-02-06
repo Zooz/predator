@@ -1,5 +1,4 @@
 'use strict';
-const logger = require('../../../../common/logger');
 const uuid = require('uuid/v4');
 const Sequelize = require('sequelize');
 let client;

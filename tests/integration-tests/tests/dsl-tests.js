@@ -192,7 +192,6 @@ function generateCreatePaymentRequest() {
     return {
         'post': {
             'url': '/payments',
-            'gateway': 'payments',
             'capture': {
                 'json': '$.id',
                 'as': 'paymentId'
@@ -251,7 +250,6 @@ const expectedCreatePaymentBody = {
                 'as': 'paymentId',
                 'json': '$.id'
             },
-            'gateway': 'payments',
             'headers': {
                 'Content-Type': 'application/json'
             },
@@ -272,7 +270,6 @@ const expectedGetDefinitionsResponse = [
                     'as': 'paymentId',
                     'json': '$.id'
                 },
-                'gateway': 'payments',
                 'headers': {
                     'Content-Type': 'application/json'
                 },

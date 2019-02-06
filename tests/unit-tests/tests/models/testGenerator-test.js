@@ -46,7 +46,6 @@ const definitions = [
                     'json': '$.id'
                 },
                 'forever': true,
-                'gateway': 'payments',
                 'gzip': true,
                 'headers': {
                     'Content-Type': 'application/json',
@@ -90,7 +89,6 @@ const definitions = [
                     'json': '$.id'
                 },
                 'forever': true,
-                'gateway': 'payments',
                 'gzip': true,
                 'headers': {
                     'Content-Type': 'application/json',
@@ -112,7 +110,6 @@ const definitions = [
         artillery_json: {
             'post': {
                 'forever': true,
-                'gateway': 'payments',
                 'gzip': true,
                 'headers': {
                     'Content-Type': 'application/json',
@@ -132,7 +129,6 @@ const definitions = [
                     'json': '$.token'
                 },
                 'forever': true,
-                'gateway': 'pci',
                 'gzip': true,
                 'headers': {
                     'Content-Type': 'application/json',
@@ -172,7 +168,6 @@ const definitions = [
                     'json': '$.id'
                 },
                 'forever': true,
-                'gateway': 'payments',
                 'gzip': true,
                 'headers': {
                     'Content-Type': 'application/json',
@@ -191,7 +186,6 @@ const definitions = [
         artillery_json: {
             'get': {
                 'forever': true,
-                'gateway': 'pci',
                 'headers': {
                     'Content-Type': 'application/json',
                     'x-payments-os-env': 'test'
@@ -205,7 +199,6 @@ const definitions = [
         artillery_json: {
             'post': {
                 'url': '/customers/{{ customerId }}/payment-methods/{{ tokenId }}',
-                'gateway': 'payments',
                 'gzip': true,
                 'forever': true,
                 'headers': {

@@ -22,5 +22,5 @@ RUN apk update && \
 COPY /src /usr/src
 COPY /docs /usr/docs
 
-EXPOSE 8080
+EXPOSE 80
 CMD [ "node","--max_old_space_size=196","./src/server.js" ]

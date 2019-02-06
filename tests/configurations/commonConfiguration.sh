@@ -8,7 +8,7 @@ function setRunnerIp() {
 }
 
 setRunnerIp
-export URL=$RUNNER_IP:8080
+export URL=$RUNNER_IP:80
 
 export MY_ADDRESS=$URL
 export GRAFANA_URL=https://grafana.zooz.com/predator

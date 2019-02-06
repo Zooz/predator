@@ -48,7 +48,6 @@ describe('Artillery validator tests', function () {
                     flow: [{
                         post: {
                             url: '/payments',
-                            gateway: 'payments',
                             capture: {
                                 json: '$.id',
                                 as: 'paymentId'

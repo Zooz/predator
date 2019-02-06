@@ -31,7 +31,7 @@ module.exports.send = async (testId, reportId, message, webhooks) => {
 
     let promises = [];
     webhooks.forEach(webhookUrl => {
-        promises.push(request.post(Object.assign({url: webhookUrl}, options)));
+        promises.push(request.post(Object.assign({ url: webhookUrl }, options)));
     });
 
     try {

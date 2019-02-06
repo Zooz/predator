@@ -99,7 +99,7 @@ function generateReportFromTemplate(testName, testInfo, grafanaUrl, reportUrl, f
     Object.keys(finalStats.errors).forEach((error) => { errorsSummary.push(`${error}: ${finalStats.errors[error]}`) });
     errorsSummary = errorsSummary.join(', ');
 
-    let emailVars = {testName, testInfo, grafanaUrl, reportUrl, finalStats, codesSummary, errorsSummary};
+    let emailVars = { testName, testInfo, grafanaUrl, reportUrl, finalStats, codesSummary, errorsSummary };
 
     let templateFn = path.join(
         path.dirname(__filename),

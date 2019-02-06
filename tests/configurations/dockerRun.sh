@@ -112,38 +112,6 @@ function mailhog() {
     echo "$APP is ready"
 }
 
-function reporter() {
-    IMAGE_NAME=$IMAGE
-    APP=reporter
-    stop $APP
-    COMMAND="docker run \
-                    -d \
-                    -e DATABASE_ADDRESS=$DATABASE_ADDRESS\
-                    -e DATABASE_NAME=$DATABASE_NAME \
-                    -e DATABASE_USERNAME=$DATABASE_USERNAME \
-                    -e DATABASE_PASSWORD=$DATABASE_PASSWORD \
-                    -e SMTP_HOST=$SMTP_HOST\
-                    -e SMTP_PASSWORD=$SMTP_PASSWORD \
-                    -e SMTP_USERNAME=$SMTP_USERNAME \
-                    -e SMTP_PORT=$SMTP_PORT \
-                    -e MY_ADDRESS=$URL \
-                    -e GRAFANA_URL=$GRAFANA_URL \
-                    -e REPLICATION_FACTOR=$REPLICATION_FACTOR \
-                    -e DATABASE_TYPE=$DATABASE_TYPE \
-                    --name $APP \
-                    -p 8080:8080 \
-                    $IMAGE_NAME"
-    echo -e "Starting $APP\n"${COMMAND/\s+/ }
-    $COMMAND
-    COMMAND_EXIT_CODE=$?
-    if [ ${COMMAND_EXIT_CODE} != 0 ]; then
-        printf "Error when executing: '${APP}'\n"
-        exit ${COMMAND_EXIT_CODE}
-    fi
-    waitForApp $APP "App listening on port"
-    echo "$APP is ready"
-}
-
 function stop() {
     NAME=$1
     isExists=$(docker ps -af name=$NAME | grep -v IMAGE)
@@ -178,7 +146,7 @@ for option in ${@}; do
         stop
         ;;
     *)
-        echo "Usage: ./dockerRun.sh <cassandra|postgres|reporter|mailhog|mysql>"
+        echo "Usage: ./dockerRun.sh <cassandra|postgres|mailhog|mysql>"
         ;;
     esac
 done

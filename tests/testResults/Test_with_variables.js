@@ -17,7 +17,6 @@ module.exports = function (dslName) {
             'flow': [{
                 'post': {
                     'url': '/tokens',
-                    'gateway': 'pci',
                     'gzip': true,
                     'forever': true,
                     'capture': {
@@ -53,7 +52,6 @@ module.exports = function (dslName) {
             }, {
                 'post': {
                     'url': '/customers',
-                    'gateway': 'payments',
                     'gzip': true,
                     'forever': true,
                     'capture': {
@@ -73,7 +71,6 @@ module.exports = function (dslName) {
             {
                 'post': {
                     'url': '/customers',
-                    'gateway': 'payments',
                     'gzip': true,
                     'forever': true,
                     'capture': {
