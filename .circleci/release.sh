@@ -1,14 +1,12 @@
 #!/bin/sh -e
 
-if [ $CIRCLE_BRANCH != "master" ] ; then
-    exit 0
-fi
-
 TAG=v$(node -p "require('./package.json').version")
 
 echo "Releasing tag: $TAG"
 
 echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+git config --global user.email $GIT_EMAIL
+git config --global user.name $GIT_USER
 
 CONTAINER_IMAGE=zooz/predator:latest
 docker pull $CONTAINER_IMAGE

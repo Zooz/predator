@@ -101,7 +101,7 @@ jobs:
 
 workflows:
   version: 2
-  test_and_build:
+  test_build_and_release:
     jobs:
       - setup
       - integration-tests:
@@ -119,16 +119,16 @@ workflows:
           filters:
             branches:
               ignore: master
-      - hold:
+      - release-approval:
           type: approval
           requires:
             - end-to-end-tests
-          filters:
-            branches:
-              only: master
+#          filters:
+#            branches:
+#              only: master
       - release:
           requires:
-            - hold
-          filters:
-            branches:
-              only: master
+            - release-approval
+#          filters:
+#            branches:
+#              only: master
