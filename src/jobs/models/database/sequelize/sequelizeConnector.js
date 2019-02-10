@@ -1,4 +1,5 @@
 'use strict';
+
 const uuid = require('uuid/v4');
 const Sequelize = require('sequelize');
 let client;

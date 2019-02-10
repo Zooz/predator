@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
+
 export DATABASE_ADDRESS=$RUNNER_IP:9042
 export DATABASE_NAME=cassandra_keyspace
 export DATABASE_USERNAME=root

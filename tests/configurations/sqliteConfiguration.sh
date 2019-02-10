@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
+
 export DATABASE_TYPE=SQLITE
 export DATABASE_NAME=predator
 export DATABASE_ADDRESS=localhost

@@ -281,7 +281,7 @@ describe('Create job specific kubernetes tests', () => {
                 });
 
                 [true, false].forEach((runImmediately) => {
-                    describe('Create a scheduled job, should create job with the right parameters and run_immediately parameter is ' + runImmediately, async () => {
+                    describe.skip('Create a scheduled job, should create job with the right parameters and run_immediately parameter is ' + runImmediately, async () => {
                         let createJobResponse;
                         let date;
                         let jobId;
