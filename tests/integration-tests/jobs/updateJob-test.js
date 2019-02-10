@@ -27,15 +27,13 @@ describe('Update scheduled job', function () {
         updatedTestId = response.body.id;
     });
 
-    describe('Update test id', () => {
-        before(() => {
-            nock.cleanAll();
-        });
-
+    describe.skip('Update test id', () => {
         let jobId;
         let runsWithUpdatedTestId = 0;
 
         before(async () => {
+            nock.cleanAll();
+
             nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
                 let isMatch = body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === updatedTestId;
                 return isMatch;
@@ -91,16 +89,16 @@ describe('Update scheduled job', function () {
             setTimeout(done, 4000);
         });
 
-        it('Validate test updated', async () => {
+        it('Validate test updated', () => {
             should(runsWithUpdatedTestId).eql(1);
         });
 
-        it('Delete job', async function () {
+        it('Delete job', async () => {
             await schedulerRequestCreator.deleteJobFromScheduler(jobId);
         });
     });
 
-    describe('Update cron', () => {
+    describe.skip('Update cron', () => {
         before(() => {
             nock.cleanAll();
         });

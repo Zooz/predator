@@ -1,7 +1,7 @@
 #!/bin/bash
-LOGS_DIRECTORY_PATH=tests/system-tests/logs
+LOGS_DIRECTORY_PATH=tests/logs
 
-mkdir $LOGS_DIRECTORY_PATH
+mkdir -p $LOGS_DIRECTORY_PATH
 
 function waitForApp() {
     container=$1

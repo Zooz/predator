@@ -1,31 +1,19 @@
-#!/usr/bin/env bash -e
+#!/bin/bash -e
+
+CURR_DIR=`pwd`
+echo CURR_DIR is $CURR_DIR
 
 echo initalizing global service configuration
-source ./tests/configurations/commonConfiguration.sh
+source $CURR_DIR/tests/configurations/commonConfiguration.sh
 
-echo initializing mailhog
-./tests/configurations/dockerRun.sh mailhog
+if [ $LOCAL_TEST ]
+then
+    echo "Running local test"
+    $CURR_DIR/tests/configurations/dockerRun.sh $DATABASE_TYPE
+    $CURR_DIR/tests/configurations/dockerRun.sh mailhog
+fi
 
-echo running integration tests with cassandra db and kubernetes integration
-source ./tests/configurations/cassandraConfiguration.sh
-source ./tests/configurations/kubernetesConfiguration.sh
-./tests/configurations/dockerRun.sh cassandra
-node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
-
-echo running integration tests with mysql db and kubernetes integration
-source ./tests/configurations/mysqlConfiguration.sh
-source ./tests/configurations/kubernetesConfiguration.sh
-./tests/configurations/dockerRun.sh mysql
-node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
-
-echo running integration tests with sqlite db and kubernetes integration
-source ./tests/configurations/sqliteConfiguration.sh
-source ./tests/configurations/kubernetesConfiguration.sh
-./tests/configurations/dockerRun.sh sqlite
-node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
-
-echo running integration tests with postgres db and metronome integration
-source ./tests/configurations/postgresConfiguration.sh
-source ./tests/configurations/metronomeConfiguration.sh
-./tests/configurations/dockerRun.sh postgres
-node_modules/.bin/_mocha ./tests/integration-tests --recursive --timeout=20000 --exit
+echo Running integration tests with "$DATABASE_TYPE" db and "$PLATFORM_TYPE" integration
+source $CURR_DIR/tests/configurations/"$DATABASE_TYPE"Configuration.sh
+source $CURR_DIR/tests/configurations/"$PLATFORM_TYPE"Configuration.sh
+node_modules/.bin/_mocha $CURR_DIR/tests/integration-tests --recursive --timeout=20000 --exit

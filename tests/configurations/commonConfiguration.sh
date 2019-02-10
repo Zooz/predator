@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
-function setRunnerIp() {
-    if [[ $(uname) = "Darwin" ]];then
-        export RUNNER_IP=127.0.0.1
-    else
-        export RUNNER_IP=$(ifconfig eth0 | grep 'inet addr:' | cut -d':' -f2 | awk '{ print $1}' )
-    fi
-}
 
-setRunnerIp
+export RUNNER_IP=127.0.0.1
 export URL=$RUNNER_IP:80
 
 export MY_ADDRESS=$URL

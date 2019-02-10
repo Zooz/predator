@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
+
 export JOB_PLATFORM=METRONOME
 export METRONOME_URL=https://metronome
 export METRONOME_TOKEN=ya29.GluRBoPSEzMUXPArNwQbp_GDsGvB6ysA5F0fRo3gY1WbiOcJ6rGxKx35Yh6Zax9TL9rJhqJK4iJ8jsAvuiOFMQvH-1spYdLhvZv-JVzNVdUpQVJDJahTYXl-nrM_

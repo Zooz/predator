@@ -1,0 +1,127 @@
+version: 2
+jobs:
+  setup:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+  integration-tests:
+    docker:
+      - image: circleci/node:8
+      - image: circleci/cassandra:3.10
+        environment:
+          MAX_HEAP_SIZE: 2048m
+          HEAP_NEWSIZE: 512m
+      - image: mailhog/mailhog
+      - image: mysql:5.7
+        environment:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: predator
+      - image: postgres:11-alpine
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+#      - run: npm audit
+      - run: npm run lint
+      - run: npm run unit-tests
+      - store_artifacts:
+          path: ./coverage
+      - run:
+          name: Integration tests with kubernetes and cassandra configuration
+          command: npm run integration-tests
+          environment:
+            DATABASE_TYPE: cassandra
+            PLATFORM_TYPE: kubernetes
+      - run:
+          name: Integration tests with kubernetes and mysql configuration
+          command: npm run integration-tests
+          environment:
+            DATABASE_TYPE: mysql
+            PLATFORM_TYPE: kubernetes
+      - run:
+          name: Integration tests with kubernetes and sqlite configuration
+          command: npm run integration-tests
+          environment:
+            DATABASE_TYPE: sqlite
+            PLATFORM_TYPE: kubernetes
+      - run:
+          name: Integration tests with metronome and postgres configuration
+          command: npm run integration-tests
+          environment:
+            DATABASE_TYPE: postgres
+            PLATFORM_TYPE: metronome
+  build:
+    docker:
+      - image: docker:18
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: .circleci/dockerBuild.sh
+  end-to-end-tests:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: .circleci/dockerRun.sh
+      - run: npm run end-to-end-tests
+  remove-docker:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run: .circleci/removeDocker.sh
+  release:
+    docker:
+      - image: docker:18
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: .circleci/release.sh
+
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - setup
+      - integration-tests:
+          requires:
+            - setup
+      - build:
+          requires:
+            - integration-tests
+      - end-to-end-tests:
+          requires:
+            - build
+      - remove-docker:
+          requires:
+            - end-to-end-tests
+          filters:
+            branches:
+              ignore: master
+      - release:
+          requires:
+            - end-to-end-tests
+          filters:
+            branches:
+              only: master
