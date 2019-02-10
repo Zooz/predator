@@ -92,7 +92,7 @@ jobs:
       - run: .circleci/removeDocker.sh
   release:
     docker:
-      - image: docker:18
+      - image: circleci/node:8
     steps:
       - checkout
       - setup_remote_docker:
@@ -120,6 +120,7 @@ workflows:
             branches:
               ignore: master
       - release:
+          type: approval
           requires:
             - end-to-end-tests
           filters:

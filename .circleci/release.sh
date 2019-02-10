@@ -4,7 +4,7 @@ if [ $CIRCLE_BRANCH != "master" ] ; then
     exit 0
 fi
 
-TAG=$(node -p "require('./package.json').version")
+TAG=v$(node -p "require('./package.json').version")
 
 echo "Releasing tag: $TAG"
 
@@ -23,5 +23,5 @@ git tag -a $TAG -m "New predator version="$TAG""
 git push --follow-tags origin master
 
 # Bump and commit the new version of package.json
-npm version patch -m "Release new version zooz/predator:"$TAG""
+npm version patch -m "$TAG"
 git push origin master
