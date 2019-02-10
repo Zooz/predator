@@ -119,10 +119,16 @@ workflows:
           filters:
             branches:
               ignore: master
-      - release:
+      - hold:
           type: approval
           requires:
             - end-to-end-tests
+          filters:
+            branches:
+              only: master
+      - release:
+          requires:
+            - hold
           filters:
             branches:
               only: master
