@@ -10,7 +10,7 @@ echo "Releasing tag: $TAG"
 
 echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
-CONTAINER_IMAGE=zooz/predator:master
+CONTAINER_IMAGE=zooz/predator:latest
 docker pull $CONTAINER_IMAGE
 TAGGED_DOCKER_IMAGE=zooz/predator:$TAG
 docker tag $CONTAINER_IMAGE $TAGGED_DOCKER_IMAGE
