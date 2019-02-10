@@ -1,9 +1,5 @@
 #!/bin/sh -e
 
-if [ $CIRCLE_BRANCH == "master" ] ; then
-    exit
-fi
-
 export TAG=branches-$CIRCLE_BRANCH
 
 ORGANIZATION="zooz"

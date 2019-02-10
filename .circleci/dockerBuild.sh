@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-if [ $CIRCLE_BRANCH != "master" ] ; then
+if [ "$CIRCLE_BRANCH" != "master" ] ; then
     export TAG=branches-$CIRCLE_BRANCH
 else
     export TAG=latest
