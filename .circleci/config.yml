@@ -97,6 +97,9 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - add_ssh_keys:
+          fingerprints:
+            - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
       - run: .circleci/release.sh
 
 workflows:
