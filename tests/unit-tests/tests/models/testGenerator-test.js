@@ -17,11 +17,12 @@ describe('Scenario generator tests', function(){
         sandbox.restore();
     });
     [
-        'Test_with_successful_validation',
-        'Test_with_several_scenarios_and_weights',
-        'Test_with_wait_in_step',
-        'Test_with_vars_multiple_scenarios',
-        'Custom_test'
+        'Test_with_before',
+        // 'Test_with_successful_validation',
+        // 'Test_with_several_scenarios_and_weights',
+        // 'Test_with_wait_in_step',
+        // 'Test_with_vars_multiple_scenarios',
+        // 'Custom_test'
 
     ].forEach(function(scenario) {
         it(scenario, function(){
@@ -29,9 +30,8 @@ describe('Scenario generator tests', function(){
             let testDetails = require('../../../testExamples/' + scenario + '.json');
             return testGenerator.createTest(testDetails)
                 .then(function(testGenerated) {
-                    should(testGenerated).eql(testResult);
-                })
-
+                    should(JSON.parse(JSON.stringify(testGenerated))).eql(testResult);
+                });
         });
     });
 });

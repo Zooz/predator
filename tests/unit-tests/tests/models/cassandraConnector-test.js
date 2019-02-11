@@ -39,7 +39,7 @@ describe('Cassandra client tests', function() {
                     clientExecuteStub.getCall(0).args[0].should.eql(query);
                     clientExecuteStub.getCall(0).args[1][0].should.eql(id);
                     clientExecuteStub.getCall(0).args[1][7].should.eql(revisionId);
-                    clientExecuteStub.getCall(0).args[1][5].should.eql(JSON.stringify({ raw_data: 'raw' }));
+                    clientExecuteStub.getCall(0).args[1][5].should.eql(JSON.stringify({ 'scenarios': { 'raw_data': 'raw' } }));
                     clientExecuteStub.getCall(0).args[1][6].should.eql(JSON.stringify({ json: 'artillery' }));
                 });
         });

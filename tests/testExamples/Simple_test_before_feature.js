@@ -5,6 +5,16 @@ module.exports = function (dslName) {
             'name': 'test',
             'description': 'test',
             'type': 'dsl',
+            'before': {
+                'steps': [
+                    {
+                        'action': `${dslName}.createAuthorize`,
+                        'properties': {
+                            'credit_card_cvv': ['123', '568']
+                        }
+                    }
+                ]
+            },
             'scenarios': [
                 {
                     'scenario_name': 'Scenario',
