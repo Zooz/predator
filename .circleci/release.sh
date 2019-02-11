@@ -15,7 +15,7 @@ docker tag $CONTAINER_IMAGE $TAGGED_DOCKER_IMAGE
 docker push $TAGGED_DOCKER_IMAGE
 
 # Release the project tag
-git tag -a $TAG -m "New predator version="$TAG""
+git tag -a $TAG -m "New release: "$TAG""
 
 # Push the commit tag to gitlab
 git push --follow-tags origin master
