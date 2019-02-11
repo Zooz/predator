@@ -126,12 +126,12 @@ workflows:
           type: approval
           requires:
             - end-to-end-tests
-#          filters:
-#            branches:
-#              only: master
+          filters:
+            branches:
+              only: master
       - release:
           requires:
             - release-approval
-#          filters:
-#            branches:
-#              only: master
+          filters:
+            branches:
+              only: master
