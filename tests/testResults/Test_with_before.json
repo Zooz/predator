@@ -3,10 +3,10 @@
     "flow": [
       {
         "post": {
-          "capture": {
+          "capture": [{
             "as": "paymentId",
             "json": "$.id"
-          },
+          }],
           "forever": true,
           "gzip": true,
           "headers": {
@@ -62,10 +62,10 @@
       "flow": [
         {
           "post": {
-            "capture": {
+            "capture": [{
               "as": "authorizeId",
               "json": "$.id"
-            },
+            }],
             "forever": true,
             "gzip": true,
             "headers": {

@@ -22,10 +22,10 @@
             "url": "/payments",
             "gzip": true,
             "forever": true,
-            "capture": {
+            "capture": [{
               "json": "$.id",
               "as": "paymentId"
-            },
+            }],
             "headers": {
               "x-payments-os-env": "test",
               "Content-Type": "application/json"
@@ -62,10 +62,10 @@
             "url": "/payments/{{ paymentId }}/authorizations",
             "gzip": true,
             "forever": true,
-            "capture": {
+            "capture": [{
               "json": "$.id",
               "as": "authorizeId"
-            },
+            }],
             "headers": {
               "x-payments-os-env": "test",
               "Content-Type": "application/json"

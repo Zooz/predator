@@ -17,10 +17,10 @@
                       "flow": [{
                           "post": {
                               "url": "/payments",
-                              "capture": {
+                              "capture": [{
                                   "json": "$.id",
                                   "as": "paymentId"
-                              },
+                              }],
                               "headers": {
                                   "Content-Type": "application/json"
                               },

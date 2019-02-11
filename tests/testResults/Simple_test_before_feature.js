@@ -6,10 +6,10 @@ module.exports = function (dslName, id, revision_id) {
                 'flow': [
                     {
                         'post': {
-                            'capture': {
+                            'capture': [{
                                 'as': 'authorizeId',
                                 'json': '$.id'
-                            },
+                            }],
                             'forever': true,
                             'gzip': true,
                             'headers': {
@@ -53,10 +53,10 @@ module.exports = function (dslName, id, revision_id) {
                     'flow': [
                         {
                             'post': {
-                                'capture': {
+                                'capture': [{
                                     'as': 'tokenId',
                                     'json': '$.token'
-                                },
+                                }],
                                 'forever': true,
                                 'gzip': true,
                                 'headers': {
@@ -89,10 +89,10 @@ module.exports = function (dslName, id, revision_id) {
                         },
                         {
                             'post': {
-                                'capture': {
+                                'capture': [{
                                     'as': 'customerId',
                                     'json': '$.id'
-                                },
+                                }],
                                 'forever': true,
                                 'gzip': true,
                                 'headers': {
@@ -116,19 +116,37 @@ module.exports = function (dslName, id, revision_id) {
         'id': id,
         revision_id,
         'name': 'test',
-        'raw_data': [
-            {
-                'scenario_name': 'Scenario',
+        'raw_data': {
+            'before': {
                 'steps': [
                     {
-                        'action': `${dslName}.createToken`
-                    },
-                    {
-                        'action': `${dslName}.createCustomer`
+                        'action': `${dslName}.createAuthorize`,
+                        'properties': {
+                            'credit_card_cvv': [
+                                '123',
+                                '568'
+                            ]
+                        }
                     }
                 ]
-            }
-        ],
+            },
+            'description': 'test',
+            'name': 'test',
+            'scenarios': [
+                {
+                    'scenario_name': 'Scenario',
+                    'steps': [
+                        {
+                            'action': `${dslName}.createToken`
+                        },
+                        {
+                            'action': `${dslName}.createCustomer`
+                        }
+                    ]
+                }
+            ],
+            'type': 'dsl'
+        },
         'type': 'dsl'
     };
 };
