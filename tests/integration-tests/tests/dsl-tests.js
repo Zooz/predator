@@ -192,10 +192,10 @@ function generateCreatePaymentRequest() {
     return {
         'post': {
             'url': '/payments',
-            'capture': {
+            'capture': [{
                 'json': '$.id',
                 'as': 'paymentId'
-            },
+            }],
             'headers': {
                 'Content-Type': 'application/json'
             },
@@ -209,10 +209,10 @@ function generateCreatePaymentRequest() {
 const registerRequest = {
     'post': {
         'url': '/register',
-        'capture': {
+        'capture': [{
             'json': '$.id',
             'as': 'userId'
-        },
+        }],
         'headers': {
             'Content-Type': 'application/json'
         },
@@ -227,10 +227,10 @@ const expectedRegisterBody = {
     'name': 'register',
     'request': {
         'post': {
-            'capture': {
+            'capture': [{
                 'as': 'userId',
                 'json': '$.id'
-            },
+            }],
             'headers': {
                 'Content-Type': 'application/json'
             },
@@ -246,10 +246,10 @@ const expectedCreatePaymentBody = {
     'name': 'create_payment',
     'request': {
         'post': {
-            'capture': {
+            'capture': [{
                 'as': 'paymentId',
                 'json': '$.id'
-            },
+            }],
             'headers': {
                 'Content-Type': 'application/json'
             },
@@ -266,10 +266,10 @@ const expectedGetDefinitionsResponse = [
         'name': 'create_payment',
         'request': {
             'post': {
-                'capture': {
+                'capture': [{
                     'as': 'paymentId',
                     'json': '$.id'
-                },
+                }],
                 'headers': {
                     'Content-Type': 'application/json'
                 },
@@ -285,10 +285,10 @@ const expectedGetDefinitionsResponse = [
         'name': 'register',
         'request': {
             'post': {
-                'capture': {
+                'capture': [{
                     'as': 'userId',
                     'json': '$.id'
-                },
+                }],
                 'headers': {
                     'Content-Type': 'application/json'
                 },

@@ -58,7 +58,7 @@ describe('Testing sequelize connector', function () {
                         'artillery_json': '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"}}',
                         'name': 'name',
                         'description': 'desc',
-                        'raw_data': '{"s":"1"}',
+                        'raw_data': '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"}}',
                         'revision_id': 'revisionId',
                         'test_id': 'id',
                         'type': 'type',

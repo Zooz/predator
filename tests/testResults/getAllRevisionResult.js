@@ -21,10 +21,10 @@ module.exports = (dslName) => {
                         'flow': [
                             {
                                 'post': {
-                                    'capture': {
+                                    'capture': [{
                                         'as': 'tokenId',
                                         'json': '$.token'
-                                    },
+                                    }],
                                     'forever': true,
                                     'gzip': true,
                                     'headers': {
@@ -57,10 +57,10 @@ module.exports = (dslName) => {
                             },
                             {
                                 'post': {
-                                    'capture': {
+                                    'capture': [{
                                         'as': 'customerId',
                                         'json': '$.id'
-                                    },
+                                    }],
                                     'forever': true,
                                     'gzip': true,
                                     'headers': {
@@ -82,19 +82,24 @@ module.exports = (dslName) => {
             },
             'description': 'test',
             'name': 'test',
-            'raw_data': [
-                {
-                    'scenario_name': 'Scenario',
-                    'steps': [
-                        {
-                            'action': `${dslName}.createToken`
-                        },
-                        {
-                            'action': `${dslName}.createCustomer`
-                        }
-                    ]
-                }
-            ],
+            'raw_data': {
+                'description': 'test',
+                'name': 'test',
+                'scenarios': [
+                    {
+                        'scenario_name': 'Scenario',
+                        'steps': [
+                            {
+                                'action': `${dslName}.createToken`
+                            },
+                            {
+                                'action': `${dslName}.createCustomer`
+                            }
+                        ]
+                    }
+                ],
+                'type': 'dsl'
+            },
             'type': 'dsl'
         },
         {
@@ -118,10 +123,10 @@ module.exports = (dslName) => {
                         'flow': [
                             {
                                 'post': {
-                                    'capture': {
+                                    'capture': [{
                                         'as': 'tokenId',
                                         'json': '$.token'
-                                    },
+                                    }],
                                     'forever': true,
                                     'gzip': true,
                                     'headers': {
@@ -154,10 +159,10 @@ module.exports = (dslName) => {
                             },
                             {
                                 'post': {
-                                    'capture': {
+                                    'capture': [{
                                         'as': 'customerId',
                                         'json': '$.id'
-                                    },
+                                    }],
                                     'forever': true,
                                     'gzip': true,
                                     'headers': {
@@ -179,10 +184,10 @@ module.exports = (dslName) => {
                         'flow': [
                             {
                                 'post': {
-                                    'capture': {
+                                    'capture': [{
                                         'as': 'tokenId',
                                         'json': '$.token'
-                                    },
+                                    }],
                                     'forever': true,
                                     'gzip': true,
                                     'headers': {
@@ -215,10 +220,10 @@ module.exports = (dslName) => {
                             },
                             {
                                 'post': {
-                                    'capture': {
+                                    'capture': [{
                                         'as': 'customerId',
                                         'json': '$.id'
-                                    },
+                                    }],
                                     'forever': true,
                                     'gzip': true,
                                     'headers': {
@@ -240,30 +245,35 @@ module.exports = (dslName) => {
             },
             'description': 'test',
             'name': 'test',
-            'raw_data': [
-                {
-                    'scenario_name': 'Scenario',
-                    'steps': [
-                        {
-                            'action': `${dslName}.createToken`
-                        },
-                        {
-                            'action': `${dslName}.createCustomer`
-                        }
-                    ]
-                },
-                {
-                    'scenario_name': 'Scenario',
-                    'steps': [
-                        {
-                            'action': `${dslName}.createToken`
-                        },
-                        {
-                            'action': `${dslName}.createCustomer`
-                        }
-                    ]
-                }
-            ],
+            'raw_data': {
+                'description': 'test',
+                'name': 'test',
+                'scenarios': [
+                    {
+                        'scenario_name': 'Scenario',
+                        'steps': [
+                            {
+                                'action': `${dslName}.createToken`
+                            },
+                            {
+                                'action': `${dslName}.createCustomer`
+                            }
+                        ]
+                    },
+                    {
+                        'scenario_name': 'Scenario',
+                        'steps': [
+                            {
+                                'action': `${dslName}.createToken`
+                            },
+                            {
+                                'action': `${dslName}.createCustomer`
+                            }
+                        ]
+                    }
+                ],
+                'type': 'dsl'
+            },
             'type': 'dsl'
         }
     ];

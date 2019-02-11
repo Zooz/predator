@@ -10,17 +10,22 @@ module.exports.createTest = async function(testDetails) {
         delete testDetails.artillery_test;
         return artillery;
     } else {
+        const dslCached = {};
         let scenarios = [];
         let weightsSum = 0;
         let missingWeightCount = 0;
         let variables = {};
-
+        let before;
+        if (testDetails.before && testDetails.before.steps){
+            before = {};
+            before.flow = await createSteps('before', testDetails.before.steps, variables, dslCached);
+        }
         for (let i = 0; i < testDetails.scenarios.length; i++) {
             let scenario = testDetails.scenarios[i];
             let scenarioIndex = i;
             let artilleryTestJson = {};
             artilleryTestJson.name = scenario.scenario_name;
-            artilleryTestJson.flow = await createSteps(scenarioIndex, scenario.steps, variables);
+            artilleryTestJson.flow = await createSteps(scenarioIndex, scenario.steps, variables, dslCached);
 
             if (scenario.weight) {
                 weightsSum += scenario.weight;
@@ -47,12 +52,13 @@ module.exports.createTest = async function(testDetails) {
             throw error;
         }
 
-        return addTestWrapper(scenarios, variables);
+        return addTestWrapper(scenarios, before, variables);
     }
 };
 
-function addTestWrapper(scenarios, variables) {
+function addTestWrapper(scenarios, before, variables) {
     let test = JSON.parse(JSON.stringify(require('./steps/testBase.json')));
+    test.before = before;
     test.scenarios = scenarios;
     test.config.variables = Object.assign(test.config.variables, variables);
     return test;
@@ -80,10 +86,9 @@ async function getDslDefinitionsAsMap(dslName) {
     return result;
 }
 
-async function createSteps(scenarioIndex, steps, variables) {
+async function createSteps(majorPrefix, steps, variables, dslCached) {
     let stepsJsons = [];
     let previousSteps = [];
-    const dslCached = {};
     for (let i = 0; i < steps.length; i++) {
         let step = steps[i];
         let stepIndex = i;
@@ -116,8 +121,8 @@ async function createSteps(scenarioIndex, steps, variables) {
         }
 
         if (step.properties && Object.keys(step.properties).length > 0) {
-            insertPropertiesAsVars(scenarioIndex, stepIndex, step.action, stepDefinition, Object.keys(step.properties));
-            modifyVariablesArray(scenarioIndex, stepIndex, step.action, variables, step.properties);
+            insertPropertiesAsVars(majorPrefix, stepIndex, step.action, stepDefinition, Object.keys(step.properties));
+            modifyVariablesArray(majorPrefix, stepIndex, step.action, variables, step.properties);
         }
         previousSteps.push(step.action);
         stepsJsons.push(stepDefinition);
@@ -126,21 +131,21 @@ async function createSteps(scenarioIndex, steps, variables) {
     return stepsJsons;
 }
 
-function insertPropertiesAsVars(scenarioIndex, stepIndex, stepName, stepDefinition, properties){
+function insertPropertiesAsVars(majorPrefix, minorPrefix, stepName, stepDefinition, properties){
     let firstKey = Object.keys(stepDefinition)[0];
     properties.forEach(function(property) {
         let jsonBody = stepDefinition[firstKey]['json'];
         let propertyVariable = property.split('.').join('_');
-        let newValue = '{{ ' + scenarioIndex + '_' + stepIndex + '_' + stepName + '_' + propertyVariable + ' }}';
+        let newValue = '{{ ' + majorPrefix + '_' + minorPrefix + '_' + stepName + '_' + propertyVariable + ' }}';
         let updatedJsonBody = replaceValueInJsonBody(jsonBody, property, newValue);
         stepDefinition[firstKey]['json'] = updatedJsonBody;
     });
 }
 
-function modifyVariablesArray(scenarioIndex, stepIndex, stepName, variables, properties) {
+function modifyVariablesArray(majorPrefix, minorPrefix, stepName, variables, properties) {
     Object.keys(properties).forEach(function(property) {
         let propertyAsVariableInFile = property.split('.').join('_');
-        variables[scenarioIndex + '_' + stepIndex + '_' + stepName + '_' + propertyAsVariableInFile] = properties[property];
+        variables[majorPrefix + '_' + minorPrefix + '_' + stepName + '_' + propertyAsVariableInFile] = properties[property];
     });
 }
 

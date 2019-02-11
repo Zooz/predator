@@ -84,6 +84,18 @@ describe('the tests api', function() {
                 getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
                 getTestResponse.statusCode.should.eql(404);
             });
+            it('create test with before, and get it', async function () {
+                const simpleTestWithBefore = require('../../testExamples/Simple_test_before_feature')(dslName);
+                let createTestResponse = await requestSender.createTest(simpleTestWithBefore.test, validHeaders);
+                should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
+                createTestResponse.body.should.have.only.keys('id', 'revision_id');
+                const expected  = require('../../testResults/Simple_test_before_feature')(dslName,createTestResponse.body.id,createTestResponse.body.revision_id);
+                const getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
+                should(getTestResponse.statusCode).eql(200, JSON.stringify(createTestResponse.body));
+                should.exists(getTestResponse.body.updated_at);
+                delete getTestResponse.body.updated_at;
+                should(getTestResponse.body).eql(expected);
+            });
         });
 
         it('Create custom test, update with illegal test, delete test', async () => {
