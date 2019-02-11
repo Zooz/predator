@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-TAG=v$(node -p "require('./package.json').version")
+TAG=$(node -p "require('./package.json').version")
 
 echo "Releasing tag: $TAG"
 
@@ -15,11 +15,11 @@ docker tag $CONTAINER_IMAGE $TAGGED_DOCKER_IMAGE
 docker push $TAGGED_DOCKER_IMAGE
 
 # Release the project tag
-git tag -a $TAG -m "New release: "$TAG""
+git tag -a "v"$TAG"" -m "New release: v"$TAG""
 
 # Push the commit tag to gitlab
 git push --follow-tags origin master
 
 # Bump and commit the new version of package.json
-npm version patch -m "$TAG"
+npm version patch -m "v"$TAG""
 git push origin master
