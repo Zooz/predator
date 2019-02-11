@@ -129,7 +129,7 @@ async function createDslRequests(dslName, dslRequests) {
             .map(function (dslRequest) {
                 return createDsl(dslName, dslRequest.name, dslRequest.request)
                     .then(function (response) {
-                        return should(response.statusCode).eql(201);
+                        return should(response.statusCode).eql(201,JSON.stringify(response.body));
                     });
             })
     );

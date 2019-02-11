@@ -718,9 +718,11 @@ definitions:
     type: object
     properties:
       capture:
-        type: object
-        additionalProperties:
-          type: string
+        type: array
+        items:
+          type: object
+          additionalProperties:
+            type: string
       url:
         type: string
       headers:

@@ -1,0 +1,102 @@
+{
+  "before": {
+    "flow": [
+      {
+        "post": {
+          "capture": [{
+            "as": "paymentId",
+            "json": "$.id"
+          }],
+          "forever": true,
+          "gzip": true,
+          "headers": {
+            "Content-Type": "application/json",
+            "x-payments-os-env": "test"
+          },
+          "json": {
+            "amount": 5,
+            "billing_address": {
+              "city": "Greenville",
+              "country": "USA",
+              "email": "pm_billing@a.com",
+              "first_name": "John",
+              "gender": "Male",
+              "last_name": "Adams",
+              "line1": "10705 Old Mill Rd",
+              "state": "TX",
+              "title": "Mr",
+              "zip_code": "75402-3435"
+            },
+            "currency": "USD",
+            "shipping_address": {
+              "city": "Greenville",
+              "country": "USA",
+              "line1": "10705 Old Mill Rd",
+              "phone": "095090941",
+              "salutation": "Dr",
+              "state": "TX",
+              "zip_code": "75402-3435"
+            }
+          },
+          "url": "/payments"
+        }
+      }
+    ]
+  },
+  "config": {
+    "http": {
+      "pool": 100
+    },
+    "phases": [
+      {
+        "arrivalRate": 0,
+        "duration": 0,
+        "rampTo": 0
+      }
+    ],
+    "target": "",
+    "variables": {}
+  },
+  "scenarios": [
+    {
+      "flow": [
+        {
+          "post": {
+            "capture": [{
+              "as": "authorizeId",
+              "json": "$.id"
+            }],
+            "forever": true,
+            "gzip": true,
+            "headers": {
+              "Content-Type": "application/json",
+              "x-payments-os-env": "test"
+            },
+            "json": {
+              "payment_method": {
+                "credit_card_cvv": "123",
+                "token": "{{ tokenId }}",
+                "type": "tokenized"
+              }
+            },
+            "url": "/payments/{{ paymentId }}/authorizations"
+          }
+        },
+        {
+          "post": {
+            "forever": true,
+            "gzip": true,
+            "headers": {
+              "Content-Type": "application/json",
+              "x-payments-os-env": "test"
+            },
+            "json": {},
+            "url": "/payments/{{ paymentId }}/voids"
+          }
+        }
+      ],
+      "name": "Scenario",
+      "weight": 100
+    }
+  ]
+}

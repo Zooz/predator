@@ -83,7 +83,7 @@ async function insertTest(testInfo, testJson, id, revisionId){
         type: testInfo.type,
         description: testInfo.description,
         updated_at: Date.now(),
-        raw_data: JSON.stringify(testInfo.scenarios),
+        raw_data: JSON.stringify(testInfo),
         artillery_json: JSON.stringify(testJson),
         revision_id: revisionId
     };

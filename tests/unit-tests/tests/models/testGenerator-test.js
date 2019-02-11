@@ -17,6 +17,7 @@ describe('Scenario generator tests', function(){
         sandbox.restore();
     });
     [
+        'Test_with_before',
         'Test_with_successful_validation',
         'Test_with_several_scenarios_and_weights',
         'Test_with_wait_in_step',
@@ -29,9 +30,8 @@ describe('Scenario generator tests', function(){
             let testDetails = require('../../../testExamples/' + scenario + '.json');
             return testGenerator.createTest(testDetails)
                 .then(function(testGenerated) {
-                    should(testGenerated).eql(testResult);
-                })
-
+                    should(JSON.parse(JSON.stringify(testGenerated))).eql(testResult);
+                });
         });
     });
 });
@@ -41,10 +41,10 @@ const definitions = [
         definition_name: 'createPayment',
         artillery_json: {
             'post': {
-                'capture': {
+                'capture': [{
                     'as': 'paymentId',
                     'json': '$.id'
-                },
+                }],
                 'forever': true,
                 'gzip': true,
                 'headers': {
@@ -84,10 +84,10 @@ const definitions = [
         definition_name: 'createAuthorize',
         artillery_json: {
             'post': {
-                'capture': {
+                'capture': [{
                     'as': 'authorizeId',
                     'json': '$.id'
-                },
+                }],
                 'forever': true,
                 'gzip': true,
                 'headers': {
@@ -124,10 +124,10 @@ const definitions = [
         definition_name: 'createToken',
         artillery_json: {
             'post': {
-                'capture': {
+                'capture': [{
                     'as': 'tokenId',
                     'json': '$.token'
-                },
+                }],
                 'forever': true,
                 'gzip': true,
                 'headers': {
@@ -163,10 +163,10 @@ const definitions = [
         definition_name: 'createCustomer',
         artillery_json: {
             'post': {
-                'capture': {
+                'capture': [{
                     'as': 'customerId',
                     'json': '$.id'
-                },
+                }],
                 'forever': true,
                 'gzip': true,
                 'headers': {

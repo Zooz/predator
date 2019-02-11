@@ -19,10 +19,10 @@ module.exports = function (dslName) {
                     'url': '/tokens',
                     'gzip': true,
                     'forever': true,
-                    'capture': {
+                    'capture': [{
                         'json': '$.token',
                         'as': 'tokenId'
-                    },
+                    }],
                     'headers': {
                         'x-payments-os-env': 'test',
                         'Content-Type': 'application/json'
@@ -54,10 +54,10 @@ module.exports = function (dslName) {
                     'url': '/customers',
                     'gzip': true,
                     'forever': true,
-                    'capture': {
+                    'capture': [{
                         'json': '$.id',
                         'as': 'customerId'
-                    },
+                    }],
                     'headers': {
                         'x-payments-os-env': 'test',
                         'Content-Type': 'application/json'
@@ -73,10 +73,10 @@ module.exports = function (dslName) {
                     'url': '/customers',
                     'gzip': true,
                     'forever': true,
-                    'capture': {
+                    'capture': [{
                         'json': '$.id',
                         'as': 'customerId'
-                    },
+                    }],
                     'headers': {
                         'x-payments-os-env': 'test',
                         'Content-Type': 'application/json'
