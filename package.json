@@ -12,7 +12,8 @@
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "end-to-end-tests": "bash ./tests/end-to-end-tests/run.sh",
     "local-integration-tests": "LOCAL_TEST=true bash ./tests/integration-tests/run.sh",
-    "lint": "eslint src/**"
+    "lint": "eslint src/**",
+    "release": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -67,7 +68,6 @@
     "@commitlint/config-conventional": "^7.3.1",
     "chai": "^4.2.0",
     "commitlint": "^7.4.0",
-    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.13.0",
     "eslint-config-standard": "^12.0.0-alpha.0",
     "eslint-plugin-import": "^2.16.0",
@@ -84,6 +84,7 @@
     "rewire": "^4.0.1",
     "should": "^13.2.1",
     "sinon": "^4.5.0",
+    "standard-version": "^4.4.0",
     "supertest": "^3.4.2"
   },
   "husky": {

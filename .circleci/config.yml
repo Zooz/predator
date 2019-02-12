@@ -90,17 +90,45 @@ jobs:
     steps:
       - checkout
       - run: .circleci/removeDocker.sh
-  release:
+  release-patch:
     docker:
       - image: circleci/node:8
     steps:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
       - add_ssh_keys:
           fingerprints:
             - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-      - run: .circleci/release.sh
+      - run: .circleci/release-patch.sh
+  release-minor:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - add_ssh_keys:
+          fingerprints:
+            - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
+      - run: .circleci/release-minor.sh
+  release-major:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - add_ssh_keys:
+          fingerprints:
+            - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
+      - run: .circleci/release-major.sh
 
 workflows:
   version: 2
@@ -122,16 +150,42 @@ workflows:
           filters:
             branches:
               ignore: master
-      - release-approval:
+      - release-patch-approval:
           type: approval
           requires:
             - end-to-end-tests
           filters:
             branches:
               only: master
-      - release:
+      - release-minor-approval:
+          type: approval
           requires:
-            - release-approval
+            - end-to-end-tests
+          filters:
+            branches:
+              only: master
+      - release-major-approval:
+          type: approval
+          requires:
+            - end-to-end-tests
+          filters:
+            branches:
+              only: master
+      - release-patch:
+          requires:
+            - release-patch-approval
+          filters:
+            branches:
+              only: master
+      - release-minor:
+          requires:
+            - release-minor-approval
+          filters:
+            branches:
+              only: master
+      - release-major:
+          requires:
+            - release-major-approval
           filters:
             branches:
               only: master
