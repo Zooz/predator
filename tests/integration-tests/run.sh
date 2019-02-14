@@ -13,7 +13,7 @@ then
     $CURR_DIR/tests/configurations/dockerRun.sh mailhog
 fi
 
-echo Running integration tests with "$DATABASE_TYPE" db and "$PLATFORM_TYPE" integration
+echo Running integration tests with "$DATABASE_TYPE" db and "$JOB_PLATFORM" integration
 source $CURR_DIR/tests/configurations/"$DATABASE_TYPE"Configuration.sh
-source $CURR_DIR/tests/configurations/"$PLATFORM_TYPE"Configuration.sh
+source $CURR_DIR/tests/configurations/"$JOB_PLATFORM"Configuration.sh
 node_modules/.bin/_mocha $CURR_DIR/tests/integration-tests --recursive --timeout=20000 --exit
