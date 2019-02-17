@@ -183,7 +183,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
 
     if (config.metricsPluginName && config.metricsExportConfig) {
         environmentVariables.METRICS_PLUGIN_NAME = config.metricsPluginName;
-        environmentVariables.METRICS_EXPORT_CONFIG = config.metricsExportConfig;
+        environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(config.metricsExportConfig).toString('base64');
     }
 
     if (jobBody.emails) {
