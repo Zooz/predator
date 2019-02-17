@@ -6,5 +6,6 @@ module.exports = {
         DSL_DEF_ALREADY_EXIST: 'Definition already exists'
     },
     KUBERNETES: 'KUBERNETES',
-    METRONOME: 'METRONOME'
+    METRONOME: 'METRONOME',
+    DOCKER: 'DOCKER'
 };

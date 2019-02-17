@@ -2,20 +2,28 @@ let requestSender = require('../../common/requestSender');
 let config = require('../../config/serviceConfig');
 
 module.exports.getMostRecentRunnerTag = async () => {
-    let dockerHubInfo = await requestSender.send({ method: 'GET', url: `https://hub.docker.com/v2/repositories/${config.dockerName}/tags`, json: true });
-    let newestVersion = dockerHubInfo.results.map(version => version.name)
-        .filter(version => version !== 'latest')
-        .sort(sortByTags)
-        .pop();
+    let dockerImageToUse = config.dockerName;
+    if (!config.dockerName.includes(':')) {
+        let dockerHubInfo = await requestSender.send({
+            method: 'GET',
+            url: `https://hub.docker.com/v2/repositories/${config.dockerName}/tags`,
+            json: true
+        });
+        let newestVersion = dockerHubInfo.results.map(version => version.name)
+            .filter(version => version !== 'latest')
+            .sort(sortByTags)
+            .pop();
 
-    if (!newestVersion) {
-        throw new Error(`No docker found for ${config.dockerName}`);
+        if (!newestVersion) {
+            throw new Error(`No docker found for ${config.dockerName}`);
+        }
+        dockerImageToUse = `${config.dockerName}:${newestVersion}`;
     }
 
-    return `${config.dockerName}:${newestVersion}`;
+    return dockerImageToUse;
 };
 
-function sortByTags (a, b) {
+function sortByTags(a, b) {
     let i, diff;
     let regExStrip0 = /(\.0+)+$/;
     let segmentsA = a.replace(regExStrip0, '').split('.');

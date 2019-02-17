@@ -2,7 +2,9 @@ let log = require('../src/common/logger');
 let env = {};
 const BY_PLATFORM_MANDATORY_VARS = {
     METRONOME: ['METRONOME_URL'],
-    KUBERNETES: ['KUBERNETES_URL', 'KUBERNETES_NAMESPACE']
+    KUBERNETES: ['KUBERNETES_URL', 'KUBERNETES_NAMESPACE'],
+    DOCKER: []
+
 };
 const SUPPORTED_PLATFORMS = Object.keys(BY_PLATFORM_MANDATORY_VARS);
 

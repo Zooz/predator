@@ -22,8 +22,8 @@ describe('Scenario generator tests', function(){
         'Test_with_several_scenarios_and_weights',
         'Test_with_wait_in_step',
         'Test_with_vars_multiple_scenarios',
-        'Custom_test'
-
+        'Custom_test',
+        'Test_with_wait_in_step'
     ].forEach(function(scenario) {
         it(scenario, function(){
             let testResult = require('../../../testResults/' + scenario + '.json');

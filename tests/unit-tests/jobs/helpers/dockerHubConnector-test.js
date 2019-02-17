@@ -7,17 +7,15 @@ let requestSender = require('../../../../src/common/requestSender');
 let config = require('../../../../src/config/serviceConfig');
 
 describe('Docker hub connector tests', () => {
-    let sandbox, loggerInfoStub, loggerErrorStub, requestSenderSendStub;
+    let sandbox, requestSenderSendStub;
 
     before(() => {
-        config.dockerName = 'runner';
         sandbox = sinon.createSandbox();
-        loggerErrorStub = sandbox.stub(logger, 'error');
-        loggerInfoStub = sandbox.stub(logger, 'info');
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
     });
 
     beforeEach(() => {
+        config.dockerName = 'runner';
         sandbox.resetHistory();
     });
 
@@ -25,9 +23,15 @@ describe('Docker hub connector tests', () => {
         sandbox.restore();
     });
 
-    [{ results: [{ name: '1.0.0' }, { name: '0.9.9' }, { name: '1.0.1' }, { name: 'latest' }], expected: 'runner:1.0.1' },
-        { results: [{ name: '0.2.0' }, { name: '0.1.1' }, { name: '0.1.0' }, { name: 'latest' }], expected: 'runner:0.2.0' },
-        { results: [{ name: '5.0.2' }, { name: '5.2.1' }, { name: 'xyz' }, { name: 'latest' }], expected: 'runner:5.2.1' }
+    it('Docker version is provided, no need to fetch latest version', async () => {
+        config.dockerName = 'zooz/predator-runner:1.0.0';
+        let newestTag = await dockerHubConnector.getMostRecentRunnerTag();
+        newestTag.should.eql('zooz/predator-runner:1.0.0');
+    });
+
+    [{results: [{name: '1.0.0'}, {name: '0.9.9'}, {name: '1.0.1'}, {name: 'latest'}], expected: 'runner:1.0.1'},
+        {results: [{name: '0.2.0'}, {name: '0.1.1'}, {name: '0.1.0'}, {name: 'latest'}], expected: 'runner:0.2.0'},
+        {results: [{name: '5.0.2'}, {name: '5.2.1'}, {name: 'xyz'}, {name: 'latest'}], expected: 'runner:5.2.1'}
     ].forEach(testData => {
         it(`Should get newest tag: ${JSON.stringify(testData)}`, async () => {
             requestSenderSendStub.resolves({

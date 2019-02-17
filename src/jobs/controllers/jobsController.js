@@ -47,7 +47,7 @@ module.exports.updateJob = function(req, res) {
 module.exports.deleteJob = function(req, res) {
     return jobManager.deleteJob(req.params.job_id)
         .then(function(){
-            return res.status(200).json();
+            return res.status(204).json();
         })
         .catch(function(err){
             return handleError(err, res);
@@ -57,7 +57,7 @@ module.exports.deleteJob = function(req, res) {
 module.exports.stopRun = function(req, res) {
     return jobManager.stopRun(req.params.job_id, req.params.run_id)
         .then(function(){
-            return res.status(200).json();
+            return res.status(204).json();
         })
         .catch(function(err){
             return handleError(err, res);

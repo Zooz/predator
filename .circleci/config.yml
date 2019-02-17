@@ -2,190 +2,199 @@ version: 2
 jobs:
   setup:
     docker:
-      - image: circleci/node:8
+    - image: circleci/node:8
     steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-      - run: npm install
-      - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-          paths:
-            - node_modules
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+    - run: npm install
+    - save_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+        paths:
+        - node_modules
   integration-tests:
     docker:
-      - image: circleci/node:8
-      - image: circleci/cassandra:3.10
-        environment:
-          MAX_HEAP_SIZE: 2048m
-          HEAP_NEWSIZE: 512m
-      - image: mailhog/mailhog
-      - image: mysql:5.7
-        environment:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: predator
-      - image: postgres:11-alpine
-        environment:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: password
+    - image: circleci/node:8
+    - image: circleci/cassandra:3.10
+      environment:
+        MAX_HEAP_SIZE: 2048m
+        HEAP_NEWSIZE: 512m
+    - image: mailhog/mailhog
+    - image: mysql:5.7
+      environment:
+        MYSQL_ROOT_PASSWORD: password
+        MYSQL_DATABASE: predator
+    - image: postgres:11-alpine
+      environment:
+        POSTGRES_USER: root
+        POSTGRES_PASSWORD: password
     steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-#      - run: npm audit
-      - run: npm run lint
-      - run: npm run unit-tests
-      - store_artifacts:
-          path: ./coverage
-      - run:
-          name: Integration tests with kubernetes and cassandra configuration
-          command: npm run integration-tests
-          environment:
-            DATABASE_TYPE: cassandra
-            JOB_PLATFORM: kubernetes
-      - run:
-          name: Integration tests with kubernetes and mysql configuration
-          command: npm run integration-tests
-          environment:
-            DATABASE_TYPE: mysql
-            JOB_PLATFORM: kubernetes
-      - run:
-          name: Integration tests with kubernetes and sqlite configuration
-          command: npm run integration-tests
-          environment:
-            DATABASE_TYPE: sqlite
-            JOB_PLATFORM: kubernetes
-      - run:
-          name: Integration tests with metronome and postgres configuration
-          command: npm run integration-tests
-          environment:
-            DATABASE_TYPE: postgres
-            JOB_PLATFORM: metronome
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+    #      - run: npm audit
+    - run: npm run lint
+    - run: npm run unit-tests
+    - store_artifacts:
+        path: ./coverage
+    - run:
+        name: pull zooz/predator-runner:latest
+        command: ssh remote-docker \ docker pull zooz/predator-runner:latest
+    - run:
+        name: Integration tests with docker engine and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: docker
+    - run:
+        name: Integration tests with kubernetes and cassandra configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: cassandra
+          JOB_PLATFORM: kubernetes
+    - run:
+        name: Integration tests with kubernetes and mysql configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: mysql
+          JOB_PLATFORM: kubernetes
+    - run:
+        name: Integration tests with kubernetes and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: kubernetes
+    - run:
+        name: Integration tests with metronome and postgres configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: postgres
+          JOB_PLATFORM: metronome
   build:
     docker:
-      - image: docker:18
+    - image: docker:18
     steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: .circleci/dockerBuild.sh
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - run: .circleci/dockerBuild.sh
   end-to-end-tests:
     docker:
-      - image: circleci/node:8
+    - image: circleci/node:8
     steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-      - run: .circleci/dockerRun.sh
-      - run: npm run end-to-end-tests
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+    - run: .circleci/dockerRun.sh
+    - run: npm run end-to-end-tests
   remove-docker:
     docker:
-      - image: circleci/node:8
+    - image: circleci/node:8
     steps:
-      - checkout
-      - run: .circleci/removeDocker.sh
+    - checkout
+    - run: .circleci/removeDocker.sh
   release-patch:
     docker:
-      - image: circleci/node:8
+    - image: circleci/node:8
     steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-      - add_ssh_keys:
-          fingerprints:
-            - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-      - run: .circleci/release-patch.sh
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+    - add_ssh_keys:
+        fingerprints:
+        - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
+    - run: .circleci/release-patch.sh
   release-minor:
     docker:
-      - image: circleci/node:8
+    - image: circleci/node:8
     steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-      - add_ssh_keys:
-          fingerprints:
-            - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-      - run: .circleci/release-minor.sh
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+    - add_ssh_keys:
+        fingerprints:
+        - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
+    - run: .circleci/release-minor.sh
   release-major:
     docker:
-      - image: circleci/node:8
+    - image: circleci/node:8
     steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-      - add_ssh_keys:
-          fingerprints:
-            - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-      - run: .circleci/release-major.sh
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+    - add_ssh_keys:
+        fingerprints:
+        - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
+    - run: .circleci/release-major.sh
 
 workflows:
   version: 2
   test_build_and_release:
     jobs:
-      - setup
-      - integration-tests:
-          requires:
-            - setup
-      - build:
-          requires:
-            - integration-tests
-      - end-to-end-tests:
-          requires:
-            - build
-      - remove-docker:
-          requires:
-            - end-to-end-tests
-          filters:
-            branches:
-              ignore: master
-      - release-patch-approval:
-          type: approval
-          requires:
-            - end-to-end-tests
-          filters:
-            branches:
-              only: master
-      - release-minor-approval:
-          type: approval
-          requires:
-            - end-to-end-tests
-          filters:
-            branches:
-              only: master
-      - release-major-approval:
-          type: approval
-          requires:
-            - end-to-end-tests
-          filters:
-            branches:
-              only: master
-      - release-patch:
-          requires:
-            - release-patch-approval
-          filters:
-            branches:
-              only: master
-      - release-minor:
-          requires:
-            - release-minor-approval
-          filters:
-            branches:
-              only: master
-      - release-major:
-          requires:
-            - release-major-approval
-          filters:
-            branches:
-              only: master
+    - setup
+    - integration-tests:
+        requires:
+        - setup
+    - build:
+        requires:
+        - integration-tests
+    - end-to-end-tests:
+        requires:
+        - build
+    - remove-docker:
+        requires:
+        - end-to-end-tests
+        filters:
+          branches:
+            ignore: master
+    - release-patch-approval:
+        type: approval
+        requires:
+        - end-to-end-tests
+        filters:
+          branches:
+            only: master
+    - release-minor-approval:
+        type: approval
+        requires:
+        - end-to-end-tests
+        filters:
+          branches:
+            only: master
+    - release-major-approval:
+        type: approval
+        requires:
+        - end-to-end-tests
+        filters:
+          branches:
+            only: master
+    - release-patch:
+        requires:
+        - release-patch-approval
+        filters:
+          branches:
+            only: master
+    - release-minor:
+        requires:
+        - release-minor-approval
+        filters:
+          branches:
+            only: master
+    - release-major:
+        requires:
+        - release-major-approval
+        filters:
+          branches:
+            only: master
