@@ -11,7 +11,7 @@
     "unit-tests": "nyc --check-coverage --lines 95 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "end-to-end-tests": "bash ./tests/end-to-end-tests/run.sh",
-    "local-integration-tests": "LOCAL_TEST=true bash ./tests/integration-tests/run.sh",
+    "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh",
     "lint": "eslint src/**",
     "release": "standard-version"
   },
@@ -35,12 +35,14 @@
   "homepage": "https://github.com/Zooz/predator#readme",
   "dependencies": {
     "artillery": "^1.6.0-26",
+    "bluebird": "^3.5.3",
     "body-parser": "^1.18.2",
     "bunyan": "^1.8.12",
     "cassandra-driver": "^3.5.0",
     "cassandra-migration": "^2.7.0",
     "copy-dir": "^0.3.0",
     "cron": "^1.6.0",
+    "dockerode": "^2.5.8",
     "express": "^4.16.4",
     "express-ajv-swagger-validation": "^0.6.2",
     "express-requests-logger": "^1.0.18",
@@ -68,6 +70,7 @@
     "@commitlint/config-conventional": "^7.3.1",
     "chai": "^4.2.0",
     "commitlint": "^7.4.0",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.13.0",
     "eslint-config-standard": "^12.0.0-alpha.0",
     "eslint-plugin-import": "^2.16.0",
@@ -96,5 +99,9 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "nyc": {
+    "exclude": "**/databaseConnector.js",
+    "include": "src"
   }
 }

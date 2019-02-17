@@ -160,7 +160,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
     let rampToPerRunner = jobBody.ramp_to;
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
 
-    if (consts.KUBERNETES === config.jobPlatform) {
+    if (consts.KUBERNETES === config.jobPlatform || consts.DOCKER === config.jobPlatform) {
         parallelism = jobBody.parallelism || 1;
         arrivalRatePerRunner = Math.ceil(jobBody.arrival_rate / parallelism);
         if (jobBody.ramp_to) {
@@ -178,10 +178,13 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
         TEST_ID: jobBody.test_id,
         PREDATOR_URL: config.myAddress,
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
-        DURATION: jobBody.duration.toString(),
-        METRICS_PLUGIN_NAME: config.metricsPluginName,
-        METRICS_EXPORT_CONFIG: config.metricsExportConfig
+        DURATION: jobBody.duration.toString()
     };
+
+    if (config.metricsPluginName && config.metricsExportConfig) {
+        environmentVariables.METRICS_PLUGIN_NAME = config.metricsPluginName;
+        environmentVariables.METRICS_EXPORT_CONFIG = config.metricsExportConfig;
+    }
 
     if (jobBody.emails) {
         environmentVariables.EMAILS = jobBody.emails.join(';');

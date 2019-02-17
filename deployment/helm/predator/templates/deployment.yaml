@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "predator.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     app.kubernetes.io/name: {{ include "predator.name" . }}
     helm.sh/chart: {{ include "predator.chart" . }}
@@ -9,6 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: 1
+  namespace: {{ .Values.namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "predator.name" . }}
@@ -19,6 +21,7 @@ spec:
         app.kubernetes.io/name: {{ include "predator.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ include "predator.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -45,7 +48,7 @@ spec:
           - name: KUBERNETES_URL
             value: {{ .Values.KUBERNETES_URL }}
           - name: KUBERNETES_NAMESPACE
-            value: {{ .Values.KUBERNETES_NAMESPACE }}
+            value: {{ .Values.namespace }}
           - name: GRAFANA_URL
             value: {{ .Values.GRAFANA_URL }}
           - name: METRICS_PLUGIN_NAME

@@ -8,9 +8,6 @@ let defaultOptions = {
 };
 
 module.exports.send = async (options) => {
-    if (!options.method) {
-        throw new Error('Please provide method in the options object');
-    }
     Object.assign(options, defaultOptions);
     try {
         let response = await request(options);

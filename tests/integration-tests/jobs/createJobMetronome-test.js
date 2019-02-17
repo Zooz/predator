@@ -97,12 +97,12 @@ describe('Create job specific metronome tests', () => {
                             'Content-Type': 'application/json'
                         });
 
-                        should(stopRunResponse.status).eql(200);
+                        should(stopRunResponse.status).eql(204);
                     });
 
                     it('Delete job', async () => {
                         let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
-                        should(deleteJobResponse.status).eql(200);
+                        should(deleteJobResponse.status).eql(204);
 
                         jobId = createJobResponse.body.id;
                         getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
@@ -174,12 +174,12 @@ describe('Create job specific metronome tests', () => {
                             'Content-Type': 'application/json'
                         });
 
-                        should(stopRunResponse.status).eql(200);
+                        should(stopRunResponse.status).eql(204);
                     });
 
                     it('Delete job', async () => {
                         let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
-                        should(deleteJobResponse.status).eql(200);
+                        should(deleteJobResponse.status).eql(204);
 
                         jobId = createJobResponse.body.id;
                         getJobsFromService = await schedulerRequestCreator.getJob(jobId, {

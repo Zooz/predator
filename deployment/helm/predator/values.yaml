@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: enudler/predator
+  repository: zooz/predator
   tag: latest
   pullPolicy: Always
 
@@ -47,9 +47,10 @@ tolerations: []
 
 affinity: {}
 
+namespace: predator
+
 JOB_PLATFORM: KUBERNETES
 KUBERNETES_URL: https://kubernetes.default.svc
-KUBERNETES_NAMESPACE: default
 KUBERNETES_TOKEN:
 
 DATABASE_TYPE: SQLITE
@@ -59,7 +60,7 @@ DATABASE_PASSWORD:
 DATABASE_USERNAME:
 
 MY_ADDRESS:
-DOCKER_NAME: nivlipetz/predator-runner
+DOCKER_NAME: zooz/predator-runner:latest
 
 METRICS_PLUGIN_NAME:
 METRICS_EXPORT_CONFIG:

@@ -440,7 +440,7 @@ paths:
         required: true
         type: string
       responses:
-        200:
+        204:
           description: Success
         400:
           description: Bad request
@@ -467,7 +467,7 @@ paths:
         required: true
         type: string
       responses:
-        200:
+        204:
           description: Success
         404:
           description: Bad request
