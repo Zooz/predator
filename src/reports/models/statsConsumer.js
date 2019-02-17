@@ -79,7 +79,7 @@ async function handleIntermediate(report, job, stats, statsTime, statsData, graf
     await databaseConnector.insertStats(report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'intermediate', stats.data);
 
     if (report && report.status === ('started')) {
-        let htmlReportUrl = serviceConfig.myAddress + `/v1/tests/${report.test_id}/reports/${report.report_id}/html`;
+        let htmlReportUrl = serviceConfig.externalAddress + `/v1/tests/${report.test_id}/reports/${report.report_id}/html`;
         const phaseIndex = report.phase;
         webhookMessage = `🤔 *Test ${report.test_name} with id: ${report.test_id} first batch of results arrived for phase ${phaseIndex}.*\n${statsFromatter.getStatsFormatted('intermediate', statsData)}\n<${htmlReportUrl}|Track report in html report>\n`;
         if (grafanaReportUrl) {
