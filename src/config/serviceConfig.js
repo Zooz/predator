@@ -1,6 +1,7 @@
 let config = {
     grafanaUrl: process.env.GRAFANA_URL,
-    myAddress: process.env.MY_ADDRESS,
+    externalAddress: process.env.EXTERNAL_ADDRESS || process.env.INTERNAL_ADDRESS,
+    internalAddress: process.env.INTERNAL_ADDRESS,
     concurrencyLimit: process.env.CONCURRENCY_LIMIT || 500,
     dockerName: process.env.DOCKER_NAME || 'zooz/predator-runner:latest',
     jobPlatform: process.env.JOB_PLATFORM,

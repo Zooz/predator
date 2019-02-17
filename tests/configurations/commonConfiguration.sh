@@ -14,3 +14,4 @@ export SMTP_PORT=1025
 export SMTP_PASSWORD=password
 export SMTP_USERNAME=username
 export DOCKER_NAME='zooz/predator-runner:latest'
+export INTERNAL_ADDRESS='http://localhost:80'

@@ -189,7 +189,7 @@ describe('Manager tests', function () {
     describe('Create new job', function () {
         before(() => {
             manager.__set__('config.baseUrl', '');
-            manager.__set__('config.myAddress', 'localhost:80');
+            manager.__set__('config.internalAddress', 'localhost:80');
             manager.__set__('config.environment', '');
             manager.__set__('config.concurrencyLimit', '100');
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
