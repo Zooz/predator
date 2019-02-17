@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "predator.fullname" . }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: {{ include "predator.name" . }}
     helm.sh/chart: {{ include "predator.chart" . }}
@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: 1
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "predator.name" . }}
@@ -48,13 +48,17 @@ spec:
           - name: KUBERNETES_URL
             value: {{ .Values.KUBERNETES_URL }}
           - name: KUBERNETES_NAMESPACE
-            value: {{ .Values.namespace }}
+            value: {{ .Release.Namespace }}
           - name: GRAFANA_URL
             value: {{ .Values.GRAFANA_URL }}
           - name: METRICS_PLUGIN_NAME
             value: {{ .Values.METRICS_PLUGIN_NAME }}
           - name: METRICS_EXPORT_CONFIG
             value: {{ .Values.METRICS_EXPORT_CONFIG }}
+          - name: INTERNAL_ADDRESS
+            value: http://{{ include "predator.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}
+          - name: EXTERNAL_ADDRESS
+            value: {{ .Values.EXTERNAL_ADDRESS }}
           ports:
             - name: http
               containerPort: 80

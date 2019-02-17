@@ -176,7 +176,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
         RUN_ID: runId.toString(),
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
-        PREDATOR_URL: config.myAddress,
+        PREDATOR_URL: config.internalAddress,
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
         DURATION: jobBody.duration.toString()
     };

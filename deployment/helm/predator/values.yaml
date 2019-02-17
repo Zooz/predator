@@ -47,8 +47,6 @@ tolerations: []
 
 affinity: {}
 
-namespace: predator
-
 JOB_PLATFORM: KUBERNETES
 KUBERNETES_URL: https://kubernetes.default.svc
 KUBERNETES_TOKEN:
@@ -61,6 +59,9 @@ DATABASE_USERNAME:
 
 MY_ADDRESS:
 DOCKER_NAME: zooz/predator-runner:latest
+
+INTERNAL_ADDRESS:
+EXTERNAL_ADDRESS:
 
 METRICS_PLUGIN_NAME:
 METRICS_EXPORT_CONFIG:

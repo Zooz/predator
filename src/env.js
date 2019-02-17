@@ -30,7 +30,8 @@ env.init = function () {
     }
 
     let mandatoryVars = [
-        'JOB_PLATFORM'
+        'JOB_PLATFORM',
+        'INTERNAL_ADDRESS'
     ];
 
     mandatoryVars = mandatoryVars.concat(BY_PLATFORM_MANDATORY_VARS[process.env.JOB_PLATFORM]);
