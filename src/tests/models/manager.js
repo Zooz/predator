@@ -55,7 +55,7 @@ async function getTests() {
     const tests = [];
     // returns newest version of each test by id
     rows.forEach(function(row) {
-        if (tests.filter(test => test.id === row.id.toString()).length === 0) {
+        if (tests.filter(test => test.id.toString() === row.id.toString()).length === 0) {
             row.artillery_test = row.artillery_json;
             delete row.artillery_json;
             tests.push(row);
