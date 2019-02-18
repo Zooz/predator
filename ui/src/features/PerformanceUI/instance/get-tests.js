@@ -91,9 +91,10 @@ class getTests extends React.Component {
 
   editFormatter = (cell, row) => {
     return (
-      <RaisedButton primary className={style.button} onClick={() => {
-        this.setState({ createTest: true, testForEdit: row })
-      }} label='EDIT' />
+        <i onClick={() => {
+          this.setState({ createTest: true, testForEdit: row });
+          this.props.chooseTest(row);
+        }} className='material-icons' style={{ color: '#2a3f53' }}>edit</i>
     );
   };
 
@@ -232,7 +233,7 @@ class getTests extends React.Component {
                 <TableHeaderColumn dataField='report' width={'75'} dataAlign='left'
                   dataFormat={this.reportFormatter}>Reports</TableHeaderColumn>
                 <TableHeaderColumn dataField='edit' dataAlign='center' dataFormat={this.editFormatter}
-                  width={'100'} />
+                  width={'25'} />
                 <TableHeaderColumn dataField='view' dataAlign='center' dataFormat={this.viewFormatter}
                   width={'25'} />
                 <TableHeaderColumn dataField='delete' dataAlign='center'
