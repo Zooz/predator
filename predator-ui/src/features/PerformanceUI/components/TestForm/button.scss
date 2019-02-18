@@ -1,0 +1,36 @@
+
+.button-wrapper  {
+  box-shadow: 0 1px 9px 0 rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  //width: 160px;
+  height: 30px;
+  padding: 5px;
+  border: 1px solid #e9e9e9;
+  min-width:150px;
+}
+.button-without-menu {
+  justify-content: center;
+}
+
+.disable {
+  background: rgb(224, 224, 224);
+}
+
+.button-with-icon {
+  display: flex;
+  justify-content: space-evenly;
+}
+.label {
+  width: 112px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 20%;
+}
+
+

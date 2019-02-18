@@ -1,0 +1,64 @@
+.tableDiv {
+  width: 90%;
+  margin: 0 auto;
+  i {
+    cursor: pointer;
+  }
+}
+
+.container {
+  height: auto !important;
+}
+
+.button {
+  top: 150px;
+  padding: 0px;
+  margin: 5px auto 0;
+}
+
+.deleteIcon {
+  color: #FF6052;
+  &.deleteIconDisabled{
+    color: #b4c9d3;
+    cursor: not-allowed;
+  }
+}
+
+.editIcon {
+  &.editIconDisabled{
+    color: #b4c9d3;
+    cursor: not-allowed;
+  }
+}
+
+.row {
+  font-size: 13px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.search {
+  width: 40%;
+  float: right;
+}
+
+.getTests {
+  margin-top: 20px;
+}
+
+.pagination {
+  margin-top: 30px;
+  margin-right: 15px;
+  margin-left: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row-reverse;
+}
+
+.notes p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 164px;
+}
