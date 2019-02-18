@@ -1,0 +1,25 @@
+
+.form {
+  display: flex;
+  flex-direction: column;
+  padding-left: 100px;
+  .buttons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    > :first-child{
+      margin-right:5px;
+    }
+  }
+  .TextFieldAndCheckBoxToolTip{
+    margin-right: 110px;
+  }
+  .WebhookInputListToolTip{
+    margin-right: 90px;
+  }
+  .EmailInputListToolTip{
+    margin-right: 117px;
+  }
+}
+
+
