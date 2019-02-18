@@ -221,7 +221,7 @@ class getReports extends React.Component {
                   dataFormat={this.statusFormatter}>Status</TableHeaderColumn>
                 <TableHeaderColumn dataField='arrival_rate' dataAlign='left' width={'35'}>Arrival
                                 Rate</TableHeaderColumn>
-                <TableHeaderColumn dataField='rampTo' dataAlign='left' width={'25'}>Ramp</TableHeaderColumn>
+                <TableHeaderColumn dataField='ramp_to' dataAlign='left' width={'25'}>Ramp</TableHeaderColumn>
                 <TableHeaderColumn dataField='last_stats' dataAlign='left' formatExtraData={'rps.mean'}
                   dataFormat={getData} width={'25'}>RPS</TableHeaderColumn>
                 <TableHeaderColumn dataAlign='left' dataFormat={this.successRateFormatter} width={'40'}>Success

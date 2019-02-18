@@ -90,12 +90,14 @@ class getTests extends React.Component {
     };
 
   editFormatter = (cell, row) => {
-    return (
-        <i onClick={() => {
-          this.setState({ createTest: true, testForEdit: row });
-          this.props.chooseTest(row);
-        }} className='material-icons' style={{ color: '#2a3f53' }}>edit</i>
-    );
+    if (row.type !== 'custom') {
+      return (
+          <i onClick={() => {
+            this.setState({createTest: true, testForEdit: row});
+            this.props.chooseTest(row);
+          }} className='material-icons' style={{color: '#2a3f53'}}>edit</i>
+      );
+    }
   };
 
     dateFormatter = (value) => {
