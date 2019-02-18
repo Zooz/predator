@@ -1,6 +1,7 @@
 'use strict';
 
 let databaseConnector = require('./databaseConnector');
+let jobConnector = require('../../jobs/models/jobManager');
 let serviceConfig = require('../../config/serviceConfig');
 let statsConsumer = require('./statsConsumer');
 
@@ -31,9 +32,18 @@ module.exports.getLastReports = async (limit) => {
 
 module.exports.postReport = async (testId, reportBody) => {
     const startTime = new Date(Number(reportBody.start_time));
+    const job = await jobConnector.getJob(reportBody.job_id);
+
+    const testConfiguration = {
+        arrival_rate: job.arrival_rate,
+        duration: job.duration,
+        ramp_to: job.ramp_to,
+        environment: job.environment
+    };
+
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, startTime, reportBody.test_name,
-        reportBody.test_description, JSON.stringify(reportBody.test_configuration), reportBody.notes);
+        reportBody.test_description, JSON.stringify(testConfiguration), reportBody.notes);
     return reportBody;
 };
 

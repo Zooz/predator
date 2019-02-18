@@ -19,10 +19,9 @@ async function init(sequlizeClient) {
     await initSchemas();
 }
 
-async function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
+async function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, notes) {
     const report = client.model('report');
     const params = {
-        report_id: reportId,
         test_id: testId,
         job_id: jobId,
         revision_id: revisionId,
@@ -30,7 +29,6 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, start
         test_type: testType,
         test_name: testName,
         test_description: testDescription,
-        test_configuration: testConfiguration,
         last_stats: null,
         start_time: startTime,
         end_time: null,
@@ -39,7 +37,7 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, start
         status: 'initialized'
     };
 
-    return report.create(params);
+    return report.findOrCreate({ where: { report_id: reportId }, defaults: params });
 }
 
 async function insertStats(testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
@@ -139,6 +137,9 @@ async function initSchemas() {
         report_id: {
             type: Sequelize.DataTypes.STRING
         },
+        container_id: {
+            type: Sequelize.DataTypes.UUID
+        },
         stats_time: {
             type: Sequelize.DataTypes.DATE
         },
@@ -180,9 +181,6 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING
         },
         test_description: {
-            type: Sequelize.DataTypes.STRING
-        },
-        test_configuration: {
             type: Sequelize.DataTypes.STRING
         },
         last_stats: {

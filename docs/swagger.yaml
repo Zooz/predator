@@ -947,7 +947,6 @@ definitions:
     - test_type
     - test_name
     - test_description
-    - test_configuration
     - start_time
     properties:
       report_id:
@@ -971,9 +970,6 @@ definitions:
       start_time:
         type: string
         description: When the test started
-      test_configuration:
-        type: object
-        description: test configuration
       last_stats:
         type: string
         description: How many of the requests ended in error (not 2xx)
