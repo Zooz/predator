@@ -10,5 +10,6 @@ webhooks list<text>,
 emails list<text>,
 parallelism int,
 max_virtual_users int,
+notes text,
 PRIMARY KEY (id)
 );

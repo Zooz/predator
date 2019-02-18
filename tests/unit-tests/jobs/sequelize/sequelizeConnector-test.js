@@ -101,7 +101,8 @@ describe('Sequelize client tests', function () {
                 ramp_to: '1',
                 webhooks: ['http://zooz.com', 'http://payu.com'],
                 parallelism: 4,
-                max_virtual_users: 100
+                max_virtual_users: 100,
+                notes: 'some nice notes'
             });
 
             should(sequelizeCreateStub.args[0][0]).eql({
@@ -113,6 +114,7 @@ describe('Sequelize client tests', function () {
                 'environment': 'test',
                 'ramp_to': '1',
                 'parallelism': 4,
+                'notes': 'some nice notes',
                 'max_virtual_users': 100,
                 'webhooks': [{
                     'id': 'UUIDSTUB',
@@ -145,8 +147,8 @@ describe('Sequelize client tests', function () {
                 environment: 'test',
                 ramp_to: '1',
                 parallelism: 4,
-                max_virtual_users: 100
-
+                max_virtual_users: 100,
+                notes: 'some notes'
             });
 
             should(sequelizeCreateStub.args[0][0]).eql({
@@ -159,6 +161,7 @@ describe('Sequelize client tests', function () {
                 'ramp_to': '1',
                 'webhooks': undefined,
                 'emails': undefined,
+                'notes': 'some notes',
                 'parallelism': 4,
                 'max_virtual_users': 100
             });

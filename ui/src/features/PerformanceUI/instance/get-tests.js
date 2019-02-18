@@ -90,7 +90,7 @@ class getTests extends React.Component {
     };
 
   editFormatter = (cell, row) => {
-    if (row.type !== 'custom') {
+    if (row.type === 'custom') {
       return (
           <i onClick={() => {
             this.setState({createTest: true, testForEdit: row});

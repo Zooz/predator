@@ -61,7 +61,7 @@ function getReportResponse(summaryRow) {
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
 
     let htmlReportUrl = serviceConfig.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
-    let grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `?var-Name=${summaryRow.test_name}&from=${new Date(summaryRow.start_time).getTime()}`);
+    let grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `&var-Name=${summaryRow.test_name}&from=${new Date(summaryRow.start_time).getTime()}`);
 
     if (summaryRow.end_time) {
         grafanaReportUrl += `&to=${new Date(summaryRow.end_time).getTime()}`;
