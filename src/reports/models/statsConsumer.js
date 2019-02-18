@@ -79,7 +79,7 @@ async function handleIntermediate(report, job, stats, statsTime, statsData, graf
     await databaseConnector.insertStats(report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'intermediate', stats.data);
 
     if (report && report.status === ('started')) {
-        let htmlReportUrl = serviceConfig.externalAddress + `/v1/tests/${report.test_id}/reports/${report.report_id}/html`;
+        let htmlReportUrl = serviceConfig.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
         const phaseIndex = report.phase;
         webhookMessage = `🤔 *Test ${report.test_name} with id: ${report.test_id} first batch of results arrived for phase ${phaseIndex}.*\n${statsFromatter.getStatsFormatted('intermediate', statsData)}\n<${htmlReportUrl}|Track report in html report>\n`;
         if (grafanaReportUrl) {
@@ -95,7 +95,7 @@ async function handleDone(report, job, stats, statsTime, statsData, grafanaRepor
     await databaseConnector.insertStats(report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'aggregate', stats.data);
     await databaseConnector.updateReport(report.test_id, report.report_id, 'finished', report.phase, stats.data, statsTime);
 
-    const htmlReportUrl = serviceConfig.externalAddress + `/v1/tests/${report.test_id}/reports/${report.report_id}/html`;
+    const htmlReportUrl = serviceConfig.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
     let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', statsData)}\n<${htmlReportUrl}|View final html report>\n`;
 
     if (grafanaReportUrl) {
@@ -114,7 +114,7 @@ async function handleAbort(report, job, stats, statsTime, grafanaReportUrl) {
     await databaseConnector.updateReport(report.test_id, report.report_id, 'aborted', report.phase, undefined, statsTime);
 
     if (job.webhooks) {
-        const htmlReportUrl = serviceConfig.externalAddress + `/v1/tests/${report.test_id}/reports/${report.report_id}/html`;
+        const htmlReportUrl = serviceConfig.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
         let webhookMessage = `😢 *Test ${report.test_name} with id: ${report.test_id} was aborted.*\n<${htmlReportUrl}|View final html report>\n`;
         if (grafanaReportUrl) {
             webhookMessage += `<${grafanaReportUrl}|View final grafana dashboard report>`;
