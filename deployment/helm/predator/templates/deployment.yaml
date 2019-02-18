@@ -37,6 +37,8 @@ spec:
               secretKeyRef:
                 key:  DATABASE_PASSWORD
                 name: {{ .Release.Name }}-auth
+          - name: DOCKER_NAME
+            value: {{ .Values.DOCKER_NAME }}
           - name: DATABASE_TYPE
             value: {{ .Values.DATABASE_TYPE }}
           - name: DATABASE_NAME
@@ -54,7 +56,7 @@ spec:
           - name: METRICS_PLUGIN_NAME
             value: {{ .Values.METRICS_PLUGIN_NAME }}
           - name: METRICS_EXPORT_CONFIG
-            value: {{ .Values.METRICS_EXPORT_CONFIG }}
+            value: {{ .Values.METRICS_EXPORT_CONFIG | toJson | quote }}
           - name: INTERNAL_ADDRESS
             value: http://{{ include "predator.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}
           - name: EXTERNAL_ADDRESS

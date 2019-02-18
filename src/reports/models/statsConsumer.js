@@ -20,7 +20,7 @@ module.exports.handleMessage = async (testId, reportId, stats) => {
     const statsTime = new Date(Number(stats.stats_time));
     if (serviceConfig.grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : undefined;
-        grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `?var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
+        grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
     }
 
     switch (stats.phase_status) {
@@ -65,7 +65,9 @@ async function handleStart(report, job, stats) {
     let reportStatus = report.status === 'initialized' ? 'started' : 'in_progress';
     if (reportStatus === 'started') {
         let rampToMessage = report.ramp_to ? `, ramp to: ${report.ramp_to} scenarios per second` : '';
-        webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second ${rampToMessage}`;
+        let parallelismMessage = report.parallelism ? `, number of runners: ${report.parallelism}` : '';
+
+        webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second ${rampToMessage} ${parallelismMessage}`;
     }
     await databaseConnector.updateReport(report.test_id, report.report_id, reportStatus, stats.phase_index, undefined, undefined);
     if (job.webhooks && webhookMessage) {

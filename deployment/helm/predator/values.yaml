@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: zooz/predator
-  tag: latest
+  tag: demo
   pullPolicy: Always
 
 nameOverride: ""
@@ -58,11 +58,11 @@ DATABASE_PASSWORD:
 DATABASE_USERNAME:
 
 MY_ADDRESS:
-DOCKER_NAME: zooz/predator-runner:latest
+DOCKER_NAME: zooz/predator-runner:demo
 
 INTERNAL_ADDRESS:
-EXTERNAL_ADDRESS:
+EXTERNAL_ADDRESS: http://a0c235896305311e98c9f06e5c7b3da0-2032676483.eu-central-1.elb.amazonaws.com/predator/v1
 
-METRICS_PLUGIN_NAME:
-METRICS_EXPORT_CONFIG:
-GRAFANA_URL:
+METRICS_PLUGIN_NAME: prometheus
+METRICS_EXPORT_CONFIG: {"push_gateway_url": "http://wise-robin-prometheus-pushgateway.predator:9091"}
+GRAFANA_URL: https://grafana-dev.zooz.co/d/8OYEririk/predator-k8s?orgId=1&var-Cluster=predator-push-gateway-kubernetes-cluster

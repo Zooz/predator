@@ -38,12 +38,14 @@ module.exports.postReport = async (testId, reportBody) => {
         arrival_rate: job.arrival_rate,
         duration: job.duration,
         ramp_to: job.ramp_to,
+        parallelism: job.parallelism,
+        max_virtual_users: job.max_virtual_users,
         environment: job.environment
     };
 
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, startTime, reportBody.test_name,
-        reportBody.test_description, JSON.stringify(testConfiguration), reportBody.notes);
+        reportBody.test_description, JSON.stringify(testConfiguration), job.notes);
     return reportBody;
 };
 
@@ -80,6 +82,8 @@ function getReportResponse(summaryRow) {
         arrival_rate: testConfiguration.arrival_rate,
         duration: testConfiguration.duration,
         ramp_to: testConfiguration.ramp_to,
+        parallelism: testConfiguration.parallelism,
+        max_virtual_users: testConfiguration.max_virtual_users,
         status: summaryRow.status,
         last_stats: lastStats,
         html_report: htmlReportUrl,
