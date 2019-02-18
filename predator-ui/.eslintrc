@@ -1,0 +1,47 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "extends": ["standard", "standard-react"],
+  "rules": {
+    "quotes": [
+      "error",
+      "single"
+    ],
+     "no-debugger": [
+       "off"
+     ],
+    "indent": [
+      "error",
+      2
+    ],
+    "semi": 0,
+    "object-curly-spacing": [1, "always"],
+    "jsx-a11y/href-no-hash": "off",
+    "import/no-webpack-loader-syntax": "off",
+    "standard/computed-property-even-spacing": "off",
+    "no-console": "off",
+    "no-extend-native": "off",
+    "no-return-await": "off",
+    "no-useless-escape": "off",
+    "no-unused-expressions": "off",
+    "camelcase": "off",
+    "react/prop-types": "off",
+    "react/jsx-key": "off",
+    "react/display-name": "off",
+    "react/jsx-no-undef": "off",
+    "react/no-unused-prop-types": "off",
+    "react/jsx-no-bind": "off",
+    "react/no-did-update-set-state": "off"
+  },
+  "parser": "babel-eslint"
+}
