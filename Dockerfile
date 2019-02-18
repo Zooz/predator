@@ -19,10 +19,8 @@ COPY /ui/.babelrc /usr/ui
 
 WORKDIR /usr/ui
 RUN npm ci --silent
+RUN npm run build
 
 WORKDIR /usr
 
-COPY ./entrypoint.sh /
-
-ENTRYPOINT ["/entrypoint.sh"]
-
+CMD [ "node","--max_old_space_size=196","./src/server.js" ]

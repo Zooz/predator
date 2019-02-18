@@ -3,7 +3,7 @@ import env from '../../../../../App/common/env';
 
 
 export const getJobsFromFramework = (queryParams) => {
-  let url = queryParams ? `${env.PERFORMANCE_FRAMEWORK_API_URL}/jobs${queryParams}` : `${env.PERFORMANCE_FRAMEWORK_API_URL}/jobs`;
+  let url = queryParams ? `CHANGE_ME_TO_EXTERNAL_ADDRESS/jobs${queryParams}` : `CHANGE_ME_TO_EXTERNAL_ADDRESS/jobs`;
   return axios.get(url, {
     headers: {
     }
@@ -11,26 +11,26 @@ export const getJobsFromFramework = (queryParams) => {
 };
 
 export const getJobFromFramework = (jobId) => {
-  return axios.get(`${env.PERFORMANCE_FRAMEWORK_API_URL}/jobs/${jobId}`, {
+  return axios.get(`CHANGE_ME_TO_EXTERNAL_ADDRESS/jobs/${jobId}`, {
     headers: {
     }
   });
 };
 
 export const createJobInFramework = (body) => {
-  return axios.post(`${env.PERFORMANCE_FRAMEWORK_API_URL}/jobs/`, body, {
+  return axios.post(`CHANGE_ME_TO_EXTERNAL_ADDRESS/jobs/`, body, {
     headers: {}
   });
 };
 
 export const stopRunningJobInFramework = (jobId, runId) => {
-  return axios.post(`${env.PERFORMANCE_FRAMEWORK_API_URL}/jobs/${jobId}/runs/${runId}/stop`, undefined, {
+  return axios.post(`CHANGE_ME_TO_EXTERNAL_ADDRESS/jobs/${jobId}/runs/${runId}/stop`, undefined, {
     headers: {}
   });
 };
 
 export const deleteJobInFramework = (jobId) => {
-  return axios.delete(`${env.PERFORMANCE_FRAMEWORK_API_URL}/jobs/${jobId}`, {
+  return axios.delete(`CHANGE_ME_TO_EXTERNAL_ADDRESS/jobs/${jobId}`, {
     headers: {
     }
   });

@@ -58,6 +58,7 @@
     "path": "^0.12.7",
     "pg": "^7.8.0",
     "pg-hstore": "^2.3.2",
+    "replace-in-file": "^3.4.3",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "sequelize": "^4.42.0",
