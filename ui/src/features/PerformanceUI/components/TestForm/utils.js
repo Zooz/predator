@@ -34,7 +34,7 @@ export const createStateForEditTest = (test) => {
     baseUrl: artillery_test.config.target,
     before: testBeforeToStateBefore(artillery_test.before),
     scenarios: testScenarioToTestScenario(artillery_test.scenarios),
-    type: 'custom'
+    type: test.type
   }
 };
 
@@ -43,10 +43,13 @@ function testBeforeToStateBefore (before) {
     return;
   }
   return {
-    steps: buildStepsFromFlow(before)
+    steps: buildStepsFromFlow(before.steps)
   }
 }
 function testScenarioToTestScenario (testScenarios) {
+  if(!testScenarios){
+    return []
+  }
   return testScenarios.map((scenario) => {
     return {
       id: uuid(),
@@ -58,6 +61,10 @@ function testScenarioToTestScenario (testScenarios) {
 }
 
 function buildStepsFromFlow (flow) {
+  console.log('flow',flow)
+  if(!flow){
+    return []
+  }
   return flow.map((request) => {
     const method = Object.keys(request)[0];
     return {

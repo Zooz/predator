@@ -50,6 +50,7 @@
     "axios": "^0.18.0",
     "babel-runtime": "^6.26.0",
     "classnames": "^2.2.5",
+    "glob": "^7.1.3",
     "history": "^4.7.2",
     "immutable": "^3.8.2",
     "jsonwebtoken": "^8.2.1",
@@ -74,6 +75,7 @@
     "redux": "^4.0.0",
     "redux-saga": "^0.16.0",
     "redux-thunk": "^2.2.0",
+    "replace-in-file": "^3.4.3",
     "uuid": "^3.3.2"
   }
 }

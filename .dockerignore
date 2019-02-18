@@ -1,0 +1,6 @@
+.nyc_output
+tests
+.circlei
+coverage
+node_modules
+ui/node_modules

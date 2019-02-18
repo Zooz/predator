@@ -4,12 +4,25 @@ FROM node:8.15-alpine
 RUN mkdir -p /usr/src
 WORKDIR /usr
 # Install app dependencies
-COPY package.json /usr/
+COPY package*.json /usr/
 
-RUN npm install --production --silent
+RUN npm ci --production --silent
 
 ## Bundle app source
 COPY /src /usr/src
 COPY /docs /usr/docs
 
-CMD [ "node","--max_old_space_size=196","./src/server.js" ]
+COPY /ui/src /usr/ui/src
+COPY /ui/config /usr/ui/config
+COPY /ui/package*.json /usr/ui/
+COPY /ui/.babelrc /usr/ui
+
+WORKDIR /usr/ui
+RUN npm ci --silent
+
+WORKDIR /usr
+
+COPY ./entrypoint.sh /
+
+ENTRYPOINT ["/entrypoint.sh"]
+
