@@ -1,6 +1,6 @@
-
 const replace = require('replace-in-file');
 const config = require('./config/serviceConfig');
+const logger = require('./common/logger');
 
 module.exports = () => {
     const options = {
@@ -9,10 +9,8 @@ module.exports = () => {
         to: config.externalAddress
     };
 
-    return replace(options)
-        .then(changes => {
-            console.log('Modified files:', changes.join(', '));
-        }).catch(error => {
-            console.error('Error when init external api on the portal occurred:', error);
-        });
+    return replace(options).catch(error => {
+        logger.error('Error when changing external address on the predator ui:', error);
+        throw error;
+    });
 };
