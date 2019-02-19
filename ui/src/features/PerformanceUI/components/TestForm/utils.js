@@ -61,7 +61,6 @@ function testScenarioToTestScenario (testScenarios) {
 }
 
 function buildStepsFromFlow (flow) {
-  console.log('flow',flow)
   if(!flow){
     return []
   }

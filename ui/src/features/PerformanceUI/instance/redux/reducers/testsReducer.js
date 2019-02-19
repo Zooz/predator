@@ -29,6 +29,8 @@ export default function reduce (state = initialState, action = {}) {
     return state.set('error_get_test', action.error);
   case Types.SET_TEST:
     return state.set('test', action.test);
+  case Types.GET_TEST_SUCCESS:
+    return state.set('test', action.test);
   case Types.PROCESSING_GET_TESTS:
     return state.set('processing_get_tests', action.state);
   case Types.CLEAR_SELECTED_TEST:

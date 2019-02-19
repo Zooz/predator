@@ -25,6 +25,16 @@ export function * getTests () {
     yield put(Actions.processingGetTests(false));
   }
 }
+
+export function* getTest({testId, instance}) {
+  try {
+    const test = yield call(getTestFromFramework, testId, token, instance);
+    yield put(Actions.getTestSuccess(test.data))
+
+  } catch (e) {
+    yield put(Actions.getTestFaliure(e));
+  }
+}
 export function * createTest (action) {
   try {
     yield put(Actions.setLoading(true));
@@ -50,26 +60,19 @@ export function * editTest (action) {
   yield put(Actions.setLoading(false));
 }
 
-export function * getTest ({ testId }) {
-  try {
-    const test = yield call(getTestFromFramework, testId);
-    yield put(Actions.getTestSuccess(test.data))
-  } catch (e) {
-    yield put(Actions.getTestFaliure(e));
-  }
-}
 
 export function * deleteTest ({ testId }) {
   try {
     yield call(deleteTestInFramework, testId);
     yield put(Actions.deleteTestSuccess())
-  } catch (e) {
+  } catch (e) {GET_TEST_SUCCESS
     yield put(Actions.deleteTestFailure(e))
   }
 }
 
 export function * testsRegister () {
   yield takeLatest(Types.GET_TESTS, getTests);
+  yield takeLatest(Types.GET_TEST, getTest);
   yield takeLatest(Types.CREATE_TEST, createTest);
   yield takeLatest(Types.DELETE_TEST, deleteTest);
   yield takeLatest(Types.EDIT_TEST, editTest);

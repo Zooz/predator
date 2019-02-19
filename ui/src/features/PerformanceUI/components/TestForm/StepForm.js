@@ -62,7 +62,7 @@ export default (props) => {
     onChangeValue(step);
   };
 
-  const { step } = props;
+  const { step, editMode } = props;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       <div className={style['http-methods-request-options-wrapper']}>
@@ -89,7 +89,7 @@ export default (props) => {
               Body:
       <JSONInput
         id='a_unique_id'
-        placeholder={step.body || sampleObject}
+        placeholder={step.body || (editMode ? {} : sampleObject)}
         colors={{
           default: 'black',
           background: 'white',

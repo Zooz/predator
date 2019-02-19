@@ -83,3 +83,7 @@ export const initCreateTestForm = () => (
 export const editTest = (body,id) => (
   { type: Types.EDIT_TEST,body,id }
 );
+
+export const getTest = (testId) => (
+    {type: Types.GET_TEST, testId}
+);

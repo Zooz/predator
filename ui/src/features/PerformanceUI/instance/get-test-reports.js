@@ -194,7 +194,7 @@ class getTests extends React.Component {
                   <TableHeaderColumn dataField='duration' dataAlign='left' width={'30'} dataFormat={this.durationFormatter} tdStyle={{ whiteSpace: 'normal' }} thStyle={{ whiteSpace: 'normal' }}>Duration</TableHeaderColumn>
                   <TableHeaderColumn dataField='status' dataAlign='left' width={'25'} dataFormat={this.statusFormatter}>Status</TableHeaderColumn>
                   <TableHeaderColumn dataField='arrival_rate' dataAlign='left' width={'35'}>Arrival Rate</TableHeaderColumn>
-                  <TableHeaderColumn dataField='rampTo' dataAlign='left' width={'25'}>Ramp</TableHeaderColumn>
+                  <TableHeaderColumn dataField='ramp_to' dataAlign='left' width={'25'}>Ramp</TableHeaderColumn>
                   <TableHeaderColumn dataField='last_stats' dataAlign='left' formatExtraData={'rps.mean'} dataFormat={getData} width={'25'}>RPS</TableHeaderColumn>
                   <TableHeaderColumn dataAlign='left' dataFormat={this.successRateFormatter} width={'40'}>Success Rate</TableHeaderColumn>
                   <TableHeaderColumn dataField='notes' dataFormat={this.notes} dataAlign='center' width={'80'}>Notes</TableHeaderColumn>

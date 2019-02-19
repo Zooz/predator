@@ -24,3 +24,6 @@ export const IS_LOADING = 'IS_LOADING';
 export const CLEAN_ALL_ERRORS = 'CLEAN_ALL_ERRORS';
 export const INIT_CREATE_FORM = 'INIT_CREATE_FORM';
 export const EDIT_TEST = 'EDIT_TEST';
+
+export const GET_TEST = 'GET_TEST';
+
