@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Drawer, AppBar, ListItem, List } from 'material-ui'
-import PostmanLogo from '../../../../images/postman.png';
 import style from './style.scss'
 import { connect } from 'react-redux'
 import ActionGrade from 'material-ui/svg-icons/action/grade';
@@ -34,10 +33,7 @@ class DrawerE extends Component {
       const { open } = this.state;
       const { url, history } = this.props;
       const classes = [style.drawer, open ? style['drawer--open'] : undefined].join(' ');
-      const rightIcon = <RactangleAlignChildrenLeft>
-        <a href={'https://documenter.getpostman.com/view/1971107/RzfZQtih'}>
-          <img src={PostmanLogo} /></a>
-      </RactangleAlignChildrenLeft>;
+
       return (
         <div className={classes}>
           <Drawer
@@ -92,7 +88,7 @@ class DrawerE extends Component {
             onTitleClick={() => {
               history.push('/last_reports')
             }}
-            iconElementRight={rightIcon}
+            // iconElementRight={rightIcon}
             onLeftIconButtonClick={this.handleToggle} />
           {this.props.children ? this.props.children : null}
         </div>

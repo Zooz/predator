@@ -14,7 +14,6 @@ let bodyParser = require('body-parser');
 let database = require('./database/database');
 let schedulerJobManager = require('./jobs/models/jobManager');
 let path = require('path');
-let initUi = require('./init-ui');
 
 module.exports = () => {
     return swaggerValidator.init('./docs/swagger.yaml', { beautifyErrors: true })
@@ -22,9 +21,6 @@ module.exports = () => {
             return database.init();
         }).then(() => {
             return schedulerJobManager.reloadCronJobs();
-        })
-        .then(() => {
-            return initUi();
         })
         .then(() => {
             let app = express();
@@ -40,7 +36,7 @@ module.exports = () => {
 
             app.use(audit({
                 logger: logger,
-                excludeURLs: ['health', 'predator']
+                excludeURLs: ['health', 'predator', 'favicon.png']
             }));
 
             app.use('/health', healthRouter);
