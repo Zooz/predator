@@ -4,7 +4,7 @@ const logger = require('./common/logger');
 
 module.exports = () => {
     const options = {
-        files: __dirname + '/../ui/dist/*.js',
+        files: `${__dirname}/../ui/dist/*.js`,
         from: /CHANGE_ME_TO_EXTERNAL_ADDRESS/g,
         to: config.externalAddress
     };
