@@ -119,21 +119,21 @@ class getJobs extends React.Component {
     };
 
     componentDidMount () {
+    this.loadPageData();
+    this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL)
+    }
+
+    loadPageData=()=>{
       this.props.getTests();
       this.props.getAllReports();
       this.props.clearErrorOnGetJobs();
       this.props.getAllJobs();
-      setInterval(() => {
-        this.props.getTests();
-        this.props.getAllReports();
-        this.props.clearErrorOnGetJobs();
-        this.props.getAllJobs();
-      }, REFRESH_DATA_INTERVAL)
-    }
+    };
 
     componentWillUnmount () {
       this.props.clearErrorOnGetJobs();
       this.props.clearSelectedJob();
+      clearInterval(this.refreshDataInterval);
     }
 
     loader () {

@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import * as env from '../../../../App/common/env';
 import { Drawer, AppBar, ListItem, List } from 'material-ui'
 import PostmanLogo from '../../../../images/postman.png';
 import style from './style.scss'
@@ -8,6 +7,8 @@ import ActionGrade from 'material-ui/svg-icons/action/grade';
 import ContentInbox from 'material-ui/svg-icons/content/inbox';
 import RactangleAlignChildrenLeft from '../../../../components/RectangleAlign/RectangleAlignChildrenLeft';
 import history from '../../../../store/history';
+import Logo from '../../../../images/logo.png';
+
 
 class DrawerE extends Component {
   constructor (props) {
@@ -59,7 +60,7 @@ class DrawerE extends Component {
                       listItem.nestedItems.map((nestedItem) => {
                         if (nestedItem.linkUrl) {
                           return (
-                            <a target='_blank' href={nestedItem.linkUrl}>
+                            <a key={nestedItem.key} target='_blank' href={nestedItem.linkUrl}>
                               <ListItem key={'nestedItems_' + nestedItem.key}
                                 nestedListStyle={{ color: 'white' }}
                                 innerDivStyle={{ color: 'white' }}
@@ -86,7 +87,7 @@ class DrawerE extends Component {
 
           </Drawer>
           <AppBar
-            title={<span style={{ cursor: 'default' }}>Predator</span>}
+            title={<span style={{ cursor: 'default' }}><img width={'50px'} height={'50px'} src={Logo} alt={'Mickey'}/>Predator</span>}
             style={{ backgroundImage: 'linear-gradient(142deg,#00041a,#00126b)', flexShrink: 0 }}
             onTitleClick={() => {
               history.push('/last_reports')

@@ -138,7 +138,6 @@ class getTests extends React.Component {
     componentDidMount () {
       this.props.clearErrorOnGetReports();
       this.props.getReports(this.testId);
-      this.props.getTest(this.testId);
     }
 
     componentWillUnmount () {
@@ -178,8 +177,9 @@ class getTests extends React.Component {
         defaultSortName: 'end_time',
         defaultSortOrder: 'desc'
       };
+
       return (
-        <Page title={this.props.test ? `${this.props.test.name} Reports` : this.loader()}>
+        <Page title={this.props.reports && this.props.reports.length > 0 ? `${this.props.reports[0].test_name} Reports` : this.loader()}>
           <div className={style.getTests}>
             {this.props.reports
               ? <div className={style.tableDiv}>
@@ -218,7 +218,6 @@ function mapStateToProps (state) {
   return {
     reports: reports(state),
     report: report(state),
-    test: test(state),
     processingGetReports: processingGetReports(state),
     errorOnGetReports: errorOnGetReports(state),
     errorOnGetReport: errorOnGetReport(state)
@@ -230,8 +229,7 @@ const mapDispatchToProps = {
   clearSelectedTest: Actions.clearSelectedTest,
   clearErrorOnGetReports: Actions.clearErrorOnGetReports,
   getReports: Actions.getReports,
-  getReport: Actions.getReport,
-  getTest: Actions.getTest
+  getReport: Actions.getReport
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);

@@ -168,19 +168,20 @@ class getReports extends React.Component {
     };
 
     componentDidMount () {
-      this.props.getTests(this.getInstance());
-      this.props.clearErrorOnGetReports();
-      this.props.getAllReports(this.getInstance());
-      setInterval(() => {
-        this.props.getTests(this.getInstance());
-        this.props.clearErrorOnGetReports();
-        this.props.getAllReports(this.getInstance());
-      }, REFRESH_DATA_INTERVAL)
+      this.loadPageData();
+      this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL)
     }
+
+    loadPageData=()=>{
+      this.props.getTests();
+      this.props.clearErrorOnGetReports();
+      this.props.getAllReports();
+    };
 
     componentWillUnmount () {
       this.props.clearErrorOnGetReports();
       this.props.clearSelectedReport();
+      clearInterval(this.refreshDataInterval);
     }
 
     loader () {
@@ -253,7 +254,7 @@ class getReports extends React.Component {
               message={this.props.stopRunningJobSuccess ? 'Job successfully aborted' : ''}
               autoHideDuration={4000}
               onRequestClose={() => {
-                this.props.getAllReports(this.getInstance());
+                this.props.getAllReports();
                 this.props.clearStopJobSuccess();
                 this.props.clearStoppedJobError();
                 this.setState({
