@@ -18,7 +18,22 @@ if (dockerConfig.host) {
 }
 let docker = new Docker(dockerConnection);
 
+const pullImage = async (dockerImage) => {
+    let dockerImageStream = await docker.pull(dockerImage);
+    return new Promise((resolve, reject) => {
+        docker.modem.followProgress(dockerImageStream, (err) => {
+            if (!err) {
+                return resolve();
+            } else {
+                return reject(err);
+            }
+        });
+    });
+};
+
 module.exports.runJob = async (dockerJobConfig) => {
+    await pullImage(dockerJobConfig.dockerImage);
+
     let envVarArray = Object.keys(dockerJobConfig.environmentVariables).map((envVar) => {
         return `${envVar}=${dockerJobConfig.environmentVariables[envVar]}`;
     });
