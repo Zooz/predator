@@ -44,7 +44,6 @@ export default function reduce (state = initialState, action = {}) {
   case Types.DELETE_TEST_FAILURE:
     return state.set('error_delete_test', action.error);
   case Types.CREATE_TEST_FAILURE:
-    console.log('create test failure setted.', action);
     return state.set('error_create_test', action.error);
   case Types.CLEAR_ERROR_DELETE_TEST:
     return state.set('error_delete_test', undefined);

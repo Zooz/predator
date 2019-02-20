@@ -1,14 +1,14 @@
 import React, { Fragment } from 'react';
-import style from './style.scss'
+import style from './style.scss';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Checkbox from 'material-ui/Checkbox';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import { processingCreateJob, createJobSuccess, createJobFailure } from '../../instance/redux/selectors/jobsSelector';
 import * as Actions from '../../instance/redux/action';
-import Loader from '../Loader'
-import InputList from '../InputList'
-import ErrorDialog from '../ErrorDialog'
+import Loader from '../Loader';
+import InputList from '../InputList';
+import ErrorDialog from '../ErrorDialog';
 import classNames from 'classnames';
 import TooltipWrapper from '../../../../components/TooltipWrapper';
 import RactangleAlignChildrenLeft from '../../../../components/RectangleAlign/RectangleAlignChildrenLeft';
@@ -71,7 +71,8 @@ class Form extends React.Component {
         key: 'parallelism',
         floatingLabelText: 'Parallelism',
         handleChange: this.handleChangeOptionalField,
-        info: 'The amount of runners predator will start, arrival rate, ramp to and max virtual users will split between them.'
+        info: 'The amount of runners predator will start, arrival rate, ramp to and max virtual users will split between them.',
+        defaultValue: '1'
       },
       {
         width: 350,
@@ -79,7 +80,8 @@ class Form extends React.Component {
         key: 'max_virtual_users',
         floatingLabelText: 'Max virtual users',
         handleChange: this.handleChangeOptionalField,
-        info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped'
+        info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
+        defaultValue: '500'
       },
       {
         width: 350,
@@ -128,7 +130,6 @@ class Form extends React.Component {
       }
 
     ];
-
     this.state = {
       test_id: this.props.data ? this.props.data.id : '',
       arrival_rate: undefined,
@@ -152,7 +153,12 @@ class Form extends React.Component {
         upstream_connect_timeout: undefined
       },
       anchorEl: null
-    }
+    };
+    this.FormList.forEach((item) => {
+      if (item.defaultValue) {
+        this.state[item.name] = item.defaultValue;
+      }
+    });
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
@@ -195,14 +201,14 @@ class Form extends React.Component {
             ...this.state.errors,
             [name]: `${name} field have to be Integer`
           }
-        })
+        });
       } else {
         this.setState({
           errors: {
             ...this.state.errors,
             [name]: undefined
           }
-        })
+        });
       }
     };
 
@@ -221,17 +227,17 @@ class Form extends React.Component {
       this.props.clearErrorOnCreateJob();
     };
 
-    showValue (newValue, oldValues, field) {
-      let oldValue = (oldValues ? oldValues[field] : undefined);
-      return this.props.serverError ? oldValue : newValue
+    showValue (value, testDetails, field) {
+      let testField = (testDetails ? testDetails[field] : undefined);
+      return this.props.serverError ? testField : value;
     }
 
     isThereErrorOnForm () {
       let state = this.state;
 
       return (Object.values(state.errors).find((oneError) => {
-        return oneError !== undefined
-      }))
+        return oneError !== undefined;
+      }));
     }
 
     handleChangeForDropDown (name, evt, value) {
@@ -268,10 +274,10 @@ class Form extends React.Component {
               return (<Fragment key={index}>
                 {!oneItem.hidden &&
                 <RactangleAlignChildrenLeft>
-                  {this.generateInput(oneItem, testDetails, index)}
+                  {this.generateInput(oneItem, testDetails)}
                   {this.showInfo(oneItem)}
                 </RactangleAlignChildrenLeft>}
-              </Fragment>)
+              </Fragment>);
             }, this)}
 
             <div className={style.buttons}>
@@ -315,7 +321,7 @@ class Form extends React.Component {
             instance={this}
             elements={this.state[oneItem.key]}
           />
-        )
+        );
       case inputTypes.TEXT_FIELD:
         return (
           <TextField
@@ -323,7 +329,7 @@ class Form extends React.Component {
             style={{ width: oneItem.width }}
             id='standard-multiline-flexible'
             key={oneItem.key}
-            value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem[oneItem.key])}
+            value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem.name)}
             disabled={oneItem.disabled}
             errorText={this.state.errors[oneItem.name]}
             onChange={oneItem.handleChange ? oneItem.handleChange.bind(this, oneItem.name) : undefined}
@@ -340,18 +346,17 @@ class Form extends React.Component {
             className={style.TextFieldAndCheckBoxToolTip}
             style={{ width: oneItem.width }}
             key={oneItem.key}
-            value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem[oneItem.key])}
+            value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem.name)}
             disabled={oneItem.disabled}
             errorText={this.state.errors[oneItem.name]}
             onChange={oneItem.handleChange ? oneItem.handleChange.bind(this, oneItem.name) : undefined}
             floatingLabelText={oneItem.floatingLabelText}
             name={oneItem.name} />
-        )
+        );
       }
     }
 
     whenSubmit = () => {
-      console.log('state',this.state)
       let body = {
         test_id: this.props.data.id,
         arrival_rate: parseInt(this.state.arrival_rate),
@@ -377,7 +382,7 @@ function mapStateToProps (state) {
     processingAction: processingCreateJob(state),
     serverError: createJobFailure(state),
     createJobSuccess: createJobSuccess(state)
-  }
+  };
 }
 
 const mapDispatchToProps = {

@@ -42,7 +42,6 @@ export function * createTest (action) {
     yield put(Actions.createTestSuccess());
     yield call(getTests);
   } catch (err) {
-    console.log('error from api',err);
     yield put(Actions.createTestFailure(err));
   }
   yield put(Actions.setLoading(false));
@@ -54,7 +53,6 @@ export function * editTest (action) {
     yield put(Actions.createTestSuccess());
     yield call(getTests);
   } catch (err) {
-    console.log('error from api',err);
     yield put(Actions.createTestFailure(err));
   }
   yield put(Actions.setLoading(false));

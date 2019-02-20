@@ -227,6 +227,7 @@ class getReports extends React.Component {
                   dataFormat={getData} width={'25'}>RPS</TableHeaderColumn>
                 <TableHeaderColumn dataAlign='left' dataFormat={this.successRateFormatter} width={'40'}>Success
                                 Rate</TableHeaderColumn>
+                <TableHeaderColumn dataField='parallelism' dataAlign='left' width={'35'}>Parallelism</TableHeaderColumn>
                 <TableHeaderColumn dataField='notes' dataFormat={this.notes} dataAlign='left'
                   width={'80'}>Notes</TableHeaderColumn>
                 <TableHeaderColumn dataField='grafana_report' dataAlign='left'
