@@ -65,9 +65,9 @@ async function handleStart(report, job, stats) {
     let reportStatus = report.status === 'initialized' ? 'started' : 'in_progress';
     if (reportStatus === 'started') {
         let rampToMessage = report.ramp_to ? `, ramp to: ${report.ramp_to} scenarios per second` : '';
-        let parallelismMessage = report.parallelism ? `, number of runners: ${report.parallelism}` : '';
-
-        webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second ${rampToMessage} ${parallelismMessage}`;
+        let parallelism = report.parallelism || 1;
+        webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n
+         *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${parallelism}${rampToMessage}`;
     }
     await databaseConnector.updateReport(report.test_id, report.report_id, reportStatus, stats.phase_index, undefined, undefined);
     if (job.webhooks && webhookMessage) {

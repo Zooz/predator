@@ -58,7 +58,7 @@ spec:
           - name: METRICS_EXPORT_CONFIG
             value: {{ .Values.METRICS_EXPORT_CONFIG | toJson | quote }}
           - name: INTERNAL_ADDRESS
-            value: http://{{ include "predator.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}
+            value: http://{{ include "predator.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}/{{ .Values.apiVersion }}
           - name: EXTERNAL_ADDRESS
             value: {{ .Values.EXTERNAL_ADDRESS }}
           ports:
