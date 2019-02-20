@@ -12,7 +12,7 @@ import ErrorDialog from '../ErrorDialog';
 import classNames from 'classnames';
 import TooltipWrapper from '../../../../components/TooltipWrapper';
 import RactangleAlignChildrenLeft from '../../../../components/RectangleAlign/RectangleAlignChildrenLeft';
-
+import { validate } from './validator';
 const inputTypes = {
   INPUT_LIST: 'INPUT_LIST',
   CHECKBOX: 'CHECKBOX',
@@ -36,7 +36,6 @@ class Form extends React.Component {
         name: 'notes',
         key: 'notes',
         floatingLabelText: 'Notes',
-        handleChange: this.handleChangeOptionalField,
         element: 'notes',
         info: 'Add notes about the test.',
         type: inputTypes.TEXT_FIELD
@@ -46,15 +45,13 @@ class Form extends React.Component {
         name: 'arrival_rate',
         key: 'arrival_rate',
         floatingLabelText: 'Arrival rate',
-        handleChange: this.handleChangeIntegerMandatory,
         info: 'Number of scenarios per second that the test fires.'
       },
       {
         width: 350,
         name: 'duration',
         key: 'duration',
-        floatingLabelText: 'Duration',
-        handleChange: this.handleChangeIntegerMandatory,
+        floatingLabelText: 'Duration (seconds)',
         info: 'The duration of the test in seconds.'
       },
       {
@@ -62,7 +59,6 @@ class Form extends React.Component {
         name: 'ramp_to',
         key: 'ramp_to',
         floatingLabelText: 'Ramp to',
-        handleChange: this.handleChangeOptionalField,
         info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.'
       },
       {
@@ -70,7 +66,6 @@ class Form extends React.Component {
         name: 'parallelism',
         key: 'parallelism',
         floatingLabelText: 'Parallelism',
-        handleChange: this.handleChangeOptionalField,
         info: 'The amount of runners predator will start, arrival rate, ramp to and max virtual users will split between them.',
         defaultValue: '1'
       },
@@ -79,7 +74,6 @@ class Form extends React.Component {
         name: 'max_virtual_users',
         key: 'max_virtual_users',
         floatingLabelText: 'Max virtual users',
-        handleChange: this.handleChangeOptionalField,
         info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
         defaultValue: '500'
       },
@@ -88,7 +82,6 @@ class Form extends React.Component {
         name: 'environment',
         key: 'environment',
         floatingLabelText: 'Environment',
-        handleChange: this.handleChangeForDropDown,
         info: 'The chosen environment to test. Free text used to logically separate between tests runs'
       },
       {
@@ -96,7 +89,6 @@ class Form extends React.Component {
         name: 'cron_expression',
         key: 'cron_expression',
         floatingLabelText: 'Cron expression',
-        handleChange: this.handleChangeOptionalField,
         info: 'Schedule a reoccurring job using this. For example, cron expression: "0 0 22 * * *" runs the test every day at 22:00 UTC.'
       },
       {
@@ -104,7 +96,6 @@ class Form extends React.Component {
         name: 'run_immediately',
         key: 'run_immediately',
         label: 'Run immediately',
-        handleChange: this.handleChangeForCheckBox,
         info: 'Schedule a one time job, which will run the test now.',
         type: inputTypes.CHECKBOX
       },
@@ -113,7 +104,6 @@ class Form extends React.Component {
         name: 'emails',
         key: 'emails',
         floatingLabelText: 'Emails',
-        handleChange: this.handleInputListAdd,
         info: 'When the test finishes, a report will be sent to the emails included.',
         element: 'Email',
         type: inputTypes.INPUT_LIST
@@ -123,7 +113,6 @@ class Form extends React.Component {
         name: 'webhooks',
         key: 'webhooks',
         floatingLabelText: 'Webhooks',
-        handleChange: this.handleInputListAdd,
         info: 'Send test reports to Slack.',
         element: 'Webhook',
         type: inputTypes.INPUT_LIST
@@ -154,6 +143,7 @@ class Form extends React.Component {
       },
       anchorEl: null
     };
+    this.state.errors = validate(this.state);
     this.FormList.forEach((item) => {
       if (item.defaultValue) {
         this.state[item.name] = item.defaultValue;
@@ -181,35 +171,15 @@ class Form extends React.Component {
   };
 
     handleChangeForCheckBox = (name, evt) => {
-      this.setState({ [name]: evt.target.checked });
+      const newState = Object.assign({}, this.state, { [name]: evt.target.checked });
+      newState.errors = validate(newState);
+      this.setState(newState);
     };
 
-    handleChangeOptionalField = (name, evt) => {
-      this.setState({ [name]: evt.target.value });
-    };
-
-    static isNormalInteger (str) {
-      const n = Math.floor(Number(str));
-      return n !== Infinity && String(n) === str && n >= 0;
-    }
-
-    handleChangeIntegerMandatory = (name, evt) => {
-      this.setState({ [name]: evt.target.value });
-      if (!Form.isNormalInteger(evt.target.value)) {
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            [name]: `${name} field have to be Integer`
-          }
-        });
-      } else {
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            [name]: undefined
-          }
-        });
-      }
+    onChangeFreeText = (name, evt) => {
+      const newState = Object.assign({}, this.state, { [name]: evt.target.value });
+      newState.errors = validate(newState);
+      this.setState(newState);
     };
 
     handleInputListAdd = (target, newElement) => {
@@ -229,7 +199,7 @@ class Form extends React.Component {
 
     showValue (value, testDetails, field) {
       let testField = (testDetails ? testDetails[field] : undefined);
-      return this.props.serverError ? testField : value;
+      return this.props.serverError ? testField : value || '';
     }
 
     isThereErrorOnForm () {
@@ -266,7 +236,6 @@ class Form extends React.Component {
 
     render () {
       const testDetails = this.props.data;
-
       return (
         <div>
           <div className={style.form}>
@@ -284,7 +253,7 @@ class Form extends React.Component {
               {this.props.processingAction && !this.props.serverError ? <Loader />
                 : <RaisedButton label='Submit' onClick={this.whenSubmit}
                   primary
-                  disabled={this.isThereErrorOnForm()}
+                  disabled={!!this.isThereErrorOnForm()}
                 />}
               <RaisedButton label='Cancel' secondary onClick={this.returnAllTests} />
             </div>
@@ -302,10 +271,10 @@ class Form extends React.Component {
       case inputTypes.CHECKBOX:
         return (
           <Checkbox className={style.TextFieldAndCheckBoxToolTip}
-            style={{ width: oneItem.width }} key={oneItem.key}
+            style={{ width: oneItem.width, marginTop: '10px' }} key={oneItem.key}
             disabled={oneItem.disabled}
             errorText={this.state.errors[oneItem.name]}
-            onCheck={oneItem.handleChange ? oneItem.handleChange.bind(this, oneItem.name) : undefined}
+            onCheck={(evt) => { this.handleChangeForCheckBox(oneItem.name, evt) }}
             label={oneItem.label}
             name={oneItem.name}
             value={false}
@@ -317,9 +286,8 @@ class Form extends React.Component {
             title={oneItem.floatingLabelText}
             element={oneItem.element}
             id={oneItem.key}
-            onChange={oneItem.handleChange ? oneItem.handleChange.bind(this, oneItem.name) : undefined}
-            instance={this}
-            elements={this.state[oneItem.key]}
+            onChange={(evt) => this.handleInputListAdd(oneItem.name, evt)}
+            elements={this.state[oneItem.name]}
           />
         );
       case inputTypes.TEXT_FIELD:
@@ -332,7 +300,7 @@ class Form extends React.Component {
             value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem.name)}
             disabled={oneItem.disabled}
             errorText={this.state.errors[oneItem.name]}
-            onChange={oneItem.handleChange ? oneItem.handleChange.bind(this, oneItem.name) : undefined}
+            onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}
             floatingLabelText={oneItem.floatingLabelText}
             name={oneItem.name}
             rows={2}
@@ -349,7 +317,7 @@ class Form extends React.Component {
             value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem.name)}
             disabled={oneItem.disabled}
             errorText={this.state.errors[oneItem.name]}
-            onChange={oneItem.handleChange ? oneItem.handleChange.bind(this, oneItem.name) : undefined}
+            onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}
             floatingLabelText={oneItem.floatingLabelText}
             name={oneItem.name} />
         );

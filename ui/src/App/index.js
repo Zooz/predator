@@ -17,15 +17,6 @@ class App extends React.Component {
       openSnakeBar: false
     };
 
-    componentDidMount () {
-      // try {
-      //     const token = queryString.parse(history.location.search).token || localStorage.token;
-      //     this.props.addToken(token);
-      // } catch (e) {
-      //     console.log(e);
-      // }
-    }
-
     handleRequestClose = () => {
       this.setState({
         openSnakeBar: false

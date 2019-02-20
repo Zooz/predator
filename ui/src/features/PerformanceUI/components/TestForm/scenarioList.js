@@ -73,7 +73,7 @@ export default (props) => {
     beforeSteps = buildStep(before.steps)
   }
   if (before) {
-    result = [<div className={style['scenario-wrapper']}>
+    result = [<div key={'before'} className={style['scenario-wrapper']}>
       <Button onClick={onChooseBefore} label={'Before'} className={classnames({ [style['button-selected']]: isBeforeSelected }, style['button'])} />
       {beforeSteps}
     </div>].concat(result);

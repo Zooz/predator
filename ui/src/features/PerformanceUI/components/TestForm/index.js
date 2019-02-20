@@ -40,7 +40,7 @@ export class TestForm extends React.Component {
   }
 
     postTest = () => {
-      const { editMode,id } = this.state;
+      const { editMode, id } = this.state;
       const { createTest, editTest } = this.props;
       if (editMode) {
         editTest(createTestRequest(this.state), id)
@@ -151,10 +151,15 @@ export class TestForm extends React.Component {
       this.setState({ isAddStepOpen: true, isAddScenarioOpen: false, isBeforeSelected: true, currentStepIndex: 0, currentScenarioIndex: null })
     };
   onDeleteStep=() => {
-    const { scenarios, currentStepIndex, before } = this.state;
+    const { scenarios, currentStepIndex, before, isBeforeSelected } = this.state;
+
     let steps = this.getStepsByCurrentState();
     steps.splice(currentStepIndex, 1);
-    this.setState({ scenarios, before, currentStepIndex });
+    if (isBeforeSelected && steps.length === 0) {
+      this.setState({ scenarios, before: undefined, currentStepIndex, isBeforeSelected: false });
+    } else {
+      this.setState({ scenarios, before, currentStepIndex });
+    }
   };
   onDuplicateStep=() => {
     const { scenarios, currentStepIndex } = this.state;
@@ -245,7 +250,7 @@ export class TestForm extends React.Component {
             />
           </div>
           <div style={{ paddingLeft: '10px', width: '100%' }}>
-            {isAddStepOpen && step && <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step} onChangeValue={this.onChangeValueOfStep} editMode={editMode}/>}
+            {isAddStepOpen && step && <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step} onChangeValue={this.onChangeValueOfStep} editMode={editMode} />}
             {isAddScenarioOpen && scenario && <AddScenarioForm allowedWeight={this.calcMaxAllowedWeight()} key={currentScenarioIndex} scenario={scenario} onChangeValue={this.onChangeValueOfScenario} />}
           </div>
         </div>

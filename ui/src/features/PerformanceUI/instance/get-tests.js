@@ -92,10 +92,10 @@ class getTests extends React.Component {
   editFormatter = (cell, row) => {
     if (row.type === 'custom') {
       return (
-          <i onClick={() => {
-            this.setState({createTest: true, testForEdit: row});
-            this.props.chooseTest(row);
-          }} className='material-icons' style={{color: '#2a3f53'}}>edit</i>
+        <i onClick={() => {
+          this.setState({ createTest: true, testForEdit: row });
+          this.props.chooseTest(row);
+        }} className='material-icons' style={{ color: '#2a3f53' }}>edit</i>
       );
     }
   };
