@@ -62,7 +62,6 @@
     "lodash": "^4.17.11",
     "material-ui": "^0.20.0",
     "moment": "^2.22.1",
-    "node-cron": "^2.0.3",
     "pretty-seconds": "^0.2.1",
     "query-string": "^6.1.0",
     "react": "^16.6.3",
