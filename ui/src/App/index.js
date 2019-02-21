@@ -10,7 +10,6 @@ import history from '../store/history';
 import { hot } from 'react-hot-loader';
 import DrawerE from '../features/PerformanceUI/components/DrawerE';
 import menuList from '../features/PerformanceUI/mainMenu';
-import { reports } from '../features/PerformanceUI/instance/redux/selectors/reportsSelector';
 
 class App extends React.Component {
     state = {
@@ -44,7 +43,8 @@ class App extends React.Component {
                 <GetReports key={props.match.params.instance} {...props} />
               )} />
             </DrawerE>
-          </ConnectedRouter>
+          </ConnectedRouter>// TODO probably need to remove redux from here.
+
         </Fragment>
 
       )
@@ -53,17 +53,11 @@ class App extends React.Component {
 
 function mapStateToProps (state) {
   return {
-    // token: token(state),
-    reports: reports(state)
+
   }
-  // TODO do we need it here?
 }
 
 const mapDispatchToProps = {
-  // addToken: action.addToken,
-  // getLastReports: Actions.getLastReports
-
-// TODO probably need to remove redux from here.
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(hot(module)(App));

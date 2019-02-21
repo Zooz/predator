@@ -4,8 +4,6 @@ import JobForm from '../JobForm';
 
 export default class DialogExampleSimple extends React.Component {
   render () {
-    // let InputForm = this.props.input;
-
     return (
       <Dialog bodyStyle={{ overflow: 'auto' }}
         title={this.props.title}

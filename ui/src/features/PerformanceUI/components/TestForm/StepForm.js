@@ -15,8 +15,8 @@ import RequestOptions from './requestOptions';
 import style from './stepform.scss';
 export default (props) => {
   const sampleObject = {
-    'currency': 'USD',
-    'amount': 5
+    'key1': 'value1',
+    'key2': ['value1', 'value2']
   };
 
   const onHeaderChange = (key, value, index) => {

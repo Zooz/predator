@@ -105,7 +105,9 @@ export class TestForm extends React.Component {
   }
   addScenarioHandler = () => {
     const { scenarios } = this.state;
-    scenarios.push({ id: uuid(), steps: [], scenario_name: 'Scenario ' + (scenarios.length + 1) });
+    const maxWeight = this.calcMaxAllowedWeight(scenarios.length);
+    console.log('maxWeight',maxWeight);
+    scenarios.push({ id: uuid(), steps: [], weight: maxWeight, scenario_name: 'Scenario ' + (scenarios.length + 1) });
     this.setState({ scenarios, isAddStepOpen: false, isAddScenarioOpen: true, currentScenarioIndex: scenarios.length - 1, isBeforeSelected: false })
   };
 
@@ -208,10 +210,11 @@ export class TestForm extends React.Component {
 
       this.setState({ scenarios, before, currentStepIndex: hoverIndex });
     };
-    calcMaxAllowedWeight = () => {
+    calcMaxAllowedWeight = (index) => {
       const { scenarios, currentScenarioIndex } = this.state;
+      const exceptIndex = index || currentScenarioIndex;
       return reduce(scenarios, (result, value, key) => {
-        if (currentScenarioIndex !== key && isNumber(value.weight)) {
+        if (exceptIndex !== key && isNumber(value.weight)) {
           result = result - value.weight;
           return result;
         } else {

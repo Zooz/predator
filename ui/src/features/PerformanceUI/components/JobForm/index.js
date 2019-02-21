@@ -13,6 +13,8 @@ import classNames from 'classnames';
 import TooltipWrapper from '../../../../components/TooltipWrapper';
 import RactangleAlignChildrenLeft from '../../../../components/RectangleAlign/RectangleAlignChildrenLeft';
 import { validate } from './validator';
+import CronViewer from './cronViewer';
+
 const inputTypes = {
   INPUT_LIST: 'INPUT_LIST',
   CHECKBOX: 'CHECKBOX',
@@ -267,6 +269,8 @@ class Form extends React.Component {
     }
 
     generateInput = (oneItem, testDetails) => {
+      const { cron_expression } = this.state;
+
       switch (oneItem.type) {
       case inputTypes.CHECKBOX:
         return (
@@ -310,16 +314,20 @@ class Form extends React.Component {
         );
       default:
         return (
-          <TextField
-            className={style.TextFieldAndCheckBoxToolTip}
-            style={{ width: oneItem.width }}
-            key={oneItem.key}
-            value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem.name)}
-            disabled={oneItem.disabled}
-            errorText={this.state.errors[oneItem.name]}
-            onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}
-            floatingLabelText={oneItem.floatingLabelText}
-            name={oneItem.name} />
+          <div>
+            <TextField
+              className={style.TextFieldAndCheckBoxToolTip}
+              style={{ width: oneItem.width }}
+              key={oneItem.key}
+              value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem.name)}
+              disabled={oneItem.disabled}
+              errorText={this.state.errors[oneItem.name]}
+              onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}
+              floatingLabelText={oneItem.floatingLabelText}
+              name={oneItem.name} />
+            {oneItem.name === 'cron_expression' && <CronViewer value={cron_expression} />}
+          </div>
+
         );
       }
     }

@@ -1,5 +1,8 @@
 import { isUndefined } from 'lodash'
+import cronstrue from 'cronstrue';
+
 import cron from 'node-cron';
+import React from 'react';
 
 export const validate = (state) => {
   const errors = {};
@@ -61,11 +64,13 @@ function cronValidator (value, allState) {
   if (allState.run_immediately) {
     return;
   }
-  if (isUndefined(value)) {
+  if (isRequired(value)) {
     return 'Required if run immediately is unchecked'
   }
-  const isValid = cron.validate(value);
-  if (!isValid) {
+
+  try {
+    cronstrue.toString(value)
+  } catch (err) {
     return 'illegal cron input'
   }
 }

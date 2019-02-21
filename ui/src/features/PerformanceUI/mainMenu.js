@@ -6,8 +6,7 @@ module.exports = [
       {
         key: 0,
         primaryText: 'View tests',
-        navigateTo: 'tests',
-        permissionNeeded: '.'
+        navigateTo: 'tests'
       }]
   },
   {
@@ -17,8 +16,7 @@ module.exports = [
       {
         key: 0,
         primaryText: 'View Jobs',
-        navigateTo: 'jobs',
-        permissionNeeded: '.'
+        navigateTo: 'jobs'
       }]
   },
   {
@@ -28,8 +26,7 @@ module.exports = [
       {
         key: 0,
         primaryText: 'Last Reports',
-        navigateTo: 'last_reports',
-        permissionNeeded: '.'
+        navigateTo: 'last_reports'
       }]
   },
   {
@@ -39,18 +36,15 @@ module.exports = [
       {
         key: 0,
         primaryText: 'Tests API',
-        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/api/blob/master/docs/swagger.yaml',
-        permissionNeeded: '.'
+        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/api/blob/master/docs/swagger.yaml'
       }, {
         key: 1,
         primaryText: 'Scheduler API',
-        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/scheduler/blob/master/docs/swagger.yaml',
-        permissionNeeded: '.'
+        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/scheduler/blob/master/docs/swagger.yaml'
       }, {
         key: 2,
         primaryText: 'Reporter API',
-        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/reporter/blob/master/docs/swagger.yaml',
-        permissionNeeded: '.'
+        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/reporter/blob/master/docs/swagger.yaml'
       }]
   }
 ];

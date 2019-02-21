@@ -15,6 +15,7 @@ import Loader from '../components/Loader';
 import classNames from 'classnames'
 import Page from '../../../components/Page';
 import { createCustomSearchField } from './utils';
+import { getTimeFromCronExpr } from './utils';
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
 const REFRESH_DATA_INTERVAL = 30000;
@@ -78,6 +79,9 @@ class getJobs extends React.Component {
         return 'N/A';
       }
     };
+    cronFormatter = (cell, row) => {
+      return getTimeFromCronExpr(row.cron_expression) || 'N/A'
+    };
 
     submitDelete = () => {
       this.props.deleteJob(this.state.jobToDelete.id);
@@ -119,11 +123,11 @@ class getJobs extends React.Component {
     };
 
     componentDidMount () {
-    this.loadPageData();
-    this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL)
+      this.loadPageData();
+      this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL)
     }
 
-    loadPageData=()=>{
+    loadPageData=() => {
       this.props.getTests();
       this.props.getAllReports();
       this.props.clearErrorOnGetJobs();
@@ -167,7 +171,7 @@ class getJobs extends React.Component {
                 <TableHeaderColumn dataField='ramp_to' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'}>Ramp To</TableHeaderColumn>
                 <TableHeaderColumn dataField='parallelism' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'}>Parallelism</TableHeaderColumn>
                 <TableHeaderColumn dataField='max_virtual_users' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'}>Max Virtual Users</TableHeaderColumn>
-                <TableHeaderColumn dataField='cron_expression' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'}>Cron Expression</TableHeaderColumn>
+                <TableHeaderColumn dataField='cron_expression' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'} dataFormat={this.cronFormatter}>Cron Expression</TableHeaderColumn>
                 <TableHeaderColumn dataField='cron_expression' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'} dataFormat={this.lastRunFormatter}>Last Run</TableHeaderColumn>
                 <TableHeaderColumn dataField='view' dataAlign='center' dataFormat={this.viewFormatter}
                   width={'50'} />
