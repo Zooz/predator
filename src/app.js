@@ -31,8 +31,15 @@ module.exports = () => {
                 res.header('Access-Control-Allow-Methods', '*');
                 next();
             });
+            // all root request are suppose to be the ui , so we put the route before the audit to avoid audit.
+            app.use(express.static('./ui/dist'));
+            app.use('/predator', function (req, res, next) {
+                res.sendFile(path.resolve('ui/dist/index.html'));
+            });
 
             app.use(bodyParser.json());
+
+
 
             app.use(audit({
                 logger: logger,
