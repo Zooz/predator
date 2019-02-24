@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS reports_stats(
+container_id uuid,
 test_id uuid,
 report_id text,
-state_id uuid,
+stats_id uuid,
 stats_time timestamp,
 phase_status text,
 data text,

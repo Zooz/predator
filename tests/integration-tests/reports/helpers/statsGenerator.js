@@ -1,11 +1,14 @@
 'use strict';
 
+const uuid = require('uuid');
+
 module.exports.generateStats = (phaseStatus) => {
     let stats;
     switch (phaseStatus) {
     case 'error':
         const error = new Error('Error thrown');
         stats = {
+            container_id: uuid(),
             phase_status: 'error',
             stats_time: Date.now().toString(),
             data: JSON.stringify({message: error.message}),
@@ -20,6 +23,7 @@ module.exports.generateStats = (phaseStatus) => {
             'index': 0
         };
         stats = {
+            container_id: uuid(),
             phase_index: startedPhaseInfo.index.toString(),
             phase_status: 'started_phase',
             stats_time: Date.now().toString(),
@@ -65,6 +69,7 @@ module.exports.generateStats = (phaseStatus) => {
             'scenariosAvoided': 0
         };
         stats = {
+            container_id: uuid(),
             phase_status: 'intermediate',
             stats_time: Date.now().toString(),
             data: JSON.stringify(intermediatePhaseInfo)
@@ -109,6 +114,7 @@ module.exports.generateStats = (phaseStatus) => {
             'scenariosAvoided': 0
         };
         stats = {
+            container_id: uuid(),
             phase_status: 'done',
             stats_time: Date.now().toString(),
             data: JSON.stringify(donePhaseInfo)
@@ -119,6 +125,7 @@ module.exports.generateStats = (phaseStatus) => {
 
         };
         stats = {
+            container_id: uuid(),
             phase_status: 'aborted',
             stats_time: Date.now().toString(),
             data: JSON.stringify(abortedPhaseInfo)

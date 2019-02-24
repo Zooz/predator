@@ -61,11 +61,6 @@ function getReportResponse(summaryRow) {
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
 
     let htmlReportUrl = serviceConfig.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
-    let grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `&var-Name=${summaryRow.test_name}&from=${new Date(summaryRow.start_time).getTime()}`);
-
-    if (summaryRow.end_time) {
-        grafanaReportUrl += `&to=${new Date(summaryRow.end_time).getTime()}`;
-    }
 
     let report = {
         test_id: summaryRow.test_id,
@@ -87,10 +82,18 @@ function getReportResponse(summaryRow) {
         status: summaryRow.status,
         last_stats: lastStats,
         html_report: htmlReportUrl,
-        grafana_report: grafanaReportUrl,
+        grafana_report: generateGraphanaUrl(summaryRow),
         notes: summaryRow.notes,
         environment: testConfiguration.environment
     };
 
     return report;
+}
+
+function generateGraphanaUrl(report) {
+    if (serviceConfig.grafanaUrl) {
+        const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
+        const grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
+        return grafanaReportUrl;
+    }
 }
