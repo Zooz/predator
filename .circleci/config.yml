@@ -90,12 +90,6 @@ jobs:
         key: dependency-cache-{{ checksum "package.json" }}
     - run: .circleci/dockerRun.sh
     - run: npm run end-to-end-tests
-  remove-docker:
-    docker:
-    - image: circleci/node:8
-    steps:
-    - checkout
-    - run: .circleci/removeDocker.sh
   release-patch:
     docker:
     - image: circleci/node:8
@@ -150,12 +144,6 @@ workflows:
     - end-to-end-tests:
         requires:
         - build
-    - remove-docker:
-        requires:
-        - end-to-end-tests
-        filters:
-          branches:
-            ignore: master
     - release-patch-approval:
         type: approval
         requires:
