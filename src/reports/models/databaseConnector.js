@@ -19,8 +19,8 @@ function insertReport(testId, revisionId, reportId, jobId, testType, startTime, 
     return databaseConnector.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes);
 }
 
-function insertStats(testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
-    return databaseConnector.insertStats(testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
+function insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
+    return databaseConnector.insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 }
 
 function updateReport(testId, reportId, status, phaseIndex, lastStats, endTime) {

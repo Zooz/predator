@@ -17,6 +17,8 @@ jobs:
   integration-tests:
     docker:
     - image: circleci/node:8
+      environment:
+        TZ: "Asia/Jerusalem"
     - image: circleci/cassandra:3.10
       environment:
         MAX_HEAP_SIZE: 2048m
