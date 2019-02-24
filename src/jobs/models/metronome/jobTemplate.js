@@ -13,6 +13,7 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
                 image: dockerImage
             },
             env: environmentVariables
-        }
+        },
+        parallelism: parallelism
     };
 };

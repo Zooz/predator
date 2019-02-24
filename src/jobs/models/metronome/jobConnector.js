@@ -12,25 +12,48 @@ if (metronomeConfig.metronomeToken) {
 }
 
 module.exports.runJob = async (metronomeJobConfig) => {
+    let parallelism = metronomeJobConfig.parallelism || 1;
+    delete metronomeJobConfig.parallelism;
     let deployJobMethod = await chooseDeployJobMethod(metronomeJobConfig);
     let deployJobResponse = await deployJob(deployJobMethod, metronomeJobConfig);
-    let runJobResponse = await runJob(metronomeJobConfig.id);
+
+    let runJobPromises = [];
+    for (let i = 0; i < parallelism; i++) {
+        runJobPromises.push(runJob(metronomeJobConfig.id));
+    }
+    await Promise.all(runJobPromises);
 
     let genericJobResponse = {
-        jobName: deployJobResponse.id,
-        id: runJobResponse.id
+        jobName: deployJobResponse.id
     };
     return genericJobResponse;
 };
 
-module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) => {
-    let url = util.format('%s/v1/jobs/%s/runs/%s/actions/stop', metronomeUrl, jobPlatformName, platformSpecificInternalRunId);
+module.exports.stopRun = async (jobPlatformName) => {
+    let url = util.format('%s/v1/jobs/%s/runs', metronomeUrl, jobPlatformName);
     let options = {
-        method: 'POST',
+        method: 'GET',
         url: url,
         headers
     };
-    await requestSender.send(options);
+
+    let currentJobRuns = await requestSender.send(options);
+
+    let stopJobPromises = [];
+    currentJobRuns.forEach((jobRun) => {
+        stopJobPromises.push(async () => {
+            let url = util.format('%s/v1/jobs/%s/runs/%s/actions/stop', metronomeUrl, jobPlatformName, jobRun.id);
+            let options = {
+                method: 'POST',
+                url: url,
+                headers
+            };
+            await requestSender.send(options);
+        });
+    });
+
+    stopJobPromises.forEach(stopJob => stopJob());
+    await Promise.all(stopJobPromises);
 };
 
 async function deployJob(method, metronomeJobConfig) {

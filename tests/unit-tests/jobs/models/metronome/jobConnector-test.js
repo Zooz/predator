@@ -37,7 +37,6 @@ describe('Metronome job connector tests', function () {
             let jobResponse = await jobConnector.runJob({ id: 'predator.id' });
 
             jobResponse.should.eql({
-                'id': '20190115084416zH0Ta',
                 'jobName': 'predator.d651ba1d-79fa-4970-b078-6f9dc4ae43e6'
             });
 
@@ -70,7 +69,6 @@ describe('Metronome job connector tests', function () {
             let jobResponse = await jobConnector.runJob({ id: 'predator.id' });
 
             jobResponse.should.eql({
-                'id': '20190115084416zH0Ta',
                 'jobName': 'predator.d651ba1d-79fa-4970-b078-6f9dc4ae43e6'
             });
 
@@ -136,11 +134,25 @@ describe('Metronome job connector tests', function () {
 
         describe('Stop running job', () => {
             it('Stop a running run of specific job', async () => {
-                requestSenderSendStub.resolves({ statusCode: 200 });
-                await jobConnector.stopRun('jobPlatformName', 'runId');
-                requestSenderSendStub.calledOnce.should.eql(true);
+                requestSenderSendStub.withArgs(sinon.match({ method: 'GET' })).resolves([{ id: 1 }, { id: 2 }]);
+                requestSenderSendStub.withArgs(sinon.match({ method: 'POST' }))
+                    .resolves({ statusCode: 200 });
+
+                await jobConnector.stopRun('jobPlatformName');
+                requestSenderSendStub.calledThrice.should.eql(true);
+
                 requestSenderSendStub.args[0][0].should.eql({
-                    'url': 'localhost:80/v1/jobs/jobPlatformName/runs/runId/actions/stop',
+                    method: 'GET',
+                    url: 'localhost:80/v1/jobs/jobPlatformName/runs',
+                    headers: {}
+                });
+                requestSenderSendStub.args[1][0].should.eql({
+                    'url': 'localhost:80/v1/jobs/jobPlatformName/runs/1/actions/stop',
+                    method: 'POST',
+                    headers: {}
+                });
+                requestSenderSendStub.args[2][0].should.eql({
+                    'url': 'localhost:80/v1/jobs/jobPlatformName/runs/2/actions/stop',
                     method: 'POST',
                     headers: {}
                 });
