@@ -39,8 +39,6 @@ module.exports = () => {
 
             app.use(bodyParser.json());
 
-
-
             app.use(audit({
                 logger: logger,
                 excludeURLs: ['health', 'predator', 'favicon.png']
