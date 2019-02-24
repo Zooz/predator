@@ -61,7 +61,7 @@ describe('Kubernetes job connector tests', function () {
             await jobConnector.stopRun('jobPlatformName', 'runId');
             requestSenderSendStub.calledOnce.should.eql(true);
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId',
+                url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId?propagationPolicy=Foreground',
                 method: 'DELETE',
                 headers: {}
             });
