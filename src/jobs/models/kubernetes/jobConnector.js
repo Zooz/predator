@@ -41,7 +41,7 @@ module.exports.runJob = async (kubernetesJobConfig) => {
     return genericJobResponse;
 };
 module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) => {
-    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
+    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
 
     let options = {
         url,
