@@ -1,10 +1,11 @@
 #!/bin/sh -e
 
 if [ "$CIRCLE_BRANCH" != "master" ] ; then
-    export TAG=branches-$CIRCLE_BRANCH
+    export TAG=predator-$CIRCLE_BRANCH
+    export IMAGE=zooz/predator-builds:$TAG
 else
     export TAG=latest
-
+    export IMAGE=zooz/predator:$TAG
 fi
 
-docker run -d -p 80:80 --env-file .circleci/serviceConfiguration.sh --name predator zooz/predator:$TAG
+docker run -d -p 80:80 --env-file .circleci/serviceConfiguration.sh --name predator $IMAGE
