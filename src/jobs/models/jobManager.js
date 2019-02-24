@@ -1,6 +1,5 @@
 'use strict';
 let logger = require('../../common/logger');
-let consts = require('../../common/consts');
 
 let uuid = require('uuid');
 let CronJob = require('cron').CronJob;
@@ -156,20 +155,16 @@ function createResponse(jobId, jobBody, runId) {
 
 function createJobRequest(jobId, runId, jobBody, dockerImage) {
     let jobName = util.format(JOB_PLATFORM_NAME, jobId);
-    let parallelism = 1;
-    let arrivalRatePerRunner = jobBody.arrival_rate;
     let rampToPerRunner = jobBody.ramp_to;
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
 
-    if (consts.KUBERNETES === config.jobPlatform || consts.DOCKER === config.jobPlatform) {
-        parallelism = jobBody.parallelism || 1;
-        arrivalRatePerRunner = Math.ceil(jobBody.arrival_rate / parallelism);
-        if (jobBody.ramp_to) {
-            rampToPerRunner = Math.ceil(jobBody.ramp_to / parallelism);
-        }
-        if (jobBody.max_virtual_users) {
-            maxVirtualUsersPerRunner = Math.ceil(jobBody.max_virtual_users / parallelism);
-        }
+    let parallelism = jobBody.parallelism || 1;
+    let arrivalRatePerRunner = Math.ceil(jobBody.arrival_rate / parallelism);
+    if (jobBody.ramp_to) {
+        rampToPerRunner = Math.ceil(jobBody.ramp_to / parallelism);
+    }
+    if (jobBody.max_virtual_users) {
+        maxVirtualUsersPerRunner = Math.ceil(jobBody.max_virtual_users / parallelism);
     }
 
     let environmentVariables = {

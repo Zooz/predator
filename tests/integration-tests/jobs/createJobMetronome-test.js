@@ -90,7 +90,11 @@ describe('Create job specific metronome tests', () => {
 
                     it('Stop run', async () => {
                         nock(metronomeConfig.metronomeUrl)
-                            .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/${jobResponseBody.run_id}/actions/stop`)
+                            .get(`/v1/jobs/predator.${jobResponseBody.id}/runs`)
+                            .reply(200, [{ id: 1 }]);
+
+                        nock(metronomeConfig.metronomeUrl)
+                            .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/1/actions/stop`)
                             .reply(200);
 
                         let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
@@ -123,6 +127,7 @@ describe('Create job specific metronome tests', () => {
                             test_id: testId,
                             arrival_rate: 1,
                             duration: 1,
+                            parallelism: 2,
                             environment: 'test',
                             run_immediately: true,
                             max_virtual_users: 100
@@ -142,7 +147,7 @@ describe('Create job specific metronome tests', () => {
                         nock(metronomeConfig.metronomeUrl).post(
                             url => {
                                 return url.startsWith('/v1/jobs') && url.endsWith('/runs');
-                            }).reply(200, {
+                            }).times(2).reply(200, {
                             id: 'runId'
                         });
 
@@ -167,7 +172,15 @@ describe('Create job specific metronome tests', () => {
 
                     it('Stop run', async () => {
                         nock(metronomeConfig.metronomeUrl)
-                            .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/${jobResponseBody.run_id}/actions/stop`)
+                            .get(`/v1/jobs/predator.${jobResponseBody.id}/runs`)
+                            .reply(200, [{ id: 1 }, { id: 2 }]);
+
+                        nock(metronomeConfig.metronomeUrl)
+                            .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/1/actions/stop`)
+                            .reply(200);
+
+                        nock(metronomeConfig.metronomeUrl)
+                            .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/2/actions/stop`)
                             .reply(200);
 
                         let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
@@ -187,29 +200,6 @@ describe('Create job specific metronome tests', () => {
                         });
 
                         should(getJobsFromService.status).eql(404);
-                    });
-                });
-            });
-
-            describe('Bad requests', () => {
-                describe('Create job with parallelism > 1 should return 400', () => {
-                    it('Create the job', async () => {
-                        let validBody = {
-                            test_id: testId,
-                            arrival_rate: 1,
-                            duration: 1,
-                            environment: 'test',
-                            run_immediately: true,
-                            max_virtual_users: 100,
-                            parallelism: 2
-                        };
-
-                        let response = await schedulerRequestCreator.createJob(validBody, {
-                            'Content-Type': 'application/json'
-                        });
-
-                        should(response.statusCode).eql(400);
-                        should(response.body.message).eql('parallelism is only supported in JOB_PLATFORM: KUBERNETES');
                     });
                 });
             });

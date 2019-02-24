@@ -1,7 +1,5 @@
 'use strict';
 const testsManager = require('../../tests/models/manager');
-const serviceConfig = require('../../config/serviceConfig');
-const consts = require('../../common/consts');
 
 module.exports.verifyJobBody = (req, res, next) => {
     let errorToThrow;
@@ -9,11 +7,7 @@ module.exports.verifyJobBody = (req, res, next) => {
     if (!(jobBody.run_immediately || jobBody.cron_expression)) {
         errorToThrow = new Error('Please provide run_immediately or cron_expression in order to schedule a job');
         errorToThrow.statusCode = 400;
-    } else if (serviceConfig.jobPlatform !== consts.KUBERNETES && serviceConfig.jobPlatform !== consts.DOCKER && jobBody.parallelism > 1) {
-        errorToThrow = new Error(`parallelism is only supported in JOB_PLATFORM: ${consts.KUBERNETES}`);
-        errorToThrow.statusCode = 400;
     }
-
     next(errorToThrow);
 };
 
