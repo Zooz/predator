@@ -14,6 +14,20 @@ jobs:
         key: dependency-cache-{{ checksum "package.json" }}
         paths:
         - node_modules
+  unit-tests:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      #      - run: npm audit
+      - run: npm run lint
+      - run: npm run unit-tests
+      - store_artifacts:
+          path: ./coverage
   integration-tests:
     docker:
     - image: circleci/node:8
@@ -36,11 +50,6 @@ jobs:
         docker_layer_caching: true
     - restore_cache:
         key: dependency-cache-{{ checksum "package.json" }}
-    #      - run: npm audit
-    - run: npm run lint
-    - run: npm run unit-tests
-    - store_artifacts:
-        path: ./coverage
     - run:
         name: Integration tests with docker engine and sqlite configuration
         command: npm run integration-tests
@@ -102,7 +111,7 @@ jobs:
     - add_ssh_keys:
         fingerprints:
         - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-    - run: .circleci/release-patch.sh
+    - run: .circleci/releasePatch.sh
   release-minor:
     docker:
     - image: circleci/node:8
@@ -115,7 +124,7 @@ jobs:
     - add_ssh_keys:
         fingerprints:
         - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-    - run: .circleci/release-minor.sh
+    - run: .circleci/releaseMinor.sh
   release-major:
     docker:
     - image: circleci/node:8
@@ -128,16 +137,19 @@ jobs:
     - add_ssh_keys:
         fingerprints:
         - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-    - run: .circleci/release-major.sh
+    - run: .circleci/releaseMajor.sh
 
 workflows:
   version: 2
   test_build_and_release:
     jobs:
     - setup
-    - integration-tests:
+    - unit-tests:
         requires:
         - setup
+    - integration-tests:
+        requires:
+        - unit-tests
     - build:
         requires:
         - integration-tests
