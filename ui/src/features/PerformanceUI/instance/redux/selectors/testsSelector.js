@@ -1,0 +1,10 @@
+export const tests = (state) => state.TestsReducer.get('tests');
+export const errorOnGetTests = (state) => state.TestsReducer.get('error_get_tests');
+export const errorOnCreateTest = (state) => state.TestsReducer.get('error_create_test');
+export const createTestSuccess = (state) => state.TestsReducer.get('create_test_success');
+export const test = (state) => state.TestsReducer.get('test');
+export const errorOnGetTest = (state) => state.TestsReducer.get('error_get_test');
+export const processingGetTests = (state) => state.TestsReducer.get('processing_get_tests');
+export const processingDeleteTest = (state) => state.TestsReducer.get('processing_delete_test');
+export const deleteTestSuccess = (state) => state.TestsReducer.get('delete_test_success');
+export const isLoading = (state) => state.TestsReducer.get('isLoading');

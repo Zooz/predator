@@ -1,6 +1,7 @@
 'use strict';
 
 let databaseConnector = require('./databaseConnector');
+let jobConnector = require('../../jobs/models/jobManager');
 let serviceConfig = require('../../config/serviceConfig');
 let statsConsumer = require('./statsConsumer');
 
@@ -31,9 +32,20 @@ module.exports.getLastReports = async (limit) => {
 
 module.exports.postReport = async (testId, reportBody) => {
     const startTime = new Date(Number(reportBody.start_time));
+    const job = await jobConnector.getJob(reportBody.job_id);
+
+    const testConfiguration = {
+        arrival_rate: job.arrival_rate,
+        duration: job.duration,
+        ramp_to: job.ramp_to,
+        parallelism: job.parallelism,
+        max_virtual_users: job.max_virtual_users,
+        environment: job.environment
+    };
+
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, startTime, reportBody.test_name,
-        reportBody.test_description, JSON.stringify(reportBody.test_configuration), reportBody.notes);
+        reportBody.test_description, JSON.stringify(testConfiguration), job.notes);
     return reportBody;
 };
 
@@ -48,8 +60,8 @@ function getReportResponse(summaryRow) {
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
 
-    let htmlReportUrl = serviceConfig.externalAddress + `/v1/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
-    let grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `?var-Name=${summaryRow.test_name}&from=${new Date(summaryRow.start_time).getTime()}`);
+    let htmlReportUrl = serviceConfig.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
+    let grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `&var-Name=${summaryRow.test_name}&from=${new Date(summaryRow.start_time).getTime()}`);
 
     if (summaryRow.end_time) {
         grafanaReportUrl += `&to=${new Date(summaryRow.end_time).getTime()}`;
@@ -70,6 +82,8 @@ function getReportResponse(summaryRow) {
         arrival_rate: testConfiguration.arrival_rate,
         duration: testConfiguration.duration,
         ramp_to: testConfiguration.ramp_to,
+        parallelism: testConfiguration.parallelism,
+        max_virtual_users: testConfiguration.max_virtual_users,
         status: summaryRow.status,
         last_stats: lastStats,
         html_report: htmlReportUrl,

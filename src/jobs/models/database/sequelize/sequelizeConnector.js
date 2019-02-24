@@ -30,6 +30,7 @@ async function insertJob(jobId, jobInfo) {
         ramp_to: jobInfo.ramp_to,
         parallelism: jobInfo.parallelism,
         max_virtual_users: jobInfo.max_virtual_users,
+        notes: jobInfo.notes,
         webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => {
             return { id: uuid(), url: webhookUrl };
         }) : undefined,
@@ -160,6 +161,9 @@ async function initSchemas() {
         },
         max_virtual_users: {
             type: Sequelize.DataTypes.INTEGER
+        },
+        notes: {
+            type: Sequelize.DataTypes.STRING
         }
     });
 

@@ -594,7 +594,8 @@ describe('Manager tests', function () {
                 cron_expression: '* * * * *',
                 emails: null,
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1'
+                ramp_to: '1',
+                notes: 'some notes'
             },
             {
                 id: 'id2',
@@ -605,7 +606,8 @@ describe('Manager tests', function () {
                 cron_expression: null,
                 emails: ['eli@eli.eli'],
                 webhooks: null,
-                ramp_to: '1'
+                ramp_to: '1',
+                notes: 'some other notes'
             }]
             );
 
@@ -621,7 +623,8 @@ describe('Manager tests', function () {
                 custom_env_vars: undefined,
                 max_virtual_users: undefined,
                 parallelism: undefined,
-                run_id: undefined
+                run_id: undefined,
+                notes: 'some notes'
             }, {
                 id: 'id2',
                 test_id: 'test_id2',
@@ -633,7 +636,8 @@ describe('Manager tests', function () {
                 custom_env_vars: undefined,
                 max_virtual_users: undefined,
                 parallelism: undefined,
-                run_id: undefined
+                run_id: undefined,
+                notes: 'some other notes'
             }];
             let jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
@@ -650,7 +654,7 @@ describe('Manager tests', function () {
                 cron_expression: '* * * * *',
                 emails: null,
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1',
+                ramp_to: '1'
             },
             {
                 id: 'id2',
@@ -677,7 +681,8 @@ describe('Manager tests', function () {
                 custom_env_vars: undefined,
                 max_virtual_users: undefined,
                 parallelism: undefined,
-                run_id: undefined
+                run_id: undefined,
+                notes: undefined
             }];
             let jobs = await manager.getJobs();
             jobs.should.eql(expectedResult);
@@ -717,7 +722,9 @@ describe('Manager tests', function () {
                 cron_expression: '* * * * *',
                 emails: null,
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1'
+                ramp_to: '1',
+                notes: 'some nice notes'
+
             }]);
 
             let expectedResult = {
@@ -732,7 +739,8 @@ describe('Manager tests', function () {
                 custom_env_vars: undefined,
                 max_virtual_users: undefined,
                 parallelism: undefined,
-                run_id: undefined
+                run_id: undefined,
+                notes: 'some nice notes'
             };
 
             let job = await manager.getJob('id');

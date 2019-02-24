@@ -12,7 +12,7 @@ const testsRequestCreator = require('../tests/helpers/requestCreator');
 
 const mailhogHelper = require('./mailhog/mailhogHelper');
 
-let testId, reportId, jobId, minimalReportBody;
+let testId, reportId, jobId, jobBody, minimalReportBody;
 
 describe('Integration tests for the reports api', function() {
     this.timeout(10000);
@@ -54,11 +54,12 @@ describe('Integration tests for the reports api', function() {
             describe('Create report with minimal fields and notes', async () => {
                 before(async () => {
                     const jobResponse = await createJob(testId);
+                    jobBody = jobResponse.body;
                     jobId = jobResponse.body.id;
                 });
 
                 it('should successfully create report', async () => {
-                    let reportBody = Object.assign({ notes: 'My first performance test' }, minimalReportBody);
+                    let reportBody = minimalReportBody;
                     reportBody.job_id = jobId;
                     const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                     should(reportResponse.statusCode).be.eql(201);
@@ -67,7 +68,11 @@ describe('Integration tests for the reports api', function() {
                     let report = getReportResponse.body;
                     should(report.status).eql('initialized');
                     should(report.last_stats).eql({});
-                    should(report.notes).eql(reportBody.notes);
+                    should(report.notes).eql(jobBody.notes);
+                    should(report.max_virtual_users).eql(jobBody.max_virtual_users);
+                    should(report.arrival_rate).eql(jobBody.arrival_rate);
+                    should(report.duration).eql(jobBody.duration);
+                    should(report.ramp_to).eql(jobBody.ramp_to);
                 });
             });
 
@@ -89,7 +94,7 @@ describe('Integration tests for the reports api', function() {
 
                     should(report.status).eql('initialized');
                     should(report.last_stats).eql({});
-                    should(report.notes).eql('');
+                    should(report.notes).eql(jobBody.notes);
                 });
             });
 
@@ -110,7 +115,7 @@ describe('Integration tests for the reports api', function() {
 
                     should(report.status).eql('initialized');
                     should(report.last_stats).eql({});
-                    should(report.notes).eql('');
+                    should(report.notes).eql(jobBody.notes);
                 });
             });
         });
@@ -352,8 +357,7 @@ describe('Integration tests for the reports api', function() {
                         'body should have required property \'job_id\'',
                         'body should have required property \'test_name\'',
                         'body should have required property \'test_description\'',
-                        'body should have required property \'start_time\'',
-                        'body should have required property \'test_configuration\''
+                        'body should have required property \'start_time\''
                     ]
                 });
             });
@@ -427,7 +431,7 @@ function validateFinishedReport(report, expectedValues = {}) {
 
     should.exist(report.duration_seconds);
     should.exist(report.avg_response_time_ms);
-    should(report.arrival_rate).eql(20);
+    should(report.arrival_rate).eql(10);
     should(report.duration).eql(10);
 
     validateLastStats(report.last_stats);
@@ -451,7 +455,9 @@ function createJob(testId, emails, webhooks) {
         arrival_rate: 10,
         duration: 10,
         environment: 'test',
-        cron_expression: '0 0 1 * *'
+        cron_expression: '0 0 1 * *',
+        notes: 'My first performance test',
+        max_virtual_users: 500
     };
 
     if (emails) {

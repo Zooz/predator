@@ -47,6 +47,7 @@ tolerations: []
 
 affinity: {}
 
+apiVersion: v1
 JOB_PLATFORM: KUBERNETES
 KUBERNETES_URL: https://kubernetes.default.svc
 KUBERNETES_TOKEN:
@@ -57,7 +58,6 @@ DATABASE_ADDRESS:
 DATABASE_PASSWORD:
 DATABASE_USERNAME:
 
-MY_ADDRESS:
 DOCKER_NAME: zooz/predator-runner:latest
 
 INTERNAL_ADDRESS:

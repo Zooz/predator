@@ -141,7 +141,8 @@ function createResponse(jobId, jobBody, runId) {
         run_id: runId,
         arrival_rate: jobBody.arrival_rate,
         duration: jobBody.duration,
-        environment: jobBody.environment
+        environment: jobBody.environment,
+        notes: jobBody.notes
     };
 
     Object.keys(response).forEach(key => {

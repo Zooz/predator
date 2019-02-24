@@ -13,6 +13,7 @@ let audit = require('express-requests-logger');
 let bodyParser = require('body-parser');
 let database = require('./database/database');
 let schedulerJobManager = require('./jobs/models/jobManager');
+let path = require('path');
 
 module.exports = () => {
     return swaggerValidator.init('./docs/swagger.yaml', { beautifyErrors: true })
@@ -20,7 +21,8 @@ module.exports = () => {
             return database.init();
         }).then(() => {
             return schedulerJobManager.reloadCronJobs();
-        }).then(() => {
+        })
+        .then(() => {
             let app = express();
 
             app.use(function (req, res, next) {
@@ -34,7 +36,7 @@ module.exports = () => {
 
             app.use(audit({
                 logger: logger,
-                excludeURLs: ['health']
+                excludeURLs: ['health', 'predator', 'favicon.png']
             }));
 
             app.use('/health', healthRouter);
@@ -42,7 +44,10 @@ module.exports = () => {
             app.use('/v1/dsl', dslRouter);
             app.use('/v1/tests', reportsRouter);
             app.use('/v1/tests', testsRouter);
-
+            app.use(express.static('./ui/dist'));
+            app.use('/predator', function (req, res, next) {
+                res.sendFile(path.resolve('ui/dist/index.html'));
+            });
             app.use(function (err, req, res, next) {
                 if (err instanceof swaggerValidator.InputValidationError) {
                     res.status(400).json({ message: 'Input validation error', validation_errors: err.errors });
