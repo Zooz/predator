@@ -40,7 +40,7 @@ module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafana
     let htmlBody = generateReportFromTemplate(testName, testInfo, grafanaUrl, reportUrl, finalStats);
 
     const mailOptions = {
-        from: 'Performance Framework 💪 <performance@paymentsos.com>',
+        from: 'Predator 💪 <performance@predator.com>',
         to: [emails].join(','),
         html: htmlBody,
         subject: `Your test results: ${testName}`

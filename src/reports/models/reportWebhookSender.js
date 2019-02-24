@@ -3,7 +3,7 @@
 let request = require('request-promise-native');
 
 let logger = require('../../common/logger');
-let reportModel = require('./reportsManager');
+let reportManager = require('./reportsManager');
 
 module.exports.send = async (testId, reportId, message, webhooks) => {
     let options = {
@@ -19,9 +19,9 @@ module.exports.send = async (testId, reportId, message, webhooks) => {
     if (!webhooks) {
         let report;
         try {
-            report = await reportModel.getReport(testId, reportId);
+            report = await reportManager.getReport(testId, reportId);
         } catch (error) {
-            let errorMessage = `Failed to retrieve summary for testId: ${testId}, reportId: ${reportId}`;
+            let errorMessage = `Failed to retrieve report for testId: ${testId}, reportId: ${reportId}`;
             logger.error(error, errorMessage);
             return Promise.reject(new Error(errorMessage));
         }

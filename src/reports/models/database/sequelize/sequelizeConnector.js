@@ -41,9 +41,10 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, start
     return report.findOrCreate({ where: { report_id: reportId }, defaults: params });
 }
 
-async function insertStats(testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
+async function insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
     const stats = client.model('stats');
     const params = {
+        container_id: containerId,
         report_id: reportId,
         test_id: testId,
         stat_id: statId,

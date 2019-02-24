@@ -9,7 +9,7 @@ const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET status=?, phase=?, las
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=? AND report_type=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=? AND report_type=?';
 const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports LIMIT ?';
-const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(test_id, report_id, state_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?)';
+const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(container_id, test_id, report_id, stat_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
 const GET_REPORT_STATS = 'SELECT * FROM reports_stats WHERE test_id=? AND report_id=?';
 
 module.exports = {
@@ -63,9 +63,9 @@ function getLastReports(limit) {
     return executeQuery(GET_LAST_SUMMARIES, params, queryOptions);
 }
 
-function insertStats(testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
+function insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
     let params;
-    params = [testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data];
+    params = [containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data];
     return executeQuery(INSERT_REPORT_STATS, params, queryOptions);
 }
 
