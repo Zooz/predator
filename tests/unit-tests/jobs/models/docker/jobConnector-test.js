@@ -5,7 +5,7 @@ let rewire = require('rewire');
 let jobConnector = rewire('../../../../../src/jobs/models/docker/jobConnector');
 describe('Docker job connector tests', function () {
     let sandbox, createContainerStub, listContainersStub, getContainerStub, containerStopStub,
-        startContainerStub;
+        startContainerStub, pullStub, modemStub, followProgressStub;
 
     let dockerJobConfig = {
         environmentVariables: {
@@ -37,10 +37,20 @@ describe('Docker job connector tests', function () {
 
         getContainerStub.resolves({ stop: containerStopStub });
 
+        pullStub = sandbox.stub();
+
+        followProgressStub = sandbox.stub();
+        followProgressStub.yields();
+        modemStub = {
+            followProgress: followProgressStub
+        };
+
         jobConnector.__set__('docker', {
             createContainer: createContainerStub,
             listContainers: listContainersStub,
-            getContainer: getContainerStub
+            getContainer: getContainerStub,
+            pull: pullStub,
+            modem: modemStub
         });
     });
 
@@ -52,6 +62,9 @@ describe('Docker job connector tests', function () {
         it('Success to create a job and running it immediately, parallelism is 3', async () => {
             dockerJobConfig.parallelism = 3;
             let jobResponse = await jobConnector.runJob(dockerJobConfig);
+
+            should(pullStub.callCount).eql(1);
+            should(pullStub.args[0][0]).eql('image');
 
             should(createContainerStub.callCount).eql(3);
 
@@ -94,6 +107,17 @@ describe('Docker job connector tests', function () {
 
             createContainerStub.callCount.should.eql(1);
             startContainerStub.callCount.should.eql(1);
+        });
+
+        it('Fail to create a job - error on pulling image', async () => {
+            followProgressStub.yields(new Error('Failure pulling image'));
+
+            try {
+                await jobConnector.runJob(dockerJobConfig);
+                throw new Error('Should not get here');
+            } catch (error) {
+                error.should.eql(new Error('Failure pulling image'));
+            }
         });
 
         it('Fail to create a job - error on create containers', async () => {

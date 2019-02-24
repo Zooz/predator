@@ -42,9 +42,6 @@ jobs:
     - store_artifacts:
         path: ./coverage
     - run:
-        name: pull zooz/predator-runner:latest
-        command: ssh remote-docker \ docker pull zooz/predator-runner:latest
-    - run:
         name: Integration tests with docker engine and sqlite configuration
         command: npm run integration-tests
         environment:
