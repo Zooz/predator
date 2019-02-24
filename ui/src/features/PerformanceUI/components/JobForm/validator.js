@@ -1,7 +1,6 @@
 import { isUndefined } from 'lodash'
 import cronstrue from 'cronstrue';
 
-import cron from 'node-cron';
 import React from 'react';
 
 export const validate = (state) => {
