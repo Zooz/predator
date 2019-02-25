@@ -13,7 +13,8 @@
     "end-to-end-tests": "bash ./tests/end-to-end-tests/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh",
     "lint": "eslint src/**",
-    "release": "standard-version"
+    "release": "standard-version",
+    "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
   },
   "repository": {
     "type": "git",
