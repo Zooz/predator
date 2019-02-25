@@ -140,7 +140,7 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING
         },
         container_id: {
-            type: Sequelize.DataTypes.UUID
+            type: Sequelize.DataTypes.STRING
         },
         stats_time: {
             type: Sequelize.DataTypes.DATE
