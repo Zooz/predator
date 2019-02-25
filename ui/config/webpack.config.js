@@ -29,6 +29,6 @@ module.exports = {
       PERFORMANCE_FRAMEWORK_BUCKET_PATH: process.env.PERFORMANCE_FRAMEWORK_BUCKET_PATH
     }),
     new webpack.NamedModulesPlugin(),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'PERFORMANCE_FRAMEWORK_BUCKET_PATH','PERFORMANCE_FRAMEWORK_API_URL'])
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'PREDATOR_BUCKET_PATH', 'PREDATOR_URL'])
   ]
 };
