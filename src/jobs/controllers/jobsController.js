@@ -54,13 +54,13 @@ module.exports.deleteJob = function(req, res) {
         });
 };
 
-module.exports.stopRun = function(req, res) {
+module.exports.stopRun = function (req, res, next) {
     return jobManager.stopRun(req.params.job_id, req.params.run_id)
         .then(function(){
             return res.status(204).json();
         })
         .catch(function(err){
-            return handleError(err, res);
+            return next(err);
         });
 };
 

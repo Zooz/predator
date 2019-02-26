@@ -5,6 +5,7 @@ let logger = require('./common/logger');
 let healthRouter = require('./common/routes/healthRoute.js');
 let jobsRouter = require('./jobs/routes/jobsRoute.js');
 let reportsRouter = require('./reports/routes/reportsRoute.js');
+let configRouter = require('./configManager/routes/configRoute.js');
 let dslRouter = require('./tests/routes/dslRoute.js');
 let testsRouter = require('./tests/routes/testsRoute.js');
 
@@ -44,6 +45,7 @@ module.exports = () => {
                 excludeURLs: ['health', 'predator', 'favicon.png']
             }));
 
+            app.use('/v1/config', configRouter);
             app.use('/health', healthRouter);
             app.use('/v1/jobs', jobsRouter);
             app.use('/v1/dsl', dslRouter);
