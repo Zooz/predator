@@ -69,7 +69,7 @@ function buildStepsFromFlow (flow) {
     return {
       id: uuid(),
       method: method.toUpperCase(),
-      body: request[method].body,
+      body: request[method].json,
       gzip: request[method].gzip,
       forever: request[method].forever,
       url: request[method].url,
@@ -109,7 +109,6 @@ function prepareFlow (steps) {
     return {
       [step.method.toLowerCase()]: {
         url: step.url,
-        body: step.body,
         headers: prepareHeadersFromArray(step.headers),
         json: step.body,
         capture: prepareCapture(step.captures),
