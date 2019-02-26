@@ -18,7 +18,7 @@ export const createTestRequest = (data) => {
       config: {
         target: baseUrl
       },
-      before: before ? { steps: prepareFlow(before.steps) } : undefined,
+      before: before ? { flow: prepareFlow(before.steps) } : undefined,
       scenarios: scenariosRequest
     }
   }
@@ -43,7 +43,7 @@ function testBeforeToStateBefore (before) {
     return;
   }
   return {
-    steps: buildStepsFromFlow(before.steps)
+    steps: buildStepsFromFlow(before.flow)
   }
 }
 function testScenarioToTestScenario (testScenarios) {
