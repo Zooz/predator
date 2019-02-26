@@ -1,7 +1,7 @@
 {
-  "name": "performance-framework",
+  "name": "predator",
   "version": "1.0.0",
-  "description": "Performance Framework UI",
+  "description": "Predator UI",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.zooz.co:Web-Applications/admin-tools/apps/performance-framework.git"
+    "url": "git+https://github.com/Zooz/predator.git"
   },
   "author": "",
   "license": "ISC",
