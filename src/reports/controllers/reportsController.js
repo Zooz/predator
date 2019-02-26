@@ -55,7 +55,7 @@ module.exports.postReport = async (req, res, next) => {
         return next(err);
     }
 
-    return res.status(201).json(report.id);
+    return res.status(201).json(report.report_id);
 };
 
 module.exports.postStats = async (req, res, next) => {
