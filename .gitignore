@@ -9,3 +9,4 @@ mochawesome-report/*
 .nyc_output
 *.log
 *.sqlite
+docs/devguide/site
