@@ -5,9 +5,10 @@ site_name: Predator
 
 nav:
   - About: index.md
-  - Getting Started: installation.md
-  - Tests: tests.md
-  - Jobs: jobs.md
+  - Installation: installation.md
+  - My First Test: myfirsttest.md
+  - Advanced Test Setup: tests.md
+  - Schedules: schedules.md
   - Reports: reports.md
   - Contributing: contributing.md
 
