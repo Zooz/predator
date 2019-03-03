@@ -65,7 +65,10 @@ With all scenarios in place, let's go ahead and run the test.
 
 <!-- A job executes a test at predefined intervals. When defining a test, you can specify a number of parameters such as the frequency at which the test will be executed, the number of scenarios that will be executed per second and so forth. -->
 
-Predator executes tests through so-called **jobs**. To create a job, choose **Tests** > **View tests**. Then click **RUN** for the test you want to execute and complete all fields in the **Create new job** dialog. When done, click **SUBMIT**. Depending on your configuration, the test will either execute immediately or at scheduled intervals.
+Predator executes tests through so-called **jobs**. To create a job, choose **Tests** > **View tests**. Then click **RUN** for the test you want to execute and complete all fields in the **Create new job** dialog. When done, click **SUBMIT**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
+
+!!! note
+    To see the intervals at which your jobs will run, see [Viewing Scheduled Tasks]().
 
 The following table explains the job parameters you can configure:
 
@@ -76,47 +79,47 @@ The following table explains the job parameters you can configure:
     </tr>
     <tr>
       <td>Notes</td>
-      <td>bla</td> 
+      <td>Free text describing the job.</td> 
     </tr>
     <tr>
       <td>Arrival rate</td>
-      <td>bla</td> 
+      <td>The number of times per second that the test scenarios will run.</td> 
     </tr>
     <tr>
       <td>Duration (seconds)</td>
-      <td>bla</td> 
+      <td>The time during which the test will run. In seconds.</td> 
     </tr>
     <tr>
       <td>Ramp to</td>
-      <td>bla</td> 
+      <td>Used in combination with the <b>arrival rate</b> and <b>duration</b> values. Increases the arrival rate linearly to the value specified, within the specified duration.</td> 
     </tr>
     <tr>
       <td>Parallelism</td>
-      <td>bla</td> 
+      <td>The number of runners that will be allocated to executing the test. The <b>arrival rate</b>, <b>duration</b> and <b>Max virtual users</b> will be split between the specified number of runners.</td> 
     </tr>
     <tr>
       <td>Max virtual users</td>
-      <td>bla</td> 
+      <td>The maximum number of virtual users executing the scenario requests. This places a threshold on the number of requests that can exist simultaneously.</td> 
     </tr>
     <tr>
       <td>Environment</td>
-      <td>bla</td> 
+      <td>Free text describing the environment against which the test is executed.</td> 
     </tr>
     <tr>
       <td>Cron expression</td>
-      <td>bla</td> 
+      <td>A cron expression for scheduling the test to run periodically at a specified date/time. </td> 
     </tr>
     <tr>
       <td>Run immediately</td>
-      <td>bla</td> 
+      <td>If checked, the test will execute immediately when the job is saved.</td> 
     </tr>
     <tr>
       <td>New Email</td>
-      <td>bla</td> 
+      <td>An email address to which Predator will send a message when the test execution is completed.</td> 
     </tr>
     <tr>
       <td>New Webhook</td>
-      <td>bla</td> 
+      <td>ask Niv</td> 
     </tr>
   </table>
 
