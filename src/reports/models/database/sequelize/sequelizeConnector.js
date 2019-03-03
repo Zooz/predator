@@ -11,7 +11,9 @@ module.exports = {
     getReport,
     getReports,
     getLastReports,
-    getStats
+    getStats,
+    subscribeRunner,
+    updateSubscribers
 };
 
 async function init(sequlizeClient) {
@@ -35,16 +37,17 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, start
         notes: notes || '',
         phase: '0',
         status: 'initialized',
-        test_configuration: testConfiguration
+        test_configuration: testConfiguration,
+        runners_subscribed: []
     };
 
     return report.findOrCreate({ where: { report_id: reportId }, defaults: params });
 }
 
-async function insertStats(containerId, testId, reportId, statsId, statsTime, phaseIndex, phaseStatus, data) {
+async function insertStats(runnerId, testId, reportId, statsId, statsTime, phaseIndex, phaseStatus, data) {
     const stats = client.model('stats');
     const params = {
-        container_id: containerId,
+        runner_id: runnerId,
         report_id: reportId,
         test_id: testId,
         stats_id: statsId,
@@ -74,11 +77,57 @@ async function updateReport(testId, reportId, status, phaseIndex, lastStats, end
     }, options);
 }
 
+async function subscribeRunner(testId, reportId, runnerId) {
+    try {
+        const newSubscriber = {
+            runner_id: runnerId,
+            stage: 'initializing'
+        };
+
+        const reportModel = client.model('report');
+        const options = {
+            where: {
+                test_id: testId,
+                report_id: reportId
+            }
+        };
+
+        let report = await reportModel.findAll(options);
+        report = report[0];
+
+        await report.createSubscriber(newSubscriber);
+    } catch (e) {
+        console.log(e, `Failed to subscribe runner ${runnerId}`);
+    }
+}
+
+async function updateSubscribers(testId, reportId, runnerId, stage) {
+    const reportModel = client.model('report');
+    const getReportOptions = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+
+    let report = await reportModel.findAll(getReportOptions);
+    report = report[0];
+
+    const subscribers = await report.getSubscribers();
+    const subscriberToUpdate = await subscribers.find((subscriber) => {
+        return subscriber.dataValues.runner_id === runnerId;
+    });
+
+    await subscriberToUpdate.set('stage', stage);
+    return subscriberToUpdate.save();
+}
+
 async function getReportsAndParse(query) {
     const report = client.model('report');
 
     let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: { exclude: ['updated_at', 'created_at'] },
+        include: [report.subscriber]
     };
 
     Object.assign(options, query);
@@ -86,6 +135,14 @@ async function getReportsAndParse(query) {
     const allReportsRawResponse = await report.findAll(options);
     let allReports = allReportsRawResponse.map(rawReport => rawReport.dataValues);
 
+    allReports.forEach(report => {
+        report.subscribers = report.subscribers.map((sqlJob) => {
+            return {
+                runner_id: sqlJob.dataValues.runner_id,
+                stage: sqlJob.dataValues.stage
+            };
+        });
+    });
     return allReports;
 }
 
@@ -139,8 +196,8 @@ async function initSchemas() {
         report_id: {
             type: Sequelize.DataTypes.STRING
         },
-        container_id: {
-            type: Sequelize.DataTypes.STRING
+        runner_id: {
+            type: Sequelize.DataTypes.UUID
         },
         stats_time: {
             type: Sequelize.DataTypes.DATE
@@ -153,6 +210,16 @@ async function initSchemas() {
         },
         data: {
             type: Sequelize.DataTypes.TEXT('long')
+        }
+    });
+
+    const subscriber = client.define('subscriber', {
+        runner_id: {
+            type: Sequelize.DataTypes.STRING,
+            primaryKey: true
+        },
+        stage: {
+            type: Sequelize.DataTypes.STRING
         }
     });
 
@@ -205,6 +272,8 @@ async function initSchemas() {
         }
     });
 
+    report.subscriber = report.hasMany(subscriber);
     await report.sync();
     await stats.sync();
+    await subscriber.sync();
 }

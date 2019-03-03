@@ -12,15 +12,17 @@ module.exports = {
     getReport,
     getReports,
     getLastReports,
-    getStats
+    getStats,
+    subscribeRunner,
+    updateSubscribers
 };
 
 function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
     return databaseConnector.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes);
 }
 
-function insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
-    return databaseConnector.insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
+function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
+    return databaseConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 }
 
 function updateReport(testId, reportId, status, phaseIndex, lastStats, endTime) {
@@ -41,4 +43,12 @@ function getReport(testId, reportId) {
 
 function getStats(testId, reportId) {
     return databaseConnector.getStats(testId, reportId);
+}
+
+function subscribeRunner(testId, reportId, runnerId) {
+    return databaseConnector.subscribeRunner(testId, reportId, runnerId);
+}
+
+function updateSubscribers(testId, reportId, runnerId, stage) {
+    return databaseConnector.updateSubscribers(testId, reportId, runnerId, stage);
 }

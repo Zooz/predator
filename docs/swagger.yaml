@@ -948,6 +948,7 @@ definitions:
     - test_name
     - test_description
     - start_time
+    - runner_id
     properties:
       report_id:
         type: string
@@ -976,6 +977,9 @@ definitions:
       notes:
         type: string
         description: notes about the test
+      runner_id:
+        type: string
+        description: the id of the runner that created the report
 
   post_report_response:
     required:

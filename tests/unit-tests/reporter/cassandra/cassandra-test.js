@@ -187,7 +187,7 @@ describe('Cassandra client tests', function() {
     });
 
     describe('Insert new stats', function(){
-        const containerId = uuid();
+        const runnerId = uuid();
         const statId = uuid();
         const statsTime = new Date().getTime();
         const phaseIndex = uuid(0);
@@ -196,12 +196,12 @@ describe('Cassandra client tests', function() {
 
         it('should succeed simple insert', function(){
             clientExecuteStub.resolves({ result: { rowLength: 0 } });
-            let query = 'INSERT INTO reports_stats(container_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
-            return cassandraClient.insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data)
+            let query = 'INSERT INTO reports_stats(runner_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
+            return cassandraClient.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data)
                 .then(function(){
                     loggerErrorStub.callCount.should.eql(0);
                     clientExecuteStub.getCall(0).args[0].should.eql(query);
-                    clientExecuteStub.getCall(0).args[1][0].should.eql(containerId);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql(runnerId);
                     clientExecuteStub.getCall(0).args[1][1].should.eql(testId);
                     clientExecuteStub.getCall(0).args[1][2].should.eql(reportId);
                     clientExecuteStub.getCall(0).args[1][3].should.eql(statId);
@@ -210,7 +210,7 @@ describe('Cassandra client tests', function() {
 
         it('should log error for failing inserting new report', function(){
             clientExecuteStub.rejects();
-            return cassandraClient.insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data)
+            return cassandraClient.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data)
                 .catch(function(){
                     loggerErrorStub.callCount.should.eql(1);
                 });

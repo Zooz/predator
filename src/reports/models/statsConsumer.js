@@ -47,7 +47,7 @@ module.exports.handleMessage = async (testId, reportId, stats) => {
 };
 
 async function handleError(report, job, stats, statsTime) {
-    await databaseConnector.updateReport(report.test_id, report.report_id, 'failed', report.phase, stats.data, statsTime);
+    await reportsManager.updateReport(report, 'failed', stats, statsTime);
     const webhookMessage = `😞 *Test with id: ${report.test_id} Failed*.\ntest configuration:\nenvironment: ${report.environment}\n${stats.data}`;
     if (job.webhooks) {
         reportWebhookSender.send(report.test_id, report.report_id, webhookMessage, job.webhooks);
@@ -63,7 +63,7 @@ async function handleStart(report, job, stats) {
         webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n
          *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${parallelism}${rampToMessage}`;
     }
-    await databaseConnector.updateReport(report.test_id, report.report_id, reportStatus, stats.phase_index, undefined, undefined);
+    await reportsManager.updateReport(report, reportStatus, stats);
     if (job.webhooks && webhookMessage) {
         reportWebhookSender.send(report.test_id, report.report_id, webhookMessage, job.webhooks);
     }
@@ -71,10 +71,10 @@ async function handleStart(report, job, stats) {
 
 async function handleIntermediate(report, job, stats, statsTime, statsData) {
     let webhookMessage;
-    await databaseConnector.updateReport(report.test_id, report.report_id, 'in_progress', report.phase, stats.data, undefined);
-    await databaseConnector.insertStats(stats.container_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'intermediate', stats.data);
+    await reportsManager.updateReport(report, 'in_progress', stats, statsTime);
+    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'intermediate', stats.data);
 
-    if (report && report.status === ('started')) {
+    if (report && report.status === 'started') {
         let htmlReportUrl = serviceConfig.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
         const phaseIndex = report.phase;
         webhookMessage = `🤔 *Test ${report.test_name} with id: ${report.test_id} first batch of results arrived for phase ${phaseIndex}.*\n${statsFromatter.getStatsFormatted('intermediate', statsData)}\n<${htmlReportUrl}|Track report in html report>\n`;
@@ -88,8 +88,8 @@ async function handleIntermediate(report, job, stats, statsTime, statsData) {
 }
 
 async function handleDone(report, job, stats, statsTime, statsData) {
-    await databaseConnector.insertStats(stats.container_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'aggregate', stats.data);
-    await databaseConnector.updateReport(report.test_id, report.report_id, 'finished', report.phase, stats.data, statsTime);
+    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'aggregate', stats.data);
+    await reportsManager.updateReport(report, 'finished', stats, statsTime);
 
     const htmlReportUrl = serviceConfig.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
     let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', statsData)}\n<${htmlReportUrl}|View final html report>\n`;
@@ -107,7 +107,7 @@ async function handleDone(report, job, stats, statsTime, statsData) {
 }
 
 async function handleAbort(report, job, stats, statsTime) {
-    await databaseConnector.updateReport(report.test_id, report.report_id, 'aborted', report.phase, undefined, statsTime);
+    await reportsManager.updateReport(report, 'aborted', stats, statsTime);
 
     if (job.webhooks) {
         const htmlReportUrl = serviceConfig.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;

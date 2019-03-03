@@ -293,17 +293,17 @@ describe('Sequelize client tests', function () {
     describe('Insert stats', () => {
         it('should succeed inserting stats', async () => {
             await sequelizeConnector.init(sequelizeStub());
-            const containerId = uuid();
+            const runnerId = uuid();
             const statsTime = Date.now();
             const statId = uuid();
             const phaseIndex = 0;
             const phaseStatus = 'initiliazed';
             const data = JSON.stringify({message: 'started'});
 
-            await sequelizeConnector.insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
+            await sequelizeConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 
             should(sequelizeInsertStatsStub.args[0][0]).eql({
-                'container_id': containerId,
+                'runner_id': runnerId,
                 'data': data,
                 'phase_index': 0,
                 'phase_status': 'initiliazed',
@@ -327,7 +327,7 @@ describe('Sequelize client tests', function () {
                     stats_id: statId,
                     test_id: testId,
                     report_id: reportId,
-                    container_id: uuid(),
+                    runner_id: uuid(),
                     stats_time: statsTime,
                     phase_status: uuid(),
                     phase_index: uuid(),

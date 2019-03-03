@@ -170,7 +170,7 @@ describe('Stats consumer test', () => {
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await statsConsumer.handleMessage('test_id', 1, {container_id: 'container_id', stats_time: statsTime, phase_status: 'intermediate', data: JSON.stringify({ report: {reportId: 1} })});
+        await statsConsumer.handleMessage('test_id', 1, {runner_id: 'runner_id', stats_time: statsTime, phase_status: 'intermediate', data: JSON.stringify({ report: {reportId: 1} })});
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([
@@ -190,7 +190,7 @@ describe('Stats consumer test', () => {
         ]);
 
         databaseConnectorInsertStatsStub.callCount.should.eql(1);
-        databaseConnectorInsertStatsStub.args[0][0].should.eql('container_id');
+        databaseConnectorInsertStatsStub.args[0][0].should.eql('runner_id');
         databaseConnectorInsertStatsStub.args[0][1].should.eql('test_id');
         databaseConnectorInsertStatsStub.args[0][2].should.eql(1);
         databaseConnectorInsertStatsStub.args[0][3].should.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
@@ -223,7 +223,7 @@ describe('Stats consumer test', () => {
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await statsConsumer.handleMessage('test_id', 1, {container_id: 'container_id', stats_time: statsTime, phase_status: 'intermediate', data: JSON.stringify({ report: {reportId: 1} })});
+        await statsConsumer.handleMessage('test_id', 1, {runner_id: 'runner_id', stats_time: statsTime, phase_status: 'intermediate', data: JSON.stringify({ report: {reportId: 1} })});
 
         reportWebhookSenderSendStub.callCount.should.equal(0);
         loggerInfoStub.callCount.should.equal(1);
@@ -235,7 +235,7 @@ describe('Stats consumer test', () => {
         ]);
 
         databaseConnectorInsertStatsStub.callCount.should.eql(1);
-        databaseConnectorInsertStatsStub.args[0][0].should.eql('container_id');
+        databaseConnectorInsertStatsStub.args[0][0].should.eql('runner_id');
         databaseConnectorInsertStatsStub.args[0][1].should.eql('test_id');
         databaseConnectorInsertStatsStub.args[0][2].should.eql(1);
         databaseConnectorInsertStatsStub.args[0][3].should.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
@@ -273,7 +273,7 @@ describe('Stats consumer test', () => {
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await statsConsumer.handleMessage('test_id', 1, {container_id: 'container_id', stats_time: statsTime, phase_status: 'done', data: JSON.stringify({ report: {reportId: 1} })});
+        await statsConsumer.handleMessage('test_id', 1, {runner_id: 'runner_id', stats_time: statsTime, phase_status: 'done', data: JSON.stringify({ report: {reportId: 1} })});
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([
@@ -304,7 +304,7 @@ describe('Stats consumer test', () => {
         ]);
 
         databaseConnectorInsertStatsStub.callCount.should.eql(1);
-        databaseConnectorInsertStatsStub.args[0][0].should.eql('container_id');
+        databaseConnectorInsertStatsStub.args[0][0].should.eql('runner_id');
         databaseConnectorInsertStatsStub.args[0][1].should.eql('test_id');
         databaseConnectorInsertStatsStub.args[0][2].should.eql(1);
         databaseConnectorInsertStatsStub.args[0][3].should.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
@@ -342,7 +342,7 @@ describe('Stats consumer test', () => {
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await statsConsumer.handleMessage('test_id', 1, {container_id: 'container_id', stats_time: statsTime, phase_status: 'aborted', data: JSON.stringify({revisionId: 'revision_id', webhooks: ['http://www.zooz.com'], testId: 'test_id', runId: 'run_id', environment: 'test'})});
+        await statsConsumer.handleMessage('test_id', 1, {runner_id: 'runner_id', stats_time: statsTime, phase_status: 'aborted', data: JSON.stringify({revisionId: 'revision_id', webhooks: ['http://www.zooz.com'], testId: 'test_id', runId: 'run_id', environment: 'test'})});
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([

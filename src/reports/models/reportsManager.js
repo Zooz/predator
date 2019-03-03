@@ -1,9 +1,22 @@
 'use strict';
 
-let databaseConnector = require('./databaseConnector');
-let jobConnector = require('../../jobs/models/jobManager');
-let serviceConfig = require('../../config/serviceConfig');
-let statsConsumer = require('./statsConsumer');
+const _ = require('lodash');
+
+const databaseConnector = require('./databaseConnector');
+const jobConnector = require('../../jobs/models/jobManager');
+const serviceConfig = require('../../config/serviceConfig');
+const statsConsumer = require('./statsConsumer');
+
+const SUBSCRIBER_DONE_STAGE = 'done';
+const SUBSCRIBER_ABORTED_STAGE = 'aborted';
+const SUBSCRIBER_FAILED_STAGE = 'error';
+
+const REPORT_STARTED_STATUS = 'started';
+const REPORT_IN_PROGRESS_STATUS = 'in_progress';
+const REPORT_FINISHED_STATUS = 'finished';
+const REPORT_ABORTED_STATUS = 'aborted';
+const REPORT_FAILED_STATUS = 'failed';
+const REPORT_PARTIALLY_FINISHED_STATUS = 'partially_finished';
 
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
@@ -46,10 +59,12 @@ module.exports.postReport = async (testId, reportBody) => {
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, startTime, reportBody.test_name,
         reportBody.test_description, JSON.stringify(testConfiguration), job.notes);
+    await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id);
     return reportBody;
 };
 
 module.exports.postStats = async (testId, reportId, stats) => {
+    await databaseConnector.updateSubscribers(testId, reportId, stats.runner_id, stats.phase_status);
     await statsConsumer.handleMessage(testId, reportId, stats);
     return stats;
 };
@@ -84,7 +99,8 @@ function getReportResponse(summaryRow) {
         html_report: htmlReportUrl,
         grafana_report: generateGraphanaUrl(summaryRow),
         notes: summaryRow.notes,
-        environment: testConfiguration.environment
+        environment: testConfiguration.environment,
+        subscribers: summaryRow.subscribers
     };
 
     return report;
@@ -96,4 +112,55 @@ function generateGraphanaUrl(report) {
         const grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
         return grafanaReportUrl;
     }
+}
+
+module.exports.updateReport = async (report, status, stats, statsTime) => {
+    const subscribersStages = getListOfSubscribersStages(report);
+    const uniqueSubscribersStages = _.uniq(subscribersStages);
+
+    if (status === REPORT_FINISHED_STATUS) {
+        if (allSubscribersFinished(uniqueSubscribersStages)) {
+            await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
+        } else {
+            setTimeout(async () => {
+                await delayedUpdateOfReportStatus(report, stats, statsTime);
+            }, 30000);
+        }
+    } else if (status === REPORT_ABORTED_STATUS && allSubscribersAborted(uniqueSubscribersStages)) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_ABORTED_STATUS, report.phase, stats.data, statsTime);
+    } else if (status === REPORT_FAILED_STATUS && allSubscribersFailed(uniqueSubscribersStages)) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_FAILED_STATUS, report.phase, stats.data, statsTime);
+    } else if (status === REPORT_IN_PROGRESS_STATUS) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_IN_PROGRESS_STATUS, report.phase, stats.data, undefined);
+    } else {
+        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_STARTED_STATUS, report.phase, undefined, undefined);
+    }
+};
+
+function getListOfSubscribersStages (report) {
+    const runnerStates = report.subscribers.map((subscriber) => subscriber.stage);
+    return runnerStates;
+}
+
+async function delayedUpdateOfReportStatus (report, stats, statsTime) {
+    const mostUpToDateReportVersion = await module.exports.getReport(report.test_id, report.report_id);
+    const subscribersStages = getListOfSubscribersStages(mostUpToDateReportVersion);
+    const uniqueSubscribersStages = _.uniq(subscribersStages);
+    if (mostUpToDateReportVersion.status !== REPORT_FINISHED_STATUS && uniqueSubscribersStages.length === 1 && uniqueSubscribersStages[0] === SUBSCRIBER_DONE_STAGE) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
+    } else {
+        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_PARTIALLY_FINISHED_STATUS, report.phase, stats.data, statsTime);
+    }
+}
+
+function allSubscribersFinished (subscribers) {
+    return subscribers.length === 1 && subscribers[0] === SUBSCRIBER_DONE_STAGE;
+}
+
+function allSubscribersAborted (subscribers) {
+    return subscribers.length === 1 && subscribers[0] === SUBSCRIBER_ABORTED_STAGE;
+}
+
+function allSubscribersFailed (subscribers) {
+    return subscribers.length === 1 && subscribers[0] === SUBSCRIBER_FAILED_STAGE;
 }

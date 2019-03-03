@@ -9,8 +9,11 @@ const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET status=?, phase=?, las
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=? AND report_type=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=? AND report_type=?';
 const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports LIMIT ?';
-const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(container_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
+const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(runner_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
 const GET_REPORT_STATS = 'SELECT * FROM reports_stats WHERE test_id=? AND report_id=?';
+const SUBSCRIBE_RUNNER = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, stage) values(?,?,?,?)';
+const UPDATE_SUBSCRIBERS = 'UPDATE report_subscribers SET stage=? WHERE test_id=? AND report_id=? AND runner_id=?';
+const GET_REPORT_SUBSCRIBERS = 'SELECT * FROM report_subscribers WHERE test_id=? AND report_id=?';
 
 module.exports = {
     init,
@@ -20,7 +23,9 @@ module.exports = {
     getReports,
     getLastReports,
     insertStats,
-    getStats
+    getStats,
+    subscribeRunner,
+    updateSubscribers
 };
 
 let queryOptions = {
@@ -48,24 +53,24 @@ function updateReport(testId, reportId, status, phaseIndex, lastStats, endTime) 
 function getReport(testId, reportId) {
     let params;
     params = [testId, reportId, 'basic'];
-    return executeQuery(GET_REPORT_SUMMARY, params, queryOptions);
+    return getReportsAndParse(GET_REPORT_SUMMARY, params, queryOptions);
 }
 
 function getReports(testId) {
     let params;
     params = [testId, 'basic'];
-    return executeQuery(GET_REPORTS_SUMMARIES, params, queryOptions);
+    return getReportsAndParse(GET_REPORTS_SUMMARIES, params, queryOptions);
 }
 
 function getLastReports(limit) {
     let params;
     params = [limit];
-    return executeQuery(GET_LAST_SUMMARIES, params, queryOptions);
+    return getReportsAndParse(GET_LAST_SUMMARIES, params, queryOptions);
 }
 
-function insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
+function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
     let params;
-    params = [containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data];
+    params = [runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data];
     return executeQuery(INSERT_REPORT_STATS, params, queryOptions);
 }
 
@@ -73,6 +78,24 @@ function getStats(testId, reportId) {
     let params;
     params = [testId, reportId];
     return executeQuery(GET_REPORT_STATS, params, queryOptions);
+}
+
+function subscribeRunner(testId, reportId, runnerId) {
+    let params;
+    params = [testId, reportId, runnerId, 'initializing'];
+    return executeQuery(SUBSCRIBE_RUNNER, params, queryOptions);
+}
+
+function updateSubscribers(testId, reportId, runnerId, stage) {
+    let params;
+    params = [stage, testId, reportId, runnerId];
+    return executeQuery(UPDATE_SUBSCRIBERS, params, queryOptions);
+}
+
+function getReportSubscribers(testId, reportId) {
+    let params;
+    params = [testId, reportId];
+    return executeQuery(GET_REPORT_SUBSCRIBERS, params, queryOptions);
 }
 
 function executeQuery(query, params, queryOptions) {
@@ -87,4 +110,23 @@ function executeQuery(query, params, queryOptions) {
         logger.error(`Cassandra query failed \n ${JSON.stringify({ query, params, queryOptions })}`, exception);
         return Promise.reject(new Error('Error occurred in communication with cassandra'));
     });
+}
+
+async function getReportsAndParse(query, params, queryOptions) {
+    let subscribers, report;
+    const reports = await executeQuery(query, params, queryOptions);
+
+    for (let reportIndex = 0; reportIndex < reports.length; reportIndex++) {
+        report = reports[reportIndex];
+        subscribers = await getReportSubscribers(report.test_id, report.report_id);
+        subscribers = subscribers.map((subscriber) => {
+            return {
+                'runner_id': subscriber.runner_id,
+                'stage': subscriber.stage
+            };
+        });
+        report.subscribers = subscribers;
+    }
+
+    return reports;
 }
