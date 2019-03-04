@@ -3,19 +3,18 @@
 let fs = require('fs');
 let path = require('path');
 let _ = require('lodash');
+let math = require('mathjs');
 
 let logger = require('../../common/logger');
 let databaseConnector = require('./databaseConnector');
+let reportsManager = require('./reportsManager');
+
+const STATS_INTERVAL = 15;
 
 module.exports.createArtilleryReport = async (testId, reportId) => {
-    let stats;
-    try {
-        stats = await databaseConnector.getStats(testId, reportId);
-    } catch (error) {
-        logger.error(error, 'Failed to get stats from database');
-        error.statusCode = 500;
-        return Promise.reject(error);
-    }
+    let stats, report;
+    report = await reportsManager.getReport(testId, reportId);
+    stats = await databaseConnector.getStats(testId, reportId);
 
     if (stats.length === 0) {
         let errorMessage = `Can not generate artillery report as testId: ${testId} and reportId: ${reportId} is not found`;
@@ -25,14 +24,21 @@ module.exports.createArtilleryReport = async (testId, reportId) => {
         return Promise.reject(error);
     }
 
-    let reportInput = { intermediate: [] };
+    let reportInput = { intermediate: [], final_report: [] };
+    reportInput.duration = math.min(report.duration, Math.floor(report.duration_seconds));
+    reportInput.start_time = report.start_time;
+    reportInput.parallelism = report.parallelism;
+    reportInput.status = mapReportStatus(report.status);
+
     stats.forEach(stat => {
+        let data = JSON.parse(stat.data);
+        data.bucket = Math.floor((new Date(data.timestamp).getTime() - new Date(report.start_time).getTime()) / 1000 / STATS_INTERVAL) * STATS_INTERVAL;
         switch (stat.phase_status) {
         case 'intermediate':
-            reportInput.intermediate.push(JSON.parse(stat.data));
+            reportInput.intermediate.push(data);
             break;
-        case 'aggregate':
-            reportInput.aggregate = JSON.parse(stat.data);
+        case 'final_report':
+            reportInput.final_report.push(data);
             break;
         default:
             logger.warn(stat, 'Received unknown stat from database while creating report');
@@ -40,24 +46,58 @@ module.exports.createArtilleryReport = async (testId, reportId) => {
         }
     });
 
-    if (!reportInput.aggregate) {
+    if (report.parallelism > 1) {
+        const bucketIntemerdiates = _.groupBy(reportInput.intermediate, 'bucket');
+        reportInput.intermediate = _.keysIn(bucketIntemerdiates).map((bucket) => {
+            return createAggregateManually(bucketIntemerdiates[bucket]);
+        });
+    }
+
+    if (_.isEmpty(reportInput.final_report)) {
         reportInput.aggregate = createAggregateManually(reportInput.intermediate);
+    } else {
+        reportInput.aggregate = createAggregateManually(reportInput.final_report);
     }
 
     let reportOutput = generateReportFromTemplate(reportInput);
     return reportOutput;
 };
 
-function createAggregateManually(intermediateStats) {
-    let result = { requestsCompleted: 0, scenariosCreated: 0, scenariosAvoided: 0, scenariosCompleted: 0, pendingRequests: 0, scenarioCounts: {}, errors: {}, codes: {}, latency: { median: 0, max: 0, min: 9999999 } };
-    _.each(intermediateStats, function(stats) {
-        result.latency.median += stats.latency.median;
-        if (stats.latency.max >= result.latency.max) {
-            result.latency.max = stats.latency.max;
-        }
-        if (stats.latency.min <= result.latency.min) {
-            result.latency.min = stats.latency.min;
-        }
+function createAggregateManually(listOfStats) {
+    let medians = [], maxs = [], mins = [], scenario95 = [], scenario99 = [], request95 = [], request99 = [];
+    let result = {
+        bucket: 0,
+        requestsCompleted: 0,
+        scenariosCreated: 0,
+        scenariosAvoided: 0,
+        scenariosCompleted: 0,
+        pendingRequests: 0,
+        scenarioCounts: {},
+        errors: {},
+        concurrency: 0,
+        codes: {},
+        latency: {
+            median: 0,
+            max: 0,
+            min: 0
+        },
+        rps: {
+            mean: 0,
+            count: 0
+        },
+        scenarioDuration: { }
+    };
+    _.each(listOfStats, function(stats) {
+        result.bucket = stats.bucket;
+        result.concurrency += stats.concurrency;
+
+        medians.push(stats.latency.median);
+        maxs.push(stats.latency.max);
+        mins.push(stats.latency.min);
+        request95.push(stats.latency.p95 * stats.requestsCompleted);
+        request99.push(stats.latency.p99 * stats.requestsCompleted);
+        scenario95.push(stats.scenarioDuration.p95 * stats.scenariosCompleted);
+        scenario99.push(stats.scenarioDuration.p99 * stats.scenariosCompleted);
 
         result.scenariosCreated += stats.scenariosCreated;
         result.scenariosAvoided += stats.scenariosAvoided;
@@ -83,12 +123,22 @@ function createAggregateManually(intermediateStats) {
                 result.errors[error] = count;
             }
         });
+
+        result.rps.count += stats.rps.count;
         result.requestsCompleted += stats.requestsCompleted;
 
         result.pendingRequests += stats.pendingRequests;
     });
 
-    result.latency.median = result.latency.median / intermediateStats.length;
+    result.rps.mean = result.rps.count / STATS_INTERVAL;
+    result.latency.median = math.median(medians);
+    result.latency.min = math.min(mins);
+    result.latency.max = math.max(maxs);
+    result.latency.p95 = math.sum(request95) / result.requestsCompleted;
+    result.latency.p99 = math.sum(request99) / result.requestsCompleted;
+
+    result.scenarioDuration.p95 = math.sum(scenario95) / result.scenariosCompleted;
+    result.scenarioDuration.p99 = math.sum(scenario99) / result.scenariosCompleted;
 
     return result;
 }
@@ -101,4 +151,15 @@ function generateReportFromTemplate(reportInput) {
     let compiledTemplate = _.template(template);
     let html = compiledTemplate({ report: JSON.stringify(reportInput, null, 2) });
     return html;
+}
+
+function mapReportStatus(status) {
+    const mapper = {
+        'in_progress': 'In progress',
+        'partially_finished': 'Partially finished',
+        'finished': 'Finished',
+        'aborted': 'Aborted',
+        'failed': 'Failed'
+    };
+    return mapper[status];
 }

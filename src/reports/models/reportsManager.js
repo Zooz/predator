@@ -6,17 +6,7 @@ const databaseConnector = require('./databaseConnector');
 const jobConnector = require('../../jobs/models/jobManager');
 const serviceConfig = require('../../config/serviceConfig');
 const statsConsumer = require('./statsConsumer');
-
-const SUBSCRIBER_DONE_STAGE = 'done';
-const SUBSCRIBER_ABORTED_STAGE = 'aborted';
-const SUBSCRIBER_FAILED_STAGE = 'error';
-
-const REPORT_STARTED_STATUS = 'started';
-const REPORT_IN_PROGRESS_STATUS = 'in_progress';
-const REPORT_FINISHED_STATUS = 'finished';
-const REPORT_ABORTED_STATUS = 'aborted';
-const REPORT_FAILED_STATUS = 'failed';
-const REPORT_PARTIALLY_FINISHED_STATUS = 'partially_finished';
+const constants = require('../utils/constants');
 
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
@@ -51,7 +41,7 @@ module.exports.postReport = async (testId, reportBody) => {
         arrival_rate: job.arrival_rate,
         duration: job.duration,
         ramp_to: job.ramp_to,
-        parallelism: job.parallelism,
+        parallelism: job.parallelism || 1,
         max_virtual_users: job.max_virtual_users,
         environment: job.environment
     };
@@ -115,25 +105,27 @@ function generateGraphanaUrl(report) {
 }
 
 module.exports.updateReport = async (report, status, stats, statsTime) => {
+    const delayedTimeInMs = Math.max(report.duration * 0.01, 30000);
+
     const subscribersStages = getListOfSubscribersStages(report);
     const uniqueSubscribersStages = _.uniq(subscribersStages);
 
-    if (status === REPORT_FINISHED_STATUS) {
+    if (status === constants.REPORT_FINISHED_STATUS) {
         if (allSubscribersFinished(uniqueSubscribersStages)) {
-            await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
+            await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
         } else {
             setTimeout(async () => {
                 await delayedUpdateOfReportStatus(report, stats, statsTime);
-            }, 30000);
+            }, delayedTimeInMs);
         }
-    } else if (status === REPORT_ABORTED_STATUS && allSubscribersAborted(uniqueSubscribersStages)) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_ABORTED_STATUS, report.phase, stats.data, statsTime);
-    } else if (status === REPORT_FAILED_STATUS && allSubscribersFailed(uniqueSubscribersStages)) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_FAILED_STATUS, report.phase, stats.data, statsTime);
-    } else if (status === REPORT_IN_PROGRESS_STATUS) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_IN_PROGRESS_STATUS, report.phase, stats.data, undefined);
+    } else if (status === constants.REPORT_ABORTED_STATUS && allSubscribersAborted(uniqueSubscribersStages)) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_ABORTED_STATUS, report.phase, stats.data, statsTime);
+    } else if (status === constants.REPORT_FAILED_STATUS && allSubscribersFailed(uniqueSubscribersStages)) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FAILED_STATUS, report.phase, stats.data, statsTime);
+    } else if (status === constants.REPORT_IN_PROGRESS_STATUS) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_IN_PROGRESS_STATUS, report.phase, stats.data, undefined);
     } else {
-        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_STARTED_STATUS, report.phase, undefined, undefined);
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_STARTED_STATUS, report.phase, undefined, undefined);
     }
 };
 
@@ -146,21 +138,21 @@ async function delayedUpdateOfReportStatus (report, stats, statsTime) {
     const mostUpToDateReportVersion = await module.exports.getReport(report.test_id, report.report_id);
     const subscribersStages = getListOfSubscribersStages(mostUpToDateReportVersion);
     const uniqueSubscribersStages = _.uniq(subscribersStages);
-    if (mostUpToDateReportVersion.status !== REPORT_FINISHED_STATUS && uniqueSubscribersStages.length === 1 && uniqueSubscribersStages[0] === SUBSCRIBER_DONE_STAGE) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
+    if (mostUpToDateReportVersion.status !== constants.REPORT_FINISHED_STATUS && uniqueSubscribersStages.length === 1 && uniqueSubscribersStages[0] === constants.SUBSCRIBER_DONE_STAGE) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
     } else {
-        await databaseConnector.updateReport(report.test_id, report.report_id, REPORT_PARTIALLY_FINISHED_STATUS, report.phase, stats.data, statsTime);
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_PARTIALLY_FINISHED_STATUS, report.phase, stats.data, statsTime);
     }
 }
 
 function allSubscribersFinished (subscribers) {
-    return subscribers.length === 1 && subscribers[0] === SUBSCRIBER_DONE_STAGE;
+    return subscribers.length === 1 && subscribers[0] === constants.SUBSCRIBER_DONE_STAGE;
 }
 
 function allSubscribersAborted (subscribers) {
-    return subscribers.length === 1 && subscribers[0] === SUBSCRIBER_ABORTED_STAGE;
+    return subscribers.length === 1 && subscribers[0] === constants.SUBSCRIBER_ABORTED_STAGE;
 }
 
 function allSubscribersFailed (subscribers) {
-    return subscribers.length === 1 && subscribers[0] === SUBSCRIBER_FAILED_STAGE;
+    return subscribers.length === 1 && subscribers[0] === constants.SUBSCRIBER_FAILED_STAGE;
 }
