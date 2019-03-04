@@ -1,4 +1,7 @@
 'use strict';
+
+process.env.JOB_PLATFORM = '';
+
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
