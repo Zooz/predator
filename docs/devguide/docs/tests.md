@@ -38,7 +38,7 @@ Before you can use a DSL definition, you must create it first. You do so by invo
 	"name": "get-pet",
 	"request": {
 		"get": {
-			"url": "http://10.100.12.21:3000/pets/{{petId}}"
+			"url": "http://127.0.0.1:3000/pets/{{petId}}"
 		}	
 	}
 }
@@ -51,7 +51,7 @@ The request body for creating a DSL definition of a POST request is a bit more e
 	"name": "create-pet",
 	"request": {
 		"post": {
-			"url": "http://10.100.12.21:3000/pets",
+			"url": "http://127.0.0.1:3000/pets",
 			"json": {
 				"name": "mickey",
 				"species": "dog"
@@ -102,7 +102,7 @@ Here's an example:
 
 There are two additional items to note:
 
-* The `type` must always be set to `DSL`.
+* The `type` must always be set to `dsl`.
 
 * The `action` value uses the following syntax: `{dsl_group_name}.{dsl_name}`, in which the `dsl_group_name` is the name used in the path of the [Create DSL Test]() API request. 
 

@@ -33,9 +33,9 @@ When adding scenario steps or pre-scenario requests, you will need to define the
 
 While most of the properties are self-explanatory, the following items may require some additional explanation:
 
-* **gzip**: This will compress the request body to improve transfer speed and bandwidth utilization.
+* **gzip**: This will compress the request body. 
 
-* **forever**: Indicates whether the request should be executed only once, or each time the test runs.
+* **forever**: Indicates whether the connection to the endpoint will be kept alive.
 
 * **Captures**: Allows you to extract (capture) data from the request response and store it in a variable for reuse in another request. See [Data Reuse with Variables](tests.md).
 
