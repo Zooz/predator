@@ -84,7 +84,7 @@ describe('Manager tests', function () {
             let result = await manager.getConfig();
 
             should(Object.keys(result).length).eql(Object.keys(configConstants).length);
-            clearUndfiendValues(result);
+            clearUndefinedValues(result);
             should(result).eql(defaultConfig);
         });
     });
@@ -102,7 +102,7 @@ describe('Manager tests', function () {
         it('get config success', async () => {
             cassandraGetStub.resolves([{ key: 'key_not_valid', value: 2 }]);
             let result = await manager.getConfig();
-            clearUndfiendValues(result);
+            clearUndefinedValues(result);
             should(result).eql(defaultConfig);
         });
     });
@@ -113,7 +113,7 @@ describe('Manager tests', function () {
 
             let result = await manager.getConfig();
 
-            clearUndfiendValues(result);
+            clearUndefinedValues(result);
             should(result).eql(configParseExpected);
         });
     });
@@ -144,7 +144,7 @@ describe('Manager tests', function () {
         });
     });
 
-    function clearUndfiendValues(object) {
+    function clearUndefinedValues(object) {
         Object.keys(object).filter(key => !object[key]).forEach(key => {
             if (!object[key] && object[key] !== 0) {
                 delete object[key];
