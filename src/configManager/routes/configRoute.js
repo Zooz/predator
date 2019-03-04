@@ -1,10 +1,9 @@
 'use strict';
 
-let express = require('express');
-let swaggerValidator = require('express-ajv-swagger-validation');
-let router = express.Router();
-
-let config = require('../controllers/configController');
+const express = require('express');
+const swaggerValidator = require('express-ajv-swagger-validation');
+const config = require('../controllers/configController');
+const router = express.Router();
 
 router.put('/', swaggerValidator.validate, config.updateConfig);
 router.get('/', config.getConfig);

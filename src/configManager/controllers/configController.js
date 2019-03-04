@@ -1,5 +1,5 @@
 'use strict';
-let configModel = require('../model/configHandler');
+let configModel = require('../models/configHandler');
 
 let logger = require('../../common/logger');
 

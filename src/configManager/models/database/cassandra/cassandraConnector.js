@@ -1,11 +1,10 @@
-let logger = require('../../../common/logger');
-
-let databaseConfig = require('../../../config/databaseConfig');
-let client;
-
+const logger = require('../../../../common/logger');
+const databaseConfig = require('../../../../config/databaseConfig');
 const GET_CONFIG_VALUE = 'SELECT* FROM config WHERE key= ?';
 const GET_CONFIG = 'SELECT* FROM config';
 const INSERT_DATA = 'INSERT INTO config(key, value) values(?,?)';
+
+let client;
 
 module.exports = {
     init,
@@ -28,7 +27,6 @@ function updateConfig(updateValues) {
         let value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key];
         queriesArr.push({ 'query': INSERT_DATA, 'params': [key, value] });
     });
-    // handle error and results?
     return client.batch(queriesArr, queryOptions);
 }
 
