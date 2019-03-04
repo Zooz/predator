@@ -1,6 +1,6 @@
 'use strict';
 
-process.env.JOB_PLATFORM = '';
+process.env.JOB_PLATFORM = 'DOCKER';
 
 const should = require('should');
 const rewire = require('rewire');
@@ -11,6 +11,7 @@ const configConstants = require('../../../src/common/consts').CONFIG;
 let manager;
 
 const defaultConfig = {
+    job_platform: 'DOCKER',
     docker_name: 'zooz/predator-runner:latest',
     runner_cpu: 1,
     runner_memory: 2048,
@@ -32,6 +33,7 @@ const configResponseParseObject = [
 ];
 
 const configParseExpected = {
+    job_platform: 'DOCKER',
     docker_name: 'zooz/predator-runner:latest',
     runner_cpu: 5,
     runner_memory: 2048,
