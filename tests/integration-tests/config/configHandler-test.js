@@ -1,8 +1,9 @@
 'use strict';
 
 const configRequestCreator = require('./helpers/requestCreator');
+const path = require('path');
 const fs = require('fs');
-let should = require('should');
+const should = require('should');
 const validationError = 'Input validation error';
 const defaultBody = {
     external_address: 'http://localhost:80',
@@ -72,8 +73,8 @@ const requestBodyNotValidRequire = {
     }
 };
 
-beforeEach(async () => {
-    fs.writeFile(__dirname + '/../../../predator', '', () => {
+before(async () => {
+    fs.writeFile(path.join(__dirname, '..', 'predator'), '', () => {
     });
     await configRequestCreator.init();
 });
