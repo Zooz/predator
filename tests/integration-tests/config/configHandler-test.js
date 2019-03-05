@@ -73,6 +73,7 @@ const requestBodyNotValidRequire = {
 };
 
 beforeEach(async () => {
+    // todo: only for local use, when we want to delete data from sqlite
     fs.writeFile('predator', '', () => {
     });
     await configRequestCreator.init();
