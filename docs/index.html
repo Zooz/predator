@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Predator REST API</title>
+    <script src="https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js"> </script>
+</head>
+<body>
+<div id="restapiref">
+</div>
+<script type="text/javascript">
+      var redocdiv = document.getElementById('restapiref')
+      var options = {
+        scrollYOffset: 50,
+        pathInMiddlePanel: true,
+        hideDownloadButton: false,
+        expandResponses:"200,201",
+        theme: {
+                colors: { main: '#3284c8' },
+                rightPanel: {width: '40%'},
+                breakpoints: {medium: '75rem'},
+                logo: {maxHeight:'15em',
+                       maxWidth: '20em' }
+              }
+      };
+      Redoc.init('swagger.yaml', options, redocdiv )
+    </script>
+</body>
+</html>
