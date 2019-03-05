@@ -16,6 +16,8 @@ info:
     UI alongside a simple REST API, Predator simplifies the performance testing
     regime.
 
+    For an introduction to Predator and its concepts, see the <a href="https://www.zooz.com" target="_blank">Predator Documentation</a>.
+
 tags:
   - name: DSL Definitions
     description: |
@@ -874,6 +876,27 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/artillery_request_schema'
+          example: {
+                    	"name": "create-pet",
+                    	"request": {
+                    		"post": {
+                    			"url": "http://127.0.0.1:3000/pets",
+                    			"headers": {
+                                				"Content-Type": "application/json"
+                                		  },
+                    			"json": {
+                    				"name": "mickey",
+                    				"species": "dog"
+                    			},
+                    			"capture": [
+                    				{
+                    					"json": "$.id",
+                    					"as": "petId"
+                    				}
+                    			]
+                    		}
+                    	}
+                    }
     update_definition:
       required:
         - request
@@ -919,21 +942,30 @@ components:
               items:
                 $ref: '#/components/schemas/scenario'
     artillery_request_schema:
-      description: The request schema used in test scenarios
+      description: |
+        The request schema used in test scenarios. The property name must be one of the following HTTP methods: `GET`, `HEAD`, `POST`, `PUT`, `DELETE`.
+
+        **Beware**: Specifying an invalid property name will return an error.
       type: object
       properties:
         capture:
+          description: |
+            Allows you to extract (capture) data from the request response and store it in a variable for reuse in another request.
+            Must include one or more objects with a `json` attribute specifying the data to extract (using JSONPath syntax), as well as an `as` attribute specifying the variable name in which to store the extracted data.
           type: array
           items:
             type: object
             additionalProperties:
               type: string
         url:
+          description: The endpoint against which the request will be executed.
           type: string
         headers:
+          description: The headers to pass in the request.
           additionalProperties:
             type: string
         json:
+          description: The JSON body to use in the request.
           type: object
     key_value_string_object:
       type: object
