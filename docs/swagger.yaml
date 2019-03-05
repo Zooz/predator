@@ -21,29 +21,28 @@ info:
 tags:
   - name: DSL Definitions
     description: |
-      Predator's Domain Specific Language (DSL) allows you to generate request templates, which you can then reuse in the same test and in other tests under the same DSL type, reducing replication.
+      Predator's Domain Specific Language (DSL) allows you to generate request templates, which you can then reuse in the same test and in other tests, reducing replication.
+  - name: Tests
+    description: |
+      Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.
 
 x-tagGroups:
   - name: Reference
     tags:
       - DSL Definitions
+      - Tests
 
 paths:
+  # DSL Definitions
   '/v1/dsl/{dsl_group}/definitions':
+    parameters:
+      - $ref: '#/components/parameters/dsl_group'
     post:
+      operationId: create-a-dsl-definition
       tags:
         - DSL Definitions
-      summary: Create a new DSL Definition
+      summary: Create a DSL Definition
       description: Create a new DSL definition to generate a request template.
-      parameters:
-        - in: path
-          name: dsl_group
-          description: |
-            The group (category) in which the DSL definition will be created. Specify a group name of your choice. We recommend you place related DSL definitions in the same group.
-          required: true
-          schema:
-            type: string
-          example: petstore
       responses:
         '201':
           description: Success
@@ -77,15 +76,11 @@ paths:
         description: The definition to create
         required: true
     get:
+      operationId: retrieve-all-dsl-definitions
       tags:
-        - dsl
-      description: Get definitions.
-      parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          schema:
-            type: string
+        - DSL Definitions
+      summary: Retrieve all DSL Definitions
+      description: Retrieve all DSL definitions for the specified DSL group name.
       responses:
         '200':
           description: Success
@@ -111,22 +106,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  '/v1/dsl/{dsl_name}/definitions/{definition_name}':
+  '/v1/dsl/{dsl_group}/definitions/{definition_name}':
+    parameters:
+      - $ref: '#/components/parameters/dsl_group'
+      - $ref: '#/components/parameters/definition_name'
     get:
+      operationId: retrieve-a-dsl-definition
       tags:
-        - dsl
-      description: Get definition.
-      parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: definition_name
-          required: true
-          schema:
-            type: string
+        - DSL Definitions
+      summary: Retrieve a DSL Definition
+      description: Retrieve a specific DSL definition.
       responses:
         '200':
           description: Success
@@ -153,20 +142,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
     put:
+      operationId: update-a-dsl-definition
       tags:
-        - dsl
-      description: update specific definition.
-      parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: definition_name
-          required: true
-          schema:
-            type: string
+        - DSL Definitions
+      summary: Update a DSL Definition
+      description: Update a specific DSL definition.
       responses:
         '200':
           description: Success
@@ -197,23 +177,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/update_definition'
-        description: The dsl to update
+        description: The DSL definition to update
         required: true
     delete:
+      operationId: Delete-a-dsl-definition
       tags:
-        - dsl
-      description: delete a specific definition.
-      parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: definition_name
-          required: true
-          schema:
-            type: string
+        - DSL Definitions
+      summary: Delete a DSL Definition
+      description: Delete a specific DSL definition.
       responses:
         '204':
           description: Success
@@ -229,36 +200,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Tests
   /v1/tests:
-    get:
-      tags:
-        - tests
-      description: Get list of all test and there descriptions.
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/tests_response'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
     post:
+      operationId: create-a-test
       tags:
-        - tests
-      description: Create new test
+        - Tests
+      summary: Create a Test
+      description: Create a new test.
       responses:
         '201':
           description: Success
@@ -291,6 +240,33 @@ paths:
               $ref: '#/components/schemas/test'
         description: The test to add
         required: true
+    get:
+      operationId: retrieve-all-tests
+      tags:
+        - Tests
+      summary: Retrieve all Tests
+      description: Retrieve all tests specifications.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/tests_response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}':
     get:
       tags:
@@ -860,6 +836,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
 components:
+  parameters:
+    dsl_group:
+      name: dsl_group
+      in: path
+      required: true
+      description: The group (category) in which the DSL definition will be created. Specify a group name of your choice. We recommend you place related DSL definitions in the same group.
+      schema:
+        type: string
+      example: petstore
+    definition_name:
+      name: definition_name
+      in: path
+      required: true
+      description: The name of the DSL definition.
+      schema:
+        type: string
+      example: create-pet
   schemas:
     definition:
       type: object
@@ -997,11 +990,14 @@ components:
         revision_id:
           type: string
           format: uuid
-          description: The id of the revision.
+          description: |
+            The test's revision ID.
+
+            When a test is created, it is assigned a revision ID. If you update a test, then it's revision ID changes as well. This allows Predator to always relate an existing report to the test it was originally based on.
     tests_response:
       allOf:
         - $ref: '#/components/schemas/create_test_response'
-        - $ref: '#/components/schemas/test_id'
+#        - $ref: '#/components/schemas/test_id'
       required:
         - name
         - description
