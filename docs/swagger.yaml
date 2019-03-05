@@ -2,7 +2,12 @@ openapi: 3.0.0
 info:
   version: 1.0.0
   title: Predator
+  x-logo:
+    url: logo.png
+    backgroundColor: white
   description: |
+    # Overview
+
     Predator is an open-source performance framework. It manages the entire
     lifecycle of load testing a server, from creating a test file, running
     scheduled and on-demand tests, and finally viewing the test results.
@@ -10,18 +15,33 @@ info:
     service will benefit from this framework. Bootstrapped with a user-friendly
     UI alongside a simple REST API, Predator simplifies the performance testing
     regime.
+
+tags:
+  - name: DSL Definitions
+    description: |
+      Predator's Domain Specific Language (DSL) allows you to generate request templates, which you can then reuse in the same test and in other tests under the same DSL type, reducing replication.
+
+x-tagGroups:
+  - name: Reference
+    tags:
+      - DSL Definitions
+
 paths:
-  '/v1/dsl/{dsl_name}/definitions':
+  '/v1/dsl/{dsl_group}/definitions':
     post:
       tags:
-        - dsl
-      description: Create new definition
+        - DSL Definitions
+      summary: Create a new DSL Definition
+      description: Create a new DSL definition to generate a request template.
       parameters:
         - in: path
-          name: dsl_name
+          name: dsl_group
+          description: |
+            The group (category) in which the DSL definition will be created. Specify a group name of your choice. We recommend you place related DSL definitions in the same group.
           required: true
           schema:
             type: string
+          example: petstore
       responses:
         '201':
           description: Success
@@ -36,7 +56,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
         '422':
-          description: Unprocessable entity.
+          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -251,7 +271,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
         '422':
-          description: Unprocessable entity.
+          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -846,8 +866,11 @@ components:
         - request
       properties:
         name:
+          description: The name of the DSL definition.
           type: string
+          example: create-pet
         request:
+          description: The request template that the DSL definition will generate.
           type: object
           additionalProperties:
             $ref: '#/components/schemas/artillery_request_schema'
