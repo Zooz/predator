@@ -1,23 +1,21 @@
 'use strict';
-let configModel = require('../models/configHandler');
+const configModel = require('../models/configHandler');
 
-let logger = require('../../common/logger');
-
-module.exports.getConfig = function (req, res, next) {
-    logger.info('inside getConfig()');
-    configModel.getConfig().then((response) => {
+module.exports.getConfig = async (req, res, next) => {
+    try {
+        const response = await configModel.getConfig();
         return res.status(200).json(response);
-    }).catch((err) => {
+    } catch (err) {
         return next(err, res);
-    });
+    }
 };
 
-module.exports.updateConfig = function (req, res, next) {
-    logger.info('inside updateConfig()');
-    let body = req.body;
-    configModel.updateConfig(body).then(() => {
+module.exports.updateConfig = async (req, res, next) => {
+    const body = req.body;
+    try {
+        await configModel.updateConfig(body);
         return res.status(200).json(body);
-    }).catch((err) => {
+    } catch (err) {
         return next(err, res);
-    });
+    }
 };

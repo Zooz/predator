@@ -11,6 +11,7 @@ describe('Cassandra client tests', function () {
         sequelizeUpsertStub,
         sequelizeStub,
         sequelizeDefineStub,
+        sequelizeGeValueetStub,
         sequelizeGetStub;
 
     before(() => {
@@ -29,6 +30,7 @@ describe('Cassandra client tests', function () {
         sequelizeGetStub = sandbox.stub();
         sequelizeStub = sandbox.stub();
         sequelizeStub = sandbox.stub();
+        sequelizeGeValueetStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
             hasMany: () => {
@@ -41,6 +43,7 @@ describe('Cassandra client tests', function () {
             key: {},
             value: {},
             findAll: sequelizeGetStub,
+            find: sequelizeGeValueetStub,
             upsert: sequelizeUpsertStub
         });
 
@@ -104,9 +107,20 @@ describe('Cassandra client tests', function () {
     describe('Get all config with no data ', () => {
         it('should succeed to get  multiple configs', async () => {
             await sequelizeConnector.init(sequelizeStub());
-            sequelizeGetStub.resolves(undefined);
-            let config = await sequelizeConnector.getConfig();
-            should(config.length).eql(0);
+            sequelizeGetStub.resolves([]);
+            await sequelizeConnector.getConfig();
+            should(sequelizeGetStub.args[0][0].attributes.exclude[0]).eql('updated_at');
+            should(sequelizeGetStub.args[0][0].attributes.exclude[1]).eql('created_at');
+        });
+    });
+    describe('Get  config value with no data ', () => {
+        it('should succeed to get  multiple configs', async () => {
+            await sequelizeConnector.init(sequelizeStub());
+            sequelizeGetStub.resolves([]);
+            await sequelizeConnector.getConfigValue('key_value');
+            should(sequelizeGeValueetStub.args[0][0].attributes.exclude[0]).eql('updated_at');
+            should(sequelizeGeValueetStub.args[0][0].attributes.exclude[1]).eql('created_at');
+            should(sequelizeGeValueetStub.args[0][0].where.key).eql('key_value');
         });
     });
 });

@@ -658,16 +658,18 @@ paths:
     get:
       tags:
         - config
-      description: Get list of saved configoration
+      description: Get list of saved configuration
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/config_body"
         500:
           description: Internal server error
     put:
       tags:
         - config
-      description: Add conig data
+      description: Add config data
       parameters:
         - name: config
           in: body
@@ -678,8 +680,12 @@ paths:
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/config_body"
         500:
           description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
 
 definitions:
   definition:

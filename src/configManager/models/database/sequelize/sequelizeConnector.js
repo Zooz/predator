@@ -17,37 +17,35 @@ async function init(sequelizeClient) {
 
 async function updateConfig(updateValues) {
     const configClient = client.model('config');
-    let records = [];
+    const records = [];
     Object.keys(updateValues).forEach(key => {
         let value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key];
         records.push(configClient.upsert({ key: key, value: value }));
     });
-    let results = await Promise.all(records);
+    const results = await Promise.all(records);
     return results;
 }
 
 async function getConfig() {
     const configClient = client.model('config');
-    let options = {
+    const options = {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
-    let dbResults = await configClient.findAll(options);
-    let resultArr = [];
-    if (dbResults) {
-        dbResults.forEach(result => {
-            resultArr.push({ key: result.dataValues['key'], value: result.dataValues['value'] });
-        });
-    }
+    const dbResults = await configClient.findAll(options);
+    const resultArr = [];
+    dbResults.forEach(result => {
+        resultArr.push({ key: result.dataValues['key'], value: result.dataValues['value'] });
+    });
     return resultArr;
 }
 
 async function getConfigValue(configValue) {
     const configClient = client.model('config');
-    let options = {
+    const options = {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     options.where = { key: configValue };
-    let dbResult = await configClient.find(options);
+    const dbResult = await configClient.find(options);
     // todo: IF NOT EXISTS? throw error
     return dbResult;
 }
@@ -61,7 +59,6 @@ async function initSchemas() {
         value: {
             type: Sequelize.DataTypes.STRING
         }
-
     });
     await config.sync();
 }

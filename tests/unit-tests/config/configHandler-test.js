@@ -5,7 +5,7 @@ process.env.JOB_PLATFORM = 'DOCKER';
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
-const databaseConnector = require('../../../src/configManager/models/database/databaseConnector');
+const databaseConnector = require('../../../src/configManager/models/database/sequelize/sequelizeConnector');
 const configConstants = require('../../../src/common/consts').CONFIG;
 
 let manager;
@@ -15,7 +15,13 @@ const defaultConfig = {
     docker_name: 'zooz/predator-runner:latest',
     runner_cpu: 1,
     runner_memory: 2048,
-    smtp_server: {}
+    smtp_server: {
+        host: undefined,
+        port: undefined,
+        username: undefined,
+        password: undefined,
+        timeout: 200
+    }
 };
 
 const configResponseParseObject = [
@@ -46,31 +52,38 @@ const configParseExpected = {
     }
 };
 
-const allConfigData = {
-    grafana_url: { value: 'test' },
-    external_address: { value: 'test' },
-    internal_address: { value: 'test' },
-    docker_name: { value: 'test' },
-    job_platform: { value: 'test' },
-    runner_memory: { value: 'test' },
-    runner_cpu: { value: 'test' },
-    metrics_plugin_name: { value: 'test' },
-    default_email_address: { value: 'test' },
-    default_webhook_url: { value: 'test' },
-    metrics_export_conf: { value: 'test' },
-    influx_metrics: { value: 'test' },
-    prometheus_metrics: { value: 'test' },
-    smtp_server: { value: 'test' }
+const convertObjectDBData = {
+    grafana_url: 'test_grafana_url',
+    external_address: 'test_external_address',
+    runner_cpu: 2
+};
+const resultAfterConvert = {
+    job_platform: 'DOCKER',
+    docker_name: 'zooz/predator-runner:latest',
+    grafana_url: 'test_grafana_url',
+    external_address: 'test_external_address',
+    runner_cpu: 2,
+    runner_memory: 2048,
+    smtp_server: {
+        host: undefined,
+        port: undefined,
+        username: undefined,
+        password: undefined,
+        timeout: 200
+    }
 };
 
-describe('Manager tests', function () {
+describe('Manager config', function () {
     let sandbox;
-
     let cassandraGetStub;
+    let cassandraGetValueStub;
+    let cassandraUpdateStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         cassandraGetStub = sandbox.stub(databaseConnector, 'getConfig');
+        cassandraGetValueStub = sandbox.stub(databaseConnector, 'getConfigValue');
+        cassandraUpdateStub = sandbox.stub(databaseConnector, 'updateConfig');
         manager = rewire('../../../src/configManager/models/configHandler');
     });
 
@@ -136,16 +149,30 @@ describe('Manager tests', function () {
         });
     });
 
-    describe('get all configs with value from env data', function () {
-        it('get all config success', async () => {
-            cassandraGetStub.resolves([]);
-            manager.__set__('configDataMap', allConfigData);
+    describe('get config value from env variables', function () {
+        it('get config  value success with errors', async () => {
+            cassandraGetValueStub.resolves([]);
 
-            let results = await manager.getConfig();
+            let result = await manager.getConfigValue('runner_cpu');
+            should(result).eql(1);
+        });
+    });
 
-            Object.values(configConstants).forEach(value => {
-                should(results[value]).eql('test');
-            });
+    describe('update config ', function () {
+        it('update config success', async () => {
+            cassandraUpdateStub.resolves([]);
+
+            let result = await manager.updateConfig({ runner_cpu: 'test_runner_cpu' });
+            should(result).eql([]);
+        });
+    });
+
+    describe('convert data to object from db data and default', function () {
+        it('get config  values ', async () => {
+            const createConfigObject = manager.__get__('createConfigObject');
+            const result = createConfigObject(convertObjectDBData);
+            clearUndefinedValues(result);
+            should(result).eql(resultAfterConvert);
         });
     });
 
