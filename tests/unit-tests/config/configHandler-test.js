@@ -133,7 +133,6 @@ describe('Manager config', function () {
         });
     });
 
-
     describe('get config value from env variables', function () {
         it('get config  value success', async () => {
             cassandraGetValueStub.resolves(undefined);
