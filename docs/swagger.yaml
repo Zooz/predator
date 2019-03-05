@@ -940,7 +940,7 @@ definitions:
         description: .
       metrics_plugin_name:
         type: string
-        enum: ['influx,prometheus']
+        enum: ['influx','prometheus']
         description: .
       default_email_address:
         type: string

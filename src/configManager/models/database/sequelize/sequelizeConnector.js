@@ -10,6 +10,7 @@ module.exports = {
     getConfigValue
 
 };
+
 async function init(sequelizeClient) {
     client = sequelizeClient;
     await initSchemas();
@@ -19,7 +20,7 @@ async function updateConfig(updateValues) {
     const configClient = client.model('config');
     const records = [];
     Object.keys(updateValues).forEach(key => {
-        let value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key];
+        let value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key] + '';
         records.push(configClient.upsert({ key: key, value: value }));
     });
     const results = await Promise.all(records);
@@ -32,10 +33,7 @@ async function getConfig() {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     const dbResults = await configClient.findAll(options);
-    const resultArr = [];
-    dbResults.forEach(result => {
-        resultArr.push({ key: result.dataValues['key'], value: result.dataValues['value'] });
-    });
+    const resultArr = dbResults.map(result => (result.dataValues));
     return resultArr;
 }
 

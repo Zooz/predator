@@ -24,7 +24,7 @@ const queryOptions = {
 function updateConfig(updateValues) {
     let queriesArr = [];
     Object.keys(updateValues).forEach(key => {
-        let value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key];
+        let value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key] + '';
         queriesArr.push({ 'query': INSERT_DATA, 'params': [key, value] });
     });
     return batchUpsert(queriesArr, queryOptions);
@@ -40,7 +40,7 @@ function getConfig() {
 
 async function batchUpsert(queriesArr, queryOptions) {
     try {
-        const result = client.batch(queriesArr, queryOptions);
+        const result = await client.batch(queriesArr, queryOptions);
         logger.trace('Query result', {
             queryArr: queriesArr,
             queryOptions: queryOptions,

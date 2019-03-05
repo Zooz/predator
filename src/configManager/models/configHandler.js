@@ -1,6 +1,6 @@
 const dbConnector = require('./database/databaseConnector');
 const configDataMap = require('../helpers/configDataMap');
-const constConfig = require('../../common/consts').CONFIG;
+const configTemplate = require('../../common/consts').CONFIG;
 
 module.exports.getConfigValue = async (configPath) => {
     const dbConfigValue = await dbConnector.getConfigValue(configPath);
@@ -19,9 +19,9 @@ module.exports.updateConfig = async (config) => {
 
 function createConfigObject(configAsObject) {
     let config = {};
-    Object.values(constConfig).forEach(constValue => {
-        const value = configAsObject[constValue] || configDataMap.getConstDefaultValue(constValue);
-        config[constValue] = value;
+    Object.values(configTemplate).forEach(configTemplateKeys => {
+        const value = configAsObject[configTemplateKeys] !== (undefined) ? configAsObject[configTemplateKeys] : configDataMap.getConstDefaultValue(configTemplateKeys);
+        config[configTemplateKeys] = value;
     });
     return config;
 }

@@ -8,8 +8,9 @@ let configDataMap = {
     [constConfig.JOB_PLATFORM]: { value: process.env.JOB_PLATFORM },
     [constConfig.RUNNER_CPU]: { value: process.env.RUNNER_CPU || 1, type: 'int' },
     [constConfig.RUNNER_MEMORY]: { value: process.env.RUNNER_MEMORY || 2048, type: 'int' },
-    [constConfig.METRICS_PLUGIN_NAME]: { value: process.env.METRICS_PLUGIN_NAME, type: 'json' },
-    [constConfig.METRICS_EXPORT_CONF]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
+    [constConfig.METRICS_PLUGIN_NAME]: { value: process.env.METRICS_PLUGIN_NAME, type: 'string' },
+    [constConfig.PROMETHEUS_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
+    [constConfig.INFLUX_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
     [constConfig.SMTP_SERVER]: {
         value: {
             host: process.env.SMTP_HOST,
