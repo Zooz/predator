@@ -25,12 +25,20 @@ tags:
   - name: Tests
     description: |
       Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.
+  - name: Jobs
+    description: |
+      Predator executes tests through so-called **jobs**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
+  - name: Reports
+    description: |
+      Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.
 
 x-tagGroups:
   - name: Reference
     tags:
       - DSL Definitions
       - Tests
+      - Jobs
+      - Reports
 
 paths:
   # DSL Definitions
@@ -245,7 +253,7 @@ paths:
       tags:
         - Tests
       summary: Retrieve all Tests
-      description: Retrieve all tests specifications.
+      description: Retrieve all available tests.
       responses:
         '200':
           description: Success
@@ -269,9 +277,11 @@ paths:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}':
     get:
+      operationId: retrieve-a-test
       tags:
-        - tests
-      description: Get specific test.
+        - Tests
+      summary: Retrieve a Test
+      description: Retrieve a specific test.
       parameters:
         - in: path
           name: test_id
@@ -305,9 +315,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
     put:
+      operationId: update-a-test
       tags:
-        - tests
-      description: update specific test.
+        - Tests
+      summary: Update a Test
+      description: Update a specific test.
       parameters:
         - in: path
           name: test_id
@@ -347,9 +359,11 @@ paths:
         description: The test to update
         required: true
     delete:
+      operationId: delete-a-test
       tags:
-        - tests
-      description: delete a specific test.
+        - Tests
+      summary: Delete a Test
+      description: Delete a specific test.
       parameters:
         - in: path
           name: test_id
@@ -372,10 +386,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/revisions':
+    operationId: retrieve-all-test-revisions
     get:
       tags:
-        - tests
-      description: Get list of all test revision of a specific test.
+        - Tests
+      summary: Retrieve Test Revisions
+      description: Retrieve the revisions of the specified test.
       parameters:
         - in: path
           name: test_id
@@ -410,11 +426,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Jobs
   /v1/jobs:
     get:
+      operationId: retrieve-all-jobs
       tags:
-        - jobs
-      description: Get list of all jobs.
+        - Jobs
+      summary: Retrieve all Jobs
+      description: Retrieve the details of all available jobs.
       parameters:
         - in: query
           name: one_time
@@ -443,9 +462,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
     post:
+      operationId: create-a-job
       tags:
-        - jobs
-      description: Create a new job that will trigger test run
+        - Jobs
+      summary: Create a Job
+      description: Create a new job that will trigger a test run.
       responses:
         '201':
           description: Success
@@ -476,9 +497,11 @@ paths:
         required: true
   '/v1/jobs/{job_id}':
     get:
+      operationId: retrieve-a-job
       tags:
-        - jobs
-      description: Get specific job.
+        - Jobs
+      summary: Retrieve a Job
+      description: Retrieve a specific job.
       parameters:
         - in: path
           name: job_id
@@ -553,9 +576,11 @@ paths:
         description: The job to add
         required: true
     delete:
+      operationId: delete-a-job
       tags:
-        - jobs
-      description: delete a specific job.
+        - Jobs
+      summary: Delete a Job
+      description: Delete a specific job.
       parameters:
         - in: path
           name: job_id
@@ -579,9 +604,11 @@ paths:
                 $ref: '#/components/schemas/error_response'
   '/v1/jobs/{job_id}/runs/{run_id}/stop':
     post:
+      operationId: terminate-a-job
       tags:
-        - jobs
-      description: stop a specific run of specific job.
+        - Jobs
+      summary: Terminate a Job
+      description: Terminate the execution of a specific job.
       parameters:
         - in: path
           description: The ID of the job.
@@ -610,11 +637,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Reports
   '/v1/tests/{test_id}/reports':
     post:
+      operationId: create-a-report
       tags:
-        - tests
-      description: Create new report for specific test.
+        - Reports
+      summary: Create a Report
+      description: Create a new report for the specified test.
       parameters:
         - in: path
           name: test_id
@@ -650,9 +680,11 @@ paths:
         description: report data
         required: true
     get:
+      operationId: retrieve-all-reports
       tags:
-        - tests
-      description: Get all summary reports for specific test.
+        - Reports
+      summary: Retrieve all Reports
+      description: Retrieve all reports for the specified test.
       parameters:
         - in: path
           name: test_id
@@ -682,13 +714,15 @@ paths:
                 $ref: '#/components/schemas/error_response'
   /v1/tests/last_reports:
     get:
+      operationId: retrieve-recent-reports
       tags:
-        - tests
-      description: Get all last reports limited by a query param
+        - Reports
+      summary: Retrieve Recent Reports
+      description: Retrieve the most recent reports
       parameters:
         - in: query
           name: limit
-          description: How many last reports show
+          description: The number of most recent reports to retrieve.
           required: true
           schema:
             type: number
@@ -716,7 +750,8 @@ paths:
   '/v1/tests/{test_id}/reports/{report_id}/stats':
     post:
       tags:
-        - tests
+        - Reports
+      summary: Insert a Stats Object
       description: Insert a new stats object for a specific report
       parameters:
         - in: path
@@ -759,9 +794,11 @@ paths:
         required: true
   '/v1/tests/{test_id}/reports/{report_id}':
     get:
+      operationId: retrieve-a-report
       tags:
-        - tests
-      description: Get specific report for specific test
+        - Reports
+      summary: Retrieve a Report
+      description: Retrieve a specific report for the specified test
       parameters:
         - in: path
           name: test_id
@@ -801,7 +838,8 @@ paths:
   '/v1/tests/{test_id}/reports/{report_id}/html':
     get:
       tags:
-        - tests
+        - Reports
+      summary: Get list of the history of this specific job id
       description: Get list of the history of this specific job id
       parameters:
         - in: path

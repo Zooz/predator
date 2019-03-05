@@ -2,6 +2,9 @@
 
 In this section, we will walk you through the steps of creating a simple test in Predator. It will allow you to familiarize yourself with some basic concepts, before moving onto some more advanced features later on.
 
+!!! note
+    We will use the [Petstore API](https://petstore.swagger.io/) in the examples that follow.
+
 Adding a new test is easy. From the Predator web interface, choose **Tests** > **View Tests**. Then click **Create Test** and complete all fields on the form, like so:
 
 
@@ -90,7 +93,7 @@ The following table explains the job parameters you can configure:
     </tr>
     <tr>
       <td>Run immediately</td>
-      <td>If checked, the test will execute immediately when the job is saved.</td> 
+      <td>Determines if the test will be executed immediately when the job is saved.</td> 
     </tr>
     <tr>
       <td>New Email</td>
@@ -98,12 +101,14 @@ The following table explains the job parameters you can configure:
     </tr>
     <tr>
       <td>New Webhook</td>
-      <td>ask Niv</td> 
+      <td>A URL to which an event will be sent when the test execution is completed. The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked. </td> 
     </tr>
   </table>
 
 
 # Viewing the Test Report
 
-asda
+Your curiosity is probably reaching an all-time high right now, as Predator is working hard to push your API to its limits. So how's your API performing under all that pressure?
+
+Predator's test reports will give you the in-depth performance metrics you're looking for. From the Predator UI choose **Reports** > **Last Reports** to view a detailed report of the test that was executed. For more information about the data shown in the test reports, see [Reports](reports.md).
 
