@@ -8,8 +8,7 @@ const uuidv4 = require('uuid/v4'),
     jobsManager = require('../../jobs/models/jobManager'),
     statsFromatter = require('./statsFormatter'),
     configHandler = require('../../configManager/models/configHandler'),
-    logger = require('../../common/logger'),
-    congigData = configHandler.getConfig();
+    logger = require('../../common/logger');
 
 module.exports.handleMessage = async (testId, reportId, stats) => {
     const metadata = { testId: testId, reportId: reportId };
@@ -73,6 +72,7 @@ async function handleIntermediate(report, job, stats, statsTime, statsData) {
     let webhookMessage;
     await databaseConnector.updateReport(report.test_id, report.report_id, 'in_progress', report.phase, stats.data, undefined);
     await databaseConnector.insertStats(stats.container_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'intermediate', stats.data);
+    const congigData = await configHandler.getConfig();
 
     if (report && report.status === ('started')) {
         let htmlReportUrl = congigData.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
@@ -90,6 +90,7 @@ async function handleIntermediate(report, job, stats, statsTime, statsData) {
 async function handleDone(report, job, stats, statsTime, statsData) {
     await databaseConnector.insertStats(stats.container_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'aggregate', stats.data);
     await databaseConnector.updateReport(report.test_id, report.report_id, 'finished', report.phase, stats.data, statsTime);
+    const congigData = await configHandler.getConfig();
 
     const htmlReportUrl = congigData.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
     let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', statsData)}\n<${htmlReportUrl}|View final html report>\n`;
@@ -108,6 +109,7 @@ async function handleDone(report, job, stats, statsTime, statsData) {
 
 async function handleAbort(report, job, stats, statsTime) {
     await databaseConnector.updateReport(report.test_id, report.report_id, 'aborted', report.phase, undefined, statsTime);
+    const congigData = await configHandler.getConfig();
 
     if (job.webhooks) {
         const htmlReportUrl = congigData.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;

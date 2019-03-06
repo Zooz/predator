@@ -5,7 +5,7 @@ const should = require('should'),
     configHandler = require('../../../src/configManager/models/configHandler'),
     metronomeConfig = require('../../../src/config/metronomeConfig');
 
-describe('Create job specific metronome tests', () => {
+describe('Create job specific metronome tests', async () => {
     let testId;
     let expectedResult;
     before(async () => {
@@ -30,8 +30,8 @@ describe('Create job specific metronome tests', () => {
     beforeEach(async () => {
         nock.cleanAll();
     });
-
-    if (configHandler.getConfigValue('jobPlatform') === 'METRONOME') {
+    const jobPlatform = await configHandler.getConfigValue('jobPlatform');
+    if (jobPlatform === 'METRONOME') {
         describe('Metronome', () => {
             describe('Good requests', () => {
                 let jobId;

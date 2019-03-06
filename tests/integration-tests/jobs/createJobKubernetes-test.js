@@ -6,7 +6,7 @@ const should = require('should'),
     configHandler = require('../../../src/configManager/models/configHandler'),
     kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
-describe('Create job specific kubernetes tests', () => {
+describe('Create job specific kubernetes tests', async () => {
     let testId;
 
     before(async () => {
@@ -23,8 +23,8 @@ describe('Create job specific kubernetes tests', () => {
     beforeEach(async () => {
         nock.cleanAll();
     });
-
-    if (configHandler.getConfigValue('jobPlatform') === 'KUBERNETES') {
+    const jobPlatform = await configHandler.getConfigValue('jobPlatform');
+    if (jobPlatform === 'KUBERNETES') {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
                 let jobId;

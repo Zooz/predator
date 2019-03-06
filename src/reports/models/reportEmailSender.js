@@ -6,7 +6,6 @@ const fs = require('fs'),
     nodemailer = require('nodemailer'),
     configHandler = require('../../configManager/models/configHandler'),
     cnfigConsts = require('../../common/consts').CONFIG,
-    configSmtp = configHandler.getConfigValue(cnfigConsts.SMTP_SERVER),
     logger = require('../../common/logger'),
     reportsManager = require('./reportsManager'),
     jobsManager = require('../../jobs/models/jobManager');
@@ -57,7 +56,8 @@ module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafana
     }
 };
 
-function createSMTPClient() {
+async function createSMTPClient() {
+    let configSmtp = configHandler.getConfigValue(cnfigConsts.SMTP_SERVER);
     var options = {
         port: configSmtp.port,
         host: configSmtp.host,

@@ -1,13 +1,12 @@
-const configHandler = require('../../../configManager/models/configHandler'),
-    configData = configHandler.getConfig();
+const configHandler = require('../../../configManager/models/configHandler');
 
-module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage) => {
+module.exports.createJobRequest = async (jobName, runId, parallelism, environmentVariables, dockerImage) => {
     return {
         id: jobName,
         description: 'Runs a performance test',
         run: {
-            cpus: configData.runnerCpu || 1,
-            mem: configData.runnerMemory || 2048,
+            cpus: await configHandler.getConfigValue('runnerCpu') || 1,
+            mem: await configHandler.getConfigValue('runnerMemory') || 2048,
             disk: 0,
             maxLaunchDelay: 30,
             docker: {

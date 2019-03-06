@@ -1,13 +1,13 @@
 const requestSender = require('../../common/requestSender'),
-    configHandler = require('../../configManager/models/configHandler'),
-    configData = configHandler.getConfig();
+    configHandler = require('../../configManager/models/configHandler');
 
 module.exports.getMostRecentRunnerTag = async () => {
+    let configData = await configHandler.getConfig();
     let dockerImageToUse = configData.dockerName;
     if (!configData.dockerName.includes(':')) {
         let dockerHubInfo = await requestSender.send({
             method: 'GET',
-            url: `https://hub.docker.com/v2/repositories/${configData.dockerName}/tags`,
+            url: `https://hub.docker.com/v2/repositories/${configHandler.getConfigValue('dockerName')}/tags`,
             json: true
         });
         let newestVersion = dockerHubInfo.results.map(version => version.name)

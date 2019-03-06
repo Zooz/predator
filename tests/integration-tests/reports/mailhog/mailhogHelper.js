@@ -4,16 +4,16 @@ const request = require('request-promise-native'),
     util = require('util'),
     should = require('should'),
     configHandler = require('../../configManager/models/configHandler'),
-    cnfigConsts = require('../../common/consts').CONFIG,
-    configSmtp = configHandler.getConfigValue(cnfigConsts.SMTP_SERVER),
-    smtpServerUrl = util.format('http://%s:%s', configSmtp.host, configSmtp.port);
+    configConst = require('../../common/consts').CONFIG,
+    smtpServerUrlTemplate = 'http://%s:%s';
 
 module.exports.validateEmail = async () => {
     return new Promise((resolve, reject) => {
         setTimeout(async () => {
+            const configSmtp = configHandler.getConfigValue(configConst.SMTP_SERVER);
             const messages = await request({
                 method: 'GET',
-                url: smtpServerUrl + '/api/v1/messages',
+                url: util.format(smtpServerUrlTemplate, configSmtp.host, configSmtp.port) + '/api/v1/messages',
                 timeout: 2000,
                 time: true
             });
@@ -31,9 +31,10 @@ module.exports.validateEmail = async () => {
 };
 
 module.exports.clearAllOldMails = () => {
+    const configSmtp = configHandler.getConfigValue(configConst.SMTP_SERVER);
     return request({
         method: 'DELETE',
-        url: smtpServerUrl + '/api/v1/messages',
+        url: util.format(smtpServerUrlTemplate, configSmtp.host, configSmtp.port) + '/api/v1/messages',
         timeout: 2000,
         time: true
     });

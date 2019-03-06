@@ -3,8 +3,7 @@
 const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
-    statsConsumer = require('./statsConsumer'),
-    configData = configHandler.getConfig();
+    statsConsumer = require('./statsConsumer');
 
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
@@ -55,13 +54,13 @@ module.exports.postStats = async (testId, reportId, stats) => {
     return stats;
 };
 
-function getReportResponse(summaryRow) {
+async function getReportResponse(summaryRow) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
-
-    let htmlReportUrl = configData.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
+    let externalAddress = await configHandler.getConfigValue('externalAddress');
+    let htmlReportUrl = externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
 
     let report = {
         test_id: summaryRow.test_id,
@@ -91,10 +90,11 @@ function getReportResponse(summaryRow) {
     return report;
 }
 
-function generateGraphanaUrl(report) {
-    if (configData.grafanaUrl) {
+async function generateGraphanaUrl(report) {
+    let grafanaUrl = await configHandler.getConfigValue('grafanaUrl');
+    if (grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
-        const grafanaReportUrl = encodeURI(configData.grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
+        const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
         return grafanaReportUrl;
     }
 }

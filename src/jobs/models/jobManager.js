@@ -3,12 +3,9 @@ const logger = require('../../common/logger'),
     uuid = require('uuid'),
     CronJob = require('cron').CronJob,
     configHandler = require('../../configManager/models/configHandler'),
-    configData = configHandler.getConfig(),
     util = require('util'),
     dockerHubConnector = require('./dockerHubConnector'),
-    databaseConnector = require('./database/databaseConnector'),
-    jobTemplate = require(`./${configData.jobPlatform.toLowerCase()}/jobTemplate`),
-    jobConnector = require(`./${configData.jobPlatform.toLowerCase()}/jobConnector`);
+    databaseConnector = require('./database/databaseConnector');
 
 let cronJobs = {};
 const JOB_PLATFORM_NAME = 'predator.%s';
@@ -27,6 +24,8 @@ module.exports.reloadCronJobs = async function () {
 };
 
 module.exports.createJob = async function (job) {
+    const configData = await configHandler.getConfig();
+    const jobConnector = require(`./${configData.jobPlatform.toLowerCase()}/jobConnector`);
     let jobId = uuid.v4();
 
     try {
@@ -58,6 +57,8 @@ module.exports.deleteJob = function (jobId) {
 };
 
 module.exports.stopRun = async function (jobId, runId) {
+    const configData = await configHandler.getConfig();
+    const jobConnector = require(`./${configData.jobPlatform.toLowerCase()}/jobConnector`);
     await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), runId);
 };
 
@@ -152,7 +153,9 @@ function createResponse(jobId, jobBody, runId) {
     return response;
 }
 
-function createJobRequest(jobId, runId, jobBody, dockerImage) {
+async function createJobRequest(jobId, runId, jobBody, dockerImage) {
+    const configData = await configHandler.getConfig();
+    const jobTemplate = require(`./${configData.jobPlatform.toLowerCase()}/jobTemplate`);
     let jobName = util.format(JOB_PLATFORM_NAME, jobId);
     let rampToPerRunner = jobBody.ramp_to;
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
@@ -210,7 +213,9 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
     return jobRequest;
 }
 
-function addCron(jobId, job, cronExpression) {
+async function addCron(jobId, job, cronExpression) {
+    const configData = await configHandler.getConfig();
+    const jobConnector = require(`./${configData.jobPlatform.toLowerCase()}/jobConnector`);
     let scheduledJob = new CronJob(cronExpression, async function () {
         try {
             let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();

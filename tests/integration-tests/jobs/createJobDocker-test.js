@@ -23,7 +23,7 @@ if (dockerConfig.host) {
 }
 let docker = new Docker(dockerConnection);
 
-describe('Create job specific docker tests', () => {
+describe('Create job specific docker tests', async () => {
     let testId;
     let expectedResult;
     before(async () => {
@@ -48,8 +48,8 @@ describe('Create job specific docker tests', () => {
     beforeEach(async () => {
         nock.cleanAll();
     });
-
-    if (configHandler.getConfigValue('jobPlatform') === 'DOCKER') {
+    const jobPlatform = await configHandler.getConfigValue('jobPlatform');
+    if (jobPlatform === 'DOCKER') {
         describe('DOCKER', () => {
             after(async () => {
                 let containers = await docker.listContainers();
