@@ -25,7 +25,7 @@ module.exports.reloadCronJobs = async function () {
 
 module.exports.createJob = async function (job) {
     const configData = await configHandler.getConfig();
-    const jobConnector = require(`./${configData.jobPlatform.toLowerCase()}/jobConnector`);
+    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     let jobId = uuid.v4();
 
     try {
@@ -33,7 +33,7 @@ module.exports.createJob = async function (job) {
         logger.info('Job saved successfully to database');
         let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
         let runId = Date.now();
-        let jobSpecificPlatformRequest = createJobRequest(jobId, runId, job, latestDockerImage);
+        let jobSpecificPlatformRequest = await createJobRequest(jobId, runId, job, latestDockerImage);
         if (job.run_immediately) {
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
@@ -58,7 +58,7 @@ module.exports.deleteJob = function (jobId) {
 
 module.exports.stopRun = async function (jobId, runId) {
     const configData = await configHandler.getConfig();
-    const jobConnector = require(`./${configData.jobPlatform.toLowerCase()}/jobConnector`);
+    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), runId);
 };
 
@@ -155,7 +155,7 @@ function createResponse(jobId, jobBody, runId) {
 
 async function createJobRequest(jobId, runId, jobBody, dockerImage) {
     const configData = await configHandler.getConfig();
-    const jobTemplate = require(`./${configData.jobPlatform.toLowerCase()}/jobTemplate`);
+    const jobTemplate = require(`./${configData.job_platform.toLowerCase()}/jobTemplate`);
     let jobName = util.format(JOB_PLATFORM_NAME, jobId);
     let rampToPerRunner = jobBody.ramp_to;
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
@@ -174,14 +174,15 @@ async function createJobRequest(jobId, runId, jobBody, dockerImage) {
         RUN_ID: runId.toString(),
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
-        PREDATOR_URL: configData.internalAddress,
+        PREDATOR_URL: configData.internal_address,
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
         DURATION: jobBody.duration.toString()
     };
+    const metricsExport = configData.metrics_plugin_name === 'influx' ? configData.influx_metrics : configData.prometheus_metrics;
 
-    if (configData.metricsPluginName && configData.metricsExportConfig) {
-        environmentVariables.METRICS_PLUGIN_NAME = configData.metricsPluginName;
-        environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(configData.metricsExportConfig).toString('base64');
+    if (configData.metrics_plugin_name && metricsExport) {
+        environmentVariables.METRICS_PLUGIN_NAME = configData.metrics_plugin_name;
+        environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(metricsExport).toString('base64');
     }
 
     if (jobBody.emails) {
@@ -215,7 +216,7 @@ async function createJobRequest(jobId, runId, jobBody, dockerImage) {
 
 async function addCron(jobId, job, cronExpression) {
     const configData = await configHandler.getConfig();
-    const jobConnector = require(`./${configData.jobPlatform.toLowerCase()}/jobConnector`);
+    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     let scheduledJob = new CronJob(cronExpression, async function () {
         try {
             let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
