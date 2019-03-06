@@ -47,7 +47,7 @@ module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafana
     };
 
     try {
-        const transporter = createSMTPClient();
+        const transporter = await createSMTPClient();
         let response = await transporter.sendMail(mailOptions);
         transporter.close();
         logger.info(response, `Send email successfully for testId: ${testId}, reportId: ${reportId}`);

@@ -208,7 +208,7 @@ async function createJobRequest(jobId, runId, jobBody, dockerImage) {
         });
     }
 
-    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage);
+    let jobRequest = await jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage);
 
     return jobRequest;
 }

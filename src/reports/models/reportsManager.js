@@ -14,7 +14,7 @@ module.exports.getReport = async (testId, reportId) => {
         throw error;
     }
 
-    let report = getReportResponse(reportSummary[0]);
+    let report = await getReportResponse(reportSummary[0]);
     return report;
 };
 

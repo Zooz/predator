@@ -28,22 +28,28 @@ async function updateConfig(updateValues) {
 }
 
 async function getConfig() {
-    const configClient = client.model('config');
-    const options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
-    };
-    const dbResults = await configClient.findAll(options);
-    const resultArr = dbResults.map(result => (result.dataValues));
+    let resultArr = [];
+    if (client) {
+        const configClient = client.model('config');
+        const options = {
+            attributes: { exclude: ['updated_at', 'created_at'] }
+        };
+        const dbResults = await configClient.findAll(options);
+        resultArr = dbResults.map(result => (result.dataValues));
+    }
     return resultArr;
 }
 
 async function getConfigValue(configValue) {
-    const configClient = client.model('config');
-    const options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
-    };
-    options.where = { key: configValue };
-    const dbResult = await configClient.find(options);
+    let dbResult = [];
+    if (client) {
+        const configClient = client.model('config');
+        const options = {
+            attributes: { exclude: ['updated_at', 'created_at'] }
+        };
+        options.where = { key: configValue };
+        dbResult = await configClient.find(options);
+    }
     // todo: IF NOT EXISTS? throw error
     return dbResult;
 }

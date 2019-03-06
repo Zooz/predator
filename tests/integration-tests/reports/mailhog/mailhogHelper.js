@@ -30,8 +30,8 @@ module.exports.validateEmail = async () => {
     });
 };
 
-module.exports.clearAllOldMails = () => {
-    const configSmtp = configHandler.getConfigValue(configConst.SMTP_SERVER);
+module.exports.clearAllOldMails = async () => {
+    const configSmtp = await configHandler.getConfigValue(configConst.SMTP_SERVER);
     return request({
         method: 'DELETE',
         url: util.format(smtpServerUrlTemplate, configSmtp.host, configSmtp.port) + '/api/v1/messages',
