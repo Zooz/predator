@@ -3,8 +3,8 @@
 const request = require('request-promise-native'),
     util = require('util'),
     should = require('should'),
-    configHandler = require('../../configManager/models/configHandler'),
-    configConst = require('../../common/consts').CONFIG,
+    configHandler = require('../../../../src/configManager/models/configHandler'),
+    configConst = require('../../../../src/common/consts').CONFIG,
     smtpServerUrlTemplate = 'http://%s:%s';
 
 module.exports.validateEmail = async () => {
