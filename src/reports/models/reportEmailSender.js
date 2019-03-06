@@ -1,14 +1,15 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let _ = require('lodash');
-let nodemailer = require('nodemailer');
-
-let smtpConfig = require('../../config/smtpConfig');
-let logger = require('../../common/logger');
-let reportsManager = require('./reportsManager');
-let jobsManager = require('../../jobs/models/jobManager');
+const fs = require('fs'),
+    path = require('path'),
+    _ = require('lodash'),
+    nodemailer = require('nodemailer'),
+    configHandler = require('../../configManager/models/configHandler'),
+    cnfigConsts = require('../../common/consts').CONFIG,
+    configSmtp = configHandler.getConfigValue(cnfigConsts.SMTP_SERVER),
+    logger = require('../../common/logger'),
+    reportsManager = require('./reportsManager'),
+    jobsManager = require('../../jobs/models/jobManager');
 
 module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafanaUrl) => {
     let report, job;
@@ -58,12 +59,12 @@ module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafana
 
 function createSMTPClient() {
     var options = {
-        port: smtpConfig.port,
-        host: smtpConfig.host,
-        connectionTimeout: smtpConfig.timeout,
+        port: configSmtp.port,
+        host: configSmtp.host,
+        connectionTimeout: configSmtp.timeout,
         auth: {
-            user: smtpConfig.username,
-            pass: smtpConfig.password
+            user: configSmtp.username,
+            pass: configSmtp.password
         }
     };
 

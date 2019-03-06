@@ -1,12 +1,13 @@
-let requestSender = require('../../common/requestSender');
-let config = require('../../config/serviceConfig');
+const requestSender = require('../../common/requestSender'),
+    configHandler = require('../../configManager/models/configHandler'),
+    configData = configHandler.getConfig();
 
 module.exports.getMostRecentRunnerTag = async () => {
-    let dockerImageToUse = config.dockerName;
-    if (!config.dockerName.includes(':')) {
+    let dockerImageToUse = configData.dockerName;
+    if (!configData.dockerName.includes(':')) {
         let dockerHubInfo = await requestSender.send({
             method: 'GET',
-            url: `https://hub.docker.com/v2/repositories/${config.dockerName}/tags`,
+            url: `https://hub.docker.com/v2/repositories/${configData.dockerName}/tags`,
             json: true
         });
         let newestVersion = dockerHubInfo.results.map(version => version.name)
@@ -15,9 +16,9 @@ module.exports.getMostRecentRunnerTag = async () => {
             .pop();
 
         if (!newestVersion) {
-            throw new Error(`No docker found for ${config.dockerName}`);
+            throw new Error(`No docker found for ${configData.dockerName}`);
         }
-        dockerImageToUse = `${config.dockerName}:${newestVersion}`;
+        dockerImageToUse = `${configData.dockerName}:${newestVersion}`;
     }
 
     return dockerImageToUse;

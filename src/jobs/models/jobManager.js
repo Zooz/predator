@@ -1,15 +1,14 @@
 'use strict';
-let logger = require('../../common/logger');
-
-let uuid = require('uuid');
-let CronJob = require('cron').CronJob;
-let config = require('../../config/serviceConfig');
-let util = require('util');
-let dockerHubConnector = require('./dockerHubConnector');
-let databaseConnector = require('./database/databaseConnector');
-
-let jobTemplate = require(`./${config.jobPlatform.toLowerCase()}/jobTemplate`);
-let jobConnector = require(`./${config.jobPlatform.toLowerCase()}/jobConnector`);
+const logger = require('../../common/logger'),
+    uuid = require('uuid'),
+    CronJob = require('cron').CronJob,
+    configHandler = require('../../configManager/models/configHandler'),
+    configData = configHandler.getConfig(),
+    util = require('util'),
+    dockerHubConnector = require('./dockerHubConnector'),
+    databaseConnector = require('./database/databaseConnector'),
+    jobTemplate = require(`./${configData.jobPlatform.toLowerCase()}/jobTemplate`),
+    jobConnector = require(`./${configData.jobPlatform.toLowerCase()}/jobConnector`);
 
 let cronJobs = {};
 const JOB_PLATFORM_NAME = 'predator.%s';
@@ -172,14 +171,14 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
         RUN_ID: runId.toString(),
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
-        PREDATOR_URL: config.internalAddress,
+        PREDATOR_URL: configData.internalAddress,
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
         DURATION: jobBody.duration.toString()
     };
 
-    if (config.metricsPluginName && config.metricsExportConfig) {
-        environmentVariables.METRICS_PLUGIN_NAME = config.metricsPluginName;
-        environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(config.metricsExportConfig).toString('base64');
+    if (configData.metricsPluginName && configData.metricsExportConfig) {
+        environmentVariables.METRICS_PLUGIN_NAME = configData.metricsPluginName;
+        environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(configData.metricsExportConfig).toString('base64');
     }
 
     if (jobBody.emails) {

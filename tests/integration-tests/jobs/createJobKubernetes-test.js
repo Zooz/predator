@@ -1,11 +1,10 @@
-let should = require('should');
-let uuid = require('uuid');
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
-
-let nock = require('nock');
-let serviceConfig = require('../../../src/config/serviceConfig');
-let kubernetesConfig = require('../../../src/config/kubernetesConfig');
+const should = require('should'),
+    uuid = require('uuid'),
+    schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    nock = require('nock'),
+    configHandler = require('../../../src/configManager/models/configHandler'),
+    kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
 describe('Create job specific kubernetes tests', () => {
     let testId;
@@ -25,7 +24,7 @@ describe('Create job specific kubernetes tests', () => {
         nock.cleanAll();
     });
 
-    if (serviceConfig.jobPlatform === 'KUBERNETES') {
+    if (configHandler.getConfigValue('jobPlatform') === 'KUBERNETES') {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
                 let jobId;

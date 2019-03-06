@@ -1,12 +1,12 @@
-let should = require('should');
-let URL = require('url').URL;
-let fs = require('fs');
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
-let nock = require('nock');
-let Docker = require('dockerode');
-let serviceConfig = require('../../../src/config/serviceConfig');
-let dockerConfig = require('../../../src/config/dockerConfig');
+const should = require('should'),
+    URL = require('url').URL,
+    fs = require('fs'),
+    schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    nock = require('nock'),
+    Docker = require('dockerode'),
+    configHandler = require('../../../src/configManager/models/configHandler'),
+    dockerConfig = require('../../../src/config/dockerConfig');
 
 let dockerConnection;
 if (dockerConfig.host) {
@@ -19,7 +19,7 @@ if (dockerConfig.host) {
         key: dockerConfig.certPath ? fs.readFileSync(dockerConfig.certPath + '/key.pem') : undefined
     };
 } else {
-    dockerConnection = ({socketPath: '/var/run/docker.sock'});
+    dockerConnection = ({ socketPath: '/var/run/docker.sock' });
 }
 let docker = new Docker(dockerConnection);
 
@@ -49,7 +49,7 @@ describe('Create job specific docker tests', () => {
         nock.cleanAll();
     });
 
-    if (serviceConfig.jobPlatform === 'DOCKER') {
+    if (configHandler.getConfigValue('jobPlatform') === 'DOCKER') {
         describe('DOCKER', () => {
             after(async () => {
                 let containers = await docker.listContainers();

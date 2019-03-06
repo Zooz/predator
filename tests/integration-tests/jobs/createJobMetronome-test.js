@@ -1,10 +1,9 @@
-let should = require('should');
-let uuid = require('uuid');
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
-let nock = require('nock');
-let serviceConfig = require('../../../src/config/serviceConfig');
-let metronomeConfig = require('../../../src/config/metronomeConfig');
+const should = require('should'),
+    schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    nock = require('nock'),
+    configHandler = require('../../../src/configManager/models/configHandler'),
+    metronomeConfig = require('../../../src/config/metronomeConfig');
 
 describe('Create job specific metronome tests', () => {
     let testId;
@@ -32,7 +31,7 @@ describe('Create job specific metronome tests', () => {
         nock.cleanAll();
     });
 
-    if (serviceConfig.jobPlatform === 'METRONOME') {
+    if (configHandler.getConfigValue('jobPlatform') === 'METRONOME') {
         describe('Metronome', () => {
             describe('Good requests', () => {
                 let jobId;

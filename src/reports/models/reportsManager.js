@@ -1,9 +1,10 @@
 'use strict';
 
-let databaseConnector = require('./databaseConnector');
-let jobConnector = require('../../jobs/models/jobManager');
-let serviceConfig = require('../../config/serviceConfig');
-let statsConsumer = require('./statsConsumer');
+const databaseConnector = require('./databaseConnector'),
+    jobConnector = require('../../jobs/models/jobManager'),
+    configHandler = require('../../configManager/models/configHandler'),
+    statsConsumer = require('./statsConsumer'),
+    configData = configHandler.getConfig();
 
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
@@ -60,7 +61,7 @@ function getReportResponse(summaryRow) {
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
 
-    let htmlReportUrl = serviceConfig.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
+    let htmlReportUrl = configData.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
 
     let report = {
         test_id: summaryRow.test_id,
@@ -91,9 +92,9 @@ function getReportResponse(summaryRow) {
 }
 
 function generateGraphanaUrl(report) {
-    if (serviceConfig.grafanaUrl) {
+    if (configData.grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
-        const grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
+        const grafanaReportUrl = encodeURI(configData.grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
         return grafanaReportUrl;
     }
 }

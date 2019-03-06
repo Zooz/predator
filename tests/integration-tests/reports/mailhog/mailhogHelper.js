@@ -1,11 +1,12 @@
 'use strict';
 
-const request = require('request-promise-native');
-const util = require('util');
-const should = require('should');
-
-const smtpConfig = require('./smtpConfig');
-const smtpServerUrl = util.format('http://%s:%s', smtpConfig.host, smtpConfig.port);
+const request = require('request-promise-native'),
+    util = require('util'),
+    should = require('should'),
+    configHandler = require('../../configManager/models/configHandler'),
+    cnfigConsts = require('../../common/consts').CONFIG,
+    configSmtp = configHandler.getConfigValue(cnfigConsts.SMTP_SERVER),
+    smtpServerUrl = util.format('http://%s:%s', configSmtp.host, configSmtp.port);
 
 module.exports.validateEmail = async () => {
     return new Promise((resolve, reject) => {
