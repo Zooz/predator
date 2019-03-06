@@ -25,6 +25,8 @@ use_directory_urls: False
 markdown_extensions:
    - codehilite:
        css_class: codehilite
+   - pymdownx.superfences: 
+   - pymdownx.details:    
    - admonition
    - sane_lists
    - fenced_code

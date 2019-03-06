@@ -1,15 +1,22 @@
 # Adding your First Test
 
-In this section, we will walk you through the steps of creating a simple test in Predator. It will allow you to familiarize yourself with some basic concepts, before moving onto some more advanced features later on.
+In this section, we will walk you through the steps of creating a simple test in Predator. It will allow you to familiarize yourself with some basic concepts, before moving onto some more advanced features later on. 
 
-!!! note
-    We will use the [Petstore API](https://petstore.swagger.io/) in the examples that follow.
+!!! note "Following along with the examples"
+    To make it easy for you to follow along with the steps below, we created a demo Predator docker image. This image allows you to invoke our fictitious petstore API, used in the examples that follow. You can retrieve and run the docker image with the following command (just make sure to replace {MACHINE_IP} with the IP address of your own machine):
 
+    ```
+    docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://{MACHINE_IP}:80:80/v1 
+    -p 80:80 --name quirky_yonath -v /var/run/docker.sock:/var/run/docker.sock zooz/
+    predator-builds:petstore
+    ```
+    
 Adding a new test is easy. From the Predator web interface, choose **Tests** > **View Tests**. Then click **Create Test** and complete all fields on the form, like so:
 
 
 ![Screenshot](images/createtest.png)
 
+## Test Scenarios
 
 Now proceed to add one or more test **scenarios**. A scenario is a sequence of HTTP requests aimed to test the performance of a single piece of functionality. For instance, a scenario could test the performance of multiple users requesting information about a specific pet simultaneously. Another scenario could be ordering a pet from the pet store. 
 
@@ -23,6 +30,8 @@ Here's a sample scenario that fetches the inventory from the pet store:
 
 
 ![Screenshot](images/scenario.png)
+
+## Pre-scenario Requests
 
 Sometimes a prerequisite must be fulfilled before your scenarios can actually work. For example, pets must already have been created before you can fetch them from the inventory. This is where a **pre-scenario request** comes into play. A pre-scenario request is an HTTP request that Predator executes before running the scenarios in your test.
 
