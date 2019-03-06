@@ -30,7 +30,7 @@ describe('Create job specific metronome tests', async () => {
     beforeEach(async () => {
         nock.cleanAll();
     });
-    const jobPlatform = await configHandler.getConfigValue('jobPlatform');
+    const jobPlatform = await configHandler.getConfigValue('job_platform');
     if (jobPlatform === 'METRONOME') {
         describe('Metronome', () => {
             describe('Good requests', () => {

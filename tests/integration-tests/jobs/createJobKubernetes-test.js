@@ -23,7 +23,7 @@ describe('Create job specific kubernetes tests', async () => {
     beforeEach(async () => {
         nock.cleanAll();
     });
-    const jobPlatform = await configHandler.getConfigValue('jobPlatform');
+    const jobPlatform = await configHandler.getConfigValue('job_platform');
     if (jobPlatform === 'KUBERNETES') {
         describe('Kubernetes', () => {
             describe('Good requests', () => {

@@ -5,7 +5,6 @@ let rewire = require('rewire');
 let sinon = require('sinon');
 let databaseConnector = require('../../../../src/reports/models/databaseConnector');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
-let logger = require('../../../../src/common/logger');
 
 let manager;
 
@@ -42,7 +41,7 @@ const REPORT = {
             'Create token and get token': 173732,
             'Create token, create customer and assign token to customer': 115716
         },
-        'errors': {EAI_AGAIN: 112, NOTREACH: 123 },
+        'errors': { EAI_AGAIN: 112, NOTREACH: 123 },
         'codes': {
             '200': 173732,
             '201': 520878,
@@ -70,8 +69,6 @@ const JOB = {
 
 describe('Reports manager tests', function () {
     let sandbox;
-    let loggerErrorStub;
-    let loggerInfoStub;
     let databaseGetReportsStub;
     let databaseGetReportStub;
     let databaseGetLastReportsStub;
@@ -89,13 +86,17 @@ describe('Reports manager tests', function () {
         databasePostReportStub = sandbox.stub(databaseConnector, 'insertReport');
         databasePostStatsStub = sandbox.stub(databaseConnector, 'insertStats');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
-        loggerErrorStub = sandbox.stub(logger, 'error');
-        loggerInfoStub = sandbox.stub(logger, 'info');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
 
         manager = rewire('../../../../src/reports/models/reportsManager');
-        manager.__set__('serviceConfig.externalAddress', 'http://www.zooz.com');
-        manager.__set__('serviceConfig.jobPlatform', 'KUBERNETES');
+        manager.__set__('configHandler', {
+            getConfig: () => {
+                return {
+                    job_platform: 'KUBERNETES',
+                    external_address: 'http://www.zooz.com'
+                };
+            }
+        });
     });
 
     beforeEach(() => {
@@ -108,7 +109,11 @@ describe('Reports manager tests', function () {
 
     describe('Get report', function () {
         it('Database connector returns an array with one report', async () => {
-            manager.__set__('serviceConfig.grafanaUrl', 'http://www.grafana.com');
+            manager.__set__('configHandler', {
+                getConfigValue: () => {
+                    return 'http://www.grafana.com';
+                }
+            });
             databaseGetReportStub.resolves([REPORT]);
             const report = await manager.getReport();
             should.exist(report);
@@ -118,7 +123,11 @@ describe('Reports manager tests', function () {
         });
 
         it('Database connector returns an array with one report without grafana url configured', async () => {
-            manager.__set__('serviceConfig.grafanaUrl', undefined);
+            manager.__set__('configHandler', {
+                getConfigValue: () => {
+                    return undefined;
+                }
+            });
             databaseGetReportStub.resolves([REPORT]);
             const report = await manager.getReport();
             should.exist(report);
@@ -198,7 +207,7 @@ describe('Reports manager tests', function () {
             databasePostStatsStub.resolves();
             databaseUpdateReportStub.resolves();
             getJobStub.resolves(JOB);
-            const stats = { phase_status: 'intermediate', data: JSON.stringify({medain: 4 })};
+            const stats = { phase_status: 'intermediate', data: JSON.stringify({ medain: 4 }) };
             const statsResponse = await manager.postStats('test_id', 'report_id', stats);
             should.exist(statsResponse);
             statsResponse.should.eql(stats);

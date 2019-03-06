@@ -5,8 +5,8 @@ module.exports.createJobRequest = async (jobName, runId, parallelism, environmen
         id: jobName,
         description: 'Runs a performance test',
         run: {
-            cpus: await configHandler.getConfigValue('runnerCpu') || 1,
-            mem: await configHandler.getConfigValue('runnerMemory') || 2048,
+            cpus: await configHandler.getConfigValue('runner_cpu') || 1,
+            mem: await configHandler.getConfigValue('runner_memory') || 2048,
             disk: 0,
             maxLaunchDelay: 30,
             docker: {

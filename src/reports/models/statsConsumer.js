@@ -92,7 +92,7 @@ async function handleDone(report, job, stats, statsTime, statsData) {
     await databaseConnector.updateReport(report.test_id, report.report_id, 'finished', report.phase, stats.data, statsTime);
     const congigData = await configHandler.getConfig();
 
-    const htmlReportUrl = congigData.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
+    const htmlReportUrl = congigData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
     let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', statsData)}\n<${htmlReportUrl}|View final html report>\n`;
 
     if (report.grafana_report) {

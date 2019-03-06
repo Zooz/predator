@@ -59,7 +59,7 @@ async function getReportResponse(summaryRow) {
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
-    let externalAddress = await configHandler.getConfigValue('externalAddress');
+    let externalAddress = await configHandler.getConfigValue('external_address');
     let htmlReportUrl = externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
 
     let report = {
@@ -82,7 +82,7 @@ async function getReportResponse(summaryRow) {
         status: summaryRow.status,
         last_stats: lastStats,
         html_report: htmlReportUrl,
-        grafana_report: generateGraphanaUrl(summaryRow),
+        grafana_report: await generateGraphanaUrl(summaryRow),
         notes: summaryRow.notes,
         environment: testConfiguration.environment
     };
@@ -91,7 +91,7 @@ async function getReportResponse(summaryRow) {
 }
 
 async function generateGraphanaUrl(report) {
-    let grafanaUrl = await configHandler.getConfigValue('grafanaUrl');
+    let grafanaUrl = await configHandler.getConfigValue('grafana_url');
     if (grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
         const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
