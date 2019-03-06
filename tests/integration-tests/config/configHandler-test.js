@@ -1,8 +1,6 @@
 'use strict';
 
 const configRequestCreator = require('./helpers/requestCreator');
-const path = require('path');
-const fs = require('fs');
 const should = require('should');
 const validationError = 'Input validation error';
 const defaultBody = {
@@ -74,8 +72,6 @@ const requestBodyNotValidRequire = {
 };
 
 before(async () => {
-    fs.writeFile(path.join(__dirname, '..', 'predator'), '', () => {
-    });
     await configRequestCreator.init();
 });
 
