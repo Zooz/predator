@@ -28,7 +28,6 @@ describe('Stats consumer test', () => {
         databaseConnectorUpdateSummaryStub = sandbox.stub(databaseConnector, 'updateReport');
         databaseConnectorInsertStatsStub = sandbox.stub(databaseConnector, 'insertStats');
         databaseConnectorGetSummaryStub = sandbox.stub(databaseConnector, 'getReport');
-
         loggerInfoStub = sandbox.stub(logger, 'info');
         loggerWarnStub = sandbox.stub(logger, 'warn');
         reportWebhookSenderSendStub = sandbox.stub(reportWebhookSender, 'send');
