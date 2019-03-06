@@ -56,7 +56,6 @@ jobs:
         name: Integration tests with docker engine and sqlite configuration
         command: npm run integration-tests
         environment:
-          DATABASE_NAME: sqlite_docker
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: docker
     - run:
@@ -75,7 +74,6 @@ jobs:
         name: Integration tests with kubernetes and sqlite configuration
         command: npm run integration-tests
         environment:
-          DATABASE_NAME: sqlite_kubernetes
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: kubernetes
     - run:

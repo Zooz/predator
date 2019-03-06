@@ -1,5 +1,5 @@
 let cassandra = require('cassandra-driver');
-let config = {
+const config = {
     type: process.env.DATABASE_TYPE || 'SQLITE',
     name: process.env.DATABASE_NAME || 'predator',
     address: process.env.DATABASE_ADDRESS,
