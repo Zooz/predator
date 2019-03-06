@@ -72,10 +72,10 @@ async function handleIntermediate(report, job, stats, statsTime, statsData) {
     let webhookMessage;
     await databaseConnector.updateReport(report.test_id, report.report_id, 'in_progress', report.phase, stats.data, undefined);
     await databaseConnector.insertStats(stats.container_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'intermediate', stats.data);
-    const congigData = await configHandler.getConfig();
+    const configData = await configHandler.getConfig();
 
     if (report && report.status === ('started')) {
-        let htmlReportUrl = congigData.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
+        let htmlReportUrl = configData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
         const phaseIndex = report.phase;
         webhookMessage = `🤔 *Test ${report.test_name} with id: ${report.test_id} first batch of results arrived for phase ${phaseIndex}.*\n${statsFromatter.getStatsFormatted('intermediate', statsData)}\n<${htmlReportUrl}|Track report in html report>\n`;
         if (report.grafana_report) {
@@ -112,7 +112,7 @@ async function handleAbort(report, job, stats, statsTime) {
     const congigData = await configHandler.getConfig();
 
     if (job.webhooks) {
-        const htmlReportUrl = congigData.externalAddress + `/tests/${report.test_id}/reports/${report.report_id}/html`;
+        const htmlReportUrl = congigData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
         let webhookMessage = `😢 *Test ${report.test_name} with id: ${report.test_id} was aborted.*\n<${htmlReportUrl}|View final html report>\n`;
         if (report.grafana_report) {
             webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;
