@@ -156,8 +156,8 @@ describe('Stats consumer test', () => {
         statsConsumer.__set__('configHandler', {
             getConfig: () => {
                 return {
-                    grafana_url: 'http://www.grafana.com'
-
+                    grafana_url: 'http://www.grafana.com',
+                    external_address: 'http://www.zooz.com/v1'
                 };
             }
         });
@@ -265,7 +265,8 @@ describe('Stats consumer test', () => {
         statsConsumer.__set__('configHandler', {
             getConfig: () => {
                 return {
-                    grafana_url: 'http://www.grafana.com'
+                    grafana_url: 'http://www.grafana.com',
+                    external_address: 'http://www.zooz.com/v1'
 
                 };
             }
@@ -341,7 +342,8 @@ describe('Stats consumer test', () => {
         statsConsumer.__set__('configHandler', {
             getConfig: () => {
                 return {
-                    grafana_url: 'http://www.grafana.com'
+                    grafana_url: 'http://www.grafana.com',
+                    external_address: 'http://www.zooz.com/v1'
 
                 };
             }
