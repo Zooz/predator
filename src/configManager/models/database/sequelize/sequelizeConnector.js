@@ -50,8 +50,7 @@ async function getConfigValue(configValue) {
         options.where = { key: configValue };
         dbResult = await configClient.find(options);
     }
-    // todo: IF NOT EXISTS? throw error
-    return dbResult;
+    return dbResult || [];
 }
 
 async function initSchemas() {
