@@ -155,6 +155,14 @@ paths:
         - DSL Definitions
       summary: Update a DSL Definition
       description: Update a specific DSL definition.
+      parameters:
+        - name: dsl_group
+          in: path
+          required: true
+          description: The name of the group (category) holding the DSL definition to be updated.
+          schema:
+            type: string
+          example: petstore
       responses:
         '200':
           description: Success
@@ -193,6 +201,13 @@ paths:
         - DSL Definitions
       summary: Delete a DSL Definition
       description: Delete a specific DSL definition.
+      parameters:
+        - name: dsl_group
+          in: path
+          required: true
+          description: The name of the group (category) holding the DSL definition to be deleted.
+          schema:
+            type: string
       responses:
         '204':
           description: Success
@@ -436,39 +451,6 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Jobs
   /v1/jobs:
-    get:
-      operationId: retrieve-all-jobs
-      tags:
-        - Jobs
-      summary: Retrieve all Jobs
-      description: Retrieve the details of all available jobs.
-      parameters:
-        - in: query
-          name: one_time
-          description: Should return the one time tests (no cron expression)
-          schema:
-            type: boolean
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/job_response'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
     post:
       operationId: create-a-job
       tags:
@@ -503,6 +485,39 @@ paths:
               $ref: '#/components/schemas/create_job_response'
         description: The job to add
         required: true
+    get:
+      operationId: retrieve-all-jobs
+      tags:
+        - Jobs
+      summary: Retrieve all Jobs
+      description: Retrieve the details of all available jobs.
+      parameters:
+        - in: query
+          name: one_time
+          description: Should return the one time tests (no cron expression)
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/job_response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   '/v1/jobs/{job_id}':
     get:
       operationId: retrieve-a-job
@@ -680,41 +695,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  /v1/tests/last_reports:
-    get:
-      operationId: retrieve-recent-reports
-      tags:
-        - Reports
-      summary: Retrieve Recent Reports
-      description: Retrieve the most recent reports
-      parameters:
-        - in: query
-          name: limit
-          description: The number of most recent reports to retrieve.
-          required: true
-          schema:
-            type: number
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/report_response'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}':
     get:
       operationId: retrieve-a-report
@@ -750,6 +730,41 @@ paths:
                 $ref: '#/components/schemas/error_response'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+  /v1/tests/last_reports:
+    get:
+      operationId: retrieve-recent-reports
+      tags:
+        - Reports
+      summary: Retrieve Recent Reports
+      description: Retrieve the most recent reports
+      parameters:
+        - in: query
+          name: limit
+          description: The number of most recent reports to retrieve.
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/report_response'
+        '400':
+          description: Bad request
           content:
             application/json:
               schema:
@@ -821,6 +836,7 @@ components:
       properties:
         request:
           type: object
+          description: The request template that the DSL definition will generate.
           additionalProperties:
             $ref: '#/components/schemas/artillery_request_schema'
     definitions_response:
@@ -850,12 +866,12 @@ components:
       type: string
       description: |
         The type of test. Can be one of the following:
-          * `dsl`: Tests of this type reuse request templates based on previously created DSL definitons.
           * `basic`: Tests of this type cannot reuse request templates (DSL definition). All request specifications must be directly included in the test itself.
             This test type is identical to the type of tests you can create through the Predator UI.
+          * `dsl`: Tests of this type reuse request templates based on previously created DSL definitons.
       enum:
         - dsl
-        - custom
+        - basic
       example: dsl
     dsl:
       description: A test that is made of scenarios base on domain specific language
@@ -900,7 +916,7 @@ components:
       type: object
       additionalProperties:
         type: string
-    custom:
+    basic:
       description: A test that is made of artillery json
       allOf:
         - $ref: '#/components/schemas/test'
@@ -931,16 +947,20 @@ components:
 
             When a test is created, it is assigned a revision ID. If you update a test, then it's revision ID changes as well. This allows Predator to always relate an existing report to the test it was originally based on.
     tests_response:
-      allOf:
-        - $ref: '#/components/schemas/create_test_response'
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          dsl: '#/components/schemas/dsl_test_response'
+          basic: '#/components/schemas/basic_test_response'
       required:
+        - type
         - name
         - description
-        - type
-        - raw_data
-        - artillery_test
         - updated_at
       properties:
+        type:
+          $ref: '#/components/schemas/test_type'
         updated_at:
           type: string
           format: date_time
@@ -951,16 +971,23 @@ components:
         description:
           type: string
           description: The description of the test.
-        type:
-          $ref: '#/components/schemas/test_type'
+    dsl_test_response:
+      type: object
+      description: A test that is made of scenarios base on domain specific language
+      allOf:
+        - $ref: '#/components/schemas/tests_response'
+        - $ref: '#/components/schemas/create_test_response'
+          required:
+            - raw_data
+      properties:
         raw_data:
           type: object
           description: The entire specification of the DSL that was used to create the test.
           example: {
-                               "name": "Pet store",
-                               "description": "DSL",
-                               "type": "dsl",
-                               "before": {
+                      "name": "Pet store",
+                      "description": "DSL",
+                      "type": "dsl",
+                        "before": {
                                    "steps": [
                                        {
                                            "action": "petstore.create-pet",
@@ -973,7 +1000,7 @@ components:
                                        }
                                    ]
                                },
-                               "scenarios": [
+                        "scenarios": [
                                    {
                                        "scenario_name": "Only get pet",
                                        "steps": [
@@ -983,13 +1010,11 @@ components:
                                        ]
                                    }
                                ]
-                           }
+                    }
         artillery_test:
           type: object
           description: |
             The request JSON created from the DSL specification (as returned in the `raw_data` array).
-            The artillery json that represents the test created from the raw
-            data.
           example:  {
                                "config": {
                                    "target": "",
@@ -1045,6 +1070,40 @@ components:
                                        }
                                    ]
                                }
+                           }
+    basic_test_response:
+      type: object
+      description: bla
+      allOf:
+        - $ref: '#/components/schemas/tests_response'
+        - $ref: '#/components/schemas/create_test_response'
+        - type: object
+          required:
+            - artillery_test
+      properties:
+        artillery_test:
+          type: object
+          description: |
+            The complete request JSON used in the test.
+          example: {
+                               "config": {
+                                   "target": "http://127.0.0.1:3000"
+                               },
+                               "scenarios": [
+                                   {
+                                       "name": "Get Pets",
+                                       "weight": 100,
+                                       "flow": [
+                                           {
+                                               "get": {
+                                                   "url": "/pets",
+                                                   "headers": {},
+                                                   "capture": []
+                                               }
+                                           }
+                                       ]
+                                   }
+                               ]
                            }
     error_response:
       required:
@@ -1326,8 +1385,7 @@ components:
           type: string
           description: The id of the job in the scheduler
         test_type:
-          type: string
-          description: 'The type of the test, can be paymentsos or custom'
+           $ref: '#/components/schemas/test_type'
         status:
           type: string
           description: The status of the running test
