@@ -57,7 +57,7 @@ module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafana
 };
 
 async function createSMTPClient() {
-    let configSmtp = configHandler.getConfigValue(cnfigConsts.SMTP_SERVER);
+    let configSmtp = await configHandler.getConfigValue(cnfigConsts.SMTP_SERVER);
     var options = {
         port: configSmtp.port,
         host: configSmtp.host,

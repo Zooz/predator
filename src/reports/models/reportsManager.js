@@ -20,7 +20,11 @@ module.exports.getReport = async (testId, reportId) => {
 
 module.exports.getReports = async (testId) => {
     let reportSummaries = await databaseConnector.getReports(testId);
-    let reports = reportSummaries.map(getReportResponse);
+    let reports = [];
+    for (let i = 0; i < reportSummaries.length; i++) {
+        const reportResponse = await getReportResponse(reportSummaries[i]);
+        reports.push(reportResponse);
+    }
     return reports;
 };
 
