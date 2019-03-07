@@ -933,7 +933,6 @@ components:
     tests_response:
       allOf:
         - $ref: '#/components/schemas/create_test_response'
-#        - $ref: '#/components/schemas/test_id'
       required:
         - name
         - description
@@ -1078,8 +1077,16 @@ components:
               properties:
                 type: object
                 description: |
-                  Any additional properties in the body request that should be
-                  changed.
+                  Allows you to replace a request's body's property value when the test is executed. `properties` must be an object of key-value pairs.
+                  Each key you specify must correspond to the name you specified in the `json` object of the [Create a DSL Defintion](/#operation/create-a-dsl-definition) request.
+                  The value must be an `array` of the values that should be used during test execution (when specifying multiple values, the value to be used will be selected randomly).,
+                example: {
+                           	"name":
+                           		[
+                           		  "kushkush",
+                           		  "daisy"
+                           		]
+                          }
               wait:
                 type: integer
                 description: The time to wait before starting the request. In seconds.
@@ -1089,7 +1096,8 @@ components:
         weight:
           type: number
           description: |
-            Allows for the probability of a scenario being picked by a new virtual user to be "weighed" relative to other scenarios. If not specified, each scenario is equally likely to be picked.
+            Allows for the probability (in %) of a scenario being picked by a new virtual user to be "weighed" relative to other scenarios. If not specified, each scenario is equally likely to be picked.
+          example: 20
     job:
       required:
         - test_id
