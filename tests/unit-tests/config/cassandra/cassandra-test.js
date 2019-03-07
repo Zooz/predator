@@ -88,7 +88,7 @@ describe('Cassandra client tests', function() {
             await cassandraClient.getConfigValue('value_test');
 
             clientExecuteStub.getCall(0).args[0].should.eql(query);
-            clientExecuteStub.getCall(0).args[1].should.eql('value_test');
+            clientExecuteStub.getCall(0).args[1][0].should.eql('value_test');
         });
     });
 
