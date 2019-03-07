@@ -18,10 +18,9 @@ describe('convert data  helper tests', function () {
     });
     describe('validate convert data of all types ', function () {
         it('convert all value with error', () => {
-            const errorText = 'Value is corrupted can cause to errors.';
             valuesError.forEach(object => {
                 let result = manager.convertByType(object.value, object.type);
-                should(result.includes(errorText));
+                should(result).eql(undefined);
             });
         });
     });

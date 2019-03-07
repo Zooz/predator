@@ -23,9 +23,8 @@ module.exports.updateConfig = async (req, res, next) => {
 module.exports.deleteConfig = async (req, res, next) => {
     const key = req.params.key;
     try {
-        const response = await configModel.deleteConfig(key);
-        const status = response ? 200 : 500;
-        return res.status(status).json(key);
+        await configModel.deleteConfig(key);
+        return res.status(204).json();
     } catch (err) {
         return next(err);
     }

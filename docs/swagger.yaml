@@ -686,13 +686,29 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/error_response"
-
+  /v1/config/{config_key}:
     delete:
       tags:
         - config
+      description: Delete specfig config
+      parameters:
+        - in: path
+          name: config_key
+          required: true
+          type: string
       responses:
-        200:
+        204:
           description: Success
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
+
+
 
 definitions:
   definition:

@@ -9,6 +9,7 @@ describe('Cassandra client tests', function () {
     let sandbox,
         sequelizeModelStub,
         sequelizeUpsertStub,
+        sequelizeDeleteStub,
         sequelizeStub,
         sequelizeDefineStub,
         sequelizeGeValueetStub,
@@ -29,7 +30,7 @@ describe('Cassandra client tests', function () {
         sequelizeDefineStub = sandbox.stub();
         sequelizeGetStub = sandbox.stub();
         sequelizeStub = sandbox.stub();
-        sequelizeStub = sandbox.stub();
+        sequelizeDeleteStub = sandbox.stub();
         sequelizeGeValueetStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
@@ -44,6 +45,7 @@ describe('Cassandra client tests', function () {
             value: {},
             findAll: sequelizeGetStub,
             find: sequelizeGeValueetStub,
+            destroy: sequelizeDeleteStub,
             upsert: sequelizeUpsertStub
         });
 
@@ -86,6 +88,15 @@ describe('Cassandra client tests', function () {
             await sequelizeConnector.updateConfig({ test_key: 'test_value', test_key_json: jsonToSave });
             should(sequelizeUpsertStub.args[0][0]).eql({ key: 'test_key', value: 'test_value' });
             should(sequelizeUpsertStub.args[1][0]).eql({ key: 'test_key_json', value: JSON.stringify(jsonToSave) });
+        });
+    });
+    describe('delete key', () => {
+        it('delete key succeed', async () => {
+            await sequelizeConnector.init(sequelizeStub());
+            await sequelizeConnector.deleteConfig('delete_key');
+            should(sequelizeDeleteStub.args[0][0]).eql({
+                where: { key: 'delete_key' }
+            });
         });
     });
 

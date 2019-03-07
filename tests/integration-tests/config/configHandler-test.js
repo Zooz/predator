@@ -91,6 +91,22 @@ describe('update and get config', () => {
         });
     });
 
+    describe('delete config ', () => {
+        it('delete config when value in db', async () => {
+            await configRequestCreator.updateConfig({ grafana_url: 'delete_value' });
+            const deleteResponse = await configRequestCreator.deleteConfig('grafana_url');
+            const getResponse = await configRequestCreator.getConfig();
+            should(deleteResponse.statusCode).eql(204);
+            should(getResponse.body['grafana_url']).eql(undefined);
+        });
+    });
+    describe('delete config ', () => {
+        it('delete config when value in db', async () => {
+            const deleteResponse = await configRequestCreator.deleteConfig('not_real_key');
+            should(deleteResponse.statusCode).eql(204);
+        });
+    });
+
     describe('Update config with special types ', () => {
         it('get all config with special types', async () => {
             let response = await configRequestCreator.updateConfig(updateBodyWithTypes);

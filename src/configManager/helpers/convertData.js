@@ -21,5 +21,5 @@ module.exports.convertByType = (valueToConvert, type) => {
 
 function handleParseError(value, type) {
     logger.error('Failed to convert value : ' + value + 'to type: ' + type);
-    return 'Value is corrupted can cause to errors. value is: ' + value + ' expected to be of type: ' + type;
+    return undefined;
 }

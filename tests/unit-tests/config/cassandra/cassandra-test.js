@@ -78,6 +78,15 @@ describe('Cassandra client tests', function() {
             clientExecuteStub.getCall(0).args[0].should.eql(query);
         });
     });
+    describe('handle cassandra delete ', () => {
+        it('should succeed delete', async () => {
+            const query = 'DELETE FROM config WHERE key=?;';
+            clientExecuteStub.resolves([]);
+            await cassandraClient.deleteConfig('delete_key');
+            clientExecuteStub.getCall(0).args[0].should.eql(query);
+            clientExecuteStub.getCall(0).args[1][0].should.eql('delete_key');
+        });
+    });
 
     describe('get config by value multple ', () => {
         it('should succeed get config', async () => {
