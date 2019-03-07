@@ -3,6 +3,8 @@
 const configRequestCreator = require('./helpers/requestCreator');
 const should = require('should');
 const validationError = 'Input validation error';
+const configValues = require('../../../src/common/consts').CONFIG;
+
 const defaultBody = {
     external_address: 'http://localhost:80',
     internal_address: 'http://localhost:80',
@@ -75,12 +77,18 @@ before(async () => {
     await configRequestCreator.init();
 });
 
+after(async () => {
+    const valuesToDelete = Object.values(configValues);
+    for (let i = 0; i < valuesToDelete.length; i++) {
+        await configRequestCreator.deleteConfig(valuesToDelete[i]);
+    }
+});
+
 describe('update and get config', () => {
     describe('get config ', () => {
         it('get default config', async () => {
             let response = await configRequestCreator.getConfig();
             should(response.statusCode).eql(200);
-            // TODO: patch for now, should be change when config data will be change.
             delete response.body['smtp_server'];
             should(response.body).eql(defaultBody);
         });

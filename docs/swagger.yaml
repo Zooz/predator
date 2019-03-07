@@ -687,6 +687,13 @@ paths:
           schema:
             $ref: "#/definitions/error_response"
 
+    delete:
+      tags:
+        - config
+      responses:
+        200:
+          description: Success
+
 definitions:
   definition:
     type: object

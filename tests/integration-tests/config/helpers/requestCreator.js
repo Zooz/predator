@@ -6,6 +6,7 @@ let testApp;
 module.exports = {
     init,
     updateConfig,
+    deleteConfig,
     getConfig
 };
 
@@ -28,4 +29,10 @@ function getConfig() {
             console.log(res.body);
             return res;
         });
+}
+
+function deleteConfig(key) {
+    return request(testApp).delete(uri + '/' + key)
+        .send()
+        .set({ 'Content-Type': 'application/json' });
 }

@@ -7,6 +7,7 @@ module.exports = {
     init,
     updateConfig,
     getConfig,
+    deleteConfig,
     getConfigValue
 
 };
@@ -25,6 +26,15 @@ async function updateConfig(updateValues) {
     });
     const results = await Promise.all(records);
     return results;
+}
+
+async function deleteConfig(key) {
+    const configClient = client.model('config');
+    const result = await configClient.destroy(
+        {
+            where: { key: key }
+        });
+    return result;
 }
 
 async function getConfig() {
