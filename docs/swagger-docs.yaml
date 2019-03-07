@@ -460,6 +460,10 @@ paths:
       responses:
         '201':
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create_job_response'
         '400':
           description: Bad request
           content:
@@ -482,7 +486,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/create_job_response'
+              $ref: '#/components/schemas/job'
         description: The job to add
         required: true
     get:
@@ -528,6 +532,7 @@ paths:
       parameters:
         - in: path
           name: job_id
+          description: The id of the job to retrieve.
           required: true
           schema:
             type: string
@@ -557,12 +562,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
     put:
+      operationId: update-a-job
       tags:
-        - jobs
-      description: update specific job.
+        - Jobs
+      summary: Update a Job
+      description: Update a specific job.
       parameters:
         - in: path
           name: job_id
+          description: The id of the job to update.
           required: true
           schema:
             type: string
@@ -671,6 +679,7 @@ paths:
       parameters:
         - in: path
           name: test_id
+          description: The id of the test for which to retrieve the reports.
           required: true
           schema:
             type: string
@@ -706,12 +715,13 @@ paths:
         - in: path
           name: test_id
           required: true
-          description: The test id.
+          description: The id of the test for which to retrieve the report.
           schema:
             type: string
           example: 81a27853-0db5-4e57-ad63-4b637528398a
         - in: path
           name: report_id
+          description: The id of the report to retrieve.
           required: true
           schema:
             type: string
@@ -746,7 +756,7 @@ paths:
       tags:
         - Reports
       summary: Retrieve Recent Reports
-      description: Retrieve the most recent reports
+      description: Retrieve the most recent reports.
       parameters:
         - in: query
           name: limit
@@ -1162,121 +1172,80 @@ components:
         - test_id
         - arrival_rate
         - duration
-      properties:
-        variables:
-          type: object
-          description: >-
-            Variables that the artillery uses and can be defined by the user.
-            Supported variables: 1) appId - if specifed merchantId must be a
-            variable too.
-          example:
-            appId: App-name
-            merchantId: cd44fc7a-7719-4383-9981-427ff1210553
-        test_id:
-          type: string
-          pattern: >-
-            ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-          description: The id of the test we would like to schedule.
-        cron_expression:
-          type: string
-          description: >-
-            A cron expression describes when the test should be triggered,
-            mandatory if run_immediately is not true
-        run_immediately:
-          type: boolean
-          description: >-
-            Should the test be triggered immediately, regarding the cron
-            expression
-        webhooks:
-          type: array
-          items:
-            type: string
-            description: The url of where to send the webhook with the report information
-        arrival_rate:
-          type: number
-          minimum: 1
-          description: How many requests per second to create
-        duration:
-          type: number
-          minimum: 1
-          description: For how many seconds the test should run
-        ramp_to:
-          type: number
-          minimum: 1
-          description: >-
-            A linear ramp up where the number of new arrivals increases linearly
-            over the duration of the phase.
-        max_virtual_users:
-          type: number
-          minimum: 1
-          description: >-
-            The number of concurrent users that can execute requests. The
-            arrival rate will split between them
-        parallelism:
-          type: number
-          minimum: 1
-          description: >-
-            The number of runners to deploy upon start of the test. The arrival
-            rate, ramp to and the max virtual users will be split by this value
-        emails:
-          type: array
-          items:
-            type: string
-            description: The url of where to send the the email with the report information
-        environment:
-          type: string
-          description: In which environment the test will run
+      allOf:
+        - $ref: '#/components/schemas/job_update'
+        - type: object
+          properties:
+            variables:
+              type: object
+              description: >-
+                        Variables that the artillery uses and can be defined by the user.
+                        Supported variables: 1) appId - if specifed merchantId must be a
+                        variable too.
+              example:
+                appId: App-name
+                merchantId: cd44fc7a-7719-4383-9981-427ff1210553
+            run_immediately:
+              type: boolean
+              description: Determines if the test will be executed immediately when the job is created.
+              example: true
     job_update:
       properties:
         test_id:
           type: string
           pattern: >-
             ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-          description: The id of the test we would like to schedule.
+          description: The id of the test to schedule.
+          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
         cron_expression:
           type: string
-          description: >-
-            A cron expression describes when the test should be triggered,
-            mandatory if run_immediately is not true
+          description: A cron expression for scheduling the test to run periodically at a specified date/time.
+          example: 0 0 12 * * ?
         webhooks:
           type: array
+          description: |
+            A URL to which an event will be sent when the test execution is completed.
+            The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked.
           items:
             type: string
-            description: The url of where to send the webhook with the report information
+            example: https://myendpoint.com
         arrival_rate:
           type: number
           minimum: 1
-          description: How many requests per second to create
+          description: The number of times per second that the test scenarios will run.
         duration:
           type: number
           minimum: 1
-          description: For how many seconds the test should run
+          description: The time during which the test will run. In seconds.
+          example: 20
         ramp_to:
           type: number
           minimum: 1
-          description: >-
-            A linear ramp up where the number of new arrivals increases linearly
-            over the duration of the phase.
+          description: |
+            Used in combination with the `arrival_rate` and `duration` values. Increases the arrival rate linearly to the value specified, within the specified duration.
+          example: 5
         max_virtual_users:
           type: number
           minimum: 1
-          description: >-
-            The number of concurrent users that can execute requests. The
-            arrival rate will split between them
+          description: |
+            The maximum number of virtual users executing the scenario requests. This places a threshold on the number of requests that can exist simultaneously.
+          example: 5
         parallelism:
           type: number
           minimum: 1
-          description: >-
-            The number of runners to deploy upon start of the test. The arrival
-            rate, ramp to and the max virtual users will be split by this value
+          description: |
+            The number of runners that will be allocated to executing the test. The `arrival_rate`, `duration` and `max_virtual_users` will be split between the specified number of runners.
+          example: 5
         emails:
           type: array
+          description: An email address to which Predator will send a message when the test execution is completed.
           items:
             type: string
-            description: The url of where to send the the email with the report information
+            example: nhoj@atlovart.com
         environment:
           type: string
-          description: In which environment the test will run
+          description: Free text describing the environment against which the test is executed.
+          example: test
     job_response:
       allOf:
         - $ref: '#/components/schemas/job'
@@ -1285,14 +1254,14 @@ components:
               type: string
               pattern: >-
                 ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-              description: Uuid that identifies the job
+              description: The job id.
     create_job_response:
       allOf:
         - $ref: '#/components/schemas/job_response'
         - properties:
             run_id:
               type: string
-              description: 'If the job is ran immediately, will show the run id.'
+              description: The run id. Only shown if the job is ran immediately.
     post_report:
       required:
         - report_id
@@ -1374,41 +1343,42 @@ components:
       properties:
         test_id:
           type: string
-          description: The id of the test we would like to schedule.
+          description: The test id.
         revision_id:
           type: string
-          description: The revision id of the test
+          description: The revision id of the test.
         report_id:
           type: string
-          description: The id of the report/same as run_id
+          description: The report id.
         job_id:
           type: string
-          description: The id of the job in the scheduler
+          description: The job id.
         test_type:
            $ref: '#/components/schemas/test_type'
         status:
           type: string
-          description: The status of the running test
+          description: The status of the running test.
         start_time:
           type: string
           format: date
-          description: When the test started
+          description: The date and time that the test started its execution.
         end_time:
           type: string
           format: date
-          description: when the tests finished
+          description: The date and time that the test execution ended.
         duration_seconds:
           type: number
-          description: The length of test in seconds
+          description: The duration of the test in seconds.
+          example: 60
         avg_response_time_ms:
           type: number
-          description: The average response time of the requests
+          description: The average response time of the requests.
         arrival_rate:
           type: number
-          description: Arrival rate set for the test (how many requests send per second)
+          description: The arrival rate that was set for the test. This is the number of times per second that the test scenarios will run.
         last_stats:
           type: string
-          description: How many of the requests ended in error (not 2xx)
+          description: The current report metrics.
         notes:
           type: string
-          description: notes about the test
+          description: Notes about the test.
