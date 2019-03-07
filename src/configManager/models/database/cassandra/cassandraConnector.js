@@ -1,6 +1,6 @@
 const logger = require('../../../../common/logger');
 const databaseConfig = require('../../../../config/databaseConfig');
-const GET_CONFIG_VALUE = 'SELECT* FROM config WHERE key = ?';
+const GET_CONFIG_VALUE = 'SELECT* FROM config WHERE key= ?';
 const GET_CONFIG = 'SELECT* FROM config';
 const INSERT_DATA = 'INSERT INTO config(key, value) values(?,?)';
 const DELETE_CONFIG = 'DELETE FROM config WHERE key=?;';
