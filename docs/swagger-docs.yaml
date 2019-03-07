@@ -285,10 +285,12 @@ paths:
       parameters:
         - in: path
           name: test_id
+          description: The test id.
           required: true
           schema:
             type: string
             format: uuid
+          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -323,9 +325,11 @@ paths:
       parameters:
         - in: path
           name: test_id
+          description: The test id.
           required: true
           schema:
             type: string
+          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -367,9 +371,11 @@ paths:
       parameters:
         - in: path
           name: test_id
+          description: The test id.
           required: true
           schema:
             type: string
+          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -395,10 +401,12 @@ paths:
       parameters:
         - in: path
           name: test_id
+          description: The test id.
           required: true
           schema:
             type: string
             format: uuid
+          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -608,7 +616,7 @@ paths:
       tags:
         - Jobs
       summary: Terminate a Job
-      description: Terminate the execution of a specific job.
+      description: Terminate the execution of a running job.
       parameters:
         - in: path
           description: The ID of the job.
@@ -639,46 +647,6 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Reports
   '/v1/tests/{test_id}/reports':
-    post:
-      operationId: create-a-report
-      tags:
-        - Reports
-      summary: Create a Report
-      description: Create a new report for the specified test.
-      parameters:
-        - in: path
-          name: test_id
-          required: true
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/post_report_response'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/post_report'
-        description: report data
-        required: true
     get:
       operationId: retrieve-all-reports
       tags:
@@ -747,64 +715,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  '/v1/tests/{test_id}/reports/{report_id}/stats':
-    post:
-      tags:
-        - Reports
-      summary: Insert a Stats Object
-      description: Insert a new stats object for a specific report
-      parameters:
-        - in: path
-          name: test_id
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: report_id
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Success
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/stats'
-        description: stats data
-        required: true
   '/v1/tests/{test_id}/reports/{report_id}':
     get:
       operationId: retrieve-a-report
       tags:
         - Reports
       summary: Retrieve a Report
-      description: Retrieve a specific report for the specified test
+      description: Retrieve a specific report for the specified test.
       parameters:
         - in: path
           name: test_id
           required: true
+          description: The test id.
           schema:
             type: string
+          example: 81a27853-0db5-4e57-ad63-4b637528398a
         - in: path
           name: report_id
           required: true
@@ -817,44 +742,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/report_response'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-  '/v1/tests/{test_id}/reports/{report_id}/html':
-    get:
-      tags:
-        - Reports
-      summary: Get list of the history of this specific job id
-      description: Get list of the history of this specific job id
-      parameters:
-        - in: path
-          name: test_id
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: report_id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success.
         '400':
           description: Bad request
           content:
@@ -952,14 +839,24 @@ components:
         name:
           type: string
           description: The name of the test.
+          example: Order from Pet Store
         description:
           type: string
           description: A description of the test.
+          example: Performance test for placing orders from the pet store.
         type:
-          type: string
-          enum:
-            - dsl
-            - custom
+           $ref: '#/components/schemas/test_type'
+    test_type:
+      type: string
+      description: |
+        The type of test. Can be one of the following:
+          * `dsl`: Tests of this type reuse request templates based on previously created DSL definitons.
+          * `basic`: Tests of this type cannot reuse request templates (DSL definition). All request specifications must be directly included in the test itself.
+            This test type is identical to the type of tests you can create through the Predator UI.
+      enum:
+        - dsl
+        - custom
+      example: dsl
     dsl:
       description: A test that is made of scenarios base on domain specific language
       allOf:
@@ -969,6 +866,7 @@ components:
             - scenarios
           properties:
             scenarios:
+              description: A scenario is a sequence of HTTP requests aimed to test the performance of specific functionality.
               type: array
               items:
                 $ref: '#/components/schemas/scenario'
@@ -1047,30 +945,108 @@ components:
         updated_at:
           type: string
           format: date_time
-          description: The time the test was created/updated
+          description: 	The date and time that the test was created.
         name:
           type: string
           description: The name of the test.
         description:
           type: string
-          description: The description of the test
+          description: The description of the test.
         type:
-          type: string
-          enum:
-            - dsl
-            - custom
-          description: >-
-            the type of the test, custom - an artillery json created by the
-            client, dsl - a test with saved request definitions api.
+          $ref: '#/components/schemas/test_type'
         raw_data:
-          type: array
-          items:
-            $ref: '#/components/schemas/scenario'
+          type: object
+          description: The entire specification of the DSL that was used to create the test.
+          example: {
+                               "name": "Pet store",
+                               "description": "DSL",
+                               "type": "dsl",
+                               "before": {
+                                   "steps": [
+                                       {
+                                           "action": "petstore.create-pet",
+                                           "properties": {
+                                               "name": [
+                                                   "kushkush",
+                                                   "daisy"
+                                               ]
+                                           }
+                                       }
+                                   ]
+                               },
+                               "scenarios": [
+                                   {
+                                       "scenario_name": "Only get pet",
+                                       "steps": [
+                                           {
+                                               "action": "petstore.get-pet"
+                                           }
+                                       ]
+                                   }
+                               ]
+                           }
         artillery_test:
           type: object
-          description: >-
+          description: |
+            The request JSON created from the DSL specification (as returned in the `raw_data` array).
             The artillery json that represents the test created from the raw
             data.
+          example:  {
+                               "config": {
+                                   "target": "",
+                                   "http": {
+                                       "pool": 100
+                                   },
+                                   "phases": [
+                                       {
+                                           "duration": 0,
+                                           "arrivalRate": 0,
+                                           "rampTo": 0
+                                       }
+                                   ],
+                                   "variables": {
+                                       "before_0_petstore.create-pet_name": [
+                                           "kushkush",
+                                           "daisy"
+                                       ]
+                                   }
+                               },
+                               "scenarios": [
+                                   {
+                                       "name": "Only get pet",
+                                       "flow": [
+                                           {
+                                               "get": {
+                                                   "url": "http://127.0.0.1:3000/pets/{{petId}}"
+                                               }
+                                           }
+                                       ],
+                                       "weight": 100
+                                   }
+                               ],
+                               "before": {
+                                   "flow": [
+                                       {
+                                           "post": {
+                                               "url": "http://127.0.0.1:3000/pets",
+                                               "json": {
+                                                   "name": "{{ before_0_petstore.create-pet_name }}",
+                                                   "species": "dog"
+                                               },
+                                               "capture": [
+                                                   {
+                                                       "json": "$.id",
+                                                       "as": "petId"
+                                                   }
+                                               ],
+                                               "headers": {
+                                                   "Content-Type": "application/json"
+                                               }
+                                           }
+                                       }
+                                   ]
+                               }
+                           }
     error_response:
       required:
         - message
@@ -1084,7 +1060,8 @@ components:
       properties:
         scenario_name:
           type: string
-          description: The name of the scenario
+          description: The name of the scenario.
+          example: Get Inventory
         steps:
           type: array
           minItems: 1
@@ -1095,21 +1072,24 @@ components:
             properties:
               action:
                 type: string
+                description: |
+                  A reference to the DSL definition you want to use. Uses the following syntax: `{dsl_group_name}.{dsl_name}`.
+                example: petstore.create-pet
               properties:
                 type: object
-                description: >-
+                description: |
                   Any additional properties in the body request that should be
                   changed.
               wait:
                 type: integer
-                description: To wait 'x' seconds before starting the request.
+                description: The time to wait before starting the request. In seconds.
+                example: 2
             description: An object that represent an action.
-          description: An array of the steps in the scenario
+          description: An array of the scenario steps. Steps are the HTTP requests that make up the scenario.
         weight:
           type: number
-          description: >-
-            The weight (in percentage) of the scenario in the test. If not
-            specified, will be calculated.
+          description: |
+            Allows for the probability of a scenario being picked by a new virtual user to be "weighed" relative to other scenarios. If not specified, each scenario is equally likely to be picked.
     job:
       required:
         - test_id
@@ -1278,8 +1258,8 @@ components:
           type: string
           description: When the test started
         last_stats:
-          type: string
-          description: How many of the requests ended in error (not 2xx)
+          type: object
+          description: The current report metrics.
         notes:
           type: string
           description: notes about the test

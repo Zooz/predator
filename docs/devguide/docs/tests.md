@@ -104,7 +104,7 @@ There are two additional items to note:
 
 * The `type` must always be set to `dsl`.
 
-* The `action` value uses the following syntax: `{dsl_group_name}.{dsl_name}`, in which the `dsl_group_name` is the name used in the path of the [Create DSL Test]() API request. 
+* The `action` value uses the following syntax: `{dsl_group_name}.{dsl_name}`, in which the `dsl_group_name` is the name used in the path of the [Create DSL Defintion]() API request. 
 
 If you login to the Predator UI after creating the test, you will notice that the test has been added with a type of **dsl**. 
 

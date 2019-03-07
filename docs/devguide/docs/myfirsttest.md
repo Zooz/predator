@@ -6,10 +6,13 @@ In this section, we will walk you through the steps of creating a simple test in
     To make it easy for you to follow along with the steps below, we created a demo Predator docker image. This image allows you to invoke our fictitious petstore API, used in the examples that follow. You can retrieve and run the docker image with the following command (just make sure to replace {MACHINE_IP} with the IP address of your own machine):
 
     ```
-    docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://{MACHINE_IP}:80:80/v1 
-    -p 80:80 --name quirky_yonath -v /var/run/docker.sock:/var/run/docker.sock zooz/
-    predator-builds:petstore
+    docker run -d -p 3000:3000 --name predator-petstore zooz/predator-builds:petstore    
     ```
+
+<!-- base http://{machineip}:3000 -->
+
+GET:
+<!-- base http://{machineip}:3000/pets -->
     
 Adding a new test is easy. From the Predator web interface, choose **Tests** > **View Tests**. Then click **Create Test** and complete all fields on the form, like so:
 
@@ -22,9 +25,9 @@ Now proceed to add one or more test **scenarios**. A scenario is a sequence of H
 
 To add a new scenario, create a new test or edit an existing one. Then click the **scenario** button and do the following:
 
-* Set a **scenario weight** to set the time allocation (in %) of this scenario out of the total time allocated to run the other scenarios in your test. For example, if you set the weight to 20%, then 20% of the time allocated to run your test will be allocated to running this scenario.
+* Set a **scenario weight**. Allows for the probability of a scenario being picked by a new virtual user to be "weighed" relative to other scenarios. If not specified, each scenario is equally likely to be picked.
 
-* Click the **Steps** button to add **scenario steps**. This allows you to add the HTTP requests that make up the scenario.
+* Click the **Steps** button to add **scenario steps**. This allows you to add the  .
 
 Here's a sample scenario that fetches the inventory from the pet store:
 
