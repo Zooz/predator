@@ -8,7 +8,7 @@ module.exports.createJob = function(req, res, next) {
             return res.status(201).json(result);
         })
         .catch(function(err){
-            return next(err, res);
+            return next(err);
         });
 };
 

@@ -73,18 +73,15 @@ const requestBodyNotValidRequire = {
     }
 };
 
-before(async () => {
-    await configRequestCreator.init();
-});
-
-after(async () => {
-    const valuesToDelete = Object.values(configValues);
-    for (let i = 0; i < valuesToDelete.length; i++) {
-        await configRequestCreator.deleteConfig(valuesToDelete[i]);
-    }
-});
-
 describe('update and get config', () => {
+    before(async () => {
+        await configRequestCreator.init();
+    });
+
+    after(async () => {
+        await cleanData();
+    });
+
     describe('get config ', () => {
         it('get default config', async () => {
             let response = await configRequestCreator.getConfig();
@@ -112,6 +109,10 @@ describe('update and get config', () => {
             should(responseUpdate.body).eql(requestBody);
             should(getResponse.statusCode).eql(200);
             should(getResponse.body).eql(requestBody);
+            const valuesToDelete = Object.values(configValues);
+            for (let i = 0; i < valuesToDelete.length; i++) {
+                await configRequestCreator.deleteConfig(valuesToDelete[i]);
+            }
         });
     });
 
@@ -137,3 +138,10 @@ describe('update and get config', () => {
         });
     });
 });
+
+async function cleanData() {
+    const valuesToDelete = Object.values(configValues);
+    for (let i = 0; i < valuesToDelete.length; i++) {
+        await configRequestCreator.deleteConfig(valuesToDelete[i]);
+    }
+}
