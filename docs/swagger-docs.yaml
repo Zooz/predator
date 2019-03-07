@@ -392,8 +392,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/revisions':
-    operationId: retrieve-all-test-revisions
     get:
+      operationId: retrieve-all-test-revisions
       tags:
         - Tests
       summary: Retrieve Test Revisions
