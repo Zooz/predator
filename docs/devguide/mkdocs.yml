@@ -1,24 +1,17 @@
 site_name: Predator
 
-# nav:
-#   - index.md
-
 nav:
   - About: index.md
   - Installation: installation.md
   - My First Test: myfirsttest.md
   - Advanced Test Setup: tests.md
-  - Schedules: schedules.md
-  - Reports: reports.md
+  - Schedules and Reports: schedulesandreports.md
   - Plugins: plugins.md
   - Contributing: contributing.md
 
 theme:
   name: windmill
   custom_dir: 'mkdocs-windmill/mkdocs_windmill'
-
-# theme: readthedocs
-
 
 use_directory_urls: False
 

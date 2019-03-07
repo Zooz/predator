@@ -62,7 +62,7 @@ With all scenarios in place, let's go ahead and run the test.
 Predator executes tests through so-called **jobs**. To create a job, choose **Tests** > **View tests**. Then click **RUN** for the test you want to execute and complete all fields in the **Create new job** dialog. When done, click **SUBMIT**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
 
 !!! note
-    To see the intervals at which your jobs will run, see [Viewing Scheduled Tasks]().
+    To see the intervals at which your jobs will run, see [Scheduled Tasks](schedulesandreports.md#scheduled-tasks).
 
 The following table explains the job parameters you can configure:
 
@@ -122,5 +122,5 @@ The following table explains the job parameters you can configure:
 
 Your curiosity is probably reaching an all-time high right now, as Predator is working hard to push your API to its limits. So how's your API performing under all that pressure?
 
-Predator's test reports will give you the in-depth performance metrics you're looking for. From the Predator UI choose **Reports** > **Last Reports** to view a detailed report of the test that was executed. For more information about the data shown in the test reports, see [Reports](reports.md).
+Predator's test reports will give you the in-depth performance metrics you're looking for. From the Predator UI choose **Reports** > **Last Reports** to view a detailed report of the test that was executed. For more information about the data shown in the test reports, see [Test Reports](schedulesandreports.md#test-reports).
 
