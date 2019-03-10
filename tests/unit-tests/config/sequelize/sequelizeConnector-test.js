@@ -15,10 +15,9 @@ describe('Cassandra client tests', function () {
 
     before(async () => {
         sandbox = sinon.sandbox.create();
-        await sequelizeConnector.init(sequelizeStub());
     });
 
-    beforeEach(() => {
+    beforeEach(async () => {
         databaseConfig.type = 'SQLITE';
         databaseConfig.name = 'predator';
         databaseConfig.username = 'username';
@@ -60,6 +59,7 @@ describe('Cassandra client tests', function () {
         after(() => {
             sandbox.restore();
         });
+        await sequelizeConnector.init(sequelizeStub());
     });
 
     describe('Update new config record', function () {
