@@ -4,30 +4,9 @@ const should = require('should');
 const rewire = require('rewire');
 const configConstants = require('../../../../src/common/consts').CONFIG;
 
-let manager;
-// let configDataMap = {
-//     [constConfig.GRFANA_URL]: { value: process.env.GRAFANA_URL },
-//     [constConfig.EXTERNAL_ADDRESS]: { value: process.env.EXTERNAL_ADDRESS || process.env.INTERNAL_ADDRESS },
-//     [constConfig.INTERNAL_ADDRESS]: { value: process.env.INTERNAL_ADDRESS },
-//     [constConfig.DOCKER_NAME]: { value: process.env.DOCKER_NAME || 'zooz/predator-runner:latest' },
-//     [constConfig.JOB_PLATFORM]: { value: process.env.JOB_PLATFORM },
-//     [constConfig.RUNNER_CPU]: { value: process.env.RUNNER_CPU || 1, type: 'int' },
-//     [constConfig.RUNNER_MEMORY]: { value: process.env.RUNNER_MEMORY || 2048, type: 'int' },
-//     [constConfig.METRICS_PLUGIN_NAME]: { value: process.env.METRICS_PLUGIN_NAME, type: 'string' },
-//     [constConfig.PROMETHEUS_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
-//     [constConfig.INFLUX_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
-//     [constConfig.SMTP_SERVER]: {
-//         value: {
-//             host: process.env.SMTP_HOST,
-//             port: process.env.SMTP_PORT,
-//             username: process.env.SMTP_USERNAME,
-//             password: process.env.SMTP_PASSWORD,
-//             timeout: process.env.SMTP_TIMEOUT || 200
-//         },
-//         type: 'json'
-//     }
-// };
+const valuesToCheck = ['grafana_url', 'external_address', 'internal_address', 'docker_name', 'job_platform', 'runner_memory', 'runner_cpu', 'metrics_plugin_name'];
 
+let manager;
 const expectedTypes = {
     grafana_url: undefined,
     external_address: undefined,
@@ -44,17 +23,25 @@ const expectedTypes = {
     smtp_server: 'json'
 };
 
-describe('configManager data map helper  tests', function() {
-    describe('Manager configManager', function () {
-        manager = rewire('../../../../src/configManager/helpers/configDataMap');
-    });
+function changeAllEnvData() {
+    process.env.GRAFANA_URL = 'grafana_url_test';
+    process.env.EXTERNAL_ADDRESS = 'external_address_test';
+    process.env.INTERNAL_ADDRESS = 'internal_address_test';
+    process.env.DOCKER_NAME = 'docker_name_test';
+    process.env.JOB_PLATFORM = 'job_platform_test';
+    process.env.RUNNER_CPU = 'runner_cpu_test';
+    process.env.RUNNER_MEMORY = 'runner_memory_test';
+    process.env.METRICS_PLUGIN_NAME = 'metrics_plugin_name_test';
+}
 
+describe('configManager data map helper  tests', function() {
     describe('get all configs with value from env data', function () {
         it('get all value success', () => {
-            manager.__set__('configDataMap', allConfigData);
-            Object.values(configConstants).forEach(key => {
+            changeAllEnvData();
+            manager = rewire('../../../../src/configManager/helpers/configDataMap');
+            valuesToCheck.forEach(key => {
                 let result = manager.getConstDefaultValue(key);
-                const expectedValue = allConfigData[key].value;
+                const expectedValue = key + '_test';
                 should(result).eql(expectedValue);
             });
         });
