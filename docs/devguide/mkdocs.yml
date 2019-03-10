@@ -8,7 +8,7 @@ nav:
   - Schedules and Reports: schedulesandreports.md
   - Plugins: plugins.md
   - Contributing: contributing.md
-  - API Reference: indexapiref.html
+  - API Reference: apireference.md
 
 theme:
    name: windmill
