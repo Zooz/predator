@@ -45,8 +45,8 @@ module.exports = () => {
                 excludeURLs: ['health', 'predator', 'favicon.png']
             }));
 
-            app.use('/v1/config', configRouter);
             app.use('/health', healthRouter);
+            app.use('/v1/config', configRouter);
             app.use('/v1/jobs', jobsRouter);
             app.use('/v1/dsl', dslRouter);
             app.use('/v1/tests', reportsRouter);
