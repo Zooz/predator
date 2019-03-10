@@ -1,0 +1,32 @@
+site_name: Predator
+
+nav:
+  - About: index.md
+  - Installation: installation.md
+  - My First Test: myfirsttest.md
+  - Advanced Test Setup: tests.md
+  - Schedules and Reports: schedulesandreports.md
+  - Plugins: plugins.md
+  - Contributing: contributing.md
+
+theme:
+  name: windmill
+  custom_dir: 'mkdocs-windmill/mkdocs_windmill'
+
+use_directory_urls: False
+
+markdown_extensions:
+   - codehilite:
+       css_class: codehilite
+   - pymdownx.superfences: 
+   - pymdownx.details:    
+   - admonition
+   - sane_lists
+   - fenced_code
+   - toc:
+       permalink: '#'
+
+extra:
+    version: 1.0
+    logo: logo.png
+
