@@ -658,7 +658,7 @@ paths:
     get:
       tags:
         - config
-      description: Get list of all configration
+      description: Get list of the configuration.
       responses:
         200:
           description: Success
@@ -669,7 +669,7 @@ paths:
     put:
       tags:
         - config
-      description: Change configration values will override environment variables
+      description: Change configration values that will override environment variables.
       parameters:
         - name: config
           in: body
@@ -690,7 +690,7 @@ paths:
     delete:
       tags:
         - config
-      description: Delete specific configuration value. it will not delete value from environment. variables
+      description: Delete specific configuration value. it will fallback to the original env varible.
       parameters:
         - in: path
           name: config_key
@@ -700,10 +700,6 @@ paths:
       responses:
         204:
           description: Success
-        400:
-          description: Bad request
-          schema:
-            $ref: "#/definitions/error_response"
         500:
           description: Internal server error
           schema:
@@ -946,13 +942,13 @@ definitions:
         description: The url for grafana.
       external_address:
         type: string
-        description: ???.
+        description: Exposed address of the deployed service.
       internal_address:
         type: string
         description: The local ip address of your machine.
       docker_name:
         type: string
-        description: ??? .
+        description: The predator-runner docker image that will run the test.
       job_platform:
         type: string
         description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)
@@ -968,14 +964,14 @@ definitions:
         description: Metrics to use, in case one or both metrics are configured.
       default_email_address:
         type: string
-        description: Default email address can configured only by using API.
+        description: Default email to send final report to, address can be configured only by using API.
       default_webhook_url:
         type: string
-        description: Default webhook url can configured only by using API.
+        description: Default webhook url to send live report statistics to, can be configured only by using API.
       influx_metrics:
         additionalProperties: false
         type: object
-        description:  .
+        description: Influx configuration  .
         required:
           - host
           - username
@@ -984,7 +980,7 @@ definitions:
         properties:
           host:
             type: string
-            description: ???.
+            description: Influx host.
           username:
             type: string
             description : User name to influx.
@@ -993,20 +989,20 @@ definitions:
             description: Password name to influx.
           database:
             type: string
-            description: ???.
+            description: Influx db name.
       prometheus_metrics:
         additionalProperties: false
         type: object
-        description: .
+        description: prometheus configuration.
         required:
           - push_gateway_url
         properties:
           push_gateway_url:
             type: string
-            description: .
+            description: Url of push gateway.
           buckets_sizes:
             type: string
-            description: .
+            description: Bucket sizes use to configure prometheus.
       smtp_server:
         additionalProperties: false
         type: object
