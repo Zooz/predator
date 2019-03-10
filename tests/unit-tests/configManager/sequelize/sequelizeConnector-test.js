@@ -9,7 +9,6 @@ describe('Cassandra client tests', function () {
         sequelizeModelStub,
         sequelizeUpsertStub,
         sequelizeDeleteStub,
-        sequelizeStub,
         sequelizeDefineStub,
         sequelizeGeValueetStub,
         sequelizeGetStub;
@@ -28,7 +27,6 @@ describe('Cassandra client tests', function () {
         sequelizeUpsertStub = sandbox.stub();
         sequelizeDefineStub = sandbox.stub();
         sequelizeGetStub = sandbox.stub();
-        sequelizeStub = sandbox.stub();
         sequelizeDeleteStub = sandbox.stub();
         sequelizeGeValueetStub = sandbox.stub();
 
@@ -87,7 +85,6 @@ describe('Cassandra client tests', function () {
     });
     describe('delete key', () => {
         it('delete key succeed', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             await sequelizeConnector.deleteConfig('delete_key');
             should(sequelizeDeleteStub.args[0][0]).eql({
                 where: { key: 'delete_key' }
