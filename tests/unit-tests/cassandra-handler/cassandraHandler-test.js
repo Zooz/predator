@@ -498,7 +498,7 @@
 //                     expect(cmdStub).to.have.been.calledOnce;
 //                     expect(clientExecuteStub).to.have.been.calledOnce;
 //                     expect(clientShutdownStub).to.have.been.calledOnce;
-//                     expect(stubErrorLogger.calledWith(initializeCassandraEnvironmentError, 'Cassandra handler: could not remove cassandra migration config file')).to.be.true;
+//                     expect(stubErrorLogger.calledWith(initializeCassandraEnvironmentError, 'Cassandra handler: could not remove cassandra migration configManager file')).to.be.true;
 //                     expect(exitStub).to.have.been.calledOnce;
 //                     stubErrorLogger.restore();
 //                     done();

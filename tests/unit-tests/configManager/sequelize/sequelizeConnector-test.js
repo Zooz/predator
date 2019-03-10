@@ -1,9 +1,8 @@
 'use strict';
-const sinon = require('sinon');
-const rewire = require('rewire');
-const should = require('should');
-let databaseConfig = require('../../../../src/config/databaseConfig');
-const sequelizeConnector = rewire('../../../../src/configManager/models/database/sequelize/sequelizeConnector');
+const sinon = require('sinon'),
+    should = require('should'),
+    databaseConfig = require('../../../../src/config/databaseConfig'),
+    sequelizeConnector = require('../../../../src/configManager/models/database/sequelize/sequelizeConnector');
 
 describe('Cassandra client tests', function () {
     let sandbox,
@@ -15,11 +14,11 @@ describe('Cassandra client tests', function () {
         sequelizeGeValueetStub,
         sequelizeGetStub;
 
-    before(() => {
+    before(async () => {
         sandbox = sinon.sandbox.create();
     });
 
-    beforeEach(() => {
+    beforeEach(async () => {
         databaseConfig.type = 'SQLITE';
         databaseConfig.name = 'predator';
         databaseConfig.username = 'username';
@@ -49,24 +48,22 @@ describe('Cassandra client tests', function () {
             upsert: sequelizeUpsertStub
         });
 
-        sequelizeStub.returns({
+        await sequelizeConnector.init({
             model: sequelizeModelStub,
             define: sequelizeDefineStub
         });
-        sequelizeStub.DataTypes = {};
-
-        afterEach(() => {
-            sandbox.resetHistory();
-        });
-
-        after(() => {
-            sandbox.restore();
-        });
     });
 
-    describe('Update new config record', function () {
+    afterEach(() => {
+        sandbox.resetHistory();
+    });
+
+    after(() => {
+        sandbox.restore();
+    });
+
+    describe('Update new configManager record', function () {
         it('should succeed simple update', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             await sequelizeConnector.updateConfig({ test_key: 'test_value' });
             should(sequelizeUpsertStub.args[0][0]).eql({ key: 'test_key', value: 'test_value' });
         });
@@ -74,7 +71,6 @@ describe('Cassandra client tests', function () {
 
     describe('Update new config record object as value', () => {
         it('should succeed object value update', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             let jsonToSave = { jsonTest: 'test_value' };
             await sequelizeConnector.updateConfig({ test_key_json: jsonToSave });
             should(sequelizeUpsertStub.args[0][0]).eql({ key: 'test_key_json', value: JSON.stringify(jsonToSave) });
@@ -83,7 +79,6 @@ describe('Cassandra client tests', function () {
 
     describe('Update new config multiple records object and strings as value', () => {
         it('should succeed object value update', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             let jsonToSave = { jsonTest: 'test_value' };
             await sequelizeConnector.updateConfig({ test_key: 'test_value', test_key_json: jsonToSave });
             should(sequelizeUpsertStub.args[0][0]).eql({ key: 'test_key', value: 'test_value' });
@@ -102,7 +97,6 @@ describe('Cassandra client tests', function () {
 
     describe('Get all config with data', () => {
         it('should succeed to get  multiple configs', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             let sequelizeResponse = [
                 { dataValues: { key: 'firstKey', value: 'firstValue' } },
                 { dataValues: { key: 'secondKey', value: 'secondValue' } }
@@ -117,7 +111,6 @@ describe('Cassandra client tests', function () {
 
     describe('Get all config with no data ', () => {
         it('should succeed to get  multiple configs', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             sequelizeGetStub.resolves([]);
             await sequelizeConnector.getConfig();
             should(sequelizeGetStub.args[0][0].attributes.exclude[0]).eql('updated_at');
@@ -126,7 +119,6 @@ describe('Cassandra client tests', function () {
     });
     describe('Get  config value with no data ', () => {
         it('should succeed to get  multiple configs', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             sequelizeGetStub.resolves([]);
             await sequelizeConnector.getConfigValue('key_value');
             should(sequelizeGeValueetStub.args[0][0].attributes.exclude[0]).eql('updated_at');
