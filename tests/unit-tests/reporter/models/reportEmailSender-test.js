@@ -6,7 +6,6 @@ let sinon = require('sinon');
 let should = require('should');
 let logger = require('../../../../src/common/logger');
 let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
-let serviceConfig = require('../../../../src/config/serviceConfig');
 let reportsManager = require('../../../../src/reports/models/reportsManager');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
 let nodemailer = require('nodemailer');
@@ -44,7 +43,7 @@ const REPORT = {
             'Create token and get token': 173732,
             'Create token, create customer and assign token to customer': 115716
         },
-        'errors': {EAI_AGAIN: 112, NOTREACH: 123 },
+        'errors': { EAI_AGAIN: 112, NOTREACH: 123 },
         'codes': {
             '200': 173732,
             '201': 520878,
@@ -90,11 +89,10 @@ describe('Report emails sender test', () => {
     });
 
     it('Send aggregate report successfully', async () => {
-        sendMailStub.resolves({status: 201});
+        sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
         getReportStub.resolves(REPORT);
         getJobStub.resolves(JOB);
-        serviceConfig.taskSchedulerApiUrl = 'http://task-scheduler.zooz.com';
 
         await reportEmailSender.sendAggregateReport('testId', 'reportId', 'http://report.zooz.com', 'http://grafana.zooz.com');
 
@@ -122,7 +120,7 @@ describe('Report emails sender test', () => {
 
     it('Send aggregate report fails because of error invoking smtp client', async () => {
         const error = new Error('Failed to connect to SMTP client');
-        sendMailStub.resolves({status: 201});
+        sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.throws(error);
         getReportStub.resolves(REPORT);
         getJobStub.resolves(JOB);
@@ -135,7 +133,7 @@ describe('Report emails sender test', () => {
 
     it('Error retrieving report', async () => {
         const expectedError = new Error('Failed to retrieve report');
-        sendMailStub.resolves({status: 201});
+        sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
         getReportStub.rejects(expectedError);
         getJobStub.resolves(JOB);
@@ -153,10 +151,9 @@ describe('Report emails sender test', () => {
         testShouldFail.should.eql(false, 'Test action was supposed to get exception');
     });
 
-
     it('Error retrieving job', async () => {
         const expectedError = new Error('Failed to retrieve job');
-        sendMailStub.resolves({status: 201});
+        sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
         getReportStub.resolves(REPORT);
         getJobStub.rejects(expectedError);

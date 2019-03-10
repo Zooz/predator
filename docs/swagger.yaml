@@ -654,6 +654,59 @@ paths:
                     schema:
                         $ref: "#/definitions/error_response"
 
+    /v1/config/{config_key}:
+        delete:
+            tags:
+                - config
+            description: Delete specific configuration value. it will fallback to the original env varible
+            parameters:
+                - in: path
+                  name: config_key
+                  required: true
+                  type: string
+                  description: They key to delete.
+            responses:
+                204:
+                    description: Success
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/error_response"
+    /v1/config:
+        get:
+            tags:
+                - config
+            description: Get list of the configuration.
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        $ref: "#/definitions/config_body"
+                500:
+                    description: Internal server error
+        put:
+            tags:
+                - config
+            description: Change configration values that will override environment variables.
+            parameters:
+                - name: config
+                  in: body
+                  description: The config data to add
+                  required: true
+                  schema:
+                      $ref: "#/definitions/config_body"
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        $ref: "#/definitions/config_body"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/error_response"
+
+
+
 
 
 definitions:
@@ -939,6 +992,97 @@ definitions:
                   run_id:
                       type: string
                       description: If the job is ran immediately, will show the run id.
+
+    config_body:
+        additionalProperties: false
+        properties:
+            grafana_url:
+                type: string
+                description: The url for grafana.
+            external_address:
+                type: string
+                description: Exposed address of the deployed service.
+            internal_address:
+                type: string
+                description: The local ip address of your machine.
+            docker_name:
+                type: string
+                description: The predator-runner docker image that will run the test.
+            job_platform:
+                type: string
+                description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)
+            runner_cpu:
+                type: number
+                description: Number of CPU use by the each runner.
+            runner_memory:
+                type: number
+                description: Max memory to use by each runner.
+            metrics_plugin_name:
+                type: string
+                enum: ['influx','prometheus']
+                description: Metrics to use, in case one or both metrics are configured.
+            default_email_address:
+                type: string
+                description: Default email to send final report to, address can be configured only by using API.
+            default_webhook_url:
+                type: string
+                description: Default webhook url to send live report statistics to, can be configured only by using API.
+            influx_metrics:
+                additionalProperties: false
+                type: object
+                description: Influx configuration  .
+                required:
+                    - host
+                    - username
+                    - password
+                    - database
+                properties:
+                    host:
+                        type: string
+                        description: Influx host.
+                    username:
+                        type: string
+                        description : User name to influx.
+                    password:
+                        type: string
+                        description: Password name to influx.
+                    database:
+                        type: string
+                        description: Influx db name.
+            prometheus_metrics:
+                additionalProperties: false
+                type: object
+                description: prometheus configuration.
+                required:
+                    - push_gateway_url
+                properties:
+                    push_gateway_url:
+                        type: string
+                        description: Url of push gateway.
+                    buckets_sizes:
+                        type: string
+                        description: Bucket sizes use to configure prometheus.
+            smtp_server:
+                additionalProperties: false
+                type: object
+                description: Simple mail transfer protocol.
+                required:
+                    - host
+                    - port
+                    - username
+                    - password
+                    - timeout
+                properties:
+                    host:
+                        type: string
+                    port:
+                        type: number
+                    username:
+                        type: string
+                    password:
+                        type: string
+                    timeout:
+                        type: number
     post_report:
         required:
             - report_id
