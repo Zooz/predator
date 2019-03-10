@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>My First Test - Predator</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "My First Test";
+    var mkdocs_page_input_path = "myfirsttest.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> Predator</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="index.html">About</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="installation.html">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="myfirsttest.html">My First Test</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#adding-your-first-test">Adding your First Test</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#test-scenarios">Test Scenarios</a></li>
+        
+            <li><a class="toctree-l3" href="#pre-scenario-requests">Pre-scenario Requests</a></li>
+        
+            <li><a class="toctree-l3" href="#http-request-properties">HTTP Request Properties</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#running-the-test">Running the Test</a></li>
+    
+
+    <li class="toctree-l2"><a href="#viewing-the-test-report">Viewing the Test Report</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="tests.html">Advanced Test Setup</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="schedulesandreports.html">Schedules and Reports</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="plugins.html">Plugins</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="contributing.html">Contributing</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Predator</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>My First Test</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="adding-your-first-test">Adding your First Test<a class="headerlink" href="#adding-your-first-test" title="Permanent link">#</a></h1>
+<p>In this section, we will walk you through the steps of creating a simple test in Predator. It will allow you to familiarize yourself with some basic concepts, before moving onto some more advanced features later on. </p>
+<div class="admonition note">
+<p class="admonition-title">Following along with the examples</p>
+<p>To make it easy for you to follow along with the steps below, we created a demo Predator docker image. This image allows you to invoke our fictitious petstore API, used in the examples that follow. You can retrieve and run the docker image with the following command (just make sure to replace {MACHINE_IP} with the IP address of your own machine):</p>
+<pre class="codehilite"><code>docker run -d -p 3000:3000 --name predator-petstore zooz/predator-builds:petstore    </code></pre>
+
+</div>
+<!-- base http://{machineip}:3000 -->
+
+<p>GET:
+<!-- base http://{machineip}:3000/pets --></p>
+<p>Adding a new test is easy. From the Predator web interface, choose <strong>Tests</strong> &gt; <strong>View Tests</strong>. Then click <strong>Create Test</strong> and complete all fields on the form, like so:</p>
+<p><img alt="Screenshot" src="images/createtest.png" /></p>
+<h2 id="test-scenarios">Test Scenarios<a class="headerlink" href="#test-scenarios" title="Permanent link">#</a></h2>
+<p>Now proceed to add one or more test <strong>scenarios</strong>. A scenario is a sequence of HTTP requests aimed to test the performance of a single piece of functionality. For instance, a scenario could test the performance of multiple users requesting information about a specific pet simultaneously. Another scenario could be ordering a pet from the pet store. </p>
+<p>To add a new scenario, create a new test or edit an existing one. Then click the <strong>scenario</strong> button and do the following:</p>
+<ul>
+<li>
+<p>Set a <strong>scenario weight</strong>. Allows for the probability of a scenario being picked by a new virtual user to be "weighed" relative to other scenarios. If not specified, each scenario is equally likely to be picked.</p>
+</li>
+<li>
+<p>Click the <strong>Steps</strong> button to add <strong>scenario steps</strong>. This allows you to add the  .</p>
+</li>
+</ul>
+<p>Here's a sample scenario that fetches the inventory from the pet store:</p>
+<p><img alt="Screenshot" src="images/scenario.png" /></p>
+<h2 id="pre-scenario-requests">Pre-scenario Requests<a class="headerlink" href="#pre-scenario-requests" title="Permanent link">#</a></h2>
+<p>Sometimes a prerequisite must be fulfilled before your scenarios can actually work. For example, pets must already have been created before you can fetch them from the inventory. This is where a <strong>pre-scenario request</strong> comes into play. A pre-scenario request is an HTTP request that Predator executes before running the scenarios in your test.</p>
+<p>To add a pre-scenario request, create a new test or edit an existing one. Then click the <strong>before</strong> button and add all request specifications. </p>
+<h2 id="http-request-properties">HTTP Request Properties<a class="headerlink" href="#http-request-properties" title="Permanent link">#</a></h2>
+<p>When adding scenario steps or pre-scenario requests, you will need to define the properties of the HTTP request that will be invoked:</p>
+<p><img alt="Screenshot" src="images/httprequest.png" /></p>
+<p>While most of the properties are self-explanatory, the following items may require some additional explanation:</p>
+<ul>
+<li>
+<p><strong>gzip</strong>: This will compress the request body. </p>
+</li>
+<li>
+<p><strong>forever</strong>: Indicates whether the connection to the endpoint will be kept alive.</p>
+</li>
+<li>
+<p><strong>Captures</strong>: Allows you to extract (capture) data from the request response and store it in a variable for reuse in another request. See <a href="tests.html">Data Reuse with Variables</a>.</p>
+</li>
+</ul>
+<h1 id="running-the-test">Running the Test<a class="headerlink" href="#running-the-test" title="Permanent link">#</a></h1>
+<p>With all scenarios in place, let's go ahead and run the test.</p>
+<p>Predator executes tests through so-called <strong>jobs</strong>. To create a job, choose <strong>Tests</strong> &gt; <strong>View tests</strong>. Then click <strong>RUN</strong> for the test you want to execute and complete all fields in the <strong>Create new job</strong> dialog. When done, click <strong>SUBMIT</strong>. Depending on your configuration, the job will either execute immediately or at scheduled intervals.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To see the intervals at which your jobs will run, see <a href="schedulesandreports.html#scheduled-tasks">Scheduled Tasks</a>.</p>
+</div>
+<p>The following table explains the job parameters you can configure:</p>
+<table style="width:100%">
+    <tr>
+      <th>Setting</th>
+      <th>Description</th> 
+    </tr>
+    <tr>
+      <td>Notes</td>
+      <td>Free text describing the job.</td> 
+    </tr>
+    <tr>
+      <td>Arrival rate</td>
+      <td>The number of times per second that the test scenarios will run.</td> 
+    </tr>
+    <tr>
+      <td>Duration (seconds)</td>
+      <td>The time during which the test will run. In seconds.</td> 
+    </tr>
+    <tr>
+      <td>Ramp to</td>
+      <td>Used in combination with the <b>arrival rate</b> and <b>duration</b> values. Increases the arrival rate linearly to the value specified, within the specified duration.</td> 
+    </tr>
+    <tr>
+      <td>Parallelism</td>
+      <td>The number of runners that will be allocated to executing the test. The <b>arrival rate</b>, <b>duration</b> and <b>Max virtual users</b> will be split between the specified number of runners.</td> 
+    </tr>
+    <tr>
+      <td>Max virtual users</td>
+      <td>The maximum number of virtual users executing the scenario requests. This places a threshold on the number of requests that can exist simultaneously.</td> 
+    </tr>
+    <tr>
+      <td>Environment</td>
+      <td>Free text describing the environment against which the test is executed.</td> 
+    </tr>
+    <tr>
+      <td>Cron expression</td>
+      <td>A cron expression for scheduling the test to run periodically at a specified date/time. </td> 
+    </tr>
+    <tr>
+      <td>Run immediately</td>
+      <td>Determines if the test will be executed immediately when the job is saved.</td> 
+    </tr>
+    <tr>
+      <td>New Email</td>
+      <td>An email address to which Predator will send a message when the test execution is completed.</td> 
+    </tr>
+    <tr>
+      <td>New Webhook</td>
+      <td>A URL to which an event will be sent when the test execution is completed. The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked. </td> 
+    </tr>
+  </table>
+
+<h1 id="viewing-the-test-report">Viewing the Test Report<a class="headerlink" href="#viewing-the-test-report" title="Permanent link">#</a></h1>
+<p>Your curiosity is probably reaching an all-time high right now, as Predator is working hard to push your API to its limits. So how's your API performing under all that pressure?</p>
+<p>Predator's test reports will give you the in-depth performance metrics you're looking for. From the Predator UI choose <strong>Reports</strong> &gt; <strong>Last Reports</strong> to view a detailed report of the test that was executed. For more information about the data shown in the test reports, see <a href="schedulesandreports.html#test-reports">Test Reports</a>.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tests.html" class="btn btn-neutral float-right" title="Advanced Test Setup">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="installation.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="tests.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+
+</body>
+</html>
