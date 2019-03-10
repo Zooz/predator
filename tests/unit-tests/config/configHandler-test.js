@@ -16,10 +16,6 @@ const defaultConfig = {
     runner_cpu: 1,
     runner_memory: 2048,
     smtp_server: {
-        host: undefined,
-        port: undefined,
-        username: undefined,
-        password: undefined,
         timeout: 200
     }
 };
@@ -62,10 +58,6 @@ const resultAfterConvert = {
     runner_cpu: 2,
     runner_memory: 2048,
     smtp_server: {
-        host: undefined,
-        port: undefined,
-        username: undefined,
-        password: undefined,
         timeout: 200
     }
 };
@@ -99,8 +91,8 @@ describe('Manager config', function () {
             let result = await manager.getConfig();
 
             should(Object.keys(result).length).eql(Object.keys(configConstants).length);
-            clearUndefinedValues(result);
-            should(result).eql(defaultConfig);
+            const resultEscapedUndefined = escapeUndefinedValues(result);
+            should(resultEscapedUndefined).eql(defaultConfig);
         });
     });
 
@@ -117,8 +109,8 @@ describe('Manager config', function () {
         it('get config success', async () => {
             cassandraGetStub.resolves({ 'key_not_valid': 2 });
             let result = await manager.getConfig();
-            clearUndefinedValues(result);
-            should(result).eql(defaultConfig);
+            const resultEscapedUndefined = escapeUndefinedValues(result);
+            should(resultEscapedUndefined).eql(defaultConfig);
         });
     });
 
@@ -128,8 +120,8 @@ describe('Manager config', function () {
 
             let result = await manager.getConfig();
 
-            clearUndefinedValues(result);
-            should(result).eql(configParseExpected);
+            const resultEscapedUndefined = escapeUndefinedValues(result);
+            should(resultEscapedUndefined).eql(configParseExpected);
         });
     });
 
@@ -155,16 +147,12 @@ describe('Manager config', function () {
         it('get config  values ', async () => {
             const createConfigObject = manager.__get__('createConfigObject');
             const result = createConfigObject(convertObjectDBData);
-            clearUndefinedValues(result);
-            should(result).eql(resultAfterConvert);
+            const resultEscapedUndefined = escapeUndefinedValues(result);
+            should(resultEscapedUndefined).eql(resultAfterConvert);
         });
     });
 
-    function clearUndefinedValues(object) {
-        Object.keys(object).filter(key => !object[key]).forEach(key => {
-            if (!object[key] && object[key] !== 0) {
-                delete object[key];
-            }
-        });
+    function escapeUndefinedValues(object) {
+        return JSON.parse(JSON.stringify(object));
     }
 });
