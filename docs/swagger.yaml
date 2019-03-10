@@ -653,7 +653,6 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/error_response"
-
   /v1/config:
     get:
       tags:
@@ -686,6 +685,8 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/error_response"
+
+
 
 definitions:
   definition:
@@ -913,7 +914,63 @@ definitions:
       environment:
         type: string
         description: In which environment the test will run
-
+  job_update:
+    properties:
+      test_id:
+        type: string
+        pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+        description: The id of the test we would like to schedule.
+      cron_expression:
+        type: string
+        description: A cron expression describes when the test should be triggered, mandatory if run_immediately is not true
+      webhooks:
+        type: array
+        items:
+          type: string
+          description: The url of where to send the webhook with the report information
+      arrival_rate:
+        type: number
+        minimum: 1
+        description: How many requests per second to create
+      duration:
+        type: number
+        minimum: 1
+        description: For how many seconds the test should run
+      ramp_to:
+        type: number
+        minimum: 1
+        description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
+      max_virtual_users:
+        type: number
+        minimum: 1
+        description: The number of concurrent users that can execute requests. The arrival rate will split between them
+      parallelism:
+        type: number
+        minimum: 1
+        description: The number of runners to deploy upon start of the test. The arrival rate, ramp to and the max virtual users will be split by this value
+      emails:
+        type: array
+        items:
+          type: string
+          description: The url of where to send the the email with the report information
+      environment:
+        type: string
+        description: In which environment the test will run
+  job_response:
+    allOf:
+      - $ref: "#/definitions/job"
+      - properties:
+          id:
+            type: string
+            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+            description: Uuid that identifies the job
+  create_job_response:
+    allOf:
+      - $ref: "#/definitions/job_response"
+      - properties:
+          run_id:
+            type: string
+            description: If the job is ran immediately, will show the run id.
   config_body:
     additionalProperties: false
     properties:
@@ -1009,64 +1066,6 @@ definitions:
           timeout:
             type: number
             description: .
-
-  job_update:
-    properties:
-      test_id:
-        type: string
-        pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-        description: The id of the test we would like to schedule.
-      cron_expression:
-        type: string
-        description: A cron expression describes when the test should be triggered, mandatory if run_immediately is not true
-      webhooks:
-        type: array
-        items:
-          type: string
-          description: The url of where to send the webhook with the report information
-      arrival_rate:
-        type: number
-        minimum: 1
-        description: How many requests per second to create
-      duration:
-        type: number
-        minimum: 1
-        description: For how many seconds the test should run
-      ramp_to:
-        type: number
-        minimum: 1
-        description: A linear ramp up where the number of new arrivals increases linearly over the duration of the phase.
-      max_virtual_users:
-        type: number
-        minimum: 1
-        description: The number of concurrent users that can execute requests. The arrival rate will split between them
-      parallelism:
-        type: number
-        minimum: 1
-        description: The number of runners to deploy upon start of the test. The arrival rate, ramp to and the max virtual users will be split by this value
-      emails:
-        type: array
-        items:
-          type: string
-          description: The url of where to send the the email with the report information
-      environment:
-        type: string
-        description: In which environment the test will run
-  job_response:
-    allOf:
-      - $ref: "#/definitions/job"
-      - properties:
-          id:
-            type: string
-            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-            description: Uuid that identifies the job
-  create_job_response:
-    allOf:
-      - $ref: "#/definitions/job_response"
-      - properties:
-          run_id:
-            type: string
-            description: If the job is ran immediately, will show the run id.
   post_report:
     required:
       - report_id
