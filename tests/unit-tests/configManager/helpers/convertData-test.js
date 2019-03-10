@@ -9,17 +9,18 @@ const valuesSuccess = [{ value: '2', type: 'int', result: 2 },
 const valuesError = [{ value: 'not int', type: 'int' }, { value: 'not json', type: 'json' }];
 describe('convert data  helper tests', function () {
     describe('validate convert data of all types ', function () {
-        it('convert all value success', () => {
-            valuesSuccess.forEach(object => {
+        valuesSuccess.forEach(object => {
+            it('convert  value success for type:' + object.type, () => {
                 let result = manager.convertByType(object.value, object.type);
                 should(result).eql(object.result);
             });
         });
     });
+
     describe('validate convert data of all types ', function () {
-        it('convert all value with error', () => {
-            const errorText = 'Value is corrupted can cause to errors.';
-            valuesError.forEach(object => {
+        const errorText = 'Value is corrupted can cause to errors.';
+        valuesError.forEach(object => {
+            it('convert value with error type: ' + object.type, () => {
                 let result = manager.convertByType(object.value, object.type);
                 should(result.includes(errorText));
             });

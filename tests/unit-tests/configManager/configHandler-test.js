@@ -20,6 +20,20 @@ const defaultConfig = {
     }
 };
 
+const defaultConfigNotEscaped = {
+    job_platform: 'DOCKER',
+    docker_name: 'zooz/predator-runner:latest',
+    runner_cpu: 1,
+    runner_memory: 2048,
+    smtp_server: {
+        host: undefined,
+        port: undefined,
+        username: undefined,
+        password: undefined,
+        timeout: 200
+    }
+};
+
 const configResponseParseObject = {
     runner_cpu: 5,
     smtp_server: {
@@ -101,6 +115,11 @@ describe('Manager config', function () {
             cassandraGetStub.resolves({ 'runner_cpu': 2 });
             let result = await manager.getConfig();
             should(Object.keys(result).length).eql(Object.keys(configConstants).length);
+            Object.keys(result).forEach(key => {
+                if (key !== 'runner_cpu') {
+                    should(result[key]).eql(defaultConfigNotEscaped[key]);
+                }
+            });
             should(result['runner_cpu']).eql(2);
         });
     });

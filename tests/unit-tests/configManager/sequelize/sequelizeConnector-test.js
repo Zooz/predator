@@ -8,7 +8,6 @@ describe('Cassandra client tests', function () {
     let sandbox,
         sequelizeModelStub,
         sequelizeUpsertStub,
-        sequelizeStub,
         sequelizeDefineStub,
         sequelizeGeValueetStub,
         sequelizeGetStub;
@@ -27,8 +26,6 @@ describe('Cassandra client tests', function () {
         sequelizeUpsertStub = sandbox.stub();
         sequelizeDefineStub = sandbox.stub();
         sequelizeGetStub = sandbox.stub();
-        sequelizeStub = sandbox.stub();
-        sequelizeStub = sandbox.stub();
         sequelizeGeValueetStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
@@ -46,23 +43,21 @@ describe('Cassandra client tests', function () {
             upsert: sequelizeUpsertStub
         });
 
-        sequelizeStub.returns({
+        await sequelizeConnector.init({
             model: sequelizeModelStub,
             define: sequelizeDefineStub
         });
-        sequelizeStub.DataTypes = {};
-
-        afterEach(() => {
-            sandbox.resetHistory();
-        });
-
-        after(() => {
-            sandbox.restore();
-        });
-        await sequelizeConnector.init(sequelizeStub());
     });
 
-    describe('Update new config record', function () {
+    afterEach(() => {
+        sandbox.resetHistory();
+    });
+
+    after(() => {
+        sandbox.restore();
+    });
+
+    describe('Update new configManager record', function () {
         it('should succeed simple update', async () => {
             await sequelizeConnector.updateConfig({ test_key: 'test_value' });
             should(sequelizeUpsertStub.args[0][0]).eql({ key: 'test_key', value: 'test_value' });

@@ -80,7 +80,6 @@ describe('update and get config', () => {
         it('get default config', async () => {
             let response = await configRequestCreator.getConfig();
             should(response.statusCode).eql(200);
-            // TODO: patch for now, should be change when config data will be change.
             delete response.body['smtp_server'];
             should(response.body).eql(defaultBody);
         });
