@@ -8,10 +8,11 @@ nav:
   - Schedules and Reports: schedulesandreports.md
   - Plugins: plugins.md
   - Contributing: contributing.md
+  - API Reference: indexapiref.html
 
-theme:
-  name: windmill
-  custom_dir: 'mkdocs-windmill/mkdocs_windmill'
+theme: readthedocs
+  # name: windmill
+  # custom_dir: 'mkdocs-windmill/mkdocs_windmill'
 
 use_directory_urls: False
 
