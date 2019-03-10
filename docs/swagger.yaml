@@ -954,10 +954,10 @@ definitions:
         description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)
       runner_cpu:
         type: number
-        description: Number of CPU use by the runner ???.
+        description: Number of CPU use by the each runner.
       runner_memory:
         type: number
-        description: Max memory to use by each runner ????.
+        description: Max memory to use by each runner.
       metrics_plugin_name:
         type: string
         enum: ['influx','prometheus']
