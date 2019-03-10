@@ -10,17 +10,17 @@ nav:
   - Contributing: contributing.md
   - API Reference: indexapiref.html
 
-theme: readthedocs
-  # name: windmill
-  # custom_dir: 'mkdocs-windmill/mkdocs_windmill'
+theme:
+   name: windmill
+   custom_dir: 'mkdocs-windmill/mkdocs_windmill'
 
 use_directory_urls: False
 
 markdown_extensions:
    - codehilite:
        css_class: codehilite
-   - pymdownx.superfences: 
-   - pymdownx.details:    
+   - pymdownx.superfences:
+   - pymdownx.details:
    - admonition
    - sane_lists
    - fenced_code
