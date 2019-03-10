@@ -6,7 +6,8 @@ const should = require('should'),
     configHandler = require('../../../src/configManager/models/configHandler'),
     kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
-describe('Create job specific kubernetes tests', async () => {
+describe('Create job specific kubernetes tests', async function () {
+    this.timeout(20000);
     let testId;
 
     beforeEach(async () => {
@@ -357,4 +358,4 @@ describe('Create job specific kubernetes tests', async () => {
             });
         });
     }
-}).timeout(20000);
+});

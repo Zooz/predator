@@ -5,7 +5,8 @@ const should = require('should'),
     configHandler = require('../../../src/configManager/models/configHandler'),
     metronomeConfig = require('../../../src/config/metronomeConfig');
 
-describe('Create job specific metronome tests', async () => {
+describe('Create job specific metronome tests', async function () {
+    this.timeout(20000);
     let testId;
     let expectedResult;
 
@@ -204,4 +205,4 @@ describe('Create job specific metronome tests', async () => {
             });
         });
     }
-}).timeout(20000);
+});

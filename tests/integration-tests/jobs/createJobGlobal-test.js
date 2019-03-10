@@ -1,9 +1,10 @@
-let should = require('should');
-let uuid = require('uuid');
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let nock = require('nock');
+const should = require('should'),
+    uuid = require('uuid'),
+    schedulerRequestCreator = require('./helpers/requestCreator'),
+    nock = require('nock');
 
-describe('Create job global tests', () => {
+describe('Create job global tests', function () {
+    this.timeout(20000);
     before(async () => {
         await schedulerRequestCreator.init();
     });
@@ -151,4 +152,4 @@ describe('Create job global tests', () => {
             should(response.body.message).eql('Not found');
         });
     });
-}).timeout(20000);
+});

@@ -24,6 +24,7 @@ if (dockerConfig.host) {
 let docker = new Docker(dockerConnection);
 
 describe('Create job specific docker tests', async function () {
+    this.timeout(20000);
     let testId;
     let expectedResult;
     beforeEach(async () => {

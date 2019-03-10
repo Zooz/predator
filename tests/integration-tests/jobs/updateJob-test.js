@@ -1,13 +1,13 @@
 'use strict';
 
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
-
-let should = require('should');
-let nock = require('nock');
-let kubernetesConfig = require('../../../src/config/kubernetesConfig');
+const schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    should = require('should'),
+    nock = require('nock'),
+    kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
 describe('Update scheduled job', function () {
+    this.timeout(20000);
     let testId;
     let updatedTestId;
 
