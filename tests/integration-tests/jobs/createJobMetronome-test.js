@@ -8,24 +8,6 @@ const should = require('should'),
 describe('Create job specific metronome tests', async () => {
     let testId;
     let expectedResult;
-    before(async () => {
-        await schedulerRequestCreator.init();
-        await testsRequestCreator.init();
-
-        let requestBody = require('../../testExamples/Custom_test');
-        let response = await testsRequestCreator.createTest(requestBody, {});
-        should(response.statusCode).eql(201);
-        should(response.body).have.key('id');
-        testId = response.body.id;
-
-        expectedResult = {
-            environment: 'test',
-            test_id: testId,
-            duration: 1,
-            arrival_rate: 1,
-            max_virtual_users: 100
-        };
-    });
 
     beforeEach(async () => {
         nock.cleanAll();
@@ -33,6 +15,24 @@ describe('Create job specific metronome tests', async () => {
     const jobPlatform = await configHandler.getConfigValue('job_platform');
     if (jobPlatform === 'METRONOME') {
         describe('Metronome', () => {
+            before(async () => {
+                await schedulerRequestCreator.init();
+                await testsRequestCreator.init();
+
+                let requestBody = require('../../testExamples/Custom_test');
+                let response = await testsRequestCreator.createTest(requestBody, {});
+                should(response.statusCode).eql(201);
+                should(response.body).have.key('id');
+                testId = response.body.id;
+
+                expectedResult = {
+                    environment: 'test',
+                    test_id: testId,
+                    duration: 1,
+                    arrival_rate: 1,
+                    max_virtual_users: 100
+                };
+            });
             describe('Good requests', () => {
                 let jobId;
 

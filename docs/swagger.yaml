@@ -1,32 +1,32 @@
 swagger: '2.0'
 schemes:
-  - http
+- http
 info:
   version: 1.0.0
   title: 'Predator'
   description: |
     Predator is an open-source performance framework. It manages the entire lifecycle of load testing a server, from creating a test file, running scheduled and on-demand tests, and finally viewing the test results. Developers who want to load their system end-to-end or test a specific service will benefit from this framework. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator simplifies the performance testing regime.
 consumes:
-  - application/json
+- application/json
 produces:
-  - application/json
+- application/json
 paths:
   /v1/dsl/{dsl_name}/definitions:
     post:
       tags:
-        - dsl
+      - dsl
       description: Create new definition
       parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
-        - in: body
-          name: test
-          description: The definition to create
-          required: true
-          schema:
-            $ref: '#/definitions/definition'
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
+      - in: body
+        name: test
+        description: The definition to create
+        required: true
+        schema:
+          $ref: '#/definitions/definition'
       responses:
         201:
           description: Success
@@ -46,13 +46,13 @@ paths:
             $ref: '#/definitions/error_response'
     get:
       tags:
-        - dsl
+      - dsl
       description: Get definitions.
       parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
 
       responses:
         200:
@@ -74,17 +74,17 @@ paths:
   /v1/dsl/{dsl_name}/definitions/{definition_name}:
     get:
       tags:
-        - dsl
+      - dsl
       description: Get definition.
       parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
-        - in: path
-          name: definition_name
-          required: true
-          type: string
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
+      - in: path
+        name: definition_name
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -104,23 +104,23 @@ paths:
             $ref: '#/definitions/error_response'
     put:
       tags:
-        - dsl
+      - dsl
       description: update specific definition.
       parameters:
-        - name: definition
-          in: body
-          description: The dsl to update
-          required: true
-          schema:
-            $ref: "#/definitions/update_definition"
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
-        - in: path
-          name: definition_name
-          required: true
-          type: string
+      - name: definition
+        in: body
+        description: The dsl to update
+        required: true
+        schema:
+          $ref: "#/definitions/update_definition"
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
+      - in: path
+        name: definition_name
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -140,17 +140,17 @@ paths:
             $ref: "#/definitions/error_response"
     delete:
       tags:
-        - dsl
+      - dsl
       description: delete a specific definition.
       parameters:
-        - in: path
-          name: dsl_name
-          required: true
-          type: string
-        - in: path
-          name: definition_name
-          required: true
-          type: string
+      - in: path
+        name: dsl_name
+        required: true
+        type: string
+      - in: path
+        name: definition_name
+        required: true
+        type: string
       responses:
         204:
           description: Success
@@ -165,7 +165,7 @@ paths:
   /v1/tests:
     get:
       tags:
-        - tests
+      - tests
       description: Get list of all test and there descriptions.
       responses:
         200:
@@ -184,15 +184,15 @@ paths:
             $ref: '#/definitions/error_response'
     post:
       tags:
-        - tests
+      - tests
       description: Create new test
       parameters:
-        - name: test
-          in: body
-          description: The test to add
-          required: true
-          schema:
-            $ref: '#/definitions/test'
+      - name: test
+        in: body
+        description: The test to add
+        required: true
+        schema:
+          $ref: '#/definitions/test'
       responses:
         201:
           description: Success
@@ -213,14 +213,14 @@ paths:
   /v1/tests/{test_id}:
     get:
       tags:
-        - tests
+      - tests
       description: Get specific test.
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-          format: uuid
+      - in: path
+        name: test_id
+        required: true
+        type: string
+        format: uuid
       responses:
         200:
           description: Success
@@ -240,19 +240,19 @@ paths:
             $ref: '#/definitions/error_response'
     put:
       tags:
-        - tests
+      - tests
       description: update specific test.
       parameters:
-        - name: test
-          in: body
-          description: The test to update
-          required: true
-          schema:
-            $ref: "#/definitions/test"
-        - in: path
-          name: test_id
-          required: true
-          type: string
+      - name: test
+        in: body
+        description: The test to update
+        required: true
+        schema:
+          $ref: "#/definitions/test"
+      - in: path
+        name: test_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -272,13 +272,13 @@ paths:
             $ref: "#/definitions/error_response"
     delete:
       tags:
-        - tests
+      - tests
       description: delete a specific test.
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
+      - in: path
+        name: test_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -293,14 +293,14 @@ paths:
   /v1/tests/{test_id}/revisions:
     get:
       tags:
-        - tests
+      - tests
       description: Get list of all test revision of a specific test.
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-          format: uuid
+      - in: path
+        name: test_id
+        required: true
+        type: string
+        format: uuid
       responses:
         200:
           description: Success
@@ -323,13 +323,13 @@ paths:
   /v1/jobs:
     get:
       tags:
-        - jobs
+      - jobs
       description: Get list of all jobs.
       parameters:
-        - in: query
-          name: one_time
-          type: boolean
-          description: Should return the one time tests (no cron expression)
+      - in: query
+        name: one_time
+        type: boolean
+        description: Should return the one time tests (no cron expression)
       responses:
         200:
           description: Success
@@ -347,15 +347,15 @@ paths:
             $ref: "#/definitions/error_response"
     post:
       tags:
-        - jobs
+      - jobs
       description: Create a new job that will trigger test run
       parameters:
-        - name: job
-          in: body
-          description: The job to add
-          required: true
-          schema:
-            $ref: "#/definitions/create_job_response"
+      - name: job
+        in: body
+        description: The job to add
+        required: true
+        schema:
+          $ref: "#/definitions/create_job_response"
       responses:
         201:
           description: Success
@@ -374,13 +374,13 @@ paths:
   /v1/jobs/{job_id}:
     get:
       tags:
-        - jobs
+      - jobs
       description: Get specific job.
       parameters:
-        - in: path
-          name: job_id
-          required: true
-          type: string
+      - in: path
+        name: job_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -400,19 +400,19 @@ paths:
             $ref: "#/definitions/error_response"
     put:
       tags:
-        - jobs
+      - jobs
       description: update specific job.
       parameters:
-        - name: job
-          in: body
-          description: The job to add
-          required: true
-          schema:
-            $ref: "#/definitions/job_update"
-        - in: path
-          name: job_id
-          required: true
-          type: string
+      - name: job
+        in: body
+        description: The job to add
+        required: true
+        schema:
+          $ref: "#/definitions/job_update"
+      - in: path
+        name: job_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -432,13 +432,13 @@ paths:
             $ref: "#/definitions/error_response"
     delete:
       tags:
-        - jobs
+      - jobs
       description: delete a specific job.
       parameters:
-        - in: path
-          name: job_id
-          required: true
-          type: string
+      - in: path
+        name: job_id
+        required: true
+        type: string
       responses:
         204:
           description: Success
@@ -453,19 +453,19 @@ paths:
   /v1/jobs/{job_id}/runs/{run_id}/stop:
     post:
       tags:
-        - jobs
+      - jobs
       description: stop a specific run of specific job.
       parameters:
-        - in: path
-          description: The ID of the job.
-          name: job_id
-          required: true
-          type: string
-        - in: path
-          description: The id of a specific run in metronome which is also the report id.
-          name: run_id
-          required: true
-          type: string
+      - in: path
+        description: The ID of the job.
+        name: job_id
+        required: true
+        type: string
+      - in: path
+        description: The id of a specific run in metronome which is also the report id.
+        name: run_id
+        required: true
+        type: string
       responses:
         204:
           description: Success
@@ -480,19 +480,19 @@ paths:
   /v1/tests/{test_id}/reports:
     post:
       tags:
-        - tests
+      - tests
       description: Create new report for specific test.
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-        - in: body
-          name: report_body
-          description: report data
-          required: true
-          schema:
-            $ref: '#/definitions/post_report'
+      - in: path
+        name: test_id
+        required: true
+        type: string
+      - in: body
+        name: report_body
+        description: report data
+        required: true
+        schema:
+          $ref: '#/definitions/post_report'
       responses:
         201:
           description: Success
@@ -510,13 +510,13 @@ paths:
             $ref: "#/definitions/error_response"
     get:
       tags:
-        - tests
+      - tests
       description: Get all summary reports for specific test.
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
+      - in: path
+        name: test_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -535,14 +535,14 @@ paths:
   /v1/tests/last_reports:
     get:
       tags:
-        - tests
+      - tests
       description: Get all last reports limited by a query param
       parameters:
-        - in: query
-          name: limit
-          type: number
-          description: How many last reports show
-          required: true
+      - in: query
+        name: limit
+        type: number
+        description: How many last reports show
+        required: true
       responses:
         200:
           description: Success
@@ -561,23 +561,23 @@ paths:
   /v1/tests/{test_id}/reports/{report_id}/stats:
     post:
       tags:
-        - tests
+      - tests
       description: Insert a new stats object for a specific report
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-        - in: path
-          name: report_id
-          required: true
-          type: string
-        - name: stats_body
-          in: body
-          description: stats data
-          required: true
-          schema:
-            $ref: '#/definitions/stats'
+      - in: path
+        name: test_id
+        required: true
+        type: string
+      - in: path
+        name: report_id
+        required: true
+        type: string
+      - name: stats_body
+        in: body
+        description: stats data
+        required: true
+        schema:
+          $ref: '#/definitions/stats'
       responses:
         204:
           description: Success
@@ -596,17 +596,17 @@ paths:
   /v1/tests/{test_id}/reports/{report_id}:
     get:
       tags:
-        - tests
+      - tests
       description: Get specific report for specific test
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-        - in: path
-          name: report_id
-          required: true
-          type: string
+      - in: path
+        name: test_id
+        required: true
+        type: string
+      - in: path
+        name: report_id
+        required: true
+        type: string
       responses:
         200:
           description: Success
@@ -627,17 +627,17 @@ paths:
   /v1/tests/{test_id}/reports/{report_id}/html:
     get:
       tags:
-        - tests
+      - tests
       description: Get list of the history of this specific job id
       parameters:
-        - in: path
-          name: test_id
-          required: true
-          type: string
-        - in: path
-          name: report_id
-          required: true
-          type: string
+      - in: path
+        name: test_id
+        required: true
+        type: string
+      - in: path
+        name: report_id
+        required: true
+        type: string
       responses:
         200:
           description: Success.

@@ -23,34 +23,33 @@ if (dockerConfig.host) {
 }
 let docker = new Docker(dockerConnection);
 
-describe('Create job specific docker tests', async () => {
+describe('Create job specific docker tests', async function () {
     let testId;
     let expectedResult;
-    before(async () => {
-        await schedulerRequestCreator.init();
-        await testsRequestCreator.init();
-
-        let requestBody = require('../../testExamples/Custom_test');
-        let response = await testsRequestCreator.createTest(requestBody, {});
-        should(response.statusCode).eql(201);
-        should(response.body).have.key('id');
-        testId = response.body.id;
-
-        expectedResult = {
-            environment: 'test',
-            test_id: testId,
-            duration: 1,
-            arrival_rate: 1,
-            max_virtual_users: 100
-        };
-    });
-
     beforeEach(async () => {
         nock.cleanAll();
     });
     const jobPlatform = await configHandler.getConfigValue('job_platform');
     if (jobPlatform === 'DOCKER') {
         describe('DOCKER', () => {
+            before(async () => {
+                await schedulerRequestCreator.init();
+                await testsRequestCreator.init();
+
+                let requestBody = require('../../testExamples/Custom_test');
+                let response = await testsRequestCreator.createTest(requestBody, {});
+                should(response.statusCode).eql(201);
+                should(response.body).have.key('id');
+                testId = response.body.id;
+
+                expectedResult = {
+                    environment: 'test',
+                    test_id: testId,
+                    duration: 1,
+                    arrival_rate: 1,
+                    max_virtual_users: 100
+                };
+            });
             after(async () => {
                 let containers = await docker.listContainers();
                 containers = containers.filter(container => {
@@ -132,4 +131,4 @@ describe('Create job specific docker tests', async () => {
             });
         });
     }
-}).timeout(20000);
+});

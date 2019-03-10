@@ -82,7 +82,6 @@ describe('Update scheduled job', function () {
             let expectedResponseBodyAfterUpdate = JSON.parse(JSON.stringify(getJobResponseBeforeUpdate.body));
             expectedResponseBodyAfterUpdate.test_id = updatedTestId;
             getJobResponseAfterUpdate.body.should.eql(expectedResponseBodyAfterUpdate);
-
         });
 
         it('Wait for 4 seconds', (done) => {
@@ -280,4 +279,4 @@ describe('Update scheduled job', function () {
             await schedulerRequestCreator.deleteJobFromScheduler(jobId);
         });
     });
-}).timeout(20000);
+});

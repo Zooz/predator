@@ -9,17 +9,6 @@ const should = require('should'),
 describe('Create job specific kubernetes tests', async () => {
     let testId;
 
-    before(async () => {
-        await schedulerRequestCreator.init();
-        await testsRequestCreator.init();
-
-        let requestBody = require('../../testExamples/Custom_test');
-        let response = await testsRequestCreator.createTest(requestBody, {});
-        should(response.statusCode).eql(201);
-        should(response.body).have.key('id');
-        testId = response.body.id;
-    });
-
     beforeEach(async () => {
         nock.cleanAll();
     });
@@ -27,6 +16,16 @@ describe('Create job specific kubernetes tests', async () => {
     if (jobPlatform === 'KUBERNETES') {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
+                before(async () => {
+                    await schedulerRequestCreator.init();
+                    await testsRequestCreator.init();
+
+                    let requestBody = require('../../testExamples/Custom_test');
+                    let response = await testsRequestCreator.createTest(requestBody, {});
+                    should(response.statusCode).eql(201);
+                    should(response.body).have.key('id');
+                    testId = response.body.id;
+                });
                 let jobId;
                 describe('Create two jobs, one is one time, second one is cron and get them', () => {
                     let createJobResponse;
