@@ -96,13 +96,10 @@ describe('update and get config', () => {
             await configRequestCreator.updateConfig({ grafana_url: 'delete_value' });
             const deleteResponse = await configRequestCreator.deleteConfig('grafana_url');
             const getResponse = await configRequestCreator.getConfig();
-            console.log(getResponse.body());
             should(deleteResponse.statusCode).eql(204);
             should(getResponse.body['grafana_url']).eql(undefined);
         });
-    });
-    describe('delete config ', () => {
-        it('delete config when value in db', async () => {
+        it('delete config when value not in db', async () => {
             const deleteResponse = await configRequestCreator.deleteConfig('not_real_key');
             should(deleteResponse.statusCode).eql(204);
         });
