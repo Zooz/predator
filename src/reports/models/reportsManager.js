@@ -13,16 +13,17 @@ module.exports.getReport = async (testId, reportId) => {
         error.statusCode = 404;
         throw error;
     }
-
-    let report = await getReportResponse(reportSummary[0]);
+    let externalAddress = await configHandler.getConfigValue('external_address');
+    let report = await getReportResponse(reportSummary[0], externalAddress);
     return report;
 };
 
 module.exports.getReports = async (testId) => {
     let reportSummaries = await databaseConnector.getReports(testId);
     let reports = [];
+    let externalAddress = await configHandler.getConfigValue('external_address');
     for (let i = 0; i < reportSummaries.length; i++) {
-        const reportResponse = await getReportResponse(reportSummaries[i]);
+        const reportResponse = await getReportResponse(reportSummaries[i], externalAddress);
         reports.push(reportResponse);
     }
     return reports;
@@ -30,7 +31,8 @@ module.exports.getReports = async (testId) => {
 
 module.exports.getLastReports = async (limit) => {
     let reportSummaries = await databaseConnector.getLastReports(limit);
-    let reports = reportSummaries.map(getReportResponse);
+    let externalAddress = await configHandler.getConfigValue('external_address');
+    let reports = reportSummaries.map(getReportResponse, externalAddress);
     return reports;
 };
 
@@ -58,12 +60,12 @@ module.exports.postStats = async (testId, reportId, stats) => {
     return stats;
 };
 
-async function getReportResponse(summaryRow) {
+async function getReportResponse(summaryRow, externalAddress) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
-    let externalAddress = await configHandler.getConfigValue('external_address');
+
     let htmlReportUrl = externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
 
     let report = {

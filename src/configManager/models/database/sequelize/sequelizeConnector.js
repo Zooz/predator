@@ -38,28 +38,22 @@ async function deleteConfig(key) {
 }
 
 async function getConfig() {
-    let resultArr = [];
-    if (client) {
-        const configClient = client.model('config');
-        const options = {
-            attributes: { exclude: ['updated_at', 'created_at'] }
-        };
-        const dbResults = await configClient.findAll(options);
-        resultArr = dbResults.map(result => (result.dataValues));
-    }
+    const configClient = client.model('config');
+    const options = {
+        attributes: { exclude: ['updated_at', 'created_at'] }
+    };
+    const dbResults = await configClient.findAll(options);
+    let resultArr = dbResults.map(result => (result.dataValues));
     return resultArr;
 }
 
 async function getConfigValue(configValue) {
-    let dbResult = [];
-    if (client) {
-        const configClient = client.model('config');
-        const options = {
-            attributes: { exclude: ['updated_at', 'created_at'] }
-        };
-        options.where = { key: configValue };
-        dbResult = await configClient.find(options);
-    }
+    const configClient = client.model('config');
+    const options = {
+        attributes: { exclude: ['updated_at', 'created_at'] }
+    };
+    options.where = { key: configValue };
+    let dbResult = await configClient.find(options);
     return dbResult || [];
 }
 
