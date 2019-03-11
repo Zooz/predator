@@ -25,6 +25,7 @@ import _ from 'lodash';
 import TooltipWrapper from '../../../components/TooltipWrapper';
 import {v4 as uuid} from 'uuid'
 import Report from '../components/Report';
+import env from "../../../App/common/env";
 
 const timePattern = 'DD-MM-YYYY hh:mm:ss a';
 const noDataMsg = 'There is no data to display.';
@@ -48,6 +49,16 @@ class getReports extends React.Component {
             }} className='material-icons' style={{color: '#2a3f53'}}>visibility</i>
         );
     };
+
+    logsFormatter = (cell, row) => {
+        const link = `${env.PREDATOR_URL}/jobs/${row.job_id}/runs/${row.report_id}/logs`
+        return (
+            <a target='_blank' href={link}>
+            <i  className='material-icons' style={{color: '#2a3f53'}}>cloud_download</i>
+            </a>
+        );
+    };
+
     notes = (cell, row) => {
         if (cell) {
             const id = uuid();
@@ -250,7 +261,10 @@ class getReports extends React.Component {
                             <TableHeaderColumn dataField='grafana_report' dataAlign='left'
                                                dataFormat={this.hrefFormatter} width={'40'}>Grafana</TableHeaderColumn>
                             <TableHeaderColumn dataField='view' dataAlign='center' dataFormat={this.viewFormatter}
-                                               width={'25'}/>
+                                               width={'25'}>Raw</TableHeaderColumn>
+                           <TableHeaderColumn dataAlign='center' dataFormat={this.logsFormatter}
+                                              width={'25'}>Logs</TableHeaderColumn>
+
                             <TableHeaderColumn dataAlign='center' dataFormat={this.stopTestFormatter}
                                                formatExtraData={this} width={'25'}>Stop</TableHeaderColumn>
                         </BootstrapTable>
