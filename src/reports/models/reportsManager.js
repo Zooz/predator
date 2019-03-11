@@ -13,26 +13,26 @@ module.exports.getReport = async (testId, reportId) => {
         error.statusCode = 404;
         throw error;
     }
-    let externalAddress = await configHandler.getConfigValue('external_address');
-    let report = await getReportResponse(reportSummary[0], externalAddress);
+    let config = await configHandler.getConfig();
+    let report = getReportResponse(reportSummary[0], config);
     return report;
 };
 
 module.exports.getReports = async (testId) => {
     let reportSummaries = await databaseConnector.getReports(testId);
-    let reports = [];
-    let externalAddress = await configHandler.getConfigValue('external_address');
-    for (let i = 0; i < reportSummaries.length; i++) {
-        const reportResponse = await getReportResponse(reportSummaries[i], externalAddress);
-        reports.push(reportResponse);
-    }
+    let config = await configHandler.getConfig();
+    let reports = reportSummaries.map((summaryRow) => {
+        getReportResponse(summaryRow, config);
+    });
     return reports;
 };
 
 module.exports.getLastReports = async (limit) => {
     let reportSummaries = await databaseConnector.getLastReports(limit);
-    let externalAddress = await configHandler.getConfigValue('external_address');
-    let reports = reportSummaries.map(getReportResponse, externalAddress);
+    let config = await configHandler.getConfig();
+    let reports = reportSummaries.map((summaryRow) => {
+        getReportResponse(summaryRow, config);
+    });
     return reports;
 };
 
@@ -60,13 +60,13 @@ module.exports.postStats = async (testId, reportId, stats) => {
     return stats;
 };
 
-async function getReportResponse(summaryRow, externalAddress) {
+function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
 
-    let htmlReportUrl = externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
+    let htmlReportUrl = config.external_address + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
 
     let report = {
         test_id: summaryRow.test_id,
@@ -88,7 +88,7 @@ async function getReportResponse(summaryRow, externalAddress) {
         status: summaryRow.status,
         last_stats: lastStats,
         html_report: htmlReportUrl,
-        grafana_report: await generateGraphanaUrl(summaryRow),
+        grafana_report: generateGraphanaUrl(summaryRow, config.grafana_url),
         notes: summaryRow.notes,
         environment: testConfiguration.environment
     };
@@ -96,8 +96,7 @@ async function getReportResponse(summaryRow, externalAddress) {
     return report;
 }
 
-async function generateGraphanaUrl(report) {
-    let grafanaUrl = await configHandler.getConfigValue('grafana_url');
+function generateGraphanaUrl(report, grafanaUrl) {
     if (grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
         const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
