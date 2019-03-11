@@ -22,7 +22,7 @@ describe('convert data  helper tests', function () {
         valuesError.forEach(object => {
             it('convert value with error type: ' + object.type, () => {
                 let result = manager.convertByType(object.value, object.type);
-                should(result.includes(errorText));
+                should(result).eql(undefined);
             });
         });
     });

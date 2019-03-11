@@ -1,13 +1,13 @@
 'use strict';
 
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
-
-let should = require('should');
-let nock = require('nock');
-let kubernetesConfig = require('../../../src/config/kubernetesConfig');
+const schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    should = require('should'),
+    nock = require('nock'),
+    kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
 describe('Update scheduled job', function () {
+    this.timeout(20000);
     let testId;
     let updatedTestId;
 
@@ -82,7 +82,6 @@ describe('Update scheduled job', function () {
             let expectedResponseBodyAfterUpdate = JSON.parse(JSON.stringify(getJobResponseBeforeUpdate.body));
             expectedResponseBodyAfterUpdate.test_id = updatedTestId;
             getJobResponseAfterUpdate.body.should.eql(expectedResponseBodyAfterUpdate);
-
         });
 
         it('Wait for 4 seconds', (done) => {
@@ -280,4 +279,4 @@ describe('Update scheduled job', function () {
             await schedulerRequestCreator.deleteJobFromScheduler(jobId);
         });
     });
-}).timeout(20000);
+});

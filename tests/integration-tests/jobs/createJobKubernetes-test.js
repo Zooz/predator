@@ -1,33 +1,31 @@
-let should = require('should');
-let uuid = require('uuid');
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
+const should = require('should'),
+    uuid = require('uuid'),
+    schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    nock = require('nock'),
+    kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
-let nock = require('nock');
-let serviceConfig = require('../../../src/config/serviceConfig');
-let kubernetesConfig = require('../../../src/config/kubernetesConfig');
-
-describe('Create job specific kubernetes tests', () => {
+describe('Create job specific kubernetes tests', async function () {
+    this.timeout(20000);
     let testId;
-
-    before(async () => {
-        await schedulerRequestCreator.init();
-        await testsRequestCreator.init();
-
-        let requestBody = require('../../testExamples/Custom_test');
-        let response = await testsRequestCreator.createTest(requestBody, {});
-        should(response.statusCode).eql(201);
-        should(response.body).have.key('id');
-        testId = response.body.id;
-    });
 
     beforeEach(async () => {
         nock.cleanAll();
     });
-
-    if (serviceConfig.jobPlatform === 'KUBERNETES') {
+    const jobPlatform = process.env.JOB_PLATFORM;
+    if (jobPlatform === 'KUBERNETES') {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
+                before(async () => {
+                    await schedulerRequestCreator.init();
+                    await testsRequestCreator.init();
+
+                    let requestBody = require('../../testExamples/Custom_test');
+                    let response = await testsRequestCreator.createTest(requestBody, {});
+                    should(response.statusCode).eql(201);
+                    should(response.body).have.key('id');
+                    testId = response.body.id;
+                });
                 let jobId;
                 describe('Create two jobs, one is one time, second one is cron and get them', () => {
                     let createJobResponse;
@@ -359,4 +357,4 @@ describe('Create job specific kubernetes tests', () => {
             });
         });
     }
-}).timeout(20000);
+});

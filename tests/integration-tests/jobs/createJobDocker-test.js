@@ -1,12 +1,11 @@
-let should = require('should');
-let URL = require('url').URL;
-let fs = require('fs');
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
-let nock = require('nock');
-let Docker = require('dockerode');
-let serviceConfig = require('../../../src/config/serviceConfig');
-let dockerConfig = require('../../../src/config/dockerConfig');
+const should = require('should'),
+    URL = require('url').URL,
+    fs = require('fs'),
+    schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    nock = require('nock'),
+    Docker = require('dockerode'),
+    dockerConfig = require('../../../src/config/dockerConfig');
 
 let dockerConnection;
 if (dockerConfig.host) {
@@ -19,38 +18,38 @@ if (dockerConfig.host) {
         key: dockerConfig.certPath ? fs.readFileSync(dockerConfig.certPath + '/key.pem') : undefined
     };
 } else {
-    dockerConnection = ({socketPath: '/var/run/docker.sock'});
+    dockerConnection = ({ socketPath: '/var/run/docker.sock' });
 }
 let docker = new Docker(dockerConnection);
 
-describe('Create job specific docker tests', () => {
+describe('Create job specific docker tests', async function () {
+    this.timeout(20000);
     let testId;
     let expectedResult;
-    before(async () => {
-        await schedulerRequestCreator.init();
-        await testsRequestCreator.init();
-
-        let requestBody = require('../../testExamples/Custom_test');
-        let response = await testsRequestCreator.createTest(requestBody, {});
-        should(response.statusCode).eql(201);
-        should(response.body).have.key('id');
-        testId = response.body.id;
-
-        expectedResult = {
-            environment: 'test',
-            test_id: testId,
-            duration: 1,
-            arrival_rate: 1,
-            max_virtual_users: 100
-        };
-    });
-
     beforeEach(async () => {
         nock.cleanAll();
     });
-
-    if (serviceConfig.jobPlatform === 'DOCKER') {
+    const jobPlatform = process.env.JOB_PLATFORM;
+    if (jobPlatform === 'DOCKER') {
         describe('DOCKER', () => {
+            before(async () => {
+                await schedulerRequestCreator.init();
+                await testsRequestCreator.init();
+
+                let requestBody = require('../../testExamples/Custom_test');
+                let response = await testsRequestCreator.createTest(requestBody, {});
+                should(response.statusCode).eql(201);
+                should(response.body).have.key('id');
+                testId = response.body.id;
+
+                expectedResult = {
+                    environment: 'test',
+                    test_id: testId,
+                    duration: 1,
+                    arrival_rate: 1,
+                    max_virtual_users: 100
+                };
+            });
             after(async () => {
                 let containers = await docker.listContainers();
                 containers = containers.filter(container => {
@@ -132,4 +131,4 @@ describe('Create job specific docker tests', () => {
             });
         });
     }
-}).timeout(20000);
+});

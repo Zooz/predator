@@ -1,25 +1,22 @@
 'use strict';
-let logger = require('../../common/logger');
-
-let uuid = require('uuid');
-let CronJob = require('cron').CronJob;
-let config = require('../../config/serviceConfig');
-let util = require('util');
-let dockerHubConnector = require('./dockerHubConnector');
-let databaseConnector = require('./database/databaseConnector');
-
-let jobTemplate = require(`./${config.jobPlatform.toLowerCase()}/jobTemplate`);
-let jobConnector = require(`./${config.jobPlatform.toLowerCase()}/jobConnector`);
+const logger = require('../../common/logger'),
+    uuid = require('uuid'),
+    CronJob = require('cron').CronJob,
+    configHandler = require('../../configManager/models/configHandler'),
+    util = require('util'),
+    dockerHubConnector = require('./dockerHubConnector'),
+    databaseConnector = require('./database/databaseConnector');
 
 let cronJobs = {};
 const JOB_PLATFORM_NAME = 'predator.%s';
 
 module.exports.reloadCronJobs = async function () {
+    const configData = await configHandler.getConfig();
     try {
         let jobs = await databaseConnector.getJobs();
         jobs.forEach(async function (job) {
             if (job.cron_expression !== null) {
-                addCron(job.id.toString(), job, job.cron_expression);
+                addCron(job.id.toString(), job, job.cron_expression, configData);
             }
         });
     } catch (error) {
@@ -28,6 +25,8 @@ module.exports.reloadCronJobs = async function () {
 };
 
 module.exports.createJob = async function (job) {
+    const configData = await configHandler.getConfig();
+    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     let jobId = uuid.v4();
 
     try {
@@ -35,12 +34,12 @@ module.exports.createJob = async function (job) {
         logger.info('Job saved successfully to database');
         let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
         let runId = Date.now();
-        let jobSpecificPlatformRequest = createJobRequest(jobId, runId, job, latestDockerImage);
+        let jobSpecificPlatformRequest = createJobRequest(jobId, runId, job, latestDockerImage, configData);
         if (job.run_immediately) {
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
         if (job.cron_expression) {
-            addCron(jobId, job, job.cron_expression);
+            await addCron(jobId, job, job.cron_expression, configData);
         }
         logger.info('Job deployed successfully');
         return createResponse(jobId, job, runId);
@@ -59,6 +58,8 @@ module.exports.deleteJob = function (jobId) {
 };
 
 module.exports.stopRun = async function (jobId, runId) {
+    const configData = await configHandler.getConfig();
+    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), runId);
 };
 
@@ -103,7 +104,8 @@ module.exports.getJob = async function (jobId) {
     }
 };
 
-module.exports.updateJob = function (jobId, jobConfig) {
+module.exports.updateJob = async function (jobId, jobConfig) {
+    const configData = await configHandler.getConfig();
     return databaseConnector.updateJob(jobId, jobConfig)
         .then(function () {
             return databaseConnector.getJob(jobId)
@@ -117,7 +119,7 @@ module.exports.updateJob = function (jobId, jobConfig) {
                         cronJobs[jobId].stop();
                         delete cronJobs[jobId];
                     }
-                    addCron(jobId, updatedJob[0], updatedJob[0].cron_expression);
+                    addCron(jobId, updatedJob[0], updatedJob[0].cron_expression, configData);
                     logger.info('Job updated successfully to database');
                 });
         }).catch(function (err) {
@@ -153,7 +155,8 @@ function createResponse(jobId, jobBody, runId) {
     return response;
 }
 
-function createJobRequest(jobId, runId, jobBody, dockerImage) {
+function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
+    const jobTemplate = require(`./${configData.job_platform.toLowerCase()}/jobTemplate`);
     let jobName = util.format(JOB_PLATFORM_NAME, jobId);
     let rampToPerRunner = jobBody.ramp_to;
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
@@ -172,14 +175,15 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
         RUN_ID: runId.toString(),
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
-        PREDATOR_URL: config.internalAddress,
+        PREDATOR_URL: configData.internal_address,
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
         DURATION: jobBody.duration.toString()
     };
+    const metricsExport = configData.metrics_plugin_name === 'influx' ? configData.influx_metrics : configData.prometheus_metrics;
 
-    if (config.metricsPluginName && config.metricsExportConfig) {
-        environmentVariables.METRICS_PLUGIN_NAME = config.metricsPluginName;
-        environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(config.metricsExportConfig).toString('base64');
+    if (configData.metrics_plugin_name && metricsExport) {
+        environmentVariables.METRICS_PLUGIN_NAME = configData.metrics_plugin_name;
+        environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(metricsExport).toString('base64');
     }
 
     if (jobBody.emails) {
@@ -206,17 +210,18 @@ function createJobRequest(jobId, runId, jobBody, dockerImage) {
         });
     }
 
-    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage);
+    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData);
 
     return jobRequest;
 }
 
-function addCron(jobId, job, cronExpression) {
+function addCron(jobId, job, cronExpression, configData) {
+    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     let scheduledJob = new CronJob(cronExpression, async function () {
         try {
             let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             let runId = Date.now();
-            let jobSpecificPlatformConfig = createJobRequest(jobId, runId, job, latestDockerImage);
+            let jobSpecificPlatformConfig = createJobRequest(jobId, runId, job, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformConfig);
         } catch (error) {
             logger.error({ id: jobId, error: error }, 'Unable to run scheduled job.');

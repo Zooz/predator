@@ -17,6 +17,11 @@ module.exports.updateConfig = async (config) => {
     return response;
 };
 
+module.exports.deleteConfig = async (key) => {
+    let response = await dbConnector.deleteConfig(key);
+    return response;
+};
+
 function createConfigObject(configAsObject) {
     let config = {};
     Object.values(configTemplate).forEach(configTemplateKeys => {

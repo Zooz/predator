@@ -1,9 +1,9 @@
 'use strict';
 
-let databaseConnector = require('./databaseConnector');
-let jobConnector = require('../../jobs/models/jobManager');
-let serviceConfig = require('../../config/serviceConfig');
-let statsConsumer = require('./statsConsumer');
+const databaseConnector = require('./databaseConnector'),
+    jobConnector = require('../../jobs/models/jobManager'),
+    configHandler = require('../../configManager/models/configHandler'),
+    statsConsumer = require('./statsConsumer');
 
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
@@ -13,20 +13,26 @@ module.exports.getReport = async (testId, reportId) => {
         error.statusCode = 404;
         throw error;
     }
-
-    let report = getReportResponse(reportSummary[0]);
+    let config = await configHandler.getConfig();
+    let report = getReportResponse(reportSummary[0], config);
     return report;
 };
 
 module.exports.getReports = async (testId) => {
     let reportSummaries = await databaseConnector.getReports(testId);
-    let reports = reportSummaries.map(getReportResponse);
+    let config = await configHandler.getConfig();
+    let reports = reportSummaries.map((summaryRow) => {
+        return getReportResponse(summaryRow, config);
+    });
     return reports;
 };
 
 module.exports.getLastReports = async (limit) => {
     let reportSummaries = await databaseConnector.getLastReports(limit);
-    let reports = reportSummaries.map(getReportResponse);
+    let config = await configHandler.getConfig();
+    let reports = reportSummaries.map((summaryRow) => {
+        return getReportResponse(summaryRow, config);
+    });
     return reports;
 };
 
@@ -54,13 +60,13 @@ module.exports.postStats = async (testId, reportId, stats) => {
     return stats;
 };
 
-function getReportResponse(summaryRow) {
+function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
 
-    let htmlReportUrl = serviceConfig.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
+    let htmlReportUrl = config.external_address + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
 
     let report = {
         test_id: summaryRow.test_id,
@@ -82,7 +88,7 @@ function getReportResponse(summaryRow) {
         status: summaryRow.status,
         last_stats: lastStats,
         html_report: htmlReportUrl,
-        grafana_report: generateGraphanaUrl(summaryRow),
+        grafana_report: generateGraphanaUrl(summaryRow, config.grafana_url),
         notes: summaryRow.notes,
         environment: testConfiguration.environment
     };
@@ -90,10 +96,10 @@ function getReportResponse(summaryRow) {
     return report;
 }
 
-function generateGraphanaUrl(report) {
-    if (serviceConfig.grafanaUrl) {
+function generateGraphanaUrl(report, grafanaUrl) {
+    if (grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
-        const grafanaReportUrl = encodeURI(serviceConfig.grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
+        const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
         return grafanaReportUrl;
     }
 }

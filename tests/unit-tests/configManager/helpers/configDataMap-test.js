@@ -4,36 +4,44 @@ const should = require('should');
 const rewire = require('rewire');
 const configConstants = require('../../../../src/common/consts').CONFIG;
 
-let manager;
+const valuesToCheck = ['grafana_url', 'external_address', 'internal_address', 'docker_name', 'job_platform', 'runner_memory', 'runner_cpu', 'metrics_plugin_name'];
 
-const allConfigData = {
-    grafana_url: { value: 'test_grafana_url' },
-    external_address: { value: 'test_external_address' },
-    internal_address: { value: 'test_internal_address', type: 'type_test' },
-    docker_name: { value: 'test_docker_name', type: 'type_test' },
-    job_platform: { value: 'test_job_platform', type: 'type_test' },
-    runner_memory: { value: 'test_runner_memory', type: 'type_test' },
-    runner_cpu: { value: 'test_runner_cpu', type: 'type_test' },
-    metrics_plugin_name: { value: 'test_metrics_plugin_name', type: 'type_test' },
-    default_email_address: { value: 'test_default_email_address', type: 'type_test' },
-    default_webhook_url: { value: 'test_default_webhook_url', type: 'type_test' },
-    metrics_export_conf: { value: 'test_metrics_export_conf', type: 'string' },
-    influx_metrics: { value: 'test_influx_metrics', type: 'number' },
-    prometheus_metrics: { value: 'test_prometheus_metrics', type: 'json' },
-    smtp_server: { value: 'test_smtp_server', type: 'int' }
+let manager;
+const expectedTypes = {
+    grafana_url: undefined,
+    external_address: undefined,
+    internal_address: undefined,
+    docker_name: undefined,
+    job_platform: undefined,
+    runner_memory: 'int',
+    runner_cpu: 'int',
+    metrics_plugin_name: 'string',
+    default_email_address: undefined,
+    default_webhook_url: undefined,
+    influx_metrics: 'json',
+    prometheus_metrics: 'json',
+    smtp_server: 'json'
 };
 
-describe('configManager data map helper  tests', function() {
-    describe('Manager configManager', function () {
-        manager = rewire('../../../../src/configManager/helpers/configDataMap');
-    });
+function changeAllEnvData() {
+    process.env.GRAFANA_URL = 'grafana_url_test';
+    process.env.EXTERNAL_ADDRESS = 'external_address_test';
+    process.env.INTERNAL_ADDRESS = 'internal_address_test';
+    process.env.DOCKER_NAME = 'docker_name_test';
+    process.env.JOB_PLATFORM = 'job_platform_test';
+    process.env.RUNNER_CPU = 'runner_cpu_test';
+    process.env.RUNNER_MEMORY = 'runner_memory_test';
+    process.env.METRICS_PLUGIN_NAME = 'metrics_plugin_name_test';
+}
 
+describe('configManager data map helper  tests', function() {
     describe('get all configs with value from env data', function () {
         it('get all value success', () => {
-            manager.__set__('configDataMap', allConfigData);
-            Object.values(configConstants).forEach(key => {
+            changeAllEnvData();
+            manager = rewire('../../../../src/configManager/helpers/configDataMap');
+            valuesToCheck.forEach(key => {
                 let result = manager.getConstDefaultValue(key);
-                const expectedValue = allConfigData[key].value;
+                const expectedValue = key + '_test';
                 should(result).eql(expectedValue);
             });
         });
@@ -41,10 +49,9 @@ describe('configManager data map helper  tests', function() {
 
     describe('get all configs  type from env data', function () {
         it('get all types success', () => {
-            manager.__set__('configDataMap', allConfigData);
             Object.values(configConstants).forEach(key => {
                 let result = manager.getConstType(key);
-                const expectedType = allConfigData[key].type;
+                const expectedType = expectedTypes[key];
                 should(result).eql(expectedType);
             });
         });

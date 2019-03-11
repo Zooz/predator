@@ -3,8 +3,6 @@ let should = require('should');
 let sinon = require('sinon');
 let rewire = require('rewire');
 let requestSender = require('../../../../../src/common/requestSender');
-let config = require('../../../../../src/config/serviceConfig');
-config.kubernetesNamespace = 'default';
 let jobConnector = rewire('../../../../../src/jobs/models/metronome/jobConnector');
 
 describe('Metronome job connector tests', function () {

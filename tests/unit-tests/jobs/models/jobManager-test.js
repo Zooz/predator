@@ -1,26 +1,20 @@
 'use strict';
-let databaseConfig = require('../../../../src/config/databaseConfig');
-databaseConfig.type = 'CASSANDRA';
-let should = require('should');
-let rewire = require('rewire');
-let sinon = require('sinon');
-let databaseConnector = require('../../../../src/jobs/models/database/databaseConnector');
-let logger = require('../../../../src/common/logger');
-let uuid = require('uuid');
-let jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector');
-let jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate');
+const should = require('should'),
+    rewire = require('rewire'),
+    sinon = require('sinon'),
+    databaseConnector = require('../../../../src/jobs/models/database/databaseConnector'),
+    logger = require('../../../../src/common/logger'),
+    uuid = require('uuid'),
+    jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector'),
+    dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector'),
+    jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate');
 
-let config = require('../../../../src/config/serviceConfig');
-
-config.jobPlatform = 'KUBERNETES';
 let manager;
-
-let dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector');
 
 const TEST_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaa';
 const JOB_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaf';
 
-let jobBodyWithCron = {
+const jobBodyWithCron = {
     test_id: TEST_ID,
     id: TEST_ID,
     arrival_rate: 1,
@@ -32,7 +26,7 @@ let jobBodyWithCron = {
     ramp_to: '1',
     webhooks: ['dina', 'niv', 'eli']
 };
-let jobBodyWithCronNotImmediately = {
+const jobBodyWithCronNotImmediately = {
     test_id: TEST_ID,
     arrival_rate: 1,
     duration: 1,
@@ -43,7 +37,7 @@ let jobBodyWithCronNotImmediately = {
     ramp_to: '1',
     webhooks: ['dina', 'niv', 'eli']
 };
-let jobBodyWithoutCron = {
+const jobBodyWithoutCron = {
     test_id: TEST_ID,
     arrival_rate: 1,
     duration: 1,
@@ -54,7 +48,7 @@ let jobBodyWithoutCron = {
     webhooks: ['dina', 'niv', 'eli']
 };
 
-let jobBodyWithParallelismThatSplitsNicely = {
+const jobBodyWithParallelismThatSplitsNicely = {
     test_id: TEST_ID,
     arrival_rate: 99,
     duration: 1,
@@ -67,7 +61,7 @@ let jobBodyWithParallelismThatSplitsNicely = {
     max_virtual_users: 198
 };
 
-let jobBodyWithParallelismThatSplitsWithDecimal = {
+const jobBodyWithParallelismThatSplitsWithDecimal = {
     test_id: TEST_ID,
     arrival_rate: 99,
     duration: 1,
@@ -80,7 +74,7 @@ let jobBodyWithParallelismThatSplitsWithDecimal = {
     max_virtual_users: 510
 };
 
-let jobBodyWithoutRampTo = {
+const jobBodyWithoutRampTo = {
     test_id: TEST_ID,
     arrival_rate: 1,
     duration: 1,
@@ -90,7 +84,7 @@ let jobBodyWithoutRampTo = {
     webhooks: ['dina', 'niv', 'eli']
 };
 
-let jobBodyWithCustomEnvVars = {
+const jobBodyWithCustomEnvVars = {
     test_id: TEST_ID,
     arrival_rate: 1,
     duration: 1,
@@ -134,8 +128,14 @@ describe('Manager tests', function () {
         jobTemplateCreateJobRequestStub = sandbox.spy(jobTemplate, 'createJobRequest');
 
         manager = rewire('../../../../src/jobs/models/jobManager');
-        manager.__set__('config.concurrencyLimit', '100');
-        manager.__set__('config.jobPlatform', 'KUBERNETES');
+        manager.__set__('configHandler', {
+            getConfig: () => {
+                return {
+                    job_platform: 'KUBERNETES',
+                    concurrency_limit: 100
+                };
+            }
+        });
     });
 
     beforeEach(() => {
@@ -188,10 +188,15 @@ describe('Manager tests', function () {
 
     describe('Create new job', function () {
         before(() => {
-            manager.__set__('config.baseUrl', '');
-            manager.__set__('config.internalAddress', 'localhost:80');
-            manager.__set__('config.environment', '');
-            manager.__set__('config.concurrencyLimit', '100');
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return {
+                        job_platform: 'KUBERNETES',
+                        base_url: '',
+                        internal_address: 'localhost:80'
+                    };
+                }
+            });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
 
@@ -508,10 +513,15 @@ describe('Manager tests', function () {
 
     describe('Update job', function () {
         before(() => {
-            manager.__set__('config.baseUrl', '');
-            manager.__set__('config.predatorUrl', 'localhost:80');
-            manager.__set__('config.environment', '');
-            manager.__set__('config.concurrencyLimit', '100');
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return {
+                        job_platform: 'KUBERNETES',
+                        base_url: '',
+                        internal_address: 'localhost:80'
+                    };
+                }
+            });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
 
@@ -556,10 +566,15 @@ describe('Manager tests', function () {
 
     describe('Delete scheduled job', function () {
         it('Deletes an existing job', async function () {
-            manager.__set__('config.baseUrl', '');
-            manager.__set__('config.predatorUrl', 'localhost:80');
-            manager.__set__('config.environment', '');
-            manager.__set__('config.concurrencyLimit', '100');
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return {
+                        job_platform: 'KUBERNETES',
+                        base_url: '',
+                        internal_address: 'localhost:80'
+                    };
+                }
+            });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
             jobConnectorRunJobStub.resolves({});
             cassandraInsertStub.resolves({ success: 'success' });

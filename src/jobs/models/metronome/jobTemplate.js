@@ -1,12 +1,10 @@
-let config = require('../../../config/serviceConfig');
-
-module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage) => {
+module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData) => {
     return {
         id: jobName,
         description: 'Runs a performance test',
         run: {
-            cpus: config.runnerCpu || 1,
-            mem: config.runnerMemory || 2048,
+            cpus: configData['runner_cpu'] || 1,
+            mem: configData['runner_memory'] || 2048,
             disk: 0,
             maxLaunchDelay: 30,
             docker: {

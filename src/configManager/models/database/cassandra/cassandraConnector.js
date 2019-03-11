@@ -3,6 +3,7 @@ const databaseConfig = require('../../../../config/databaseConfig');
 const GET_CONFIG_VALUE = 'SELECT* FROM config WHERE key= ?';
 const GET_CONFIG = 'SELECT* FROM config';
 const INSERT_DATA = 'INSERT INTO config(key, value) values(?,?)';
+const DELETE_CONFIG = 'DELETE FROM config WHERE key=?;';
 
 let client;
 
@@ -10,6 +11,7 @@ module.exports = {
     init,
     updateConfig,
     getConfig,
+    deleteConfig,
     getConfigValue
 };
 function init(cassandraClient) {
@@ -30,8 +32,12 @@ function updateConfig(updateValues) {
     return batchUpsert(queriesArr, queryOptions);
 }
 
+function deleteConfig(key) {
+    return executeQuery(DELETE_CONFIG, [key]);
+}
+
 function getConfigValue(configValue) {
-    return executeQuery(GET_CONFIG_VALUE, configValue);
+    return executeQuery(GET_CONFIG_VALUE, [configValue]);
 }
 
 function getConfig() {

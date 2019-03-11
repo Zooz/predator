@@ -12,6 +12,7 @@ module.exports = {
     init,
     updateConfig,
     getConfigAsObject,
+    deleteConfig,
     getConfigValue
 };
 
@@ -21,6 +22,10 @@ async function init() {
 
 async function updateConfig(updateValues) {
     return databaseConnector.updateConfig(updateValues);
+}
+
+async function deleteConfig(key) {
+    return databaseConnector.deleteConfig(key);
 }
 
 async function getConfigAsObject() {

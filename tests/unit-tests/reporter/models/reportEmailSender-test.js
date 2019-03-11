@@ -6,9 +6,9 @@ let sinon = require('sinon');
 let should = require('should');
 let logger = require('../../../../src/common/logger');
 let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
-let serviceConfig = require('../../../../src/config/serviceConfig');
 let reportsManager = require('../../../../src/reports/models/reportsManager');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
+let configHandler = require('../../../../src/configManager/models/configHandler');
 let nodemailer = require('nodemailer');
 
 const REPORT = {
@@ -44,7 +44,7 @@ const REPORT = {
             'Create token and get token': 173732,
             'Create token, create customer and assign token to customer': 115716
         },
-        'errors': {EAI_AGAIN: 112, NOTREACH: 123 },
+        'errors': { EAI_AGAIN: 112, NOTREACH: 123 },
         'codes': {
             '200': 173732,
             '201': 520878,
@@ -62,6 +62,11 @@ const REPORT = {
 const JOB = {
     'emails': 'eli@zooz.com'
 };
+const CONFIG = {
+    port: 111,
+    host: 'smtp_host_test',
+    timeout: 222
+};
 
 const transporter = {
     sendMail: () => { },
@@ -69,7 +74,7 @@ const transporter = {
 };
 
 describe('Report emails sender test', () => {
-    let sandbox, getReportStub, getJobStub, loggerErrorStub, loggerInfoStub, nodemailerCreateTransportStub, sendMailStub;
+    let sandbox, getReportStub, getJobStub, loggerErrorStub, loggerInfoStub, nodemailerCreateTransportStub, sendMailStub, getConfig;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -77,6 +82,7 @@ describe('Report emails sender test', () => {
         getJobStub = sandbox.stub(jobsManager, 'getJob');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
+        getConfig = sandbox.stub(configHandler, 'getConfigValue');
         nodemailerCreateTransportStub = sandbox.stub(nodemailer, 'createTransport');
         sendMailStub = sandbox.stub(transporter, 'sendMail');
     });
@@ -90,11 +96,11 @@ describe('Report emails sender test', () => {
     });
 
     it('Send aggregate report successfully', async () => {
-        sendMailStub.resolves({status: 201});
+        sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
         getReportStub.resolves(REPORT);
         getJobStub.resolves(JOB);
-        serviceConfig.taskSchedulerApiUrl = 'http://task-scheduler.zooz.com';
+        getConfig.resolves({});
 
         await reportEmailSender.sendAggregateReport('testId', 'reportId', 'http://report.zooz.com', 'http://grafana.zooz.com');
 
@@ -122,7 +128,7 @@ describe('Report emails sender test', () => {
 
     it('Send aggregate report fails because of error invoking smtp client', async () => {
         const error = new Error('Failed to connect to SMTP client');
-        sendMailStub.resolves({status: 201});
+        sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.throws(error);
         getReportStub.resolves(REPORT);
         getJobStub.resolves(JOB);
@@ -135,7 +141,7 @@ describe('Report emails sender test', () => {
 
     it('Error retrieving report', async () => {
         const expectedError = new Error('Failed to retrieve report');
-        sendMailStub.resolves({status: 201});
+        sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
         getReportStub.rejects(expectedError);
         getJobStub.resolves(JOB);
@@ -153,10 +159,9 @@ describe('Report emails sender test', () => {
         testShouldFail.should.eql(false, 'Test action was supposed to get exception');
     });
 
-
     it('Error retrieving job', async () => {
         const expectedError = new Error('Failed to retrieve job');
-        sendMailStub.resolves({status: 201});
+        sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
         getReportStub.resolves(REPORT);
         getJobStub.rejects(expectedError);
@@ -172,5 +177,17 @@ describe('Report emails sender test', () => {
         }
 
         testShouldFail.should.eql(false, 'Test action was supposed to get exception');
+    });
+
+    it('Verify transporter options', async () => {
+        sendMailStub.resolves({ status: 201 });
+        getReportStub.resolves(REPORT);
+        getJobStub.resolves(JOB);
+        getConfig.resolves(CONFIG);
+        nodemailerCreateTransportStub.returns(transporter);
+        await reportEmailSender.sendAggregateReport('testId', 'reportId', 'REPORT_DATA');
+        should(nodemailerCreateTransportStub.args[0][0].host).eql('smtp_host_test');
+        should(nodemailerCreateTransportStub.args[0][0].port).eql(111);
+        should(nodemailerCreateTransportStub.args[0][0].connectionTimeout).eql(222);
     });
 });
