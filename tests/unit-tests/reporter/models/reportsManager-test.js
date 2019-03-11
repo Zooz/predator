@@ -3,6 +3,7 @@ process.env.JOB_PLATFORM = 'KUBERNETES';
 let should = require('should');
 let rewire = require('rewire');
 let sinon = require('sinon');
+const configHandler = require('../../../../src/configManager/models/configHandler');
 let databaseConnector = require('../../../../src/reports/models/databaseConnector');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
 
@@ -74,6 +75,7 @@ describe('Reports manager tests', function () {
     let databaseGetLastReportsStub;
     let databasePostReportStub;
     let databasePostStatsStub;
+    let configStub;
     let databaseUpdateReportStub;
     let getJobStub;
 
@@ -83,6 +85,7 @@ describe('Reports manager tests', function () {
         databaseGetReportStub = sandbox.stub(databaseConnector, 'getReport');
         databaseGetReportsStub = sandbox.stub(databaseConnector, 'getReports');
         databaseGetLastReportsStub = sandbox.stub(databaseConnector, 'getLastReports');
+        configStub = sandbox.stub(configHandler, 'getConfig');
         databasePostReportStub = sandbox.stub(databaseConnector, 'insertReport');
         databasePostStatsStub = sandbox.stub(databaseConnector, 'insertStats');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
@@ -110,8 +113,8 @@ describe('Reports manager tests', function () {
     describe('Get report', function () {
         it('Database connector returns an array with one report', async () => {
             manager.__set__('configHandler', {
-                getConfigValue: () => {
-                    return 'http://www.grafana.com';
+                getConfig: () => {
+                    return { grafana_url: 'http://www.grafana.com' };
                 }
             });
             databaseGetReportStub.resolves([REPORT]);
@@ -124,8 +127,8 @@ describe('Reports manager tests', function () {
 
         it('Database connector returns an array with one report without grafana url configured', async () => {
             manager.__set__('configHandler', {
-                getConfigValue: () => {
-                    return undefined;
+                getConfig: () => {
+                    return {};
                 }
             });
             databaseGetReportStub.resolves([REPORT]);
@@ -203,6 +206,7 @@ describe('Reports manager tests', function () {
 
     describe('Create new stats', function () {
         it('Stats consumer handles message', async () => {
+            configStub.resolves({});
             databaseGetReportStub.resolves([REPORT]);
             databasePostStatsStub.resolves();
             databaseUpdateReportStub.resolves();

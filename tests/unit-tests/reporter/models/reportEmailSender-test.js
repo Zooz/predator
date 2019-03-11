@@ -100,6 +100,7 @@ describe('Report emails sender test', () => {
         nodemailerCreateTransportStub.returns(transporter);
         getReportStub.resolves(REPORT);
         getJobStub.resolves(JOB);
+        getConfig.resolves({});
 
         await reportEmailSender.sendAggregateReport('testId', 'reportId', 'http://report.zooz.com', 'http://grafana.zooz.com');
 
