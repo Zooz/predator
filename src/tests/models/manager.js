@@ -38,16 +38,18 @@ async function getTest(testId) {
 }
 
 async function downloadFile(fileUrl) {
-    const options = {
+    const fileName = tempFile + uuid();
+    const file = fs.createWriteStream(fileName);
+
+    options = {
         url: fileUrl,
         encoding: null
     };
 
-    request.get(options)
-        .then(function (res) {
-            const buffer = Buffer.from(res, 'utf8');
-            fs.writeFileSync(tempFile, buffer);
-        });
+    const response = await request.get(options);
+    const buffer = Buffer.from(file, 'utf8');
+    fs.writeFileSync(tempFile, buffer);
+
 }
 
 function unlinkFile(tempFile) {
