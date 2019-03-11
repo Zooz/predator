@@ -7,6 +7,7 @@ module.exports = {
     getTest,
     deleteTest,
     getTests,
+    getFile,
     downloadFile,
     getTestRevisions
 };
@@ -19,9 +20,18 @@ async function upsertTest(req, res, next) {
         return next(err);
     }
 }
+
+async function getFile(req, res, next) {
+    try {
+        const result = await manager.getFile(req.params.file_id);
+        return res.status(200).json(result);
+    } catch (err) {
+        return next(err);
+    }
+}
 async function downloadFile(req, res, next) {
     try {
-        const result = await manager.saveFileToDbUsingUrl('https://drive.google.com/file/d/1Nja7ezdXLoVibF_HolTY7eVjlIQ2P2RV/view?usp=sharing');
+        const result = await manager.saveFileToDbUsingUrl('https://www.dropbox.com/s/dffgjbojwrlz55o/fuleuPLOAD.rtf?dl=1');
         return res.status(201).json(result);
     } catch (err){
         return next(err);

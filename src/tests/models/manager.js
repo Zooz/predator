@@ -13,6 +13,7 @@ module.exports = {
     getAllTestRevisions,
     saveFileToDbUsingUrl,
     getTests,
+    getFile,
     deleteTest
 };
 
@@ -55,10 +56,15 @@ async function downloadFile(fileUrl) {
         url: fileUrl,
         encoding: null
     };
-
     const response = await request.get(options);
-    // const returnedB64 = Buffer.from(response.data).toString('base64');
-    return response;
+    const base64Value = Buffer.from(response).toString('base64');
+    return base64Value;
+}
+
+async function getFile(fileId) {
+    const file = await database.getFile(fileId);
+    const resultParsed = file ? file.toString('base64') : file;
+    return resultParsed;
 }
 
 async function saveFileToDbUsingUrl(fileUrl) {

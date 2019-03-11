@@ -16,6 +16,7 @@ const GET_DSL_DEFINITION = 'SELECT * FROM dsl WHERE dsl_name = ? AND definition_
 const GET_DSL_DEFINITIONS = 'SELECT * FROM dsl WHERE dsl_name = ?';
 
 const INSERT_FILE = 'INSERT INTO files(id,file) values(?,?)';
+const GET_FILE = 'SELECT file FROM files WHERE id = ?';
 
 module.exports = {
     init,
@@ -29,6 +30,7 @@ module.exports = {
     getDslDefinitions,
     updateDslDefinition,
     saveFile,
+    getFile,
     deleteDefinition
 };
 
@@ -138,4 +140,9 @@ async function saveFile(id, file) {
     let params = [id, file];
     const result = await executeQuery(INSERT_FILE, params, queryOptions);
     return result;
+}
+
+async function getFile(id) {
+    const result = await executeQuery(GET_FILE, [id], queryOptions);
+    return result.rows[0] ? result.rows[0].file : undefined;
 }
