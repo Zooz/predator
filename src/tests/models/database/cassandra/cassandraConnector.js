@@ -15,6 +15,8 @@ const DELETE_DSL_DEFINITION = 'DELETE FROM dsl WHERE dsl_name = ? AND definition
 const GET_DSL_DEFINITION = 'SELECT * FROM dsl WHERE dsl_name = ? AND definition_name = ? limit 1';
 const GET_DSL_DEFINITIONS = 'SELECT * FROM dsl WHERE dsl_name = ?';
 
+const INSERT_FILE = 'INSERT INTO files(id,file) values(?,?)';
+
 module.exports = {
     init,
     insertTest,
@@ -132,6 +134,8 @@ function sanitizeDslResult(data) {
     return result;
 }
 
-function saveFile(id, file) {
-
+async function saveFile(id, file) {
+    let params = [id, file];
+    const result = await executeQuery(INSERT_FILE, params, queryOptions);
+    return result;
 }

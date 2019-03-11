@@ -50,5 +50,5 @@ async function getDslDefinitions(dslName) {
 }
 
 async function saveFile(id, file) {
-    databaseConnector.saveFile(id, file);
+    return databaseConnector.saveFile(id, file);
 }

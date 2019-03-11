@@ -19,9 +19,21 @@ module.exports = {
 async function upsertTest(testRawData, existingTestId) {
     const testArtilleryJson = await testGenerator.createTest(testRawData);
     let id = existingTestId || uuid();
+    const fileId = createFileFromUrl(testRawData);
+    if (fileId) {
+        testArtilleryJson.fileId = fileId;
+    }
     let revisionId = uuid.v4();
     await database.insertTest(testRawData, testArtilleryJson, id, revisionId);
     return { id: id, revision_id: revisionId };
+}
+
+async function createFileFromUrl(testRawData) {
+    if (testRawData.url) {
+        const fileId = await saveFileToDbUsingUrl(testRawData.url);
+        return fileId;
+    }
+    return undefined;
 }
 
 async function getTest(testId) {
@@ -38,32 +50,21 @@ async function getTest(testId) {
 }
 
 async function downloadFile(fileUrl) {
-    const fileName = tempFile + uuid();
-    const file = fs.createWriteStream(fileName);
-
-    options = {
+    //todo: encoding errors and so on
+    const options = {
         url: fileUrl,
         encoding: null
     };
 
     const response = await request.get(options);
-    const buffer = Buffer.from(file, 'utf8');
-    fs.writeFileSync(tempFile, buffer);
-
-}
-
-function unlinkFile(tempFile) {
-    if (tempFile) {
-        fs.unlink(tempFile, () => {
-        });
-    }
+    const returnedB64 = Buffer.from(response.data).toString('base64');
+    return returnedB64;
 }
 
 async function saveFileToDbUsingUrl(fileUrl) {
     const id = uuid();
     const fileToSave = await downloadFile(fileUrl);
     await database.saveFile(id, fileToSave);
-    unlinkFile(fileToSave);
     return id;
 }
 
