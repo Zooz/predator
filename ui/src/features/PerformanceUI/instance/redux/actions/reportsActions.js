@@ -43,3 +43,14 @@ export const clearSelectedReport = () => (
 export const processingGetReports = (state) => (
   { type: Types.PROCESSING_GET_REPORTS, state }
 );
+
+
+export const getAggregateReport = (testId,reportId) => (
+  { type: Types.GET_AGGREGATE_REPORT, testId,reportId }
+);
+
+
+export const getAggregateReportSuccess = (data) => (
+  { type: Types.GET_AGGREGATE_REPORT_SUCCESS, data }
+);
+

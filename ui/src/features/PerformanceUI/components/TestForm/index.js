@@ -12,7 +12,7 @@ import { createTestRequest, createStateForEditTest } from './utils';
 import ScenarioList from './scenarioList';
 import { v4 as uuid } from 'uuid';
 import { cloneDeep, reduce, isNumber } from 'lodash';
-import Button from './Button';
+import Button from '../Button';
 import ErrorDialog from '../ErrorDialog';
 export class TestForm extends React.Component {
   constructor (props) {

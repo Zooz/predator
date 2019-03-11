@@ -17,6 +17,13 @@ export const getReportFromFramework = (testId, runId) => {
   });
 };
 
+export const getAggregateFromFramework = (testId,reportId) => {
+  return axios.get(`${env.PREDATOR_URL}/tests/${testId}/reports/${reportId}/aggregate`, {
+    headers: {
+    }
+  });
+};
+
 export const getLastReportsFromFramework = (queryParams) => {
   queryParams = queryParams ? '?limit=50' : undefined;
 
