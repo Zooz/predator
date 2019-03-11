@@ -232,8 +232,8 @@ class getReports extends React.Component {
                   width={'80'}>Notes</TableHeaderColumn>
                 <TableHeaderColumn dataField='grafana_report' dataAlign='left'
                   dataFormat={this.hrefFormatter} width={'40'}>Grafana</TableHeaderColumn>
-                <TableHeaderColumn dataField='html_report' dataAlign='left' dataFormat={this.hrefFormatter}
-                  width={'40'}>HTML</TableHeaderColumn>
+                <TableHeaderColumn dataField='aggregate_report' dataAlign='left' dataFormat={this.hrefFormatter}
+                  width={'40'}>Aggregate Report</TableHeaderColumn>
                 <TableHeaderColumn dataField='view' dataAlign='center' dataFormat={this.viewFormatter}
                   width={'25'} />
                 <TableHeaderColumn dataAlign='center' dataFormat={this.stopTestFormatter}

@@ -15,6 +15,17 @@ module.exports.getHtmlReport = async function (req, res, next) {
     return res.send(htmlTemplate);
 };
 
+module.exports.getAggregateReport = async function (req, res, next) {
+    let reportInput;
+    try {
+        reportInput = await finalReportGenerator.createFinalReport(req.params.test_id, req.params.report_id);
+    } catch (err) {
+        return next(err);
+    }
+
+    return res.send(reportInput);
+};
+
 module.exports.getReport = async (req, res, next) => {
     let reportSummary;
     try {

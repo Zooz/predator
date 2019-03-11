@@ -66,6 +66,7 @@ function getReportResponse(summaryRow) {
     let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
 
     let htmlReportUrl = serviceConfig.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
+    let aggregateReportUrl = serviceConfig.externalAddress + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/aggregate`;
 
     let report = {
         test_id: summaryRow.test_id,
@@ -87,6 +88,7 @@ function getReportResponse(summaryRow) {
         status: summaryRow.status,
         last_stats: lastStats,
         html_report: htmlReportUrl,
+        aggregate_report: aggregateReportUrl,
         grafana_report: generateGraphanaUrl(summaryRow),
         notes: summaryRow.notes,
         environment: testConfiguration.environment,
