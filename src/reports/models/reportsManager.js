@@ -22,7 +22,7 @@ module.exports.getReports = async (testId) => {
     let reportSummaries = await databaseConnector.getReports(testId);
     let config = await configHandler.getConfig();
     let reports = reportSummaries.map((summaryRow) => {
-        getReportResponse(summaryRow, config);
+        return getReportResponse(summaryRow, config);
     });
     return reports;
 };
@@ -31,7 +31,7 @@ module.exports.getLastReports = async (limit) => {
     let reportSummaries = await databaseConnector.getLastReports(limit);
     let config = await configHandler.getConfig();
     let reports = reportSummaries.map((summaryRow) => {
-        getReportResponse(summaryRow, config);
+        return getReportResponse(summaryRow, config);
     });
     return reports;
 };
