@@ -158,6 +158,8 @@ describe('Reports manager tests', function () {
             databaseGetReportsStub.resolves([REPORT, REPORT]);
             const reports = await manager.getReports();
             reports.length.should.eql(2);
+            should(reports[0].test_id).eql('test id');
+            should(reports[1].test_id).eql('test id');
         });
 
         it('Database returns an empty array', async () => {
