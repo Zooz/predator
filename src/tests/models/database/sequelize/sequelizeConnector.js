@@ -30,6 +30,9 @@ async function initSchemas() {
             type: Sequelize.DataTypes.UUID,
             unique: 'compositeIndex'
         },
+        file_id: {
+            type: Sequelize.DataTypes.UUID
+        },
         name: {
             type: Sequelize.DataTypes.STRING
         },

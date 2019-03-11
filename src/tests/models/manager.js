@@ -19,9 +19,9 @@ module.exports = {
 async function upsertTest(testRawData, existingTestId) {
     const testArtilleryJson = await testGenerator.createTest(testRawData);
     let id = existingTestId || uuid();
-    const fileId = createFileFromUrl(testRawData);
+    const fileId = await createFileFromUrl(testRawData);
     if (fileId) {
-        testArtilleryJson.fileId = fileId;
+        testRawData.fileId = fileId;
     }
     let revisionId = uuid.v4();
     await database.insertTest(testRawData, testArtilleryJson, id, revisionId);
@@ -57,8 +57,8 @@ async function downloadFile(fileUrl) {
     };
 
     const response = await request.get(options);
-    const returnedB64 = Buffer.from(response.data).toString('base64');
-    return returnedB64;
+    // const returnedB64 = Buffer.from(response.data).toString('base64');
+    return response;
 }
 
 async function saveFileToDbUsingUrl(fileUrl) {

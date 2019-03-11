@@ -3,7 +3,7 @@ let cassandra = require('cassandra-driver');
 let client = {};
 let uuid = require('cassandra-driver').types.Uuid;
 
-const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id) values(?,?,?,?,?,?,?,?)';
+const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id,file_id) values(?,?,?,?,?,?,?,?,?)';
 const GET_TEST = 'SELECT * FROM tests WHERE id = ? ORDER BY updated_at DESC limit 1';
 const GET_TEST_REVISIONS = 'SELECT * FROM tests WHERE id = ?';
 const GET_TESTS = 'SELECT * FROM tests';
@@ -68,7 +68,7 @@ async function getAllTestRevisions(id) {
 
 async function insertTest(testInfo, testJson, id, revisionId) {
     let params;
-    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId];
+    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, testInfo.fileId];
     const result = await executeQuery(INSERT_TEST_DETAILS, params, queryOptions);
     return result;
 }
