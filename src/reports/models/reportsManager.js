@@ -7,6 +7,7 @@ const jobConnector = require('../../jobs/models/jobManager');
 const serviceConfig = require('../../config/serviceConfig');
 const statsConsumer = require('./statsConsumer');
 const constants = require('../utils/constants');
+const MINIMUM_WAIT_FOR_DELAYED_REPORT_UPDATE_MS = 30000;
 
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
@@ -45,7 +46,6 @@ module.exports.postReport = async (testId, reportBody) => {
         max_virtual_users: job.max_virtual_users,
         environment: job.environment
     };
-
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, startTime, reportBody.test_name,
         reportBody.test_description, JSON.stringify(testConfiguration), job.notes);
@@ -105,33 +105,52 @@ function generateGraphanaUrl(report) {
 }
 
 module.exports.updateReport = async (report, status, stats, statsTime) => {
-    const delayedTimeInMs = Math.max(report.duration * 0.01, 30000);
+    const delayedTimeInMs = Math.max(report.duration * 0.01, MINIMUM_WAIT_FOR_DELAYED_REPORT_UPDATE_MS);
 
     const subscribersStages = getListOfSubscribersStages(report);
     const uniqueSubscribersStages = _.uniq(subscribersStages);
-
-    if (status === constants.REPORT_FINISHED_STATUS) {
+    if (status === constants.REPORT_IN_PROGRESS_STATUS) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_IN_PROGRESS_STATUS, report.phase, stats.data, undefined);
+    } else if (status === constants.REPORT_STARTED_STATUS && report.status === constants.REPORT_INITIALIZING_STATUS) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_STARTED_STATUS, report.phase, undefined, undefined);
+    } else if (status === constants.REPORT_ABORTED_STATUS && allSubscribersAborted(uniqueSubscribersStages)) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_ABORTED_STATUS, report.phase, stats.data, statsTime);
+    } else if (status === constants.REPORT_FAILED_STATUS && allSubscribersFailed(uniqueSubscribersStages)) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FAILED_STATUS, report.phase, stats.data, statsTime);
+    } else if (status === constants.REPORT_FINISHED_STATUS) {
         if (allSubscribersFinished(uniqueSubscribersStages)) {
-            await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
+            await updateFinishedReportStatus(uniqueSubscribersStages, report, stats, statsTime);
         } else {
             setTimeout(async () => {
                 await delayedUpdateOfReportStatus(report, stats, statsTime);
             }, delayedTimeInMs);
         }
-    } else if (status === constants.REPORT_ABORTED_STATUS && allSubscribersAborted(uniqueSubscribersStages)) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_ABORTED_STATUS, report.phase, stats.data, statsTime);
-    } else if (status === constants.REPORT_FAILED_STATUS && allSubscribersFailed(uniqueSubscribersStages)) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FAILED_STATUS, report.phase, stats.data, statsTime);
-    } else if (status === constants.REPORT_IN_PROGRESS_STATUS) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_IN_PROGRESS_STATUS, report.phase, stats.data, undefined);
-    } else {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_STARTED_STATUS, report.phase, undefined, undefined);
     }
 };
 
 function getListOfSubscribersStages (report) {
     const runnerStates = report.subscribers.map((subscriber) => subscriber.stage);
     return runnerStates;
+}
+
+function allSubscribersFinished (subscriberStages) {
+    return !(subscriberStages.includes(constants.SUBSCRIBER_INTERMEDIATE_STAGE) || subscriberStages.includes(constants.SUBSCRIBER_STARTED_STAGE));
+}
+
+function allSubscribersAborted (subscriberStages) {
+    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_ABORTED_STAGE;
+}
+
+function allSubscribersFailed (subscriberStages) {
+    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_FAILED_STAGE;
+}
+
+async function updateFinishedReportStatus (uniqueSubscribersStages, report, stats, statsTime) {
+    if (uniqueSubscribersStages.length === 1) {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
+    } else {
+        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_PARTIALLY_FINISHED_STATUS, report.phase, stats.data, statsTime);
+    }
 }
 
 async function delayedUpdateOfReportStatus (report, stats, statsTime) {
@@ -143,16 +162,4 @@ async function delayedUpdateOfReportStatus (report, stats, statsTime) {
     } else {
         await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_PARTIALLY_FINISHED_STATUS, report.phase, stats.data, statsTime);
     }
-}
-
-function allSubscribersFinished (subscribers) {
-    return subscribers.length === 1 && subscribers[0] === constants.SUBSCRIBER_DONE_STAGE;
-}
-
-function allSubscribersAborted (subscribers) {
-    return subscribers.length === 1 && subscribers[0] === constants.SUBSCRIBER_ABORTED_STAGE;
-}
-
-function allSubscribersFailed (subscribers) {
-    return subscribers.length === 1 && subscribers[0] === constants.SUBSCRIBER_FAILED_STAGE;
 }

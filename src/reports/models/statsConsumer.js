@@ -57,14 +57,14 @@ async function handleError(report, job, stats, statsTime) {
 
 async function handleStart(report, job, stats) {
     let webhookMessage;
-    const reportStatus = report.status === constants.REPORTER_INITIALIZED_STATUS ? constants.REPORT_STARTED_STATUS : constants.REPORT_IN_PROGRESS_STATUS;
-    if (reportStatus === constants.REPORT_STARTED_STATUS) {
+    if (report.status === constants.REPORT_INITIALIZING_STATUS) {
+        await reportsManager.updateReport(report, constants.REPORT_STARTED_STATUS, stats);
         let rampToMessage = report.ramp_to ? `, ramp to: ${report.ramp_to} scenarios per second` : '';
         let parallelism = report.parallelism || 1;
         webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n
          *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${parallelism}${rampToMessage}`;
     }
-    await reportsManager.updateReport(report, reportStatus, stats);
+
     if (job.webhooks && webhookMessage) {
         reportWebhookSender.send(report.test_id, report.report_id, webhookMessage, job.webhooks);
     }

@@ -1,6 +1,10 @@
 'use strict';
 
 const Sequelize = require('sequelize');
+
+const constants = require('../../../utils/constants');
+const logger = require('../../../../common/logger');
+
 let client;
 
 module.exports = {
@@ -36,7 +40,7 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, start
         end_time: null,
         notes: notes || '',
         phase: '0',
-        status: 'initialized',
+        status: constants.REPORT_INITIALIZING_STATUS,
         test_configuration: testConfiguration,
         runners_subscribed: []
     };
@@ -78,27 +82,23 @@ async function updateReport(testId, reportId, status, phaseIndex, lastStats, end
 }
 
 async function subscribeRunner(testId, reportId, runnerId) {
-    try {
-        const newSubscriber = {
-            runner_id: runnerId,
-            stage: 'initializing'
-        };
+    const newSubscriber = {
+        runner_id: runnerId,
+        stage: constants.SUBSCRIBER_INITIALIZING_STAGE
+    };
 
-        const reportModel = client.model('report');
-        const options = {
-            where: {
-                test_id: testId,
-                report_id: reportId
-            }
-        };
+    const report = client.model('report');
+    const options = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
 
-        let report = await reportModel.findAll(options);
-        report = report[0];
+    let reportToSubscribeRunner = await report.findAll(options);
+    reportToSubscribeRunner = reportToSubscribeRunner[0];
 
-        await report.createSubscriber(newSubscriber);
-    } catch (e) {
-        console.log(e, `Failed to subscribe runner ${runnerId}`);
-    }
+    return reportToSubscribeRunner.createSubscriber(newSubscriber);
 }
 
 async function updateSubscribers(testId, reportId, runnerId, stage) {
@@ -113,13 +113,24 @@ async function updateSubscribers(testId, reportId, runnerId, stage) {
     let report = await reportModel.findAll(getReportOptions);
     report = report[0];
 
-    const subscribers = await report.getSubscribers();
-    const subscriberToUpdate = await subscribers.find((subscriber) => {
-        return subscriber.dataValues.runner_id === runnerId;
-    });
+    if (!report) {
+        let error = new Error('Report not found');
+        error.statusCode = 404;
+        throw error;
+    }
 
-    await subscriberToUpdate.set('stage', stage);
-    return subscriberToUpdate.save();
+    try {
+        const subscribers = await report.getSubscribers();
+        const subscriberToUpdate = await subscribers.find((subscriber) => {
+            return subscriber.dataValues.runner_id === runnerId;
+        });
+
+        await subscriberToUpdate.set('stage', stage);
+        return subscriberToUpdate.save();
+    } catch (e) {
+        logger.error(e, `Failed to update subscriber ${runnerId} in report ${reportId} for test ${testId}`);
+        throw e;
+    }
 }
 
 async function getReportsAndParse(query) {
@@ -133,6 +144,7 @@ async function getReportsAndParse(query) {
     Object.assign(options, query);
 
     const allReportsRawResponse = await report.findAll(options);
+
     let allReports = allReportsRawResponse.map(rawReport => rawReport.dataValues);
 
     allReports.forEach(report => {

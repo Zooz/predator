@@ -1,17 +1,18 @@
 
 'use strict';
-let artilleryReportGenerator = require('../models/artilleryReportGenerator');
+let finalReportGenerator = require('../models/finalReportGenerator');
 let reports = require('../models/reportsManager');
 
 module.exports.getHtmlReport = async function (req, res, next) {
-    let report;
+    let reportInput, htmlTemplate;
     try {
-        report = await artilleryReportGenerator.createArtilleryReport(req.params.test_id, req.params.report_id);
+        reportInput = await finalReportGenerator.createFinalReport(req.params.test_id, req.params.report_id);
+        htmlTemplate = await finalReportGenerator.generateReportFromTemplate(reportInput);
     } catch (err) {
         return next(err);
     }
 
-    return res.send(report);
+    return res.send(htmlTemplate);
 };
 
 module.exports.getReport = async (req, res, next) => {

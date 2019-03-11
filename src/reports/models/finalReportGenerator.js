@@ -8,10 +8,11 @@ let math = require('mathjs');
 let logger = require('../../common/logger');
 let databaseConnector = require('./databaseConnector');
 let reportsManager = require('./reportsManager');
+let constants = require('../utils/constants');
 
-const STATS_INTERVAL = 15;
+const STATS_INTERVAL = 30;
 
-module.exports.createArtilleryReport = async (testId, reportId) => {
+module.exports.createFinalReport = async (testId, reportId) => {
     let stats, report;
     report = await reportsManager.getReport(testId, reportId);
     stats = await databaseConnector.getStats(testId, reportId);
@@ -31,18 +32,23 @@ module.exports.createArtilleryReport = async (testId, reportId) => {
     reportInput.status = mapReportStatus(report.status);
 
     stats.forEach(stat => {
-        let data = JSON.parse(stat.data);
-        data.bucket = Math.floor((new Date(data.timestamp).getTime() - new Date(report.start_time).getTime()) / 1000 / STATS_INTERVAL) * STATS_INTERVAL;
-        switch (stat.phase_status) {
-        case 'intermediate':
-            reportInput.intermediate.push(data);
-            break;
-        case 'final_report':
-            reportInput.final_report.push(data);
-            break;
-        default:
-            logger.warn(stat, 'Received unknown stat from database while creating report');
-            break;
+        let data;
+        try {
+            data = JSON.parse(stat.data);
+            data.bucket = Math.floor((new Date(data.timestamp).getTime() - new Date(report.start_time).getTime()) / 1000 / STATS_INTERVAL) * STATS_INTERVAL;
+            switch (stat.phase_status) {
+            case 'intermediate':
+                reportInput.intermediate.push(data);
+                break;
+            case 'final_report':
+                reportInput.final_report.push(data);
+                break;
+            default:
+                logger.warn(stat, 'Received unknown stat from database while creating report');
+                break;
+            }
+        } catch (e) {
+            logger.warn(e, 'Received unsupported stats data type while creating report');
         }
     });
 
@@ -59,8 +65,17 @@ module.exports.createArtilleryReport = async (testId, reportId) => {
         reportInput.aggregate = createAggregateManually(reportInput.final_report);
     }
 
-    let reportOutput = generateReportFromTemplate(reportInput);
-    return reportOutput;
+    return reportInput;
+};
+
+module.exports.generateReportFromTemplate = (reportInput) => {
+    let templateFn = path.join(
+        path.dirname(__filename),
+        './templates/index.html.ejs');
+    let template = fs.readFileSync(templateFn, 'utf-8');
+    let compiledTemplate = _.template(template);
+    let html = compiledTemplate({ report: JSON.stringify(reportInput, null, 2) });
+    return html;
 };
 
 function createAggregateManually(listOfStats) {
@@ -143,23 +158,14 @@ function createAggregateManually(listOfStats) {
     return result;
 }
 
-function generateReportFromTemplate(reportInput) {
-    let templateFn = path.join(
-        path.dirname(__filename),
-        './templates/index.html.ejs');
-    let template = fs.readFileSync(templateFn, 'utf-8');
-    let compiledTemplate = _.template(template);
-    let html = compiledTemplate({ report: JSON.stringify(reportInput, null, 2) });
-    return html;
-}
-
 function mapReportStatus(status) {
     const mapper = {
-        'in_progress': 'In progress',
-        'partially_finished': 'Partially finished',
-        'finished': 'Finished',
-        'aborted': 'Aborted',
-        'failed': 'Failed'
+        [constants.REPORT_INITIALIZING_STATUS]: 'Initializing',
+        [constants.REPORT_IN_PROGRESS_STATUS]: 'In progress',
+        [constants.REPORT_PARTIALLY_FINISHED_STATUS]: 'Partially finished',
+        [constants.REPORT_FINISHED_STATUS]: 'Finished',
+        [constants.REPORT_ABORTED_STATUS]: 'Aborted',
+        [constants.REPORT_FAILED_STATUS]: 'Failed'
     };
     return mapper[status];
 }

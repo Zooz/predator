@@ -1,7 +1,8 @@
 'use strict';
-let databaseConfig = require('../../../../config/databaseConfig');
+const databaseConfig = require('../../../../config/databaseConfig');
+const constants = require('../../../../../src/reports/utils/constants');
 
-let logger = require('../../../../common/logger');
+const logger = require('../../../../common/logger');
 let client;
 
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_type, report_id, job_id, test_type, status, phase, start_time, test_name, test_description, test_configuration, notes) values(?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
@@ -40,7 +41,7 @@ async function init(cassandraClient) {
 function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
     let params;
     const testNotes = notes || '';
-    params = [testId, revisionId, 'basic', reportId, jobId, testType, 'initialized', '0', startTime, testName, testDescription, testConfiguration, testNotes];
+    params = [testId, revisionId, 'basic', reportId, jobId, testType, constants.REPORT_INITIALIZING_STATUS, '0', startTime, testName, testDescription, testConfiguration, testNotes];
     return executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
 }
 
@@ -82,11 +83,17 @@ function getStats(testId, reportId) {
 
 function subscribeRunner(testId, reportId, runnerId) {
     let params;
-    params = [testId, reportId, runnerId, 'initializing'];
+    params = [testId, reportId, runnerId, constants.SUBSCRIBER_INITIALIZING_STAGE];
     return executeQuery(SUBSCRIBE_RUNNER, params, queryOptions);
 }
 
-function updateSubscribers(testId, reportId, runnerId, stage) {
+async function updateSubscribers(testId, reportId, runnerId, stage) {
+    const report = await getReport(testId, reportId);
+    if (report.length === 0) {
+        let error = new Error('Report not found');
+        error.statusCode = 404;
+        throw error;
+    }
     let params;
     params = [stage, testId, reportId, runnerId];
     return executeQuery(UPDATE_SUBSCRIBERS, params, queryOptions);
