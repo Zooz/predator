@@ -8,6 +8,7 @@ let logger = require('../../../../src/common/logger');
 let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
 let reportsManager = require('../../../../src/reports/models/reportsManager');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
+let configHandler = require('../../../../src/configManager/models/configHandler');
 let nodemailer = require('nodemailer');
 
 const REPORT = {
@@ -61,6 +62,11 @@ const REPORT = {
 const JOB = {
     'emails': 'eli@zooz.com'
 };
+const CONFIG = {
+    port: 111,
+    host: 'smtp_host_test',
+    timeout: 222
+};
 
 const transporter = {
     sendMail: () => { },
@@ -68,7 +74,7 @@ const transporter = {
 };
 
 describe('Report emails sender test', () => {
-    let sandbox, getReportStub, getJobStub, loggerErrorStub, loggerInfoStub, nodemailerCreateTransportStub, sendMailStub;
+    let sandbox, getReportStub, getJobStub, loggerErrorStub, loggerInfoStub, nodemailerCreateTransportStub, sendMailStub, getConfig;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -76,6 +82,7 @@ describe('Report emails sender test', () => {
         getJobStub = sandbox.stub(jobsManager, 'getJob');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
+        getConfig = sandbox.stub(configHandler, 'getConfigValue');
         nodemailerCreateTransportStub = sandbox.stub(nodemailer, 'createTransport');
         sendMailStub = sandbox.stub(transporter, 'sendMail');
     });
@@ -169,5 +176,17 @@ describe('Report emails sender test', () => {
         }
 
         testShouldFail.should.eql(false, 'Test action was supposed to get exception');
+    });
+
+    it('Verify transporter options', async () => {
+        sendMailStub.resolves({ status: 201 });
+        getReportStub.resolves(REPORT);
+        getJobStub.resolves(JOB);
+        getConfig.resolves(CONFIG);
+        nodemailerCreateTransportStub.returns(transporter);
+        await reportEmailSender.sendAggregateReport('testId', 'reportId', 'REPORT_DATA');
+        should(nodemailerCreateTransportStub.args[0][0].host).eql('smtp_host_test');
+        should(nodemailerCreateTransportStub.args[0][0].port).eql(111);
+        should(nodemailerCreateTransportStub.args[0][0].connectionTimeout).eql(222);
     });
 });

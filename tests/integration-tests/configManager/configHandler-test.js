@@ -36,30 +36,30 @@ const updateBodyWithTypes = {
 
 const requestBody =
     {
-        grafana_url: 'string_value',
-        external_address: 'string_value',
-        internal_address: 'string_value',
-        docker_name: 'string_value',
-        job_platform: 'string_value',
+        grafana_url: 'string_value_grafana_url',
+        external_address: 'string_value_external_address',
+        internal_address: 'string_value_internal_address',
+        docker_name: 'string_value_docker_name',
+        job_platform: 'string_value_job_platform',
         runner_cpu: 0,
         runner_memory: 0,
         metrics_plugin_name: 'prometheus',
-        default_email_address: 'string_value',
-        default_webhook_url: 'string_value',
+        default_email_address: 'string_value_default_email_address',
+        default_webhook_url: 'string_value_default_webhook_url',
         influx_metrics: {
-            host: 'string_value',
-            username: 'string_value',
-            password: 'string_value',
-            database: 'string_value'
+            host: 'string_value_influx_metrics',
+            username: 'string_value_username',
+            password: 'string_value_password',
+            database: 'string_value_database'
         },
         prometheus_metrics: {
-            push_gateway_url: 'string_value',
-            buckets_sizes: 'string_value'
+            push_gateway_url: 'string_value_push_gateway_url',
+            buckets_sizes: 'string_value_buckets_sizes'
         },
         smtp_server: {
-            host: 'string_value',
+            host: 'string_value_smtp_server',
             port: 2,
-            username: 'string_value',
+            username: 'string_value_username',
             password: 'string_value',
             timeout: 2
         }
@@ -123,10 +123,7 @@ describe('update and get config', () => {
             should(responseUpdate.body).eql(requestBody);
             should(getResponse.statusCode).eql(200);
             should(getResponse.body).eql(requestBody);
-            const valuesToDelete = Object.values(configValues);
-            for (let i = 0; i < valuesToDelete.length; i++) {
-                await configRequestCreator.deleteConfig(valuesToDelete[i]);
-            }
+
         });
     });
 
