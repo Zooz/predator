@@ -5,7 +5,6 @@ const should = require('should'),
     testsRequestCreator = require('../tests/helpers/requestCreator'),
     nock = require('nock'),
     Docker = require('dockerode'),
-    configHandler = require('../../../src/configManager/models/configHandler'),
     dockerConfig = require('../../../src/config/dockerConfig');
 
 let dockerConnection;
@@ -30,7 +29,7 @@ describe('Create job specific docker tests', async function () {
     beforeEach(async () => {
         nock.cleanAll();
     });
-    const jobPlatform = await configHandler.getConfigValue('job_platform');
+    const jobPlatform = process.env.JOB_PLATFORM;
     if (jobPlatform === 'DOCKER') {
         describe('DOCKER', () => {
             before(async () => {

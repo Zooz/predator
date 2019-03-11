@@ -2,7 +2,6 @@ const should = require('should'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
     testsRequestCreator = require('../tests/helpers/requestCreator'),
     nock = require('nock'),
-    configHandler = require('../../../src/configManager/models/configHandler'),
     metronomeConfig = require('../../../src/config/metronomeConfig');
 
 describe('Create job specific metronome tests', async function () {
@@ -13,7 +12,7 @@ describe('Create job specific metronome tests', async function () {
     beforeEach(async () => {
         nock.cleanAll();
     });
-    const jobPlatform = await configHandler.getConfigValue('job_platform');
+    const jobPlatform = process.env.JOB_PLATFORM;
     if (jobPlatform === 'METRONOME') {
         describe('Metronome', () => {
             before(async () => {

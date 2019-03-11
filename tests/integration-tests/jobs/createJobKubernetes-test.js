@@ -3,7 +3,6 @@ const should = require('should'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
     testsRequestCreator = require('../tests/helpers/requestCreator'),
     nock = require('nock'),
-    configHandler = require('../../../src/configManager/models/configHandler'),
     kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
 describe('Create job specific kubernetes tests', async function () {
@@ -13,7 +12,7 @@ describe('Create job specific kubernetes tests', async function () {
     beforeEach(async () => {
         nock.cleanAll();
     });
-    const jobPlatform = await configHandler.getConfigValue('job_platform');
+    const jobPlatform = process.env.JOB_PLATFORM;
     if (jobPlatform === 'KUBERNETES') {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
