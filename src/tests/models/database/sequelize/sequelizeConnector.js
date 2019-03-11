@@ -9,6 +9,8 @@ module.exports = {
     getTests,
     deleteTest,
     getAllTestRevisions,
+    saveFile,
+    getFile,
     insertDslDefinition,
     getDslDefinitions,
     getDslDefinition,
@@ -25,6 +27,15 @@ async function init(sequlizeClient) {
 }
 
 async function initSchemas() {
+    const file = client.define('file', {
+        id: {
+            type: Sequelize.DataTypes.UUID,
+            unique: 'compositeIndex'
+        },
+        file: {
+            type: Sequelize.DataTypes.STRING
+        }
+    });
     const test = client.define('test', {
         test_id: {
             type: Sequelize.DataTypes.UUID,
@@ -76,6 +87,7 @@ async function initSchemas() {
     });
     await test.sync();
     await dslDefinition.sync();
+    await file.sync();
 }
 
 async function insertTest(testInfo, testJson, id, revisionId){
@@ -84,6 +96,7 @@ async function insertTest(testInfo, testJson, id, revisionId){
         test_id: id,
         name: testInfo.name,
         type: testInfo.type,
+        file: testInfo.fileId,
         description: testInfo.description,
         updated_at: Date.now(),
         raw_data: JSON.stringify(testInfo),
@@ -179,6 +192,27 @@ function sanitizeDslResult(data) {
         return dataValues;
     });
     return result;
+}
+
+async function saveFile(id, file) {
+    const fileClient = client.model('file');
+    let params = {
+        id: id,
+        file: file
+    };
+
+    const result = fileClient.create(params);
+    return result;
+}
+
+async function getFile(id) {
+    const fileClient = client.model('file');
+    const options = {
+        attributes: { exclude: ['updated_at', 'created_at'] }
+    };
+    options.where = { id: id };
+    const dbResult = await fileClient.find(options);
+    return dbResult;
 }
 
 function sanitizeTestResult(data) {

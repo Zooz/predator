@@ -1,4 +1,4 @@
 CREATE TABLE IF NOT EXISTS files(
 id text,
-file blob,
+file text,
 PRIMARY KEY (id));

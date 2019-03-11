@@ -30,8 +30,8 @@ async function upsertTest(testRawData, existingTestId) {
 }
 
 async function createFileFromUrl(testRawData) {
-    if (testRawData.url) {
-        const fileId = await saveFileToDbUsingUrl(testRawData.url);
+    if (testRawData['file_url']) {
+        const fileId = await saveFileToDbUsingUrl(testRawData['file_url']);
         return fileId;
     }
     return undefined;
@@ -51,20 +51,29 @@ async function getTest(testId) {
 }
 
 async function downloadFile(fileUrl) {
-    //todo: encoding errors and so on
     const options = {
         url: fileUrl,
         encoding: null
     };
-    const response = await request.get(options);
-    const base64Value = Buffer.from(response).toString('base64');
-    return base64Value;
+    try {
+        const response = await request.get(options);
+        const base64Value = Buffer.from(response).toString('base64');
+        return base64Value;
+    } catch (err) {
+        console.log('Error to read file, throw exception: ' + err);
+        throw new Error();
+    }
 }
 
 async function getFile(fileId) {
     const file = await database.getFile(fileId);
-    const resultParsed = file ? file.toString('base64') : file;
-    return resultParsed;
+    if (file) {
+        return file;
+    } else {
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
 }
 
 async function saveFileToDbUsingUrl(fileUrl) {
