@@ -26,6 +26,7 @@ module.exports = {
     getDslDefinition,
     getDslDefinitions,
     updateDslDefinition,
+    saveFile,
     deleteDefinition
 };
 
@@ -129,4 +130,8 @@ function sanitizeDslResult(data) {
         return row;
     });
     return result;
+}
+
+function saveFile(id, file) {
+
 }

@@ -61,6 +61,7 @@
     "pg-hstore": "^2.3.2",
     "replace-in-file": "^3.4.3",
     "request": "^2.88.0",
+    "request-promise": "^4.2.4",
     "request-promise-native": "^1.0.5",
     "sequelize": "^4.42.0",
     "sqlite3": "^4.0.6",

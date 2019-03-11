@@ -2,12 +2,16 @@
 const testGenerator = require('./testGenerator'),
     database = require('./database'),
     uuid = require('uuid'),
+    request = require('request-promise'),
+    fs = require('fs'),
+    tempFile = 'predator_temp_file_',
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
     upsertTest,
     getTest,
     getAllTestRevisions,
+    saveFileToDbUsingUrl,
     getTests,
     deleteTest
 };
@@ -31,6 +35,34 @@ async function getTest(testId) {
         error.statusCode = 404;
         throw error;
     }
+}
+
+async function downloadFile(fileUrl) {
+    const options = {
+        url: fileUrl,
+        encoding: null
+    };
+
+    request.get(options)
+        .then(function (res) {
+            const buffer = Buffer.from(res, 'utf8');
+            fs.writeFileSync(tempFile, buffer);
+        });
+}
+
+function unlinkFile(tempFile) {
+    if (tempFile) {
+        fs.unlink(tempFile, () => {
+        });
+    }
+}
+
+async function saveFileToDbUsingUrl(fileUrl) {
+    const id = uuid();
+    const fileToSave = await downloadFile(fileUrl);
+    await database.saveFile(id, fileToSave);
+    unlinkFile(fileToSave);
+    return id;
 }
 
 async function getAllTestRevisions(testId) {

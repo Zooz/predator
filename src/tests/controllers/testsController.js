@@ -7,12 +7,21 @@ module.exports = {
     getTest,
     deleteTest,
     getTests,
+    downloadFile,
     getTestRevisions
 };
 
 async function upsertTest(req, res, next) {
     try {
         const result = await manager.upsertTest(req.body, req.params.test_id);
+        return res.status(201).json(result);
+    } catch (err){
+        return next(err);
+    }
+}
+async function downloadFile(req, res, next) {
+    try {
+        const result = await manager.saveFileToDbUsingUrl('https://drive.google.com/file/d/1Nja7ezdXLoVibF_HolTY7eVjlIQ2P2RV/view?usp=sharing');
         return res.status(201).json(result);
     } catch (err){
         return next(err);
