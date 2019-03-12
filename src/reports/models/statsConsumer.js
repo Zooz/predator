@@ -8,7 +8,8 @@ const uuidv4 = require('uuid/v4'),
     jobsManager = require('../../jobs/models/jobManager'),
     statsFromatter = require('./statsFormatter'),
     configHandler = require('../../configManager/models/configHandler'),
-    logger = require('../../common/logger');
+    logger = require('../../common/logger'),
+    constants = require('../utils/constants');
 
 module.exports.handleMessage = async (testId, reportId, stats) => {
     const metadata = { testId: testId, reportId: reportId };
@@ -46,7 +47,7 @@ module.exports.handleMessage = async (testId, reportId, stats) => {
 };
 
 async function handleError(report, job, stats, statsTime) {
-    await databaseConnector.updateReport(report.test_id, report.report_id, 'failed', report.phase, stats.data, statsTime);
+    await reportsManager.updateReport(report, constants.REPORT_FAILED_STATUS, stats, statsTime);
     const webhookMessage = `😞 *Test with id: ${report.test_id} Failed*.\ntest configuration:\nenvironment: ${report.environment}\n${stats.data}`;
     if (job.webhooks) {
         reportWebhookSender.send(report.test_id, report.report_id, webhookMessage, job.webhooks);
@@ -55,14 +56,14 @@ async function handleError(report, job, stats, statsTime) {
 
 async function handleStart(report, job, stats) {
     let webhookMessage;
-    let reportStatus = report.status === 'initialized' ? 'started' : 'in_progress';
-    if (reportStatus === 'started') {
+    if (report.status === constants.REPORT_INITIALIZING_STATUS) {
+        await reportsManager.updateReport(report, constants.REPORT_STARTED_STATUS, stats);
         let rampToMessage = report.ramp_to ? `, ramp to: ${report.ramp_to} scenarios per second` : '';
         let parallelism = report.parallelism || 1;
         webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n
          *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${parallelism}${rampToMessage}`;
     }
-    await databaseConnector.updateReport(report.test_id, report.report_id, reportStatus, stats.phase_index, undefined, undefined);
+
     if (job.webhooks && webhookMessage) {
         reportWebhookSender.send(report.test_id, report.report_id, webhookMessage, job.webhooks);
     }
@@ -70,11 +71,11 @@ async function handleStart(report, job, stats) {
 
 async function handleIntermediate(report, job, stats, statsTime, statsData) {
     let webhookMessage;
-    await databaseConnector.updateReport(report.test_id, report.report_id, 'in_progress', report.phase, stats.data, undefined);
-    await databaseConnector.insertStats(stats.container_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'intermediate', stats.data);
+    await reportsManager.updateReport(report, constants.REPORT_IN_PROGRESS_STATUS, stats, statsTime);
+    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, constants.SUBSCRIBER_INTERMEDIATE_STAGE, stats.data);
     const configData = await configHandler.getConfig();
 
-    if (report && report.status === ('started')) {
+    if (report && report.status === constants.REPORT_STARTED_STATUS) {
         let htmlReportUrl = configData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
         const phaseIndex = report.phase;
         webhookMessage = `🤔 *Test ${report.test_name} with id: ${report.test_id} first batch of results arrived for phase ${phaseIndex}.*\n${statsFromatter.getStatsFormatted('intermediate', statsData)}\n<${htmlReportUrl}|Track report in html report>\n`;
@@ -88,11 +89,11 @@ async function handleIntermediate(report, job, stats, statsTime, statsData) {
 }
 
 async function handleDone(report, job, stats, statsTime, statsData) {
-    await databaseConnector.insertStats(stats.container_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'aggregate', stats.data);
-    await databaseConnector.updateReport(report.test_id, report.report_id, 'finished', report.phase, stats.data, statsTime);
-    const congigData = await configHandler.getConfig();
+    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'final_report', stats.data);
+    await reportsManager.updateReport(report, constants.REPORT_FINISHED_STATUS, stats, statsTime);
+    const configData = await configHandler.getConfig();
 
-    const htmlReportUrl = congigData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
+    const htmlReportUrl = configData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
     let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', statsData)}\n<${htmlReportUrl}|View final html report>\n`;
 
     if (report.grafana_report) {
@@ -108,11 +109,11 @@ async function handleDone(report, job, stats, statsTime, statsData) {
 }
 
 async function handleAbort(report, job, stats, statsTime) {
-    await databaseConnector.updateReport(report.test_id, report.report_id, 'aborted', report.phase, undefined, statsTime);
-    const congigData = await configHandler.getConfig();
+    await reportsManager.updateReport(report, constants.REPORT_ABORTED_STATUS, stats, statsTime);
+    const configData = await configHandler.getConfig();
 
     if (job.webhooks) {
-        const htmlReportUrl = congigData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
+        const htmlReportUrl = configData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
         let webhookMessage = `😢 *Test ${report.test_name} with id: ${report.test_id} was aborted.*\n<${htmlReportUrl}|View final html report>\n`;
         if (report.grafana_report) {
             webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;

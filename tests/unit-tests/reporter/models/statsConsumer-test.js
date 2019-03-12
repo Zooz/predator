@@ -12,29 +12,31 @@ let reportsManager = require('../../../../src/reports/models/reportsManager');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
 let reportWebhookSender = require('../../../../src/reports/models/reportWebhookSender');
 let statsFormatter = require('../../../../src/reports/models/statsFormatter');
-let artilleryReportGenerator = require('../../../../src/reports/models/artilleryReportGenerator');
+let finalReportGenerator = require('../../../../src/reports/models/finalReportGenerator');
 let databaseConnector = require('../../../../src/reports/models/databaseConnector');
 
 describe('Stats consumer test', () => {
-    let sandbox, databaseConnectorInsertSummaryStub, databaseConnectorUpdateSummaryStub, databaseConnectorInsertStatsStub,
+    let sandbox, databaseConnectorInsertSummaryStub, databaseConnectorInsertStatsStub,
         databaseConnectorGetSummaryStub, loggerInfoStub, loggerWarnStub, reportWebhookSenderSendStub, statsFormatterStub,
-        artilleryReportGeneratorStub, reportEmailSenderSendStub, reportsManagerStub, jobsManagerStub, dateGetTimeStub;
+        finalReportGeneratorStub, reportEmailSenderSendStub, reportsManagerStub, jobsManagerStub, dateGetTimeStub,
+        reportsManagerUpdateReportStatusStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         const date = new Date();
         dateGetTimeStub = sandbox.stub(date, 'getTime');
         databaseConnectorInsertSummaryStub = sandbox.stub(databaseConnector, 'insertReport');
-        databaseConnectorUpdateSummaryStub = sandbox.stub(databaseConnector, 'updateReport');
         databaseConnectorInsertStatsStub = sandbox.stub(databaseConnector, 'insertStats');
         databaseConnectorGetSummaryStub = sandbox.stub(databaseConnector, 'getReport');
+
         loggerInfoStub = sandbox.stub(logger, 'info');
         loggerWarnStub = sandbox.stub(logger, 'warn');
         reportWebhookSenderSendStub = sandbox.stub(reportWebhookSender, 'send');
         statsFormatterStub = sandbox.stub(statsFormatter, 'getStatsFormatted');
-        artilleryReportGeneratorStub = sandbox.stub(artilleryReportGenerator, 'createArtilleryReport');
+        finalReportGeneratorStub = sandbox.stub(finalReportGenerator, 'createFinalReport');
         reportEmailSenderSendStub = sandbox.stub(reportEmailSender, 'sendAggregateReport');
         reportsManagerStub = sandbox.stub(reportsManager, 'getReport');
+        reportsManagerUpdateReportStatusStub = sandbox.stub(reportsManager, 'updateReport');
         jobsManagerStub = sandbox.stub(jobsManager, 'getJob');
         statsConsumer.__set__('configHandler', {
             getConfig: () => {
@@ -65,8 +67,8 @@ describe('Stats consumer test', () => {
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com']
         });
-        databaseConnectorUpdateSummaryStub.resolves();
-        await statsConsumer.handleMessage('test_id', 'report_id', { stats_time: statsTime, phase_status: 'error', data: JSON.stringify({ message: 'fail to get test' }), error: { code: 500, message: 'fail to get test' } });
+        reportsManagerUpdateReportStatusStub.resolves();
+        await statsConsumer.handleMessage('test_id', 'report_id', {stats_time: statsTime, phase_status: 'error', data: JSON.stringify({message: 'fail to get test'}), error: {code: 500, message: 'fail to get test'}});
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([
@@ -96,12 +98,11 @@ describe('Stats consumer test', () => {
     it('Handing message with phase: started', async () => {
         const statsTime = Date.now().toString();
         databaseConnectorInsertSummaryStub.resolves();
-        databaseConnectorUpdateSummaryStub.resolves();
         reportWebhookSenderSendStub.resolves();
         reportsManagerStub.resolves({
             test_id: 'test_id',
             report_id: 'report_id',
-            status: 'initialized',
+            status: 'initializing',
             phase: 0,
             test_name: 'some_test_name',
             webhooks: ['http://www.zooz.com'],
@@ -112,15 +113,8 @@ describe('Stats consumer test', () => {
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com']
         });
-        await statsConsumer.handleMessage('test_id', 'report_id', { stats_time: statsTime, phase_status: 'started_phase', data: JSON.stringify({ info: { duration: 10, arrivalRate: 100 } }) });
-
-        databaseConnectorUpdateSummaryStub.callCount.should.equal(1);
-        databaseConnectorUpdateSummaryStub.args.should.containDeep([
-            [
-                'test_id',
-                'report_id'
-            ]
-        ]);
+        reportsManagerUpdateReportStatusStub.resolves();
+        await statsConsumer.handleMessage('test_id', 'report_id', {stats_time: statsTime, phase_status: 'started_phase', data: JSON.stringify({ info: {duration: 10, arrivalRate: 100} })});
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([
@@ -161,8 +155,7 @@ describe('Stats consumer test', () => {
             }
         });
         databaseConnectorInsertStatsStub.resolves();
-        databaseConnectorUpdateSummaryStub.resolves();
-        databaseConnectorGetSummaryStub.resolves({ rows: [{ status: 'started', start_time: 123456 }] });
+        databaseConnectorGetSummaryStub.resolves({rows: [{status: 'started', start_time: 123456}]});
         reportWebhookSenderSendStub.resolves();
         reportsManagerStub.resolves({
             test_id: 'test_id',
@@ -176,12 +169,13 @@ describe('Stats consumer test', () => {
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com']
         });
+        reportsManagerUpdateReportStatusStub.resolves();
 
         dateGetTimeStub.onCall(0).returns(327403375200000);
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await statsConsumer.handleMessage('test_id', 1, { container_id: 'container_id', stats_time: statsTime, phase_status: 'intermediate', data: JSON.stringify({ report: { reportId: 1 } }) });
+        await statsConsumer.handleMessage('test_id', 1, {runner_id: 'runner_id', stats_time: statsTime, phase_status: 'intermediate', data: JSON.stringify({ report: {reportId: 1} })});
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([
@@ -201,24 +195,20 @@ describe('Stats consumer test', () => {
         ]);
 
         databaseConnectorInsertStatsStub.callCount.should.eql(1);
-        databaseConnectorInsertStatsStub.args[0][0].should.eql('container_id');
+        databaseConnectorInsertStatsStub.args[0][0].should.eql('runner_id');
         databaseConnectorInsertStatsStub.args[0][1].should.eql('test_id');
         databaseConnectorInsertStatsStub.args[0][2].should.eql(1);
         databaseConnectorInsertStatsStub.args[0][3].should.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
         databaseConnectorInsertStatsStub.args[0][4].should.eql(new Date(Number(statsTime)));
         databaseConnectorInsertStatsStub.args[0][5].should.eql(0);
         databaseConnectorInsertStatsStub.args[0][6].should.eql('intermediate');
-        databaseConnectorInsertStatsStub.args[0][7].should.eql(JSON.stringify({ report: { reportId: 1 } }));
-
-        databaseConnectorUpdateSummaryStub.callCount.should.eql(1);
-        databaseConnectorUpdateSummaryStub.args.should.eql([[ 'test_id', 1, 'in_progress', 0, JSON.stringify({ report: { reportId: 1 } }), undefined ]]);
+        databaseConnectorInsertStatsStub.args[0][7].should.eql(JSON.stringify({report: {reportId: 1 }}));
     });
 
     it('Handing message with phase: intermediate, not first message', async () => {
         const statsTime = Date.now().toString();
         databaseConnectorInsertStatsStub.resolves();
-        databaseConnectorUpdateSummaryStub.resolves();
-        databaseConnectorGetSummaryStub.resolves({ rows: [{ status: 'in_progress' }] });
+        databaseConnectorGetSummaryStub.resolves({rows: [{status: 'in_progress'}]});
         reportWebhookSenderSendStub.resolves();
         reportsManagerStub.resolves({
             test_id: 'test_id',
@@ -231,32 +221,30 @@ describe('Stats consumer test', () => {
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com']
         });
+        reportsManagerUpdateReportStatusStub.resolves();
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await statsConsumer.handleMessage('test_id', 1, { container_id: 'container_id', stats_time: statsTime, phase_status: 'intermediate', data: JSON.stringify({ report: { reportId: 1 } }) });
+        await statsConsumer.handleMessage('test_id', 1, {runner_id: 'runner_id', stats_time: statsTime, phase_status: 'intermediate', data: JSON.stringify({ report: {reportId: 1} })});
 
         reportWebhookSenderSendStub.callCount.should.equal(0);
         loggerInfoStub.callCount.should.equal(1);
         loggerInfoStub.args.should.deepEqual([
             [
-                { testId: 'test_id', reportId: 1 },
+                { testId: 'test_id', reportId: 1},
                 'handling intermediate message'
             ]
         ]);
 
         databaseConnectorInsertStatsStub.callCount.should.eql(1);
-        databaseConnectorInsertStatsStub.args[0][0].should.eql('container_id');
+        databaseConnectorInsertStatsStub.args[0][0].should.eql('runner_id');
         databaseConnectorInsertStatsStub.args[0][1].should.eql('test_id');
         databaseConnectorInsertStatsStub.args[0][2].should.eql(1);
         databaseConnectorInsertStatsStub.args[0][3].should.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
         databaseConnectorInsertStatsStub.args[0][4].should.eql(new Date(Number(statsTime)));
         databaseConnectorInsertStatsStub.args[0][5].should.eql(0);
         databaseConnectorInsertStatsStub.args[0][6].should.eql('intermediate');
-        databaseConnectorInsertStatsStub.args[0][7].should.eql(JSON.stringify({ report: { reportId: 1 } }));
-
-        databaseConnectorUpdateSummaryStub.callCount.should.eql(1);
-        databaseConnectorUpdateSummaryStub.args.should.eql([[ 'test_id', 1, 'in_progress', 0, JSON.stringify({ report: { reportId: 1 } }), undefined ]]);
+        databaseConnectorInsertStatsStub.args[0][7].should.eql(JSON.stringify({ report: {reportId: 1} }));
     });
 
     it('Handing message with phase: done', async () => {
@@ -266,16 +254,14 @@ describe('Stats consumer test', () => {
                 return {
                     grafana_url: 'http://www.grafana.com',
                     external_address: 'http://www.zooz.com/v1'
-
                 };
             }
         });
 
-        databaseConnectorGetSummaryStub.resolves({ rows: [{ status: 'in_progress', start_time: 123456, end_time: 24567 }] });
+        databaseConnectorGetSummaryStub.resolves({rows: [{status: 'in_progress', start_time: 123456, end_time: 24567}]});
         databaseConnectorInsertStatsStub.resolves();
-        databaseConnectorUpdateSummaryStub.resolves();
         reportWebhookSenderSendStub.resolves();
-        artilleryReportGeneratorStub.resolves();
+        finalReportGeneratorStub.resolves();
         reportsManagerStub.resolves({
             test_id: 'test_id',
             start_time: '12345',
@@ -289,10 +275,11 @@ describe('Stats consumer test', () => {
             webhooks: ['http://www.zooz.com'],
             emails: ['mickey@gmail.com']
         });
+        reportsManagerUpdateReportStatusStub.resolves();
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await statsConsumer.handleMessage('test_id', 1, { container_id: 'container_id', stats_time: statsTime, phase_status: 'done', data: JSON.stringify({ report: { reportId: 1 } }) });
+        await statsConsumer.handleMessage('test_id', 1, {runner_id: 'runner_id', stats_time: statsTime, phase_status: 'done', data: JSON.stringify({ report: {reportId: 1} })});
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([
@@ -323,17 +310,14 @@ describe('Stats consumer test', () => {
         ]);
 
         databaseConnectorInsertStatsStub.callCount.should.eql(1);
-        databaseConnectorInsertStatsStub.args[0][0].should.eql('container_id');
+        databaseConnectorInsertStatsStub.args[0][0].should.eql('runner_id');
         databaseConnectorInsertStatsStub.args[0][1].should.eql('test_id');
         databaseConnectorInsertStatsStub.args[0][2].should.eql(1);
         databaseConnectorInsertStatsStub.args[0][3].should.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
         databaseConnectorInsertStatsStub.args[0][4].should.eql(new Date(Number(statsTime)));
         databaseConnectorInsertStatsStub.args[0][5].should.eql(0);
-        databaseConnectorInsertStatsStub.args[0][6].should.eql('aggregate');
-        databaseConnectorInsertStatsStub.args[0][7].should.eql(JSON.stringify({ report: { reportId: 1 } }));
-
-        databaseConnectorUpdateSummaryStub.callCount.should.eql(1);
-        databaseConnectorUpdateSummaryStub.args.should.eql([[ 'test_id', 1, 'finished', 0, JSON.stringify({ report: { reportId: 1 } }), new Date(Number(statsTime)) ]]);
+        databaseConnectorInsertStatsStub.args[0][6].should.eql('final_report');
+        databaseConnectorInsertStatsStub.args[0][7].should.eql(JSON.stringify({report: {reportId: 1 }}));
     });
 
     it('Handing message with phase: aborted', async () => {
@@ -348,11 +332,10 @@ describe('Stats consumer test', () => {
             }
         });
 
-        databaseConnectorGetSummaryStub.resolves({ rows: [{ status: 'started', start_time: 123456, end_time: 24567 }] });
+        databaseConnectorGetSummaryStub.resolves({rows: [{status: 'started', start_time: 123456, end_time: 24567}]});
         databaseConnectorInsertStatsStub.resolves();
-        databaseConnectorUpdateSummaryStub.resolves();
         reportWebhookSenderSendStub.resolves();
-        artilleryReportGeneratorStub.resolves();
+        finalReportGeneratorStub.resolves();
         reportsManagerStub.resolves({
             test_id: 'test_id',
             start_time: '12345',
@@ -366,10 +349,11 @@ describe('Stats consumer test', () => {
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com']
         });
+        reportsManagerUpdateReportStatusStub.resolves();
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await statsConsumer.handleMessage('test_id', 1, { container_id: 'container_id', stats_time: statsTime, phase_status: 'aborted', data: JSON.stringify({ revisionId: 'revision_id', webhooks: ['http://www.zooz.com'], testId: 'test_id', runId: 'run_id', environment: 'test' }) });
+        await statsConsumer.handleMessage('test_id', 1, {runner_id: 'runner_id', stats_time: statsTime, phase_status: 'aborted', data: JSON.stringify({revisionId: 'revision_id', webhooks: ['http://www.zooz.com'], testId: 'test_id', runId: 'run_id', environment: 'test'})});
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([
@@ -384,8 +368,6 @@ describe('Stats consumer test', () => {
         reportEmailSenderSendStub.callCount.should.equal(0);
 
         databaseConnectorInsertStatsStub.callCount.should.eql(0);
-        databaseConnectorUpdateSummaryStub.callCount.should.eql(1);
-        databaseConnectorUpdateSummaryStub.args.should.eql([[ 'test_id', 1, 'aborted', 0, undefined, new Date(Number(statsTime)) ]]);
     });
 
     it('Handing message with unknown phase', async () => {

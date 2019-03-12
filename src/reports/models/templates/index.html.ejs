@@ -95,8 +95,16 @@
             <table class="table table-bordered table-hover table-condensed">
                 <tbody>
                 <tr>
+                    <td>Test status</td>
+                    <td><span id="testStatus">In Progress</span></td>
+                </tr>
+                <tr>
                     <td>Test duration</td>
                     <td><span id="testDuration">0</span> sec</td>
+                </tr>
+                <tr>
+                    <td>Runners deployed</td>
+                    <td><span id="parallelism">0</span></td>
                 </tr>
                 <tr>
                     <td>Scenarios created</td>
@@ -112,6 +120,7 @@
                     <td>Scenarios avoided</td>
                     <td><span id="scenariosAvoided">0</span></td>
                 </tr>
+
                 </tbody>
             </table>
         </div>
@@ -226,10 +235,12 @@
     var l = _;
 
     $('#timestamp').html(moment(Report.aggregate.timestamp).format('DD MMM YYYY HH:mm:SS'));
-    $('#testDuration').html(l.size(Report.intermediate) * 30);
+    $('#testStatus').html(Report.status);
+    $('#testDuration').html(Report.duration);
     $('#scenariosCompleted').html(Report.aggregate.scenariosCompleted);
     $('#scenariosCreated').html(Report.aggregate.scenariosCreated);
     $('#scenariosAvoided').html(Report.aggregate.scenariosAvoided);
+    $('#parallelism').html(Report.parallelism);
 
     var markers = [];
     if(l.size(Report.phases) > 0) {
@@ -322,8 +333,7 @@
         window.Report.intermediate,
         function(o,i) {
             return {
-                timestamp: i*30+30,
-
+                bucket: o.bucket,
                 rpsMean: o.rps.mean,
                 rpsCount: o.rps.count,
                 concurrency: o.concurrency,
@@ -342,7 +352,7 @@
     if (l.size(Report.aggregate.codes) > 0) {
         var codesData = l.foldl(Report.intermediate, function(acc, o, i) {
             var res = {};
-            res.timestamp = i*30+30;
+            res.bucket = o.bucket;
             l.each(o.codes, function(count, code) {
                 res[code] = count;
             });
@@ -365,7 +375,7 @@
             description: 'Occurence of HTTP response codes',
             target: '.codes-line',
             data: codesData,
-            x_accessor: 'timestamp',
+            x_accessor: 'bucket',
             y_accessor: uniqueCodes,
             legend: uniqueCodes,
             right: 50,
@@ -383,7 +393,7 @@
     if (l.size(Report.aggregate.errors) > 0) {
         var errorData = l.foldl(Report.intermediate, function(acc, o, i) {
             var res = {};
-            res.timestamp = i*30+30;
+            res.bucket = o.bucket;
             l.each(o.errors, function(count, name) {
                 res[name] = count;
             });
@@ -404,7 +414,7 @@
             description: 'Occurence of error codes',
             target: '.errors-line',
             data: errorData,
-            x_accessor: 'timestamp',
+            x_accessor: 'bucket',
             y_accessor: uniqueErrors,
             chart_type: 'line',
             area: false,
@@ -412,6 +422,8 @@
         });
 
     }
+
+    console.log(chartData)
 
     //
     // Latency
@@ -427,7 +439,7 @@
         data: chartData,
         target: '.latency',
         width: 900,
-        x_accessor: 'timestamp',
+        x_accessor: 'bucket',
         y_accessor: ['latencyMin', 'latencyMedian', 'latencyp95', 'latencyMax'],
         legend: ['min', 'p50', 'p95', 'max'],
         //legend_target: '.latency-legend',
@@ -447,7 +459,7 @@
         description: 'Concurrent users',
         data: chartData,
         target: '.concurrency',
-        x_accessor: 'timestamp',
+        x_accessor: 'bucket',
         y_accessor: ['concurrency'],
         interpolate: 'monotone',
         markers: markers,
@@ -463,7 +475,7 @@
         description: 'Mean requests per second',
         data: chartData,
         target: '.rps-mean',
-        x_accessor: 'timestamp',
+        x_accessor: 'bucket',
         y_accessor: ['rpsMean'],
         interpolate: 'monotone',
         markers: markers,
@@ -479,7 +491,7 @@
         description: 'Count of requests per second',
         data: chartData,
         target: '.rps-count',
-        x_accessor: 'timestamp',
+        x_accessor: 'bucket',
         y_accessor: ['rpsCount'],
         interpolate: 'monotone',
         markers: markers,
