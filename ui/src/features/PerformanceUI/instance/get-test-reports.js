@@ -189,7 +189,6 @@ class getTests extends React.Component {
         this.setState({showReport: null})
     }
     openReport = (cell, row) => {
-        console.log('here!!', row);
         return (<RaisedButton onClick={() => {
             this.setState({showReport: row})
         }} backgroundColor={''} primary className={style.button} label='View'/>)

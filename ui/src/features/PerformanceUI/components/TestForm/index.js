@@ -60,6 +60,7 @@ export class TestForm extends React.Component {
       closeDialog();
     }
   }
+
   componentDidMount () {
     const { initForm } = this.props;
     initForm();
@@ -106,7 +107,6 @@ export class TestForm extends React.Component {
   addScenarioHandler = () => {
     const { scenarios } = this.state;
     const maxWeight = this.calcMaxAllowedWeight(scenarios.length);
-    console.log('maxWeight',maxWeight);
     scenarios.push({ id: uuid(), steps: [], weight: maxWeight, scenario_name: 'Scenario ' + (scenarios.length + 1) });
     this.setState({ scenarios, isAddStepOpen: false, isAddScenarioOpen: true, currentScenarioIndex: scenarios.length - 1, isBeforeSelected: false })
   };

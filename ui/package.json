@@ -68,14 +68,12 @@
     "react": "^16.6.3",
     "react-bootstrap": "^0.32.1",
     "react-bootstrap-table": "^4.3.1",
-    "react-charts": "^2.0.0-alpha.12",
     "react-dnd": "^7.0.2",
     "react-dnd-html5-backend": "^7.0.2",
     "react-dom": "^16.8.3",
     "react-json-editor-ajrm": "^2.5.9",
     "react-json-pretty": "^1.7.6",
     "react-redux": "^5.0.7",
-    "react-resizable": "^1.7.5",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.9",
     "react-table": "^6.8.2",
@@ -85,6 +83,7 @@
     "redux-saga": "^0.16.0",
     "redux-thunk": "^2.2.0",
     "replace-in-file": "^3.4.3",
+    "reselect": "^4.0.0",
     "uuid": "^3.3.2"
   }
 }

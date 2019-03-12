@@ -7,7 +7,7 @@ import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import CircularProgress from 'material-ui/CircularProgress';
 
-const Index = (props) => {
+const Button = (props) => {
   const { label, onClick, className, menuActions, actionHandler, isLoading } = props;
 
   return (
@@ -39,4 +39,4 @@ const Index = (props) => {
     </div>)
 };
 
-export default Index;
+export default Button;

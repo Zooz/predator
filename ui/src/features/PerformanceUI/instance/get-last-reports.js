@@ -296,11 +296,6 @@ class getReports extends React.Component {
             </Page>
         )
     }
-
-    getInstance() {
-        const {match: {params}} = this.props;
-        return params.instance;
-    }
 }
 
 function mapStateToProps(state) {

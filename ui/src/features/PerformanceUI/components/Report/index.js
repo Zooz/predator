@@ -27,64 +27,6 @@ const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
 
 class Report extends React.Component {
 
-    prepareData = (report) => {
-        let latencyGraph = [];
-        let errorsCodeGraph = [];
-        let errorCodes = {};
-        let errorsGraph = [];
-        let errors = {};
-        let rps = [];
-        let errorsBar = [];
-        let scenarios = [];
-        if (report) {
-            const startTime = new Date(report.start_time).getTime();
-            report.intermediate.forEach((bucket, index) => {
-                const latency = bucket.latency;
-                const time = new Date(startTime + (bucket.bucket * 1000));
-                latencyGraph.push({
-                    name: `${dateFormat(time, 'h:MM:ss')}`,
-                    median: latency.median,
-                    p95: latency.p95,
-                    p99: latency.p99,
-                });
-                rps.push({name: `${dateFormat(time, 'h:MM:ss')}`, mean: bucket.rps.mean});
-
-                if (Object.keys(bucket.codes).length > 0) {
-                    errorsCodeGraph.push({name: `${dateFormat(time, 'h:MM:ss')}`, ...bucket.codes, ...bucket.errors});
-                    Object.keys(bucket.codes).forEach((code) => {
-                        errorCodes[code] = true;
-                    });
-                    Object.keys(bucket.errors).forEach((error) => {
-                        errorCodes[error] = true;
-                    })
-                }
-
-            })
-
-            Object.keys(report.aggregate.codes).forEach((code) => {
-                errorsBar.push({name: code, count: report.aggregate.codes[code]})
-            });
-            Object.keys(report.aggregate.errors).forEach((error) => {
-                errorsBar.push({name: error, count: report.aggregate.errors[error]})
-            });
-            Object.keys(report.aggregate.scenarioCounts).forEach((key) => {
-                scenarios.push({name: key, value: report.aggregate.scenarioCounts[key]})
-            })
-
-        }
-
-        return {
-            latencyGraph,
-            errorsCodeGraph,
-            errorCodes,
-            errorsGraph,
-            errors,
-            rps,
-            errorsBar,
-            scenarios
-        }
-    }
-
     generateAreaChart = (data, keys, labelY) => {
         return (
             <ResponsiveContainer width="100%" height={300}>
@@ -113,7 +55,6 @@ class Report extends React.Component {
         )
     }
     lineChart = (data, keys) => {
-
         return (
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
@@ -141,7 +82,6 @@ class Report extends React.Component {
         )
     }
     barChart = (data, keys) => {
-
         return (
             <ResponsiveContainer width={'100%'} height={300}>
                 <BarChart
@@ -167,9 +107,7 @@ class Report extends React.Component {
     };
 
     render() {
-        const data = this.prepareData(this.props.aggregateReport);
-        const {report, onClose} = this.props;
-
+        const {report, onClose,aggregateReport} = this.props;
         return (
             <Modal>
                 <div style={{
@@ -184,20 +122,19 @@ class Report extends React.Component {
                 <span>Started at {dateFormat(new Date(report.start_time), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</span>
                 <div>
                     <h3>Overall Latency</h3>
-                    {this.generateAreaChart(data.latencyGraph, ['median', 'p95', 'p99'], 'ms')}
+                    {this.generateAreaChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms')}
                     <h3>Status Codes</h3>
-                    {this.lineChart(data.errorsCodeGraph, Object.keys(data.errorCodes))}
+                    {this.lineChart(aggregateReport.errorsCodeGraph, Object.keys(aggregateReport.errorCodes))}
                     <h3>RPS</h3>
-                    {this.generateAreaChart(data.rps, ['mean'])}
-
+                    {this.generateAreaChart(aggregateReport.rps, ['mean'])}
                     <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                         <div style={{width: '50%'}}>
                             <h3>Status Codes And Errors Distribution</h3>
-                            {this.barChart(data.errorsBar, ['count'])}
+                            {this.barChart(aggregateReport.errorsBar, ['count'])}
                         </div>
                         <div>
                             <h3>Scenarios</h3>
-                            <PieChart data={data.scenarios}/>
+                            <PieChart data={aggregateReport.scenarios}/>
                         </div>
                     </div>
                 </div>
@@ -230,7 +167,7 @@ class Report extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        aggregateReport: selectors.aggregateReport(state),
+        aggregateReport: selectors.getAggregateReort(state),
     }
 }
 
