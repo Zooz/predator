@@ -1,8 +1,6 @@
 'use strict';
 
-const uuidv4 = require('uuid/v4'),
-    databaseConnector = require('./databaseConnector'),
-    reportEmailSender = require('./reportEmailSender'),
+const reportEmailSender = require('./reportEmailSender'),
     reportWebhookSender = require('./reportWebhookSender'),
     reportsManager = require('./reportsManager'),
     jobsManager = require('../../jobs/models/jobManager'),
@@ -11,7 +9,7 @@ const uuidv4 = require('uuid/v4'),
     logger = require('../../common/logger'),
     constants = require('../utils/constants');
 
-module.exports.handleMessage = async (testId, reportId, stats) => {
+module.exports.notifyIfNeeded = async (testId, reportId, stats) => {
     const metadata = { testId: testId, reportId: reportId };
     const report = await reportsManager.getReport(testId, reportId);
     const job = await jobsManager.getJob(report.job_id);
@@ -20,11 +18,11 @@ module.exports.handleMessage = async (testId, reportId, stats) => {
     switch (stats.phase_status) {
     case 'error':
         logger.info(metadata, stats.error, 'handling error message');
-        await handleError(report, job, stats, statsTime);
+        await handleError(report, job, stats);
         break;
     case 'started_phase':
         logger.info(metadata, statsData, 'handling started message');
-        await handleStart(report, job, stats);
+        await handleStart(report, job);
         break;
     case 'intermediate':
         logger.info(metadata, 'handling intermediate message');
@@ -36,7 +34,7 @@ module.exports.handleMessage = async (testId, reportId, stats) => {
         break;
     case 'aborted':
         logger.info(metadata, 'handling aborted message');
-        await handleAbort(report, job, stats, statsTime);
+        await handleAbort(report, job);
         break;
     default:
         logger.warn(metadata, 'Handling unsupported test status: ' + JSON.stringify(stats));
@@ -46,18 +44,16 @@ module.exports.handleMessage = async (testId, reportId, stats) => {
     return Promise.resolve();
 };
 
-async function handleError(report, job, stats, statsTime) {
-    await reportsManager.updateReport(report, constants.REPORT_FAILED_STATUS, stats, statsTime);
+async function handleError(report, job, stats) {
     const webhookMessage = `😞 *Test with id: ${report.test_id} Failed*.\ntest configuration:\nenvironment: ${report.environment}\n${stats.data}`;
     if (job.webhooks) {
         reportWebhookSender.send(report.test_id, report.report_id, webhookMessage, job.webhooks);
     }
 }
 
-async function handleStart(report, job, stats) {
+async function handleStart(report, job) {
     let webhookMessage;
     if (report.status === constants.REPORT_INITIALIZING_STATUS) {
-        await reportsManager.updateReport(report, constants.REPORT_STARTED_STATUS, stats);
         let rampToMessage = report.ramp_to ? `, ramp to: ${report.ramp_to} scenarios per second` : '';
         let parallelism = report.parallelism || 1;
         webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n
@@ -71,8 +67,6 @@ async function handleStart(report, job, stats) {
 
 async function handleIntermediate(report, job, stats, statsTime, statsData) {
     let webhookMessage;
-    await reportsManager.updateReport(report, constants.REPORT_IN_PROGRESS_STATUS, stats, statsTime);
-    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, constants.SUBSCRIBER_INTERMEDIATE_STAGE, stats.data);
     const configData = await configHandler.getConfig();
 
     if (report && report.status === constants.REPORT_STARTED_STATUS) {
@@ -89,8 +83,6 @@ async function handleIntermediate(report, job, stats, statsTime, statsData) {
 }
 
 async function handleDone(report, job, stats, statsTime, statsData) {
-    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuidv4(), statsTime, report.phase, 'final_report', stats.data);
-    await reportsManager.updateReport(report, constants.REPORT_FINISHED_STATUS, stats, statsTime);
     const configData = await configHandler.getConfig();
 
     const htmlReportUrl = configData.external_address + `/tests/${report.test_id}/reports/${report.report_id}/html`;
@@ -108,8 +100,7 @@ async function handleDone(report, job, stats, statsTime, statsData) {
     }
 }
 
-async function handleAbort(report, job, stats, statsTime) {
-    await reportsManager.updateReport(report, constants.REPORT_ABORTED_STATUS, stats, statsTime);
+async function handleAbort(report, job) {
     const configData = await configHandler.getConfig();
 
     if (job.webhooks) {

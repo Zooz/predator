@@ -1,11 +1,12 @@
 'use strict';
 
-const _ = require('lodash');
+const _ = require('lodash'),
+    uuid = require('uuid/v4');
 
 const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
-    statsConsumer = require('./statsConsumer'),
+    notifier = require('./notifier'),
     constants = require('../utils/constants');
 
 const MINIMUM_WAIT_FOR_DELAYED_REPORT_UPDATE_MS = 30000;
@@ -44,6 +45,7 @@ module.exports.getLastReports = async (limit) => {
 module.exports.postReport = async (testId, reportBody) => {
     const startTime = new Date(Number(reportBody.start_time));
     const job = await jobConnector.getJob(reportBody.job_id);
+    const phase = '0';
 
     const testConfiguration = {
         arrival_rate: job.arrival_rate,
@@ -55,23 +57,37 @@ module.exports.postReport = async (testId, reportBody) => {
     };
 
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
-        reportBody.test_type, startTime, reportBody.test_name,
-        reportBody.test_description, JSON.stringify(testConfiguration), job.notes);
+        reportBody.test_type, phase, startTime, reportBody.test_name,
+        reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now());
     await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id);
     return reportBody;
 };
 
 module.exports.postStats = async (testId, reportId, stats) => {
+    const statsTime = new Date(Number(stats.stats_time));
+    await notifier.notifyIfNeeded(testId, reportId, stats);
+
     await databaseConnector.updateSubscribers(testId, reportId, stats.runner_id, stats.phase_status);
-    await statsConsumer.handleMessage(testId, reportId, stats);
+    const report = await module.exports.getReport(testId, reportId);
+    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
+    await module.exports.updateReport(report, stats);
+
     return stats;
+};
+
+module.exports.updateReport = async (report, stats) => {
+    const statsParsed = JSON.parse(stats.data);
+    const statsTime = statsParsed.timestamp;
+    const reportStatus = calculateReportStatus(report);
+    const endTime = reportStatus === constants.REPORT_FINISHED_STATUS || reportStatus === constants.REPORT_PARTIALLY_FINISHED_STATUS
+        ? statsTime : undefined;
+    await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime, endTime);
 };
 
 function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
-    let lastStats = summaryRow.last_stats ? JSON.parse(summaryRow.last_stats) : {};
 
     let htmlReportUrl = config.external_address + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
 
@@ -86,14 +102,13 @@ function getReportResponse(summaryRow, config) {
         end_time: summaryRow.end_time || undefined,
         phase: summaryRow.phase,
         duration_seconds: (new Date(timeEndOrCurrent).getTime() - new Date(summaryRow.start_time).getTime()) / 1000,
-        avg_response_time_ms: lastStats.latency ? lastStats.latency.median : undefined,
+        avg_response_time_ms: undefined,
         arrival_rate: testConfiguration.arrival_rate,
         duration: testConfiguration.duration,
         ramp_to: testConfiguration.ramp_to,
         parallelism: testConfiguration.parallelism,
         max_virtual_users: testConfiguration.max_virtual_users,
-        status: summaryRow.status,
-        last_stats: lastStats,
+        last_updated_at: summaryRow.last_updated_at,
         html_report: htmlReportUrl,
         grafana_report: generateGraphanaUrl(summaryRow, config.grafana_url),
         notes: summaryRow.notes,
@@ -101,6 +116,11 @@ function getReportResponse(summaryRow, config) {
         subscribers: summaryRow.subscribers
     };
 
+    report.status = calculateReportStatus(report);
+
+    if (report.status === constants.REPORT_FAILED_STATUS || report.status === constants.REPORT_ABORTED_STATUS) {
+        report.end_time = report.last_updated_at;
+    }
     return report;
 }
 
@@ -112,29 +132,48 @@ function generateGraphanaUrl(report, grafanaUrl) {
     }
 }
 
-module.exports.updateReport = async (report, status, stats, statsTime) => {
-    const delayedTimeInMs = Math.max(report.duration * 0.01, MINIMUM_WAIT_FOR_DELAYED_REPORT_UPDATE_MS);
-
+function calculateReportStatus(report) {
     const subscribersStages = getListOfSubscribersStages(report);
     const uniqueSubscribersStages = _.uniq(subscribersStages);
-    if (status === constants.REPORT_IN_PROGRESS_STATUS) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_IN_PROGRESS_STATUS, report.phase, stats.data, undefined);
-    } else if (status === constants.REPORT_STARTED_STATUS && report.status === constants.REPORT_INITIALIZING_STATUS) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_STARTED_STATUS, report.phase, undefined, undefined);
-    } else if (status === constants.REPORT_ABORTED_STATUS && allSubscribersAborted(uniqueSubscribersStages)) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_ABORTED_STATUS, report.phase, stats.data, statsTime);
-    } else if (status === constants.REPORT_FAILED_STATUS && allSubscribersFailed(uniqueSubscribersStages)) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FAILED_STATUS, report.phase, stats.data, statsTime);
-    } else if (status === constants.REPORT_FINISHED_STATUS) {
-        if (allSubscribersFinished(uniqueSubscribersStages)) {
-            await updateFinishedReportStatus(uniqueSubscribersStages, report, stats, statsTime);
+
+    const delayedTimeInMs = Math.max(report.duration * 0.01, MINIMUM_WAIT_FOR_DELAYED_REPORT_UPDATE_MS);
+    const reportDurationMs = report.duration * 1000;
+    const reportStartTimeMs = new Date(report.start_time).getTime();
+
+    if (allSubscribersFinished(uniqueSubscribersStages)) {
+        return constants.REPORT_FINISHED_STATUS;
+    } else if (Date.now() >= reportStartTimeMs + reportDurationMs + delayedTimeInMs) {
+        if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_DONE_STAGE)) {
+            return constants.REPORT_PARTIALLY_FINISHED_STATUS;
         } else {
-            setTimeout(async () => {
-                await delayedUpdateOfReportStatus(report, stats, statsTime);
-            }, delayedTimeInMs);
+            return constants.REPORT_FAILED_STATUS;
         }
+    } else if (allSubscribersInitializing(uniqueSubscribersStages)) {
+        return constants.REPORT_INITIALIZING_STATUS;
+    } else if (allSubscribersStarted(uniqueSubscribersStages)) {
+        return constants.REPORT_STARTED_STATUS;
+    } else if (allSubscribersAborted(uniqueSubscribersStages)) {
+        return constants.REPORT_ABORTED_STATUS;
+    } else if (allSubscribersFailed(uniqueSubscribersStages)) {
+        return constants.REPORT_FAILED_STATUS;
+    } else {
+        return calculateDynamicReportStatus(report, uniqueSubscribersStages);
     }
-};
+}
+
+function calculateDynamicReportStatus(report, uniqueSubscribersStages) {
+    if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_DONE_STAGE)) {
+        return constants.REPORT_PARTIALLY_FINISHED_STATUS;
+    } else if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_INTERMEDIATE_STAGE)) {
+        return constants.REPORT_IN_PROGRESS_STATUS;
+    } else if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_STARTED_STAGE)) {
+        return constants.REPORT_STARTED_STATUS;
+    } else if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_INITIALIZING_STAGE)) {
+        return constants.REPORT_INITIALIZING_STATUS;
+    } else {
+        return constants.REPORT_FAILED_STATUS;
+    }
+}
 
 function getListOfSubscribersStages (report) {
     const runnerStates = report.subscribers.map((subscriber) => subscriber.stage);
@@ -142,7 +181,7 @@ function getListOfSubscribersStages (report) {
 }
 
 function allSubscribersFinished (subscriberStages) {
-    return !(subscriberStages.includes(constants.SUBSCRIBER_INTERMEDIATE_STAGE) || subscriberStages.includes(constants.SUBSCRIBER_STARTED_STAGE));
+    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_DONE_STAGE;
 }
 
 function allSubscribersAborted (subscriberStages) {
@@ -153,21 +192,10 @@ function allSubscribersFailed (subscriberStages) {
     return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_FAILED_STAGE;
 }
 
-async function updateFinishedReportStatus (uniqueSubscribersStages, report, stats, statsTime) {
-    if (uniqueSubscribersStages.length === 1) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
-    } else {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_PARTIALLY_FINISHED_STATUS, report.phase, stats.data, statsTime);
-    }
+function allSubscribersInitializing (subscriberStages) {
+    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_INITIALIZING_STAGE;
 }
 
-async function delayedUpdateOfReportStatus (report, stats, statsTime) {
-    const mostUpToDateReportVersion = await module.exports.getReport(report.test_id, report.report_id);
-    const subscribersStages = getListOfSubscribersStages(mostUpToDateReportVersion);
-    const uniqueSubscribersStages = _.uniq(subscribersStages);
-    if (mostUpToDateReportVersion.status !== constants.REPORT_FINISHED_STATUS && uniqueSubscribersStages.length === 1 && uniqueSubscribersStages[0] === constants.SUBSCRIBER_DONE_STAGE) {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_FINISHED_STATUS, report.phase, stats.data, statsTime);
-    } else {
-        await databaseConnector.updateReport(report.test_id, report.report_id, constants.REPORT_PARTIALLY_FINISHED_STATUS, report.phase, stats.data, statsTime);
-    }
+function allSubscribersStarted (subscriberStages) {
+    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_STARTED_STAGE;
 }

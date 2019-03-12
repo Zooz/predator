@@ -114,6 +114,8 @@ class getReports extends React.Component {
         'in_progress': 'Running',
         'aborted': 'Aborted',
         'finished': 'Finished',
+        'partially_finished': 'Partially Finished',
+        'failed': 'Failed',
         'started': 'Started'
       };
       return (mapper[cell] ? mapper[cell] : cell);
@@ -223,10 +225,10 @@ class getReports extends React.Component {
                 <TableHeaderColumn dataField='arrival_rate' dataAlign='left' width={'35'}>Arrival
                                 Rate</TableHeaderColumn>
                 <TableHeaderColumn dataField='ramp_to' dataAlign='left' width={'25'}>Ramp</TableHeaderColumn>
-                <TableHeaderColumn dataField='last_stats' dataAlign='left' formatExtraData={'rps.mean'}
-                  dataFormat={getData} width={'25'}>RPS</TableHeaderColumn>
-                <TableHeaderColumn dataAlign='left' dataFormat={this.successRateFormatter} width={'40'}>Success
-                                Rate</TableHeaderColumn>
+                {/*<TableHeaderColumn dataField='last_stats' dataAlign='left' formatExtraData={'rps.mean'}*/}
+                  {/*dataFormat={getData} width={'25'}>RPS</TableHeaderColumn>*/}
+                {/*<TableHeaderColumn dataAlign='left' dataFormat={this.successRateFormatter} width={'40'}>Success*/}
+                                {/*Rate</TableHeaderColumn>*/}
                 <TableHeaderColumn dataField='parallelism' dataAlign='left' width={'35'}>Parallelism</TableHeaderColumn>
                 <TableHeaderColumn dataField='notes' dataFormat={this.notes} dataAlign='left'
                   width={'80'}>Notes</TableHeaderColumn>

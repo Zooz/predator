@@ -8,12 +8,14 @@ const fs = require('fs'),
     cnfigConsts = require('../../common/consts').CONFIG,
     logger = require('../../common/logger'),
     reportsManager = require('./reportsManager'),
+    // finalReportGenerator = require('./finalReportGenerator'),
     jobsManager = require('../../jobs/models/jobManager');
 
 module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafanaUrl) => {
     let report, job;
     try {
         report = await reportsManager.getReport(testId, reportId);
+        // aggregatedResults = await finalReportGenerator.createFinalReport(testId, reportId);
         job = await jobsManager.getJob(report.job_id);
     } catch (error) {
         let errorMessage = `Failed to retrieve summary for testId: ${testId}, reportId: ${reportId}`;
@@ -26,6 +28,7 @@ module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafana
     let endTime = report.end_time;
     let startTime = report.start_time;
     let testRunTime = timeConversion(endTime - startTime);
+    // let finalStats = aggregatedResults;
     let finalStats = report.last_stats;
 
     let testInfo = {

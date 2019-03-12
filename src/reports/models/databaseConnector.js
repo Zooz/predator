@@ -17,16 +17,16 @@ module.exports = {
     updateSubscribers
 };
 
-function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
-    return databaseConnector.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes);
+function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+    return databaseConnector.insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
 }
 
 function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
     return databaseConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 }
 
-function updateReport(testId, reportId, status, phaseIndex, lastStats, endTime) {
-    return databaseConnector.updateReport(testId, reportId, status, phaseIndex, lastStats, endTime);
+function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime) {
+    return databaseConnector.updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime);
 }
 
 function getLastReports(limit) {

@@ -6,7 +6,7 @@ let sinon = require('sinon');
 let should = require('should');
 let rewire = require('rewire');
 let logger = require('../../../../src/common/logger');
-let statsConsumer = rewire('../../../../src/reports/models/statsConsumer');
+let statsConsumer = rewire('../../../../src/reports/models/notifier');
 let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
 let reportsManager = require('../../../../src/reports/models/reportsManager');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
@@ -15,7 +15,7 @@ let statsFormatter = require('../../../../src/reports/models/statsFormatter');
 let finalReportGenerator = require('../../../../src/reports/models/finalReportGenerator');
 let databaseConnector = require('../../../../src/reports/models/databaseConnector');
 
-describe('Stats consumer test', () => {
+describe.skip('Webhook/email notifier test', () => {
     let sandbox, databaseConnectorInsertSummaryStub, databaseConnectorInsertStatsStub,
         databaseConnectorGetSummaryStub, loggerInfoStub, loggerWarnStub, reportWebhookSenderSendStub, statsFormatterStub,
         finalReportGeneratorStub, reportEmailSenderSendStub, reportsManagerStub, jobsManagerStub, dateGetTimeStub,

@@ -125,7 +125,7 @@ describe('Artillery report generator test', () => {
                     'p99': 112.76666666666668
                 },
                 'rps': {
-                    'mean': 59.8,
+                    'mean': 60,
                     'count': 897
                 },
                 'scenarioDuration': {
@@ -157,7 +157,7 @@ describe('Artillery report generator test', () => {
                     'p99': 86.93052164261931
                 },
                 'rps': {
-                    'mean': 60.2,
+                    'mean': 60,
                     'count': 903
                 },
                 'scenarioDuration': {
@@ -239,7 +239,7 @@ describe('Artillery report generator test', () => {
                     'p99': 95.6
                 },
                 'rps': {
-                    'mean': 59.9,
+                    'mean': 60,
                     'count': 1797
                 },
                 'scenarioDuration': {
@@ -271,7 +271,7 @@ describe('Artillery report generator test', () => {
                     'p99': 93.16666666666667
                 },
                 'rps': {
-                    'mean': 60.1,
+                    'mean': 60,
                     'count': 1803
                 },
                 'scenarioDuration': {
@@ -335,7 +335,7 @@ describe('Artillery report generator test', () => {
                     'p99': 90.43333333333334
                 },
                 'rps': {
-                    'mean': 200,
+                    'mean': 60,
                     'count': 6000
                 },
                 'scenarioDuration': {
@@ -386,14 +386,14 @@ const INTERMEDIATE_AND_SUMMARY_ROWS = [{
     'test_id': 'cb7d7862-55c2-4a9b-bcec-d41d54101836',
     'report_id': 'b6489011-2073-4998-91cc-fd62f8b927f7',
     'stats_time': '1526900730945',
-    'data': '{"timestamp":"2018-05-21T11:05:30.933Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":600,"latency":{"min":160.6,"max":743.9,"median":191.5,"p95":264,"p99":611.8},"rps":{"count":600,"mean":39.19},"scenarioDuration":{"min":353,"max":1014.7,"median":384.8,"p95":629.4,"p99":930},"scenarioCounts":{"Scenario":300},"errors":{},"codes":{"201":600},"matches":0,"customStats":{},"concurrency":0,"pendingRequests":0}',
+    'data': '{"timestamp":"2018-05-21T11:05:30.933Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":600,"latency":{"min":160.6,"max":743.9,"median":191.5,"p95":264,"p99":611.8},"rps":{"count":600,"mean":40},"scenarioDuration":{"min":353,"max":1014.7,"median":384.8,"p95":629.4,"p99":930},"scenarioCounts":{"Scenario":300},"errors":{},"codes":{"201":600},"matches":0,"customStats":{},"concurrency":0,"pendingRequests":0}',
     'phase_status': 'intermediate',
     'state_id': 'c94cc1bd-31e8-403c-99cd-c75ce64605b5'
 }, {
     'test_id': 'cb7d7862-55c2-4a9b-bcec-d41d54101836',
     'report_id': 'b6489011-2073-4998-91cc-fd62f8b927f7',
     'stats_time': '1526900732453',
-    'data': '{"timestamp":"2018-05-21T11:05:30.947Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":600,"latency":{"min":160.6,"max":743.9,"median":191.5,"p95":264,"p99":611.8},"rps":{"count":600,"mean":39.16},"scenarioDuration":{"min":353,"max":1014.7,"median":384.8,"p95":629.4,"p99":930},"scenarioCounts":{"Scenario":300},"errors":{},"codes":{"201":600},"matches":0,"customStats":{},"concurrency":0,"pendingRequests":0}',
+    'data': '{"timestamp":"2018-05-21T11:05:30.947Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":600,"latency":{"min":160.6,"max":743.9,"median":191.5,"p95":264,"p99":611.8},"rps":{"count":600,"mean":40},"scenarioDuration":{"min":353,"max":1014.7,"median":384.8,"p95":629.4,"p99":930},"scenarioCounts":{"Scenario":300},"errors":{},"codes":{"201":600},"matches":0,"customStats":{},"concurrency":0,"pendingRequests":0}',
     'phase_status': 'final_report',
     'state_id': '949f1448-3b22-47ab-aef8-387c74f5ceac'
 }];
@@ -402,7 +402,7 @@ const ONLY_INTERMEDIATE_ROWS = [{
     'test_id': 'cb7d7862-55c2-4a9b-bcec-d41d54101836',
     'report_id': 'b6489011-2073-4998-91cc-fd62f8b927f7',
     'stats_time': '1526900730945',
-    'data': '{"timestamp":"2018-05-21T11:05:30.933Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":600,"latency":{"min":160.6,"max":743.9,"median":191.5,"p95":264,"p99":611.8},"rps":{"count":600,"mean":39.19},"scenarioDuration":{"min":353,"max":1014.7,"median":384.8,"p95":629.4,"p99":930},"scenarioCounts":{"Scenario":300},"errors":{},"codes":{"201":600},"matches":0,"customStats":{},"concurrency":0,"pendingRequests":0}',
+    'data': '{"timestamp":"2018-05-21T11:05:30.933Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":600,"latency":{"min":160.6,"max":743.9,"median":191.5,"p95":264,"p99":611.8},"rps":{"count":600,"mean":40},"scenarioDuration":{"min":353,"max":1014.7,"median":384.8,"p95":629.4,"p99":930},"scenarioCounts":{"Scenario":300},"errors":{},"codes":{"201":600},"matches":0,"customStats":{},"concurrency":0,"pendingRequests":0}',
     'phase_status': 'intermediate',
     'state_id': 'c94cc1bd-31e8-403c-99cd-c75ce64605b5'
 }];
@@ -426,7 +426,7 @@ const PARALLEL_INTERMEDIATE_ROWS = [
         'stats_time': '2019-03-10T17:24:00.676Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:24:00.672Z","scenariosCreated":299,"scenariosCompleted":298,"requestsCompleted":298,"latency":{"min":59.2,"max":133.5,"median":61.6,"p95":76.1,"p99":107.4},"rps":{"count":299,"mean":20.01},"scenarioDuration":{"min":59.8,"max":139.5,"median":62.4,"p95":76.9,"p99":108.2},"scenarioCounts":{"Get response code 200":299},"errors":{},"codes":{"200":298},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:24:00.672Z","scenariosCreated":299,"scenariosCompleted":298,"requestsCompleted":298,"latency":{"min":59.2,"max":133.5,"median":61.6,"p95":76.1,"p99":107.4},"rps":{"count":299,"mean":20},"scenarioDuration":{"min":59.8,"max":139.5,"median":62.4,"p95":76.9,"p99":108.2},"scenarioCounts":{"Get response code 200":299},"errors":{},"codes":{"200":298},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': '62fe8964-3cc6-43a3-adcd-67a17aa9fe39',
@@ -446,7 +446,7 @@ const PARALLEL_INTERMEDIATE_ROWS = [
         'stats_time': '2019-03-10T17:24:15.560Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:24:15.558Z","scenariosCreated":301,"scenariosCompleted":301,"requestsCompleted":301,"latency":{"min":59.4,"max":355.2,"median":62,"p95":76,"p99":84.4},"rps":{"count":301,"mean":20.07},"scenarioDuration":{"min":60,"max":355.8,"median":62.7,"p95":76.7,"p99":85},"scenarioCounts":{"Get response code 200":301},"errors":{},"codes":{"200":301},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:24:15.558Z","scenariosCreated":301,"scenariosCompleted":301,"requestsCompleted":301,"latency":{"min":59.4,"max":355.2,"median":62,"p95":76,"p99":84.4},"rps":{"count":301,"mean":20},"scenarioDuration":{"min":60,"max":355.8,"median":62.7,"p95":76.7,"p99":85},"scenarioCounts":{"Get response code 200":301},"errors":{},"codes":{"200":301},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': '7fe20a63-9b50-4504-9758-dda6e777f4de',
@@ -456,7 +456,7 @@ const PARALLEL_INTERMEDIATE_ROWS = [
         'stats_time': '2019-03-10T17:24:15.686Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:24:15.684Z","scenariosCreated":301,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.4,"max":361.1,"median":61.9,"p95":77.2,"p99":86.3},"rps":{"count":301,"mean":20.07},"scenarioDuration":{"min":59.9,"max":361.7,"median":62.5,"p95":77.8,"p99":87},"scenarioCounts":{"Get response code 200":301},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":2,"pendingRequests":2,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:24:15.684Z","scenariosCreated":301,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.4,"max":361.1,"median":61.9,"p95":77.2,"p99":86.3},"rps":{"count":301,"mean":20},"scenarioDuration":{"min":59.9,"max":361.7,"median":62.5,"p95":77.8,"p99":87},"scenarioCounts":{"Get response code 200":301},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":2,"pendingRequests":2,"scenariosAvoided":0}'
     },
     {
         'stats_id': '289c183f-6477-44e2-be38-c51c963797ee',
@@ -466,7 +466,7 @@ const PARALLEL_INTERMEDIATE_ROWS = [
         'stats_time': '2019-03-10T17:24:16.031Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:24:16.029Z","scenariosCreated":301,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.5,"max":347.1,"median":61.7,"p95":77.4,"p99":90.1},"rps":{"count":301,"mean":20.07},"scenarioDuration":{"min":60.2,"max":347.8,"median":62.4,"p95":78.1,"p99":90.8},"scenarioCounts":{"Get response code 200":301},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":2,"pendingRequests":2,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:24:16.029Z","scenariosCreated":301,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.5,"max":347.1,"median":61.7,"p95":77.4,"p99":90.1},"rps":{"count":301,"mean":20},"scenarioDuration":{"min":60.2,"max":347.8,"median":62.4,"p95":78.1,"p99":90.8},"scenarioCounts":{"Get response code 200":301},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":2,"pendingRequests":2,"scenariosAvoided":0}'
     },
     {
         'stats_id': '82eab6f5-c0e0-4d82-a246-049817ec2476',
@@ -476,7 +476,7 @@ const PARALLEL_INTERMEDIATE_ROWS = [
         'stats_time': '2019-03-10T17:24:45.577Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:24:31.575Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.5,"max":117.5,"median":61.2,"p95":72.5,"p99":78.1},"rps":{"count":300,"mean":20.03},"scenarioDuration":{"min":60,"max":118,"median":61.8,"p95":73.1,"p99":78.6},"scenarioCounts":{"Get response code 200":300},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:24:31.575Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.5,"max":117.5,"median":61.2,"p95":72.5,"p99":78.1},"rps":{"count":300,"mean":20},"scenarioDuration":{"min":60,"max":118,"median":61.8,"p95":73.1,"p99":78.6},"scenarioCounts":{"Get response code 200":300},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': '93737e55-cebf-44c0-92bb-5cdd6e64635f',
@@ -486,7 +486,7 @@ const PARALLEL_INTERMEDIATE_ROWS = [
         'stats_time': '2019-03-10T17:24:45.700Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:24:32.698Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.3,"max":86.9,"median":61.2,"p95":73.3,"p99":79.7},"rps":{"count":300,"mean":20.04},"scenarioDuration":{"min":59.8,"max":87.4,"median":61.9,"p95":73.9,"p99":80.2},"scenarioCounts":{"Get response code 200":300},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:24:32.698Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.3,"max":86.9,"median":61.2,"p95":73.3,"p99":79.7},"rps":{"count":300,"mean":20},"scenarioDuration":{"min":59.8,"max":87.4,"median":61.9,"p95":73.9,"p99":80.2},"scenarioCounts":{"Get response code 200":300},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': '875f3e89-593b-4fbf-9228-957ce5c691ff',
@@ -496,7 +496,7 @@ const PARALLEL_INTERMEDIATE_ROWS = [
         'stats_time': '2019-03-10T17:24:46.046Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:24:33.043Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.5,"max":98.3,"median":61.3,"p95":72.9,"p99":84},"rps":{"count":300,"mean":20.03},"scenarioDuration":{"min":60,"max":98.9,"median":61.9,"p95":73.5,"p99":84.5},"scenarioCounts":{"Get response code 200":300},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:24:33.043Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.5,"max":98.3,"median":61.3,"p95":72.9,"p99":84},"rps":{"count":300,"mean":20},"scenarioDuration":{"min":60,"max":98.9,"median":61.9,"p95":73.5,"p99":84.5},"scenarioCounts":{"Get response code 200":300},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     }
 ];
 
@@ -539,7 +539,7 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:30:19.317Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:30:19.312Z","scenariosCreated":601,"scenariosCompleted":601,"requestsCompleted":601,"latency":{"min":59,"max":356.4,"median":60.6,"p95":75.9,"p99":93.3},"rps":{"count":601,"mean":20.03},"scenarioDuration":{"min":59.5,"max":356.9,"median":61.2,"p95":76.4,"p99":93.8},"scenarioCounts":{"Get response code 200":601},"errors":{},"codes":{"200":601},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:30:19.312Z","scenariosCreated":601,"scenariosCompleted":601,"requestsCompleted":601,"latency":{"min":59,"max":356.4,"median":60.6,"p95":75.9,"p99":93.3},"rps":{"count":601,"mean":20},"scenarioDuration":{"min":59.5,"max":356.9,"median":61.2,"p95":76.4,"p99":93.8},"scenarioCounts":{"Get response code 200":601},"errors":{},"codes":{"200":601},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': '2b0c02d0-cb8e-491a-986b-e41b89d7e938',
@@ -549,7 +549,7 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:30:19.666Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:30:19.662Z","scenariosCreated":601,"scenariosCompleted":601,"requestsCompleted":601,"latency":{"min":59.2,"max":346.1,"median":60.9,"p95":76.1,"p99":92.3},"rps":{"count":601,"mean":20.03},"scenarioDuration":{"min":59.7,"max":346.6,"median":61.5,"p95":76.7,"p99":92.9},"scenarioCounts":{"Get response code 200":601},"errors":{},"codes":{"200":601},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:30:19.662Z","scenariosCreated":601,"scenariosCompleted":601,"requestsCompleted":601,"latency":{"min":59.2,"max":346.1,"median":60.9,"p95":76.1,"p99":92.3},"rps":{"count":601,"mean":20},"scenarioDuration":{"min":59.7,"max":346.6,"median":61.5,"p95":76.7,"p99":92.9},"scenarioCounts":{"Get response code 200":601},"errors":{},"codes":{"200":601},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': 'cc9b9c00-fd5b-482c-aaa6-0e8770576498',
@@ -559,7 +559,7 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:30:20.588Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:30:20.583Z","scenariosCreated":601,"scenariosCompleted":601,"requestsCompleted":601,"latency":{"min":59.5,"max":343.7,"median":60.9,"p95":77.1,"p99":93.9},"rps":{"count":601,"mean":20.03},"scenarioDuration":{"min":60,"max":344.2,"median":61.5,"p95":77.9,"p99":94.5},"scenarioCounts":{"Get response code 200":601},"errors":{},"codes":{"200":601},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:30:20.583Z","scenariosCreated":601,"scenariosCompleted":601,"requestsCompleted":601,"latency":{"min":59.5,"max":343.7,"median":60.9,"p95":77.1,"p99":93.9},"rps":{"count":601,"mean":20},"scenarioDuration":{"min":60,"max":344.2,"median":61.5,"p95":77.9,"p99":94.5},"scenarioCounts":{"Get response code 200":601},"errors":{},"codes":{"200":601},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': '877937de-f62f-4d19-90ae-a802c4025ae8',
@@ -569,7 +569,7 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:30:49.326Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:30:49.323Z","scenariosCreated":600,"scenariosCompleted":600,"requestsCompleted":600,"latency":{"min":59,"max":349.3,"median":60.3,"p95":69.1,"p99":90.1},"rps":{"count":600,"mean":20.01},"scenarioDuration":{"min":59.4,"max":349.8,"median":60.8,"p95":69.6,"p99":90.6},"scenarioCounts":{"Get response code 200":600},"errors":{},"codes":{"200":600},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:30:49.323Z","scenariosCreated":600,"scenariosCompleted":600,"requestsCompleted":600,"latency":{"min":59,"max":349.3,"median":60.3,"p95":69.1,"p99":90.1},"rps":{"count":600,"mean":20},"scenarioDuration":{"min":59.4,"max":349.8,"median":60.8,"p95":69.6,"p99":90.6},"scenarioCounts":{"Get response code 200":600},"errors":{},"codes":{"200":600},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': '9d796028-46fc-4504-927d-69a47c8c8903',
@@ -579,7 +579,7 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:30:49.674Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:30:49.671Z","scenariosCreated":600,"scenariosCompleted":600,"requestsCompleted":600,"latency":{"min":59.2,"max":340.8,"median":60.8,"p95":68.5,"p99":91.8},"rps":{"count":600,"mean":20.01},"scenarioDuration":{"min":59.7,"max":341.2,"median":61.3,"p95":69.1,"p99":92.3},"scenarioCounts":{"Get response code 200":600},"errors":{},"codes":{"200":600},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:30:49.671Z","scenariosCreated":600,"scenariosCompleted":600,"requestsCompleted":600,"latency":{"min":59.2,"max":340.8,"median":60.8,"p95":68.5,"p99":91.8},"rps":{"count":600,"mean":20},"scenarioDuration":{"min":59.7,"max":341.2,"median":61.3,"p95":69.1,"p99":92.3},"scenarioCounts":{"Get response code 200":600},"errors":{},"codes":{"200":600},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': '0e53bfd5-82ed-4481-9b31-b13a65a0ecf3',
@@ -589,7 +589,7 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:30:50.595Z',
         'phase_status': 'intermediate',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:30:50.593Z","scenariosCreated":600,"scenariosCompleted":600,"requestsCompleted":600,"latency":{"min":59.3,"max":374,"median":60.8,"p95":71.8,"p99":91.3},"rps":{"count":600,"mean":20.01},"scenarioDuration":{"min":59.8,"max":374.4,"median":61.3,"p95":72.2,"p99":91.8},"scenarioCounts":{"Get response code 200":600},"errors":{},"codes":{"200":600},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:30:50.593Z","scenariosCreated":600,"scenariosCompleted":600,"requestsCompleted":600,"latency":{"min":59.3,"max":374,"median":60.8,"p95":71.8,"p99":91.3},"rps":{"count":600,"mean":20},"scenarioDuration":{"min":59.8,"max":374.4,"median":61.3,"p95":72.2,"p99":91.8},"scenarioCounts":{"Get response code 200":600},"errors":{},"codes":{"200":600},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     },
     {
         'stats_id': 'bfffc67a-fc64-478d-a47d-5112524ba92c',
@@ -599,7 +599,7 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:31:01.310Z',
         'phase_status': 'final_report',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:30:59.800Z","scenariosCreated":2000,"scenariosCompleted":2000,"requestsCompleted":2000,"latency":{"min":58.9,"max":373.3,"median":60.4,"p95":74.5,"p99":90},"rps":{"count":2000,"mean":19.91},"scenarioDuration":{"min":59.4,"max":373.8,"median":61,"p95":75.1,"p99":90.5},"scenarioCounts":{"Get response code 200":2000},"errors":{},"codes":{"200":2000},"matches":0,"customStats":{},"counters":{},"concurrency":3,"pendingRequests":3,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:30:59.800Z","scenariosCreated":2000,"scenariosCompleted":2000,"requestsCompleted":2000,"latency":{"min":58.9,"max":373.3,"median":60.4,"p95":74.5,"p99":90},"rps":{"count":2000,"mean":20},"scenarioDuration":{"min":59.4,"max":373.8,"median":61,"p95":75.1,"p99":90.5},"scenarioCounts":{"Get response code 200":2000},"errors":{},"codes":{"200":2000},"matches":0,"customStats":{},"counters":{},"concurrency":3,"pendingRequests":3,"scenariosAvoided":0}'
     },
     {
         'stats_id': '5e6afaff-c4e7-46b1-948a-f1769ed46243',
@@ -609,7 +609,7 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:31:01.663Z',
         'phase_status': 'final_report',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:31:00.150Z","scenariosCreated":2000,"scenariosCompleted":2000,"requestsCompleted":2000,"latency":{"min":59.2,"max":346.1,"median":60.8,"p95":75,"p99":91.2},"rps":{"count":2000,"mean":19.91},"scenarioDuration":{"min":59.6,"max":346.6,"median":61.4,"p95":75.7,"p99":91.7},"scenarioCounts":{"Get response code 200":2000},"errors":{},"codes":{"200":2000},"matches":0,"customStats":{},"counters":{},"concurrency":3,"pendingRequests":3,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:31:00.150Z","scenariosCreated":2000,"scenariosCompleted":2000,"requestsCompleted":2000,"latency":{"min":59.2,"max":346.1,"median":60.8,"p95":75,"p99":91.2},"rps":{"count":2000,"mean":20},"scenarioDuration":{"min":59.6,"max":346.6,"median":61.4,"p95":75.7,"p99":91.7},"scenarioCounts":{"Get response code 200":2000},"errors":{},"codes":{"200":2000},"matches":0,"customStats":{},"counters":{},"concurrency":3,"pendingRequests":3,"scenariosAvoided":0}'
     },
     {
         'stats_id': '0b2b5782-4020-4eaa-9acb-d2364843ebe5',
@@ -619,6 +619,6 @@ const PARALLEL_INTERMEDIATE_AND_SUMMARY_ROWS = [
         'stats_time': '2019-03-10T17:31:02.589Z',
         'phase_status': 'final_report',
         'phase_index': '0',
-        'data': '{"timestamp":"2019-03-10T17:31:01.077Z","scenariosCreated":2000,"scenariosCompleted":2000,"requestsCompleted":2000,"latency":{"min":59.3,"max":374,"median":60.9,"p95":75.6,"p99":90.1},"rps":{"count":2000,"mean":19.91},"scenarioDuration":{"min":59.8,"max":374.4,"median":61.4,"p95":76.1,"p99":90.6},"scenarioCounts":{"Get response code 200":2000},"errors":{},"codes":{"200":2000},"matches":0,"customStats":{},"counters":{},"concurrency":3,"pendingRequests":3,"scenariosAvoided":0}'
+        'data': '{"timestamp":"2019-03-10T17:31:01.077Z","scenariosCreated":2000,"scenariosCompleted":2000,"requestsCompleted":2000,"latency":{"min":59.3,"max":374,"median":60.9,"p95":75.6,"p99":90.1},"rps":{"count":2000,"mean":20},"scenarioDuration":{"min":59.8,"max":374.4,"median":61.4,"p95":76.1,"p99":90.6},"scenarioCounts":{"Get response code 200":2000},"errors":{},"codes":{"200":2000},"matches":0,"customStats":{},"counters":{},"concurrency":3,"pendingRequests":3,"scenariosAvoided":0}'
     }
 ];

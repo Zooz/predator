@@ -5,10 +5,10 @@ const constants = require('../../../../../src/reports/utils/constants');
 const logger = require('../../../../common/logger');
 let client;
 
-const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_type, report_id, job_id, test_type, status, phase, start_time, test_name, test_description, test_configuration, notes) values(?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
-const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET status=?, phase=?, last_stats=?, end_time=? WHERE test_id=? AND report_id=? AND report_type=?';
-const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=? AND report_type=?';
-const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=? AND report_type=?';
+const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
+const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=?, end_time=? WHERE test_id=? AND report_id=?';
+const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
+const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
 const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports LIMIT ?';
 const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(runner_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
 const GET_REPORT_STATS = 'SELECT * FROM reports_stats WHERE test_id=? AND report_id=?';
@@ -38,28 +38,28 @@ async function init(cassandraClient) {
     client = cassandraClient;
 }
 
-function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
+function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
     let params;
     const testNotes = notes || '';
-    params = [testId, revisionId, 'basic', reportId, jobId, testType, constants.REPORT_INITIALIZING_STATUS, '0', startTime, testName, testDescription, testConfiguration, testNotes];
+    params = [testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
     return executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
 }
 
-function updateReport(testId, reportId, status, phaseIndex, lastStats, endTime) {
+function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime) {
     let params;
-    params = [status, phaseIndex, lastStats, endTime, testId, reportId, 'basic'];
+    params = [phaseIndex, lastUpdatedAt, endTime, testId, reportId];
     return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
 }
 
 function getReport(testId, reportId) {
     let params;
-    params = [testId, reportId, 'basic'];
+    params = [testId, reportId];
     return getReportsAndParse(GET_REPORT_SUMMARY, params, queryOptions);
 }
 
 function getReports(testId) {
     let params;
-    params = [testId, 'basic'];
+    params = [testId];
     return getReportsAndParse(GET_REPORTS_SUMMARIES, params, queryOptions);
 }
 

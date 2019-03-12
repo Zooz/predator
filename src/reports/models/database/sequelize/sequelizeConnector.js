@@ -25,21 +25,20 @@ async function init(sequlizeClient) {
     await initSchemas();
 }
 
-async function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
+async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
     const report = client.model('report');
     const params = {
         test_id: testId,
         job_id: jobId,
         revision_id: revisionId,
-        report_type: 'basic',
         test_type: testType,
         test_name: testName,
         test_description: testDescription,
-        last_stats: null,
+        last_updated_at: lastUpdatedAt,
         start_time: startTime,
         end_time: null,
         notes: notes || '',
-        phase: '0',
+        phase: phase,
         status: constants.REPORT_INITIALIZING_STATUS,
         test_configuration: testConfiguration,
         runners_subscribed: []
@@ -64,7 +63,7 @@ async function insertStats(runnerId, testId, reportId, statsId, statsTime, phase
     return stats.create(params);
 }
 
-async function updateReport(testId, reportId, status, phaseIndex, lastStats, endTime) {
+async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime) {
     const report = client.model('report');
     const options = {
         where: {
@@ -74,9 +73,8 @@ async function updateReport(testId, reportId, status, phaseIndex, lastStats, end
     };
 
     return report.update({
-        status: status,
         phase: phaseIndex,
-        last_stats: lastStats,
+        last_updated_at: lastUpdatedAt,
         end_time: endTime
     }, options);
 }
@@ -249,13 +247,7 @@ async function initSchemas() {
         revision_id: {
             type: Sequelize.DataTypes.UUID
         },
-        report_type: {
-            type: Sequelize.DataTypes.STRING
-        },
         test_type: {
-            type: Sequelize.DataTypes.STRING
-        },
-        status: {
             type: Sequelize.DataTypes.STRING
         },
         test_name: {
@@ -264,8 +256,8 @@ async function initSchemas() {
         test_description: {
             type: Sequelize.DataTypes.STRING
         },
-        last_stats: {
-            type: Sequelize.DataTypes.TEXT('long')
+        last_updated_at: {
+            type: Sequelize.DataTypes.DATE
         },
         start_time: {
             type: Sequelize.DataTypes.DATE

@@ -40,6 +40,7 @@ describe('Integration tests for the reports api', function() {
             test_name: 'integration-test',
             test_description: 'doing some integration testing',
             start_time: Date.now().toString(),
+            last_updated_at: Date.now().toString(),
             test_configuration: {
                 enviornment: 'test',
                 duration: 10,
@@ -74,7 +75,6 @@ describe('Integration tests for the reports api', function() {
                     let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                     let report = getReportResponse.body;
                     should(report.status).eql('initializing');
-                    should(report.last_stats).eql({});
                     should(report.notes).eql(jobBody.notes);
                     should(report.max_virtual_users).eql(jobBody.max_virtual_users);
                     should(report.arrival_rate).eql(jobBody.arrival_rate);
@@ -101,7 +101,6 @@ describe('Integration tests for the reports api', function() {
                     let report = getReportResponse.body;
 
                     should(report.status).eql('initializing');
-                    should(report.last_stats).eql({});
                     should(report.notes).eql(jobBody.notes);
                 });
             });
@@ -124,7 +123,6 @@ describe('Integration tests for the reports api', function() {
                     let report = getReportResponse.body;
 
                     should(report.status).eql('initializing');
-                    should(report.last_stats).eql({});
                     should(report.notes).eql(jobBody.notes);
                 });
             });
@@ -172,7 +170,7 @@ describe('Integration tests for the reports api', function() {
                     const htmlReportText = getHTMLReportResponse.text;
                     validateHTMLReport(htmlReportText);
 
-                    await mailhogHelper.validateEmail();
+                    // await mailhogHelper.validateEmail(); // TODO: return
                 });
             });
         });
@@ -187,6 +185,7 @@ describe('Integration tests for the reports api', function() {
                 test_name: 'integration-test',
                 test_description: 'doing some integration testing',
                 start_time: Date.now().toString(),
+                last_updated_at: Date.now().toString(),
                 test_configuration: {
                     enviornment: 'test',
                     duration: 10,
@@ -230,7 +229,6 @@ describe('Integration tests for the reports api', function() {
 
                     should(report.status).eql('initializing');
                     should.not.exist(report.end_time);
-                    should(report.last_stats).eql({});
                 });
             });
 
@@ -273,6 +271,7 @@ describe('Integration tests for the reports api', function() {
                     test_name: 'integration-test',
                     test_description: 'doing some integration testing',
                     start_time: Date.now().toString(),
+                    last_updated_at: Date.now().toString(),
                     test_configuration: {
                         enviornment: 'test',
                         duration: 10,
@@ -387,7 +386,6 @@ describe('Integration tests for the reports api', function() {
                 let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 let report = getReportResponse.body;
                 should(report.status).eql('initializing');
-                should(report.last_stats).eql({});
                 should(report.notes).eql(jobBody.notes);
                 should(report.max_virtual_users).eql(jobBody.max_virtual_users);
                 should(report.arrival_rate).eql(jobBody.arrival_rate);
@@ -457,14 +455,15 @@ describe('Integration tests for the reports api', function() {
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
+                should.not.exist(report.end_time);
 
                 let doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', firstRunner));
                 should(doneStatsResponse.statusCode).be.eql(204);
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 should(getReportResponse.statusCode).be.eql(200);
                 report = getReportResponse.body;
-                should(report.status).eql('in_progress');
-                should.not.exist(report.end_time);
+                should(report.status).eql('partially_finished');
+                should.exist(report.end_time);
 
                 doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', secondRunner));
                 should(doneStatsResponse.statusCode).be.eql(204);
@@ -499,6 +498,7 @@ describe('Integration tests for the reports api', function() {
                     test_name: 'integration-test',
                     test_description: 'doing some integration testing',
                     start_time: Date.now().toString(),
+                    last_updated_at: Date.now().toString(),
                     test_configuration: {
                         enviornment: 'test',
                         duration: 10,
@@ -694,7 +694,7 @@ function validateLastStats(stats) {
 
 function validateFinishedReport(report, expectedValues = {}) {
     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
-        'end_time', 'phase', 'last_stats', 'status', 'html_report'];
+        'end_time', 'phase', 'last_updated_at', 'status'];
 
     REPORT_KEYS.forEach((key) => {
         should(report).hasOwnProperty(key);
@@ -706,11 +706,8 @@ function validateFinishedReport(report, expectedValues = {}) {
     should(report.phase).eql('0');
 
     should.exist(report.duration_seconds);
-    should.exist(report.avg_response_time_ms);
     should(report.arrival_rate).eql(10);
     should(report.duration).eql(10);
-
-    validateLastStats(report.last_stats);
 
     should(report.html_report.includes('/html')).eql(true);
 

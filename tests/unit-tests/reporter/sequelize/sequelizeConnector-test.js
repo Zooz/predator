@@ -117,16 +117,16 @@ describe('Sequelize client tests', function () {
 
     describe('Insert new report', () => {
         it('should succeed full insert', async () => {
-            await sequelizeConnector.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes);
+            const lastUpdateAt = Date.now();
+            await sequelizeConnector.insertReport(testId, revisionId, reportId, jobId, testType, '0', startTime, testName, testDescription, testConfiguration, notes, lastUpdateAt);
 
             should(sequelizeFindOrCreateStub.args[0][0]).eql({
                 'defaults': {
                     'job_id': jobId,
                     'end_time': null,
-                    'last_stats': null,
+                    'last_updated_at': lastUpdateAt,
                     'notes': 'some notes',
                     'phase': '0',
-                    'report_type': 'basic',
                     'revision_id': revisionId,
                     'start_time': startTime,
                     'status': 'initializing',
@@ -293,16 +293,14 @@ describe('Sequelize client tests', function () {
     describe('Update report', () => {
         it('should succeed updating report', async () => {
             const endTime = Date.now();
+            const lastUpdatedAt = Date.now();
 
-            await sequelizeConnector.updateReport(testId, reportId, 'intermediate', 0, { median: 1 }, endTime);
+            await sequelizeConnector.updateReport(testId, reportId, '0', lastUpdatedAt, endTime);
 
             should(sequelizeUpdateStub.args[0][0]).eql({
                 'end_time': endTime,
-                'last_stats': {
-                    'median': 1
-                },
-                'phase': 0,
-                'status': 'intermediate'
+                'last_updated_at': lastUpdatedAt,
+                'phase': '0',
             });
 
             should(sequelizeUpdateStub.args[0][1]).eql({
