@@ -1,12 +1,11 @@
 'use strict';
 const databaseConfig = require('../../../../config/databaseConfig');
-const constants = require('../../../../../src/reports/utils/constants');
 
 const logger = require('../../../../common/logger');
 let client;
 
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
-const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=?, end_time=? WHERE test_id=? AND report_id=?';
+const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=?';
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
 const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports LIMIT ?';
@@ -45,28 +44,28 @@ function insertReport(testId, revisionId, reportId, jobId, testType, phase, star
     return executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
 }
 
-function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime) {
+function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
     let params;
-    params = [phaseIndex, lastUpdatedAt, endTime, testId, reportId];
+    params = [phaseIndex, lastUpdatedAt, testId, reportId];
     return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
 }
 
 function getReport(testId, reportId) {
     let params;
     params = [testId, reportId];
-    return getReportsAndParse(GET_REPORT_SUMMARY, params, queryOptions);
+    return joinReportsWIthSubscribers(GET_REPORT_SUMMARY, params, queryOptions);
 }
 
 function getReports(testId) {
     let params;
     params = [testId];
-    return getReportsAndParse(GET_REPORTS_SUMMARIES, params, queryOptions);
+    return joinReportsWIthSubscribers(GET_REPORTS_SUMMARIES, params, queryOptions);
 }
 
 function getLastReports(limit) {
     let params;
     params = [limit];
-    return getReportsAndParse(GET_LAST_SUMMARIES, params, queryOptions);
+    return joinReportsWIthSubscribers(GET_LAST_SUMMARIES, params, queryOptions);
 }
 
 function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
@@ -81,19 +80,13 @@ function getStats(testId, reportId) {
     return executeQuery(GET_REPORT_STATS, params, queryOptions);
 }
 
-function subscribeRunner(testId, reportId, runnerId) {
+function subscribeRunner(testId, reportId, runnerId, subscriberStage) {
     let params;
-    params = [testId, reportId, runnerId, constants.SUBSCRIBER_INITIALIZING_STAGE];
+    params = [testId, reportId, runnerId, subscriberStage];
     return executeQuery(SUBSCRIBE_RUNNER, params, queryOptions);
 }
 
 async function updateSubscribers(testId, reportId, runnerId, stage) {
-    const report = await getReport(testId, reportId);
-    if (report.length === 0) {
-        let error = new Error('Report not found');
-        error.statusCode = 404;
-        throw error;
-    }
     let params;
     params = [stage, testId, reportId, runnerId];
     return executeQuery(UPDATE_SUBSCRIBERS, params, queryOptions);
@@ -119,7 +112,7 @@ function executeQuery(query, params, queryOptions) {
     });
 }
 
-async function getReportsAndParse(query, params, queryOptions) {
+async function joinReportsWIthSubscribers(query, params, queryOptions) {
     let subscribers, report;
     const reports = await executeQuery(query, params, queryOptions);
 

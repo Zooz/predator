@@ -2,8 +2,6 @@
 
 const should = require('should');
 const uuid = require('uuid/v4');
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
 
 const statsGenerator = require('./helpers/statsGenerator');
 const reportsRequestCreator = require('./helpers/requestCreator');
@@ -128,7 +126,7 @@ describe('Integration tests for the reports api', function() {
             });
         });
 
-        describe('Create report, post stats, and get final html report', function () {
+        describe('Create report, post stats, and get final report', function () {
             describe('Create report with all fields, and post full cycle stats', async function () {
                 before(async function () {
                     const jobResponse = await createJob(testId, ['mickey@dog.com'], ['https://webhook.here.com']);
@@ -165,12 +163,7 @@ describe('Integration tests for the reports api', function() {
                         notes: 'My first performance test'
                     });
 
-                    let getHTMLReportResponse = await reportsRequestCreator.getHTMLReport(testId, reportId);
-                    getHTMLReportResponse.statusCode.should.eql(200);
-                    const htmlReportText = getHTMLReportResponse.text;
-                    validateHTMLReport(htmlReportText);
-
-                    // await mailhogHelper.validateEmail(); // TODO: return
+                    await mailhogHelper.validateEmail();
                 });
             });
         });
@@ -221,7 +214,7 @@ describe('Integration tests for the reports api', function() {
 
                 reports.forEach((report) => {
                     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
-                        'phase', 'status', 'html_report'];
+                        'phase', 'status'];
 
                     REPORT_KEYS.forEach((key) => {
                         should(report).hasOwnProperty(key);
@@ -248,6 +241,15 @@ describe('Integration tests for the reports api', function() {
                 const lastReports = getLastReportsResponse.body;
 
                 should(lastReports.length).eql(5);
+
+                lastReports.forEach((report) => {
+                    const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
+                        'phase', 'status'];
+
+                    REPORT_KEYS.forEach((key) => {
+                        should(report).hasOwnProperty(key);
+                    });
+                });
             });
         });
 
@@ -709,17 +711,11 @@ function validateFinishedReport(report, expectedValues = {}) {
     should(report.arrival_rate).eql(10);
     should(report.duration).eql(10);
 
-    should(report.html_report.includes('/html')).eql(true);
-
     if (expectedValues) {
         for (let key in expectedValues) {
             should(report[key]).eql(expectedValues[key]);
         }
     }
-}
-
-function validateHTMLReport(text) {
-    const parsedHTMLReport = new JSDOM(text);
 }
 
 function createJob(testId, emails, webhooks) {

@@ -11,7 +11,8 @@ const defaultBody = {
     docker_name: 'zooz/predator-runner:latest',
     job_platform: process.env.JOB_PLATFORM || 'DOCKER',
     runner_cpu: 1,
-    runner_memory: 2048
+    runner_memory: 2048,
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 const updateBodyWithTypes = {
     influx_metrics: {
@@ -62,7 +63,8 @@ const requestBody =
             username: 'string_value_username',
             password: 'string_value',
             timeout: 2
-        }
+        },
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000
     };
 const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
 const requestBodyNotValidType = { runner_cpu: 'not_int' };

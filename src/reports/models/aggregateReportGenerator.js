@@ -1,31 +1,27 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
 let _ = require('lodash');
 let math = require('mathjs');
 
 let logger = require('../../common/logger');
 let databaseConnector = require('./databaseConnector');
-let reportsManager = require('./reportsManager');
 let constants = require('../utils/constants');
 
 const STATS_INTERVAL = 30;
 
-module.exports.createFinalReport = async (testId, reportId) => {
-    let stats, report;
-    report = await reportsManager.getReport(testId, reportId);
-    stats = await databaseConnector.getStats(testId, reportId);
+module.exports.createAggregateReport = async (report) => {
+    let stats;
+    stats = await databaseConnector.getStats(report.test_id, report.report_id);
 
     if (stats.length === 0) {
-        let errorMessage = `Can not generate artillery report as testId: ${testId} and reportId: ${reportId} is not found`;
+        let errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${report.test_id} and reportId: ${report.report_id}`;
         logger.error(errorMessage);
         let error = new Error(errorMessage);
         error.statusCode = 404;
         return Promise.reject(error);
     }
 
-    let reportInput = { intermediate: [], final_report: [] };
+    let reportInput = { intermediates: [] };
     reportInput.duration = math.min(report.duration, Math.floor(report.duration_seconds));
     reportInput.start_time = report.start_time;
     reportInput.parallelism = report.parallelism;
@@ -38,10 +34,7 @@ module.exports.createFinalReport = async (testId, reportId) => {
             data.bucket = Math.floor((new Date(data.timestamp).getTime() - new Date(report.start_time).getTime()) / 1000 / STATS_INTERVAL) * STATS_INTERVAL;
             switch (stat.phase_status) {
             case 'intermediate':
-                reportInput.intermediate.push(data);
-                break;
-            case 'final_report':
-                reportInput.final_report.push(data);
+                reportInput.intermediates.push(data);
                 break;
             default:
                 logger.warn(stat, 'Received unknown stat from database while creating report');
@@ -53,29 +46,15 @@ module.exports.createFinalReport = async (testId, reportId) => {
     });
 
     if (report.parallelism > 1) {
-        const bucketIntemerdiates = _.groupBy(reportInput.intermediate, 'bucket');
-        reportInput.intermediate = _.keysIn(bucketIntemerdiates).map((bucket) => {
+        const bucketIntemerdiates = _.groupBy(reportInput.intermediates, 'bucket');
+        reportInput.intermediates = _.keysIn(bucketIntemerdiates).map((bucket) => {
             return createAggregateManually(bucketIntemerdiates[bucket]);
         });
     }
 
-    if (_.isEmpty(reportInput.final_report)) {
-        reportInput.aggregate = createAggregateManually(reportInput.intermediate);
-    } else {
-        reportInput.aggregate = createAggregateManually(reportInput.final_report);
-    }
+    reportInput.aggregate = createAggregateManually(reportInput.intermediates);
 
     return reportInput;
-};
-
-module.exports.generateReportFromTemplate = (reportInput) => {
-    let templateFn = path.join(
-        path.dirname(__filename),
-        './templates/index.html.ejs');
-    let template = fs.readFileSync(templateFn, 'utf-8');
-    let compiledTemplate = _.template(template);
-    let html = compiledTemplate({ report: JSON.stringify(reportInput, null, 2) });
-    return html;
 };
 
 function createAggregateManually(listOfStats) {

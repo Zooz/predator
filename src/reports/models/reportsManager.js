@@ -9,8 +9,6 @@ const databaseConnector = require('./databaseConnector'),
     notifier = require('./notifier'),
     constants = require('../utils/constants');
 
-const MINIMUM_WAIT_FOR_DELAYED_REPORT_UPDATE_MS = 30000;
-
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
 
@@ -20,7 +18,7 @@ module.exports.getReport = async (testId, reportId) => {
         throw error;
     }
     let config = await configHandler.getConfig();
-    let report = getReportResponse(reportSummary[0], config);
+    let report = await getReportResponse(reportSummary[0], config);
     return report;
 };
 
@@ -59,37 +57,27 @@ module.exports.postReport = async (testId, reportBody) => {
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, phase, startTime, reportBody.test_name,
         reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now());
-    await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id);
+    await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id, constants.SUBSCRIBER_INITIALIZING_STAGE);
     return reportBody;
 };
 
-module.exports.postStats = async (testId, reportId, stats) => {
-    const statsTime = new Date(Number(stats.stats_time));
-    await notifier.notifyIfNeeded(testId, reportId, stats);
-
-    await databaseConnector.updateSubscribers(testId, reportId, stats.runner_id, stats.phase_status);
-    const report = await module.exports.getReport(testId, reportId);
-    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
-    await module.exports.updateReport(report, stats);
-
-    return stats;
-};
-
-module.exports.updateReport = async (report, stats) => {
+module.exports.postStats = async (report, stats) => {
     const statsParsed = JSON.parse(stats.data);
     const statsTime = statsParsed.timestamp;
-    const reportStatus = calculateReportStatus(report);
-    const endTime = reportStatus === constants.REPORT_FINISHED_STATUS || reportStatus === constants.REPORT_PARTIALLY_FINISHED_STATUS
-        ? statsTime : undefined;
-    await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime, endTime);
+
+    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
+    await databaseConnector.updateSubscribers(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
+    await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime);
+    report = await module.exports.getReport(report.test_id, report.report_id);
+    notifier.notifyIfNeeded(report, stats);
+
+    return stats;
 };
 
 function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
-
-    let htmlReportUrl = config.external_address + `/tests/${summaryRow.test_id}/reports/${summaryRow.report_id}/html`;
 
     let report = {
         test_id: summaryRow.test_id,
@@ -102,23 +90,24 @@ function getReportResponse(summaryRow, config) {
         end_time: summaryRow.end_time || undefined,
         phase: summaryRow.phase,
         duration_seconds: (new Date(timeEndOrCurrent).getTime() - new Date(summaryRow.start_time).getTime()) / 1000,
-        avg_response_time_ms: undefined,
         arrival_rate: testConfiguration.arrival_rate,
         duration: testConfiguration.duration,
         ramp_to: testConfiguration.ramp_to,
         parallelism: testConfiguration.parallelism,
         max_virtual_users: testConfiguration.max_virtual_users,
         last_updated_at: summaryRow.last_updated_at,
-        html_report: htmlReportUrl,
         grafana_report: generateGraphanaUrl(summaryRow, config.grafana_url),
         notes: summaryRow.notes,
         environment: testConfiguration.environment,
         subscribers: summaryRow.subscribers
     };
 
-    report.status = calculateReportStatus(report);
+    report.status = calculateReportStatus(report, config);
 
-    if (report.status === constants.REPORT_FAILED_STATUS || report.status === constants.REPORT_ABORTED_STATUS) {
+    const STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
+        constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
+
+    if (STATUSES_WITH_END_TIME.includes(report.status)) {
         report.end_time = report.last_updated_at;
     }
     return report;
@@ -132,11 +121,11 @@ function generateGraphanaUrl(report, grafanaUrl) {
     }
 }
 
-function calculateReportStatus(report) {
+function calculateReportStatus(report, config) {
     const subscribersStages = getListOfSubscribersStages(report);
     const uniqueSubscribersStages = _.uniq(subscribersStages);
 
-    const delayedTimeInMs = Math.max(report.duration * 0.01, MINIMUM_WAIT_FOR_DELAYED_REPORT_UPDATE_MS);
+    const delayedTimeInMs = Math.max(report.duration * 0.01, config.minimum_wait_for_delayed_report_status_update_in_ms);
     const reportDurationMs = report.duration * 1000;
     const reportStartTimeMs = new Date(report.start_time).getTime();
 
@@ -148,14 +137,8 @@ function calculateReportStatus(report) {
         } else {
             return constants.REPORT_FAILED_STATUS;
         }
-    } else if (allSubscribersInitializing(uniqueSubscribersStages)) {
-        return constants.REPORT_INITIALIZING_STATUS;
-    } else if (allSubscribersStarted(uniqueSubscribersStages)) {
-        return constants.REPORT_STARTED_STATUS;
-    } else if (allSubscribersAborted(uniqueSubscribersStages)) {
-        return constants.REPORT_ABORTED_STATUS;
-    } else if (allSubscribersFailed(uniqueSubscribersStages)) {
-        return constants.REPORT_FAILED_STATUS;
+    } else if (uniqueSubscribersStages.length === 1) {
+        return subscriberStageToReportStatusMap(uniqueSubscribersStages[0]);
     } else {
         return calculateDynamicReportStatus(report, uniqueSubscribersStages);
     }
@@ -181,21 +164,21 @@ function getListOfSubscribersStages (report) {
 }
 
 function allSubscribersFinished (subscriberStages) {
-    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_DONE_STAGE;
+    if (subscriberStages.length === 1) {
+        return subscriberStageToReportStatusMap(subscriberStages) === constants.REPORT_FINISHED_STATUS;
+    }
+    return false;
 }
 
-function allSubscribersAborted (subscriberStages) {
-    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_ABORTED_STAGE;
-}
+function subscriberStageToReportStatusMap (subscriberStage) {
+    const map = {
+        [constants.SUBSCRIBER_INITIALIZING_STAGE]: constants.REPORT_INITIALIZING_STATUS,
+        [constants.SUBSCRIBER_STARTED_STAGE]: constants.REPORT_STARTED_STATUS,
+        [constants.SUBSCRIBER_INTERMEDIATE_STAGE]: constants.REPORT_IN_PROGRESS_STATUS,
+        [constants.SUBSCRIBER_DONE_STAGE]: constants.REPORT_FINISHED_STATUS,
+        [constants.SUBSCRIBER_ABORTED_STAGE]: constants.REPORT_ABORTED_STATUS,
+        [constants.SUBSCRIBER_FAILED_STAGE]: constants.REPORT_FAILED_STATUS
+    };
 
-function allSubscribersFailed (subscriberStages) {
-    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_FAILED_STAGE;
-}
-
-function allSubscribersInitializing (subscriberStages) {
-    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_INITIALIZING_STAGE;
-}
-
-function allSubscribersStarted (subscriberStages) {
-    return subscriberStages.length === 1 && subscriberStages[0] === constants.SUBSCRIBER_STARTED_STAGE;
+    return map[subscriberStage];
 }

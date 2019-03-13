@@ -80,7 +80,7 @@ const JOB = {
     environment: 'test'
 };
 
-describe.skip('Reports manager tests', function () {
+describe('Reports manager tests', function () {
     let sandbox;
     let loggerErrorStub;
     let loggerInfoStub;

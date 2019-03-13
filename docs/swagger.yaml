@@ -1012,6 +1012,9 @@ definitions:
       runner_memory:
         type: number
         description: Max memory to use by each runner.
+      minimum_wait_for_delayed_report_status_update_in_ms:
+        type: number
+        description: the number of ms that report should wait in non-finished mode before updating its status to partially finished or failed
       metrics_plugin_name:
         type: string
         enum: ['influx','prometheus']
@@ -1161,7 +1164,6 @@ definitions:
     - start_time
     - end_time
     - duration_seconds
-    - avg_response_time_ms
     - arrival_rate
     properties:
       test_id:
@@ -1193,9 +1195,6 @@ definitions:
       duration_seconds:
         type: number
         description: The length of test in seconds
-      avg_response_time_ms:
-        type: number
-        description: The average response time of the requests
       arrival_rate:
         type: number
         description: Arrival rate set for the test (how many requests send per second)

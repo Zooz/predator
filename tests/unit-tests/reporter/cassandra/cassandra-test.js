@@ -255,7 +255,7 @@ describe('Cassandra client tests', function() {
             clientExecuteStub.resolves({ result: { rowLength: 0 } });
 
             let query = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, stage) values(?,?,?,?)';
-            return cassandraClient.subscribeRunner('test_id', 'report_id', 'runner_id', 'stage')
+            return cassandraClient.subscribeRunner('test_id', 'report_id', 'runner_id', 'initializing')
                 .then(function(result){
                     loggerErrorStub.callCount.should.eql(0);
                     clientExecuteStub.getCall(0).args[0].should.eql(query);
@@ -287,35 +287,15 @@ describe('Cassandra client tests', function() {
             let cassandraResponse = { rows: [REPORT] };
             clientExecuteStub.resolves(cassandraResponse);
 
-            let getReportQuery = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
-            let getReportSubscribersQuery = 'SELECT * FROM report_subscribers WHERE test_id=? AND report_id=?';
             let query = 'UPDATE report_subscribers SET stage=? WHERE test_id=? AND report_id=? AND runner_id=?';
             return cassandraClient.updateSubscribers('test_id', 'report_id', 'runner_id', 'intermediate')
                 .then(function(result){
                     loggerErrorStub.callCount.should.eql(0);
-                    clientExecuteStub.getCall(0).args[0].should.eql(getReportQuery);
-                    clientExecuteStub.getCall(1).args[0].should.eql(getReportSubscribersQuery);
-                    clientExecuteStub.getCall(2).args[0].should.eql(query);
-                    clientExecuteStub.getCall(2).args[1][0].should.eql('intermediate');
-                    clientExecuteStub.getCall(2).args[1][1].should.eql('test_id');
-                    clientExecuteStub.getCall(2).args[1][2].should.eql('report_id');
-                    clientExecuteStub.getCall(2).args[1][3].should.eql('runner_id');
-                });
-        });
-
-        it('should fail to update subscriber stage in report that does not exist', function(){
-            let cassandraResponse = { rows: [] };
-            clientExecuteStub.onCall(0).resolves(cassandraResponse);
-
-            let getReportQuery = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
-            return cassandraClient.updateSubscribers('test_id', 'report_id', 'runner_id', 'intermediate')
-                .then(function(result){
-                    loggerErrorStub.callCount.should.eql(0);
-                    clientExecuteStub.getCall(0).args[0].should.eql(getReportQuery);
-                    should.not.exist(result);
-                }).catch((err) => {
-                    should.exist(err);
-                    err.message.should.eql('Report not found');
+                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql('intermediate');
+                    clientExecuteStub.getCall(0).args[1][1].should.eql('test_id');
+                    clientExecuteStub.getCall(0).args[1][2].should.eql('report_id');
+                    clientExecuteStub.getCall(0).args[1][3].should.eql('runner_id');
                 });
         });
     });

@@ -1,18 +1,17 @@
 
 'use strict';
-let finalReportGenerator = require('../models/finalReportGenerator');
+let aggregateReportGenerator = require('../models/aggregateReportGenerator');
 let reports = require('../models/reportsManager');
 
-module.exports.getHtmlReport = async function (req, res, next) {
-    let reportInput, htmlTemplate;
+module.exports.getAggregateReport = async function (req, res, next) {
+    let reportInput;
     try {
-        reportInput = await finalReportGenerator.createFinalReport(req.params.test_id, req.params.report_id);
-        htmlTemplate = await finalReportGenerator.generateReportFromTemplate(reportInput);
+        reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
     } catch (err) {
         return next(err);
     }
 
-    return res.send(htmlTemplate);
+    return res.send(reportInput);
 };
 
 module.exports.getReport = async (req, res, next) => {
@@ -61,7 +60,8 @@ module.exports.postReport = async (req, res, next) => {
 
 module.exports.postStats = async (req, res, next) => {
     try {
-        await reports.postStats(req.params.test_id, req.params.report_id, req.body);
+        const report = await reports.getReport(req.params.test_id, req.params.report_id);
+        await reports.postStats(report, req.body);
     } catch (err) {
         return next(err);
     }

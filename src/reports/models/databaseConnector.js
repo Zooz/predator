@@ -25,8 +25,8 @@ function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, 
     return databaseConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 }
 
-function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime) {
-    return databaseConnector.updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime);
+function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
+    return databaseConnector.updateReport(testId, reportId, phaseIndex, lastUpdatedAt);
 }
 
 function getLastReports(limit) {
@@ -45,8 +45,8 @@ function getStats(testId, reportId) {
     return databaseConnector.getStats(testId, reportId);
 }
 
-function subscribeRunner(testId, reportId, runnerId) {
-    return databaseConnector.subscribeRunner(testId, reportId, runnerId);
+function subscribeRunner(testId, reportId, runnerId, subscriberStage) {
+    return databaseConnector.subscribeRunner(testId, reportId, runnerId, subscriberStage);
 }
 
 function updateSubscribers(testId, reportId, runnerId, stage) {
