@@ -9,12 +9,13 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
             runner_id: runnerId,
             phase_status: 'error',
             stats_time: Date.now().toString(),
-            data: JSON.stringify({message: error.message}),
+            data: JSON.stringify({ timestamp: Date.now(), message: error.message}),
             error
         };
         break;
     case 'started_phase':
         const startedPhaseInfo = {
+            'timestamp': Date.now(),
             'duration': 120,
             'arrivalRate': 500,
             'mode': 'uniform',
@@ -30,7 +31,7 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
         break;
     case 'intermediate':
         const intermediatePhaseInfo = {
-            'timestamp': '2019-01-22T14:43:24.910Z',
+            'timestamp': Date.now(),
             'scenariosCreated': 101,
             'scenariosCompleted': 101,
             'requestsCompleted': 101,
@@ -75,7 +76,7 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
         break;
     case 'done':
         const donePhaseInfo = {
-            'timestamp': '2019-01-22T14:44:37.667Z',
+            'timestamp': Date.now(),
             'scenariosCreated': 150,
             'scenariosCompleted': 150,
             'requestsCompleted': 150,
@@ -120,7 +121,7 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
         break;
     case 'aborted':
         const abortedPhaseInfo = {
-
+            'timestamp': Date.now()
         };
         stats = {
             runner_id: runnerId,

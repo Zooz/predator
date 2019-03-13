@@ -123,13 +123,11 @@ describe('Sequelize client tests', function () {
             should(sequelizeFindOrCreateStub.args[0][0]).eql({
                 'defaults': {
                     'job_id': jobId,
-                    'end_time': null,
                     'last_updated_at': lastUpdateAt,
                     'notes': 'some notes',
                     'phase': '0',
                     'revision_id': revisionId,
                     'start_time': startTime,
-                    'status': 'initializing',
                     'test_configuration': testConfiguration,
                     'test_description': 'desc',
                     'test_id': testId,
@@ -298,7 +296,6 @@ describe('Sequelize client tests', function () {
             await sequelizeConnector.updateReport(testId, reportId, '0', lastUpdatedAt, endTime);
 
             should(sequelizeUpdateStub.args[0][0]).eql({
-                'end_time': endTime,
                 'last_updated_at': lastUpdatedAt,
                 'phase': '0',
             });

@@ -1338,7 +1338,6 @@ components:
         - start_time
         - end_time
         - duration_seconds
-        - avg_response_time_ms
         - arrival_rate
       properties:
         test_id:
@@ -1370,9 +1369,6 @@ components:
           type: number
           description: The duration of the test in seconds.
           example: 60
-        avg_response_time_ms:
-          type: number
-          description: The average response time of the requests.
         arrival_rate:
           type: number
           description: The arrival rate that was set for the test. This is the number of times per second that the test scenarios will run.

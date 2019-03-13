@@ -6,18 +6,23 @@ let sinon = require('sinon');
 let should = require('should');
 let logger = require('../../../../src/common/logger');
 let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
-let reportsManager = require('../../../../src/reports/models/reportsManager');
+let aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
 let configHandler = require('../../../../src/configManager/models/configHandler');
 let nodemailer = require('nodemailer');
 
 const REPORT = {
-    'test_id': 'test id',
+    'test_id': 'test_id',
     'revision_id': 'revision_id',
     'report_id': 'report_id',
     'test_name': 'test name',
-    'report_url': 'http://www.zooz.com',
-    'last_stats': {
+    'grafana_url': 'http://www.grafana.zooz.com',
+    'end_time': 1527533519591,
+    'start_time': 1527533459591
+};
+
+const AGGREGATE_REPORT = {
+    aggregate: {
         'timestamp': '2018-05-28T15:40:10.044Z',
         'scenariosCreated': 289448,
         'scenariosCompleted': 289447,
@@ -54,14 +59,13 @@ const REPORT = {
         'customStats': {},
         'concurrency': 1510,
         'pendingRequests': 1471
-    },
-    'end_time': 1527533519591,
-    'start_time': 1527533459591
+    }
 };
 
 const JOB = {
     'emails': 'eli@zooz.com'
 };
+
 const CONFIG = {
     port: 111,
     host: 'smtp_host_test',
@@ -74,17 +78,17 @@ const transporter = {
 };
 
 describe('Report emails sender test', () => {
-    let sandbox, getReportStub, getJobStub, loggerErrorStub, loggerInfoStub, nodemailerCreateTransportStub, sendMailStub, getConfig;
+    let sandbox, getJobStub, loggerErrorStub, loggerInfoStub, nodemailerCreateTransportStub, sendMailStub, getConfig, aggregateReportGeneratorStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
-        getReportStub = sandbox.stub(reportsManager, 'getReport');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
         getConfig = sandbox.stub(configHandler, 'getConfigValue');
         nodemailerCreateTransportStub = sandbox.stub(nodemailer, 'createTransport');
         sendMailStub = sandbox.stub(transporter, 'sendMail');
+        aggregateReportGeneratorStub = sandbox.stub(aggregateReportGenerator, 'createAggregateReport');
     });
 
     beforeEach(() => {
@@ -98,11 +102,10 @@ describe('Report emails sender test', () => {
     it('Send aggregate report successfully', async () => {
         sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
-        getReportStub.resolves(REPORT);
-        getJobStub.resolves(JOB);
+        aggregateReportGeneratorStub.resolves(AGGREGATE_REPORT);
         getConfig.resolves({});
 
-        await reportEmailSender.sendAggregateReport('testId', 'reportId', 'http://report.zooz.com', 'http://grafana.zooz.com');
+        await reportEmailSender.sendAggregateReport(REPORT, JOB);
 
         sendMailStub.callCount.should.equal(1);
         sendMailStub.args.should.containDeep([
@@ -121,7 +124,7 @@ describe('Report emails sender test', () => {
         loggerInfoStub.args.should.deepEqual([
             [
                 { status: 201 },
-                'Send email successfully for testId: testId, reportId: reportId'
+                'Sent email successfully for testId: test_id, reportId: report_id'
             ]
         ]);
     });
@@ -129,63 +132,21 @@ describe('Report emails sender test', () => {
     it('Send aggregate report fails because of error invoking smtp client', async () => {
         const error = new Error('Failed to connect to SMTP client');
         sendMailStub.resolves({ status: 201 });
+        aggregateReportGeneratorStub.resolves(AGGREGATE_REPORT);
         nodemailerCreateTransportStub.throws(error);
-        getReportStub.resolves(REPORT);
-        getJobStub.resolves(JOB);
 
-        await reportEmailSender.sendAggregateReport('testId', 'reportId', 'REPORT_DATA');
+        await reportEmailSender.sendAggregateReport(REPORT, JOB);
 
         loggerErrorStub.callCount.should.equal(1);
         loggerErrorStub.args[0][0].should.eql(error);
     });
 
-    it('Error retrieving report', async () => {
-        const expectedError = new Error('Failed to retrieve report');
-        sendMailStub.resolves({ status: 201 });
-        nodemailerCreateTransportStub.returns(transporter);
-        getReportStub.rejects(expectedError);
-        getJobStub.resolves(JOB);
-
-        let testShouldFail = true;
-        try {
-            await reportEmailSender.sendAggregateReport('testId', 'reportId', 'REPORT_DATA');
-        } catch (error) {
-            testShouldFail = false;
-            error.message.should.eql('Failed to retrieve summary for testId: testId, reportId: reportId');
-            loggerErrorStub.callCount.should.eql(1);
-            loggerErrorStub.args[0][0].should.eql(expectedError);
-        }
-
-        testShouldFail.should.eql(false, 'Test action was supposed to get exception');
-    });
-
-    it('Error retrieving job', async () => {
-        const expectedError = new Error('Failed to retrieve job');
-        sendMailStub.resolves({ status: 201 });
-        nodemailerCreateTransportStub.returns(transporter);
-        getReportStub.resolves(REPORT);
-        getJobStub.rejects(expectedError);
-
-        let testShouldFail = true;
-        try {
-            await reportEmailSender.sendAggregateReport('testId', 'reportId', 'REPORT_DATA');
-        } catch (error) {
-            testShouldFail = false;
-            error.message.should.eql('Failed to retrieve summary for testId: testId, reportId: reportId');
-            loggerErrorStub.callCount.should.eql(1);
-            loggerErrorStub.args[0][0].should.eql(expectedError);
-        }
-
-        testShouldFail.should.eql(false, 'Test action was supposed to get exception');
-    });
-
     it('Verify transporter options', async () => {
         sendMailStub.resolves({ status: 201 });
-        getReportStub.resolves(REPORT);
-        getJobStub.resolves(JOB);
+        aggregateReportGeneratorStub.resolves(AGGREGATE_REPORT);
         getConfig.resolves(CONFIG);
         nodemailerCreateTransportStub.returns(transporter);
-        await reportEmailSender.sendAggregateReport('testId', 'reportId', 'REPORT_DATA');
+        await reportEmailSender.sendAggregateReport(REPORT, JOB);
         should(nodemailerCreateTransportStub.args[0][0].host).eql('smtp_host_test');
         should(nodemailerCreateTransportStub.args[0][0].port).eql(111);
         should(nodemailerCreateTransportStub.args[0][0].connectionTimeout).eql(222);

@@ -3,7 +3,6 @@
 const Sequelize = require('sequelize');
 
 const constants = require('../../../utils/constants');
-const logger = require('../../../../common/logger');
 
 let client;
 
@@ -36,10 +35,8 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, phase
         test_description: testDescription,
         last_updated_at: lastUpdatedAt,
         start_time: startTime,
-        end_time: null,
         notes: notes || '',
         phase: phase,
-        status: constants.REPORT_INITIALIZING_STATUS,
         test_configuration: testConfiguration,
         runners_subscribed: []
     };
@@ -63,7 +60,7 @@ async function insertStats(runnerId, testId, reportId, statsId, statsTime, phase
     return stats.create(params);
 }
 
-async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime) {
+async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
     const report = client.model('report');
     const options = {
         where: {
@@ -74,8 +71,7 @@ async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, endTime
 
     return report.update({
         phase: phaseIndex,
-        last_updated_at: lastUpdatedAt,
-        end_time: endTime
+        last_updated_at: lastUpdatedAt
     }, options);
 }
 
@@ -107,28 +103,16 @@ async function updateSubscribers(testId, reportId, runnerId, stage) {
             report_id: reportId
         }
     };
-
     let report = await reportModel.findAll(getReportOptions);
     report = report[0];
 
-    if (!report) {
-        let error = new Error('Report not found');
-        error.statusCode = 404;
-        throw error;
-    }
+    const subscribers = await report.getSubscribers();
+    const subscriberToUpdate = await subscribers.find((subscriber) => {
+        return subscriber.dataValues.runner_id === runnerId;
+    });
 
-    try {
-        const subscribers = await report.getSubscribers();
-        const subscriberToUpdate = await subscribers.find((subscriber) => {
-            return subscriber.dataValues.runner_id === runnerId;
-        });
-
-        await subscriberToUpdate.set('stage', stage);
-        return subscriberToUpdate.save();
-    } catch (e) {
-        logger.error(e, `Failed to update subscriber ${runnerId} in report ${reportId} for test ${testId}`);
-        throw e;
-    }
+    await subscriberToUpdate.set('stage', stage);
+    return subscriberToUpdate.save();
 }
 
 async function getReportsAndParse(query) {
@@ -260,9 +244,6 @@ async function initSchemas() {
             type: Sequelize.DataTypes.DATE
         },
         start_time: {
-            type: Sequelize.DataTypes.DATE
-        },
-        end_time: {
             type: Sequelize.DataTypes.DATE
         },
         notes: {

@@ -12,13 +12,13 @@ let reportsManager = require('../../../../src/reports/models/reportsManager');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
 let reportWebhookSender = require('../../../../src/reports/models/reportWebhookSender');
 let statsFormatter = require('../../../../src/reports/models/statsFormatter');
-let finalReportGenerator = require('../../../../src/reports/models/finalReportGenerator');
+let aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
 let databaseConnector = require('../../../../src/reports/models/databaseConnector');
 
 describe.skip('Webhook/email notifier test', () => {
     let sandbox, databaseConnectorInsertSummaryStub, databaseConnectorInsertStatsStub,
         databaseConnectorGetSummaryStub, loggerInfoStub, loggerWarnStub, reportWebhookSenderSendStub, statsFormatterStub,
-        finalReportGeneratorStub, reportEmailSenderSendStub, reportsManagerStub, jobsManagerStub, dateGetTimeStub,
+        aggregateReportGeneratorStub, reportEmailSenderSendStub, reportsManagerStub, jobsManagerStub, dateGetTimeStub,
         reportsManagerUpdateReportStatusStub;
 
     before(() => {
@@ -33,7 +33,7 @@ describe.skip('Webhook/email notifier test', () => {
         loggerWarnStub = sandbox.stub(logger, 'warn');
         reportWebhookSenderSendStub = sandbox.stub(reportWebhookSender, 'send');
         statsFormatterStub = sandbox.stub(statsFormatter, 'getStatsFormatted');
-        finalReportGeneratorStub = sandbox.stub(finalReportGenerator, 'createFinalReport');
+        aggregateReportGeneratorStub = sandbox.stub(aggregateReportGenerator, 'createFinalReport');
         reportEmailSenderSendStub = sandbox.stub(reportEmailSender, 'sendAggregateReport');
         reportsManagerStub = sandbox.stub(reportsManager, 'getReport');
         reportsManagerUpdateReportStatusStub = sandbox.stub(reportsManager, 'updateReport');
@@ -261,7 +261,7 @@ describe.skip('Webhook/email notifier test', () => {
         databaseConnectorGetSummaryStub.resolves({rows: [{status: 'in_progress', start_time: 123456, end_time: 24567}]});
         databaseConnectorInsertStatsStub.resolves();
         reportWebhookSenderSendStub.resolves();
-        finalReportGeneratorStub.resolves();
+        aggregateReportGeneratorStub.resolves();
         reportsManagerStub.resolves({
             test_id: 'test_id',
             start_time: '12345',
@@ -335,7 +335,7 @@ describe.skip('Webhook/email notifier test', () => {
         databaseConnectorGetSummaryStub.resolves({rows: [{status: 'started', start_time: 123456, end_time: 24567}]});
         databaseConnectorInsertStatsStub.resolves();
         reportWebhookSenderSendStub.resolves();
-        finalReportGeneratorStub.resolves();
+        aggregateReportGeneratorStub.resolves();
         reportsManagerStub.resolves({
             test_id: 'test_id',
             start_time: '12345',
