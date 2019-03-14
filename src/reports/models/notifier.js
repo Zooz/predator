@@ -65,14 +65,12 @@ function handleStart(report, job) {
 function handleIntermediate(report, job, stats, statsData) {
     let webhookMessage;
 
-    if (report && report.status === constants.REPORT_STARTED_STATUS) {
+    if (report && report.status === constants.REPORT_STARTED_STATUS && job.webhooks) {
         const phaseIndex = report.phase;
         webhookMessage = `🤔 *Test ${report.test_name} with id: ${report.test_id} first batch of results arrived for phase ${phaseIndex}.*\n${statsFromatter.getStatsFormatted('intermediate', statsData)}\n`;
         if (report.grafana_report) {
             webhookMessage += `<${report.grafana_report}|Track report in grafana dashboard>`;
         }
-    }
-    if (job.webhooks && webhookMessage) {
         reportWebhookSender.send(job.webhooks, webhookMessage);
     }
 }

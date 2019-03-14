@@ -5,7 +5,6 @@ const rewire = require('rewire');
 const sinon = require('sinon');
 
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
-const reportsManager = rewire('../../../../src/reports/models/reportsManager');
 const jobsManager = require('../../../../src/jobs/models/jobManager');
 const logger = require('../../../../src/common/logger');
 const notifier = require('../../../../src/reports/models/notifier');
@@ -92,7 +91,6 @@ describe('Reports manager tests', function () {
     let databaseSubscribeRunnerStub;
     let databaseUpdateSubscribersStub;
     let databaseUpdateReportStub;
-    let reportManagerUpdateReportStub;
     let getJobStub;
     let configStub;
     let notifierStub;
@@ -143,7 +141,6 @@ describe('Reports manager tests', function () {
             databaseGetReportStub.resolves([REPORT]);
             const report = await manager.getReport();
             should.exist(report);
-            should(report.last_stats).eql(JSON.parse(REPORT.last_stats));
             should.exist(report.grafana_report);
             should(report.grafana_report).eql(REPORT.grafana_report);
         });
@@ -157,7 +154,6 @@ describe('Reports manager tests', function () {
             databaseGetReportStub.resolves([REPORT]);
             const report = await manager.getReport();
             should.exist(report);
-            should(report.last_stats).eql(JSON.parse(REPORT.last_stats));
             should.not.exist(report.grafana_report);
             should(report.grafana_report).eql(undefined);
         });
@@ -232,158 +228,16 @@ describe('Reports manager tests', function () {
     describe('Create new stats', function () {
         it('Stats consumer handles message', async () => {
             configStub.resolves({});
-            reportManagerUpdateReportStub = sandbox.stub(reportsManager, 'updateReport');
             databaseGetReportStub.resolves([REPORT]);
             databasePostStatsStub.resolves();
-            reportManagerUpdateReportStub.resolves();
             getJobStub.resolves(JOB);
             databaseUpdateSubscribersStub.resolves();
             notifierStub.resolves();
             const stats = { phase_status: 'intermediate', data: JSON.stringify({ median: 4 }) };
 
-            const statsResponse = await manager.postStats('test_id', 'report_id', stats);
+            const statsResponse = await manager.postStats('test_id', stats);
             should.exist(statsResponse);
             statsResponse.should.eql(stats);
-            reportManagerUpdateReportStub.restore();
-        });
-    });
-
-    describe('Update report status', function () {
-        describe('Update report without parallelism', function () {
-            it('Should update report successfully to started', async function () {
-                REPORT.status = constants.REPORT_INITIALIZING_STATUS;
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_STARTED_STAGE;
-                const data = JSON.stringify({ arrival_rate: '5', duration: '5' });
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_STARTED_STATUS, { phase_status: constants.SUBSCRIBER_STARTED_STAGE, data });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_STARTED_STATUS]);
-            });
-
-            it('Should update report successfully to in progress', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_INTERMEDIATE_STAGE;
-                const data = REPORT.last_stats;
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_IN_PROGRESS_STATUS, { phase_status: constants.SUBSCRIBER_INTERMEDIATE_STAGE, data });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_IN_PROGRESS_STATUS]);
-            });
-
-            it('Should update report successfully to finished', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_DONE_STAGE;
-                const data = REPORT.last_stats;
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_FINISHED_STATUS, { phase_status: constants.SUBSCRIBER_DONE_STAGE, data });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_FINISHED_STATUS]);
-            });
-
-            it('Should update report successfully to aborted', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_ABORTED_STAGE;
-                const data = JSON.stringify({ arrival_rate: '5', duration: '5' });
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_ABORTED_STATUS, { phase_status: constants.SUBSCRIBER_ABORTED_STAGE, data });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_ABORTED_STATUS]);
-            });
-
-            it('Should update report successfully to failed', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_FAILED_STAGE;
-                const error = new Error('error');
-                const data = JSON.stringify({ message: error.message });
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_FAILED_STATUS, { phase_status: constants.SUBSCRIBER_FAILED_STAGE, data });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_FAILED_STATUS]);
-            });
-        });
-
-        describe('Update report with parallelism - no delayed update', async () => {
-            before(() => {
-                REPORT.subscribers = [
-                    { runner_id: '1234', stage: constants.SUBSCRIBER_STARTED_STAGE },
-                    { runner_id: '5678', stage: constants.SUBSCRIBER_STARTED_STAGE }
-                ];
-            });
-
-            it('Should update report successfully to started', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_STARTED_STAGE;
-                const data = JSON.stringify({ arrival_rate: '5', duration: '5' });
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_STARTED_STATUS, { phase_status: constants.SUBSCRIBER_STARTED_STAGE, data });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_STARTED_STATUS]);
-            });
-
-            it('Should update report successfully to in progress', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_INTERMEDIATE_STAGE;
-                const data = REPORT.last_stats;
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_IN_PROGRESS_STATUS, {
-                    phase_status: constants.SUBSCRIBER_INTERMEDIATE_STAGE,
-                    data
-                });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_IN_PROGRESS_STATUS]);
-            });
-
-            it('Should update report successfully to finished', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_DONE_STAGE;
-                REPORT.subscribers[1].stage = constants.SUBSCRIBER_DONE_STAGE;
-                const data = REPORT.last_stats;
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_FINISHED_STATUS, {
-                    phase_status: constants.SUBSCRIBER_DONE_STAGE,
-                    data
-                });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_FINISHED_STATUS]);
-            });
-
-            it('Should update report successfully to aborted', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_ABORTED_STAGE;
-                REPORT.subscribers[1].stage = constants.SUBSCRIBER_ABORTED_STAGE;
-                const data = JSON.stringify({ arrival_rate: '5', duration: '5' });
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_ABORTED_STATUS, {
-                    phase_status: constants.SUBSCRIBER_ABORTED_STAGE,
-                    data
-                });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_ABORTED_STATUS]);
-            });
-
-            it('Should update report successfully to failed', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_FAILED_STAGE;
-                REPORT.subscribers[1].stage = constants.SUBSCRIBER_FAILED_STAGE;
-                const error = new Error('error');
-                const data = JSON.stringify({ message: error.message });
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_FAILED_STATUS, {
-                    phase_status: constants.SUBSCRIBER_FAILED_STAGE,
-                    data
-                });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_FAILED_STATUS]);
-            });
-
-            it('Should update report successfully to partially finished (one runner failed and one finished)', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_DONE_STAGE;
-                REPORT.subscribers[1].stage = constants.SUBSCRIBER_FAILED_STAGE;
-                databaseGetReportStub.resolves([REPORT]);
-                const error = new Error('error');
-                const data = JSON.stringify({ message: error.message });
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_FINISHED_STATUS, {
-                    phase_status: constants.SUBSCRIBER_DONE_STAGE,
-                    data
-                });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_PARTIALLY_FINISHED_STATUS]);
-            });
-
-            it('Should update report successfully to partially finished (one runner aborted and one finished)', async function () {
-                REPORT.subscribers[0].stage = constants.SUBSCRIBER_DONE_STAGE;
-                REPORT.subscribers[1].stage = constants.SUBSCRIBER_ABORTED_STAGE;
-                databaseGetReportStub.resolves([REPORT]);
-                const error = new Error('error');
-                const data = JSON.stringify({ message: error.message });
-                databaseUpdateReportStub.resolves();
-                await reportsManager.updateReport(REPORT, constants.REPORT_FINISHED_STATUS, {
-                    phase_status: constants.SUBSCRIBER_DONE_STAGE,
-                    data
-                });
-                should(databaseUpdateReportStub.args[0]).containDeepOrdered(['test_id', 'report_id', constants.REPORT_PARTIALLY_FINISHED_STATUS]);
-            });
         });
     });
 });
