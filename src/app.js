@@ -18,7 +18,7 @@ let path = require('path');
 let zip = require('express-easy-zip');
 
 module.exports = () => {
-    return swaggerValidator.init('./docs/swagger.yaml', { beautifyErrors: true })
+    return swaggerValidator.init('./docs/openapi3.yaml', { beautifyErrors: true })
         .then(() => {
             return database.init();
         }).then(() => {

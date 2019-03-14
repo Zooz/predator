@@ -493,7 +493,7 @@ describe('Integration tests for the reports api', function() {
                 secondRunner = uuid();
 
                 minimalReportBody = {
-                    test_type: 'custom',
+                    test_type: 'basic',
                     report_id: reportId,
                     revision_id: uuid(),
                     job_id: jobId,
@@ -659,7 +659,7 @@ describe('Integration tests for the reports api', function() {
                 lastReportsResponse.body.should.eql({
                     message: 'Input validation error',
                     validation_errors: [
-                        'query/limit should be number'
+                        'query/limit should be integer'
                     ]
                 });
             });
