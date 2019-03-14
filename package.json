@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "unit-tests": "nyc --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
+    "unit-tests": "nyc --check-coverage --lines 94 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "end-to-end-tests": "bash ./tests/end-to-end-tests/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh",
@@ -45,7 +45,7 @@
     "cron": "^1.6.0",
     "dockerode": "^2.5.8",
     "express": "^4.16.4",
-    "express-ajv-swagger-validation": "^0.6.2",
+    "express-ajv-swagger-validation": "^0.9.0",
     "express-easy-zip": "^1.1.4",
     "express-requests-logger": "^1.0.18",
     "fs": "0.0.1-security",

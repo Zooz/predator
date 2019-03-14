@@ -33,18 +33,6 @@ module.exports = [
     key: 3,
     primaryText: 'Docs',
     nestedItems: [
-      {
-        key: 0,
-        primaryText: 'Tests API',
-        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/api/blob/master/docs/swagger.yaml'
-      }, {
-        key: 1,
-        primaryText: 'Scheduler API',
-        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/scheduler/blob/master/docs/swagger.yaml'
-      }, {
-        key: 2,
-        primaryText: 'Reporter API',
-        linkUrl: 'https://git.zooz.co/PaymentsOS/performance-framework/reporter/blob/master/docs/swagger.yaml'
-      }]
+      ]
   }
 ];
