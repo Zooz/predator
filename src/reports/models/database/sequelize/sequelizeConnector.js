@@ -217,7 +217,7 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING
         },
         last_stats: {
-            type: Sequelize.DataTypes.STRING
+            type: Sequelize.DataTypes.TEXT('long')
         }
     });
 
