@@ -116,8 +116,7 @@ describe('Reports manager tests', function () {
         manager.__set__('configHandler', {
             getConfig: () => {
                 return {
-                    job_platform: 'KUBERNETES',
-                    external_address: 'http://www.zooz.com'
+                    job_platform: 'KUBERNETES'
                 };
             }
         });

@@ -91,7 +91,7 @@ describe('Sequelize client tests', function () {
         testId = uuid.v4();
         jobId = uuid.v4();
         revisionId = uuid.v4();
-        testType = 'custom';
+        testType = 'basic';
         startTime = Date.now();
         testName = 'unit-test';
         testDescription = 'desc';
@@ -132,7 +132,7 @@ describe('Sequelize client tests', function () {
                     'test_description': 'desc',
                     'test_id': testId,
                     'test_name': 'unit-test',
-                    'test_type': 'custom',
+                    'test_type': 'basic',
                     'runners_subscribed': []
                 },
                 'where': {

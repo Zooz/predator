@@ -4,12 +4,11 @@ const should = require('should');
 const rewire = require('rewire');
 const configConstants = require('../../../../src/common/consts').CONFIG;
 
-const valuesToCheck = ['grafana_url', 'external_address', 'internal_address', 'docker_name', 'job_platform', 'runner_memory', 'runner_cpu', 'metrics_plugin_name', 'minimum_wait_for_delayed_report_status_update_in_ms'];
+const valuesToCheck = ['grafana_url', 'internal_address', 'docker_name', 'job_platform', 'runner_memory', 'runner_cpu', 'metrics_plugin_name', 'minimum_wait_for_delayed_report_status_update_in_ms'];
 
 let manager;
 const expectedTypes = {
     grafana_url: undefined,
-    external_address: undefined,
     internal_address: undefined,
     docker_name: undefined,
     job_platform: undefined,
@@ -26,7 +25,6 @@ const expectedTypes = {
 
 function changeAllEnvData() {
     process.env.GRAFANA_URL = 'grafana_url_test';
-    process.env.EXTERNAL_ADDRESS = 'external_address_test';
     process.env.INTERNAL_ADDRESS = 'internal_address_test';
     process.env.DOCKER_NAME = 'docker_name_test';
     process.env.JOB_PLATFORM = 'job_platform_test';

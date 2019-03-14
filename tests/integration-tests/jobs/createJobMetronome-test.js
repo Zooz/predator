@@ -19,7 +19,7 @@ describe('Create job specific metronome tests', async function () {
                 await schedulerRequestCreator.init();
                 await testsRequestCreator.init();
 
-                let requestBody = require('../../testExamples/Custom_test');
+                let requestBody = require('../../testExamples/Basic_test');
                 let response = await testsRequestCreator.createTest(requestBody, {});
                 should(response.statusCode).eql(201);
                 should(response.body).have.key('id');

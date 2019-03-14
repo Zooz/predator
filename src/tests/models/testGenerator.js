@@ -5,7 +5,7 @@ const database = require('./database');
 const { get, cloneDeep } = require('lodash');
 
 module.exports.createTest = async function(testDetails) {
-    if (testDetails.type === consts.TEST_TYPE_CUSTOM) {
+    if (testDetails.type === consts.TEST_TYPE_BASIC) {
         let artillery = testDetails.artillery_test;
         delete testDetails.artillery_test;
         return artillery;

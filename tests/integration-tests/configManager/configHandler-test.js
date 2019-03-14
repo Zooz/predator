@@ -6,7 +6,6 @@ const validationError = 'Input validation error';
 const configValues = require('../../../src/common/consts').CONFIG;
 
 const defaultBody = {
-    external_address: 'http://localhost:80',
     internal_address: 'http://localhost:80',
     docker_name: 'zooz/predator-runner:latest',
     job_platform: process.env.JOB_PLATFORM || 'DOCKER',
@@ -38,7 +37,6 @@ const updateBodyWithTypes = {
 const requestBody =
     {
         grafana_url: 'string_value_grafana_url',
-        external_address: 'string_value_external_address',
         internal_address: 'string_value_internal_address',
         docker_name: 'string_value_docker_name',
         job_platform: 'string_value_job_platform',

@@ -958,7 +958,7 @@ components:
           type: string
           enum:
             - dsl
-            - custom
+            - basic
     dsl:
       description: A test that is made of scenarios base on domain specific language
       allOf:
@@ -1001,7 +1001,7 @@ components:
       type: object
       additionalProperties:
         type: string
-    custom:
+    basic:
       description: A test that is made of artillery json
       allOf:
         - $ref: '#/components/schemas/test'
@@ -1057,9 +1057,9 @@ components:
           type: string
           enum:
             - dsl
-            - custom
+            - basic
           description: >-
-            the type of the test, custom - an artillery json created by the
+            the type of the test, basic - an artillery json created by the
             client, dsl - a test with saved request definitions api.
         raw_data:
           type: array

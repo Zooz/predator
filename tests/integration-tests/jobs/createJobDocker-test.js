@@ -18,7 +18,7 @@ if (dockerConfig.host) {
         key: dockerConfig.certPath ? fs.readFileSync(dockerConfig.certPath + '/key.pem') : undefined
     };
 } else {
-    dockerConnection = ({ socketPath: '/var/run/docker.sock' });
+    dockerConnection = ({socketPath: '/var/run/docker.sock'});
 }
 let docker = new Docker(dockerConnection);
 
@@ -36,7 +36,7 @@ describe('Create job specific docker tests', async function () {
                 await schedulerRequestCreator.init();
                 await testsRequestCreator.init();
 
-                let requestBody = require('../../testExamples/Custom_test');
+                let requestBody = require('../../testExamples/Basic_test');
                 let response = await testsRequestCreator.createTest(requestBody, {});
                 should(response.statusCode).eql(201);
                 should(response.body).have.key('id');
@@ -106,6 +106,12 @@ describe('Create job specific docker tests', async function () {
                         });
 
                         should(containers.length).eql(2);
+                    });
+
+                    it('Get logs', async () => {
+                        let logs = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {});
+                        should(logs.status).eql(200);
+                        should(logs.headers['content-type']).eql('application/zip')
                     });
 
                     it('Stop run', async () => {

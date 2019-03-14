@@ -1,5 +1,5 @@
 module.exports = {
-    TEST_TYPE_CUSTOM: 'custom',
+    TEST_TYPE_BASIC: 'basic',
     TEST_TYPE_DSL: 'dsl',
     ERROR_MESSAGES: {
         NOT_FOUND: 'Not found',
@@ -11,7 +11,6 @@ module.exports = {
 
     CONFIG: {
         GRFANA_URL: 'grafana_url',
-        EXTERNAL_ADDRESS: 'external_address',
         INTERNAL_ADDRESS: 'internal_address',
         DOCKER_NAME: 'docker_name',
         JOB_PLATFORM: 'job_platform',

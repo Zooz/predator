@@ -20,7 +20,7 @@ describe('Integration tests for the reports api', function() {
         await testsRequestCreator.init();
         await jobRequestCreator.init();
 
-        let requestBody = require('../../testExamples/Custom_test');
+        let requestBody = require('../../testExamples/Basic_test');
         let response = await testsRequestCreator.createTest(requestBody, {});
         should(response.statusCode).eql(201);
         should(response.body).have.key('id');
@@ -31,7 +31,7 @@ describe('Integration tests for the reports api', function() {
         reportId = uuid();
 
         minimalReportBody = {
-            test_type: 'custom',
+            test_type: 'basic',
             report_id: reportId,
             job_id: undefined,
             revision_id: uuid(),
@@ -174,7 +174,7 @@ describe('Integration tests for the reports api', function() {
             let reportBody = {
                 report_id: reportId,
                 revision_id: uuid(),
-                test_type: 'custom',
+                test_type: 'basic',
                 test_name: 'integration-test',
                 test_description: 'doing some integration testing',
                 start_time: Date.now().toString(),
@@ -266,7 +266,7 @@ describe('Integration tests for the reports api', function() {
 
                 minimalReportBody = {
                     runner_id: runnerId,
-                    test_type: 'custom',
+                    test_type: 'basic',
                     report_id: reportId,
                     revision_id: uuid(),
                     job_id: jobId,

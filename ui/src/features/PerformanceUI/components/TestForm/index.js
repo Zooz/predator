@@ -28,7 +28,7 @@ export class TestForm extends React.Component {
         scenarios: [],
         before: null,
         isBeforeSelected: false,
-        type: 'custom',
+        type: 'basic',
         name: '',
         baseUrl: '',
         description: '',

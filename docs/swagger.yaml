@@ -477,6 +477,37 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/error_response"
+  /v1/jobs/{job_id}/runs/{run_id}/logs:
+    get:
+      tags:
+      - jobs
+      description: get logs of specific job.
+      parameters:
+      - in: path
+        description: The ID of the job.
+        name: job_id
+        required: true
+        type: string
+      - in: path
+        description: The id of a specific run in metronome which is also the report id.
+        name: run_id
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success
+        404:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/error_response"
+        501:
+          description: Not Implemented
+          schema:
+            $ref: "#/definitions/error_response"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/error_response"
   /v1/tests/{test_id}/reports:
     post:
       tags:
@@ -749,7 +780,7 @@ definitions:
         description: A description of the test.
       type:
         type: string
-        enum: ['dsl', 'custom']
+        enum: ['dsl', 'basic']
   dsl:
     description: A test that is made of scenarios base on domain specific language
     allOf:
@@ -783,7 +814,7 @@ definitions:
     type: object
     additionalProperties:
       type: string
-  custom:
+  basic:
     description: A test that is made of artillery json
     allOf:
     - $ref: '#/definitions/test'
@@ -834,8 +865,8 @@ definitions:
         description: The description of the test
       type:
         type: string
-        enum: [dsl, custom]
-        description: the type of the test, custom - an artillery json created by the client, dsl - a test with saved request definitions api.
+        enum: [dsl, basic]
+        description: the type of the test, basic - an artillery json created by the client, dsl - a test with saved request definitions api.
       raw_data:
         type: array
         items:
@@ -884,10 +915,6 @@ definitions:
     - arrival_rate
     - duration
     properties:
-      variables:
-        type: object
-        description: "Variables that the artillery uses and can be defined by the user. Supported variables: 1) appId - if specifed merchantId must be a variable too."
-        example: {appId: 'App-name', merchantId: 'cd44fc7a-7719-4383-9981-427ff1210553'}
       test_id:
         type: string
         pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
@@ -994,9 +1021,6 @@ definitions:
       grafana_url:
         type: string
         description: The url for grafana.
-      external_address:
-        type: string
-        description: Exposed address of the deployed service.
       internal_address:
         type: string
         description: The local ip address of your machine.
@@ -1180,7 +1204,7 @@ definitions:
         description: The id of the job in the scheduler
       test_type:
         type: string
-        description: The type of the test, can be paymentsos or custom
+        description: The type of the test, can be paymentsos or basic
       status:
         type: string
         description: The status of the running test

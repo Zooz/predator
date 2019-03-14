@@ -20,7 +20,7 @@ describe('Create job specific kubernetes tests', async function () {
                     await schedulerRequestCreator.init();
                     await testsRequestCreator.init();
 
-                    let requestBody = require('../../testExamples/Custom_test');
+                    let requestBody = require('../../testExamples/Basic_test');
                     let response = await testsRequestCreator.createTest(requestBody, {});
                     should(response.statusCode).eql(201);
                     should(response.body).have.key('id');
@@ -131,7 +131,6 @@ describe('Create job specific kubernetes tests', async function () {
                             environment: 'test',
                             run_immediately: true,
                             max_virtual_users: 500
-
                         };
 
                         expectedResult = {
@@ -164,6 +163,35 @@ describe('Create job specific kubernetes tests', async function () {
 
                         should(getJobsFromService.status).eql(200);
                         should(getJobsFromService.body).containEql(expectedResult);
+                    });
+
+                    it('Get logs', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}`)
+                            .reply(200, {
+                                spec: { selector: { matchLabels: { 'controller-uid': 'uid' } } }
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods?labelSelector=controller-uid=uid`)
+                            .reply(200, {
+                                items: [{ metadata: { name: 'podA' } }, { metadata: { name: 'podB' } }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podA/log`)
+                            .reply(200, {
+                                items: [{ content: 'log' }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podB/log`)
+                            .reply(200, {
+                                items: [{ content: 'log' }]
+                            });
+
+                        let getLogsResponse = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getLogsResponse.status).eql(200);
+                        should(getLogsResponse.headers['content-type']).eql('application/zip');
                     });
 
                     it('Stop run', async () => {
@@ -352,6 +380,22 @@ describe('Create job specific kubernetes tests', async function () {
                             'Content-Type': 'application/json'
                         });
                         should(stopRunResponse.statusCode).eql(404);
+                    });
+                });
+
+                describe('Failures on getLogs', () => {
+                    it('Gets logs should return 401', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job_id-run_id`)
+                            .reply(401, {
+                                error: 'error '
+                            });
+
+                        let getLogsResponse = await schedulerRequestCreator.getLogs('job_id', 'run_id', {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getLogsResponse.status).eql(401);
+                        should(getLogsResponse.headers['content-type']).eql('application/json; charset=utf-8');
                     });
                 });
             });
