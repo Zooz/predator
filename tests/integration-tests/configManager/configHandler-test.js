@@ -6,12 +6,12 @@ const validationError = 'Input validation error';
 const configValues = require('../../../src/common/consts').CONFIG;
 
 const defaultBody = {
-    external_address: 'http://localhost:80',
     internal_address: 'http://localhost:80',
     docker_name: 'zooz/predator-runner:latest',
     job_platform: process.env.JOB_PLATFORM || 'DOCKER',
     runner_cpu: 1,
-    runner_memory: 2048
+    runner_memory: 2048,
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 const updateBodyWithTypes = {
     influx_metrics: {
@@ -37,7 +37,6 @@ const updateBodyWithTypes = {
 const requestBody =
     {
         grafana_url: 'string_value_grafana_url',
-        external_address: 'string_value_external_address',
         internal_address: 'string_value_internal_address',
         docker_name: 'string_value_docker_name',
         job_platform: 'string_value_job_platform',
@@ -62,7 +61,8 @@ const requestBody =
             username: 'string_value_username',
             password: 'string_value',
             timeout: 2
-        }
+        },
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000
     };
 const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
 const requestBodyNotValidType = { runner_cpu: 'not_int' };

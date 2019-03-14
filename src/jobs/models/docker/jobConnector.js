@@ -76,3 +76,21 @@ module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) 
     }
     );
 };
+
+module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId) => {
+    let containers = await docker.listContainers({ all: true });
+
+    containers = containers.filter(container => container.Names &&
+        container.Names[0] && container.Names[0].includes(jobPlatformName) &&
+        container.Names[0].includes(platformSpecificInternalRunId));
+
+    let logs = [];
+
+    for (let i = 0; i < containers.length; i++) {
+        let containerToGetLogsFrom = await docker.getContainer(containers[i].Id);
+        let logBuffer = await containerToGetLogsFrom.logs({ stdout: true });
+        let logString = logBuffer.toString('utf-8');
+        logs.push({ type: 'file', name: containers[i].Id + '.txt', content: logString });
+    }
+    return logs;
+};

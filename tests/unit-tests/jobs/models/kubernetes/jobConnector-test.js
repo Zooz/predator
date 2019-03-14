@@ -77,4 +77,35 @@ describe('Kubernetes job connector tests', function () {
             }
         });
     });
+
+    describe('Get logs', () => {
+        it('Get logs of specific job', async () => {
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId' })).resolves({
+                spec: { selector: { matchLabels: { 'controller-uid': 'uid' } } }
+            });
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods?labelSelector=controller-uid=uid' })).resolves({
+                items: [{ metadata: { name: 'podA' } }, { metadata: { name: 'podB' } }]
+            });
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podA/log' })).resolves('aLog');
+
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podB/log' })).resolves('bLog');
+
+            let logs = await jobConnector.getLogs('jobPlatformName', 'runId');
+
+            logs.should.eql([{ type: 'file', name: 'podA.txt', content: 'aLog' },
+                { type: 'file', name: 'podB.txt', content: 'bLog' }]);
+        });
+
+        it('Get logs fails due to error in kubernetes', async () => {
+            requestSenderSendStub
+                .withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId' }))
+                .rejects(new Error('Error in kubernetes'));
+            try {
+                await jobConnector.getLogs('jobPlatformName', 'runId');
+                throw new Error('Should not get here');
+            } catch (error) {
+                error.message.should.eql('Error in kubernetes');
+            }
+        });
+    });
 });

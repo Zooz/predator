@@ -8,6 +8,8 @@ const config = {
     host: process.env.RUNNER_IP || '127.0.0.1',
     cassandraReplicationFactor: process.env.CASSANDRA_REPLICATION_FACTOR || 1,
     cassandraConsistency: process.env.CASSANDRA_CONSISTENCY || cassandra.types.consistencies.localQuorum,
+    cassandraKeyspaceStrategy: process.env.CASSANDRA_CONSISTENCY || cassandra.types.consistencies.localQuorum,
+
     sqliteStorage: process.env.SQLITE_STORAGE || 'predator'
 };
 

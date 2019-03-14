@@ -55,6 +55,7 @@
     "babel-runtime": "^6.26.0",
     "classnames": "^2.2.5",
     "cronstrue": "^1.61.0",
+    "dateformat": "^3.0.3",
     "glob": "^7.1.3",
     "history": "^4.7.2",
     "immutable": "^3.8.2",
@@ -77,10 +78,12 @@
     "react-router-redux": "^5.0.0-alpha.9",
     "react-table": "^6.8.2",
     "react-tooltip": "^3.9.0",
+    "recharts": "^1.5.0",
     "redux": "^4.0.0",
     "redux-saga": "^0.16.0",
     "redux-thunk": "^2.2.0",
     "replace-in-file": "^3.4.3",
+    "reselect": "^4.0.0",
     "uuid": "^3.3.2"
   }
 }

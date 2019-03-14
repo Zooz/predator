@@ -9,7 +9,7 @@ module.exports = {
 
 function verifyArtillery(req, res, next) {
     let body = req.body;
-    if (body.type === consts.TEST_TYPE_CUSTOM) {
+    if (body.type === consts.TEST_TYPE_BASIC) {
         let validationOutput = artilleryCheck.validate(body.artillery_test);
         if (!validationOutput.valid) {
             const error = new Error('The artillery json is not valid. Errors: ' + validationOutput.errors.map(error => error.description));

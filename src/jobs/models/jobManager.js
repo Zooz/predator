@@ -63,6 +63,18 @@ module.exports.stopRun = async function (jobId, runId) {
     await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), runId);
 };
 
+module.exports.getLogs = async function (jobId, runId) {
+    const configData = await configHandler.getConfig();
+    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
+    let logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), runId);
+    let response = {
+        files: logs,
+        filename: `${jobId}-${runId}.zip`
+    };
+
+    return response;
+};
+
 module.exports.getJobs = async function (getOneTimeJobs) {
     try {
         let jobs = await databaseConnector.getJobs();

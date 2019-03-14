@@ -18,6 +18,8 @@ describe('Sequelize client tests', function () {
     let sequelizeUpdateStub;
     let sequelizeGetStub;
     let sequelizeDestroyStub;
+    let sequelizeCreateSubscriberStatsStub;
+    let sequelizeGetSubscribersStatsStub;
 
     let reportId;
     let testId;
@@ -29,12 +31,20 @@ describe('Sequelize client tests', function () {
     let testDescription;
     let testConfiguration;
     let notes;
+    let lastStats = JSON.stringify({});
+    let subscribers = [{
+        dataValues: {
+            runner_id: '12345',
+            stage: 'done',
+            last_stats: lastStats
+        }
+    }];
 
     before(() => {
         sandbox = sinon.sandbox.create();
     });
 
-    beforeEach(() => {
+    beforeEach(async () => {
         databaseConfig.type = 'SQLITE';
         databaseConfig.name = 'predator';
         databaseConfig.username = 'username';
@@ -50,20 +60,25 @@ describe('Sequelize client tests', function () {
         sequelizeCloseStub = sandbox.stub();
         sequelizeStub = sandbox.stub();
         sequelizeInsertStatsStub = sandbox.stub();
+        sequelizeCreateSubscriberStatsStub = sandbox.stub();
+        sequelizeGetSubscribersStatsStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
             sync: () => {
+            },
+            hasMany: () => {
+            },
+            save: () => {
             }
         });
 
         sequelizeModelStub.returns({
-            email: {},
-            webhook: {},
             findOrCreate: sequelizeFindOrCreateStub,
             create: sequelizeInsertStatsStub,
             update: sequelizeUpdateStub,
             findAll: sequelizeGetStub,
-            destroy: sequelizeDestroyStub
+            destroy: sequelizeDestroyStub,
+            subscriber: {}
         });
 
         sequelizeStub.returns({
@@ -73,7 +88,8 @@ describe('Sequelize client tests', function () {
             close: sequelizeCloseStub
         });
         sequelizeStub.DataTypes = {
-            TEXT: () => {}
+            TEXT: () => {
+            }
         };
         sequelizeConnector.__set__('Sequelize', sequelizeStub);
 
@@ -81,12 +97,13 @@ describe('Sequelize client tests', function () {
         testId = uuid.v4();
         jobId = uuid.v4();
         revisionId = uuid.v4();
-        testType = 'custom';
+        testType = 'basic';
         startTime = Date.now();
         testName = 'unit-test';
         testDescription = 'desc';
-        testConfiguration = JSON.stringify({ environment: 'test' });
+        testConfiguration = JSON.stringify({environment: 'test'});
         notes = 'some notes';
+        await sequelizeConnector.init(sequelizeStub());
     });
 
     afterEach(() => {
@@ -105,26 +122,23 @@ describe('Sequelize client tests', function () {
 
     describe('Insert new report', () => {
         it('should succeed full insert', async () => {
-            await sequelizeConnector.init(sequelizeStub());
-
-            await sequelizeConnector.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes);
+            const lastUpdateAt = Date.now();
+            await sequelizeConnector.insertReport(testId, revisionId, reportId, jobId, testType, '0', startTime, testName, testDescription, testConfiguration, notes, lastUpdateAt);
 
             should(sequelizeFindOrCreateStub.args[0][0]).eql({
                 'defaults': {
                     'job_id': jobId,
-                    'end_time': null,
-                    'last_stats': null,
+                    'last_updated_at': lastUpdateAt,
                     'notes': 'some notes',
                     'phase': '0',
-                    'report_type': 'basic',
                     'revision_id': revisionId,
                     'start_time': startTime,
-                    'status': 'initialized',
                     'test_configuration': testConfiguration,
                     'test_description': 'desc',
                     'test_id': testId,
                     'test_name': 'unit-test',
-                    'test_type': 'custom',
+                    'test_type': 'basic',
+                    'runners_subscribed': []
                 },
                 'where': {
                     'report_id': reportId
@@ -135,8 +149,6 @@ describe('Sequelize client tests', function () {
 
     describe('Get reports', () => {
         it('should get multiple reports', async () => {
-            await sequelizeConnector.init(sequelizeStub());
-
             let sequelizeResponse = [{
                 dataValues: {
                     reportId,
@@ -148,7 +160,8 @@ describe('Sequelize client tests', function () {
                     testName,
                     testDescription,
                     testConfiguration,
-                    notes
+                    notes,
+                    subscribers
                 }
             }, {
                 dataValues: {
@@ -161,6 +174,7 @@ describe('Sequelize client tests', function () {
                     testName,
                     testDescription,
                     testConfiguration,
+                    subscribers
                 }
             }];
 
@@ -178,7 +192,14 @@ describe('Sequelize client tests', function () {
                 testName,
                 testDescription,
                 testConfiguration,
-                notes
+                notes,
+                subscribers: [
+                    {
+                        runner_id: '12345',
+                        stage: 'done',
+                        last_stats: {}
+                    }
+                ]
             });
             should(reports[1]).eql({
                 reportId,
@@ -189,13 +210,19 @@ describe('Sequelize client tests', function () {
                 startTime,
                 testName,
                 testDescription,
-                testConfiguration
+                testConfiguration,
+                subscribers: [
+                    {
+                        runner_id: '12345',
+                        stage: 'done',
+                        last_stats: {}
+
+                    }
+                ]
             });
         });
 
         it('should get multiple reports - no reports exists', async () => {
-            await sequelizeConnector.init(sequelizeStub());
-
             let sequelizeResponse = [];
 
             sequelizeGetStub.resolves(sequelizeResponse);
@@ -205,10 +232,8 @@ describe('Sequelize client tests', function () {
         });
     });
 
-    describe('Get single report', async () => {
+    describe('Get single report', () => {
         it('should get single report', async () => {
-            await sequelizeConnector.init(sequelizeStub());
-
             let sequelizeResponse = [{
                 dataValues: {
                     reportId,
@@ -220,7 +245,9 @@ describe('Sequelize client tests', function () {
                     testName,
                     testDescription,
                     testConfiguration,
-                    notes                }
+                    notes,
+                    subscribers
+                }
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
@@ -236,10 +263,17 @@ describe('Sequelize client tests', function () {
                 testName,
                 testDescription,
                 testConfiguration,
-                notes
+                notes,
+                subscribers: [
+                    {
+                        runner_id: '12345',
+                        stage: 'done',
+                        last_stats: {}
+                    }
+                ]
             }]);
 
-            should(sequelizeGetStub.args[0][0]).eql({
+            should(sequelizeGetStub.args[0][0]).containEql({
                 'attributes': {
                     'exclude': [
                         'updated_at',
@@ -254,8 +288,6 @@ describe('Sequelize client tests', function () {
         });
 
         it('should return empty response as no such report id exists', async () => {
-            await sequelizeConnector.init(sequelizeStub());
-
             let sequelizeResponse = [];
 
             sequelizeGetStub.resolves(sequelizeResponse);
@@ -267,18 +299,14 @@ describe('Sequelize client tests', function () {
 
     describe('Update report', () => {
         it('should succeed updating report', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             const endTime = Date.now();
+            const lastUpdatedAt = Date.now();
 
-            await sequelizeConnector.updateReport(testId, reportId, 'intermediate', 0, { median: 1 }, endTime);
+            await sequelizeConnector.updateReport(testId, reportId, '0', lastUpdatedAt, endTime);
 
             should(sequelizeUpdateStub.args[0][0]).eql({
-                'end_time': endTime,
-                'last_stats': {
-                    'median': 1
-                },
-                'phase': 0,
-                'status': 'intermediate'
+                'last_updated_at': lastUpdatedAt,
+                'phase': '0',
             });
 
             should(sequelizeUpdateStub.args[0][1]).eql({
@@ -292,18 +320,17 @@ describe('Sequelize client tests', function () {
 
     describe('Insert stats', () => {
         it('should succeed inserting stats', async () => {
-            await sequelizeConnector.init(sequelizeStub());
-            const containerId = uuid();
+            const runnerId = uuid();
             const statsTime = Date.now();
             const statId = uuid();
             const phaseIndex = 0;
             const phaseStatus = 'initiliazed';
             const data = JSON.stringify({message: 'started'});
 
-            await sequelizeConnector.insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
+            await sequelizeConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 
             should(sequelizeInsertStatsStub.args[0][0]).eql({
-                'container_id': containerId,
+                'runner_id': runnerId,
                 'data': data,
                 'phase_index': 0,
                 'phase_status': 'initiliazed',
@@ -317,21 +344,18 @@ describe('Sequelize client tests', function () {
 
     describe('Get stats', () => {
         it('should succeed getting stats', async () => {
-            await sequelizeConnector.init(sequelizeStub());
             const statsTime = Date.now();
             const statId = uuid();
-
-
             let sequelizeResponse = [{
                 dataValues: {
                     stats_id: statId,
                     test_id: testId,
                     report_id: reportId,
-                    container_id: uuid(),
+                    runner_id: uuid(),
                     stats_time: statsTime,
                     phase_status: uuid(),
                     phase_index: uuid(),
-                    data: JSON.stringify({ median: 5 })
+                    data: JSON.stringify({median: 5})
                 }
             }];
 
@@ -349,6 +373,66 @@ describe('Sequelize client tests', function () {
                     test_id: testId
                 }
             });
+        });
+    });
+
+    describe('Subscribe runner', () => {
+        it('Should successfully subscribe runner', async () => {
+            let sequelizeResponse = [{
+                dataValues: {
+                    reportId,
+                    testId,
+                    jobId,
+                    revisionId,
+                    testType,
+                    startTime,
+                    testName,
+                    testDescription,
+                    testConfiguration,
+                    notes
+                },
+                getSubscribers: sequelizeGetSubscribersStatsStub,
+                createSubscriber: sequelizeCreateSubscriberStatsStub
+            }];
+
+            sequelizeGetStub.resolves(sequelizeResponse);
+            await sequelizeConnector.subscribeRunner('test_id', 'report_id', 'runner_id');
+        });
+    });
+
+    describe('Update subscribers', () => {
+        it('Should successfully subscribe runner', async () => {
+            sequelizeGetSubscribersStatsStub.resolves([{
+                dataValues: {
+                    runner_id: 'runner_id',
+                    stage: 'initializing'
+                },
+                set: () => {
+                },
+                save: () => {
+                }
+            }]);
+
+
+            let sequelizeResponse = [{
+                dataValues: {
+                    reportId,
+                    testId,
+                    jobId,
+                    revisionId,
+                    testType,
+                    startTime,
+                    testName,
+                    testDescription,
+                    testConfiguration,
+                    notes
+                },
+                getSubscribers: sequelizeGetSubscribersStatsStub,
+                createSubscriber: sequelizeCreateSubscriberStatsStub
+            }];
+
+            sequelizeGetStub.resolves(sequelizeResponse);
+            await sequelizeConnector.updateSubscribers('test_id', 'report_id', 'runner_id', 'started_phase');
         });
     });
 });

@@ -13,8 +13,7 @@ module.exports = {
     postStats,
     getReport,
     getReports,
-    getLastReports,
-    getHTMLReport
+    getLastReports
 };
 
 async function init() {
@@ -57,14 +56,6 @@ function getReports(testId) {
 
 function getLastReports(limit) {
     return request(testApp).get(`/v1/tests/last_reports?limit=${limit}`)
-        .set(HEADERS)
-        .expect(function(res){
-            return res;
-        });
-}
-
-function getHTMLReport(testId, reportId) {
-    return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}/html`)
         .set(HEADERS)
         .expect(function(res){
             return res;

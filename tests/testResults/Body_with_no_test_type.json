@@ -1,4 +1,4 @@
 {
   "message":"Input validation error",
-  "validation_errors":["body/type should be equal to one of the allowed values [dsl,custom]"]
+  "validation_errors":["body/type should be equal to one of the allowed values [basic,dsl]"]
 }

@@ -90,7 +90,7 @@ class getTests extends React.Component {
     };
 
   editFormatter = (cell, row) => {
-    if (row.type === 'custom') {
+    if (row.type === 'basic') {
       return (
         <i onClick={() => {
           this.setState({ createTest: true, testForEdit: row });
@@ -247,8 +247,7 @@ class getTests extends React.Component {
             {this.state.openViewTest
               ? <Dialog title_key={'id'} data={this.props.test} closeDialog={this.closeViewTestDialog} /> : null}
             {this.state.createTest && <TestForm data={this.state.testForEdit} closeDialog={this.closeCreateTest} />}
-            {/* TODO fix open dialog! */}
-            {(this.state.openViewCreateJob && !this.props.createJobSuccess)// TODO what is this niv title?
+            {(this.state.openViewCreateJob && !this.props.createJobSuccess)
               ? <InputDialog input={<JobForm />} history={history}
                 title={'Create new job'} data={this.props.test}
                 closeDialog={this.closeViewCreateJobDialog} /> : null}

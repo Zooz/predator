@@ -64,7 +64,7 @@ describe('Artillery validator tests', function () {
                 }]
             };
 
-            req = { body: { type: consts.TEST_TYPE_CUSTOM, artillery_test: validArtilleryJson } };
+            req = { body: { type: consts.TEST_TYPE_BASIC, artillery_test: validArtilleryJson } };
             await artilleryValidator.verifyArtillery(req, res, nextStub);
             should(nextStub.calledOnce).eql(true);
         });
@@ -72,7 +72,7 @@ describe('Artillery validator tests', function () {
         it('The artillery json is not a valid json', async () => {
             let invalidArtilleryJson = {};
 
-            req = { body: { type: consts.TEST_TYPE_CUSTOM, artillery_test: invalidArtilleryJson } };
+            req = { body: { type: consts.TEST_TYPE_BASIC, artillery_test: invalidArtilleryJson } };
             await artilleryValidator.verifyArtillery(req, res, nextStub);
             should(nextStub.args[0][0].message).eql('The artillery json is not valid. Errors: Required property \'scenarios\' is missing');
             should(nextStub.args[0][0].statusCode).eql(400);

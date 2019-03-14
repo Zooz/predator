@@ -1,20 +1,25 @@
 'use strict';
 process.env.JOB_PLATFORM = 'KUBERNETES';
-let should = require('should');
-let rewire = require('rewire');
-let sinon = require('sinon');
+const should = require('should');
+const rewire = require('rewire');
+const sinon = require('sinon');
+
+const databaseConnector = require('../../../../src/reports/models/databaseConnector');
+const jobsManager = require('../../../../src/jobs/models/jobManager');
+const logger = require('../../../../src/common/logger');
+const notifier = require('../../../../src/reports/models/notifier');
+const constants = require('../../../../src/reports/utils/constants');
 const configHandler = require('../../../../src/configManager/models/configHandler');
-let databaseConnector = require('../../../../src/reports/models/databaseConnector');
-let jobsManager = require('../../../../src/jobs/models/jobManager');
 
 let manager;
 
 const REPORT = {
-    'test_id': 'test id',
+    'test_id': 'test_id',
     'revision_id': 'revision_id',
     'report_id': 'report_id',
     'test_name': 'test name',
     'report_url': 'http://www.zooz.com',
+    'status': constants.REPORT_INITIALIZING_STATUS,
     'last_stats': JSON.stringify({
         'timestamp': '2018-05-28T15:40:10.044Z',
         'scenariosCreated': 289448,
@@ -55,7 +60,13 @@ const REPORT = {
     }),
     'end_time': 1527533519591,
     'start_time': 1527533459591,
-    'grafana_report': 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591'
+    'grafana_report': 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
+    'subscribers': [
+        {
+            'runner_id': '1234',
+            'stage': constants.SUBSCRIBER_STARTED_STAGE
+        }
+    ]
 };
 
 const JOB = {
@@ -70,14 +81,19 @@ const JOB = {
 
 describe('Reports manager tests', function () {
     let sandbox;
+    let loggerErrorStub;
+    let loggerInfoStub;
     let databaseGetReportsStub;
     let databaseGetReportStub;
     let databaseGetLastReportsStub;
     let databasePostReportStub;
     let databasePostStatsStub;
-    let configStub;
+    let databaseSubscribeRunnerStub;
+    let databaseUpdateSubscribersStub;
     let databaseUpdateReportStub;
     let getJobStub;
+    let configStub;
+    let notifierStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -85,18 +101,22 @@ describe('Reports manager tests', function () {
         databaseGetReportStub = sandbox.stub(databaseConnector, 'getReport');
         databaseGetReportsStub = sandbox.stub(databaseConnector, 'getReports');
         databaseGetLastReportsStub = sandbox.stub(databaseConnector, 'getLastReports');
-        configStub = sandbox.stub(configHandler, 'getConfig');
         databasePostReportStub = sandbox.stub(databaseConnector, 'insertReport');
         databasePostStatsStub = sandbox.stub(databaseConnector, 'insertStats');
+        databaseSubscribeRunnerStub = sandbox.stub(databaseConnector, 'subscribeRunner');
+        databaseUpdateSubscribersStub = sandbox.stub(databaseConnector, 'updateSubscribers');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
+        loggerErrorStub = sandbox.stub(logger, 'error');
+        loggerInfoStub = sandbox.stub(logger, 'info');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
+        configStub = sandbox.stub(configHandler, 'getConfig');
+        notifierStub = sandbox.stub(notifier, 'notifyIfNeeded');
 
         manager = rewire('../../../../src/reports/models/reportsManager');
         manager.__set__('configHandler', {
             getConfig: () => {
                 return {
-                    job_platform: 'KUBERNETES',
-                    external_address: 'http://www.zooz.com'
+                    job_platform: 'KUBERNETES'
                 };
             }
         });
@@ -120,7 +140,6 @@ describe('Reports manager tests', function () {
             databaseGetReportStub.resolves([REPORT]);
             const report = await manager.getReport();
             should.exist(report);
-            should(report.last_stats).eql(JSON.parse(REPORT.last_stats));
             should.exist(report.grafana_report);
             should(report.grafana_report).eql(REPORT.grafana_report);
         });
@@ -134,7 +153,6 @@ describe('Reports manager tests', function () {
             databaseGetReportStub.resolves([REPORT]);
             const report = await manager.getReport();
             should.exist(report);
-            should(report.last_stats).eql(JSON.parse(REPORT.last_stats));
             should.not.exist(report.grafana_report);
             should(report.grafana_report).eql(undefined);
         });
@@ -158,8 +176,6 @@ describe('Reports manager tests', function () {
             databaseGetReportsStub.resolves([REPORT, REPORT]);
             const reports = await manager.getReports();
             reports.length.should.eql(2);
-            should(reports[0].test_id).eql('test id');
-            should(reports[1].test_id).eql('test id');
         });
 
         it('Database returns an empty array', async () => {
@@ -189,6 +205,7 @@ describe('Reports manager tests', function () {
         it('Successfully insert report', async () => {
             getJobStub.resolves(JOB);
             databasePostReportStub.resolves();
+            databaseSubscribeRunnerStub.resolves();
             const reportBody = await manager.postReport('test_id', REPORT);
             should.exist(reportBody);
         });
@@ -197,6 +214,7 @@ describe('Reports manager tests', function () {
             const expectedError = new Error('Fail to retrieve job');
             getJobStub.rejects(expectedError);
             databasePostReportStub.resolves(REPORT);
+            databaseSubscribeRunnerStub.resolves();
             try {
                 const reportBody = await manager.postReport('test_id', REPORT);
                 should.not.exist(reportBody);
@@ -211,10 +229,12 @@ describe('Reports manager tests', function () {
             configStub.resolves({});
             databaseGetReportStub.resolves([REPORT]);
             databasePostStatsStub.resolves();
-            databaseUpdateReportStub.resolves();
             getJobStub.resolves(JOB);
-            const stats = { phase_status: 'intermediate', data: JSON.stringify({ medain: 4 }) };
-            const statsResponse = await manager.postStats('test_id', 'report_id', stats);
+            databaseUpdateSubscribersStub.resolves();
+            notifierStub.resolves();
+            const stats = { phase_status: 'intermediate', data: JSON.stringify({ median: 4 }) };
+
+            const statsResponse = await manager.postStats('test_id', stats);
             should.exist(statsResponse);
             statsResponse.should.eql(stats);
         });

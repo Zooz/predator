@@ -1,6 +1,6 @@
 import React from 'react';
 import DragableWrapper from './dragableWrapper';
-import Button from './Button';
+import Button from '../Button';
 import classnames from 'classnames';
 import style from './scenarioList.scss';
 const actions = ['Delete', 'Duplicate'];

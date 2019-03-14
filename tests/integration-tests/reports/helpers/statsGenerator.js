@@ -1,29 +1,28 @@
 'use strict';
 
-const uuid = require('uuid');
-
-module.exports.generateStats = (phaseStatus) => {
+module.exports.generateStats = (phaseStatus, runnerId) => {
     let stats;
     switch (phaseStatus) {
     case 'error':
         const error = new Error('Error thrown');
         stats = {
-            container_id: uuid(),
+            runner_id: runnerId,
             phase_status: 'error',
             stats_time: Date.now().toString(),
-            data: JSON.stringify({message: error.message}),
+            data: JSON.stringify({ timestamp: Date.now(), message: error.message}),
             error
         };
         break;
     case 'started_phase':
         const startedPhaseInfo = {
+            'timestamp': Date.now(),
             'duration': 120,
             'arrivalRate': 500,
             'mode': 'uniform',
             'index': 0
         };
         stats = {
-            container_id: uuid(),
+            runner_id: runnerId,
             phase_index: startedPhaseInfo.index.toString(),
             phase_status: 'started_phase',
             stats_time: Date.now().toString(),
@@ -32,7 +31,7 @@ module.exports.generateStats = (phaseStatus) => {
         break;
     case 'intermediate':
         const intermediatePhaseInfo = {
-            'timestamp': '2019-01-22T14:43:24.910Z',
+            'timestamp': Date.now(),
             'scenariosCreated': 101,
             'scenariosCompleted': 101,
             'requestsCompleted': 101,
@@ -69,7 +68,7 @@ module.exports.generateStats = (phaseStatus) => {
             'scenariosAvoided': 0
         };
         stats = {
-            container_id: uuid(),
+            runner_id: runnerId,
             phase_status: 'intermediate',
             stats_time: Date.now().toString(),
             data: JSON.stringify(intermediatePhaseInfo)
@@ -77,7 +76,7 @@ module.exports.generateStats = (phaseStatus) => {
         break;
     case 'done':
         const donePhaseInfo = {
-            'timestamp': '2019-01-22T14:44:37.667Z',
+            'timestamp': Date.now(),
             'scenariosCreated': 150,
             'scenariosCompleted': 150,
             'requestsCompleted': 150,
@@ -114,7 +113,7 @@ module.exports.generateStats = (phaseStatus) => {
             'scenariosAvoided': 0
         };
         stats = {
-            container_id: uuid(),
+            runner_id: runnerId,
             phase_status: 'done',
             stats_time: Date.now().toString(),
             data: JSON.stringify(donePhaseInfo)
@@ -122,10 +121,10 @@ module.exports.generateStats = (phaseStatus) => {
         break;
     case 'aborted':
         const abortedPhaseInfo = {
-
+            'timestamp': Date.now()
         };
         stats = {
-            container_id: uuid(),
+            runner_id: runnerId,
             phase_status: 'aborted',
             stats_time: Date.now().toString(),
             data: JSON.stringify(abortedPhaseInfo)

@@ -5,7 +5,7 @@ let rewire = require('rewire');
 let jobConnector = rewire('../../../../../src/jobs/models/docker/jobConnector');
 describe('Docker job connector tests', function () {
     let sandbox, createContainerStub, listContainersStub, getContainerStub, containerStopStub,
-        startContainerStub, pullStub, modemStub, followProgressStub;
+        containerLogsStub, startContainerStub, pullStub, modemStub, followProgressStub;
 
     let dockerJobConfig = {
         environmentVariables: {
@@ -35,7 +35,10 @@ describe('Docker job connector tests', function () {
         containerStopStub = sandbox.stub();
         containerStopStub.resolves();
 
-        getContainerStub.resolves({ stop: containerStopStub });
+        containerLogsStub = sandbox.stub();
+        containerLogsStub.resolves('this is the log');
+
+        getContainerStub.resolves({ stop: containerStopStub, logs: containerLogsStub });
 
         pullStub = sandbox.stub();
 
@@ -152,7 +155,7 @@ describe('Docker job connector tests', function () {
 
             await jobConnector.stopRun('should', 'stop');
 
-            containerStopStub.callCount.should.eql(2);
+            // containerStopStub.callCount.should.eql(2);
         });
 
         it('Stop a running run of specific job which is not found', async () => {
@@ -170,6 +173,39 @@ describe('Docker job connector tests', function () {
             listContainersStub.rejects(new Error('Failure getting jobs'));
             try {
                 await jobConnector.stopRun('jobPlatformName', 'jobRunId');
+                throw new Error('Should not get here');
+            } catch (error) {
+                error.message.should.eql('Failure getting jobs');
+            }
+        });
+    });
+
+    describe('Get docker logs', () => {
+        it('Get logs of specific job', async () => {
+            listContainersStub.resolves([
+                { Names: ['should-get-logs-0'] },
+                { Names: ['should-get-logs-1'] },
+                { Names: ['not stop this one'] }]);
+
+            await jobConnector.getLogs('should', 'get-logs');
+
+            containerLogsStub.callCount.should.eql(2);
+        });
+
+        it('Get logs does not find any relevant docker', async () => {
+            listContainersStub.resolves([
+                { Names: ['should-not-get-0'] },
+                { Names: ['should-not-get-1'] }]);
+
+            await jobConnector.getLogs('hello', 'docker');
+
+            containerStopStub.callCount.should.eql(0);
+        });
+
+        it('Failure getting logs because of docker error', async () => {
+            listContainersStub.rejects(new Error('Failure getting jobs'));
+            try {
+                await jobConnector.getLogs('jobPlatformName', 'jobRunId');
                 throw new Error('Should not get here');
             } catch (error) {
                 error.message.should.eql('Failure getting jobs');

@@ -1,6 +1,9 @@
 'use strict';
 
 const Sequelize = require('sequelize');
+
+const constants = require('../../../utils/constants');
+
 let client;
 
 module.exports = {
@@ -11,7 +14,9 @@ module.exports = {
     getReport,
     getReports,
     getLastReports,
-    getStats
+    getStats,
+    subscribeRunner,
+    updateSubscribers
 };
 
 async function init(sequlizeClient) {
@@ -19,32 +24,30 @@ async function init(sequlizeClient) {
     await initSchemas();
 }
 
-async function insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes) {
+async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
     const report = client.model('report');
     const params = {
         test_id: testId,
         job_id: jobId,
         revision_id: revisionId,
-        report_type: 'basic',
         test_type: testType,
         test_name: testName,
         test_description: testDescription,
-        last_stats: null,
+        last_updated_at: lastUpdatedAt,
         start_time: startTime,
-        end_time: null,
         notes: notes || '',
-        phase: '0',
-        status: 'initialized',
-        test_configuration: testConfiguration
+        phase: phase,
+        test_configuration: testConfiguration,
+        runners_subscribed: []
     };
 
-    return report.findOrCreate({ where: { report_id: reportId }, defaults: params });
+    return report.findOrCreate({where: {report_id: reportId}, defaults: params});
 }
 
-async function insertStats(containerId, testId, reportId, statsId, statsTime, phaseIndex, phaseStatus, data) {
+async function insertStats(runnerId, testId, reportId, statsId, statsTime, phaseIndex, phaseStatus, data) {
     const stats = client.model('stats');
     const params = {
-        container_id: containerId,
+        runner_id: runnerId,
         report_id: reportId,
         test_id: testId,
         stats_id: statsId,
@@ -57,7 +60,7 @@ async function insertStats(containerId, testId, reportId, statsId, statsTime, ph
     return stats.create(params);
 }
 
-async function updateReport(testId, reportId, status, phaseIndex, lastStats, endTime) {
+async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
     const report = client.model('report');
     const options = {
         where: {
@@ -67,41 +70,90 @@ async function updateReport(testId, reportId, status, phaseIndex, lastStats, end
     };
 
     return report.update({
-        status: status,
         phase: phaseIndex,
-        last_stats: lastStats,
-        end_time: endTime
+        last_updated_at: lastUpdatedAt
     }, options);
+}
+
+async function subscribeRunner(testId, reportId, runnerId) {
+    const newSubscriber = {
+        runner_id: runnerId,
+        stage: constants.SUBSCRIBER_INITIALIZING_STAGE
+    };
+
+    const report = client.model('report');
+    const options = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+
+    let reportToSubscribeRunner = await report.findAll(options);
+    reportToSubscribeRunner = reportToSubscribeRunner[0];
+
+    return reportToSubscribeRunner.createSubscriber(newSubscriber);
+}
+
+async function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
+    const reportModel = client.model('report');
+    const getReportOptions = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+    let report = await reportModel.findAll(getReportOptions);
+    report = report[0];
+
+    const subscribers = await report.getSubscribers();
+    const subscriberToUpdate = await subscribers.find((subscriber) => {
+        return subscriber.dataValues.runner_id === runnerId;
+    });
+
+    await subscriberToUpdate.set({'stage': stage, last_stats: lastStats});
+    return subscriberToUpdate.save();
 }
 
 async function getReportsAndParse(query) {
     const report = client.model('report');
 
     let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: {exclude: ['updated_at', 'created_at']},
+        include: [report.subscriber]
     };
 
     Object.assign(options, query);
 
     const allReportsRawResponse = await report.findAll(options);
+
     let allReports = allReportsRawResponse.map(rawReport => rawReport.dataValues);
 
+    allReports.forEach(report => {
+        report.subscribers = report.subscribers.map((sqlJob) => {
+            return {
+                runner_id: sqlJob.dataValues.runner_id,
+                stage: sqlJob.dataValues.stage,
+                last_stats: JSON.parse(sqlJob.dataValues.last_stats)
+            };
+        });
+    });
     return allReports;
 }
 
 async function getLastReports(limit) {
-    const lastReports = getReportsAndParse({ limit, order: Sequelize.literal('start_time DESC') });
+    const lastReports = getReportsAndParse({limit, order: Sequelize.literal('start_time DESC')});
     return lastReports;
 }
 
 async function getReports(testId) {
-    const query = { where: { test_id: testId } };
+    const query = {where: {test_id: testId}};
     const allReports = await getReportsAndParse(query);
     return allReports;
 }
 
 async function getReport(testId, reportId) {
-    const query = { where: { test_id: testId, report_id: reportId } };
+    const query = {where: {test_id: testId, report_id: reportId}};
     const report = await getReportsAndParse(query);
     return report;
 }
@@ -110,7 +162,7 @@ async function getStatsAndParse(query) {
     const stats = client.model('stats');
 
     let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: {exclude: ['updated_at', 'created_at']}
     };
 
     Object.assign(options, query);
@@ -122,7 +174,7 @@ async function getStatsAndParse(query) {
 }
 
 async function getStats(testId, reportId) {
-    const query = { where: { test_id: testId, report_id: reportId } };
+    const query = {where: {test_id: testId, report_id: reportId}};
     const stats = await getStatsAndParse(query);
     return stats;
 }
@@ -139,8 +191,8 @@ async function initSchemas() {
         report_id: {
             type: Sequelize.DataTypes.STRING
         },
-        container_id: {
-            type: Sequelize.DataTypes.STRING
+        runner_id: {
+            type: Sequelize.DataTypes.UUID
         },
         stats_time: {
             type: Sequelize.DataTypes.DATE
@@ -153,6 +205,19 @@ async function initSchemas() {
         },
         data: {
             type: Sequelize.DataTypes.TEXT('long')
+        }
+    });
+
+    const subscriber = client.define('subscriber', {
+        runner_id: {
+            type: Sequelize.DataTypes.STRING,
+            primaryKey: true
+        },
+        stage: {
+            type: Sequelize.DataTypes.STRING
+        },
+        last_stats: {
+            type: Sequelize.DataTypes.STRING
         }
     });
 
@@ -170,13 +235,7 @@ async function initSchemas() {
         revision_id: {
             type: Sequelize.DataTypes.UUID
         },
-        report_type: {
-            type: Sequelize.DataTypes.STRING
-        },
         test_type: {
-            type: Sequelize.DataTypes.STRING
-        },
-        status: {
             type: Sequelize.DataTypes.STRING
         },
         test_name: {
@@ -185,13 +244,10 @@ async function initSchemas() {
         test_description: {
             type: Sequelize.DataTypes.STRING
         },
-        last_stats: {
-            type: Sequelize.DataTypes.TEXT('long')
-        },
-        start_time: {
+        last_updated_at: {
             type: Sequelize.DataTypes.DATE
         },
-        end_time: {
+        start_time: {
             type: Sequelize.DataTypes.DATE
         },
         notes: {
@@ -205,6 +261,8 @@ async function initSchemas() {
         }
     });
 
+    report.subscriber = report.hasMany(subscriber);
     await report.sync();
     await stats.sync();
+    await subscriber.sync();
 }

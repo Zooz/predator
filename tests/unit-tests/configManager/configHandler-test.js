@@ -17,7 +17,8 @@ const defaultConfig = {
     runner_memory: 2048,
     smtp_server: {
         timeout: 200
-    }
+    },
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
 const defaultConfigNotEscaped = {
@@ -31,7 +32,8 @@ const defaultConfigNotEscaped = {
         username: undefined,
         password: undefined,
         timeout: 200
-    }
+    },
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
 const configResponseParseObject = {
@@ -42,7 +44,8 @@ const configResponseParseObject = {
         username: 'test',
         password: 'test',
         timeout: 'test'
-    }
+    },
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
 const configParseExpected = {
@@ -56,24 +59,25 @@ const configParseExpected = {
         username: 'test',
         password: 'test',
         timeout: 'test'
-    }
+    },
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
 const convertObjectDBData = {
     grafana_url: 'test_grafana_url',
-    external_address: 'test_external_address',
-    runner_cpu: 2
+    runner_cpu: 2,
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 const resultAfterConvert = {
     job_platform: 'DOCKER',
     docker_name: 'zooz/predator-runner:latest',
     grafana_url: 'test_grafana_url',
-    external_address: 'test_external_address',
     runner_cpu: 2,
     runner_memory: 2048,
     smtp_server: {
         timeout: 200
-    }
+    },
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
 describe('Manager config', function () {
