@@ -17,6 +17,7 @@ module.exports = {
         JOB_PLATFORM: 'job_platform',
         RUNNER_CPU: 'runner_cpu',
         RUNNER_MEMORY: 'runner_memory',
+        MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS: 'minimum_wait_for_delayed_report_status_update_in_ms',
         METRICS_PLUGIN_NAME: 'metrics_plugin_name',
         DEFAULT_EMAIL_ADDRESS: 'default_email_address',
         DEFAULT_WEBHOOK_URL: 'default_webhook_url',

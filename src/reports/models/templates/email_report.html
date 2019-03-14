@@ -548,12 +548,6 @@
 
                         <div style="Margin-left: 20px;Margin-right: 20px;">
                             <div class="btn btn--flat btn--medium" style="Margin-bottom: 20px;text-align: center;">
-                                <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #e31212;font-family: Avenir, sans-serif;" href=<%= reportUrl %>>Html Report</a><!--[endif]-->
-                                <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href=<%= reportUrl %> style="width:110px" arcsize="10%" fillcolor="#E31212" stroke="f"><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Avenir,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">Html Report</center></v:textbox></v:roundrect><![endif]--></div>
-                        </div>
-
-                        <div style="Margin-left: 20px;Margin-right: 20px;">
-                            <div class="btn btn--flat btn--medium" style="Margin-bottom: 20px;text-align: center;">
                                 <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #e31212;font-family: Avenir, sans-serif;" href=<%= grafanaUrl %>>Grafana Report</a><!--[endif]-->
                                 <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href=<%= grafanaUrl %> style="width:126px" arcsize="10%" fillcolor="#E31212" stroke="f"><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Avenir,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">Grafana Report</center></v:textbox></v:roundrect><![endif]--></div>
                         </div>
@@ -603,13 +597,13 @@
                     <div style="Margin-left: 20px;Margin-right: 20px;">
                         <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
                             <p style="Margin-top: 0;Margin-bottom: 20px;"><strong>Scenarios:</strong><br>
-                                Created: <%= finalStats.scenariosCreated %><br>
-                                Completed:&nbsp;<%= finalStats.scenariosCompleted %><br>
-                                Avoided:&nbsp;<%= finalStats.scenariosAvoided %><br>
+                                Created: <%= aggregatedResults.scenariosCreated %><br>
+                                Completed:&nbsp;<%= aggregatedResults.scenariosCompleted %><br>
+                                Avoided:&nbsp;<%= aggregatedResults.scenariosAvoided %><br>
                                 <strong>Requests:</strong><br>
-                                Completed: <%= finalStats.requestsCompleted %><br>
-                                RPS: <%= finalStats.rps.mean %><br>
-                                Pending: <%= finalStats.pendingRequests %></p>
+                                Completed: <%= aggregatedResults.requestsCompleted %><br>
+                                RPS: <%= aggregatedResults.rps.mean %><br>
+                                Pending: <%= aggregatedResults.pendingRequests %></p>
                         </div>
                     </div>
 
@@ -620,7 +614,7 @@
                     <div style="Margin-left: 20px;Margin-right: 20px;">
                         <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
                             <p style="Margin-top: 0;Margin-bottom: 20px;"><strong>Request Latency:</strong><br>
-                                Min: <%= finalStats.latency.min %>,&nbsp;Max: <%= finalStats.latency.max %>,&nbsp;Median: <%= finalStats.latency.median %>,&nbsp;p95: <%= finalStats.latency.p95 %>, p99: <%= finalStats.latency.p99 %></p>
+                                Min: <%= aggregatedResults.latency.min %>,&nbsp;Max: <%= aggregatedResults.latency.max %>,&nbsp;Median: <%= aggregatedResults.latency.median %>,&nbsp;p95: <%= aggregatedResults.latency.p95 %>, p99: <%= aggregatedResults.latency.p99 %></p>
                         </div>
                     </div>
 
@@ -631,7 +625,7 @@
                     <div style="Margin-left: 20px;Margin-right: 20px;">
                         <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
                             <p style="Margin-top: 0;Margin-bottom: 20px;"><strong>Scenario Latency:</strong><br>
-                                Min: <%= finalStats.scenarioDuration.min %>,&nbsp;Max: <%= finalStats.scenarioDuration.max %>,&nbsp;Median: <%= finalStats.scenarioDuration.median %>,&nbsp;p95: <%= finalStats.scenarioDuration.p95 %>, p99: <%= finalStats.scenarioDuration.p99 %></p>
+                                Min: <%= aggregatedResults.scenarioDuration.min %>,&nbsp;Max: <%= aggregatedResults.scenarioDuration.max %>,&nbsp;Median: <%= aggregatedResults.scenarioDuration.median %>,&nbsp;p95: <%= aggregatedResults.scenarioDuration.p95 %>, p99: <%= aggregatedResults.scenarioDuration.p99 %></p>
                         </div>
                     </div>
 
