@@ -42,12 +42,13 @@ describe('Artillery report generator test', () => {
     describe('Happy flows - Without parallelism', function () {
         before(function() {
             REPORT.parallelism = 1;
+            reportsManagerGetReportStub.resolves(REPORT);
         });
 
         it('create aggregate report when there is only intermediate rows', async () => {
             databaseConnectorGetStatsStub.resolves(SINGLE_RUNNER_INTERMEDIATE_ROWS);
 
-            let reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT);
+            let reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             should(reportOutput.parallelism).eql(1);
         });
 
@@ -56,10 +57,8 @@ describe('Artillery report generator test', () => {
             statsWithUnknownData.push({ 'phase_status': 'some_unknown_phase', 'data': JSON.stringify({}) });
             databaseConnectorGetStatsStub.resolves(statsWithUnknownData);
 
-            let reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT);
+            let reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             should(reportOutput.parallelism).eql(1);
-
-            loggerWarnStub.callCount.should.eql(1);
         });
 
         it('create final report successfully with intermediate and some unsupported stats data type', async function() {
@@ -67,7 +66,7 @@ describe('Artillery report generator test', () => {
             statsWithUnknownData.push({ 'phase_status': 'intermediate', 'data': 'unsupported data type' });
             databaseConnectorGetStatsStub.resolves(statsWithUnknownData);
 
-            let reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT);
+            let reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             should(reportOutput.parallelism).eql(1);
 
             loggerWarnStub.callCount.should.eql(1);
@@ -86,7 +85,7 @@ describe('Artillery report generator test', () => {
 
             REPORT.start_time = new Date(new Date(firstStatsTimestamp).getTime() - (STATS_INTERVAL * 1000));
             databaseConnectorGetStatsStub.resolves(PARALLEL_INTERMEDIATE_ROWS);
-            const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT);
+            let reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
 
             should(reportOutput.parallelism).eql(3);
 
@@ -207,10 +206,11 @@ describe('Artillery report generator test', () => {
 
         it('create final report fails when no rows returned from cassandra ', async () => {
             databaseConnectorGetStatsStub.resolves([]);
+            reportsManagerGetReportStub.resolves(REPORT);
 
             let testShouldFail = true;
             try {
-                await aggregateReportGenerator.createAggregateReport(REPORT);
+                await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             } catch (error) {
                 testShouldFail = false;
                 error.message.should.eql('Can not generate aggregate report as there are no statistics yet for testId: test_id and reportId: report_id');

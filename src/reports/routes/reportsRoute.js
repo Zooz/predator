@@ -1,5 +1,4 @@
 'use strict';
-
 let swaggerValidator = require('express-ajv-swagger-validation');
 let express = require('express');
 let router = express.Router();

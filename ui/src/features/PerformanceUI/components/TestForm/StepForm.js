@@ -14,10 +14,7 @@ import RequestOptions from './requestOptions';
 
 import style from './stepform.scss';
 export default (props) => {
-  const sampleObject = {
-    'key1': 'value1',
-    'key2': ['value1', 'value2']
-  };
+  const sampleObject = {};
 
   const onHeaderChange = (key, value, index) => {
     const { onChangeValue } = props;
@@ -87,19 +84,20 @@ export default (props) => {
             Captures:
       <DynamicKeyValueInput value={step.captures} onAdd={onAddCapture} onChange={onCaptureChange} keyHintText={'$.id'} valueHintText={'id'} />
               Body:
-      <JSONInput
-        id='a_unique_id'
-        placeholder={step.body || (editMode ? {} : sampleObject)}
-        colors={{
-          default: 'black',
-          background: 'white',
-          string: 'red',
-          keys: 'blue' }}
-        locale={locale}
-        height={'200px'}
-        width={'100%'}
-        onChange={onBodyChange}
-      />
+        <JSONInput
+            id='a_unique_id'
+            placeholder={step.body || (editMode ? {} : sampleObject)}
+            colors={{
+                default: 'black',
+                background: 'white',
+                string: 'red',
+                keys: 'blue'
+            }}
+            locale={locale}
+            height={'200px'}
+            width={'100%'}
+            onChange={onBodyChange}
+        />
     </div>
 
   )

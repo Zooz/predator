@@ -287,15 +287,16 @@ describe('Cassandra client tests', function() {
             let cassandraResponse = { rows: [REPORT] };
             clientExecuteStub.resolves(cassandraResponse);
 
-            let query = 'UPDATE report_subscribers SET stage=? WHERE test_id=? AND report_id=? AND runner_id=?';
-            return cassandraClient.updateSubscribers('test_id', 'report_id', 'runner_id', 'intermediate')
+            let query = 'UPDATE report_subscribers SET stage=?, last_stats=? WHERE test_id=? AND report_id=? AND runner_id=?';
+            return cassandraClient.updateSubscribers('test_id', 'report_id', 'runner_id', 'intermediate', 'last_stats')
                 .then(function(result){
                     loggerErrorStub.callCount.should.eql(0);
                     clientExecuteStub.getCall(0).args[0].should.eql(query);
                     clientExecuteStub.getCall(0).args[1][0].should.eql('intermediate');
-                    clientExecuteStub.getCall(0).args[1][1].should.eql('test_id');
-                    clientExecuteStub.getCall(0).args[1][2].should.eql('report_id');
-                    clientExecuteStub.getCall(0).args[1][3].should.eql('runner_id');
+                    clientExecuteStub.getCall(0).args[1][1].should.eql('last_stats');
+                    clientExecuteStub.getCall(0).args[1][2].should.eql('test_id');
+                    clientExecuteStub.getCall(0).args[1][3].should.eql('report_id');
+                    clientExecuteStub.getCall(0).args[1][4].should.eql('runner_id');
                 });
         });
     });

@@ -12,7 +12,7 @@ const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports LIMIT ?';
 const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(runner_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
 const GET_REPORT_STATS = 'SELECT * FROM reports_stats WHERE test_id=? AND report_id=?';
 const SUBSCRIBE_RUNNER = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, stage) values(?,?,?,?)';
-const UPDATE_SUBSCRIBERS = 'UPDATE report_subscribers SET stage=? WHERE test_id=? AND report_id=? AND runner_id=?';
+const UPDATE_SUBSCRIBERS = 'UPDATE report_subscribers SET stage=?, last_stats=? WHERE test_id=? AND report_id=? AND runner_id=?';
 const GET_REPORT_SUBSCRIBERS = 'SELECT * FROM report_subscribers WHERE test_id=? AND report_id=?';
 
 module.exports = {
@@ -86,9 +86,9 @@ function subscribeRunner(testId, reportId, runnerId, subscriberStage) {
     return executeQuery(SUBSCRIBE_RUNNER, params, queryOptions);
 }
 
-async function updateSubscribers(testId, reportId, runnerId, stage) {
+async function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
     let params;
-    params = [stage, testId, reportId, runnerId];
+    params = [stage, lastStats, testId, reportId, runnerId];
     return executeQuery(UPDATE_SUBSCRIBERS, params, queryOptions);
 }
 
@@ -122,7 +122,8 @@ async function joinReportsWIthSubscribers(query, params, queryOptions) {
         subscribers = subscribers.map((subscriber) => {
             return {
                 'runner_id': subscriber.runner_id,
-                'stage': subscriber.stage
+                'stage': subscriber.stage,
+                'last_stats': JSON.parse(subscriber.last_stats)
             };
         });
         report.subscribers = subscribers;

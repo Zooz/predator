@@ -31,10 +31,12 @@ describe('Sequelize client tests', function () {
     let testDescription;
     let testConfiguration;
     let notes;
+    let lastStats = JSON.stringify({});
     let subscribers = [{
         dataValues: {
             runner_id: '12345',
-            stage: 'done'
+            stage: 'done',
+            last_stats: lastStats
         }
     }];
 
@@ -62,9 +64,12 @@ describe('Sequelize client tests', function () {
         sequelizeGetSubscribersStatsStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
-            sync: () => { },
-            hasMany: () => { },
-            save: () => { }
+            sync: () => {
+            },
+            hasMany: () => {
+            },
+            save: () => {
+            }
         });
 
         sequelizeModelStub.returns({
@@ -83,7 +88,8 @@ describe('Sequelize client tests', function () {
             close: sequelizeCloseStub
         });
         sequelizeStub.DataTypes = {
-            TEXT: () => {}
+            TEXT: () => {
+            }
         };
         sequelizeConnector.__set__('Sequelize', sequelizeStub);
 
@@ -95,9 +101,8 @@ describe('Sequelize client tests', function () {
         startTime = Date.now();
         testName = 'unit-test';
         testDescription = 'desc';
-        testConfiguration = JSON.stringify({ environment: 'test' });
+        testConfiguration = JSON.stringify({environment: 'test'});
         notes = 'some notes';
-
         await sequelizeConnector.init(sequelizeStub());
     });
 
@@ -191,7 +196,8 @@ describe('Sequelize client tests', function () {
                 subscribers: [
                     {
                         runner_id: '12345',
-                        stage: 'done'
+                        stage: 'done',
+                        last_stats: {}
                     }
                 ]
             });
@@ -208,7 +214,9 @@ describe('Sequelize client tests', function () {
                 subscribers: [
                     {
                         runner_id: '12345',
-                        stage: 'done'
+                        stage: 'done',
+                        last_stats: {}
+
                     }
                 ]
             });
@@ -259,7 +267,8 @@ describe('Sequelize client tests', function () {
                 subscribers: [
                     {
                         runner_id: '12345',
-                        stage: 'done'
+                        stage: 'done',
+                        last_stats: {}
                     }
                 ]
             }]);
@@ -316,7 +325,7 @@ describe('Sequelize client tests', function () {
             const statId = uuid();
             const phaseIndex = 0;
             const phaseStatus = 'initiliazed';
-            const data = JSON.stringify({ message: 'started' });
+            const data = JSON.stringify({message: 'started'});
 
             await sequelizeConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 
@@ -346,7 +355,7 @@ describe('Sequelize client tests', function () {
                     stats_time: statsTime,
                     phase_status: uuid(),
                     phase_index: uuid(),
-                    data: JSON.stringify({ median: 5 })
+                    data: JSON.stringify({median: 5})
                 }
             }];
 
@@ -398,8 +407,10 @@ describe('Sequelize client tests', function () {
                     runner_id: 'runner_id',
                     stage: 'initializing'
                 },
-                set: () => { },
-                save: () => { }
+                set: () => {
+                },
+                save: () => {
+                }
             }]);
 
 

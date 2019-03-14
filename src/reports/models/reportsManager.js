@@ -28,6 +28,7 @@ module.exports.getReports = async (testId) => {
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
+
     return reports;
 };
 
@@ -37,6 +38,8 @@ module.exports.getLastReports = async (limit) => {
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
+
+    reports = reports.sort((a, b) => b.start_time - a.start_time);
     return reports;
 };
 
@@ -64,9 +67,10 @@ module.exports.postReport = async (testId, reportBody) => {
 module.exports.postStats = async (report, stats) => {
     const statsParsed = JSON.parse(stats.data);
     const statsTime = statsParsed.timestamp;
-
-    await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
-    await databaseConnector.updateSubscribers(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
+    if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE) {
+        await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
+    }
+    await databaseConnector.updateSubscribers(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
     await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime);
     report = await module.exports.getReport(report.test_id, report.report_id);
     notifier.notifyIfNeeded(report, stats);
@@ -78,6 +82,24 @@ function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
+
+    let rps = 0;
+    let completedRequests = 0;
+    let successRequests = 0;
+
+    summaryRow.subscribers.forEach((subscriber) => {
+        if (subscriber.last_stats && subscriber.last_stats.rps && subscriber.last_stats.codes) {
+            completedRequests += subscriber.last_stats.requestsCompleted;
+            rps += subscriber.last_stats.rps.mean;
+            Object.keys(subscriber.last_stats.codes).forEach(key => {
+                if (key[0] === '2') {
+                    successRequests += subscriber.last_stats.codes[key]
+                }
+            });
+        }
+    });
+
+    let successRate = successRequests / completedRequests * 100;
 
     let report = {
         test_id: summaryRow.test_id,
@@ -99,7 +121,9 @@ function getReportResponse(summaryRow, config) {
         grafana_report: generateGraphanaUrl(summaryRow, config.grafana_url),
         notes: summaryRow.notes,
         environment: testConfiguration.environment,
-        subscribers: summaryRow.subscribers
+        subscribers: summaryRow.subscribers,
+        last_rps: rps,
+        last_success_rate: successRate
     };
 
     report.status = calculateReportStatus(report, config);
@@ -158,19 +182,19 @@ function calculateDynamicReportStatus(report, uniqueSubscribersStages) {
     }
 }
 
-function getListOfSubscribersStages (report) {
+function getListOfSubscribersStages(report) {
     const runnerStates = report.subscribers.map((subscriber) => subscriber.stage);
     return runnerStates;
 }
 
-function allSubscribersFinished (subscriberStages) {
+function allSubscribersFinished(subscriberStages) {
     if (subscriberStages.length === 1) {
         return subscriberStageToReportStatusMap(subscriberStages) === constants.REPORT_FINISHED_STATUS;
     }
     return false;
 }
 
-function subscriberStageToReportStatusMap (subscriberStage) {
+function subscriberStageToReportStatusMap(subscriberStage) {
     const map = {
         [constants.SUBSCRIBER_INITIALIZING_STAGE]: constants.REPORT_INITIALIZING_STATUS,
         [constants.SUBSCRIBER_STARTED_STAGE]: constants.REPORT_STARTED_STATUS,

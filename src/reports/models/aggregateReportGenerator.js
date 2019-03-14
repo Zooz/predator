@@ -6,40 +6,35 @@ let math = require('mathjs');
 let logger = require('../../common/logger');
 let databaseConnector = require('./databaseConnector');
 let constants = require('../utils/constants');
+let reports = require('./reportsManager');
 
 const STATS_INTERVAL = 30;
 
-module.exports.createAggregateReport = async (report) => {
-    let stats;
-    stats = await databaseConnector.getStats(report.test_id, report.report_id);
+module.exports.createAggregateReport = async (testId, reportId) => {
+    let report = await reports.getReport(testId, reportId);
+    let stats = await databaseConnector.getStats(testId, reportId);
 
     if (stats.length === 0) {
-        let errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${report.test_id} and reportId: ${report.report_id}`;
+        let errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${testId} and reportId: ${reportId}`;
         logger.error(errorMessage);
         let error = new Error(errorMessage);
         error.statusCode = 404;
         return Promise.reject(error);
     }
 
-    let reportInput = { intermediates: [] };
+    let reportInput = {intermediates: []};
     reportInput.duration = math.min(report.duration, Math.floor(report.duration_seconds));
     reportInput.start_time = report.start_time;
     reportInput.parallelism = report.parallelism;
     reportInput.status = mapReportStatus(report.status);
 
+    stats = stats.filter(stat => stat.phase_status === 'intermediate')
     stats.forEach(stat => {
         let data;
         try {
             data = JSON.parse(stat.data);
             data.bucket = Math.floor((new Date(data.timestamp).getTime() - new Date(report.start_time).getTime()) / 1000 / STATS_INTERVAL) * STATS_INTERVAL;
-            switch (stat.phase_status) {
-            case 'intermediate':
-                reportInput.intermediates.push(data);
-                break;
-            default:
-                logger.warn(stat, 'Received unknown stat from database while creating report');
-                break;
-            }
+            reportInput.intermediates.push(data);
         } catch (e) {
             logger.warn(e, 'Received unsupported stats data type while creating report');
         }
@@ -79,19 +74,20 @@ function createAggregateManually(listOfStats) {
             mean: 0,
             count: 0
         },
-        scenarioDuration: { }
+        scenarioDuration: {}
     };
-    _.each(listOfStats, function(stats) {
+
+    _.each(listOfStats, function (stats) {
         result.bucket = stats.bucket;
         result.concurrency += stats.concurrency;
 
-        medians.push(stats.latency.median);
-        maxs.push(stats.latency.max);
-        mins.push(stats.latency.min);
-        request95.push(stats.latency.p95 * stats.requestsCompleted);
-        request99.push(stats.latency.p99 * stats.requestsCompleted);
-        scenario95.push(stats.scenarioDuration.p95 * stats.scenariosCompleted);
-        scenario99.push(stats.scenarioDuration.p99 * stats.scenariosCompleted);
+        medians.push(stats.latency.median || 0);
+        maxs.push(stats.latency.max || 0);
+        mins.push(stats.latency.min || 0);
+        request95.push((stats.latency.p95 || 0) * stats.requestsCompleted);
+        request99.push((stats.latency.p99 || 0) * stats.requestsCompleted);
+        scenario95.push((stats.scenarioDuration.p95 || 0) * stats.scenariosCompleted);
+        scenario99.push((stats.scenarioDuration.p99 || 0) * stats.scenariosCompleted);
 
         result.scenariosCreated += stats.scenariosCreated;
         result.scenariosAvoided += stats.scenariosAvoided;
@@ -102,21 +98,21 @@ function createAggregateManually(listOfStats) {
         result.rps.count += stats.rps.count;
         result.rps.mean += stats.rps.mean;
 
-        _.each(stats.scenarioCounts, function(count, name) {
+        _.each(stats.scenarioCounts, function (count, name) {
             if (result.scenarioCounts[name]) {
                 result.scenarioCounts[name] += count;
             } else {
                 result.scenarioCounts[name] = count;
             }
         });
-        _.each(stats.codes, function(count, code) {
+        _.each(stats.codes, function (count, code) {
             if (result.codes[code.toString()]) {
                 result.codes[code.toString()] += count;
             } else {
                 result.codes[code.toString()] = count;
             }
         });
-        _.each(stats.errors, function(count, error) {
+        _.each(stats.errors, function (count, error) {
             if (result.errors[error]) {
                 result.errors[error] += count;
             } else {

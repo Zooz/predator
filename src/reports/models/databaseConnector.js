@@ -49,6 +49,6 @@ function subscribeRunner(testId, reportId, runnerId, subscriberStage) {
     return databaseConnector.subscribeRunner(testId, reportId, runnerId, subscriberStage);
 }
 
-function updateSubscribers(testId, reportId, runnerId, stage) {
-    return databaseConnector.updateSubscribers(testId, reportId, runnerId, stage);
+function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
+    return databaseConnector.updateSubscribers(testId, reportId, runnerId, stage, lastStats);
 }

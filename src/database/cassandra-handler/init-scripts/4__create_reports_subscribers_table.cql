@@ -3,4 +3,5 @@ test_id uuid,
 report_id text,
 runner_id uuid,
 stage text,
+last_stats text,
 PRIMARY KEY (test_id, report_id, runner_id));

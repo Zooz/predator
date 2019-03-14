@@ -43,7 +43,7 @@ class App extends React.Component {
                 <GetReports key={props.match.params.instance} {...props} />
               )} />
             </DrawerE>
-          </ConnectedRouter>// TODO probably need to remove redux from here.
+          </ConnectedRouter>
 
         </Fragment>
 

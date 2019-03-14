@@ -10,7 +10,7 @@ const fs = require('fs'),
     aggregateReportGenerator = require('./aggregateReportGenerator');
 
 module.exports.sendAggregateReport = async (report, job) => {
-    const aggregatedResults = await aggregateReportGenerator.createAggregateReport(report);
+    const aggregatedResults = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
 
     let testName = report.test_name;
     let emails = job.emails;

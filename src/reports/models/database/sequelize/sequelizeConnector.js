@@ -41,7 +41,7 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, phase
         runners_subscribed: []
     };
 
-    return report.findOrCreate({ where: { report_id: reportId }, defaults: params });
+    return report.findOrCreate({where: {report_id: reportId}, defaults: params});
 }
 
 async function insertStats(runnerId, testId, reportId, statsId, statsTime, phaseIndex, phaseStatus, data) {
@@ -95,7 +95,7 @@ async function subscribeRunner(testId, reportId, runnerId) {
     return reportToSubscribeRunner.createSubscriber(newSubscriber);
 }
 
-async function updateSubscribers(testId, reportId, runnerId, stage) {
+async function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
     const reportModel = client.model('report');
     const getReportOptions = {
         where: {
@@ -111,7 +111,7 @@ async function updateSubscribers(testId, reportId, runnerId, stage) {
         return subscriber.dataValues.runner_id === runnerId;
     });
 
-    await subscriberToUpdate.set('stage', stage);
+    await subscriberToUpdate.set({'stage': stage, last_stats: lastStats});
     return subscriberToUpdate.save();
 }
 
@@ -119,7 +119,7 @@ async function getReportsAndParse(query) {
     const report = client.model('report');
 
     let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] },
+        attributes: {exclude: ['updated_at', 'created_at']},
         include: [report.subscriber]
     };
 
@@ -133,7 +133,8 @@ async function getReportsAndParse(query) {
         report.subscribers = report.subscribers.map((sqlJob) => {
             return {
                 runner_id: sqlJob.dataValues.runner_id,
-                stage: sqlJob.dataValues.stage
+                stage: sqlJob.dataValues.stage,
+                last_stats: JSON.parse(sqlJob.dataValues.last_stats)
             };
         });
     });
@@ -141,18 +142,18 @@ async function getReportsAndParse(query) {
 }
 
 async function getLastReports(limit) {
-    const lastReports = getReportsAndParse({ limit, order: Sequelize.literal('start_time DESC') });
+    const lastReports = getReportsAndParse({limit, order: Sequelize.literal('start_time DESC')});
     return lastReports;
 }
 
 async function getReports(testId) {
-    const query = { where: { test_id: testId } };
+    const query = {where: {test_id: testId}};
     const allReports = await getReportsAndParse(query);
     return allReports;
 }
 
 async function getReport(testId, reportId) {
-    const query = { where: { test_id: testId, report_id: reportId } };
+    const query = {where: {test_id: testId, report_id: reportId}};
     const report = await getReportsAndParse(query);
     return report;
 }
@@ -161,7 +162,7 @@ async function getStatsAndParse(query) {
     const stats = client.model('stats');
 
     let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: {exclude: ['updated_at', 'created_at']}
     };
 
     Object.assign(options, query);
@@ -173,7 +174,7 @@ async function getStatsAndParse(query) {
 }
 
 async function getStats(testId, reportId) {
-    const query = { where: { test_id: testId, report_id: reportId } };
+    const query = {where: {test_id: testId, report_id: reportId}};
     const stats = await getStatsAndParse(query);
     return stats;
 }
@@ -213,6 +214,9 @@ async function initSchemas() {
             primaryKey: true
         },
         stage: {
+            type: Sequelize.DataTypes.STRING
+        },
+        last_stats: {
             type: Sequelize.DataTypes.STRING
         }
     });
