@@ -41,7 +41,7 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, phase
         runners_subscribed: []
     };
 
-    return report.findOrCreate({where: {report_id: reportId}, defaults: params});
+    return report.findOrCreate({ where: { report_id: reportId }, defaults: params });
 }
 
 async function insertStats(runnerId, testId, reportId, statsId, statsTime, phaseIndex, phaseStatus, data) {
@@ -111,7 +111,7 @@ async function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
         return subscriber.dataValues.runner_id === runnerId;
     });
 
-    await subscriberToUpdate.set({'stage': stage, last_stats: lastStats});
+    await subscriberToUpdate.set({ 'stage': stage, last_stats: lastStats });
     return subscriberToUpdate.save();
 }
 
@@ -119,7 +119,7 @@ async function getReportsAndParse(query) {
     const report = client.model('report');
 
     let options = {
-        attributes: {exclude: ['updated_at', 'created_at']},
+        attributes: { exclude: ['updated_at', 'created_at'] },
         include: [report.subscriber]
     };
 
@@ -142,18 +142,18 @@ async function getReportsAndParse(query) {
 }
 
 async function getLastReports(limit) {
-    const lastReports = getReportsAndParse({limit, order: Sequelize.literal('start_time DESC')});
+    const lastReports = getReportsAndParse({ limit, order: Sequelize.literal('start_time DESC') });
     return lastReports;
 }
 
 async function getReports(testId) {
-    const query = {where: {test_id: testId}};
+    const query = { where: { test_id: testId } };
     const allReports = await getReportsAndParse(query);
     return allReports;
 }
 
 async function getReport(testId, reportId) {
-    const query = {where: {test_id: testId, report_id: reportId}};
+    const query = { where: { test_id: testId, report_id: reportId } };
     const report = await getReportsAndParse(query);
     return report;
 }
@@ -162,7 +162,7 @@ async function getStatsAndParse(query) {
     const stats = client.model('stats');
 
     let options = {
-        attributes: {exclude: ['updated_at', 'created_at']}
+        attributes: { exclude: ['updated_at', 'created_at'] }
     };
 
     Object.assign(options, query);
@@ -174,7 +174,7 @@ async function getStatsAndParse(query) {
 }
 
 async function getStats(testId, reportId) {
-    const query = {where: {test_id: testId, report_id: reportId}};
+    const query = { where: { test_id: testId, report_id: reportId } };
     const stats = await getStatsAndParse(query);
     return stats;
 }

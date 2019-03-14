@@ -9,34 +9,34 @@ const reportEmailSender = require('./reportEmailSender'),
 
 module.exports.notifyIfNeeded = async (report, stats) => {
     let job;
-    const metadata = {testId: report.test_id, reportId: report.report_id};
+    const metadata = { testId: report.test_id, reportId: report.report_id };
     const statsData = JSON.parse(stats.data);
     try {
         job = await jobsManager.getJob(report.job_id);
         switch (stats.phase_status) {
-            case 'error':
-                logger.info(metadata, stats.error, 'handling error message');
-                handleError(report, job, stats);
-                break;
-            case 'started_phase':
-                logger.info(metadata, statsData, 'handling started message');
-                handleStart(report, job);
-                break;
-            case 'intermediate':
-                logger.info(metadata, 'handling intermediate message');
-                handleIntermediate(report, job, stats, statsData);
-                break;
-            case 'done':
-                logger.info(metadata, 'handling done message');
-                handleDone(report, job, stats, statsData);
-                break;
-            case 'aborted':
-                logger.info(metadata, 'handling aborted message');
-                handleAbort(report, job);
-                break;
-            default:
-                logger.warn(metadata, 'Handling unsupported test status: ' + JSON.stringify(stats));
-                break;
+        case 'error':
+            logger.info(metadata, stats.error, 'handling error message');
+            handleError(report, job, stats);
+            break;
+        case 'started_phase':
+            logger.info(metadata, statsData, 'handling started message');
+            handleStart(report, job);
+            break;
+        case 'intermediate':
+            logger.info(metadata, 'handling intermediate message');
+            handleIntermediate(report, job, stats, statsData);
+            break;
+        case 'done':
+            logger.info(metadata, 'handling done message');
+            handleDone(report, job, stats, statsData);
+            break;
+        case 'aborted':
+            logger.info(metadata, 'handling aborted message');
+            handleAbort(report, job);
+            break;
+        default:
+            logger.warn(metadata, 'Handling unsupported test status: ' + JSON.stringify(stats));
+            break;
         }
     } catch (err) {
         logger.error(err, `Failed to notify for testID ${report.test_id} with reportID ${report.report_id}`);

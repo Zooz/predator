@@ -22,13 +22,13 @@ module.exports.createAggregateReport = async (testId, reportId) => {
         return Promise.reject(error);
     }
 
-    let reportInput = {intermediates: []};
+    let reportInput = { intermediates: [] };
     reportInput.duration = math.min(report.duration, Math.floor(report.duration_seconds));
     reportInput.start_time = report.start_time;
     reportInput.parallelism = report.parallelism;
     reportInput.status = mapReportStatus(report.status);
 
-    stats = stats.filter(stat => stat.phase_status === 'intermediate')
+    stats = stats.filter(stat => stat.phase_status === 'intermediate');
     stats.forEach(stat => {
         let data;
         try {

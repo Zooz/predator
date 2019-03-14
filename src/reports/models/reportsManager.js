@@ -93,7 +93,7 @@ function getReportResponse(summaryRow, config) {
             rps += subscriber.last_stats.rps.mean;
             Object.keys(subscriber.last_stats.codes).forEach(key => {
                 if (key[0] === '2') {
-                    successRequests += subscriber.last_stats.codes[key]
+                    successRequests += subscriber.last_stats.codes[key];
                 }
             });
         }
