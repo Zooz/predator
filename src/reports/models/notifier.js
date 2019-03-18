@@ -37,11 +37,11 @@ module.exports.notifyIfNeeded = async (report, stats) => {
             await handleAbort(report, job);
             break;
         default:
-            logger.warn(metadata, 'Handling unsupported test status: ' + JSON.stringify(stats));
+            logger.trace(metadata, 'Handling unsupported test status: ' + JSON.stringify(stats));
             break;
         }
     } catch (err) {
-        logger.error(err, `Failed to notify for testID ${report.test_id} with reportID ${report.report_id}`);
+        logger.error(err, `Failed to notify for testId ${report.test_id} with reportID ${report.report_id}`);
     }
 };
 

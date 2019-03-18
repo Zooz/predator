@@ -685,14 +685,6 @@ describe('Integration tests for the reports api', function() {
     });
 });
 
-function validateLastStats(stats) {
-    const LAST_STATS_KEYS = ['timestamp', 'scenariosCreated', 'scenariosCompleted', 'requestsCompleted', 'latency',
-        'rps', 'scenarioDuration', 'scenarioCounts', 'errors', 'codes', 'matches'];
-
-    LAST_STATS_KEYS.forEach((key) => {
-        should(stats).hasOwnProperty(key);
-    });
-}
 
 function validateFinishedReport(report, expectedValues = {}) {
     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
