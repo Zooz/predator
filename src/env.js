@@ -8,6 +8,7 @@ const BY_PLATFORM_MANDATORY_VARS = {
 };
 const SUPPORTED_PLATFORMS = Object.keys(BY_PLATFORM_MANDATORY_VARS);
 
+const SUPPORTED_CASSANDRA_STRATEGY = ['SimpleStrategy', 'NetworkTopologyStrategy'];
 const BY_DATABASE_MANDATORY_VARS = {
     CASSANDRA: ['DATABASE_NAME', 'DATABASE_ADDRESS', 'DATABASE_USERNAME', 'DATABASE_PASSWORD'],
     MYSQL: ['DATABASE_NAME', 'DATABASE_ADDRESS', 'DATABASE_USERNAME', 'DATABASE_PASSWORD'],
@@ -47,6 +48,13 @@ env.init = function () {
     if (missingFields.length > 0) {
         log.error('Missing mandatory environment variables', missingFields);
         process.exit(1);
+    }
+
+    if (process.env.CASSANDRA_KEY_SPACE_STRATEGY && !SUPPORTED_CASSANDRA_STRATEGY.includes(process.env.CASSANDRA_KEY_SPACE_STRATEGY)) {
+        throw new Error('CASSANDRA_KEY_SPACE_STRATEGY not one of the supported values: ' + SUPPORTED_CASSANDRA_STRATEGY);
+    }
+    if (process.env.CASSANDRA_KEY_SPACE_STRATEGY === 'NetworkTopologyStrategy' && !process.env.CASSANDRA_LOCAL_DATA_CENTER) {
+        throw new Error('When using CASSANDRA_KEY_SPACE_STRATEGY: NetworkTopologyStrategy, CASSANDRA_LOCAL_DATA_CENTER is mandatory');
     }
 };
 

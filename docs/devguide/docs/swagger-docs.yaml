@@ -1208,7 +1208,7 @@ components:
             The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked.
           items:
             type: string
-            example: https://myendpoint.com
+            description: The url of where to send the webhook with the report information
         arrival_rate:
           type: number
           minimum: 1

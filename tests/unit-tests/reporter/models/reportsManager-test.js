@@ -64,7 +64,8 @@ const REPORT = {
     'subscribers': [
         {
             'runner_id': '1234',
-            'stage': constants.SUBSCRIBER_STARTED_STAGE
+            'stage': constants.SUBSCRIBER_STARTED_STAGE,
+            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
         }
     ]
 };

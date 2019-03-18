@@ -67,10 +67,11 @@ module.exports.postReport = async (testId, reportBody) => {
 module.exports.postStats = async (report, stats) => {
     const statsParsed = JSON.parse(stats.data);
     const statsTime = statsParsed.timestamp;
-    if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE) {
+    await databaseConnector.updateSubscribers(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
+
+    if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
         await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
     }
-    await databaseConnector.updateSubscribers(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
     await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime);
     report = await module.exports.getReport(report.test_id, report.report_id);
     notifier.notifyIfNeeded(report, stats);
@@ -183,7 +184,7 @@ function calculateDynamicReportStatus(report, uniqueSubscribersStages) {
 }
 
 function getListOfSubscribersStages(report) {
-    const runnerStates = report.subscribers.map((subscriber) => subscriber.stage);
+    const runnerStates = report.subscribers.map((subscriber) => subscriber.phase_status);
     return runnerStates;
 }
 

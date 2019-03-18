@@ -78,7 +78,7 @@ async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
 async function subscribeRunner(testId, reportId, runnerId) {
     const newSubscriber = {
         runner_id: runnerId,
-        stage: constants.SUBSCRIBER_INITIALIZING_STAGE
+        phase_status: constants.SUBSCRIBER_INITIALIZING_STAGE
     };
 
     const report = client.model('report');
@@ -95,7 +95,7 @@ async function subscribeRunner(testId, reportId, runnerId) {
     return reportToSubscribeRunner.createSubscriber(newSubscriber);
 }
 
-async function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
+async function updateSubscribers(testId, reportId, runnerId, phaseStatus, lastStats) {
     const reportModel = client.model('report');
     const getReportOptions = {
         where: {
@@ -111,7 +111,7 @@ async function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
         return subscriber.dataValues.runner_id === runnerId;
     });
 
-    await subscriberToUpdate.set({ 'stage': stage, last_stats: lastStats });
+    await subscriberToUpdate.set({ 'phase_status': phaseStatus, last_stats: lastStats });
     return subscriberToUpdate.save();
 }
 
@@ -133,7 +133,7 @@ async function getReportsAndParse(query) {
         report.subscribers = report.subscribers.map((sqlJob) => {
             return {
                 runner_id: sqlJob.dataValues.runner_id,
-                stage: sqlJob.dataValues.stage,
+                phase_status: sqlJob.dataValues.phase_status,
                 last_stats: JSON.parse(sqlJob.dataValues.last_stats)
             };
         });
@@ -213,7 +213,7 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING,
             primaryKey: true
         },
-        stage: {
+        phase_status: {
             type: Sequelize.DataTypes.STRING
         },
         last_stats: {

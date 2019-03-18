@@ -176,7 +176,9 @@ class getTests extends React.Component {
             'in_progress': 'Running',
             'aborted': 'Aborted',
             'finished': 'Finished',
-            'started': 'Started'
+            'started': 'Started',
+            'partially_finished': 'Partially Finished',
+            'failed': 'Failed'
         };
         return (mapper[cell] ? mapper[cell] : cell);
     }
