@@ -1515,7 +1515,7 @@ components:
             - password
             - timeout
           properties:
-            from:
+            sender:
               type: string
               format: email
             host:
