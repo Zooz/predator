@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS reports_stats(
-runner_id uuid,
+runner_id text,
 test_id uuid,
 report_id text,
 stats_id uuid,
