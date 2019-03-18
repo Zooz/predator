@@ -1527,4 +1527,5 @@ components:
             password:
               type: string
             timeout:
+              description: time in milliseconds
               type: number
