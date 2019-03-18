@@ -25,15 +25,19 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
 
     let htmlBody = generateReportFromTemplate(testName, testInfo, aggregatedResults.grafana_url, aggregatedResults.aggregate);
 
-    const mailOptions = {
-        from: 'Predator 💪 <performance@predator.com>',
-        to: [emails].join(','),
-        html: htmlBody,
-        subject: `Your test results: ${testName}`
-    };
+    async function createMailOptions(configSmtp) {
+        return {
+            from: configSmtp.from,
+            to: [emails].join(','),
+            html: htmlBody,
+            subject: `Your test results: ${testName}`
+        };
+    }
 
     try {
-        const transporter = await createSMTPClient();
+        let configSmtp = await configHandler.getConfigValue(configConsts.SMTP_SERVER);
+        const transporter = await createSMTPClient(configSmtp);
+        const mailOptions = createMailOptions(configSmtp);
         let response = await transporter.sendMail(mailOptions);
         transporter.close();
         logger.info(response, `Sent email successfully for testId: ${aggregatedResults.test_id}, reportId: ${aggregatedResults.report_id}`);
@@ -42,8 +46,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
     }
 };
 
-async function createSMTPClient() {
-    let configSmtp = await configHandler.getConfigValue(configConsts.SMTP_SERVER);
+async function createSMTPClient(configSmtp) {
     var options = {
         port: configSmtp.port,
         host: configSmtp.host,
