@@ -1,6 +1,7 @@
 # Predator
 
 [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![CircleCI](https://circleci.com/gh/Zooz/predator/tree/master.svg?style=svg)](https://circleci.com/gh/Zooz/predator/tree/master)
 
 Predator is an open-source performance testing framework. Predator manages the entire lifecycle of stress-testing a server, 
 from creating a test file, to running scheduled and on-demand tests, and finally viewing the test results in a highly informative report. 
