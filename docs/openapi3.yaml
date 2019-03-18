@@ -1675,12 +1675,17 @@ components:
           type: object
           description: Simple mail transfer protocol.
           required:
+          - sender
           - host
           - port
           - username
           - password
           - timeout
           properties:
+            sender:
+              type: string
+              format: email
+              description: the 'from' emaila address will be used to send emails
             host:
               type: string
             port:
@@ -1690,4 +1695,5 @@ components:
             password:
               type: string
             timeout:
+              description: timout to smtp server in milliseconds
               type: number
