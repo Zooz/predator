@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.4"></a>
+## [1.0.4](https://github.com/Zooz/predator/compare/v1.0.3...v1.0.4) (2019-03-18)
+
+
+### Bug Fixes
+
+* **reports:** update runner_id to text instead uuid ([9147da5](https://github.com/Zooz/predator/commit/9147da5))
+
+
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/Zooz/predator/compare/v1.0.1...v1.0.3) (2019-03-18)
 
