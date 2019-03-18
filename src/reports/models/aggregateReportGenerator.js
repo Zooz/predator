@@ -59,7 +59,8 @@ module.exports.createAggregateReport = async (testId, reportId) => {
 };
 
 function createAggregateManually(listOfStats) {
-    let medians = [], maxs = [], mins = [], scenario95 = [], scenario99 = [], request95 = [], request99 = [];
+    let requestMedians = [], requestMaxs = [], requestMins = [], scenario95 = [], scenario99 = [], request95 = [],
+        request99 = [], scenarioMins = [], scenarioMaxs = [], scenarioMedians = [];
     let result = {
         bucket: 0,
         requestsCompleted: 0,
@@ -87,11 +88,15 @@ function createAggregateManually(listOfStats) {
         result.bucket = stats.bucket;
         result.concurrency += stats.concurrency;
 
-        medians.push(stats.latency.median || 0);
-        maxs.push(stats.latency.max || 0);
-        mins.push(stats.latency.min || 0);
+        requestMedians.push(stats.latency.median || 0);
+        requestMaxs.push(stats.latency.max || 0);
+        requestMins.push(stats.latency.min || 0);
         request95.push((stats.latency.p95 || 0) * stats.requestsCompleted);
         request99.push((stats.latency.p99 || 0) * stats.requestsCompleted);
+
+        scenarioMedians.push(stats.scenarioDuration.median || 0);
+        scenarioMaxs.push(stats.scenarioDuration.max || 0);
+        scenarioMins.push(stats.scenarioDuration.min || 0);
         scenario95.push((stats.scenarioDuration.p95 || 0) * stats.scenariosCompleted);
         scenario99.push((stats.scenarioDuration.p99 || 0) * stats.scenariosCompleted);
 
@@ -127,12 +132,15 @@ function createAggregateManually(listOfStats) {
         });
     });
 
-    result.latency.median = math.median(medians);
-    result.latency.min = math.min(mins);
-    result.latency.max = math.max(maxs);
+    result.latency.median = math.median(requestMedians);
+    result.latency.min = math.min(requestMins);
+    result.latency.max = math.max(requestMaxs);
     result.latency.p95 = math.sum(request95) / result.requestsCompleted;
     result.latency.p99 = math.sum(request99) / result.requestsCompleted;
 
+    result.scenarioDuration.median = math.median(scenarioMedians);
+    result.scenarioDuration.min = math.min(scenarioMins);
+    result.scenarioDuration.max = math.max(scenarioMaxs);
     result.scenarioDuration.p95 = math.sum(scenario95) / result.scenariosCompleted;
     result.scenarioDuration.p99 = math.sum(scenario99) / result.scenariosCompleted;
 

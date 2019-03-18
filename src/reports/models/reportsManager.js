@@ -172,7 +172,7 @@ function calculateReportStatus(report, config) {
 function calculateDynamicReportStatus(report, uniqueSubscribersStages) {
     if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_DONE_STAGE)) {
         return constants.REPORT_PARTIALLY_FINISHED_STATUS;
-    } else if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_INTERMEDIATE_STAGE)) {
+    } else if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_INTERMEDIATE_STAGE) || uniqueSubscribersStages.includes(constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE)) {
         return constants.REPORT_IN_PROGRESS_STATUS;
     } else if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_STARTED_STAGE)) {
         return constants.REPORT_STARTED_STATUS;
@@ -199,6 +199,7 @@ function subscriberStageToReportStatusMap(subscriberStage) {
     const map = {
         [constants.SUBSCRIBER_INITIALIZING_STAGE]: constants.REPORT_INITIALIZING_STATUS,
         [constants.SUBSCRIBER_STARTED_STAGE]: constants.REPORT_STARTED_STATUS,
+        [constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE]: constants.REPORT_IN_PROGRESS_STATUS,
         [constants.SUBSCRIBER_INTERMEDIATE_STAGE]: constants.REPORT_IN_PROGRESS_STATUS,
         [constants.SUBSCRIBER_DONE_STAGE]: constants.REPORT_FINISHED_STATUS,
         [constants.SUBSCRIBER_ABORTED_STAGE]: constants.REPORT_ABORTED_STATUS,
