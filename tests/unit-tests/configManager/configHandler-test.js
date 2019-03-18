@@ -27,6 +27,7 @@ const defaultConfigNotEscaped = {
     runner_cpu: 1,
     runner_memory: 2048,
     smtp_server: {
+        from: undefined,
         host: undefined,
         port: undefined,
         username: undefined,

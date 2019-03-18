@@ -102,7 +102,7 @@ describe('Report emails sender test', () => {
         sendMailStub.args.should.containDeep([
             [
                 {
-                    from: 'Predator 💪 <performance@predator.com>',
+                    from: undefined,
                     to: [JOB.emails].join(','),
                     subject: 'Your test results: test name'
 

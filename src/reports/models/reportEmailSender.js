@@ -37,7 +37,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
     try {
         let configSmtp = await configHandler.getConfigValue(configConsts.SMTP_SERVER);
         const transporter = await createSMTPClient(configSmtp);
-        const mailOptions = createMailOptions(configSmtp);
+        const mailOptions = await createMailOptions(configSmtp);
         let response = await transporter.sendMail(mailOptions);
         transporter.close();
         logger.info(response, `Sent email successfully for testId: ${aggregatedResults.test_id}, reportId: ${aggregatedResults.report_id}`);
