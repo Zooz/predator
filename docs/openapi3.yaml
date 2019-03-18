@@ -19,36 +19,36 @@ info:
     For an introduction to Predator and its concepts, see the <a href="https://www.zooz.com" target="_blank">Predator Documentation</a>.
 
 tags:
-- name: DSL Definitions
-  description: |
-    Predator's Domain Specific Language (DSL) allows you to generate request templates, which you can then reuse in the same test and in other tests, reducing replication.
-- name: Tests
-  description: |
-    Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.
-- name: Jobs
-  description: |
-    Predator executes tests through so-called **jobs**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
-- name: Reports
-  description: |
-    Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.
+  - name: DSL Definitions
+    description: |
+      Predator's Domain Specific Language (DSL) allows you to generate request templates, which you can then reuse in the same test and in other tests, reducing replication.
+  - name: Tests
+    description: |
+      Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.
+  - name: Jobs
+    description: |
+      Predator executes tests through so-called **jobs**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
+  - name: Reports
+    description: |
+      Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.
 
 x-tagGroups:
-- name: Reference
-  tags:
-  - DSL Definitions
-  - Tests
-  - Jobs
-  - Reports
+  - name: Reference
+    tags:
+      - DSL Definitions
+      - Tests
+      - Jobs
+      - Reports
 
 paths:
   # DSL Definitions
   '/v1/dsl/{dsl_name}/definitions':
     parameters:
-    - $ref: '#/components/parameters/dsl_name'
+      - $ref: '#/components/parameters/dsl_name'
     post:
       operationId: create-a-dsl-definition
       tags:
-      - DSL Definitions
+        - DSL Definitions
       summary: Create a DSL Definition
       description: Create a new DSL definition to generate a request template.
       responses:
@@ -86,7 +86,7 @@ paths:
     get:
       operationId: retrieve-all-dsl-definitions
       tags:
-      - DSL Definitions
+        - DSL Definitions
       summary: Retrieve all DSL Definitions
       description: Retrieve all DSL definitions for the specified DSL group name.
       responses:
@@ -116,12 +116,12 @@ paths:
                 $ref: '#/components/schemas/error_response'
   '/v1/dsl/{dsl_name}/definitions/{definition_name}':
     parameters:
-    - $ref: '#/components/parameters/dsl_name'
-    - $ref: '#/components/parameters/definition_name'
+      - $ref: '#/components/parameters/dsl_name'
+      - $ref: '#/components/parameters/definition_name'
     get:
       operationId: retrieve-a-dsl-definition
       tags:
-      - DSL Definitions
+        - DSL Definitions
       summary: Retrieve a DSL Definition
       description: Retrieve a specific DSL definition.
       responses:
@@ -152,7 +152,7 @@ paths:
     put:
       operationId: update-a-dsl-definition
       tags:
-      - DSL Definitions
+        - DSL Definitions
       summary: Update a DSL Definition
       description: Update a specific DSL definition.
       responses:
@@ -190,7 +190,7 @@ paths:
     delete:
       operationId: Delete-a-dsl-definition
       tags:
-      - DSL Definitions
+        - DSL Definitions
       summary: Delete a DSL Definition
       description: Delete a specific DSL definition.
       responses:
@@ -213,7 +213,7 @@ paths:
     post:
       operationId: create-a-test
       tags:
-      - Tests
+        - Tests
       summary: Create a Test
       description: Create a new test.
       responses:
@@ -251,7 +251,7 @@ paths:
     get:
       operationId: retrieve-all-tests
       tags:
-      - Tests
+        - Tests
       summary: Retrieve all Tests
       description: Retrieve all available tests.
       responses:
@@ -279,16 +279,16 @@ paths:
     get:
       operationId: retrieve-a-test
       tags:
-      - Tests
+        - Tests
       summary: Retrieve a Test
       description: Retrieve a specific test.
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Success
@@ -317,15 +317,15 @@ paths:
     put:
       operationId: update-a-test
       tags:
-      - Tests
+        - Tests
       summary: Update a Test
       description: Update a specific test.
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -361,15 +361,15 @@ paths:
     delete:
       operationId: delete-a-test
       tags:
-      - Tests
+        - Tests
       summary: Delete a Test
       description: Delete a specific test.
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -388,16 +388,16 @@ paths:
   '/v1/tests/{test_id}/revisions':
     get:
       tags:
-      - Tests
+        - Tests
       summary: Retrieve Test Revisions
       description: Retrieve the revisions of the specified test.
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Success
@@ -430,15 +430,15 @@ paths:
     get:
       operationId: retrieve-all-jobs
       tags:
-      - Jobs
+        - Jobs
       summary: Retrieve all Jobs
       description: Retrieve the details of all available jobs.
       parameters:
-      - in: query
-        name: one_time
-        description: Should return the one time tests (no cron expression)
-        schema:
-          type: boolean
+        - in: query
+          name: one_time
+          description: Should return the one time tests (no cron expression)
+          schema:
+            type: boolean
       responses:
         '200':
           description: Success
@@ -463,7 +463,7 @@ paths:
     post:
       operationId: create-a-job
       tags:
-      - Jobs
+        - Jobs
       summary: Create a Job
       description: Create a new job that will trigger a test run.
       responses:
@@ -498,15 +498,15 @@ paths:
     get:
       operationId: retrieve-a-job
       tags:
-      - Jobs
+        - Jobs
       summary: Retrieve a Job
       description: Retrieve a specific job.
       parameters:
-      - in: path
-        name: job_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: job_id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -534,14 +534,14 @@ paths:
                 $ref: '#/components/schemas/error_response'
     put:
       tags:
-      - jobs
+        - jobs
       description: update specific job.
       parameters:
-      - in: path
-        name: job_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: job_id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -577,15 +577,15 @@ paths:
     delete:
       operationId: delete-a-job
       tags:
-      - Jobs
+        - Jobs
       summary: Delete a Job
       description: Delete a specific job.
       parameters:
-      - in: path
-        name: job_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: job_id
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: Success
@@ -605,22 +605,22 @@ paths:
     post:
       operationId: terminate-a-job
       tags:
-      - Jobs
+        - Jobs
       summary: Terminate a Job
       description: Terminate the execution of a specific job.
       parameters:
-      - in: path
-        description: The ID of the job.
-        name: job_id
-        required: true
-        schema:
-          type: string
-      - in: path
-        description: The id of a specific run in metronome which is also the report id.
-        name: run_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          description: The ID of the job.
+          name: job_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: The id of a specific run in metronome which is also the report id.
+          name: run_id
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: Success
@@ -639,21 +639,21 @@ paths:
   /v1/jobs/{job_id}/runs/{run_id}/logs:
     get:
       tags:
-      - jobs
+        - jobs
       description: get logs of specific job.
       parameters:
-      - in: path
-        description: The ID of the job.
-        name: job_id
-        required: true
-        schema:
-          type: string
-      - in: path
-        description: The id of a specific run in metronome which is also the report id.
-        name: run_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          description: The ID of the job.
+          name: job_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: The id of a specific run in metronome which is also the report id.
+          name: run_id
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Success
@@ -680,15 +680,15 @@ paths:
     post:
       operationId: create-a-report
       tags:
-      - Reports
+        - Reports
       summary: Create a Report
       description: Create a new report for the specified test.
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
       responses:
         '201':
           description: Success
@@ -720,15 +720,15 @@ paths:
     get:
       operationId: retrieve-all-reports
       tags:
-      - Reports
+        - Reports
       summary: Retrieve all Reports
       description: Retrieve all reports for the specified test.
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -754,17 +754,17 @@ paths:
     get:
       operationId: retrieve-recent-reports
       tags:
-      - Reports
+        - Reports
       summary: Retrieve Recent Reports
       description: Retrieve the most recent reports
       parameters:
-      - in: query
-        name: limit
-        description: The number of most recent reports to retrieve.
-        required: true
-        minimum: 1
-        maximum: 100
-        type: integer
+        - in: query
+          name: limit
+          description: The number of most recent reports to retrieve.
+          required: true
+          minimum: 1
+          maximum: 100
+          type: integer
       responses:
         '200':
           description: Success
@@ -789,20 +789,20 @@ paths:
   '/v1/tests/{test_id}/reports/{report_id}/stats':
     post:
       tags:
-      - Reports
+        - Reports
       summary: Insert a Stats Object
       description: Insert a new stats object for a specific report
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: report_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: report_id
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: Success
@@ -835,20 +835,20 @@ paths:
     get:
       operationId: retrieve-a-report
       tags:
-      - Reports
+        - Reports
       summary: Retrieve a Report
       description: Retrieve a specific report for the specified test
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: report_id
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: report_id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -878,16 +878,16 @@ paths:
   /v1/config/{config_key}:
     delete:
       tags:
-      - config
+        - config
       description: Delete specific configuration value. it will fallback to the original
         env varible
       parameters:
-      - in: path
-        name: config_key
-        required: true
-        description: They key to delete.
-        schema:
-          type: string
+        - in: path
+          name: config_key
+          required: true
+          description: They key to delete.
+          schema:
+            type: string
       responses:
         "204":
           description: Success
@@ -900,7 +900,7 @@ paths:
   /v1/config:
     get:
       tags:
-      - config
+        - config
       description: Get list of the configuration.
       responses:
         "200":
@@ -913,7 +913,7 @@ paths:
           description: Internal server error
     put:
       tags:
-      - config
+        - config
       description: Change configration values that will override environment variables.
       requestBody:
         content:
@@ -957,8 +957,8 @@ components:
     definition:
       type: object
       required:
-      - name
-      - request
+        - name
+        - request
       properties:
         name:
           description: The name of the DSL definition.
@@ -992,7 +992,7 @@ components:
           }
     update_definition:
       required:
-      - request
+        - request
       properties:
         request:
           type: object
@@ -1007,12 +1007,12 @@ components:
       discriminator:
         propertyName: type
       oneOf:
-      - $ref: '#/components/schemas/basic'
-      - $ref: '#/components/schemas/dsl'
+        - $ref: '#/components/schemas/basic'
+        - $ref: '#/components/schemas/dsl'
       required:
-      - name
-      - description
-      - type
+        - name
+        - description
+        - type
       properties:
         name:
           type: string
@@ -1023,13 +1023,13 @@ components:
         type:
           type: string
           enum:
-          - dsl
-          - basic
+            - dsl
+            - basic
     dsl:
       description: A test that is made of scenarios base on domain specific language
       type: object
       required:
-      - scenarios
+        - scenarios
       properties:
         scenarios:
           type: array
@@ -1068,13 +1068,13 @@ components:
     basic:
       description: A test that is made of artillery json
       required:
-      - artillery_test
+        - artillery_test
       properties:
         artillery_test:
           type: object
     test_id:
       required:
-      - id
+        - id
       properties:
         id:
           type: string
@@ -1082,9 +1082,9 @@ components:
           description: The id of the test.
     create_test_response:
       allOf:
-      - $ref: '#/components/schemas/test_id'
+        - $ref: '#/components/schemas/test_id'
       required:
-      - revision_id
+        - revision_id
       properties:
         revision_id:
           type: string
@@ -1095,15 +1095,15 @@ components:
             When a test is created, it is assigned a revision ID. If you update a test, then it's revision ID changes as well. This allows Predator to always relate an existing report to the test it was originally based on.
     tests_response:
       allOf:
-      - $ref: '#/components/schemas/create_test_response'
+        - $ref: '#/components/schemas/create_test_response'
       #        - $ref: '#/components/schemas/test_id'
       required:
-      - name
-      - description
-      - type
-      - raw_data
-      - artillery_test
-      - updated_at
+        - name
+        - description
+        - type
+        - raw_data
+        - artillery_test
+        - updated_at
       properties:
         updated_at:
           type: string
@@ -1118,8 +1118,8 @@ components:
         type:
           type: string
           enum:
-          - dsl
-          - basic
+            - dsl
+            - basic
           description: >-
             the type of the test, basic - an artillery json created by the
             client, dsl - a test with saved request definitions api.
@@ -1134,14 +1134,14 @@ components:
             data.
     error_response:
       required:
-      - message
+        - message
       properties:
         message:
           type: string
     scenario:
       required:
-      - scenario_name
-      - steps
+        - scenario_name
+        - steps
       properties:
         scenario_name:
           type: string
@@ -1152,7 +1152,7 @@ components:
           items:
             type: object
             required:
-            - action
+              - action
             properties:
               action:
                 type: string
@@ -1173,9 +1173,9 @@ components:
             specified, will be calculated.
     job:
       required:
-      - test_id
-      - arrival_rate
-      - duration
+        - test_id
+        - arrival_rate
+        - duration
       properties:
         variables:
           type: object
@@ -1293,30 +1293,30 @@ components:
           description: In which environment the test will run
     job_response:
       allOf:
-      - $ref: '#/components/schemas/job'
-      - properties:
-          id:
-            type: string
-            pattern: >-
-              ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-            description: Uuid that identifies the job
+        - $ref: '#/components/schemas/job'
+        - properties:
+            id:
+              type: string
+              pattern: >-
+                ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+              description: Uuid that identifies the job
     create_job_response:
       allOf:
-      - $ref: '#/components/schemas/job_response'
-      - properties:
-          run_id:
-            type: string
-            description: 'If the job is ran immediately, will show the run id.'
+        - $ref: '#/components/schemas/job_response'
+        - properties:
+            run_id:
+              type: string
+              description: 'If the job is ran immediately, will show the run id.'
     post_report:
       required:
-      - report_id
-      - job_id
-      - revision_id
-      - test_type
-      - test_name
-      - test_description
-      - start_time
-      - runner_id
+        - report_id
+        - job_id
+        - revision_id
+        - test_type
+        - test_name
+        - test_description
+        - start_time
+        - runner_id
       properties:
         report_id:
           type: string
@@ -1347,16 +1347,16 @@ components:
           description: the id of the runner that created the report
     post_report_response:
       required:
-      - report_id
+        - report_id
       properties:
         report_id:
           type: string
           description: The id of the report/same as run_id
     stats:
       required:
-      - stats_time
-      - phase_status
-      - data
+        - stats_time
+        - phase_status
+        - data
       properties:
         stats_time:
           type: string
@@ -1375,17 +1375,17 @@ components:
           description: Error thrown while running test
     report_response:
       required:
-      - test_id
-      - revision_id
-      - report_id
-      - job_id
-      - test_type
-      - status
-      - start_time
-      - end_time
-      - duration_seconds
-      - avg_response_time_ms
-      - arrival_rate
+        - test_id
+        - revision_id
+        - report_id
+        - job_id
+        - test_type
+        - status
+        - start_time
+        - end_time
+        - duration_seconds
+        - avg_response_time_ms
+        - arrival_rate
       properties:
         test_id:
           type: string
@@ -1453,8 +1453,8 @@ components:
         metrics_plugin_name:
           type: string
           enum:
-          - influx
-          - prometheus
+            - influx
+            - prometheus
           description: Metrics to use, in case one or both metrics are configured.
         default_email_address:
           type: string
@@ -1473,10 +1473,10 @@ components:
           type: object
           description: Influx configuration  .
           required:
-          - host
-          - username
-          - password
-          - database
+            - host
+            - username
+            - password
+            - database
           properties:
             host:
               type: string
@@ -1495,7 +1495,7 @@ components:
           type: object
           description: prometheus configuration.
           required:
-          - push_gateway_url
+            - push_gateway_url
           properties:
             push_gateway_url:
               type: string
@@ -1508,12 +1508,16 @@ components:
           type: object
           description: Simple mail transfer protocol.
           required:
-          - host
-          - port
-          - username
-          - password
-          - timeout
+            - from
+            - host
+            - port
+            - username
+            - password
+            - timeout
           properties:
+            from:
+              type: string
+              format: email
             host:
               type: string
             port:
