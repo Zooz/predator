@@ -214,7 +214,7 @@ describe('Sequelize client tests', function () {
                 subscribers: [
                     {
                         runner_id: '12345',
-                        stage: 'done',
+                        phase_status: 'done',
                         last_stats: {}
 
                     }
@@ -267,7 +267,7 @@ describe('Sequelize client tests', function () {
                 subscribers: [
                     {
                         runner_id: '12345',
-                        stage: 'done',
+                        phase_status: 'done',
                         last_stats: {}
                     }
                 ]
