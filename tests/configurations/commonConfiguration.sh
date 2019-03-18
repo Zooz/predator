@@ -9,6 +9,7 @@ export MAILHOG_HOST=$RUNNER_IP
 export MAILHOG_PORT=8025
 
 export SMTP_HOST=$RUNNER_IP
+export SMTP_FROM='Predator 💪 <performance@predator.com>'
 export SMTP_PORT=1025
 export SMTP_PASSWORD=password
 export SMTP_USERNAME=username
