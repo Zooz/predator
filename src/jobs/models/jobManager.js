@@ -191,10 +191,13 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
         DURATION: jobBody.duration.toString()
     };
-    const metricsExport = configData.metrics_plugin_name === 'influx' ? configData.influx_metrics : configData.prometheus_metrics;
+    let metricsExport = configData.metrics_plugin_name === 'influx' ? configData.influx_metrics : configData.prometheus_metrics;
 
     if (configData.metrics_plugin_name && metricsExport) {
         environmentVariables.METRICS_PLUGIN_NAME = configData.metrics_plugin_name;
+        if (typeof metricsExport === 'object') {
+            metricsExport = JSON.stringify(metricsExport);
+        }
         environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(metricsExport).toString('base64');
     }
 

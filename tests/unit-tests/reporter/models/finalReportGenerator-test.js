@@ -117,6 +117,9 @@ describe('Artillery report generator test', () => {
                     'count': 897
                 },
                 'scenarioDuration': {
+                    'median': 62.3,
+                    'max': 221.9,
+                    'min': 59.8,
                     'p95': 76.7,
                     'p99': 113.6
                 }
@@ -149,6 +152,9 @@ describe('Artillery report generator test', () => {
                     'count': 903
                 },
                 'scenarioDuration': {
+                    'median': 62.5,
+                    'max': 361.7,
+                    'min': 59.9,
                     'p95': 77.53240843507214,
                     'p99': 87.59711431742508
                 }
@@ -181,6 +187,9 @@ describe('Artillery report generator test', () => {
                     'count': 900
                 },
                 'scenarioDuration': {
+                    'median': 61.9,
+                    'max': 118,
+                    'min': 59.8,
                     'p95': 73.5,
                     'p99': 81.1
                 }

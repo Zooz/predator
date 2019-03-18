@@ -307,13 +307,6 @@ describe('Webhook/email notifier test', () => {
         };
 
         await notifier.notifyIfNeeded(report, stats);
-        loggerWarnStub.callCount.should.eql(1);
-        loggerWarnStub.args.should.eql([
-            [
-                { testId: 'test_id', reportId: 'report_id' },
-                'Handling unsupported test status: {"phase_status":"unknown","data":"{\\"message\\":\\"some unknown phase\\"}"}'
-            ]
-        ]);
     });
 })
 ;
