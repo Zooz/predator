@@ -27,7 +27,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
 
     async function createMailOptions(configSmtp) {
         return {
-            from: configSmtp.from,
+            from: configSmtp.from || 'Predator 💪 <performance@predator.com>',
             to: [emails].join(','),
             html: htmlBody,
             subject: `Your test results: ${testName}`
