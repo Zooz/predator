@@ -13,6 +13,7 @@ let configDataMap = {
     [constConfig.INFLUX_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
     [constConfig.SMTP_SERVER]: {
         value: {
+            sender: process.env.SMTP_SENDER,
             host: process.env.SMTP_HOST,
             port: process.env.SMTP_PORT,
             username: process.env.SMTP_USERNAME,
