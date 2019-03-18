@@ -4,6 +4,7 @@ module.exports.SUBSCRIBER_DONE_STAGE = 'done';
 module.exports.SUBSCRIBER_ABORTED_STAGE = 'aborted';
 module.exports.SUBSCRIBER_FAILED_STAGE = 'error';
 module.exports.SUBSCRIBER_INTERMEDIATE_STAGE = 'intermediate';
+module.exports.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE = 'first_intermediate';
 
 module.exports.REPORT_INITIALIZING_STATUS = 'initializing';
 module.exports.REPORT_STARTED_STATUS = 'started';

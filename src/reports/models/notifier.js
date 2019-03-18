@@ -4,35 +4,37 @@ const reportEmailSender = require('./reportEmailSender'),
     reportWebhookSender = require('./reportWebhookSender'),
     jobsManager = require('../../jobs/models/jobManager'),
     statsFromatter = require('./statsFormatter'),
+    aggregateReportGenerator = require('./aggregateReportGenerator'),
     logger = require('../../common/logger'),
-    constants = require('../utils/constants');
+    constants = require('../utils/constants'),
+    configHandler = require('../../configManager/models/configHandler'),
+    configConstants = require('../../common/consts').CONFIG;
 
 module.exports.notifyIfNeeded = async (report, stats) => {
     let job;
     const metadata = { testId: report.test_id, reportId: report.report_id };
-    const statsData = JSON.parse(stats.data);
     try {
         job = await jobsManager.getJob(report.job_id);
         switch (stats.phase_status) {
-        case 'error':
+        case constants.SUBSCRIBER_FAILED_STAGE:
             logger.info(metadata, stats.error, 'handling error message');
-            handleError(report, job, stats);
+            await handleError(report, job, stats);
             break;
-        case 'started_phase':
-            logger.info(metadata, statsData, 'handling started message');
-            handleStart(report, job);
+        case constants.SUBSCRIBER_STARTED_STAGE:
+            logger.info(metadata, 'handling started message');
+            await handleStart(report, job);
             break;
-        case 'intermediate':
+        case constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE:
             logger.info(metadata, 'handling intermediate message');
-            handleIntermediate(report, job, stats, statsData);
+            await handleFirstIntermediate(report, job);
             break;
-        case 'done':
+        case constants.SUBSCRIBER_DONE_STAGE:
             logger.info(metadata, 'handling done message');
-            handleDone(report, job, stats, statsData);
+            await handleDone(report, job);
             break;
-        case 'aborted':
+        case constants.SUBSCRIBER_ABORTED_STAGE:
             logger.info(metadata, 'handling aborted message');
-            handleAbort(report, job);
+            await handleAbort(report, job);
             break;
         default:
             logger.warn(metadata, 'Handling unsupported test status: ' + JSON.stringify(stats));
@@ -43,59 +45,129 @@ module.exports.notifyIfNeeded = async (report, stats) => {
     }
 };
 
-function handleError(report, job, stats) {
-    const webhookMessage = `😞 *Test with id: ${report.test_id} Failed*.\ntest configuration:\nenvironment: ${report.environment}\n${stats.data}`;
-    if (job.webhooks) {
-        reportWebhookSender.send(job.webhooks, webhookMessage);
+async function handleError(report, job, stats) {
+    let webhooks = await getWebhookTargets(job);
+    if (webhooks.length === 0) {
+        return;
     }
+
+    const webhookMessage = `😞 *Test with id: ${report.test_id} Failed*.\ntest configuration:\nenvironment: ${report.environment}\n${stats.data}`;
+    reportWebhookSender.send(webhooks, webhookMessage);
 }
 
-function handleStart(report, job) {
-    if (job.webhooks) {
-        let webhookMessage;
-        let rampToMessage = report.ramp_to ? `, ramp to: ${report.ramp_to} scenarios per second` : '';
-        let parallelism = report.parallelism || 1;
-        webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n
+async function handleStart(report, job) {
+    if (!isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_STARTED_STAGE)) {
+        return;
+    }
+
+    let webhooks = await getWebhookTargets(job);
+    if (webhooks.length === 0) {
+        return;
+    }
+
+    let webhookMessage;
+    let rampToMessage = report.ramp_to ? `, ramp to: ${report.ramp_to} scenarios per second` : '';
+    let parallelism = report.parallelism || 1;
+    webhookMessage = `🤓 *Test ${report.test_name} with id: ${report.test_id} has started*.\n
      *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${parallelism}${rampToMessage}`;
 
-        reportWebhookSender.send(job.webhooks, webhookMessage);
-    }
+    reportWebhookSender.send(webhooks, webhookMessage);
 }
 
-function handleIntermediate(report, job, stats, statsData) {
+async function handleFirstIntermediate(report, job) {
+    if (!isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE)) {
+        return;
+    }
+    let webhooks = await getWebhookTargets(job);
+    if (webhooks.length === 0) {
+        return;
+    }
+
     let webhookMessage;
-
-    if (report && report.status === constants.REPORT_STARTED_STATUS && job.webhooks) {
-        const phaseIndex = report.phase;
-        webhookMessage = `🤔 *Test ${report.test_name} with id: ${report.test_id} first batch of results arrived for phase ${phaseIndex}.*\n${statsFromatter.getStatsFormatted('intermediate', statsData)}\n`;
-        if (report.grafana_report) {
-            webhookMessage += `<${report.grafana_report}|Track report in grafana dashboard>`;
-        }
-        reportWebhookSender.send(job.webhooks, webhookMessage);
+    let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
+    const phaseIndex = report.phase;
+    webhookMessage = `🤔 *Test ${report.test_name} with id: ${report.test_id} first batch of results arrived for phase ${phaseIndex}.*\n${statsFromatter.getStatsFormatted('intermediate', aggregatedReport.aggregate)}\n`;
+    if (report.grafana_report) {
+        webhookMessage += `<${report.grafana_report}|Track report in grafana dashboard>`;
     }
+    reportWebhookSender.send(webhooks, webhookMessage);
 }
 
-function handleDone(report, job, stats, statsData) {
-    let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', statsData)}\n`;
+async function handleDone(report, job) {
+    if (!isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
+        return;
+    }
+
+    let emails = await getEmailTargets(job);
+    let webhooks = await getWebhookTargets(job);
+
+    if (emails.length === 0 && webhooks.length === 0) {
+        return;
+    }
+
+    let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
+    let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate)}\n`;
 
     if (report.grafana_report) {
         webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;
     }
 
-    if (job.emails) {
-        reportEmailSender.sendAggregateReport(report, job);
+    if (emails.length > 0) {
+        reportEmailSender.sendAggregateReport(aggregatedReport, job, emails);
     }
-    if (job.webhooks) {
-        reportWebhookSender.send(job.webhooks, webhookMessage);
+
+    if (webhooks.length > 0) {
+        reportWebhookSender.send(webhooks, webhookMessage);
     }
 }
 
-function handleAbort(report, job) {
-    if (job.webhooks) {
-        let webhookMessage = `😢 *Test ${report.test_name} with id: ${report.test_id} was aborted.*\n`;
-        if (report.grafana_report) {
-            webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;
-        }
-        reportWebhookSender.send(job.webhooks, webhookMessage);
+async function handleAbort(report, job) {
+    let webhooks = await getWebhookTargets(job);
+    if (webhooks.length === 0) {
+        return;
     }
+    let webhookMessage = `😢 *Test ${report.test_name} with id: ${report.test_id} was aborted.*\n`;
+    if (report.grafana_report) {
+        webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;
+    }
+    reportWebhookSender.send(webhooks, webhookMessage);
+}
+
+function isAllRunnersInExpectedPhase(report, phaseStatus) {
+    let postStatsUpdate = [];
+    report.subscribers.forEach(subscribers => {
+        postStatsUpdate.push(subscribers.phase_status);
+    });
+    let uniquePostStatsUpdatePhases = [...new Set(postStatsUpdate)];
+
+    let isInStage = (postStatsUpdate.length === (report.parallelism || 1) && uniquePostStatsUpdatePhases.length === 1 && uniquePostStatsUpdatePhases[0] === phaseStatus);
+    return isInStage;
+}
+
+async function getWebhookTargets(job) {
+    let targets = [];
+    let defaultWebhookUrl = await configHandler.getConfigValue(configConstants.DEFAULT_WEBHOOK_URL);
+
+    if (defaultWebhookUrl) {
+        targets.push(defaultWebhookUrl);
+    }
+
+    if (job.webhooks) {
+        targets = targets.concat(job.webhooks);
+    }
+    return targets;
+}
+
+async function getEmailTargets(job) {
+    let targets = [];
+    let defaultEmailAddress = await configHandler.getConfigValue(configConstants.DEFAULT_EMAIL_ADDRESS);
+
+    if (defaultEmailAddress) {
+        targets.push(defaultEmailAddress);
+    }
+
+    if (job.emails) {
+        targets = targets.concat(job.emails);
+    }
+    return targets;
 }

@@ -5,11 +5,10 @@ const config = {
     address: process.env.DATABASE_ADDRESS,
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
-    host: process.env.RUNNER_IP || '127.0.0.1',
     cassandraReplicationFactor: process.env.CASSANDRA_REPLICATION_FACTOR || 1,
     cassandraConsistency: process.env.CASSANDRA_CONSISTENCY || cassandra.types.consistencies.localQuorum,
-    cassandraKeyspaceStrategy: process.env.CASSANDRA_CONSISTENCY || cassandra.types.consistencies.localQuorum,
-
+    cassandraKeyspaceStrategy: process.env.CASSANDRA_KEY_SPACE_STRATEGY || 'SimpleStrategy',
+    cassandraLocalDataCenter: process.env.CASSANDRA_LOCAL_DATA_CENTER,
     sqliteStorage: process.env.SQLITE_STORAGE || 'predator'
 };
 

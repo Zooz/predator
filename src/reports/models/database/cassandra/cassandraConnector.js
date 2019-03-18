@@ -11,8 +11,8 @@ const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
 const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports LIMIT ?';
 const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(runner_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
 const GET_REPORT_STATS = 'SELECT * FROM reports_stats WHERE test_id=? AND report_id=?';
-const SUBSCRIBE_RUNNER = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, stage) values(?,?,?,?)';
-const UPDATE_SUBSCRIBERS = 'UPDATE report_subscribers SET stage=?, last_stats=? WHERE test_id=? AND report_id=? AND runner_id=?';
+const SUBSCRIBE_RUNNER = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, phase_status) values(?,?,?,?)';
+const UPDATE_SUBSCRIBERS = 'UPDATE report_subscribers SET phase_status=?, last_stats=? WHERE test_id=? AND report_id=? AND runner_id=?';
 const GET_REPORT_SUBSCRIBERS = 'SELECT * FROM report_subscribers WHERE test_id=? AND report_id=?';
 
 module.exports = {
@@ -80,15 +80,15 @@ function getStats(testId, reportId) {
     return executeQuery(GET_REPORT_STATS, params, queryOptions);
 }
 
-function subscribeRunner(testId, reportId, runnerId, subscriberStage) {
+function subscribeRunner(testId, reportId, runnerId, phaseStatus) {
     let params;
-    params = [testId, reportId, runnerId, subscriberStage];
+    params = [testId, reportId, runnerId, phaseStatus];
     return executeQuery(SUBSCRIBE_RUNNER, params, queryOptions);
 }
 
-async function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
+async function updateSubscribers(testId, reportId, runnerId, phaseStatus, lastStats) {
     let params;
-    params = [stage, lastStats, testId, reportId, runnerId];
+    params = [phaseStatus, lastStats, testId, reportId, runnerId];
     return executeQuery(UPDATE_SUBSCRIBERS, params, queryOptions);
 }
 
@@ -122,7 +122,7 @@ async function joinReportsWIthSubscribers(query, params, queryOptions) {
         subscribers = subscribers.map((subscriber) => {
             return {
                 'runner_id': subscriber.runner_id,
-                'stage': subscriber.stage,
+                'phase_status': subscriber.phase_status,
                 'last_stats': JSON.parse(subscriber.last_stats)
             };
         });

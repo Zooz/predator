@@ -35,7 +35,7 @@ describe('Sequelize client tests', function () {
     let subscribers = [{
         dataValues: {
             runner_id: '12345',
-            stage: 'done',
+            phase_status: 'done',
             last_stats: lastStats
         }
     }];
@@ -196,7 +196,7 @@ describe('Sequelize client tests', function () {
                 subscribers: [
                     {
                         runner_id: '12345',
-                        stage: 'done',
+                        phase_status: 'done',
                         last_stats: {}
                     }
                 ]
@@ -214,7 +214,7 @@ describe('Sequelize client tests', function () {
                 subscribers: [
                     {
                         runner_id: '12345',
-                        stage: 'done',
+                        phase_status: 'done',
                         last_stats: {}
 
                     }
@@ -267,7 +267,7 @@ describe('Sequelize client tests', function () {
                 subscribers: [
                     {
                         runner_id: '12345',
-                        stage: 'done',
+                        phase_status: 'done',
                         last_stats: {}
                     }
                 ]
@@ -405,7 +405,7 @@ describe('Sequelize client tests', function () {
             sequelizeGetSubscribersStatsStub.resolves([{
                 dataValues: {
                     runner_id: 'runner_id',
-                    stage: 'initializing'
+                    phase_status: 'initializing'
                 },
                 set: () => {
                 },

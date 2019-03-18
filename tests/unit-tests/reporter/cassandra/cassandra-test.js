@@ -254,7 +254,7 @@ describe('Cassandra client tests', function() {
         it('should subscribe runner to report', function(){
             clientExecuteStub.resolves({ result: { rowLength: 0 } });
 
-            let query = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, stage) values(?,?,?,?)';
+            let query = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, phase_status) values(?,?,?,?)';
             return cassandraClient.subscribeRunner('test_id', 'report_id', 'runner_id', 'initializing')
                 .then(function(result){
                     loggerErrorStub.callCount.should.eql(0);
@@ -287,7 +287,7 @@ describe('Cassandra client tests', function() {
             let cassandraResponse = { rows: [REPORT] };
             clientExecuteStub.resolves(cassandraResponse);
 
-            let query = 'UPDATE report_subscribers SET stage=?, last_stats=? WHERE test_id=? AND report_id=? AND runner_id=?';
+            let query = 'UPDATE report_subscribers SET phase_status=?, last_stats=? WHERE test_id=? AND report_id=? AND runner_id=?';
             return cassandraClient.updateSubscribers('test_id', 'report_id', 'runner_id', 'intermediate', 'last_stats')
                 .then(function(result){
                     loggerErrorStub.callCount.should.eql(0);

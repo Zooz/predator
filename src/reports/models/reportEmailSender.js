@@ -6,28 +6,24 @@ const fs = require('fs'),
     nodemailer = require('nodemailer'),
     configHandler = require('../../configManager/models/configHandler'),
     configConsts = require('../../common/consts').CONFIG,
-    logger = require('../../common/logger'),
-    aggregateReportGenerator = require('./aggregateReportGenerator');
-
-module.exports.sendAggregateReport = async (report, job) => {
-    const aggregatedResults = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
-
-    let testName = report.test_name;
-    let emails = job.emails;
-    let endTime = report.end_time;
-    let startTime = report.start_time;
+    logger = require('../../common/logger');
+module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
+    let testName = aggregatedResults.test_name;
+    let endTime = aggregatedResults.end_time;
+    let startTime = aggregatedResults.start_time;
     let testRunTime = timeConversion(endTime - startTime);
 
     let testInfo = {
         runTime: testRunTime,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
-        testId: report.test_id,
-        revisionId: report.revision_id,
-        reportId: report.report_id
+        testId: aggregatedResults.test_id,
+        revisionId: aggregatedResults.revision_id,
+        reportId: aggregatedResults.report_id,
+        parallelism: aggregatedResults.parallelism
     };
 
-    let htmlBody = generateReportFromTemplate(testName, testInfo, report.grafana_url, aggregatedResults.aggregate);
+    let htmlBody = generateReportFromTemplate(testName, testInfo, aggregatedResults.grafana_url, aggregatedResults.aggregate);
 
     const mailOptions = {
         from: 'Predator 💪 <performance@predator.com>',
@@ -40,7 +36,7 @@ module.exports.sendAggregateReport = async (report, job) => {
         const transporter = await createSMTPClient();
         let response = await transporter.sendMail(mailOptions);
         transporter.close();
-        logger.info(response, `Sent email successfully for testId: ${report.test_id}, reportId: ${report.report_id}`);
+        logger.info(response, `Sent email successfully for testId: ${aggregatedResults.test_id}, reportId: ${aggregatedResults.report_id}`);
     } catch (error) {
         logger.error(error, 'Failed to send email');
     }
@@ -83,11 +79,15 @@ function timeConversion(milliseconds) {
 
 function generateReportFromTemplate(testName, testInfo, grafanaUrl, aggregatedResults) {
     let codesSummary = [];
-    Object.keys(aggregatedResults.codes).forEach((code) => { codesSummary.push(`${code}: ${aggregatedResults.codes[code]}`) });
+    Object.keys(aggregatedResults.codes).forEach((code) => {
+        codesSummary.push(`${code}: ${aggregatedResults.codes[code]}`);
+    });
     codesSummary = codesSummary.join(', ');
 
     let errorsSummary = [];
-    Object.keys(aggregatedResults.errors).forEach((error) => { errorsSummary.push(`${error}: ${aggregatedResults.errors[error]}`) });
+    Object.keys(aggregatedResults.errors).forEach((error) => {
+        errorsSummary.push(`${error}: ${aggregatedResults.errors[error]}`);
+    });
     errorsSummary = errorsSummary.join(', ');
 
     let emailVars = { testName, testInfo, grafanaUrl, aggregatedResults, codesSummary, errorsSummary };

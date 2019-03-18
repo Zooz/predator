@@ -6,14 +6,16 @@ let sinon = require('sinon');
 let should = require('should');
 let logger = require('../../../../src/common/logger');
 let notifier = require('../../../../src/reports/models/notifier');
-let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
 let jobsManager = require('../../../../src/jobs/models/jobManager');
 let reportWebhookSender = require('../../../../src/reports/models/reportWebhookSender');
+let configHandler = require('../../../../src/configManager/models/configHandler');
 let statsFormatter = require('../../../../src/reports/models/statsFormatter');
+let aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
+let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
 
 describe('Webhook/email notifier test', () => {
     let sandbox, loggerInfoStub, loggerWarnStub, reportWebhookSenderSendStub,
-        statsFormatterStub, jobsManagerStub;
+        statsFormatterStub, jobsManagerStub, getConfigStub, aggregateReportGeneratorStub, reportEmailSenderStub;
     before(() => {
         sandbox = sinon.sandbox.create();
         loggerInfoStub = sandbox.stub(logger, 'info');
@@ -21,6 +23,9 @@ describe('Webhook/email notifier test', () => {
         reportWebhookSenderSendStub = sandbox.stub(reportWebhookSender, 'send');
         statsFormatterStub = sandbox.stub(statsFormatter, 'getStatsFormatted');
         jobsManagerStub = sandbox.stub(jobsManager, 'getJob');
+        getConfigStub = sandbox.stub(configHandler, 'getConfigValue');
+        aggregateReportGeneratorStub = sandbox.stub(aggregateReportGenerator, 'createAggregateReport');
+        reportEmailSenderStub = sandbox.stub(reportEmailSender, 'sendAggregateReport');
     });
 
     beforeEach(() => {
@@ -69,35 +74,72 @@ describe('Webhook/email notifier test', () => {
         ]);
     });
 
-    it('Handing message with phase: started', async () => {
-        jobsManagerStub.resolves({
-            webhooks: ['http://www.zooz.com']
-        });
-        let report = {
-            environment: 'test',
-            report_id: 'report_id',
-            test_id: 'test_id',
-            test_name: 'some_test_name',
-            duration: 10,
-            arrival_rate: 10
-        };
-        let stats = {
-            phase_status: 'started_phase',
-            data: JSON.stringify({ 'message': 'fail to get test' })
-        };
-        await notifier.notifyIfNeeded(report, stats);
+    describe('Handing message with phase: started_phase', () => {
+        it('parallelism is 2 and ramp to is defined, runners in correct phases ', async () => {
+            jobsManagerStub.resolves({
+                webhooks: ['http://www.zooz.com', 'http://www.zooz2.com']
+            });
+            let report = {
+                environment: 'test',
+                report_id: 'report_id',
+                test_id: 'test_id',
+                test_name: 'some_test_name',
+                duration: 10,
+                arrival_rate: 10,
+                parallelism: 2,
+                ramp_to: 20,
+                status: 'started',
+                phase: '0',
+                subscribers: [{ phase_status: 'started_phase' }, { phase_status: 'started_phase' }]
 
-        reportWebhookSenderSendStub.callCount.should.equal(1);
-        reportWebhookSenderSendStub.args.should.containDeep([
-            [
-                '🤓 *Test some_test_name with id: test_id has started*.\n\n     *test configuration:* environment: test duration: 10 seconds, arrival rate: 10 scenarios per second, number of runners: 1',
-                ['http://www.zooz.com']
-            ]
-        ]);
-        loggerInfoStub.callCount.should.equal(1);
+            };
+            let stats = {
+                phase_status: 'started_phase',
+                data: JSON.stringify({ 'message': 'fail to get test' })
+            };
+            await notifier.notifyIfNeeded(report, stats);
+
+            reportWebhookSenderSendStub.callCount.should.equal(1);
+            reportWebhookSenderSendStub.args.should.containDeep([
+                [
+                    '🤓 *Test some_test_name with id: test_id has started*.\n\n     *test configuration:* environment: test duration: 10 seconds, arrival rate: 10 scenarios per second, number of runners: 2, ramp to: 20 scenarios per second',
+                    ['http://www.zooz.com', 'http://www.zooz2.com']
+                ]
+            ]);
+            loggerInfoStub.callCount.should.equal(1);
+        });
+
+        it('parallelism is not defined, runner in corrects phase ', async () => {
+            jobsManagerStub.resolves({
+                webhooks: ['http://www.zooz.com']
+            });
+            let report = {
+                environment: 'test',
+                report_id: 'report_id',
+                test_id: 'test_id',
+                test_name: 'some_test_name',
+                duration: 10,
+                arrival_rate: 10,
+                subscribers: [{ phase_status: 'started_phase' }]
+            };
+            let stats = {
+                phase_status: 'started_phase',
+                data: JSON.stringify({ 'message': 'fail to get test' })
+            };
+            await notifier.notifyIfNeeded(report, stats);
+
+            reportWebhookSenderSendStub.callCount.should.equal(1);
+            reportWebhookSenderSendStub.args.should.containDeep([
+                [
+                    '🤓 *Test some_test_name with id: test_id has started*.\n\n     *test configuration:* environment: test duration: 10 seconds, arrival rate: 10 scenarios per second, number of runners: 1',
+                    ['http://www.zooz.com']
+                ]
+            ]);
+            loggerInfoStub.callCount.should.equal(1);
+        });
     });
 
-    it('Handing message with phase: started with parallelism and ramp to', async () => {
+    it('parallelism is 2, runners in different phases', async () => {
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com', 'http://www.zooz2.com']
         });
@@ -108,28 +150,24 @@ describe('Webhook/email notifier test', () => {
             test_name: 'some_test_name',
             duration: 10,
             arrival_rate: 10,
-            parallelism: 5,
+            parallelism: 2,
             ramp_to: 20,
             status: 'started',
-            phase: '0'
+            phase: '0',
+            subscribers: [{ phase_status: 'started_phase' }, { phase_status: 'not_started_phase' }]
+
         };
         let stats = {
-            phase_status: 'started_phase',
-            data: JSON.stringify({ 'message': 'fail to get test' })
+            phase_status: 'started_phase'
         };
         await notifier.notifyIfNeeded(report, stats);
 
-        reportWebhookSenderSendStub.callCount.should.equal(1);
-        reportWebhookSenderSendStub.args.should.containDeep([
-            [
-                '🤓 *Test some_test_name with id: test_id has started*.\n\n     *test configuration:* environment: test duration: 10 seconds, arrival rate: 10 scenarios per second, number of runners: 5, ramp to: 20 scenarios per second',
-                ['http://www.zooz.com']
-            ]
-        ]);
-        loggerInfoStub.callCount.should.equal(1);
+        reportWebhookSenderSendStub.callCount.should.equal(0);
     });
 
-    it('Handing message with phase: intermediate, first intermediate message', async () => {
+    it('Handing message with phase: first_intermediate', async () => {
+        aggregateReportGeneratorStub.resolves({});
+
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com']
         });
@@ -140,13 +178,15 @@ describe('Webhook/email notifier test', () => {
             test_name: 'some_test_name',
             duration: 10,
             arrival_rate: 10,
-            parallelism: 5,
+            parallelism: 2,
             ramp_to: 20,
             status: 'started',
-            phase: 0
+            phase: 0,
+            subscribers: [{ phase_status: 'first_intermediate' }, { phase_status: 'first_intermediate' }]
+
         };
         let stats = {
-            phase_status: 'intermediate',
+            phase_status: 'first_intermediate',
             data: JSON.stringify({})
         };
 
@@ -192,8 +232,15 @@ describe('Webhook/email notifier test', () => {
     });
 
     it('Handing message with phase: done', async () => {
+        getConfigStub.resolves('test@predator.com');
+        getConfigStub.withArgs(sinon.match('default_webhook_url')).resolves('http://www.webhook.com');
+        getConfigStub.withArgs(sinon.match('default_email_address')).resolves('test@predator.com');
+
+        aggregateReportGeneratorStub.resolves({});
         jobsManagerStub.resolves({
-            webhooks: ['http://www.zooz.com']
+            webhooks: ['http://www.zooz.com'],
+            emails: ['test2@predator.com']
+
         });
         let report = {
             environment: 'test',
@@ -202,10 +249,12 @@ describe('Webhook/email notifier test', () => {
             test_name: 'some_test_name',
             duration: 10,
             arrival_rate: 10,
-            parallelism: 5,
+            parallelism: 2,
             ramp_to: 20,
             status: 'started',
-            phase: 0
+            phase: 0,
+            subscribers: [{ phase_status: 'done' }, { phase_status: 'done' }]
+
         };
         let stats = {
             phase_status: 'done',
@@ -223,6 +272,9 @@ describe('Webhook/email notifier test', () => {
                 ['http://www.zooz.com']
             ]
         ]);
+
+        reportEmailSenderStub.callCount.should.equal(1);
+        reportEmailSenderStub.args[0][2].should.containDeep(['test@predator.com', 'test2@predator.com']);
         loggerInfoStub.callCount.should.equal(1);
     });
 
@@ -263,4 +315,5 @@ describe('Webhook/email notifier test', () => {
             ]
         ]);
     });
-});
+})
+;

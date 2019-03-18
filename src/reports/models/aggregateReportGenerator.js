@@ -25,10 +25,16 @@ module.exports.createAggregateReport = async (testId, reportId) => {
     let reportInput = { intermediates: [] };
     reportInput.duration = math.min(report.duration, Math.floor(report.duration_seconds));
     reportInput.start_time = report.start_time;
+    reportInput.end_time = report.end_time;
     reportInput.parallelism = report.parallelism;
+    reportInput.report_id = report.report_id;
+    reportInput.test_id = report.test_id;
+    reportInput.test_name = report.test_name;
+    reportInput.revision_id = report.revision_id;
+
     reportInput.status = mapReportStatus(report.status);
 
-    stats = stats.filter(stat => stat.phase_status === 'intermediate');
+    stats = stats.filter(stat => stat.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stat.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE);
     stats.forEach(stat => {
         let data;
         try {
@@ -48,7 +54,7 @@ module.exports.createAggregateReport = async (testId, reportId) => {
     }
 
     reportInput.aggregate = createAggregateManually(reportInput.intermediates);
-
+    reportInput.aggregate.rps.mean = reportInput.aggregate.rps.mean / reportInput.intermediates.length;
     return reportInput;
 };
 

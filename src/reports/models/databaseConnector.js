@@ -45,10 +45,10 @@ function getStats(testId, reportId) {
     return databaseConnector.getStats(testId, reportId);
 }
 
-function subscribeRunner(testId, reportId, runnerId, subscriberStage) {
-    return databaseConnector.subscribeRunner(testId, reportId, runnerId, subscriberStage);
+function subscribeRunner(testId, reportId, runnerId, phaseStatus) {
+    return databaseConnector.subscribeRunner(testId, reportId, runnerId, phaseStatus);
 }
 
-function updateSubscribers(testId, reportId, runnerId, stage, lastStats) {
-    return databaseConnector.updateSubscribers(testId, reportId, runnerId, stage, lastStats);
+function updateSubscribers(testId, reportId, runnerId, phaseStatus, lastStats) {
+    return databaseConnector.updateSubscribers(testId, reportId, runnerId, phaseStatus, lastStats);
 }

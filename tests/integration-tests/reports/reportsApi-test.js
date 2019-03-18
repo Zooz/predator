@@ -410,8 +410,8 @@ describe('Integration tests for the reports api', function() {
                 should.exist(firstSubscriber);
                 should.exist(secondSubscriber);
 
-                should(firstSubscriber.stage).eql(constants.SUBSCRIBER_INITIALIZING_STAGE);
-                should(secondSubscriber.stage).eql(constants.SUBSCRIBER_INITIALIZING_STAGE);
+                should(firstSubscriber.phase_status).eql(constants.SUBSCRIBER_INITIALIZING_STAGE);
+                should(secondSubscriber.phase_status).eql(constants.SUBSCRIBER_INITIALIZING_STAGE);
             });
         });
 
