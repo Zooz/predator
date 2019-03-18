@@ -25,7 +25,7 @@ const updateBodyWithTypes = {
         buckets_sizes: 'string_value'
     },
     smtp_server: {
-        sender: 'test@mail.com',
+        from: 'test@mail.com',
         host: 'string_value',
         port: 2,
         username: 'string_value',
@@ -57,7 +57,7 @@ const requestBody =
             buckets_sizes: 'string_value_buckets_sizes'
         },
         smtp_server: {
-            sender: 'test@mail.com',
+            from: 'test@mail.com',
             host: 'string_value_smtp_server',
             port: 2,
             username: 'string_value_username',

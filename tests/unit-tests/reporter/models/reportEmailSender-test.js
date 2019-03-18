@@ -94,7 +94,7 @@ describe('Report emails sender test', () => {
         sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
         aggregateReportGeneratorStub.resolves(AGGREGATE_REPORT);
-        getConfig.resolves({ sender: 'Predator 💪 <performance@predator.com>' });
+        getConfig.resolves({ from: 'Predator 💪 <performance@predator.com>' });
 
         await reportEmailSender.sendAggregateReport(AGGREGATE_REPORT, JOB, ['eli@zooz.com']);
 
@@ -102,7 +102,7 @@ describe('Report emails sender test', () => {
         sendMailStub.args.should.containDeep([
             [
                 {
-                    sender: 'Predator 💪 <performance@predator.com>',
+                    from: 'Predator 💪 <performance@predator.com>',
                     to: [JOB.emails].join(','),
                     subject: 'Your test results: test name'
 
