@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-export DATABASE_ADDRESS=$RUNNER_IP:5432
+export DATABASE_ADDRESS=$RUNNER_IP
 export DATABASE_NAME=postgres
 export DATABASE_USERNAME=root
 export DATABASE_PASSWORD=password
