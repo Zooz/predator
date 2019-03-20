@@ -1,6 +1,7 @@
 import { SearchField } from 'react-bootstrap-table';
 import React from 'react';
 import cronstrue from 'cronstrue';
+const window = require("global/window");
 
 export const sortDates = (a, b, order) => {
   let dateA = new Date(a.updated_at);
@@ -74,4 +75,13 @@ export const prettySeconds =(seconds)=> {
   }
 
   return prettyString
+}
+
+export const getUrlPrefix =  () => {
+  const path = window.location.pathname.split('/predator');
+  let predatorUrlPrefix = '';
+  if (path.length > 1) {
+    predatorUrlPrefix = path[0];
+  }
+  return predatorUrlPrefix;
 }
