@@ -43,7 +43,10 @@ module.exports = () => {
 
             app.use(audit({
                 logger: logger,
-                excludeURLs: ['health', 'predator', 'favicon.png']
+                excludeURLs: ['health', 'predator', 'favicon.png'],
+                response: {
+                    excludeBody: ['*']
+                }
             }));
 
             app.use(zip());
