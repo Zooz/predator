@@ -23,5 +23,14 @@ module.exports = {
         INFLUX_METRICS: 'influx_metrics',
         PROMETHEUS_METRICS: 'prometheus_metrics',
         SMTP_SERVER: 'smtp_server'
+    },
+
+    SMTP_SERVER: {
+        SMTP_FROM: 'from',
+        SMTP_HOST: 'host',
+        SMTP_PORT: 'port',
+        SMTP_TIMEOUT: 'timeout',
+        SMTP_PASSWORD: 'password',
+        SMTP_USERNAME: 'username'
     }
 };

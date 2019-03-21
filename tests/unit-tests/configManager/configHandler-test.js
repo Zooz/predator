@@ -15,9 +15,6 @@ const defaultConfig = {
     docker_name: 'zooz/predator-runner:latest',
     runner_cpu: 1,
     runner_memory: 2048,
-    smtp_server: {
-        timeout: 200
-    },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
@@ -26,25 +23,17 @@ const defaultConfigNotEscaped = {
     docker_name: 'zooz/predator-runner:latest',
     runner_cpu: 1,
     runner_memory: 2048,
-    smtp_server: {
-        from: undefined,
-        host: undefined,
-        port: undefined,
-        username: undefined,
-        password: undefined,
-        timeout: 200
-    },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
 const configResponseParseObject = {
     runner_cpu: 5,
     smtp_server: {
-        host: 'test',
-        port: 'test',
-        username: 'test',
-        password: 'test',
-        timeout: 'test'
+        host: { value: 'test' },
+        port: { value: 'test' },
+        username: { value: 'test' },
+        password: { value: 'test' },
+        timeout: { value: 'test' }
     },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
@@ -75,9 +64,6 @@ const resultAfterConvert = {
     grafana_url: 'test_grafana_url',
     runner_cpu: 2,
     runner_memory: 2048,
-    smtp_server: {
-        timeout: 200
-    },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
@@ -104,28 +90,34 @@ describe('Manager config', function () {
     });
 
     describe('get default config', function () {
-        it('get default config success', async () => {
+        it('get default config success without nested smtp server configuration', async () => {
             cassandraGetStub.resolves([]);
 
             let result = await manager.getConfig();
 
-            should(Object.keys(result).length).eql(Object.keys(configConstants).length);
+            should(Object.keys(result).length).eql(Object.keys(configConstants).length - 1); // no smtp_server is returned in result;
+            should.not.exist(result.smtp_server);
             const resultEscapedUndefined = escapeUndefinedValues(result);
             should(resultEscapedUndefined).eql(defaultConfig);
         });
     });
 
-    describe('get config from default and DB', function () {
+    describe('get config from default and DB with nested smtp_server configuration', function () {
         it('get config success', async () => {
-            cassandraGetStub.resolves({ 'runner_cpu': 2 });
+            cassandraGetStub.resolves({ 'runner_cpu': 2, 'smtp_server': { from: { value: 'from' }, host: { value: 'host' }, port: { value: 'port' } } });
             let result = await manager.getConfig();
             should(Object.keys(result).length).eql(Object.keys(configConstants).length);
             Object.keys(result).forEach(key => {
-                if (key !== 'runner_cpu') {
+                if (key !== 'runner_cpu' && key !== 'smtp_server') {
                     should(result[key]).eql(defaultConfigNotEscaped[key]);
                 }
             });
             should(result['runner_cpu']).eql(2);
+            should(result['smtp_server']).eql({
+                'from': 'from',
+                'host': 'host',
+                'port': 'port'
+            });
         });
     });
 

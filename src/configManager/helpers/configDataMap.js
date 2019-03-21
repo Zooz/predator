@@ -2,7 +2,6 @@ const constConfig = require('../../common/consts').CONFIG;
 
 let configDataMap = {
     [constConfig.GRFANA_URL]: { value: process.env.GRAFANA_URL, type: 'string' },
-    [constConfig.EXTERNAL_ADDRESS]: { value: process.env.EXTERNAL_ADDRESS || process.env.INTERNAL_ADDRESS, type: 'string' },
     [constConfig.INTERNAL_ADDRESS]: { value: process.env.INTERNAL_ADDRESS, type: 'string' },
     [constConfig.DOCKER_NAME]: { value: process.env.DOCKER_NAME || 'zooz/predator-runner:latest', type: 'string' },
     [constConfig.JOB_PLATFORM]: { value: process.env.JOB_PLATFORM, type: 'string' },
