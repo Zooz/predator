@@ -1,6 +1,15 @@
 'use strict';
 const configModel = require('../models/configHandler');
 
+module.exports.getConfigDataMap = async (req, res, next) => {
+    try {
+        const response = await configModel.getConfigDataMap();
+        return res.status(200).json(response);
+    } catch (err) {
+        return next(err);
+    }
+};
+
 module.exports.getConfig = async (req, res, next) => {
     try {
         const response = await configModel.getConfig();

@@ -49,33 +49,35 @@ class DrawerE extends Component {
                   <ListItem key={listItem.key}
                     innerDivStyle={{ color: 'white' }}
                     primaryText={listItem.primaryText}
+                    onClick={listItem.navigateTo ? () => this.apiClick(`/${listItem.navigateTo}`): undefined}
                     leftIcon={<ContentInbox />}
                     initiallyOpen={false}
                     primaryTogglesNestedList
                     nestedItems={
-                      listItem.nestedItems.map((nestedItem) => {
-                        if (nestedItem.linkUrl) {
-                          return (
-                            <a key={nestedItem.key} target='_blank' href={nestedItem.linkUrl}>
+                      listItem.nestedItems ?
+                        listItem.nestedItems.map((nestedItem) => {
+                          if (nestedItem.linkUrl) {
+                            return (
+                              <a key={nestedItem.key} target='_blank' href={nestedItem.linkUrl}>
+                                <ListItem key={'nestedItems_' + nestedItem.key}
+                                  nestedListStyle={{ color: 'white' }}
+                                  innerDivStyle={{ color: 'white' }}
+                                  className={url.includes(nestedItem.navigateTo) ? style['menu-selected'] : undefined}
+                                  primaryText={nestedItem.primaryText}
+                                  leftIcon={<ActionGrade />} />
+                              </a>
+                            )
+                          } else {
+                            return (
                               <ListItem key={'nestedItems_' + nestedItem.key}
-                                nestedListStyle={{ color: 'white' }}
                                 innerDivStyle={{ color: 'white' }}
                                 className={url.includes(nestedItem.navigateTo) ? style['menu-selected'] : undefined}
                                 primaryText={nestedItem.primaryText}
+                                onClick={() => this.apiClick(`/${nestedItem.navigateTo}`)}
                                 leftIcon={<ActionGrade />} />
-                            </a>
-                          )
-                        } else {
-                          return (
-                            <ListItem key={'nestedItems_' + nestedItem.key}
-                              innerDivStyle={{ color: 'white' }}
-                              className={url.includes(nestedItem.navigateTo) ? style['menu-selected'] : undefined}
-                              primaryText={nestedItem.primaryText}
-                              onClick={() => this.apiClick(`/${nestedItem.navigateTo}`)}
-                              leftIcon={<ActionGrade />} />
-                          )
-                        }
-                      })
+                            )
+                          }
+                        }) : []
                     } />
                 )
               })}

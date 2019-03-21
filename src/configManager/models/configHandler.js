@@ -2,6 +2,10 @@ const dbConnector = require('./database/databaseConnector');
 const configDataMap = require('../helpers/configDataMap');
 const configTemplate = require('../../common/consts').CONFIG;
 
+module.exports.getConfigDataMap = () => {
+    return configDataMap.getConfigMap();
+};
+
 module.exports.getConfigValue = async (configPath) => {
     const dbConfigValue = await dbConnector.getConfigValue(configPath);
     return dbConfigValue || configDataMap.getConstDefaultValue(configPath);

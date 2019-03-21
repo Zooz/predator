@@ -3,6 +3,7 @@ import GetTests from '../features/PerformanceUI/instance/get-tests';
 import GetJobs from '../features/PerformanceUI/instance/get-jobs';
 import GetReports from '../features/PerformanceUI/instance/get-last-reports';
 import GetTestReports from '../features/PerformanceUI/instance/get-test-reports';
+import GetConfiguration from '../features/PerformanceUI/instance/get-configuration';
 import { Route, Redirect } from 'react-router';
 import { connect } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
@@ -42,9 +43,11 @@ class App extends React.Component {
               <Route exact path='/last_reports' render={props => (
                 <GetReports key={props.match.params.instance} {...props} />
               )} />
+              <Route exact path='/configuration' render={props => (
+                  <GetConfiguration key={props.match.params.instance} {...props} />
+              )} />
             </DrawerE>
           </ConnectedRouter>
-
         </Fragment>
 
       )

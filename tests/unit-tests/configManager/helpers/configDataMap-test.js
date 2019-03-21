@@ -8,10 +8,10 @@ const valuesToCheck = ['grafana_url', 'internal_address', 'docker_name', 'job_pl
 
 let manager;
 const expectedTypes = {
-    grafana_url: undefined,
-    internal_address: undefined,
-    docker_name: undefined,
-    job_platform: undefined,
+    grafana_url: 'string',
+    internal_address: 'string',
+    docker_name: 'string',
+    job_platform: 'string',
     runner_memory: 'int',
     runner_cpu: 'int',
     minimum_wait_for_delayed_report_status_update_in_ms: 'int',

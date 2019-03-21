@@ -153,7 +153,7 @@ class getJobs extends React.Component {
       };
 
       return (
-        <Page title={'Jobs'}>
+        <Page title={'Scheduled Jobs'}>
           <div className={style.getTests}>
             <div className={style.tableDiv}>
               <BootstrapTable options={options} bodyContainerClass={style.container}
