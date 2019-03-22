@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.5"></a>
+## [1.0.5](https://github.com/Zooz/predator/compare/v1.0.4...v1.0.5) (2019-03-22)
+
+
+### Bug Fixes
+
+* **dockerfile:** setting max_old_space_size to 512mb ([8fc2160](https://github.com/Zooz/predator/commit/8fc2160))
+* **dockerfile:** setting max_old_space_size to 512mb cli ([bb936f9](https://github.com/Zooz/predator/commit/bb936f9))
+* **general:** adjust helm template ([d01dcc1](https://github.com/Zooz/predator/commit/d01dcc1))
+
+
+
 <a name="1.0.4"></a>
 ## [1.0.4](https://github.com/Zooz/predator/compare/v1.0.3...v1.0.4) (2019-03-18)
 
