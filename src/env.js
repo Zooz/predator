@@ -38,7 +38,7 @@ env.init = function () {
     mandatoryVars = mandatoryVars.concat(BY_PLATFORM_MANDATORY_VARS[process.env.JOB_PLATFORM.toUpperCase()]);
 
     if (process.env.DATABASE_TYPE) {
-        mandatoryVars = mandatoryVars.concat(BY_DATABASE_MANDATORY_VARS[process.env.DATABASE_TYPE]);
+        mandatoryVars = mandatoryVars.concat(BY_DATABASE_MANDATORY_VARS[process.env.DATABASE_TYPE.toUpperCase()]);
     }
 
     let missingFields = mandatoryVars.filter((currVar) => {

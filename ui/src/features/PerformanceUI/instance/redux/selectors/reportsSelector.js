@@ -1,5 +1,5 @@
 import dateFormat from "dateformat";
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
 export const reports = (state) => state.ReportsReducer.get('reports');
 export const aggregateReport = (state) => state.ReportsReducer.get('aggregate_report');
@@ -9,7 +9,7 @@ export const errorOnGetReport = (state) => state.ReportsReducer.get('error_get_r
 export const processingGetReports = (state) => state.ReportsReducer.get('processing_get_reports');
 
 
-export const getAggregateReort = createSelector(aggregateReport, (report) => {
+export const getAggregateReort = createSelector(aggregateReport,(report)=>{
     const latencyGraph = [],
         errorsCodeGraph = [],
         errorCodes = {},
@@ -19,11 +19,10 @@ export const getAggregateReort = createSelector(aggregateReport, (report) => {
         errorsBar = [],
         scenarios = [];
     if (report) {
-        const startTime = new Date('2019-03-21T04:49:43.000Z').getTime();
+        const startTime = new Date(report.start_time).getTime();
         report.intermediates.forEach((bucket, index) => {
             const latency = bucket.latency;
             const time = new Date(startTime + (bucket.bucket * 1000));
-            console.log(dateFormat(time, 'h:MM:ss') + ' ' + latency.median);
             latencyGraph.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
                 median: latency.median,
