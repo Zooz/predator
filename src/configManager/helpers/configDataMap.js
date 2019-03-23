@@ -9,16 +9,30 @@ let configDataMap = {
     [constConfig.RUNNER_MEMORY]: { value: process.env.RUNNER_MEMORY || 2048, type: 'int' },
     [constConfig.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS]: { value: process.env.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS || 30000, type: 'int' },
     [constConfig.METRICS_PLUGIN_NAME]: { value: process.env.METRICS_PLUGIN_NAME, type: 'string' },
-    [constConfig.PROMETHEUS_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
-    [constConfig.INFLUX_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
+    [constConfig.PROMETHEUS_METRICS]: {
+        value: {
+            prometheus_push_gateway_url: { value: process.env.PROMETHEUS_PUSH_GATEWAY_URL, type: 'string' },
+            prometheus_bucket_sizes: { value: process.env.PROMETHEUS_BUCKET_SIZES, type: 'string' }
+        },
+        type: 'json'
+    },
+    [constConfig.INFLUX_METRICS]: {
+        value: {
+            influx_host: { value: process.env.INFLUX_HOST, type: 'string' },
+            influx_username: { value: process.env.INFLUX_USERNAME, type: 'string' },
+            influx_password: { value: process.env.INFLUX_PASSWORD, type: 'string' },
+            influx_database: { value: process.env.INFLUX_DATABASE, type: 'string' }
+        },
+        type: 'json'
+    },
     [constConfig.SMTP_SERVER]: {
         value: {
-            from: process.env.SMTP_FROM,
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            username: process.env.SMTP_USERNAME,
-            password: process.env.SMTP_PASSWORD,
-            timeout: process.env.SMTP_TIMEOUT || 200
+            smtp_from: { value: process.env.SMTP_FROM, type: 'string' },
+            smtp_host: { value: process.env.SMTP_HOST, type: 'string' },
+            smtp_port: { value: process.env.SMTP_PORT, type: 'int' },
+            smtp_username: { value: process.env.SMTP_USERNAME, type: 'string' },
+            smtp_password: { value: process.env.SMTP_PASSWORD, type: 'string' },
+            smtp_timeout: { value: process.env.SMTP_TIMEOUT, type: 'int' }
         },
         type: 'json'
     }
@@ -29,6 +43,13 @@ module.exports.getConstType = (configValue) => {
 };
 
 module.exports.getConstDefaultValue = (configValue) => {
+    if (configDataMap[configValue] && configDataMap[configValue].value instanceof Object) {
+        let innerConfig = {};
+        Object.keys(configDataMap[configValue].value).forEach((nestedConfigKey) => {
+            innerConfig[nestedConfigKey] = configDataMap[configValue].value[nestedConfigKey].value;
+        });
+        return innerConfig;
+    }
     return configDataMap[configValue] ? configDataMap[configValue].value : undefined;
 };
 

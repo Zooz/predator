@@ -1,7 +1,7 @@
 import { put, takeLatest, select, call } from 'redux-saga/effects'
 import * as Actions from '../actions/configActions'
 import * as Types from '../types/configTypes'
-import { getFrameworkConfig, getConfigDataMap, updateFrameworkConfig } from '../apis/configApi'
+import { getFrameworkConfig, getConfigDataMap, updateFrameworkConfig, deleteFrameworkConfigKey } from '../apis/configApi'
 
 export function * getConfig () {
   try {
@@ -37,8 +37,21 @@ export function * editConfig (action) {
   yield put(Actions.processUpdateConfig(false));
 }
 
+export function * deleteConfigKey (action) {
+  console.log(action)
+  try {
+    yield put(Actions.processDeleteConfigKey(true));
+    yield call(deleteFrameworkConfigKey, action.body);
+  } catch (err) {
+    yield put(Actions.deleteConfigKeyFailure(err));
+  }
+  yield put(Actions.processDeleteConfigKey(false));
+}
+
+
 export function * configRegister() {
   yield takeLatest(Types.GET_CONFIG, getConfig);
   yield takeLatest(Types.GET_CONFIG_DATA_MAP, getDataMap);
   yield takeLatest(Types.UPDATE_CONFIG, editConfig);
+  yield takeLatest(Types.DELETE_CONFIG_KEY, deleteConfigKey);
 }

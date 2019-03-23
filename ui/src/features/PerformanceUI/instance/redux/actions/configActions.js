@@ -47,3 +47,15 @@ export const updateConfig = (body) => (
 export const clearUpdateConfigError = (state) => (
     { type: Types.CLEAR_ERROR_ON_UPDATE_CONFIG, state }
 );
+
+export const deleteConfigKey = (body) => (
+    { type: Types.DELETE_CONFIG_KEY, body }
+);
+
+export const processDeleteConfigKey = (state) => (
+    { type: Types.PROCESSING_DELETE_CONFIG_KEY, state }
+);
+
+export const deleteConfigKeyFailure = (error) => (
+    { type: Types.DELETE_CONFIG_FAILURE, error }
+);

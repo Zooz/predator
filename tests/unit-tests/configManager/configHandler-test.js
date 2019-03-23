@@ -15,9 +15,6 @@ const defaultConfig = {
     docker_name: 'zooz/predator-runner:latest',
     runner_cpu: 1,
     runner_memory: 2048,
-    smtp_server: {
-        timeout: 200
-    },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
@@ -27,12 +24,12 @@ const defaultConfigNotEscaped = {
     runner_cpu: 1,
     runner_memory: 2048,
     smtp_server: {
-        from: undefined,
-        host: undefined,
-        port: undefined,
-        username: undefined,
-        password: undefined,
-        timeout: 200
+        smtp_from: undefined,
+        smtp_host: undefined,
+        smtp_port: undefined,
+        smtp_username: undefined,
+        smtp_password: undefined,
+        smtp_timeout: undefined
     },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
@@ -40,11 +37,11 @@ const defaultConfigNotEscaped = {
 const configResponseParseObject = {
     runner_cpu: 5,
     smtp_server: {
-        host: 'test',
-        port: 'test',
-        username: 'test',
-        password: 'test',
-        timeout: 'test'
+        smtp_host: 'test',
+        smtp_port: 'test',
+        smtp_username: 'test',
+        smtp_password: 'test',
+        smtp_timeout: 'test'
     },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
@@ -54,14 +51,14 @@ const configParseExpected = {
     docker_name: 'zooz/predator-runner:latest',
     runner_cpu: 5,
     runner_memory: 2048,
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000,
     smtp_server: {
-        host: 'test',
-        port: 'test',
-        username: 'test',
-        password: 'test',
-        timeout: 'test'
-    },
-    minimum_wait_for_delayed_report_status_update_in_ms: 30000
+        smtp_host: 'test',
+        smtp_port: 'test',
+        smtp_username: 'test',
+        smtp_password: 'test',
+        smtp_timeout: 'test'
+    }
 };
 
 const convertObjectDBData = {
@@ -75,9 +72,6 @@ const resultAfterConvert = {
     grafana_url: 'test_grafana_url',
     runner_cpu: 2,
     runner_memory: 2048,
-    smtp_server: {
-        timeout: 200
-    },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
@@ -105,11 +99,12 @@ describe('Manager config', function () {
 
     describe('get default config', function () {
         it('get default config success', async () => {
+            let numberOfInnerConfigurationsNotReturned = 3;
             cassandraGetStub.resolves([]);
 
             let result = await manager.getConfig();
 
-            should(Object.keys(result).length).eql(Object.keys(configConstants).length);
+            should(Object.keys(result).length).eql(Object.keys(configConstants).length - numberOfInnerConfigurationsNotReturned);
             const resultEscapedUndefined = escapeUndefinedValues(result);
             should(resultEscapedUndefined).eql(defaultConfig);
         });
@@ -117,9 +112,11 @@ describe('Manager config', function () {
 
     describe('get config from default and DB', function () {
         it('get config success', async () => {
+            let numberOfInnerConfigurationsNotReturned = 3;
             cassandraGetStub.resolves({ 'runner_cpu': 2 });
+
             let result = await manager.getConfig();
-            should(Object.keys(result).length).eql(Object.keys(configConstants).length);
+            should(Object.keys(result).length).eql(Object.keys(configConstants).length - numberOfInnerConfigurationsNotReturned);
             Object.keys(result).forEach(key => {
                 if (key !== 'runner_cpu') {
                     should(result[key]).eql(defaultConfigNotEscaped[key]);

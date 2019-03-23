@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import _ from 'lodash';
 import style from './style.scss';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -12,7 +13,6 @@ import ErrorDialog from '../ErrorDialog';
 import classNames from 'classnames';
 import TooltipWrapper from '../../../../components/TooltipWrapper';
 import RactangleAlignChildrenLeft from '../../../../components/RectangleAlign/RectangleAlignChildrenLeft';
-import { validate } from './validator';
 
 const inputTypes = {
   INPUT_LIST: 'INPUT_LIST',
@@ -31,15 +31,19 @@ class Form extends React.Component {
       this.ConfigForm[configTitle] = [];
       this.props.parsedConfig[configTitle].forEach((singleConfigValue) => {
         this.ConfigForm[configTitle].push({
-          width: 350,
+          width: 600,
           name: singleConfigValue.name,
           key: singleConfigValue.name,
-          value: this.props.config[singleConfigValue.name] || singleConfigValue.value,
+          value: this.props.config[configTitle] instanceof Object
+              ? this.props.config[configTitle][singleConfigValue.name]
+              : this.props.config[singleConfigValue.name] || singleConfigValue.value,
           floatingLabelText: singleConfigValue.name,
           info: singleConfigValue.info
         });
 
-        this.state[singleConfigValue.name] = this.props.config[singleConfigValue.name] || singleConfigValue.value
+        this.props.config[configTitle] instanceof Object
+            ? this.state[singleConfigValue.name] = this.props.config[configTitle][singleConfigValue.name]
+            : this.state[singleConfigValue.name] = this.props.config[singleConfigValue.name] || singleConfigValue.value
       });
     });
 
@@ -76,9 +80,9 @@ class Form extends React.Component {
       this.props.clearErrorOnUpdateConfig();
     };
 
-    showValue (value, testDetails, field) {
-      let testField = (testDetails ? testDetails[field] : undefined);
-      return this.props.serverError ? testField : value || '';
+    showValue (value, configDetails, field) {
+      let configField = (configDetails ? configDetails[field] : undefined);
+      return this.props.serverError ? configField : value || '';
     }
 
     isThereErrorOnForm () {
@@ -131,12 +135,12 @@ class Form extends React.Component {
 
 
   render () {
-      const testDetails = this.props.data;
+      const configDetails = this.props.config;
       return (
         <div>
           <div className={style.form}>
             {Object.keys(this.ConfigForm).map((title) => {
-              return this.generateSectionInput(title, testDetails);
+              return this.generateSectionInput(title, configDetails);
             })}
 
             <div className={style.buttons}>
@@ -155,7 +159,7 @@ class Form extends React.Component {
       );
     }
 
-    generateInput = (oneItem, testDetails) => {
+    generateInput = (oneItem, configDetails) => {
       switch (oneItem.type) {
       case inputTypes.CHECKBOX:
         return (
@@ -186,7 +190,7 @@ class Form extends React.Component {
             style={{ width: oneItem.width }}
             id='standard-multiline-flexible'
             key={oneItem.key}
-            value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem.name)}
+            value={oneItem.disabled ? configDetails && configDetails[oneItem.name] : this.showValue(this.state[oneItem.name], configDetails, oneItem.name)}
             disabled={oneItem.disabled}
             errorText={this.state.errors[oneItem.name]}
             onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}
@@ -204,7 +208,7 @@ class Form extends React.Component {
               className={style.TextFieldAndCheckBoxToolTip}
               style={{ width: oneItem.width }}
               key={oneItem.key}
-              value={oneItem.disabled ? testDetails && testDetails[oneItem.name] : this.showValue(this.state[oneItem.name], testDetails, oneItem.name)}
+              value={oneItem.disabled ? configDetails && configDetails[oneItem.name] : this.showValue(this.state[oneItem.name], configDetails, oneItem.name)}
               disabled={oneItem.disabled}
               errorText={this.state.errors[oneItem.name]}
               onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}
@@ -216,7 +220,7 @@ class Form extends React.Component {
       }
     };
 
-    generateSectionInput = (title, testDetails) => {
+    generateSectionInput = (title, configDetails) => {
       return (
           <fragment key={title}>
             <h2>{title}</h2>
@@ -225,7 +229,7 @@ class Form extends React.Component {
                 <Fragment key={index}>
                 {!oneItem.hidden &&
                 <RactangleAlignChildrenLeft>
-                  {this.generateInput(oneItem, testDetails)}
+                  {this.generateInput(oneItem, configDetails)}
                   {this.showInfo(oneItem)}
                 </RactangleAlignChildrenLeft>}
                 </Fragment>
@@ -239,7 +243,7 @@ class Form extends React.Component {
       let body = {};
 
       Object.keys(this.state).forEach((configKey) => {
-        if (configKey !== 'errors' && this.state[configKey] !== '') {
+        if (configKey !== 'errors') {
           if (this.props.configDataMap[configKey] && this.props.configDataMap[configKey].type === 'int') {
             body[configKey] = parseInt(this.state[configKey]);
           } else {
@@ -247,6 +251,32 @@ class Form extends React.Component {
           }
         }
       });
+
+      for (let configSection in this.props.parsedConfig) {
+        if (configSection !== 'General') {
+          body[configSection] = {};
+          Object.keys(body).forEach((bodyKey) => {
+            const configElement = this.props.parsedConfig[configSection].find((element) => element.name === bodyKey);
+            if (configElement) {
+              if (body[bodyKey] !== '') {
+                const value = configElement.type === 'int' ? parseInt(body[bodyKey]) : body[bodyKey];
+                if (value) {
+                  body[configSection][bodyKey] = value;
+                }
+              }
+              delete body[bodyKey];
+            }
+          });
+        }
+      }
+
+      //delete empty values from config
+      for(let key in body) {
+        if (_.isEmpty(body[key])) {
+          delete body[key];
+          this.props.deleteConfigKey(key);
+        }
+      }
 
       body = JSON.parse(JSON.stringify(body));
 
@@ -267,6 +297,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = {
   clearErrorOnUpdateConfig: Actions.clearUpdateConfigError,
   updateConfig: Actions.updateConfig,
+  deleteConfigKey: Actions.deleteConfigKey,
   getConfig: Actions.getConfig
 };
 

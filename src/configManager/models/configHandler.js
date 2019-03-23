@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const dbConnector = require('./database/databaseConnector');
 const configDataMap = require('../helpers/configDataMap');
 const configTemplate = require('../../common/consts').CONFIG;
@@ -30,7 +32,31 @@ function createConfigObject(configAsObject) {
     let config = {};
     Object.values(configTemplate).forEach(configTemplateKeys => {
         const value = configAsObject[configTemplateKeys] !== (undefined) ? configAsObject[configTemplateKeys] : configDataMap.getConstDefaultValue(configTemplateKeys);
-        config[configTemplateKeys] = value;
+        if (value instanceof Object) {
+            const nestedConfigAsObject = createNestedConfigObject(value);
+            if (nestedConfigAsObject) {
+                config[configTemplateKeys] = nestedConfigAsObject;
+            }
+        } else {
+            config[configTemplateKeys] = value;
+        }
     });
     return config;
+}
+
+function createNestedConfigObject(nestedConfigTemplate) {
+    let nestedConfig = {};
+    Object.keys(nestedConfigTemplate).forEach((templateKey) => {
+        const value = nestedConfigTemplate[templateKey] instanceof Object
+            ? nestedConfigTemplate[templateKey].value
+            : nestedConfigTemplate[templateKey];
+        if (value) {
+            nestedConfig[templateKey] = value;
+        }
+    });
+    if (_.isEmpty(nestedConfig)) {
+        return undefined;
+    } else {
+        return nestedConfig;
+    }
 }

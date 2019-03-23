@@ -1,19 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { config, configDataMap, errorOnGetConfig, errorOnUpdateConfig, processingGetConfig, processingUpdateConfig, processGetConfigDataMap } from './redux/selectors/configSelector';
-import { BootstrapTable, TableHeaderColumn, SearchField } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import style from './style.scss';
 import * as Actions from './redux/action';
 import Loader from '../components/Loader';
 import Page from '../../../components/Page';
 import ConfigurationForm from '../components/ConfigurationForm';
-import InputDialog from "./get-tests";
 import history from "../../../store/history";
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetConfig = 'Error occurred while trying to get Predator configuration.';
 let parsedConfigDataMap;
-let parsedConfig;
 
 class getConfiguration extends React.Component {
   constructor (props) {
@@ -70,27 +67,25 @@ function parseConfigDataMap (configDataMap) {
         };
         parsedConfigDataMap['General'].push(configValueElement);
       } else {
-          // TODO: nested objects - not supported in UI yet
-
-          // parsedConfigDataMap[configKey] = [];
-          // let configValueElement;
-          // if (configDataMap[configKey].value) {
-          //   Object.keys(configDataMap[configKey].value).forEach((key) => {
-          //     configValueElement = {
-          //       name: key,
-          //       value: configDataMap[configKey].value[key].value || '',
-          //       type: configDataMap[configKey].value[key].type
-          //     };
-          //     parsedConfigDataMap[configKey].push(configValueElement)
-          //   });
-          // } else {
-          //   configValueElement = {
-          //     name: configKey,
-          //     value: '',
-          //     type: configDataMap[configKey].type
-          //   };
-          //   parsedConfigDataMap[configKey].push(configValueElement)
-          // }
+          parsedConfigDataMap[configKey] = [];
+          let configValueElement;
+          if (configDataMap[configKey].value) {
+            Object.keys(configDataMap[configKey].value).forEach((key) => {
+              configValueElement = {
+                name: key,
+                value: configDataMap[configKey].value[key].value || '',
+                type: configDataMap[configKey].value[key].type
+              };
+              parsedConfigDataMap[configKey].push(configValueElement)
+            });
+          } else {
+            configValueElement = {
+              name: configKey,
+              value: '',
+              type: configDataMap[configKey].type
+            };
+            parsedConfigDataMap[configKey].push(configValueElement)
+          }
       }
   });
 

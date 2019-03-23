@@ -23,3 +23,11 @@ export const updateFrameworkConfig = (body) => {
       responseType: 'json'
     });
 };
+
+export const deleteFrameworkConfigKey = (configKey) => {
+  return axios.delete(`${env.PREDATOR_URL}/config/${configKey}`, {
+    headers: {},
+    responseType: 'json'
+  });
+};
+

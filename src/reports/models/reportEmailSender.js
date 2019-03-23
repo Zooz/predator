@@ -7,6 +7,7 @@ const fs = require('fs'),
     configHandler = require('../../configManager/models/configHandler'),
     configConsts = require('../../common/consts').CONFIG,
     logger = require('../../common/logger');
+
 module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
     let testName = aggregatedResults.test_name;
     let endTime = aggregatedResults.end_time;
@@ -27,7 +28,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
 
     async function createMailOptions(configSmtp) {
         return {
-            from: configSmtp.from,
+            from: configSmtp.smtp_from,
             to: [emails].join(','),
             html: htmlBody,
             subject: `Your test results: ${testName}`
@@ -48,12 +49,12 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
 
 async function createSMTPClient(configSmtp) {
     const options = {
-        port: configSmtp.port,
-        host: configSmtp.host,
-        connectionTimeout: configSmtp.timeout,
+        port: configSmtp.smtp_port,
+        host: configSmtp.smtp_host,
+        connectionTimeout: configSmtp.smtp_timeout,
         auth: {
-            user: configSmtp.username,
-            pass: configSmtp.password
+            user: configSmtp.smtp_username,
+            pass: configSmtp.smtp_password
         }
     };
 
