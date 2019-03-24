@@ -16,8 +16,8 @@ const expectedTypes = {
     runner_cpu: 'int',
     minimum_wait_for_delayed_report_status_update_in_ms: 'int',
     metrics_plugin_name: 'string',
-    default_email_address: undefined,
-    default_webhook_url: undefined,
+    default_email_address: 'string',
+    default_webhook_url: 'string',
     influx_metrics: 'json',
     prometheus_metrics: 'json',
     smtp_server: 'json'
@@ -32,6 +32,8 @@ function changeAllEnvData() {
     process.env.RUNNER_MEMORY = 'runner_memory_test';
     process.env.METRICS_PLUGIN_NAME = 'metrics_plugin_name_test';
     process.env.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS = 'minimum_wait_for_delayed_report_status_update_in_ms_test';
+    process.env.DEFAULT_WEBHOOK_URL = 'default_webhook_url_test';
+    process.env.DEFAULT_EMAIL_ADDRESS = 'default_email_address_test';
 }
 
 describe('configManager data map helper tests', function() {

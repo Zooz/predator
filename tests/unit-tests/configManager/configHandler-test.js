@@ -6,7 +6,6 @@ const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
 const databaseConnector = require('../../../src/configManager/models/database/databaseConnector');
-const configConstants = require('../../../src/common/consts').CONFIG;
 
 let manager;
 
@@ -99,12 +98,11 @@ describe('Manager config', function () {
 
     describe('get default config', function () {
         it('get default config success', async () => {
-            let numberOfInnerConfigurationsNotReturned = 3;
             cassandraGetStub.resolves([]);
 
             let result = await manager.getConfig();
 
-            should(Object.keys(result).length).eql(Object.keys(configConstants).length - numberOfInnerConfigurationsNotReturned);
+            should(Object.keys(result).length).eql(10);
             const resultEscapedUndefined = escapeUndefinedValues(result);
             should(resultEscapedUndefined).eql(defaultConfig);
         });
@@ -112,17 +110,64 @@ describe('Manager config', function () {
 
     describe('get config from default and DB', function () {
         it('get config success', async () => {
-            let numberOfInnerConfigurationsNotReturned = 3;
             cassandraGetStub.resolves({ 'runner_cpu': 2 });
 
             let result = await manager.getConfig();
-            should(Object.keys(result).length).eql(Object.keys(configConstants).length - numberOfInnerConfigurationsNotReturned);
+            should(Object.keys(result).length).eql(10);
             Object.keys(result).forEach(key => {
                 if (key !== 'runner_cpu') {
                     should(result[key]).eql(defaultConfigNotEscaped[key]);
                 }
             });
             should(result['runner_cpu']).eql(2);
+        });
+    });
+
+    describe('get config with inner config from db', function () {
+        it('get config success with smtp', async () => {
+            cassandraGetStub.resolves({
+                'smtp_server': {
+                    'smtp_host': 'host',
+                    'smtp_port': 123
+                }
+            });
+
+            let result = await manager.getConfig();
+            should(Object.keys(result).length).eql(11);
+            should(result.smtp_server.smtp_port).eql(123);
+            should(result.smtp_server.smtp_host).eql('host');
+        });
+
+        it('get config success with smtp and prometheus metrics', async () => {
+            cassandraGetStub.resolves({
+                'smtp_server': {
+                    'smtp_host': 'host',
+                    'smtp_port': 123
+                },
+                'prometheus_metrics': {
+                    'prometheus_push_gateway_url': 'url'
+                }
+            });
+
+            let result = await manager.getConfig();
+            should(Object.keys(result).length).eql(12);
+            should(result.smtp_server.smtp_port).eql(123);
+            should(result.smtp_server.smtp_host).eql('host');
+            should(result.prometheus_metrics.prometheus_push_gateway_url).eql('url');
+        });
+
+        it('get config success', async () => {
+            cassandraGetStub.resolves({
+                'smtp_server': {
+                    'smtp_host': 'host',
+                    'smtp_port': 123
+                }
+            });
+
+            let result = await manager.getConfig();
+            should(Object.keys(result).length).eql(11);
+            should(result.smtp_server.smtp_port).eql(123);
+            should(result.smtp_server.smtp_host).eql('host');
         });
     });
 

@@ -38,7 +38,7 @@ class Form extends React.Component {
               ? this.props.config[configTitle][singleConfigValue.name]
               : this.props.config[singleConfigValue.name] || singleConfigValue.value,
           floatingLabelText: singleConfigValue.name,
-          info: singleConfigValue.info
+          info: this.infoMapper[singleConfigValue.name]
         });
 
         this.props.config[configTitle] instanceof Object
@@ -57,6 +57,31 @@ class Form extends React.Component {
           upstream_connect_timeout: undefined
     };
   }
+
+    infoMapper = {
+      runner_memory: 'Max memory to use by each runner in MB',
+      grafana_url: 'The url for grafana',
+      internal_address: 'The local ip address of your machine',
+      docker_name: 'The predator-runner docker image that will run the test',
+      job_platform: 'Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)',
+      runner_cpu: 'Number of CPU use by the each runner',
+      minimum_wait_for_delayed_report_status_update_in_ms: 'The minimum of time waiting for runner to report before the test considered as finished in milliseconds',
+      metrics_plugin_name: 'Metrics to use (prometheus, influx)',
+      default_email_address: 'Default email to send final report to',
+      default_webhook_url: 'Default webhook url to send live report statistics to',
+      prometheus_push_gateway_url: 'Url of push gateway',
+      prometheus_bucket_sizes: 'Bucket sizes use to configure prometheus',
+      influx_host: 'Influx db host',
+      influx_username: 'Influx db username',
+      influx_password: 'Influx db password',
+      influx_database: 'Influx db name',
+      smtp_host: 'SMTP host',
+      smtp_port: 'SMTP port',
+      smtp_username: 'SMTP username',
+      smtp_password: 'SMTP password',
+      smtp_from: 'The \'from\' email address that will be used to send emails',
+      smtp_timeout: 'Timout to SMTP server in milliseconds'
+    };
 
     handleChangeForCheckBox = (name, evt) => {
       const newState = Object.assign({}, this.state, { [name]: evt.target.checked });
@@ -215,7 +240,6 @@ class Form extends React.Component {
               floatingLabelText={oneItem.floatingLabelText}
               name={oneItem.name} />
           </div>
-
         );
       }
     };
@@ -272,7 +296,7 @@ class Form extends React.Component {
 
       //delete empty values from config
       for(let key in body) {
-        if (_.isEmpty(body[key])) {
+        if (!_.isNumber(body[key]) && _.isEmpty(body[key])) {
           delete body[key];
           this.props.deleteConfigKey(key);
         }

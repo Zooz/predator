@@ -1616,7 +1616,7 @@ components:
           description: Number of CPU use by the each runner.
         runner_memory:
           type: number
-          description: Max memory to use by each runner.
+          description: Max memory to use by each runner in MB.
         metrics_plugin_name:
           type: string
           enum:
@@ -1625,20 +1625,17 @@ components:
           description: Metrics to use, in case one or both metrics are configured.
         default_email_address:
           type: string
-          description: Default email to send final report to, address can be configured
-            only by using API.
+          description: Default email to send final report to.
         minimum_wait_for_delayed_report_status_update_in_ms:
           type: number
-          description: The minimum of time waiting for runner to report before the test considered as finished.
-            configured only by using API.
+          description: The minimum of time waiting for runner to report before the test considered as finished in milliseconds
         default_webhook_url:
           type: string
-          description: Default webhook url to send live report statistics to, can be
-            configured only by using API.
+          description: Default webhook url to send live report statistics to.
         influx_metrics:
           additionalProperties: false
           type: object
-          description: Influx configuration  .
+          description: Influx configuration.
           required:
           - influx_host
           - influx_username
@@ -1647,13 +1644,13 @@ components:
           properties:
             influx_host:
               type: string
-              description: Influx host.
+              description: Influx db host.
             influx_username:
               type: string
-              description: User name to influx.
+              description: Influx db username.
             influx_password:
               type: string
-              description: Password name to influx.
+              description: Influx db password.
             influx_database:
               type: string
               description: Influx db name.

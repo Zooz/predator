@@ -23,5 +23,22 @@ module.exports = {
         INFLUX_METRICS: 'influx_metrics',
         PROMETHEUS_METRICS: 'prometheus_metrics',
         SMTP_SERVER: 'smtp_server'
+    },
+
+    INNER_CONFIGS: {
+        PROMETHEUS_PUSH_GATEWAY_URL: 'prometheus_push_gateway_url',
+        PROMETHEUS_BUCKET_SIZES: 'prometheus_bucket_sizes',
+
+        INFLUX_HOST: 'influx_host',
+        INFLUX_USERNAME: 'influx_username',
+        INFLUX_PASSWORD: 'influx_password',
+        INFLUX_DATABASE: 'influx_database',
+
+        SMTP_HOST: 'smtp_host',
+        SMTP_PORT: 'smtp_port',
+        SMTP_USERNAME: 'smtp_username',
+        SMTP_PASSWORD: 'smtp_password',
+        SMTP_FROM: 'smtp_from',
+        SMTP_TIMEOUT: 'smtp_timeout'
     }
 };
