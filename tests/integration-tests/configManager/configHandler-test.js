@@ -25,22 +25,22 @@ const requestBody = {
     default_email_address: 'string_value_default_email_address',
     default_webhook_url: 'string_value_default_webhook_url',
     influx_metrics: {
-        influx_host: 'string_value_influx_metrics',
-        influx_username: 'string_value_username',
-        influx_password: 'string_value_password',
-        influx_database: 'string_value_database'
+        host: 'string_value_influx_metrics',
+        username: 'string_value_username',
+        password: 'string_value_password',
+        database: 'string_value_database'
     },
     prometheus_metrics: {
-        prometheus_push_gateway_url: 'string_value_push_gateway_url',
-        prometheus_bucket_sizes: 'string_value_buckets_sizes'
+        push_gateway_url: 'string_value_push_gateway_url',
+        bucket_sizes: 'string_value_buckets_sizes'
     },
     smtp_server: {
-        smtp_from: 'test@mail.com',
-        smtp_host: 'string_value_smtp_server',
-        smtp_port: 2,
-        smtp_username: 'string_value_username',
-        smtp_password: 'string_value',
-        smtp_timeout: 2
+        from: 'test@mail.com',
+        host: 'string_value_smtp_server',
+        port: 2,
+        username: 'string_value_username',
+        password: 'string_value',
+        timeout: 2
     },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
@@ -48,8 +48,8 @@ const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
 const requestBodyNotValidType = { runner_cpu: 'not_int' };
 const requestBodyNotValidRequire = {
     influx_metrics: {
-        influx_host: 'string_value',
-        influx_username: 'string_value'
+        host: 'string_value',
+        username: 'string_value'
     }
 };
 

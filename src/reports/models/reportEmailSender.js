@@ -28,7 +28,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
 
     async function createMailOptions(configSmtp) {
         return {
-            from: configSmtp.smtp_from,
+            from: configSmtp.from,
             to: [emails].join(','),
             html: htmlBody,
             subject: `Your test results: ${testName}`
@@ -49,12 +49,12 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
 
 async function createSMTPClient(configSmtp) {
     const options = {
-        port: configSmtp.smtp_port,
-        host: configSmtp.smtp_host,
-        connectionTimeout: configSmtp.smtp_timeout,
+        port: configSmtp.port,
+        host: configSmtp.host,
+        connectionTimeout: configSmtp.timeout,
         auth: {
-            user: configSmtp.smtp_username,
-            pass: configSmtp.smtp_password
+            user: configSmtp.username,
+            pass: configSmtp.password
         }
     };
 

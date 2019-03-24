@@ -38,7 +38,6 @@ export function * editConfig (action) {
 }
 
 export function * deleteConfigKey (action) {
-  console.log(action)
   try {
     yield put(Actions.processDeleteConfigKey(true));
     yield call(deleteFrameworkConfigKey, action.body);

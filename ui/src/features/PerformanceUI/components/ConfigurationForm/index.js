@@ -25,11 +25,11 @@ class Form extends React.Component {
     super(props);
     this.state = {};
     this.ConfigForm = {};
-    this.FormList = [];
 
     Object.keys(this.props.parsedConfig).forEach((configTitle) => {
       this.ConfigForm[configTitle] = [];
       this.props.parsedConfig[configTitle].forEach((singleConfigValue) => {
+        const nameWithoutConfigTitle = singleConfigValue.name.replace(`${configTitle}_`, '');
         this.ConfigForm[configTitle].push({
           width: 600,
           name: singleConfigValue.name,
@@ -42,7 +42,7 @@ class Form extends React.Component {
         });
 
         this.props.config[configTitle] instanceof Object
-            ? this.state[singleConfigValue.name] = this.props.config[configTitle][singleConfigValue.name]
+            ? this.state[singleConfigValue.name] = this.props.config[configTitle][nameWithoutConfigTitle]
             : this.state[singleConfigValue.name] = this.props.config[singleConfigValue.name] || singleConfigValue.value
       });
     });
@@ -69,18 +69,18 @@ class Form extends React.Component {
       metrics_plugin_name: 'Metrics to use (prometheus, influx)',
       default_email_address: 'Default email to send final report to',
       default_webhook_url: 'Default webhook url to send live report statistics to',
-      prometheus_push_gateway_url: 'Url of push gateway',
-      prometheus_bucket_sizes: 'Bucket sizes use to configure prometheus',
-      influx_host: 'Influx db host',
-      influx_username: 'Influx db username',
-      influx_password: 'Influx db password',
-      influx_database: 'Influx db name',
-      smtp_host: 'SMTP host',
-      smtp_port: 'SMTP port',
-      smtp_username: 'SMTP username',
-      smtp_password: 'SMTP password',
-      smtp_from: 'The \'from\' email address that will be used to send emails',
-      smtp_timeout: 'Timout to SMTP server in milliseconds'
+      prometheus_metrics_push_gateway_url: 'Url of push gateway',
+      prometheus_metrics_bucket_sizes: 'Bucket sizes use to configure prometheus',
+      influx_metrics_host: 'Host IP',
+      influx_metrics_username: 'Username',
+      influx_metrics_password: 'Password',
+      smtp_server_host: 'Host IP',
+      smtp_server_port: 'Port number',
+      smtp_server_username: 'Username',
+      smtp_server_password: 'Password',
+      smtp_server_database: 'Influx db name',
+      smtp_server_from: 'The \'from\' email address that will be used to send emails',
+      smtp_server_timeout: 'Timout to SMTP server in milliseconds'
     };
 
     handleChangeForCheckBox = (name, evt) => {
@@ -285,7 +285,8 @@ class Form extends React.Component {
               if (body[bodyKey] !== '') {
                 const value = configElement.type === 'int' ? parseInt(body[bodyKey]) : body[bodyKey];
                 if (value) {
-                  body[configSection][bodyKey] = value;
+                  const bodyKeyWithoutConfigSection = bodyKey.replace(`${configSection}_`, '');
+                  body[configSection][bodyKeyWithoutConfigSection] = value;
                 }
               }
               delete body[bodyKey];

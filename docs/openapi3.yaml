@@ -1637,21 +1637,21 @@ components:
           type: object
           description: Influx configuration.
           required:
-          - influx_host
-          - influx_username
-          - influx_password
-          - influx_database
+          - host
+          - username
+          - password
+          - database
           properties:
-            influx_host:
+            host:
               type: string
               description: Influx db host.
-            influx_username:
+            username:
               type: string
               description: Influx db username.
-            influx_password:
+            password:
               type: string
               description: Influx db password.
-            influx_database:
+            database:
               type: string
               description: Influx db name.
         prometheus_metrics:
@@ -1659,12 +1659,12 @@ components:
           type: object
           description: prometheus configuration.
           required:
-          - prometheus_push_gateway_url
+          - push_gateway_url
           properties:
-            prometheus_push_gateway_url:
+            push_gateway_url:
               type: string
               description: Url of push gateway.
-            prometheus_bucket_sizes:
+            bucket_sizes:
               type: string
               description: Bucket sizes use to configure prometheus.
         smtp_server:
@@ -1672,25 +1672,25 @@ components:
           type: object
           description: Simple mail transfer protocol.
           required:
-          - smtp_from
-          - smtp_host
-          - smtp_port
-          - smtp_username
-          - smtp_password
-          - smtp_timeout
+          - from
+          - host
+          - port
+          - username
+          - password
+          - timeout
           properties:
-            smtp_from:
+            from:
               type: string
               format: email
               description: the 'from' email address that will be used to send emails
-            smtp_host:
+            host:
               type: string
-            smtp_port:
+            port:
               type: number
-            smtp_username:
+            username:
               type: string
-            smtp_password:
+            password:
               type: string
-            smtp_timeout:
+            timeout:
               description: timout to smtp server in milliseconds
               type: number

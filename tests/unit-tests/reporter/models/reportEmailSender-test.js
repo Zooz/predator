@@ -59,9 +59,9 @@ const JOB = {
 };
 
 const CONFIG = {
-    smtp_port: 111,
-    smtp_host: 'smtp_host_test',
-    smtp_timeout: 222
+    port: 111,
+    host: 'smtp_host_test',
+    timeout: 222
 };
 
 const transporter = {
@@ -94,7 +94,7 @@ describe('Report emails sender test', () => {
         sendMailStub.resolves({ status: 201 });
         nodemailerCreateTransportStub.returns(transporter);
         aggregateReportGeneratorStub.resolves(AGGREGATE_REPORT);
-        getConfig.resolves({ smtp_from: 'Predator 💪 <performance@predator.com>' });
+        getConfig.resolves({ from: 'Predator 💪 <performance@predator.com>' });
 
         await reportEmailSender.sendAggregateReport(AGGREGATE_REPORT, JOB, ['eli@zooz.com']);
 

@@ -72,19 +72,12 @@ function parseConfigDataMap (configDataMap) {
           if (configDataMap[configKey].value) {
             Object.keys(configDataMap[configKey].value).forEach((key) => {
               configValueElement = {
-                name: key,
+                name: `${configKey}_${key}`,
                 value: configDataMap[configKey].value[key].value || '',
                 type: configDataMap[configKey].value[key].type
               };
               parsedConfigDataMap[configKey].push(configValueElement)
             });
-          } else {
-            configValueElement = {
-              name: configKey,
-              value: '',
-              type: configDataMap[configKey].type
-            };
-            parsedConfigDataMap[configKey].push(configValueElement)
           }
       }
   });
