@@ -42,7 +42,12 @@ const rules = [
                     name: 'images/[hash]-[name].[ext]'
                   }
                 }]
-  }
+  },
+        {
+            test: /\.(eot|svg|ttf|woff|woff2)$/,
+            loader: 'file-loader?name=public/fonts/[name].[ext]'
+        }
+
 ]
 ;
 
