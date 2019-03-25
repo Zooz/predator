@@ -1,4 +1,36 @@
-.page{
-  height:100%;
+.page {
+  height: 100%;
   overflow: auto;
+  background-color: #f1f3f6;
+}
+.content {
+  margin-top: 116px;
+  margin-left:35px;
+}
+.title {
+  width: 115px;
+  height: 24px;
+  font-family: Roboto;
+  font-size: 20px;
+  font-weight: 900;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #555555;
+}
+
+.description {
+  max-width: 644px;
+  min-height: 46px;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.62;
+  letter-spacing: normal;
+  color: #778195;
+  margin-bottom: 43px;
+  margin-top: 20px;
 }

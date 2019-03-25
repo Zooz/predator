@@ -1,0 +1,101 @@
+@import "../styles/colors";
+
+$primary-color: $glowing-blue;
+$secondary-color: $white;
+$disabled-primary-color: $border-grey;
+$disabled-secondary-color: $disabled-grey-text;
+$transition-duration: 0.25s;
+$shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+$padding-sides: 28px;
+
+.button {
+  font-weight: normal;
+  line-height: 1;
+  transition: color $transition-duration,
+  width $transition-duration,
+  background-color $transition-duration,
+  border $transition-duration,
+  box-shadow $transition-duration;
+  cursor: pointer;
+  outline: none;
+  font-size: 13px;
+  border-radius: 3px;
+  padding: 0 $padding-sides;
+  text-align: center;
+  text-decoration: none;
+  position: relative;
+  min-width: 110px;
+  height: 26px;
+  overflow: hidden;
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:not([data-inverted=true]) {
+    color: $secondary-color;
+    background-color: $primary-color;
+    border: 1px solid transparent;
+  }
+
+  &[data-inverted=true] {
+    color: $primary-color;
+    background-color: $secondary-color;
+    border: 1px solid $primary-color;
+  }
+
+  &[data-spinner=true] {
+    pointer-events: none;
+  }
+
+  &[data-hover=true]:not([data-inverted=true]):hover {
+    box-shadow: $shadow;
+    background: darken($primary-color, 10%);
+  }
+
+  &[data-hover=true][data-inverted=true]:hover {
+    box-shadow: $shadow;
+  }
+
+  &[data-spinner=true] {
+    &[data-icon=false] {
+      padding: 0 calc(#{$padding-sides} - 7px);
+    }
+
+    .icon {
+      display: none;
+    }
+  }
+
+  &:disabled {
+    pointer-events: none;
+    box-shadow: none;
+    color: $disabled-secondary-color;
+    background-color: $disabled-primary-color;
+    border: 1px solid $disabled-primary-color;
+  }
+}
+
+.button__text {
+  display: inline-block;
+}
+
+.button-spinner {
+  display: inline-block;
+}
+
+.button__inner {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.icon:not(:last-child) {
+  margin-right: 9px;
+}
+
+.button-spinner:not(:last-child) {
+  margin-right: 5px;
+}

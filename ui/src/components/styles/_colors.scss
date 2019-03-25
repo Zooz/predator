@@ -1,0 +1,37 @@
+$error-red: #f9453e;
+$border-grey: #e9e9e9;
+$white: #ffffff;
+$default-blue: #557eff;
+$glowing-blue: #0d47ff;
+$text-black: #555555;
+$text-grey: #778195;
+$default-turquoise: #0d91bd;
+$success-green: #03b571;
+$list-item-grey: #f3f3f3;
+$outline-color: #79c2db;
+$greyout: #fafafa;
+$orange: #f87748;
+
+$disabled-grey-background: #f9fafb;
+$disabled-grey-text: #a8a8a8;
+
+$disabled-grey-button: #969696;
+$disabled-grey-button-hover: #545454;
+
+:export {
+  default-turquoise: $default-turquoise;
+  error-red: $error-red;
+  border-grey: $border-grey;
+  white: $white;
+  default-blue: $default-blue;
+  glowing-blue: $glowing-blue;
+  text-black: $text-black;
+  text-grey: $text-grey;
+  disabled-grey-background: $disabled-grey-background;
+  disabled-grey-text: $disabled-grey-text;
+  success-green: $success-green;
+  list-item-grey: $list-item-grey;
+  outline-color: $outline-color;
+  greyout: $greyout;
+  orange: $orange;
+}

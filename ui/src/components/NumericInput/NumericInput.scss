@@ -1,0 +1,44 @@
+@import "../styles/inputs";
+
+.input-counter {
+  flex: 1;
+  width: 0;
+  height: 100%;
+  border-radius: 3px 0 0 3px;
+  background-color: transparent;
+  text-align: center;
+  border: none;
+  border-right: 1px solid $default-border-color;
+
+  &:active, &:focus {
+    outline: none;
+  }
+}
+
+.input-counter-wrapper {
+  display: flex;
+  width: var(--number-input-width);
+  height: var(--number-input-height);
+  background: white;
+  @include default;
+
+  &[data-error="true"] {
+    @include error
+  }
+
+  &:hover {
+    @include hover;
+  }
+
+  &:focus-within {
+    @include active;
+  }
+
+  &[data-disabled="true"] {
+    pointer-events: none;
+
+    .input-counter {
+      background: $greyout;
+    }
+  }
+}

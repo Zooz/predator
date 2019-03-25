@@ -1,0 +1,42 @@
+@import "../../styles/colors";
+
+$headerColor: $default-blue;
+
+.header-wrapper {
+  display: flex;
+  align-items: center;
+}
+.header-text {
+  position: relative;
+  color: $headerColor;
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: var(--header-padding);
+  margin-right: 0.2em;
+}
+
+.header-sorters {
+  position: relative;
+  display: inline-flex;
+  margin-left: 10px;
+  flex-direction: column;
+  justify-content: center;
+
+  i {
+    font-size: 12px;
+    color: #dbdbdb;
+    position: absolute;
+
+    &:first-child {
+      top: -16px;
+    }
+
+    &:last-child {
+      top: -6px;
+    }
+
+    &[sorted=true] {
+      color: $headerColor;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+//.header-time {
+//  word-wrap: break-word !important;
+//  color:red;
+//  text-overflow:initial!important;
+//  overflow:visible!important;
+//}
+
+.action-style {
+  color:#557eff;
+  cursor: pointer;
+}
+
+.disabled-button {
+  color: #b4c9d3;
+  cursor: not-allowed;
+}
+
+.icon-cell{
+  display:flex;
+  align-items:center;
+}
+
+.icon {
+  font-size:27px;
+}
+
+.notes p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 164px;
+}
