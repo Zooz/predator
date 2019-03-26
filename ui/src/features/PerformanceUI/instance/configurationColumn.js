@@ -5,13 +5,14 @@ import Moment from 'moment';
 import prettySeconds from 'pretty-seconds';
 import 'font-awesome/css/font-awesome.min.css';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faEye, faCloudDownloadAlt, faStopCircle} from '@fortawesome/free-solid-svg-icons'
+import {faEye, faCloudDownloadAlt, faStopCircle, faTrashAlt, faPen,faRunning} from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames';
 import css from './configurationColumn.scss';
 import env from "../../../App/common/env";
 import {v4 as uuid} from "uuid";
 import TooltipWrapper from '../../../components/TooltipWrapper';
 import style from "./style.scss";
+import {getTimeFromCronExpr} from './utils';
 
 
 const dateFormatter = (cell, row) => {
@@ -27,13 +28,13 @@ const dateFormatter = (cell, row) => {
 };
 //TODO clean the code. all unused up/down /sortable
 
-const ViewButton = ({onClick, icon, disabled}) => {
+const ViewButton = ({onClick, icon, disabled,text}) => {
     if (icon) {
         return (<FontAwesomeIcon
             className={classnames(css['icon'], {[css['action-style']]: !disabled, [css['disabled-button']]: disabled})}
             onClick={!disabled && onClick} icon={icon}/>)
     }
-    return (<div className={css['action-style']} onClick={onClick}>View</div>)
+    return (<div className={css['action-style']} onClick={onClick}>{text || 'View'}</div>)
 };
 
 
@@ -58,7 +59,7 @@ const notes = (cell, row) => {
 };
 
 
-const statusFormatter= (cell)=>{
+const statusFormatter = (cell) => {
     let mapper = {
         'in_progress': 'Running',
         'aborted': 'Aborted',
@@ -69,7 +70,7 @@ const statusFormatter= (cell)=>{
     };
     return (mapper[cell] ? mapper[cell] : cell);
 }
-export const getColumns = ({columnsNames, sortHeader, onSort, onReportView, onRawView, onStop}) => {
+export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView,onStop, onDelete, onEdit, onRunTest }) => {
 
     const columns = [
         {
@@ -78,11 +79,74 @@ export const getColumns = ({columnsNames, sortHeader, onSort, onReportView, onRa
                 <TableHeader sortable={false}
                     // padding={text('headerPadding')}
                              up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}>
-                    Report Id
+                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
+                >
+                    Test Name
                 </TableHeader>
             ),
-            accessor: 'report_id'//TODO problem - it must to be here for selected if
+            accessor: 'report_id'
+        },      {
+            id: 'name',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
+                >
+                    Test Name
+                </TableHeader>
+            ),
+            accessor: 'name'
+        },
+        {
+            id: 'description',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
+                >
+                    Description
+                </TableHeader>
+            ),
+            accessor: 'description'
+        }, {
+            id: 'updated_at',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
+                >
+                    Modified
+                </TableHeader>
+            ),
+            accessor: (data) => (dateFormatter(data.updated_at))
+        }, {
+            id: 'type',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
+                >
+                    Type
+                </TableHeader>
+            ),
+            accessor: 'type'
+        }, {
+            id: 'edit',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
+                >
+                    Edit
+                </TableHeader>
+            ),
+            accessor: data => data.type ==='basic' ? <ViewButton icon={faPen} onClick={() => onEdit(data)}/> : 'N/A',
+            className: css['icon-cell']
         },
         {
             id: 'test_name',
@@ -96,6 +160,19 @@ export const getColumns = ({columnsNames, sortHeader, onSort, onReportView, onRa
                 </TableHeader>
             ),
             accessor: 'test_name'
+        },
+        {
+            id: 'environment',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
+                >
+                    Environment
+                </TableHeader>
+            ),
+            accessor: 'environment'
         },
         {
             id: 'start_time',
@@ -168,7 +245,43 @@ export const getColumns = ({columnsNames, sortHeader, onSort, onReportView, onRa
                     Ramp To
                 </TableHeader>
             ),
-            accessor: 'ramp_to'
+            accessor: data => (data.ramp_to || 'N/A')
+        },
+        {
+            id: 'max_virtual_users',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                    Max Virtual Users
+                </TableHeader>
+            ),
+            accessor: data => (data.max_virtual_users || 'N/A')
+        },
+        {
+            id: 'cron_expression',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                    Cron Expression
+                </TableHeader>
+            ),
+            accessor: data => (getTimeFromCronExpr(data.cron_expression) || 'N/A')
+        },
+        {
+            id: 'last_run',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                    Last Run
+                </TableHeader>
+            ),
+            accessor: 'last_run'
         },
 
         {
@@ -232,7 +345,7 @@ export const getColumns = ({columnsNames, sortHeader, onSort, onReportView, onRa
             accessor: data => <ViewButton onClick={() => onReportView(data)}/>
         },
         {
-            id: 'aggregate_report',
+            id: 'grafana_report',
             Header: () => (
                 <TableHeader sortable={false}
                     // padding={text('headerPadding')}
@@ -254,6 +367,32 @@ export const getColumns = ({columnsNames, sortHeader, onSort, onReportView, onRa
                 </TableHeader>
             ),
             accessor: data => <ViewButton icon={faEye} onClick={() => onRawView(data)}/>,
+            className: css['icon-cell']
+        },
+        {
+            id: 'delete',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                    Delete
+                </TableHeader>
+            ),
+            accessor: data => <ViewButton icon={faTrashAlt} onClick={() => onDelete(data)}/>,
+            className: css['icon-cell']
+        },
+        {
+            id: 'run_test',
+            Header: () => (
+                <TableHeader sortable={false}
+                    // padding={text('headerPadding')}
+                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                    Run Test
+                </TableHeader>
+            ),
+            accessor: data => <ViewButton text={'Run'} onClick={() => onRunTest(data)}/>,
             className: css['icon-cell']
         }, {
             id: 'logs',
@@ -288,8 +427,14 @@ export const getColumns = ({columnsNames, sortHeader, onSort, onReportView, onRa
     ];
 
 
-    return filter(columns, (column) => columnsNames.includes(column.id))
-
+    // return filter(columns, (column) => columnsNames.includes(column.id))
+    return columnsNames.map((name) => {
+        const column = columns.find((c) => c.id === name);
+        if(!column){
+            throw new Error(`column ${name} not found`);
+        }
+        return column;
+    });
 };
 
 

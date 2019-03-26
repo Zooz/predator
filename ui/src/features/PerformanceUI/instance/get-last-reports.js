@@ -12,13 +12,14 @@ import Page from '../../../components/Page';
 import _ from 'lodash';
 import Report from '../components/Report';
 
-const REFRESH_DATA_INTERVAL = 30000;
 import {ReactTableComponent} from './../../../components/ReactTable';
 import {getColumns} from './configurationColumn'
-import SearchBar from '../../../components/SearchBar'
+
+const REFRESH_DATA_INTERVAL = 30000;
+
 //TODO add error handler - should i? maybe in the main
-const columnsNames = ['report_id', 'test_name', 'start_time', 'end_time', 'duration', 'status', 'arrival_rate',
-    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'report', 'aggregate_report', 'raw', 'logs', 'stop'];
+const columnsNames = ['test_name', 'start_time', 'end_time', 'duration', 'status', 'arrival_rate',
+    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'report', 'grafana_report', 'raw', 'logs', 'stop'];
 
 
 class getReports extends React.Component {
@@ -121,11 +122,12 @@ class getReports extends React.Component {
         return (
             <Page title={'Last Reports'}
                   description={'here is the last reports here is the last reports here is the last reports here is the last reports here is the last reports'}>
+
                 <div style={{width: '100%'}}>
                     {showReport && <Report onClose={this.closeReport} key={showReport.report_id} report={showReport}/>}
-                    <SearchBar onSearch={this.onSearch}/>
                     <ReactTableComponent
-                        tableRowId={'report_id'}
+                        // tableRowId={'report_id'}
+                        onSearch={this.onSearch}
                         rowHeight={'46px'}
                         manual={false}
                         data={sortedReports}
