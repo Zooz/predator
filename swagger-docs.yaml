@@ -16,7 +16,7 @@ info:
     UI alongside a simple REST API, Predator simplifies the performance testing
     regime.
 
-    For an introduction to Predator and its concepts, see the <a href="https://www.zooz.com" target="_blank">Predator Documentation</a>.
+    For an introduction to Predator and its concepts, see the <a href="https://zooz.github.io/predator/" target="_blank">Predator Documentation</a>.
 
 tags:
   - name: DSL Definitions
@@ -1141,7 +1141,7 @@ components:
               action:
                 type: string
                 description: |
-                  A reference to the DSL definition you want to use. Uses the following syntax: `{dsl_group_name}.{dsl_name}`.
+                  A reference to the DSL definition you want to use. Uses the following syntax: `{dsl_group}.{dsl_name}`.
                 example: petstore.create-pet
               properties:
                 type: object
@@ -1208,7 +1208,7 @@ components:
             The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked.
           items:
             type: string
-            example: https://myendpoint.com
+            description: The url of where to send the webhook with the report information
         arrival_rate:
           type: number
           minimum: 1
@@ -1338,7 +1338,6 @@ components:
         - start_time
         - end_time
         - duration_seconds
-        - avg_response_time_ms
         - arrival_rate
       properties:
         test_id:
@@ -1370,9 +1369,6 @@ components:
           type: number
           description: The duration of the test in seconds.
           example: 60
-        avg_response_time_ms:
-          type: number
-          description: The average response time of the requests.
         arrival_rate:
           type: number
           description: The arrival rate that was set for the test. This is the number of times per second that the test scenarios will run.

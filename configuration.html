@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="./img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Configuration - Predator</title>
+    <link href="./css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="./css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="./css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/bootstrap-3.3.7.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '.';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Configuration", url: "#_top", children: [
+              {title: "General", url: "#general" },
+              {title: "Database", url: "#database" },
+              {title: "Deployment", url: "#deployment" },
+              {title: "Metrics", url: "#metrics" },
+              {title: "SMTP Server", url: "#smtp-server" },
+          ]},
+        ];
+
+    </script>
+    <script src="./js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="contributing.html" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="contributing.html" class="btn btn-xs btn-link">
+        Contributing
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="schedulesandreports.html" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="schedulesandreports.html" class="btn btn-xs btn-link">
+        Schedules and Reports
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h1>
+<p>When running Predator, it is possible to retrieve and update some of the service's configuration 
+during runtime with the /config endpoint, please check the API reference for more details.</p>
+<p>Below are variables Predator can be configured with. </p>
+<h2 id="general">General<a class="headerlink" href="#general" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Configuration key</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>INTERNAL_ADDRESS</td>
+<td>internal_address</td>
+<td>The local ip address of your machine</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>DOCKER_NAME</td>
+<td>docker_name</td>
+<td>The predator-runner docker image that will run the test</td>
+<td>✓</td>
+<td>zooz/predator-runner:latest</td>
+</tr>
+<tr>
+<td>RUNNER_CPU</td>
+<td>runner_cpu</td>
+<td>Number of CPU use by the each runner</td>
+<td>✓</td>
+<td>1</td>
+</tr>
+<tr>
+<td>RUNNER_MEMORY</td>
+<td>runner_memory</td>
+<td>Max memory to use by each runner</td>
+<td>✓</td>
+<td>2048</td>
+</tr>
+<tr>
+<td>DEFAULT_EMAIL_ADDRESS</td>
+<td>default_email_address</td>
+<td>Default email to send final report to, address can be configured</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>DEFAULT_WEBHOOK_URL</td>
+<td>default_webhook_url</td>
+<td>Default webhook url to send live report statistics to</td>
+<td>✓</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="database">Database<a class="headerlink" href="#database" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DATABASE_TYPE</td>
+<td>Database to integrate Predator with [Cassandra, Postgres, MySQL, MSSQL, SQLITE]</td>
+<td>x</td>
+<td>SQLITE</td>
+</tr>
+<tr>
+<td>DATABASE_NAME</td>
+<td>Database/Keyspace name</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr>
+<td>DATABASE_ADDRESS</td>
+<td>Database address</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr>
+<td>DATABASE_USERNAME</td>
+<td>Database username</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr>
+<td>DATABASE_PASSWORD</td>
+<td>Database password</td>
+<td>x</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Additional parameters for the following chosen databases:</p>
+<h4 id="cassandra">Cassandra<a class="headerlink" href="#cassandra" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CASSANDRA_REPLICATION_FACTOR</td>
+<td>x</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CASSANDRA_CONSISTENCY</td>
+<td>x</td>
+<td>localQuorum</td>
+</tr>
+<tr>
+<td>CASSANDRA_KEY_SPACE_STRATEGY</td>
+<td>x</td>
+<td>SimpleStrategy</td>
+</tr>
+<tr>
+<td>CASSANDRA_LOCAL_DATA_CENTER</td>
+<td>x</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="sqlite">SQLITE<a class="headerlink" href="#sqlite" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SQLITE_STORATE</td>
+<td>SQLITE file name</td>
+<td>x</td>
+<td>predator</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deployment">Deployment<a class="headerlink" href="#deployment" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JOB_PLATFORM</td>
+<td>Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)</td>
+<td>x</td>
+<td>DOCKER</td>
+</tr>
+</tbody>
+</table>
+<h4 id="kubernetes">Kubernetes<a class="headerlink" href="#kubernetes" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KUBERNETES_URL</td>
+<td>Kubernetes API Url</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr>
+<td>KUBERNETES_TOKEN</td>
+<td>Kubernetes API Token</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr>
+<td>KUBERNETES_NAMESPACE</td>
+<td>Kubernetes Namespace</td>
+<td>x</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="metronome">Metronome<a class="headerlink" href="#metronome" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>METRONOME_URL</td>
+<td>Metronome API Url</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr>
+<td>METRONOME_TOKEN</td>
+<td>Metronome API Token</td>
+<td>x</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DOCKER_HOST</td>
+<td>Docker engine url (host and port number of docker engine)</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr>
+<td>DOCKER_CERT_PATH</td>
+<td>Path to CA certificate directory</td>
+<td>x</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>PROCESS.ENV Variable</th>
+<th>Configuration key</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>METRICS_PLUGIN_NAME</td>
+<td>metrics_plugin_name</td>
+<td>Metrics integration to use [prometheus,influx]</td>
+<td>✓</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="prometheus">Prometheus<a class="headerlink" href="#prometheus" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Configuration key</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>prometheus_metrics.push_gateway_url</td>
+<td>Url of push gateway</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>prometheus_metrics.buckets_sizes</td>
+<td>Bucket sizes to configure prometheus</td>
+<td>✓</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="influx">Influx<a class="headerlink" href="#influx" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Configuration key</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>influx_metrics.host</td>
+<td>Influx db host</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>influx_metrics.username</td>
+<td>Influx db username</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>influx_metrics.password</td>
+<td>Influx db password</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>influx_metrics.database</td>
+<td>Influx db name</td>
+<td>✓</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="smtp-server">SMTP Server<a class="headerlink" href="#smtp-server" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Configuration key</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SMTP_FROM</td>
+<td>smtp_server.from</td>
+<td>the 'from' email address that will be used to send emails</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_HOST</td>
+<td>smtp_server.host</td>
+<td>SMTP host</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_PORT</td>
+<td>smtp_server.port</td>
+<td>SMTP port number</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_USERNAME</td>
+<td>smtp_server.username</td>
+<td>SMTP username</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_PASSWORD</td>
+<td>smtp_server.password</td>
+<td>SMTP password</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_TIMEOUT</td>
+<td>smtp_server.timeout</td>
+<td>timeout to SMTP server in milliseconds</td>
+<td>✓</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="contributing.html" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="contributing.html" class="btn btn-xs btn-link">
+        Contributing
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="schedulesandreports.html" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="schedulesandreports.html" class="btn btn-xs btn-link">
+        Schedules and Reports
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

@@ -101,10 +101,10 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 <p>Let's dive right in and get going with our first DSL definition. </p>
 <div class="admonition note">
 <p class="admonition-title">Predator API</p>
-<p>This functionality is only available through the <a href="">Predator API</a>.</p>
+<p>This functionality is only available through the <a href="https://zooz.github.io/predator/indexapiref.html#section/Overview#section" target="_blank">Predator API</a>.</p>
 </div>
 <h2 id="creating-a-dsl-definition">Creating a DSL Definition<a class="headerlink" href="#creating-a-dsl-definition" title="Permanent link">#</a></h2>
-<p>Before you can use a DSL definition, you must create it first. You do so by invoking the <a href="">Create DSL request</a>. Here's an example request body for creating a DSL definition of a GET request. Notice how we use the <code>{{petId}}</code> in the url endpoint (we will create this variable in the example of a POST request DSL definition):</p>
+<p>Before you can use a DSL definition, you must create it first. You do so by invoking the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-dsl-definition" target="_blank">Create DSL Definition</a> request. Here's an example request body for creating a DSL definition of a GET request. Notice how we use the <code>{{petId}}</code> in the url endpoint (we will create this variable in the example of a POST request DSL definition):</p>
 <pre class="codehilite"><code class="language-JSON">{
     "name": "get-pet",
     "request": {
@@ -135,7 +135,7 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 }</code></pre>
 
 <h2 id="creating-a-test-that-uses-the-dsl">Creating a Test that Uses the DSL<a class="headerlink" href="#creating-a-test-that-uses-the-dsl" title="Permanent link">#</a></h2>
-<p>Tests that use a DSL definition can only be created using the <a href="">Create DSL Test</a> API request. The <a href="">Create DSL Test</a> API request body must include all components that make up a test, including pre-scenario requests and scenarios. However, instead of defining the entire HTTP request in each scenario step (as you would through the Predator UI), you can now reference the HTTP request through its DSL definition. You do so, using the <code>action</code> property (in the <code>steps</code> array). </p>
+<p>Tests that use a DSL definition can only be created using the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request. The <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request body must include all components that make up a test, including pre-scenario requests and scenarios. However, instead of defining the entire HTTP request in each scenario step (as you would through the Predator UI), you can now reference the HTTP request through its DSL definition. You do so, using the <code>action</code> property (in the <code>steps</code> array). </p>
 <p>Here's an example:</p>
 <pre class="codehilite"><code class="language-JSON">{
   "name": "Pet store",
@@ -166,7 +166,7 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 <p>The <code>type</code> must always be set to <code>dsl</code>.</p>
 </li>
 <li>
-<p>The <code>action</code> value uses the following syntax: <code>{dsl_group_name}.{dsl_name}</code>, in which the <code>dsl_group_name</code> is the name used in the path of the <a href="">Create DSL Defintion</a> API request. </p>
+<p>The <code>action</code> value uses the following syntax: <code>{dsl_group}.{dsl_name}</code>, in which the <code>dsl_group</code> is the name used in the path of the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-dsl-definition" target="_blank">Create DSL Definition</a> API request. </p>
 </li>
 </ul>
 <p>If you login to the Predator UI after creating the test, you will notice that the test has been added with a type of <strong>dsl</strong>. </p>

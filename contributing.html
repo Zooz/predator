@@ -32,11 +32,10 @@
       var is_top_frame = false;
         
         var pageToc = [
-          {title: "Contributor Guidelines", url: "#_top", children: [
-          ]},
-          {title: "Contributing Documentation Changes", url: "#contributing-documentation-changes", children: [
-          ]},
-          {title: "Contributing Code Changes", url: "#contributing-code-changes", children: [
+          {title: "Guidelines", url: "#_top", children: [
+              {title: "Submitting a Bug Report", url: "#submitting-a-bug-report" },
+              {title: "Contributing Code Changes", url: "#contributing-code-changes" },
+              {title: "Contributing Documentation Changes", url: "#contributing-documentation-changes" },
           ]},
         ];
 
@@ -63,20 +62,20 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
   <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
     
     <div class="wm-article-nav pull-right">
-      <a href="indexapiref.html" class="btn btn-xs btn-default pull-right">
+      <a href="apireference.html" class="btn btn-xs btn-default pull-right">
         Next
         <i class="fa fa-chevron-right" aria-hidden="true"></i>
       </a>
-      <a href="indexapiref.html" class="btn btn-xs btn-link">
+      <a href="apireference.html" class="btn btn-xs btn-link">
         API Reference
       </a>
     </div>
     
     <div class="wm-article-nav">
-      <a href="plugins.html" class="btn btn-xs btn-default pull-left">
+      <a href="configuration.html" class="btn btn-xs btn-default pull-left">
         <i class="fa fa-chevron-left" aria-hidden="true"></i>
-        Previous</a><a href="plugins.html" class="btn btn-xs btn-link">
-        Plugins
+        Previous</a><a href="configuration.html" class="btn btn-xs btn-link">
+        Configuration
       </a>
     </div>
     
@@ -84,10 +83,32 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 
     
 
-    <p>Contribute to Predator!</p>
-<h2 id="contributor-guidelines">Contributor Guidelines<a class="headerlink" href="#contributor-guidelines" title="Permanent link">#</a></h2>
-<h2 id="contributing-documentation-changes">Contributing Documentation Changes<a class="headerlink" href="#contributing-documentation-changes" title="Permanent link">#</a></h2>
+    <h1 id="guidelines">Guidelines<a class="headerlink" href="#guidelines" title="Permanent link">#</a></h1>
+<p>First off, thanks for taking the time to contribute! </p>
+<p>The following is a set of guidelines for contributing to Predator and its packages, which are hosted in the <a href="https://github.com/Zooz/predator">Zooz Predator</a> project on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.</p>
+<h2 id="submitting-a-bug-report">Submitting a Bug Report<a class="headerlink" href="#submitting-a-bug-report" title="Permanent link">#</a></h2>
+<p>Bugs are tracked as <a href="https://guides.github.com/features/issues/">GitHub issues</a>. Provide the following information when submitting a bug:</p>
+<ul>
+<li>Use a clear and descriptive title for the issue to identify the problem.</li>
+<li>Describe the exact steps which reproduce the problem in as many details as possible. </li>
+<li>Provide specific examples to demonstrate the steps. Include links to files or GitHub projects, or copy pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use Markdown code blocks.</li>
+<li>Describe the behavior you observed after following the steps and point out what exactly is the problem with that behavior.</li>
+<li>Explain which behavior you expected to see instead and why.</li>
+</ul>
 <h2 id="contributing-code-changes">Contributing Code Changes<a class="headerlink" href="#contributing-code-changes" title="Permanent link">#</a></h2>
+<p>As an open-source project, we welcome and encourage the community to submit patches directly to the project. In our collaborative open source environment, standards for submitting changes help reduce the chaos that can result from an active development community. So here are some high-level steps we suggest you follow when contributing code changes:</p>
+<ol>
+<li>Fork the project &amp; clone locally.</li>
+<li>Create an upstream remote and sync your local copy before you branch.</li>
+<li>Branch for each separate piece of work.</li>
+<li>Do the work, write good commit messages. Commit messages must adhere to <a href="https://github.com/conventional-changelog/commitlint">commitlint</a> standards.</li>
+<li>Push to your origin repository.</li>
+<li>Create a new PR in GitHub.</li>
+<li>Respond to any code review feedback.</li>
+</ol>
+<h2 id="contributing-documentation-changes">Contributing Documentation Changes<a class="headerlink" href="#contributing-documentation-changes" title="Permanent link">#</a></h2>
+<p>Documentation is mega-important. Predator cannot truly succeed without great documentation. It’s that simple. So please make sure to provide documentation updates for any new features you contributed, including useful example code snippets.</p>
+<p>Needless to say, as a user of this project you're perfect for helping us improve our docs. So feel free to report documentation bugs or submit documentation changes through a pull request.</p>
 
   <br>
     
@@ -100,20 +121,20 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
   <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
     
     <div class="wm-article-nav pull-right">
-      <a href="indexapiref.html" class="btn btn-xs btn-default pull-right">
+      <a href="apireference.html" class="btn btn-xs btn-default pull-right">
         Next
         <i class="fa fa-chevron-right" aria-hidden="true"></i>
       </a>
-      <a href="indexapiref.html" class="btn btn-xs btn-link">
+      <a href="apireference.html" class="btn btn-xs btn-link">
         API Reference
       </a>
     </div>
     
     <div class="wm-article-nav">
-      <a href="plugins.html" class="btn btn-xs btn-default pull-left">
+      <a href="configuration.html" class="btn btn-xs btn-default pull-left">
         <i class="fa fa-chevron-left" aria-hidden="true"></i>
-        Previous</a><a href="plugins.html" class="btn btn-xs btn-link">
-        Plugins
+        Previous</a><a href="configuration.html" class="btn btn-xs btn-link">
+        Configuration
       </a>
     </div>
     

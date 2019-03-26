@@ -87,19 +87,20 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 <p>Before Predator, running two or more tests simultaneously was limited due to third party limitations. Now, you are able to scale tests using our own resources. With support for both Kubernetes and Metronome, all you need to do is provide the platform configuration, sit back, and let Predator deploy runners that load your API from your chosen platform. </p>
 <p>You're probably eager to get your hands dirty, so let's go ahead and install Predator.</p>
 <h2 id="kubernetes">Kubernetes<a class="headerlink" href="#kubernetes" title="Permanent link">#</a></h2>
-<p>Bacon ipsum dolor amet cupim chicken pork ribeye. Short loin ball tip jowl beef. Ball tip strip steak jowl tail shoulder doner chicken salami beef ribs pork short ribs swine ham hock landjaeger biltong. Ribeye cow filet mignon landjaeger.</p>
-<pre class="codehilite"><code>pork --save</code></pre>
+<p>Predator is designed to seamlessly deploy into your Kubernetes cluster. This is done with helm charts. For this, run the following command:</p>
+<pre class="codehilite"><code>helm repo add zooz https://zooz.github.io/helm/</code></pre>
 
+<p>After successfully adding the above repository, follow the simple guidelines in the <a href="https://zooz.github.io/helm/predator/">README</a> to configure the appropriate variables.</p>
 <h2 id="dcos">DC/OS<a class="headerlink" href="#dcos" title="Permanent link">#</a></h2>
-<p>Jowl pancetta meatloaf short ribs buffalo. Leberkas meatball alcatra chuck, capicola buffalo spare ribs shankle sirloin tenderloin landjaeger salami meatloaf biltong. Flank pancetta meatball turkey chuck tenderloin bresaola biltong prosciutto andouille. Turducken jowl ball tip short loin.</p>
+<p>Predator has a <a href="https://github.com/mesosphere/universe/pull/2229">PR</a> open waiting for approval to be included in the Mesosphere Universe.</p>
 <h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">#</a></h2>
-<p>Predator runs using Docker. In order to run Predator locally run the following command:</p>
+<p>Predator runs using Docker. In order to run Predator locally, clone the <a href="https://github.com/Zooz/predator">repository</a> and run the following command:</p>
 <p><code>runPredatorLocal.sh</code></p>
-<p>You can also manually run the following command:</p>
+<p>Or, you can run Predator without cloning the repository with the following command :</p>
 <p><code>docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator</code></p>
 <p>where <code>$MACHINE_IP</code> is the local ip address of your machine.</p>
 <p>After successfully mounting the Predator docker image, access Predator by typing the following URL in your browser:</p>
-<p><code>http://{ipaddress}/predator</code></p>
+<p><code>http://{$MACHINE_IP}/predator</code></p>
 
   <br>
     
