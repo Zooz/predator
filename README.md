@@ -13,7 +13,7 @@ These instructions will help you run Predator on your local machine.
 
 ### Installing using Docker
 
-Predator runs using Docker. In order to run Predator locally run the following command:
+Predator runs using Docker. In order to run Predator locally, clone this repository and then run the following command:
 
 `runPredatorLocal.sh`
 
