@@ -24,10 +24,9 @@ export const getAggregateFromFramework = (testId,reportId) => {
   });
 };
 
-export const getLastReportsFromFramework = (queryParams) => {
-  queryParams = queryParams ? '?limit=200' : undefined;
+export const getLastReportsFromFramework = () => {
 
-  let url = queryParams ? `${env.PREDATOR_URL}/tests/last_reports${queryParams}` : `${env.PREDATOR_URL}/tests/last_reports?limit=50`;
+  let url = `${env.PREDATOR_URL}/tests/last_reports?limit=200`;
   return axios.get(url, {
     headers: {
     }
