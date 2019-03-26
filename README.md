@@ -6,6 +6,8 @@ Predator is an open-source distributed performance testing framework. Predator m
 from creating a test file, to running scheduled and on-demand tests, and finally viewing the test results in a highly informative report. 
 Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
 
+## Documentation
+
 ## Features
 - **Distributed load**:  Predator supports unlimited number of load generators that produce load concurrently.
 - **Real time reports**: Predator aggreated all concurrent runs into one beautiful report in real time (latency, rps, status codes and more)
@@ -21,6 +23,7 @@ Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps
 Predator is designed to seamlessly deploy into your Kubernetes cluster. This is done with helm charts. For this, run the following command:
 
 `helm repo add zooz https://zooz.github.io/helm/`
+<br>
 `helm install predator`
 
 <br>follow the simple guidelines in the [README](https://zooz.github.io/helm/) to configure the appropriate variables.
