@@ -21,7 +21,7 @@ import {getColumns} from "./configurationColumn";
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetReports = 'Error occurred while trying to get all reports for test.';
 const columnsNames = ['start_time', 'end_time', 'duration', 'status','arrival_rate',
-    'ramp_to', 'last_success_rate', 'last_rps','parallelism','notes','grafana_report','report','raw','logs'];
+    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'grafana_report', 'report', 'raw', 'logs'];
 
 
 class getTests extends React.Component {
@@ -35,7 +35,8 @@ class getTests extends React.Component {
             openSnakeBar: false,
             openViewReport: false,
             showReport: null,
-            sortedReports:[]
+            sortedReports:[],
+            sortHeader:''
         };
     }
 
@@ -121,7 +122,8 @@ class getTests extends React.Component {
         const {showReport} = this.state;
         return (
             <Page
-                title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}>
+                title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
+            description={'fdsfdjksfhdjsfhdjksfhjkdshf'}>
                 <ReactTableComponent
                     onSearch={this.onSearch}
                     rowHeight={'46px'}

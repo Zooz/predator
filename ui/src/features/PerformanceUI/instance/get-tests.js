@@ -31,7 +31,7 @@ import _ from "lodash";
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
 const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test','report', 'edit', 'raw', 'delete'];
-
+const DESCRIPTION = 'Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.';
 
 class getTests extends React.Component {
     constructor(props) {
@@ -183,7 +183,7 @@ class getTests extends React.Component {
         });
 
         return (
-            <Page title={'Tests'} description={'ajshjadhjkasdajshjadhjkasdajshjadhjkasdajshjadhjkasdajshjadhjkasd'}>
+            <Page title={'Tests'} description={DESCRIPTION}>
                 <Button className={style['create-button']} onClick={() => {
                     this.setState({
                         createTest: true
