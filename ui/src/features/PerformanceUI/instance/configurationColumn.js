@@ -21,11 +21,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'report_id',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
-                >
+                <TableHeader sortable={false}>
                     Test Name
                 </TableHeader>
             ),
@@ -33,11 +29,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         },      {
             id: 'name',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
-                >
+                <TableHeader sortable={false}>
                     Test Name
                 </TableHeader>
             ),
@@ -46,11 +38,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'description',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
-                >
+                <TableHeader sortable={false}>
                     Description
                 </TableHeader>
             ),
@@ -58,11 +46,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         }, {
             id: 'updated_at',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
-                >
+                <TableHeader sortable={false}>
                     Modified
                 </TableHeader>
             ),
@@ -70,11 +54,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         }, {
             id: 'type',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
-                >
+                <TableHeader sortable={false}>
                     Type
                 </TableHeader>
             ),
@@ -82,11 +62,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         }, {
             id: 'edit',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
-                >
+                <TableHeader sortable={false}>
                     Edit
                 </TableHeader>
             ),
@@ -96,11 +72,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'test_name',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
-                >
+                <TableHeader sortable={false}>
                     Test Name
                 </TableHeader>
             ),
@@ -109,11 +81,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'environment',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('id') > -1 && sortHeader.indexOf('-') > -1}
-                >
+                <TableHeader sortable={false}>
                     Environment
                 </TableHeader>
             ),
@@ -133,15 +101,11 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => (<div className={css['header-time']}>{dateFormatter(data.start_time)}</div>),
-            // className: `${css['header-time']}`,
         },
         {
             id: 'end_time',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('orderId') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('orderId') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     End Time
                 </TableHeader>
             ),
@@ -150,10 +114,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'duration',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('customerEmail') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('customerEmail') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Duration
                 </TableHeader>
             ),
@@ -171,10 +132,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'arrival_rate',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('status') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('status') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Arrival Rate
                 </TableHeader>
             ),
@@ -183,10 +141,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'ramp_to',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Ramp To
                 </TableHeader>
             ),
@@ -195,10 +150,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'max_virtual_users',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Max Virtual Users
                 </TableHeader>
             ),
@@ -207,10 +159,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'cron_expression',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Cron Expression
                 </TableHeader>
             ),
@@ -219,10 +168,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'last_run',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Last Run
                 </TableHeader>
             ),
@@ -232,10 +178,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'last_success_rate',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Success Rate
                 </TableHeader>
             ),
@@ -244,10 +187,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'last_rps',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     RPS
                 </TableHeader>
             ),
@@ -257,10 +197,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'parallelism',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Parallelism
                 </TableHeader>
             ),
@@ -269,10 +206,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'notes',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Notes
                 </TableHeader>
             ),
@@ -280,10 +214,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         }, {
             id: 'report',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Report
                 </TableHeader>
             ),
@@ -292,10 +223,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'grafana_report',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Grafana
                 </TableHeader>
             ),
@@ -304,10 +232,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'raw',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Raw
                 </TableHeader>
             ),
@@ -317,10 +242,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'delete',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Delete
                 </TableHeader>
             ),
@@ -330,10 +252,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         {
             id: 'run_test',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Run Test
                 </TableHeader>
             ),
@@ -342,10 +261,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         }, {
             id: 'logs',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Logs
                 </TableHeader>
             ),
@@ -355,10 +271,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         }, {
             id: 'stop',
             Header: () => (
-                <TableHeader sortable={false}
-                    // padding={text('headerPadding')}
-                             up={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('+') > -1}
-                             down={sortHeader.indexOf('created') > -1 && sortHeader.indexOf('-') > -1}>
+                <TableHeader sortable={false}>
                     Stop
                 </TableHeader>
             ),
@@ -395,7 +308,6 @@ const dateFormatter = (cell, row) => {
         );
     }
 };
-//TODO clean the code. all unused up/down /sortable
 
 const ViewButton = ({onClick, icon, disabled,text}) => {
     if (icon) {

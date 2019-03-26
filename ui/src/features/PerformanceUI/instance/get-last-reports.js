@@ -101,7 +101,7 @@ class getReports extends React.Component {
             this.setState({sortedReports: [...this.props.reports]})
         }
         const newSorted = _.filter(this.props.reports, (report) => {
-            return (report.test_name.includes(value.toLowerCase()) || report.status.includes(value.toLowerCase()))
+            return (String(report.test_name).toLowerCase().includes(value.toLowerCase()) || String(report.status).toLowerCase().includes(value.toLowerCase()))
         });
         this.setState({sortedReports: newSorted})
     };

@@ -52,8 +52,8 @@ class getJobs extends React.Component {
             this.setState({sortedJobs: [...this.props.jobs]})
         }
         const newSorted = _.filter(this.props.jobs, (job) => {
-            return (_.includes(job.test_name,value.toLowerCase()) ||
-                _.includes(job.environment,value.toLowerCase()))
+            return (_.includes(String(job.test_name).toLowerCase(),value.toLowerCase()) ||
+                _.includes(String(job.environment).toLowerCase(),value.toLowerCase()))
         });
         this.setState({sortedJobs: newSorted})
     };
@@ -142,18 +142,11 @@ class getJobs extends React.Component {
                     manual={false}
                     data={sortedJobs}
                     pageSize={10}
-                    // numericPagination
-                    // cellPadding={text('cellPadding')}
                     columns={columns}
                     noDataText={noDataText}
-                    // selectedRow={text('selected row')}
-                    // selectRow={selectRow}
-                    // sortEvent={sortEvent}
-                    // rowHeight={text('height', '')}
                     showPagination
                     resizable={false}
                     cursor={'default'}
-                    // className={style.table}
                 />
 
                 {this.state.openViewJob

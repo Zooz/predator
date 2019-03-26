@@ -68,9 +68,9 @@ class getTests extends React.Component {
         }
         const newSorted = _.filter(this.props.tests, (test) => {
             return (
-                _.includes(test.name,value.toLowerCase()) ||
-                _.includes(test.type,value.toLowerCase()) ||
-                _.includes(test.description,value.toLowerCase())
+                _.includes(String(test.name).toLowerCase(),value.toLowerCase()) ||
+                _.includes(String(test.type).toLowerCase(),value.toLowerCase()) ||
+                _.includes(String(test.description).toLowerCase(),value.toLowerCase())
             )
 
         });
