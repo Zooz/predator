@@ -7,6 +7,7 @@ import PaginationComponent from './Pagination'
 import css from './style/table-style.scss'
 import 'react-table/react-table.css'
 import NumericPagination from './NumericPagination/NumericPagination'
+import SearchBar from '../SearchBar'
 
 export default class ReactTableComponent extends React.Component {
   constructor (props) {
@@ -40,6 +41,7 @@ export default class ReactTableComponent extends React.Component {
   render () {
     const {
       data,
+      noDataText,
       columns,
       loading,
       selectRow,
@@ -63,14 +65,17 @@ export default class ReactTableComponent extends React.Component {
       rowHeight,
       onRowEnter,
       onRowLeave,
-      cellPadding
+      cellPadding,
+      onSearch
     } = this.props
     const backgroundColors = Object.assign({}, ReactTableComponent.defaultProps.colors.background, colors.background)
     const textColors = Object.assign({}, ReactTableComponent.defaultProps.colors.text, colors.text)
     const headerColors = Object.assign({}, ReactTableComponent.defaultProps.colors.header, colors.header)
 
     return (
-      <ReactTable
+        <div>
+          {onSearch && <SearchBar onSearch={onSearch}/>}
+        <ReactTable
         data={data}
         className={classnames(css['table'], className)}
         columns={columns}
@@ -86,7 +91,7 @@ export default class ReactTableComponent extends React.Component {
         resizable={resizable}
         minRows={data.length ? pageSize || 0 : 5}
         totalDataCount={totalDataCount}
-        noDataText='There is no data'
+        noDataText= {noDataText || 'There is no data'}
         getTheadProps={() => ({
           style: { '--header-color': headerColors.default },
           className: css['thead']
@@ -143,6 +148,7 @@ export default class ReactTableComponent extends React.Component {
             }
           }
         }} />
+        </div>
     )
   }
 }

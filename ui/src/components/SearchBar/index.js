@@ -15,10 +15,12 @@ class SearchBar extends React.Component {
         const { onSearch, description, children } = this.props;
         return (
             <div className={style.wrapper}>
-                <TitleInput title={'Search'} className={style.input}>
+                <div className={style['title-wrapper']}>
+                <TitleInput title={'Search'}>
                     <Input className={style.input} onChange={(event) => this.setState({value: event.target.value})}/>
                 </TitleInput>
-                <Button hover onClick={()=>{onSearch(this.state.value)}}>Search</Button>
+                </div>
+                <Button hover className={style['button']} onClick={()=>{onSearch(this.state.value)}}>Search</Button>
             </div>
         )
     }

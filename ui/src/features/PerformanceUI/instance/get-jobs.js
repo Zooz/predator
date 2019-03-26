@@ -1,241 +1,218 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import Snackbar from 'material-ui/Snackbar';
-import prettySeconds from 'pretty-seconds';
-import { jobs, job, processingGetJobs, errorOnGetJobs, errorOnGetJob, processingDeleteJob, deleteJobSuccess } from './redux/selectors/jobsSelector';
-import { tests } from './redux/selectors/testsSelector';
-import { reports } from './redux/selectors/reportsSelector';
-import { BootstrapTable, TableHeaderColumn, SearchField } from 'react-bootstrap-table';
+import {
+    job,
+    processingGetJobs,
+    errorOnGetJobs,
+    errorOnGetJob,
+    processingDeleteJob,
+    deleteJobSuccess,
+    getJobsWithTestNameAndLastRun
+} from './redux/selectors/jobsSelector';
+import {tests} from './redux/selectors/testsSelector';
+import {reports} from './redux/selectors/reportsSelector';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import style from './style.scss';
 import Dialog from '../components/Dialog';
 import DeleteDialog from '../components/DeleteDialog';
 import * as Actions from './redux/action';
 import Loader from '../components/Loader';
-import classNames from 'classnames'
 import Page from '../../../components/Page';
-import { createCustomSearchField } from './utils';
-import { getTimeFromCronExpr } from './utils';
+import {ReactTableComponent} from "../../../components/ReactTable";
+import {getColumns} from "./configurationColumn";
+import _ from "lodash";
+
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
 const REFRESH_DATA_INTERVAL = 30000;
+const columnsNames = ['test_name', 'environment', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'raw', 'delete'];
 
 class getJobs extends React.Component {
-  constructor (props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.state = {
-      openSnakeBar: false,
-      deleteDialog: false,
-      openViewJob: false,
-      jobToDelete: undefined
-    };
-  }
-
-    deleteFormatter = (cell, row) => {
-      const classes = classNames('material-icons', style.deleteIcon, {
-      });
-      return (
-        <i onClick={() => {
-          this.setState({
-            deleteDialog: true,
-            jobToDelete: row
-          })
-        }} className={classes}>delete_forever</i>
-      );
-    };
-
-    viewFormatter = (cell, row) => {
-      return (
-        <i onClick={() => {
-          this.setState({ openViewJob: true });
-          this.props.getJob(row.id);
-        }} className='material-icons' style={{ color: '#2a3f53' }}>visibility</i>
-      );
-    };
-
-    durationFormatter (cell, row) {
-      return prettySeconds(Number(cell));
+        this.state = {
+            openSnakeBar: false,
+            deleteDialog: false,
+            openViewJob: false,
+            jobToDelete: undefined,
+            sortedJobs: []
+        };
     }
 
-    testNameFormatter = (cell, row) => {
-      let test = this.props.tests.find((element) => {
-        return element.id === row.test_id;
-      });
-      if (test) {
-        return test.name;
-      } else {
-        return 'N/A';
-      }
+    componentDidUpdate(prevProps) {
+        if (prevProps.jobs !== this.props.jobs) {
+            this.setState({sortedJobs: [...this.props.jobs]})
+        }
+    }
+
+    onSearch = (value) => {
+        if (!value) {
+            this.setState({sortedJobs: [...this.props.jobs]})
+        }
+        const newSorted = _.filter(this.props.jobs, (job) => {
+            return (_.includes(job.test_name,value.toLowerCase()) ||
+                _.includes(job.environment,value.toLowerCase()))
+        });
+        this.setState({sortedJobs: newSorted})
     };
 
-    lastRunFormatter = (cell, row) => {
-      let report = this.props.reports.find((element) => {
-        return element.job_id === row.id;
-      });
-      if (report) {
-        return report.start_time;
-      } else {
-        return 'N/A';
-      }
+
+    onDelete = (data) => {
+        this.setState({
+            deleteDialog: true,
+            jobToDelete: data
+        })
     };
-    cronFormatter = (cell, row) => {
-      return getTimeFromCronExpr(row.cron_expression) || 'N/A'
+
+    onRawView = (job) => {
+        this.setState({openViewJob: job});
+
     };
 
     submitDelete = () => {
-      this.props.deleteJob(this.state.jobToDelete.id);
-      this.props.getAllJobs();
-      this.setState({
-        deleteDialog: false
-      });
+        this.props.deleteJob(this.state.jobToDelete.id);
+        this.props.getAllJobs();
+        this.setState({
+            deleteDialog: false
+        });
     };
 
     clearDeleteError = () => {
-      this.props.getAllJobs();
-      this.props.clearErrorOnDelete();
+        this.props.getAllJobs();
+        this.props.clearErrorOnDelete();
     };
 
     cancelDelete = () => {
-      this.setState({
-        deleteDialog: false
-      });
+        this.setState({
+            deleteDialog: false
+        });
 
-      this.props.deleteError ? this.clearDeleteError() : undefined
+        this.props.deleteError ? this.clearDeleteError() : undefined
     };
 
     closeViewJobDialog = () => {
-      this.setState({
-        openViewJob: false
-      });
-      this.props.clearSelectedJob();
+        this.setState({
+            openViewJob: false
+        });
+        this.props.clearSelectedJob();
     };
 
-    renderPaginationPanel = (props) => {
-      return (
-        <div className={style.pagination}>
-          <div>{props.components.pageList}</div>
-          <div>
-            {props.components.sizePerPageDropdown}
-          </div>
-        </div>
-      );
+
+    componentDidMount() {
+        this.loadPageData();
+        this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL)
+    }
+
+    loadPageData = () => {
+        this.props.getTests();
+        this.props.getAllReports();
+        this.props.clearErrorOnGetJobs();
+        this.props.getAllJobs();
     };
 
-    componentDidMount () {
-      this.loadPageData();
-      this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL)
+    componentWillUnmount() {
+        this.props.clearErrorOnGetJobs();
+        this.props.clearSelectedJob();
+        clearInterval(this.refreshDataInterval);
     }
 
-    loadPageData=() => {
-      this.props.getTests();
-      this.props.getAllReports();
-      this.props.clearErrorOnGetJobs();
-      this.props.getAllJobs();
-    };
-
-    componentWillUnmount () {
-      this.props.clearErrorOnGetJobs();
-      this.props.clearSelectedJob();
-      clearInterval(this.refreshDataInterval);
+    loader() {
+        return this.props.processingGetJobs ? <Loader/> : noDataMsg
     }
 
-    loader () {
-      return this.props.processingGetJobs ? <Loader /> : noDataMsg
-    }
+    render() {
+        const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
-    render () {
-      let options = {
-        clearSearch: true,
-        paginationPanel: this.renderPaginationPanel,
-        noDataText: this.props.errorOnGetJobs ? errorMsgGetTests : this.loader(),
-        searchField: createCustomSearchField
-      };
+        const {sortedJobs} = this.state;
+        const columns = getColumns({
+            columnsNames,
+            onSort: this.onSort,
+            onRawView: this.onRawView,
+            onDelete: this.onDelete
+        });
 
-      return (
-        <Page title={'Jobs'}>
-          <div className={style.getTests}>
-            <div className={style.tableDiv}>
-              <BootstrapTable options={options} bodyContainerClass={style.container}
-                tableStyle={{ height: 'auto !important' }} trClassName={style.row} pagination
-                search
-                editable
-                data={this.props.jobs}
-                striped hover>
-                <TableHeaderColumn dataField='id' hidden isKey dataAlign='left' width={'175'}
-                  dataSort>ID</TableHeaderColumn>
-                <TableHeaderColumn dataFormat={this.testNameFormatter} width={'100'} tdStyle={{ whiteSpace: 'normal' }} thStyle={{ whiteSpace: 'normal' }}>Test Name</TableHeaderColumn>
-                <TableHeaderColumn dataField='environment' width={'100'}>Environment</TableHeaderColumn>
-                <TableHeaderColumn dataField='duration' dataFormat={this.durationFormatter} width={'100'} tdStyle={{ whiteSpace: 'normal' }} thStyle={{ whiteSpace: 'normal' }}>Duration</TableHeaderColumn>
-                <TableHeaderColumn dataField='arrival_rate' width={'100'}>Arrival Rate</TableHeaderColumn>
-                <TableHeaderColumn dataField='ramp_to' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'}>Ramp To</TableHeaderColumn>
-                <TableHeaderColumn dataField='parallelism' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'}>Parallelism</TableHeaderColumn>
-                <TableHeaderColumn dataField='max_virtual_users' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'}>Max Virtual Users</TableHeaderColumn>
-                <TableHeaderColumn dataField='cron_expression' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'} dataFormat={this.cronFormatter}>Cron Expression</TableHeaderColumn>
-                <TableHeaderColumn dataField='cron_expression' editable={{ type: 'text', defaultValue: 'N/A' }} width={'100'} dataFormat={this.lastRunFormatter}>Last Run</TableHeaderColumn>
-                <TableHeaderColumn dataField='view' dataAlign='center' dataFormat={this.viewFormatter}
-                  width={'50'} />
-                <TableHeaderColumn dataField='delete' dataAlign='center'
-                  dataFormat={this.deleteFormatter}
-                  width={'50'} />
-              </BootstrapTable>
-            </div>
+        return (
+            <Page title={'Jobs'}
+                  description={'klajsdklasdjklasjdklajsdklasdjklasjdklajsdklasdjklasjdklajsdklasdjklasjdklajsdklasdjklasjd'}>
+                <ReactTableComponent
+                    // tableRowId={'report_id'}
+                    onSearch={this.onSearch}
+                    rowHeight={'46px'}
+                    manual={false}
+                    data={sortedJobs}
+                    pageSize={10}
+                    // numericPagination
+                    // cellPadding={text('cellPadding')}
+                    columns={columns}
+                    noDataText={noDataText}
+                    // selectedRow={text('selected row')}
+                    // selectRow={selectRow}
+                    // sortEvent={sortEvent}
+                    // rowHeight={text('height', '')}
+                    showPagination
+                    resizable={false}
+                    cursor={'default'}
+                    // className={style.table}
+                />
 
-            {this.state.openViewJob
-              ? <Dialog title_key={'id'} data={this.props.job} closeDialog={this.closeViewJobDialog} /> : null}
+                {this.state.openViewJob
+                    ? <Dialog title_key={'id'} data={this.state.openViewJob}
+                              closeDialog={this.closeViewJobDialog}/> : null}
 
-            {this.state.deleteDialog && !this.props.deleteJobSuccess
-              ? <DeleteDialog loader={this.props.processingDeleteJob} display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}
-                onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
-                onCancel={this.cancelDelete} /> : null}
-
-            <Snackbar
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'center'
-              }}
-              open={this.props.deleteJobSuccess}
-              bodyStyle={{ backgroundColor: '#2fbb67' }}
-              message={(this.state.jobToDelete && this.state.jobToDelete.id) ? `Job deleted successfully: ${this.state.jobToDelete.id}` : ''}
-              autoHideDuration={4000}
-              onRequestClose={() => {
-                this.props.getAllJobs();
-                this.props.clearDeleteJobSuccess();
-                this.setState({
-                  jobToDelete: undefined
-                });
-              }}
-            />
-          </div>
-        </Page>
-      )
+                {this.state.deleteDialog && !this.props.deleteJobSuccess
+                    ? <DeleteDialog loader={this.props.processingDeleteJob}
+                                    display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}
+                                    onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
+                                    onCancel={this.cancelDelete}/> : null}
+                {/*//TODO seems deleteError will not work*/}
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={this.props.deleteJobSuccess}
+                    bodyStyle={{backgroundColor: '#2fbb67'}}
+                    message={(this.state.jobToDelete && this.state.jobToDelete.id) ? `Job deleted successfully: ${this.state.jobToDelete.id}` : ''}
+                    autoHideDuration={4000}
+                    onRequestClose={() => {
+                        this.props.getAllJobs();
+                        this.props.clearDeleteJobSuccess();
+                        this.setState({
+                            jobToDelete: undefined
+                        });
+                    }}
+                />
+            </Page>
+        )
     }
 }
 
-function mapStateToProps (state) {
-  return {
-    jobs: jobs(state),
-    job: job(state),
-    processingGetJobs: processingGetJobs(state),
-    errorOnGetJobs: errorOnGetJobs(state),
-    errorOnGetJob: errorOnGetJob(state),
-    processingDeleteJob: processingDeleteJob(state),
-    deleteJobSuccess: deleteJobSuccess(state),
-    tests: tests(state),
-    reports: reports(state)
-  }
+function mapStateToProps(state) {
+    return {
+        jobs: getJobsWithTestNameAndLastRun(state),
+        job: job(state),
+        processingGetJobs: processingGetJobs(state),
+        errorOnGetJobs: errorOnGetJobs(state),
+        errorOnGetJob: errorOnGetJob(state),
+        processingDeleteJob: processingDeleteJob(state),
+        deleteJobSuccess: deleteJobSuccess(state),
+        tests: tests(state),
+        reports: reports(state)
+    }
 }
 
 const mapDispatchToProps = {
-  clearSelectedJob: Actions.clearSelectedJob,
-  clearErrorOnGetJobs: Actions.clearErrorOnGetJobs,
-  getAllJobs: Actions.getJobs,
-  getJob: Actions.getJob,
-  deleteJob: Actions.deleteJob,
-  clearDeleteJobSuccess: Actions.clearDeleteJobSuccess,
-  clearErrorOnDeleteJob: Actions.clearErrorOnDeleteJob,
-  getTests: Actions.getTests,
-  getAllReports: Actions.getLastReports
+    clearSelectedJob: Actions.clearSelectedJob,
+    clearErrorOnGetJobs: Actions.clearErrorOnGetJobs,
+    getAllJobs: Actions.getJobs,
+    getJob: Actions.getJob,
+    deleteJob: Actions.deleteJob,
+    clearDeleteJobSuccess: Actions.clearDeleteJobSuccess,
+    clearErrorOnDeleteJob: Actions.clearErrorOnDeleteJob,
+    getTests: Actions.getTests,
+    getAllReports: Actions.getLastReports
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getJobs);
