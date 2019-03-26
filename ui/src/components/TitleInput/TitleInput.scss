@@ -1,0 +1,39 @@
+@import "../styles/colors";
+
+$title-color: $default-blue;
+$title-color-disabled: #c2c2c2;
+$suffix-color: $text-grey;
+
+.title_wrapper {
+  display: grid;
+  grid-row-gap: 5px;
+}
+
+.title {
+  font-size: 13px;
+  text-align: left;
+  font-weight: 500;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: $title-color;
+  display: block;
+
+  &.title--disabled {
+    color: $title-color-disabled;
+  }
+
+  &.title--alert {
+    color: $error-red;
+  }
+}
+
+.suffix {
+  color: $suffix-color;
+  font-weight: 300;
+}
+
+.prefix {
+  font-weight: 300;
+}
