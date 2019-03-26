@@ -874,7 +874,7 @@ paths:
         description: The number of most recent reports to retrieve.
         required: true
         minimum: 1
-        maximum: 100
+        maximum: 250
         type: integer
       responses:
         '200':
