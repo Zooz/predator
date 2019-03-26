@@ -17,10 +17,9 @@ import {getColumns} from './configurationColumn'
 
 const REFRESH_DATA_INTERVAL = 30000;
 
-//TODO add error handler - should i? maybe in the main
 const columnsNames = ['test_name', 'start_time', 'end_time', 'duration', 'status', 'arrival_rate',
     'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'report', 'grafana_report', 'raw', 'logs', 'stop'];
-
+const DESCRIPTION='Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.';
 
 class getReports extends React.Component {
     constructor(props) {
@@ -120,9 +119,7 @@ class getReports extends React.Component {
         });
 
         return (
-            <Page title={'Last Reports'}
-                  description={'here is the last reports here is the last reports here is the last reports here is the last reports here is the last reports'}>
-
+            <Page title={'Last Reports'} description={DESCRIPTION}>
                 <div style={{width: '100%'}}>
                     {showReport && <Report onClose={this.closeReport} key={showReport.report_id} report={showReport}/>}
                     <ReactTableComponent
@@ -132,13 +129,7 @@ class getReports extends React.Component {
                         manual={false}
                         data={sortedReports}
                         pageSize={10}
-                        // numericPagination
-                        // cellPadding={text('cellPadding')}
                         columns={columns}
-                        // selectedRow={text('selected row')}
-                        // selectRow={selectRow}
-                        // sortEvent={sortEvent}
-                        // rowHeight={text('height', '')}
                         showPagination
                         resizable={false}
                         cursor={'default'}

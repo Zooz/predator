@@ -4,3 +4,10 @@
   margin-bottom:10px;
   padding: 0px !important;
 }
+
+.notes p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 164px;
+}

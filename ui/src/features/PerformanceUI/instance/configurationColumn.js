@@ -5,7 +5,7 @@ import Moment from 'moment';
 import prettySeconds from 'pretty-seconds';
 import 'font-awesome/css/font-awesome.min.css';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faEye, faCloudDownloadAlt, faStopCircle, faTrashAlt, faPen,faRunning} from '@fortawesome/free-solid-svg-icons'
+import {faEye, faCloudDownloadAlt, faStopCircle, faTrashAlt, faPen} from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames';
 import css from './configurationColumn.scss';
 import env from "../../../App/common/env";
@@ -15,61 +15,6 @@ import style from "./style.scss";
 import {getTimeFromCronExpr} from './utils';
 
 
-const dateFormatter = (cell, row) => {
-    const timePattern = 'DD-MM-YYYY hh:mm:ss a';
-
-    if (!cell) {
-        return 'Still running...';
-    } else {
-        return (
-            new Moment(cell).local().format('lll')
-        );
-    }
-};
-//TODO clean the code. all unused up/down /sortable
-
-const ViewButton = ({onClick, icon, disabled,text}) => {
-    if (icon) {
-        return (<FontAwesomeIcon
-            className={classnames(css['icon'], {[css['action-style']]: !disabled, [css['disabled-button']]: disabled})}
-            onClick={!disabled && onClick} icon={icon}/>)
-    }
-    return (<div className={css['action-style']} onClick={onClick}>{text || 'View'}</div>)
-};
-
-
-const notes = (cell, row) => {
-    if (cell) {
-        const id = uuid();
-        cell = cell.split('\n').map((row) => (<p>{row}</p>));
-        return <TooltipWrapper
-            content={<div>
-                {cell}
-            </div>}
-            dataId={`tooltipKey_${id}`}
-            place='top'
-            offset={{top: 1}}
-        >
-            <div className={style.notes} data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer'}}>
-                {cell}
-            </div>
-
-        </TooltipWrapper>;
-    }
-};
-
-
-const statusFormatter = (cell) => {
-    let mapper = {
-        'in_progress': 'Running',
-        'aborted': 'Aborted',
-        'finished': 'Finished',
-        'started': 'Started',
-        'partially_finished': 'Partially Finished',
-        'failed': 'Failed'
-    };
-    return (mapper[cell] ? mapper[cell] : cell);
-}
 export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView,onStop, onDelete, onEdit, onRunTest }) => {
 
     const columns = [
@@ -187,8 +132,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Start Time
                 </TableHeader>
             ),
-            accessor: data => (dateFormatter(data.start_time)),
-            className: `${css['header-time']}`,
+            accessor: data => (<div className={css['header-time']}>{dateFormatter(data.start_time)}</div>),
+            // className: `${css['header-time']}`,
         },
         {
             id: 'end_time',
@@ -200,7 +145,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     End Time
                 </TableHeader>
             ),
-            accessor: data => (dateFormatter(data.end_time))
+            accessor: data => (<div className={css['header-time']}>{dateFormatter(data.end_time)}</div>)
         },
         {
             id: 'duration',
@@ -439,5 +384,60 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
 
 
 
+const dateFormatter = (cell, row) => {
+    const timePattern = 'DD-MM-YYYY hh:mm:ss a';
+
+    if (!cell) {
+        return 'Still running...';
+    } else {
+        return (
+            new Moment(cell).local().format('lll')
+        );
+    }
+};
+//TODO clean the code. all unused up/down /sortable
+
+const ViewButton = ({onClick, icon, disabled,text}) => {
+    if (icon) {
+        return (<FontAwesomeIcon
+            className={classnames(css['icon'], {[css['action-style']]: !disabled, [css['disabled-button']]: disabled})}
+            onClick={!disabled && onClick} icon={icon}/>)
+    }
+    return (<div className={css['action-style']} onClick={onClick}>{text || 'View'}</div>)
+};
+
+
+const notes = (cell, row) => {
+    if (cell) {
+        const id = uuid();
+        cell = cell.split('\n').map((row) => (<p>{row}</p>));
+        return <TooltipWrapper
+            content={<div>
+                {cell}
+            </div>}
+            dataId={`tooltipKey_${id}`}
+            place='top'
+            offset={{top: 1}}
+        >
+            <div className={style.notes} data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer'}}>
+                {cell}
+            </div>
+
+        </TooltipWrapper>;
+    }
+};
+
+
+const statusFormatter = (cell) => {
+    let mapper = {
+        'in_progress': 'Running',
+        'aborted': 'Aborted',
+        'finished': 'Finished',
+        'started': 'Started',
+        'partially_finished': 'Partially Finished',
+        'failed': 'Failed'
+    };
+    return (mapper[cell] ? mapper[cell] : cell);
+}
 
 
