@@ -109,7 +109,7 @@ class Report extends React.Component {
     render() {
         const {report, onClose,aggregateReport} = this.props;
         return (
-            <Modal>
+            <Modal onExit={onClose}>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -153,13 +153,11 @@ class Report extends React.Component {
     componentDidMount() {
         this.loadData();
         this.refreshDataInterval = setInterval(this.loadData, REFRESH_DATA_INTERVAL)
-        document.addEventListener("keydown", this.onClose, false);
     }
 
 
     componentWillUnmount() {
         clearInterval(this.refreshDataInterval);
-        document.removeEventListener("keydown", this.onClose, false);
     }
 
 };
