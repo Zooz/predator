@@ -23,7 +23,8 @@ const errorMsgGetReports = 'Error occurred while trying to get all reports for t
 const columnsNames = ['start_time', 'end_time', 'duration', 'status','arrival_rate',
     'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'grafana_report', 'report', 'raw', 'logs'];
 
-const DESCRIPTION = 'All reports for a given test';
+const DESCRIPTION = 'All reports for a given test.';
+
 class getTests extends React.Component {
     constructor(props) {
         super(props);

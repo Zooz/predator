@@ -11,7 +11,6 @@ import css from './configurationColumn.scss';
 import env from "../../../App/common/env";
 import {v4 as uuid} from "uuid";
 import TooltipWrapper from '../../../components/TooltipWrapper';
-import style from "./style.scss";
 import {getTimeFromCronExpr} from './utils';
 
 
@@ -331,7 +330,7 @@ const notes = (cell, row) => {
             place='top'
             offset={{top: 1}}
         >
-            <div className={style.notes} data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer'}}>
+            <div className={css.notes} data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer'}}>
                 {cell}
             </div>
 
