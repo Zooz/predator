@@ -17,3 +17,30 @@
   background: #2a3f53 !important;
   flex-shrink: 0;
 }
+
+.logo-text{
+  width: 98px;
+  height: 33px;
+  font-size: 27.2px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #fbc86c;
+  font-family: Impact;
+  margin-left:9px;
+}
+
+.logo-wrapper {
+  display:flex;
+  align-items: center;
+}
+
+.drawer-root {
+  //width:240px !important;
+}
+.icon {
+  color:white;
+  font-size: 20px;
+}
