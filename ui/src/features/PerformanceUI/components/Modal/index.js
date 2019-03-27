@@ -12,9 +12,14 @@ class Modal extends React.Component {
         }
     };
 
-    componentDidMount(){
-        document.addEventListener("keydown", this.onEscape, false);
+    componentDidMount() {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === 'Escape') {
+                this.onEscape();
+            }
+        }, false);
     }
+
     componentWillUnmount(){
         document.removeEventListener("keydown", this.onEscape, false);
     }
