@@ -53,6 +53,6 @@ async function getDslDefinitions(dslName) {
 async function saveFile(id, file) {
     return databaseConnector.saveFile(id, file);
 }
-async function getFile(id,) {
+async function getFile(id) {
     return databaseConnector.getFile(id);
 }
