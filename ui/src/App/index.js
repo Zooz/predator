@@ -26,7 +26,7 @@ class App extends React.Component {
       return (
         <Fragment>
           <ConnectedRouter history={history}>
-            <DrawerE history={history} open={false} listItemData={menuList}>
+            <DrawerE history={history} open={true} listItemData={menuList}>
               <Route exact path='/' render={() => (
                 <Redirect to='/last_reports' />
               )} />
@@ -43,7 +43,7 @@ class App extends React.Component {
                 <GetReports key={props.match.params.instance} {...props} />
               )} />
             </DrawerE>
-          </ConnectedRouter>// TODO probably need to remove redux from here.
+          </ConnectedRouter>
 
         </Fragment>
 

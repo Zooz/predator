@@ -100,3 +100,9 @@ async function runJob(jobId) {
     let response = await requestSender.send(options);
     return response;
 }
+
+module.exports.getLogs = () => {
+    let error = new Error('Getting logs not supported in metronome');
+    error.statusCode = 501;
+    throw error;
+};

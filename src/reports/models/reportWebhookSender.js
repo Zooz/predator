@@ -3,9 +3,11 @@
 let request = require('request-promise-native');
 
 let logger = require('../../common/logger');
-let reportManager = require('./reportsManager');
 
-module.exports.send = async (testId, reportId, message, webhooks) => {
+module.exports.send = async (webhooks, message) => {
+    if (!webhooks) {
+        return;
+    }
     let options = {
         body:
             {
@@ -15,20 +17,6 @@ module.exports.send = async (testId, reportId, message, webhooks) => {
             },
         json: true
     };
-
-    if (!webhooks) {
-        let report;
-        try {
-            report = await reportManager.getReport(testId, reportId);
-        } catch (error) {
-            let errorMessage = `Failed to retrieve report for testId: ${testId}, reportId: ${reportId}`;
-            logger.error(error, errorMessage);
-            return Promise.reject(new Error(errorMessage));
-        }
-
-        webhooks = report.webhooks;
-    }
-
     let promises = [];
     webhooks.forEach(webhookUrl => {
         promises.push(request.post(Object.assign({ url: webhookUrl }, options)));

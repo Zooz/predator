@@ -1,7 +1,7 @@
 import { put, takeLatest, select, call } from 'redux-saga/effects'
 import * as Actions from '../actions/reportsActions'
 import * as Types from '../types/reportsTypes'
-import { getReportsFromFramework, getReportFromFramework, getLastReportsFromFramework } from '../apis/reportsApi'
+import { getReportsFromFramework, getReportFromFramework, getLastReportsFromFramework,getAggregateFromFramework } from '../apis/reportsApi'
 
 export function * getReports ({ testId }) {
   try {
@@ -58,8 +58,20 @@ export function * getReport ({ testId, runId }) {
   }
 }
 
+export function * getAggregateReport ({ testId,reportId }) {
+  try {
+    const report = yield call(getAggregateFromFramework, testId,reportId);
+    yield put(Actions.getAggregateReportSuccess(report.data));
+  } catch (e) {
+    console.log('error',e);
+    //TODO
+    // yield put(Actions.getReportFaliure(e))
+  }
+}
+
 export function * reportsRegister () {
   yield takeLatest(Types.GET_REPORTS, getReports);
   yield takeLatest(Types.GET_REPORT, getReport);
   yield takeLatest(Types.GET_LAST_REPORTS, getLastReports);
+  yield takeLatest(Types.GET_AGGREGATE_REPORT, getAggregateReport);
 }

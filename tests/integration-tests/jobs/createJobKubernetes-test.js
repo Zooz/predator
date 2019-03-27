@@ -1,33 +1,31 @@
-let should = require('should');
-let uuid = require('uuid');
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
+const should = require('should'),
+    uuid = require('uuid'),
+    schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    nock = require('nock'),
+    kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
-let nock = require('nock');
-let serviceConfig = require('../../../src/config/serviceConfig');
-let kubernetesConfig = require('../../../src/config/kubernetesConfig');
-
-describe('Create job specific kubernetes tests', () => {
+describe('Create job specific kubernetes tests', async function () {
+    this.timeout(20000);
     let testId;
-
-    before(async () => {
-        await schedulerRequestCreator.init();
-        await testsRequestCreator.init();
-
-        let requestBody = require('../../testExamples/Custom_test');
-        let response = await testsRequestCreator.createTest(requestBody, {});
-        should(response.statusCode).eql(201);
-        should(response.body).have.key('id');
-        testId = response.body.id;
-    });
 
     beforeEach(async () => {
         nock.cleanAll();
     });
-
-    if (serviceConfig.jobPlatform === 'KUBERNETES') {
+    const jobPlatform = process.env.JOB_PLATFORM;
+    if (jobPlatform === 'KUBERNETES') {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
+                before(async () => {
+                    await schedulerRequestCreator.init();
+                    await testsRequestCreator.init();
+
+                    let requestBody = require('../../testExamples/Basic_test');
+                    let response = await testsRequestCreator.createTest(requestBody, {});
+                    should(response.statusCode).eql(201);
+                    should(response.body).have.key('id');
+                    testId = response.body.id;
+                });
                 let jobId;
                 describe('Create two jobs, one is one time, second one is cron and get them', () => {
                     let createJobResponse;
@@ -133,7 +131,6 @@ describe('Create job specific kubernetes tests', () => {
                             environment: 'test',
                             run_immediately: true,
                             max_virtual_users: 500
-
                         };
 
                         expectedResult = {
@@ -166,6 +163,35 @@ describe('Create job specific kubernetes tests', () => {
 
                         should(getJobsFromService.status).eql(200);
                         should(getJobsFromService.body).containEql(expectedResult);
+                    });
+
+                    it('Get logs', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}`)
+                            .reply(200, {
+                                spec: { selector: { matchLabels: { 'controller-uid': 'uid' } } }
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods?labelSelector=controller-uid=uid`)
+                            .reply(200, {
+                                items: [{ metadata: { name: 'podA' } }, { metadata: { name: 'podB' } }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podA/log`)
+                            .reply(200, {
+                                items: [{ content: 'log' }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podB/log`)
+                            .reply(200, {
+                                items: [{ content: 'log' }]
+                            });
+
+                        let getLogsResponse = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getLogsResponse.status).eql(200);
+                        should(getLogsResponse.headers['content-type']).eql('application/zip');
                     });
 
                     it('Stop run', async () => {
@@ -356,7 +382,23 @@ describe('Create job specific kubernetes tests', () => {
                         should(stopRunResponse.statusCode).eql(404);
                     });
                 });
+
+                describe('Failures on getLogs', () => {
+                    it('Gets logs should return 401', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job_id-run_id`)
+                            .reply(401, {
+                                error: 'error '
+                            });
+
+                        let getLogsResponse = await schedulerRequestCreator.getLogs('job_id', 'run_id', {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getLogsResponse.status).eql(401);
+                        should(getLogsResponse.headers['content-type']).eql('application/json; charset=utf-8');
+                    });
+                });
             });
         });
     }
-}).timeout(20000);
+});

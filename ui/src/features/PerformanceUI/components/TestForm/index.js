@@ -12,7 +12,7 @@ import { createTestRequest, createStateForEditTest } from './utils';
 import ScenarioList from './scenarioList';
 import { v4 as uuid } from 'uuid';
 import { cloneDeep, reduce, isNumber } from 'lodash';
-import Button from './Button';
+import Button from '../Button';
 import ErrorDialog from '../ErrorDialog';
 export class TestForm extends React.Component {
   constructor (props) {
@@ -28,7 +28,7 @@ export class TestForm extends React.Component {
         scenarios: [],
         before: null,
         isBeforeSelected: false,
-        type: 'custom',
+        type: 'basic',
         name: '',
         baseUrl: '',
         description: '',
@@ -60,16 +60,17 @@ export class TestForm extends React.Component {
       closeDialog();
     }
   }
+
   componentDidMount () {
     const { initForm } = this.props;
     initForm();
   }
 
   render () {
-    const { createTestError } = this.props;
+    const { createTestError,closeDialog } = this.props;
     const { name, description, baseUrl } = this.state;
     return (
-      <Modal>
+      <Modal onExit={closeDialog}>
         <h1>Create Test</h1>
         <div className={style['top']}>
           <div className={style['top-inputs']}>
@@ -106,7 +107,6 @@ export class TestForm extends React.Component {
   addScenarioHandler = () => {
     const { scenarios } = this.state;
     const maxWeight = this.calcMaxAllowedWeight(scenarios.length);
-    console.log('maxWeight',maxWeight);
     scenarios.push({ id: uuid(), steps: [], weight: maxWeight, scenario_name: 'Scenario ' + (scenarios.length + 1) });
     this.setState({ scenarios, isAddStepOpen: false, isAddScenarioOpen: true, currentScenarioIndex: scenarios.length - 1, isBeforeSelected: false })
   };

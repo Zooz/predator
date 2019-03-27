@@ -1,26 +1,20 @@
 'use strict';
-let databaseConfig = require('../../../../src/config/databaseConfig');
-databaseConfig.type = 'CASSANDRA';
-let should = require('should');
-let rewire = require('rewire');
-let sinon = require('sinon');
-let databaseConnector = require('../../../../src/jobs/models/database/databaseConnector');
-let logger = require('../../../../src/common/logger');
-let uuid = require('uuid');
-let jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector');
-let jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate');
+const should = require('should'),
+    rewire = require('rewire'),
+    sinon = require('sinon'),
+    databaseConnector = require('../../../../src/jobs/models/database/databaseConnector'),
+    logger = require('../../../../src/common/logger'),
+    uuid = require('uuid'),
+    jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector'),
+    dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector'),
+    jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate');
 
-let config = require('../../../../src/config/serviceConfig');
-
-config.jobPlatform = 'KUBERNETES';
 let manager;
-
-let dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector');
 
 const TEST_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaa';
 const JOB_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaf';
 
-let jobBodyWithCron = {
+const jobBodyWithCron = {
     test_id: TEST_ID,
     id: TEST_ID,
     arrival_rate: 1,
@@ -32,7 +26,7 @@ let jobBodyWithCron = {
     ramp_to: '1',
     webhooks: ['dina', 'niv', 'eli']
 };
-let jobBodyWithCronNotImmediately = {
+const jobBodyWithCronNotImmediately = {
     test_id: TEST_ID,
     arrival_rate: 1,
     duration: 1,
@@ -43,7 +37,7 @@ let jobBodyWithCronNotImmediately = {
     ramp_to: '1',
     webhooks: ['dina', 'niv', 'eli']
 };
-let jobBodyWithoutCron = {
+const jobBodyWithoutCron = {
     test_id: TEST_ID,
     arrival_rate: 1,
     duration: 1,
@@ -54,7 +48,7 @@ let jobBodyWithoutCron = {
     webhooks: ['dina', 'niv', 'eli']
 };
 
-let jobBodyWithParallelismThatSplitsNicely = {
+const jobBodyWithParallelismThatSplitsNicely = {
     test_id: TEST_ID,
     arrival_rate: 99,
     duration: 1,
@@ -67,7 +61,7 @@ let jobBodyWithParallelismThatSplitsNicely = {
     max_virtual_users: 198
 };
 
-let jobBodyWithParallelismThatSplitsWithDecimal = {
+const jobBodyWithParallelismThatSplitsWithDecimal = {
     test_id: TEST_ID,
     arrival_rate: 99,
     duration: 1,
@@ -80,7 +74,7 @@ let jobBodyWithParallelismThatSplitsWithDecimal = {
     max_virtual_users: 510
 };
 
-let jobBodyWithoutRampTo = {
+const jobBodyWithoutRampTo = {
     test_id: TEST_ID,
     arrival_rate: 1,
     duration: 1,
@@ -90,7 +84,7 @@ let jobBodyWithoutRampTo = {
     webhooks: ['dina', 'niv', 'eli']
 };
 
-let jobBodyWithCustomEnvVars = {
+const jobBodyWithCustomEnvVars = {
     test_id: TEST_ID,
     arrival_rate: 1,
     duration: 1,
@@ -98,7 +92,7 @@ let jobBodyWithCustomEnvVars = {
     emails: ['dina@niv.eli'],
     environment: 'test',
     webhooks: ['dina', 'niv', 'eli'],
-    custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' },
+    custom_env_vars: {'KEY1': 'A', 'KEY2': 'B'},
     max_virtual_users: 100
 };
 
@@ -109,6 +103,7 @@ describe('Manager tests', function () {
     let loggerInfoStub;
     let jobConnectorRunJobStub;
     let jobStopRunStub;
+    let jobGetLogsStub;
     let uuidStub;
     let cassandraDeleteStub;
     let cassandraGetStub;
@@ -125,6 +120,7 @@ describe('Manager tests', function () {
         cassandraGetSingleJobStub = sandbox.stub(databaseConnector, 'getJob');
         cassandraDeleteStub = sandbox.stub(databaseConnector, 'deleteJob');
         cassandraUpdateJobStub = sandbox.stub(databaseConnector, 'updateJob');
+        jobGetLogsStub = sandbox.stub(jobConnector, 'getLogs');
         jobStopRunStub = sandbox.stub(jobConnector, 'stopRun');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
@@ -134,8 +130,14 @@ describe('Manager tests', function () {
         jobTemplateCreateJobRequestStub = sandbox.spy(jobTemplate, 'createJobRequest');
 
         manager = rewire('../../../../src/jobs/models/jobManager');
-        manager.__set__('config.concurrencyLimit', '100');
-        manager.__set__('config.jobPlatform', 'KUBERNETES');
+        manager.__set__('configHandler', {
+            getConfig: () => {
+                return {
+                    job_platform: 'KUBERNETES',
+                    concurrency_limit: 100
+                };
+            }
+        });
     });
 
     beforeEach(() => {
@@ -158,7 +160,7 @@ describe('Manager tests', function () {
         });
 
         it('Cassandra connector returns an array with job with no schedules', async () => {
-            cassandraGetStub.resolves([{ cron_expression: null }]);
+            cassandraGetStub.resolves([{cron_expression: null}]);
             await manager.reloadCronJobs();
             manager.__get__('cronJobs').should.eql({});
         });
@@ -188,16 +190,21 @@ describe('Manager tests', function () {
 
     describe('Create new job', function () {
         before(() => {
-            manager.__set__('config.baseUrl', '');
-            manager.__set__('config.internalAddress', 'localhost:80');
-            manager.__set__('config.environment', '');
-            manager.__set__('config.concurrencyLimit', '100');
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return {
+                        job_platform: 'KUBERNETES',
+                        base_url: '',
+                        internal_address: 'localhost:80'
+                    };
+                }
+            });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
 
         it('Simple request with custom env vars, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
-            jobConnectorRunJobStub.resolves({ id: 'run_id' });
-            cassandraInsertStub.resolves({ success: 'success' });
+            jobConnectorRunJobStub.resolves({id: 'run_id'});
+            cassandraInsertStub.resolves({success: 'success'});
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -236,7 +243,7 @@ describe('Manager tests', function () {
 
         it('Simple request, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
+            cassandraInsertStub.resolves({success: 'success'});
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '1',
@@ -256,7 +263,7 @@ describe('Manager tests', function () {
 
         it('Simple request, with parallelism, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
+            cassandraInsertStub.resolves({success: 'success'});
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '150',
@@ -293,7 +300,7 @@ describe('Manager tests', function () {
 
         it('Simple request, with parallelism, and arrival rate splits with decimal point, should round up', async () => {
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
+            cassandraInsertStub.resolves({success: 'success'});
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '150',
@@ -329,8 +336,8 @@ describe('Manager tests', function () {
         });
 
         it('Simple request without ramp to, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
-            jobConnectorRunJobStub.resolves({ id: 'run_id' });
-            cassandraInsertStub.resolves({ success: 'success' });
+            jobConnectorRunJobStub.resolves({id: 'run_id'});
+            cassandraInsertStub.resolves({success: 'success'});
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -348,27 +355,27 @@ describe('Manager tests', function () {
         });
 
         it('Fail to save job to cassandra', function () {
-            cassandraInsertStub.rejects({ error: 'cassandra error' });
+            cassandraInsertStub.rejects({error: 'cassandra error'});
 
             return manager.createJob(jobBodyWithoutRampTo)
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(0);
                     loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'cassandra error' }, 'Error occurred trying to create new job']);
-                    error.should.eql({ error: 'cassandra error' });
+                    loggerErrorStub.args[0].should.eql([{error: 'cassandra error'}, 'Error occurred trying to create new job']);
+                    error.should.eql({error: 'cassandra error'});
                 });
         });
 
         it('Fail to create a job', function () {
-            jobConnectorRunJobStub.rejects({ error: 'job creator error' });
-            cassandraInsertStub.resolves({ success: 'success' });
+            jobConnectorRunJobStub.rejects({error: 'job creator error'});
+            cassandraInsertStub.resolves({success: 'success'});
 
             return manager.createJob(jobBodyWithoutRampTo)
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(1);
                     loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'job creator error' }, 'Error occurred trying to create new job']);
-                    error.should.eql({ error: 'job creator error' });
+                    loggerErrorStub.args[0].should.eql([{error: 'job creator error'}, 'Error occurred trying to create new job']);
+                    error.should.eql({error: 'job creator error'});
                 });
         });
 
@@ -378,7 +385,7 @@ describe('Manager tests', function () {
             });
 
             it('Validate response', function () {
-                cassandraInsertStub.resolves({ success: 'success' });
+                cassandraInsertStub.resolves({success: 'success'});
                 cassandraDeleteStub.resolves({});
                 let expectedResult = {
                     'cron_expression': '* * * * * *',
@@ -420,7 +427,7 @@ describe('Manager tests', function () {
 
             it('Validate response', function () {
                 jobConnectorRunJobStub.resolves({});
-                cassandraInsertStub.resolves({ success: 'success' });
+                cassandraInsertStub.resolves({success: 'success'});
                 cassandraDeleteStub.resolves({});
                 let expectedResult = {
                     cron_expression: '* * * * * *',
@@ -457,7 +464,7 @@ describe('Manager tests', function () {
         describe('Request with cron expression, that is not invoked immediately', function () {
             it('Validate response', function () {
                 jobConnectorRunJobStub.resolves({});
-                cassandraInsertStub.resolves({ success: 'success' });
+                cassandraInsertStub.resolves({success: 'success'});
                 cassandraDeleteStub.resolves({});
                 let date = new Date();
                 date.setSeconds(date.getSeconds() + 5);
@@ -508,16 +515,21 @@ describe('Manager tests', function () {
 
     describe('Update job', function () {
         before(() => {
-            manager.__set__('config.baseUrl', '');
-            manager.__set__('config.predatorUrl', 'localhost:80');
-            manager.__set__('config.environment', '');
-            manager.__set__('config.concurrencyLimit', '100');
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return {
+                        job_platform: 'KUBERNETES',
+                        base_url: '',
+                        internal_address: 'localhost:80'
+                    };
+                }
+            });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
 
         it('Should update job successfully', async function () {
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
+            cassandraInsertStub.resolves({success: 'success'});
             cassandraUpdateJobStub.resolves({});
             cassandraGetSingleJobStub.resolves([{
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
@@ -531,7 +543,7 @@ describe('Manager tests', function () {
                 ramp_to: '1'
             }]);
             await manager.createJob(jobBodyWithCron);
-            await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
+            await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', {cron_expression: '20 * * * *'});
             loggerInfoStub.callCount.should.eql(4);
             manager.__get__('cronJobs')[JOB_ID].cronTime.source.should.eql('20 * * * *');
             await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -540,12 +552,12 @@ describe('Manager tests', function () {
         it('Updating data in cassandra fails', async function () {
             try {
                 jobConnectorRunJobStub.resolves({});
-                cassandraInsertStub.resolves({ success: 'success' });
-                cassandraUpdateJobStub.rejects({ error: 'error' });
+                cassandraInsertStub.resolves({success: 'success'});
+                cassandraUpdateJobStub.rejects({error: 'error'});
                 await manager.createJob(jobBodyWithCron);
-                await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
+                await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', {cron_expression: '20 * * * *'});
             } catch (error) {
-                error.should.eql({ error: 'error' });
+                error.should.eql({error: 'error'});
                 loggerInfoStub.callCount.should.eql(2);
                 loggerErrorStub.callCount.should.eql(1);
                 manager.__get__('cronJobs')[JOB_ID].cronTime.source.should.eql('* * * * * *');
@@ -556,13 +568,18 @@ describe('Manager tests', function () {
 
     describe('Delete scheduled job', function () {
         it('Deletes an existing job', async function () {
-            manager.__set__('config.baseUrl', '');
-            manager.__set__('config.predatorUrl', 'localhost:80');
-            manager.__set__('config.environment', '');
-            manager.__set__('config.concurrencyLimit', '100');
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return {
+                        job_platform: 'KUBERNETES',
+                        base_url: '',
+                        internal_address: 'localhost:80'
+                    };
+                }
+            });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
+            cassandraInsertStub.resolves({success: 'success'});
             cassandraDeleteStub.resolves({});
 
             await manager.createJob(jobBodyWithCron);
@@ -586,29 +603,29 @@ describe('Manager tests', function () {
     describe('Get jobs', function () {
         it('Get a list of all jobs - also one time jobs', async function () {
             cassandraGetStub.resolves([{
-                id: 'id',
-                test_id: 'test_id',
-                environment: 'test',
-                arrival_rate: 1,
-                duration: 1,
-                cron_expression: '* * * * *',
-                emails: null,
-                webhooks: ['dina', 'niv'],
-                ramp_to: '1',
-                notes: 'some notes'
-            },
-            {
-                id: 'id2',
-                test_id: 'test_id2',
-                arrival_rate: 1,
-                duration: 1,
-                environment: 'test',
-                cron_expression: null,
-                emails: ['eli@eli.eli'],
-                webhooks: null,
-                ramp_to: '1',
-                notes: 'some other notes'
-            }]
+                    id: 'id',
+                    test_id: 'test_id',
+                    environment: 'test',
+                    arrival_rate: 1,
+                    duration: 1,
+                    cron_expression: '* * * * *',
+                    emails: null,
+                    webhooks: ['dina', 'niv'],
+                    ramp_to: '1',
+                    notes: 'some notes'
+                },
+                    {
+                        id: 'id2',
+                        test_id: 'test_id2',
+                        arrival_rate: 1,
+                        duration: 1,
+                        environment: 'test',
+                        cron_expression: null,
+                        emails: ['eli@eli.eli'],
+                        webhooks: null,
+                        ramp_to: '1',
+                        notes: 'some other notes'
+                    }]
             );
 
             let expectedResult = [{
@@ -646,27 +663,27 @@ describe('Manager tests', function () {
 
         it('Get a list of jobs - only scheduled jobs', async function () {
             cassandraGetStub.resolves([{
-                id: 'id',
-                test_id: 'test_id',
-                environment: 'test',
-                arrival_rate: 1,
-                duration: 1,
-                cron_expression: '* * * * *',
-                emails: null,
-                webhooks: ['dina', 'niv'],
-                ramp_to: '1'
-            },
-            {
-                id: 'id2',
-                test_id: 'test_id2',
-                arrival_rate: 1,
-                duration: 1,
-                environment: 'test',
-                cron_expression: null,
-                emails: ['eli@eli.eli'],
-                webhooks: null,
-                ramp_to: '1'
-            }]
+                    id: 'id',
+                    test_id: 'test_id',
+                    environment: 'test',
+                    arrival_rate: 1,
+                    duration: 1,
+                    cron_expression: '* * * * *',
+                    emails: null,
+                    webhooks: ['dina', 'niv'],
+                    ramp_to: '1'
+                },
+                    {
+                        id: 'id2',
+                        test_id: 'test_id2',
+                        arrival_rate: 1,
+                        duration: 1,
+                        environment: 'test',
+                        cron_expression: null,
+                        emails: ['eli@eli.eli'],
+                        webhooks: null,
+                        ramp_to: '1'
+                    }]
             );
 
             let expectedResult = [{
@@ -699,14 +716,14 @@ describe('Manager tests', function () {
         });
 
         it('Fail to get jobs from cassandra', function () {
-            cassandraGetStub.rejects({ error: 'cassandra error' });
+            cassandraGetStub.rejects({error: 'cassandra error'});
 
             return manager.getJobs()
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(0);
                     loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'cassandra error' }, 'Error occurred trying to get jobs']);
-                    error.should.eql({ error: 'cassandra error' });
+                    loggerErrorStub.args[0].should.eql([{error: 'cassandra error'}, 'Error occurred trying to get jobs']);
+                    error.should.eql({error: 'cassandra error'});
                 });
         });
     });
@@ -773,15 +790,36 @@ describe('Manager tests', function () {
         });
 
         it('Fail to get jobs from cassandra', function () {
-            cassandraGetSingleJobStub.rejects({ error: 'cassandra error' });
+            cassandraGetSingleJobStub.rejects({error: 'cassandra error'});
 
             return manager.getJob('id')
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(0);
                     loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'cassandra error' }, 'Error occurred trying to get job']);
-                    error.should.eql({ error: 'cassandra error' });
+                    loggerErrorStub.args[0].should.eql([{error: 'cassandra error'}, 'Error occurred trying to get job']);
+                    error.should.eql({error: 'cassandra error'});
                 });
+        });
+    });
+
+    describe('Get logs', function () {
+        it('Success getting logs from job', async function () {
+            jobGetLogsStub.resolves([{type: 'file', name: 'log.txt', content: 'this is the log'}]);
+            let logs = await manager.getLogs('jobId', 'runId');
+            logs.should.eql({
+                files: [{type: 'file', name: 'log.txt', content: 'this is the log'}],
+                filename: 'jobId-runId.zip'
+            });
+        });
+
+        it('Get logs from job fails', async function () {
+            jobGetLogsStub.rejects(new Error('error getting logs'));
+            try {
+                await manager.getLogs('jobId', 'runId');
+                throw new Error('should not get here');
+            } catch (error) {
+                error.message.should.eql('error getting logs');
+            }
         });
     });
 });

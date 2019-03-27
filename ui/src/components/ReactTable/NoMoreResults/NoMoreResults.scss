@@ -1,0 +1,11 @@
+@import "../../styles/colors";
+
+$color: $disabled-grey-text;
+
+.no-more-results {
+  color: $color;
+  font-size: 12px;
+  text-align: center;
+  height: 20px;
+  line-height: 20px;
+}

@@ -10,6 +10,7 @@ import './style.scss'
 import './globals.css'
 import { DragDropContextProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import 'font-awesome/css/font-awesome.min.css';
 
 ReactDOM.render(
 

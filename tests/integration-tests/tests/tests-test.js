@@ -98,8 +98,8 @@ describe('the tests api', function() {
             });
         });
 
-        it('Create custom test, update with illegal test, delete test', async () => {
-            let requestBody = require('../../testExamples/Custom_test.json');
+        it('Create basic test, update with illegal test, delete test', async () => {
+            let requestBody = require('../../testExamples/Basic_test.json');
             let createTestResponse = await requestSender.createTest(requestBody, validHeaders);
             createTestResponse.statusCode.should.eql(201);
             createTestResponse.body.should.have.only.keys('id', 'revision_id');
@@ -109,7 +109,7 @@ describe('the tests api', function() {
             updatedTestResponse.statusCode.should.eql(400);
 
             let getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
-            let expectedResult = require('../../testResults/Custom_test.json');
+            let expectedResult = require('../../testResults/Basic_test.json');
             should(getTestResponse.statusCode).eql(200, JSON.stringify(getTestResponse.body));
             getTestResponse.body.artillery_test.should.eql(expectedResult);
 

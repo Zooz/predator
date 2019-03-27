@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-export JOB_PLATFORM=KUBERNETES
+export JOB_PLATFORM=kubernetes
 export KUBERNETES_URL=https://kubernetes
 export KUBERNETES_TOKEN=ya29.GluRBoPSEzMUXPArNwQbp_GDsGvB6ysA5F0fRo3gY1WbiOcJ6rGxKx35Yh6Zax9TL9rJhqJK4iJ8jsAvuiOFMQvH-1spYdLhvZv-JVzNVdUpQVJDJahTYXl-nrM_
 export KUBERNETES_NAMESPACE=default

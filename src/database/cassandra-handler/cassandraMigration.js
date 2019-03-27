@@ -36,10 +36,19 @@ module.exports.runMigration = function () {
 
     return initCassandraConnection()
         .then(function () {
-            CREATE_KEY_SPACE_QUERY = 'CREATE KEYSPACE IF NOT EXISTS ' +
-                args.key_space_name +
-                " WITH replication = {'class': 'SimpleStrategy', 'replication_factor':" +
-                args.replication_factor + '}';
+            if (args.cassandra_keyspace_strategy === 'SimpleStrategy') {
+                CREATE_KEY_SPACE_QUERY = 'CREATE KEYSPACE IF NOT EXISTS ' +
+                    args.key_space_name +
+                    " WITH replication = {'class': 'SimpleStrategy', 'replication_factor':" +
+                    args.replication_factor + '}';
+            } else if (args.cassandra_keyspace_strategy === 'NetworkTopologyStrategy') {
+                CREATE_KEY_SPACE_QUERY = 'CREATE KEYSPACE IF NOT EXISTS ' +
+                    args.key_space_name +
+                    " WITH replication = {'class': 'NetworkTopologyStrategy', '" + args.cassandra_local_data_center + "' :" +
+                    args.replication_factor + '}';
+            } else {
+                throw new Error(args.cassandra_keyspace_strategy + ' is not supported cassandra keyspace strategy');
+            }
             return createKeySpaceIfNeeded();
         })
         .then(function () {
@@ -94,6 +103,8 @@ function initArgs() {
         replication_factor: cassandraConfig.cassandraReplicationFactor,
         cassandra_username: cassandraConfig.username,
         cassandra_password: cassandraConfig.password,
+        cassandra_keyspace_strategy: cassandraConfig.cassandraKeyspaceStrategy,
+        cassandra_local_data_center: cassandraConfig.cassandraLocalDataCenter,
         root_dir: path.join(__dirname, '../../')
     };
 }

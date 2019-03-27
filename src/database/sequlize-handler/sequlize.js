@@ -36,7 +36,7 @@ async function createClient() {
             underscored: true
         },
         logging: false,
-        host: databaseConfig.host
+        host: databaseConfig.address
     };
 
     if (databaseConfig.type === 'SQLITE') {

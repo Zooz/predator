@@ -17,10 +17,16 @@ export const getReportFromFramework = (testId, runId) => {
   });
 };
 
-export const getLastReportsFromFramework = (queryParams) => {
-  queryParams = queryParams ? '?limit=50' : undefined;
+export const getAggregateFromFramework = (testId,reportId) => {
+  return axios.get(`${env.PREDATOR_URL}/tests/${testId}/reports/${reportId}/aggregate`, {
+    headers: {
+    }
+  });
+};
 
-  let url = queryParams ? `${env.PREDATOR_URL}/tests/last_reports${queryParams}` : `${env.PREDATOR_URL}/tests/last_reports?limit=50`;
+export const getLastReportsFromFramework = () => {
+
+  let url = `${env.PREDATOR_URL}/tests/last_reports?limit=200`;
   return axios.get(url, {
     headers: {
     }

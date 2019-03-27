@@ -4,6 +4,6 @@ Predator creates scheduled tasks for all tests that you scheduled to run at pred
 
 # Test Reports
 
-Predator's test reports will give you the in-depth performance metrics you're looking for. From the Predator UI choose **Reports** > **Last Reports** to view detailed reports of the tests that was executed.
+Predator's test reports will give you the in-depth performance metrics you're looking for. From the Predator UI choose **Reports** > **Last Reports** to view detailed reports of the tests that were executed.
 
 

@@ -15,9 +15,10 @@ let bodyParser = require('body-parser');
 let database = require('./database/database');
 let schedulerJobManager = require('./jobs/models/jobManager');
 let path = require('path');
+let zip = require('express-easy-zip');
 
 module.exports = () => {
-    return swaggerValidator.init('./docs/swagger.yaml', { beautifyErrors: true })
+    return swaggerValidator.init('./docs/openapi3.yaml', { beautifyErrors: true })
         .then(() => {
             return database.init();
         }).then(() => {
@@ -42,9 +43,13 @@ module.exports = () => {
 
             app.use(audit({
                 logger: logger,
-                excludeURLs: ['health', 'predator', 'favicon.png']
+                excludeURLs: ['health', 'predator', 'favicon.png'],
+                response: {
+                    excludeBody: ['*']
+                }
             }));
 
+            app.use(zip());
             app.use('/health', healthRouter);
             app.use('/v1/config', configRouter);
             app.use('/v1/jobs', jobsRouter);

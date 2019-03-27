@@ -62,7 +62,7 @@ describe('Cassandra client tests', function() {
     let revert;
     let loggerErrorStub;
 
-    let testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes;
+    let testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, phase;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -75,11 +75,13 @@ describe('Cassandra client tests', function() {
         reportId = uuid();
         jobId = uuid();
         testType = 'testType';
-        startTime = new Date().getTime();
+        startTime = Date.now();
         testName = 'testName';
         testDescription = 'testDescription';
         testConfiguration = 'testConfiguration';
         notes = 'notes';
+        lastUpdatedAt = Date.now();
+        phase = '0';
     });
 
     afterEach(() => {
@@ -106,20 +108,20 @@ describe('Cassandra client tests', function() {
     describe('Insert new report', function(){
         it('should succeed simple insert', function(){
             clientExecuteStub.resolves({ result: { rowLength: 0 } });
-            let query = 'INSERT INTO reports_summary(test_id, revision_id, report_type, report_id, job_id, test_type, status, phase, start_time, test_name, test_description, test_configuration, notes) values(?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
-            return cassandraClient.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes)
+            let query = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
+            return cassandraClient.insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt)
                 .then(function(){
                     loggerErrorStub.callCount.should.eql(0);
                     clientExecuteStub.getCall(0).args[0].should.eql(query);
                     clientExecuteStub.getCall(0).args[1][0].should.eql(testId);
                     clientExecuteStub.getCall(0).args[1][1].should.eql(revisionId);
-                    clientExecuteStub.getCall(0).args[1][3].should.eql(reportId);
+                    clientExecuteStub.getCall(0).args[1][2].should.eql(reportId);
                 });
         });
 
         it('should log error for failing inserting new report', function(){
             clientExecuteStub.rejects();
-            return cassandraClient.insertReport(testId, revisionId, reportId, jobId, testType, startTime, testName, testDescription, testConfiguration, notes)
+            return cassandraClient.insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt)
                 .catch(function(){
                     loggerErrorStub.callCount.should.eql(1);
                 });
@@ -131,7 +133,7 @@ describe('Cassandra client tests', function() {
             let cassandraResponse = { rows: [REPORT] };
             clientExecuteStub.resolves(cassandraResponse);
 
-            let query = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=? AND report_type=?';
+            let query = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
             return cassandraClient.getReport()
                 .then(function(result){
                     loggerErrorStub.callCount.should.eql(0);
@@ -143,7 +145,38 @@ describe('Cassandra client tests', function() {
         it('should get failure from cassandra', function(){
             clientExecuteStub.rejects(new Error('error'));
 
-            let query = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=? AND report_type=?';
+            let query = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
+            return cassandraClient.getReport()
+                .then(function(result){
+                    return Promise.reject(new Error('should not get here'));
+                }).catch(function(err) {
+                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    loggerErrorStub.callCount.should.eql(1);
+                    loggerErrorStub.args[0][1].message.should.eql('error');
+                    err.message.should.eql('Error occurred in communication with cassandra');
+                });
+        });
+    });
+
+    describe('Get last report', function(){
+        it('should get last reports', function(){
+            let cassandraResponse = { rows: [REPORT, REPORT, REPORT] };
+            clientExecuteStub.resolves(cassandraResponse);
+
+            let query = 'SELECT * FROM last_reports LIMIT ?';
+            return cassandraClient.getLastReports(5)
+                .then(function(result){
+                    loggerErrorStub.callCount.should.eql(0);
+                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql(5);
+                    result.should.eql(cassandraResponse.rows);
+                });
+        });
+
+        it('should get failure from cassandra', function(){
+            clientExecuteStub.rejects(new Error('error'));
+
+            let query = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
             return cassandraClient.getReport()
                 .then(function(result){
                     return Promise.reject(new Error('should not get here'));
@@ -161,7 +194,7 @@ describe('Cassandra client tests', function() {
             let cassandraResponse = { rows: [REPORT, REPORT] };
             clientExecuteStub.resolves(cassandraResponse);
 
-            let query = 'SELECT * FROM reports_summary WHERE test_id=? AND report_type=?';
+            let query = 'SELECT * FROM reports_summary WHERE test_id=?';
             return cassandraClient.getReports()
                 .then(function(result){
                     loggerErrorStub.callCount.should.eql(0);
@@ -173,7 +206,7 @@ describe('Cassandra client tests', function() {
         it('should get failure from cassandra', function(){
             clientExecuteStub.rejects(new Error('error'));
 
-            let query = 'SELECT * FROM reports_summary WHERE test_id=? AND report_type=?';
+            let query = 'SELECT * FROM reports_summary WHERE test_id=?';
             return cassandraClient.getReports()
                 .then(function(result){
                     return Promise.reject(new Error('should not get here'));
@@ -187,21 +220,21 @@ describe('Cassandra client tests', function() {
     });
 
     describe('Insert new stats', function(){
-        const containerId = uuid();
+        const runnerId = uuid();
         const statId = uuid();
         const statsTime = new Date().getTime();
         const phaseIndex = uuid(0);
         const phaseStatus = uuid('started');
-        const data = JSON.stringify({median: 5});
+        const data = JSON.stringify({ median: 5 });
 
         it('should succeed simple insert', function(){
             clientExecuteStub.resolves({ result: { rowLength: 0 } });
-            let query = 'INSERT INTO reports_stats(container_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
-            return cassandraClient.insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data)
+            let query = 'INSERT INTO reports_stats(runner_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
+            return cassandraClient.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data)
                 .then(function(){
                     loggerErrorStub.callCount.should.eql(0);
                     clientExecuteStub.getCall(0).args[0].should.eql(query);
-                    clientExecuteStub.getCall(0).args[1][0].should.eql(containerId);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql(runnerId);
                     clientExecuteStub.getCall(0).args[1][1].should.eql(testId);
                     clientExecuteStub.getCall(0).args[1][2].should.eql(reportId);
                     clientExecuteStub.getCall(0).args[1][3].should.eql(statId);
@@ -210,9 +243,60 @@ describe('Cassandra client tests', function() {
 
         it('should log error for failing inserting new report', function(){
             clientExecuteStub.rejects();
-            return cassandraClient.insertStats(containerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data)
+            return cassandraClient.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data)
                 .catch(function(){
                     loggerErrorStub.callCount.should.eql(1);
+                });
+        });
+    });
+
+    describe('Subscribe Runner', function(){
+        it('should subscribe runner to report', function(){
+            clientExecuteStub.resolves({ result: { rowLength: 0 } });
+
+            let query = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, phase_status) values(?,?,?,?)';
+            return cassandraClient.subscribeRunner('test_id', 'report_id', 'runner_id', 'initializing')
+                .then(function(result){
+                    loggerErrorStub.callCount.should.eql(0);
+                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql('test_id');
+                    clientExecuteStub.getCall(0).args[1][1].should.eql('report_id');
+                    clientExecuteStub.getCall(0).args[1][2].should.eql('runner_id');
+                    clientExecuteStub.getCall(0).args[1][3].should.eql('initializing');
+                });
+        });
+
+        it('should get failure from cassandra', function(){
+            clientExecuteStub.rejects(new Error('error'));
+
+            let query = 'SELECT * FROM reports_summary WHERE test_id=?';
+            return cassandraClient.getReports()
+                .then(function(result){
+                    return Promise.reject(new Error('should not get here'));
+                }).catch(function(err) {
+                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    loggerErrorStub.callCount.should.eql(1);
+                    loggerErrorStub.args[0][1].message.should.eql('error');
+                    err.message.should.eql('Error occurred in communication with cassandra');
+                });
+        });
+    });
+
+    describe('Update Subscriber', function(){
+        it('should update subscriber stage in report', function(){
+            let cassandraResponse = { rows: [REPORT] };
+            clientExecuteStub.resolves(cassandraResponse);
+
+            let query = 'UPDATE report_subscribers SET phase_status=?, last_stats=? WHERE test_id=? AND report_id=? AND runner_id=?';
+            return cassandraClient.updateSubscribers('test_id', 'report_id', 'runner_id', 'intermediate', 'last_stats')
+                .then(function(result){
+                    loggerErrorStub.callCount.should.eql(0);
+                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql('intermediate');
+                    clientExecuteStub.getCall(0).args[1][1].should.eql('last_stats');
+                    clientExecuteStub.getCall(0).args[1][2].should.eql('test_id');
+                    clientExecuteStub.getCall(0).args[1][3].should.eql('report_id');
+                    clientExecuteStub.getCall(0).args[1][4].should.eql('runner_id');
                 });
         });
     });

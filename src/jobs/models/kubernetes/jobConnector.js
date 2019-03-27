@@ -51,3 +51,62 @@ module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) 
 
     await requestSender.send(options);
 };
+
+module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId) => {
+    let jobControllerUid = await getJobControllerUid(jobPlatformName, platformSpecificInternalRunId);
+
+    let podsNames = await getPodsByLabel(jobControllerUid);
+
+    let logs = await getLogsByPodsNames(podsNames);
+
+    return logs;
+};
+
+async function getJobControllerUid(jobPlatformName, platformSpecificInternalRunId) {
+    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
+    let options = {
+        url,
+        method: 'GET',
+        headers
+    };
+
+    let job = await requestSender.send(options);
+
+    let controllerUid = job.spec.selector.matchLabels['controller-uid'];
+    return controllerUid;
+}
+
+async function getLogsByPodsNames(podsNames) {
+    let logs = [];
+    podsNames.forEach((podName) => {
+        let url = util.format('%s/api/v1/namespaces/%s/pods/%s/log', kubernetesUrl, kubernetesNamespace, podName);
+        let options = {
+            url,
+            method: 'GET',
+            headers
+        };
+        let getLogsPromise = requestSender.send(options);
+        logs.push({ type: 'file', name: podName + '.txt', content: getLogsPromise });
+    });
+
+    for (let i = 0; i < logs.length; i++) {
+        logs[i].content = await logs[i].content;
+    }
+    return logs;
+}
+
+async function getPodsByLabel(jobControllerUid) {
+    let url = util.format('%s/api/v1/namespaces/%s/pods?labelSelector=controller-uid=%s', kubernetesUrl, kubernetesNamespace, jobControllerUid);
+    let options = {
+        url,
+        method: 'GET',
+        headers
+    };
+
+    let pods = await requestSender.send(options);
+
+    let podsNames = pods.items.map((pod) => {
+        return pod.metadata.name;
+    });
+    return podsNames;
+}

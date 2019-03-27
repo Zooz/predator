@@ -1,69 +1,59 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let _ = require('lodash');
-let nodemailer = require('nodemailer');
-
-let smtpConfig = require('../../config/smtpConfig');
-let logger = require('../../common/logger');
-let reportsManager = require('./reportsManager');
-let jobsManager = require('../../jobs/models/jobManager');
-
-module.exports.sendAggregateReport = async (testId, reportId, reportUrl, grafanaUrl) => {
-    let report, job;
-    try {
-        report = await reportsManager.getReport(testId, reportId);
-        job = await jobsManager.getJob(report.job_id);
-    } catch (error) {
-        let errorMessage = `Failed to retrieve summary for testId: ${testId}, reportId: ${reportId}`;
-        logger.error(error, errorMessage);
-        return Promise.reject(new Error(errorMessage));
-    }
-
-    let testName = report.test_name;
-    let emails = job.emails;
-    let endTime = report.end_time;
-    let startTime = report.start_time;
+const fs = require('fs'),
+    path = require('path'),
+    _ = require('lodash'),
+    nodemailer = require('nodemailer'),
+    configHandler = require('../../configManager/models/configHandler'),
+    configConsts = require('../../common/consts').CONFIG,
+    logger = require('../../common/logger');
+module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
+    let testName = aggregatedResults.test_name;
+    let endTime = aggregatedResults.end_time;
+    let startTime = aggregatedResults.start_time;
     let testRunTime = timeConversion(endTime - startTime);
-    let finalStats = report.last_stats;
 
     let testInfo = {
         runTime: testRunTime,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
-        testId: report.test_id,
-        revisionId: report.revision_id,
-        reportId: report.report_id
+        testId: aggregatedResults.test_id,
+        revisionId: aggregatedResults.revision_id,
+        reportId: aggregatedResults.report_id,
+        parallelism: aggregatedResults.parallelism
     };
 
-    let htmlBody = generateReportFromTemplate(testName, testInfo, grafanaUrl, reportUrl, finalStats);
+    let htmlBody = generateReportFromTemplate(testName, testInfo, aggregatedResults.grafana_url, aggregatedResults.aggregate);
 
-    const mailOptions = {
-        from: 'Predator 💪 <performance@predator.com>',
-        to: [emails].join(','),
-        html: htmlBody,
-        subject: `Your test results: ${testName}`
-    };
+    async function createMailOptions(configSmtp) {
+        return {
+            from: configSmtp.from,
+            to: [emails].join(','),
+            html: htmlBody,
+            subject: `Your test results: ${testName}`
+        };
+    }
 
     try {
-        const transporter = createSMTPClient();
+        let configSmtp = await configHandler.getConfigValue(configConsts.SMTP_SERVER);
+        const transporter = await createSMTPClient(configSmtp);
+        const mailOptions = await createMailOptions(configSmtp);
         let response = await transporter.sendMail(mailOptions);
         transporter.close();
-        logger.info(response, `Send email successfully for testId: ${testId}, reportId: ${reportId}`);
+        logger.info(response, `Sent email successfully for testId: ${aggregatedResults.test_id}, reportId: ${aggregatedResults.report_id}`);
     } catch (error) {
         logger.error(error, 'Failed to send email');
     }
 };
 
-function createSMTPClient() {
+async function createSMTPClient(configSmtp) {
     var options = {
-        port: smtpConfig.port,
-        host: smtpConfig.host,
-        connectionTimeout: smtpConfig.timeout,
+        port: configSmtp.port,
+        host: configSmtp.host,
+        connectionTimeout: configSmtp.timeout,
         auth: {
-            user: smtpConfig.username,
-            pass: smtpConfig.password
+            user: configSmtp.username,
+            pass: configSmtp.password
         }
     };
 
@@ -90,16 +80,20 @@ function timeConversion(milliseconds) {
     }
 }
 
-function generateReportFromTemplate(testName, testInfo, grafanaUrl, reportUrl, finalStats) {
+function generateReportFromTemplate(testName, testInfo, grafanaUrl, aggregatedResults) {
     let codesSummary = [];
-    Object.keys(finalStats.codes).forEach((code) => { codesSummary.push(`${code}: ${finalStats.codes[code]}`) });
+    Object.keys(aggregatedResults.codes).forEach((code) => {
+        codesSummary.push(`${code}: ${aggregatedResults.codes[code]}`);
+    });
     codesSummary = codesSummary.join(', ');
 
     let errorsSummary = [];
-    Object.keys(finalStats.errors).forEach((error) => { errorsSummary.push(`${error}: ${finalStats.errors[error]}`) });
+    Object.keys(aggregatedResults.errors).forEach((error) => {
+        errorsSummary.push(`${error}: ${aggregatedResults.errors[error]}`);
+    });
     errorsSummary = errorsSummary.join(', ');
 
-    let emailVars = { testName, testInfo, grafanaUrl, reportUrl, finalStats, codesSummary, errorsSummary };
+    let emailVars = { testName, testInfo, grafanaUrl, aggregatedResults, codesSummary, errorsSummary };
 
     let templateFn = path.join(
         path.dirname(__filename),

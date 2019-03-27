@@ -1,0 +1,43 @@
+.header-time {
+  word-wrap: break-word !important;
+  text-overflow:initial!important;
+  overflow:visible!important;
+  white-space:pre-wrap;
+  line-height:1.5em;
+}
+
+.action-style {
+  color:#557eff;
+  cursor: pointer;
+  height:46px;
+  display:flex;
+  align-items: center;
+}
+
+.disabled-button {
+  color: #b4c9d3;
+  cursor: not-allowed;
+}
+
+
+
+.icon {
+  font-size:20px;
+}
+
+.notes p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 164px;
+}
+
+.header-name {
+  width:15% !important;
+}
+
+.small-header {
+  width:50px !important;
+}
+
+

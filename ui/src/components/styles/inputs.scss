@@ -1,0 +1,40 @@
+@import "../styles/colors";
+
+$default-border-color: $border-grey;
+
+$active-border-color: $default-blue;
+$active-box-shadow: inset 0 0 5px 0 rgba(13, 145, 189, 0.25);
+
+$border-radius: 6px;
+
+$hover-border-color: rgba(121, 194, 219, 0.27);
+
+$error-border-color: $error-red;
+
+$disabled-color: $greyout;
+
+$placeholder-color: $disabled-grey-text;
+
+$box-padding: 0 5px;
+
+@mixin default {
+  border-radius: $border-radius;
+  border: 1px solid $default-border-color;
+}
+
+@mixin active {
+  border-color: $active-border-color;
+  box-shadow: $active-box-shadow;
+}
+
+@mixin hover {
+  border-color: $hover-border-color;
+}
+
+@mixin error {
+  border-color: $error-border-color;
+}
+
+@mixin disabled {
+  background: $disabled-color;
+}

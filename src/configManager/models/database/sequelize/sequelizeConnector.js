@@ -7,6 +7,7 @@ module.exports = {
     init,
     updateConfig,
     getConfig,
+    deleteConfig,
     getConfigValue
 
 };
@@ -27,13 +28,22 @@ async function updateConfig(updateValues) {
     return results;
 }
 
+async function deleteConfig(key) {
+    const configClient = client.model('config');
+    const result = await configClient.destroy(
+        {
+            where: { key: key }
+        });
+    return result;
+}
+
 async function getConfig() {
     const configClient = client.model('config');
     const options = {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     const dbResults = await configClient.findAll(options);
-    const resultArr = dbResults.map(result => (result.dataValues));
+    let resultArr = dbResults.map(result => (result.dataValues));
     return resultArr;
 }
 
@@ -43,9 +53,8 @@ async function getConfigValue(configValue) {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     options.where = { key: configValue };
-    const dbResult = await configClient.find(options);
-    // todo: IF NOT EXISTS? throw error
-    return dbResult;
+    let dbResult = await configClient.find(options);
+    return dbResult || [];
 }
 
 async function initSchemas() {

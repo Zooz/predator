@@ -1,0 +1,41 @@
+@import "../../../styles/colors";
+
+$border-color: $border-grey;
+$pressed-button-color: #dce0e0;
+
+.arrow {
+  display: flex !important;
+  background: white;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 18px;
+  text-align: center;
+  font-size: 12px !important;;
+  border-left: none;
+  cursor: not-allowed;
+
+  &:active {
+    background-color: $pressed-button-color;
+  }
+}
+
+.up-arrow {
+  border-top-right-radius: 3px;
+  border-bottom: none;
+}
+
+.enabled {
+  color: $default-blue;
+  cursor: pointer;
+}
+
+.down-arrow {
+  border-top: 1px solid $border-color;
+  border-bottom-right-radius: 3px;
+}
+
+.arrows-wrapper {
+  display: flex;
+  flex-direction: column;
+}

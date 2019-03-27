@@ -1,0 +1,40 @@
+@import "../styles/inputs";
+
+.input {
+  font-family: Roboto;
+  transition: all 0.2s;
+  font-size: 13px;
+  width: 100%;
+  padding: $box-padding;
+  @include default;
+  height: var(--input-height);
+
+  &.input--error {
+    @include error;
+  }
+
+  &.input--disabled {
+    @include disabled;
+  }
+
+  &:hover {
+    @include hover;
+  }
+
+  &:active, &:focus, &:focus-within {
+    outline: none;
+    @include active;
+  }
+
+  &::placeholder{
+    color: $placeholder-color;
+  }
+  &[type=number] {
+    -moz-appearance:textfield;
+  }
+  &[type=number]::-webkit-inner-spin-button,
+  &[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

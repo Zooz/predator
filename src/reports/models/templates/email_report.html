@@ -548,12 +548,6 @@
 
                         <div style="Margin-left: 20px;Margin-right: 20px;">
                             <div class="btn btn--flat btn--medium" style="Margin-bottom: 20px;text-align: center;">
-                                <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #e31212;font-family: Avenir, sans-serif;" href=<%= reportUrl %>>Html Report</a><!--[endif]-->
-                                <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href=<%= reportUrl %> style="width:110px" arcsize="10%" fillcolor="#E31212" stroke="f"><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Avenir,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">Html Report</center></v:textbox></v:roundrect><![endif]--></div>
-                        </div>
-
-                        <div style="Margin-left: 20px;Margin-right: 20px;">
-                            <div class="btn btn--flat btn--medium" style="Margin-bottom: 20px;text-align: center;">
                                 <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #e31212;font-family: Avenir, sans-serif;" href=<%= grafanaUrl %>>Grafana Report</a><!--[endif]-->
                                 <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href=<%= grafanaUrl %> style="width:126px" arcsize="10%" fillcolor="#E31212" stroke="f"><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Avenir,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">Grafana Report</center></v:textbox></v:roundrect><![endif]--></div>
                         </div>
@@ -589,6 +583,7 @@
                         <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
                             <p style="Margin-top: 0;Margin-bottom: 0;">&nbsp;</p><p style="Margin-top: 20px;Margin-bottom: 20px;"><strong>Test Info:</strong><br>
                             Test Id: <%= testInfo.testId %><br>
+                            Parallelism: <%= testInfo.parallelism %><br>
                             Revision Id:&nbsp;<%= testInfo.revisionId %><br>
                             Report Id:&nbsp;<%= testInfo.reportId %><br>
                             Start time: <%= testInfo.startTime %><br>
@@ -603,13 +598,13 @@
                     <div style="Margin-left: 20px;Margin-right: 20px;">
                         <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
                             <p style="Margin-top: 0;Margin-bottom: 20px;"><strong>Scenarios:</strong><br>
-                                Created: <%= finalStats.scenariosCreated %><br>
-                                Completed:&nbsp;<%= finalStats.scenariosCompleted %><br>
-                                Avoided:&nbsp;<%= finalStats.scenariosAvoided %><br>
+                                Created: <%= aggregatedResults.scenariosCreated %><br>
+                                Completed:&nbsp;<%= aggregatedResults.scenariosCompleted %><br>
+                                Avoided:&nbsp;<%= aggregatedResults.scenariosAvoided %><br>
                                 <strong>Requests:</strong><br>
-                                Completed: <%= finalStats.requestsCompleted %><br>
-                                RPS: <%= finalStats.rps.mean %><br>
-                                Pending: <%= finalStats.pendingRequests %></p>
+                                Completed: <%= aggregatedResults.requestsCompleted %><br>
+                                RPS: <%= aggregatedResults.rps.mean %><br>
+                                Pending: <%= aggregatedResults.pendingRequests %></p>
                         </div>
                     </div>
 
@@ -620,7 +615,7 @@
                     <div style="Margin-left: 20px;Margin-right: 20px;">
                         <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
                             <p style="Margin-top: 0;Margin-bottom: 20px;"><strong>Request Latency:</strong><br>
-                                Min: <%= finalStats.latency.min %>,&nbsp;Max: <%= finalStats.latency.max %>,&nbsp;Median: <%= finalStats.latency.median %>,&nbsp;p95: <%= finalStats.latency.p95 %>, p99: <%= finalStats.latency.p99 %></p>
+                                Min: <%= aggregatedResults.latency.min %>,&nbsp;Max: <%= aggregatedResults.latency.max %>,&nbsp;Median: <%= aggregatedResults.latency.median %>,&nbsp;p95: <%= aggregatedResults.latency.p95 %>, p99: <%= aggregatedResults.latency.p99 %></p>
                         </div>
                     </div>
 
@@ -631,7 +626,7 @@
                     <div style="Margin-left: 20px;Margin-right: 20px;">
                         <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
                             <p style="Margin-top: 0;Margin-bottom: 20px;"><strong>Scenario Latency:</strong><br>
-                                Min: <%= finalStats.scenarioDuration.min %>,&nbsp;Max: <%= finalStats.scenarioDuration.max %>,&nbsp;Median: <%= finalStats.scenarioDuration.median %>,&nbsp;p95: <%= finalStats.scenarioDuration.p95 %>, p99: <%= finalStats.scenarioDuration.p99 %></p>
+                                Min: <%= aggregatedResults.scenarioDuration.min %>,&nbsp;Max: <%= aggregatedResults.scenarioDuration.max %>,&nbsp;Median: <%= aggregatedResults.scenarioDuration.median %>,&nbsp;p95: <%= aggregatedResults.scenarioDuration.p95 %>, p99: <%= aggregatedResults.scenarioDuration.p99 %></p>
                         </div>
                     </div>
 
@@ -707,7 +702,7 @@
 
                         <div style="Margin-left: 20px;Margin-right: 20px;">
                             <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
-                                <h1 class="size-48" style="Margin-top: 0;Margin-bottom: 20px;font-style: normal;font-weight: normal;color: #000;font-size: 36px;line-height: 43px;font-family: Avenir,sans-serif;text-align: center;" lang="x-size-48"><font color="#ffffff" face="avenir, sans-serif"><strong>FOR MORE TESTS VISIT OUR API</strong></font></h1>
+                                <h1 class="size-48" style="Margin-top: 0;Margin-bottom: 20px;font-style: normal;font-weight: normal;color: #000;font-size: 36px;line-height: 43px;font-family: Avenir,sans-serif;text-align: center;" lang="x-size-48"><font color="#ffffff" face="avenir, sans-serif"><strong>FOR MORE, VISIT US</strong></font></h1>
                             </div>
                         </div>
 
@@ -717,7 +712,7 @@
 
                         <div style="Margin-left: 20px;Margin-right: 20px;">
                             <div class="btn btn--flat btn--medium" style="Margin-bottom: 20px;text-align: center;">
-                                <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #e31212 !important;background-color: #ffffff;font-family: sans-serif;" href="https://app.apiary.io/performanceframeworkapi">Tests API</a><!--[endif]-->
+                                <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #e31212 !important;background-color: #ffffff;font-family: sans-serif;" href="https://zooz.github.io/predator/#indexapiref.html">API</a><!--[endif]-->
                                 <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://app.apiary.io/performanceframeworkapi" style="width:94px" arcsize="10%" fillcolor="#FFFFFF" stroke="f"><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#E31212;font-family:sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">Tests API</center></v:textbox></v:roundrect><![endif]--></div>
                         </div>
 
@@ -727,7 +722,18 @@
 
                         <div style="Margin-left: 20px;Margin-right: 20px;">
                             <div class="btn btn--flat btn--medium" style="Margin-bottom: 20px;text-align: center;">
-                                <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #e31212 !important;background-color: #ffffff;font-family: sans-serif;" href="https://app.apiary.io/performanceframeworkscheduler">Scheduler API</a><!--[endif]-->
+                                <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #e31212 !important;background-color: #ffffff;font-family: sans-serif;" href="https://zooz.github.io/predator/index.html">Docs</a><!--[endif]-->
+                                <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://app.apiary.io/performanceframeworkscheduler" style="width:122px" arcsize="10%" fillcolor="#FFFFFF" stroke="f"><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#E31212;font-family:sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">Scheduler<br>
+                                API</center></v:textbox></v:roundrect><![endif]--></div>
+                        </div>
+
+                        <div style="Margin-left: 20px;Margin-right: 20px;">
+                            <div style="mso-line-height-rule: exactly;line-height: 35px;font-size: 1px;">&nbsp;</div>
+                        </div>
+
+                        <div style="Margin-left: 20px;Margin-right: 20px;">
+                            <div class="btn btn--flat btn--medium" style="Margin-bottom: 20px;text-align: center;">
+                                <!--[if !mso]--><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #e31212 !important;background-color: #ffffff;font-family: sans-serif;" href="https://github.com/Zooz/predator">GitHub</a><!--[endif]-->
                                 <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://app.apiary.io/performanceframeworkscheduler" style="width:122px" arcsize="10%" fillcolor="#FFFFFF" stroke="f"><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#E31212;font-family:sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">Scheduler<br>
                                 API</center></v:textbox></v:roundrect><![endif]--></div>
                         </div>
@@ -757,12 +763,6 @@
                     <!--[if (mso)|(IE)]><table align="center" cellpadding="0" cellspacing="0" role="presentation"><tr class="layout-email-footer"><td style="width: 400px;" valign="top" class="w360"><![endif]-->
                     <div class="column wide" style="text-align: left;font-size: 12px;line-height: 19px;color: #adb3b9;font-family: sans-serif;Float: left;max-width: 400px;min-width: 320px; width: 320px;width: calc(8000% - 47600px);">
                         <div style="Margin-left: 20px;Margin-right: 20px;Margin-top: 10px;Margin-bottom: 10px;">
-
-                            <div style="font-size: 12px;line-height: 19px;">
-                                <div>Developed by the NDE Team</div>
-                            </div>
-                            <div style="font-size: 12px;line-height: 19px;Margin-top: 18px;">
-
                             </div>
                             <!--[if mso]>&nbsp;<![endif]-->
                         </div>

@@ -19,3 +19,13 @@ module.exports.updateConfig = async (req, res, next) => {
         return next(err);
     }
 };
+
+module.exports.deleteConfig = async (req, res, next) => {
+    const key = req.params.key;
+    try {
+        await configModel.deleteConfig(key);
+        return res.status(204).json();
+    } catch (err) {
+        return next(err);
+    }
+};

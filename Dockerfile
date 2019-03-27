@@ -23,4 +23,4 @@ RUN npm run build
 
 WORKDIR /usr
 
-CMD [ "node","--max_old_space_size=196","./src/server.js" ]
+CMD [ "node","--max_old_space_size=512","./src/server.js" ]

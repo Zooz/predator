@@ -37,30 +37,30 @@ spec:
               secretKeyRef:
                 key:  DATABASE_PASSWORD
                 name: {{ .Release.Name }}-auth
-          - name: DOCKER_NAME
-            value: {{ .Values.DOCKER_NAME }}
           - name: DATABASE_TYPE
             value: {{ .Values.DATABASE_TYPE }}
           - name: DATABASE_NAME
             value: {{ .Values.DATABASE_NAME }}
           - name: DATABASE_ADDRESS
             value: {{ .Values.DATABASE_ADDRESS }}
+          - name: CASSANDRA_REPLICATION_FACTOR
+            value: {{ .Values.CASSANDRA_REPLICATION_FACTOR }}
+          - name: CASSANDRA_CONSISTENCY
+            value: {{ .Values.CASSANDRA_CONSISTENCY }}
+          - name: CASSANDRA_KEY_SPACE_STRATEGY
+            value: {{ .Values.CASSANDRA_KEY_SPACE_STRATEGY }}
+          - name: CASSANDRA_LOCAL_DATA_CENTER
+            value: {{ .Values.CASSANDRA_LOCAL_DATA_CENTER }}
+          - name: SQLITE_STORAGE
+            value: {{ .Values.SQLITE_STORAGE }}
           - name: JOB_PLATFORM
             value: {{ .Values.JOB_PLATFORM }}
           - name: KUBERNETES_URL
             value: {{ .Values.KUBERNETES_URL }}
           - name: KUBERNETES_NAMESPACE
             value: {{ .Release.Namespace }}
-          - name: GRAFANA_URL
-            value: {{ .Values.GRAFANA_URL }}
-          - name: METRICS_PLUGIN_NAME
-            value: {{ .Values.METRICS_PLUGIN_NAME }}
-          - name: METRICS_EXPORT_CONFIG
-            value: {{ .Values.METRICS_EXPORT_CONFIG | toJson | quote }}
           - name: INTERNAL_ADDRESS
             value: http://{{ include "predator.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}/{{ .Values.apiVersion }}
-          - name: EXTERNAL_ADDRESS
-            value: {{ .Values.EXTERNAL_ADDRESS }}
           ports:
             - name: http
               containerPort: 80

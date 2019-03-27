@@ -1,39 +1,38 @@
-let should = require('should');
-let uuid = require('uuid');
-let schedulerRequestCreator = require('./helpers/requestCreator');
-let testsRequestCreator = require('../tests/helpers/requestCreator');
-let nock = require('nock');
-let serviceConfig = require('../../../src/config/serviceConfig');
-let metronomeConfig = require('../../../src/config/metronomeConfig');
+const should = require('should'),
+    schedulerRequestCreator = require('./helpers/requestCreator'),
+    testsRequestCreator = require('../tests/helpers/requestCreator'),
+    nock = require('nock'),
+    metronomeConfig = require('../../../src/config/metronomeConfig');
 
-describe('Create job specific metronome tests', () => {
+describe('Create job specific metronome tests', async function () {
+    this.timeout(20000);
     let testId;
     let expectedResult;
-    before(async () => {
-        await schedulerRequestCreator.init();
-        await testsRequestCreator.init();
-
-        let requestBody = require('../../testExamples/Custom_test');
-        let response = await testsRequestCreator.createTest(requestBody, {});
-        should(response.statusCode).eql(201);
-        should(response.body).have.key('id');
-        testId = response.body.id;
-
-        expectedResult = {
-            environment: 'test',
-            test_id: testId,
-            duration: 1,
-            arrival_rate: 1,
-            max_virtual_users: 100
-        };
-    });
 
     beforeEach(async () => {
         nock.cleanAll();
     });
-
-    if (serviceConfig.jobPlatform === 'METRONOME') {
+    const jobPlatform = process.env.JOB_PLATFORM;
+    if (jobPlatform === 'METRONOME') {
         describe('Metronome', () => {
+            before(async () => {
+                await schedulerRequestCreator.init();
+                await testsRequestCreator.init();
+
+                let requestBody = require('../../testExamples/Basic_test');
+                let response = await testsRequestCreator.createTest(requestBody, {});
+                should(response.statusCode).eql(201);
+                should(response.body).have.key('id');
+                testId = response.body.id;
+
+                expectedResult = {
+                    environment: 'test',
+                    test_id: testId,
+                    duration: 1,
+                    arrival_rate: 1,
+                    max_virtual_users: 100
+                };
+            });
             describe('Good requests', () => {
                 let jobId;
 
@@ -205,4 +204,4 @@ describe('Create job specific metronome tests', () => {
             });
         });
     }
-}).timeout(20000);
+});
