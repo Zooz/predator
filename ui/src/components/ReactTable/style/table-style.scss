@@ -53,3 +53,5 @@ $left-spacing: 0.7rem;
 .tr-group {
   @include header-border;
 }
+
+.tbody { overflow: visible!important;}
