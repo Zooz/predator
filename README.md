@@ -8,14 +8,21 @@ Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps
 
 ## Documentation
 
+[Starting Guide](https://zooz.github.io/predator/)
+<br>
+[API Reference](https://zooz.github.io/predator/#indexapiref.html)
+
 ## Features
 - **Distributed load**:  Predator supports unlimited number of load generators that produce load concurrently.
-- **Real time reports**: Predator aggreated all concurrent runs into one beautiful report in real time (latency, rps, status codes and more)
+- **Real time reports**: Predator aggregate all concurrent runs into one beautiful report in real time (latency, rps, status codes and more)
 - **Built for the cloud**:  Predator is built to take advantage of Kubernetes and DC/OS. it's integrated with those platform and is able to manage the load generators life cycles by it self.
 - **One click installation**:  Installed via one click in Kubernetes, DC/OS, or any other machine that has Docker.
-- **Supports 5 Diffrent databases**: Predator can ajust it self to persist data in Cassandra, Postgres, MySQL, MSSQL and SQLITE out of the box.
+- **Supports 5 Different databases**: Predator can adjust it self to persist data in Cassandra, Postgres, MySQL, MSSQL and SQLITE out of the box.
 - **Scheduled jobs**: Run any tests in recurring mode by cron expression.
-- **3RD partry metrics**:  Predator integrated with Promethues and Influx, just configure it via the config endpoint or the ui.
+- **3rd partry metrics**:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.
+- **Rich UI**: Predator offers rich UI side by side powerful REST API.
+- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as it's engine to fire the requests. the schema of creating tests via api is based on artillery schema.
+
 
 ## Getting Started
 
@@ -41,7 +48,7 @@ Predator runs using Docker. In order to source code locally, clone this reposito
 
 `runPredatorLocal.sh`
 
-## Running the tests
+#### Running the tests
 
 Run `npm test` in order to run tests in your local machine. The script runs the following tests:
 * lint

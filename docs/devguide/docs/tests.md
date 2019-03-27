@@ -27,11 +27,11 @@ Let's dive right in and get going with our first DSL definition.
 
 !!! note "Predator API"
    
-    This functionality is only available through the [Predator API]().
+    This functionality is only available through the <a href="https://zooz.github.io/predator/indexapiref.html#section/Overview#section" target="_blank">Predator API</a>.
 
 ## Creating a DSL Definition
 
-Before you can use a DSL definition, you must create it first. You do so by invoking the [Create DSL request](). Here's an example request body for creating a DSL definition of a GET request. Notice how we use the `{{petId}}` in the url endpoint (we will create this variable in the example of a POST request DSL definition):
+Before you can use a DSL definition, you must create it first. You do so by invoking the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-dsl-definition" target="_blank">Create DSL Definition</a> request. Here's an example request body for creating a DSL definition of a GET request. Notice how we use the `{{petId}}` in the url endpoint (we will create this variable in the example of a POST request DSL definition):
 
 ```JSON
 {
@@ -70,7 +70,7 @@ The request body for creating a DSL definition of a POST request is a bit more e
 
 ## Creating a Test that Uses the DSL
 
-Tests that use a DSL definition can only be created using the [Create DSL Test]() API request. The [Create DSL Test]() API request body must include all components that make up a test, including pre-scenario requests and scenarios. However, instead of defining the entire HTTP request in each scenario step (as you would through the Predator UI), you can now reference the HTTP request through its DSL definition. You do so, using the `action` property (in the `steps` array). 
+Tests that use a DSL definition can only be created using the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request. The <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request body must include all components that make up a test, including pre-scenario requests and scenarios. However, instead of defining the entire HTTP request in each scenario step (as you would through the Predator UI), you can now reference the HTTP request through its DSL definition. You do so, using the `action` property (in the `steps` array). 
 
 Here's an example:
 
@@ -104,7 +104,7 @@ There are two additional items to note:
 
 * The `type` must always be set to `dsl`.
 
-* The `action` value uses the following syntax: `{dsl_group_name}.{dsl_name}`, in which the `dsl_group_name` is the name used in the path of the [Create DSL Defintion]() API request. 
+* The `action` value uses the following syntax: `{dsl_group}.{dsl_name}`, in which the `dsl_group` is the name used in the path of the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-dsl-definition" target="_blank">Create DSL Definition</a> API request. 
 
 If you login to the Predator UI after creating the test, you will notice that the test has been added with a type of **dsl**. 
 
