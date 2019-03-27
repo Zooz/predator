@@ -16,7 +16,7 @@ info:
     UI alongside a simple REST API, Predator simplifies the performance testing
     regime.
 
-    For an introduction to Predator and its concepts, see the <a href="https://zooz.github.io/predator/" target="_blank">Predator Documentation</a>.
+    For an introduction to Predator and its concepts, see the <a href="https://www.zooz.com" target="_blank">Predator Documentation</a>.
 
 tags:
   - name: DSL Definitions
@@ -31,7 +31,9 @@ tags:
   - name: Reports
     description: |
       Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.
-
+  - name: Configuration
+    description: |
+      This resource allows you to configure Predator programmatically.
 x-tagGroups:
   - name: Reference
     tags:
@@ -39,12 +41,13 @@ x-tagGroups:
       - Tests
       - Jobs
       - Reports
+      - Configuration
 
 paths:
-  # DSL Definitions
-  '/v1/dsl/{dsl_group}/definitions':
+  #DSL Definitions
+  '/v1/dsl/{dsl_name}/definitions':
     parameters:
-      - $ref: '#/components/parameters/dsl_group'
+      - $ref: '#/components/parameters/dsl_name'
     post:
       operationId: create-a-dsl-definition
       tags:
@@ -114,9 +117,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  '/v1/dsl/{dsl_group}/definitions/{definition_name}':
+  '/v1/dsl/{dsl_name}/definitions/{definition_name}':
     parameters:
-      - $ref: '#/components/parameters/dsl_group'
+      - $ref: '#/components/parameters/dsl_name'
       - $ref: '#/components/parameters/definition_name'
     get:
       operationId: retrieve-a-dsl-definition
@@ -155,14 +158,6 @@ paths:
         - DSL Definitions
       summary: Update a DSL Definition
       description: Update a specific DSL definition.
-      parameters:
-        - name: dsl_group
-          in: path
-          required: true
-          description: The name of the group (category) holding the DSL definition to be updated.
-          schema:
-            type: string
-          example: petstore
       responses:
         '200':
           description: Success
@@ -201,13 +196,6 @@ paths:
         - DSL Definitions
       summary: Delete a DSL Definition
       description: Delete a specific DSL definition.
-      parameters:
-        - name: dsl_group
-          in: path
-          required: true
-          description: The name of the group (category) holding the DSL definition to be deleted.
-          schema:
-            type: string
       responses:
         '204':
           description: Success
@@ -305,7 +293,7 @@ paths:
           schema:
             type: string
             format: uuid
-          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -344,7 +332,7 @@ paths:
           required: true
           schema:
             type: string
-          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -390,7 +378,7 @@ paths:
           required: true
           schema:
             type: string
-          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -421,7 +409,7 @@ paths:
           schema:
             type: string
             format: uuid
-          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -522,6 +510,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+
   '/v1/jobs/{job_id}':
     get:
       operationId: retrieve-a-job
@@ -668,6 +657,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  /v1/jobs/{job_id}/runs/{run_id}/logs:
+    get:
+      tags:
+        - jobs
+      description: get logs of specific job.
+      parameters:
+        - in: path
+          description: The ID of the job.
+          name: job_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: The id of a specific run in metronome which is also the report id.
+          name: run_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+        "404":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "501":
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
   # Reports
   '/v1/tests/{test_id}/reports':
     get:
@@ -704,6 +732,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+    post:
+      operationId: create-a-report
+      tags:
+        - Reports
+      summary: Create a Report
+      description: Create a new report for the specified test.
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/post_report_response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post_report'
+        description: report data
+        required: true
   '/v1/tests/{test_id}/reports/{report_id}':
     get:
       operationId: retrieve-a-report
@@ -718,7 +786,7 @@ paths:
           description: The id of the test for which to retrieve the report.
           schema:
             type: string
-          example: 81a27853-0db5-4e57-ad63-4b637528398a
+            example: 81a27853-0db5-4e57-ad63-4b637528398a
         - in: path
           name: report_id
           description: The id of the report to retrieve.
@@ -762,8 +830,9 @@ paths:
           name: limit
           description: The number of most recent reports to retrieve.
           required: true
-          schema:
-            type: number
+          minimum: 1
+          maximum: 250
+          type: integer
       responses:
         '200':
           description: Success
@@ -785,10 +854,124 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  '/v1/tests/{test_id}/reports/{report_id}/stats':
+    post:
+      tags:
+        - Reports
+      summary: Insert a Stats Object
+      description: Insert a new stats object for a specific report
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: report_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/stats'
+        description: stats data
+        required: true
+  # Config
+  /v1/config:
+    get:
+      operationId: retrieve-configurations
+      tags:
+        - Configuration
+      summary: Retrieve Configuration Settings
+      description: Retrieve all Predator configuration settings.
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/config_body"
+        "500":
+          description: Internal server error
+    put:
+      operationId: update-configurations
+      tags:
+        - Configuration
+      summary: Update Configuration Settings
+      description: Update existing configuration settings. This will override environment variables.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/config_body"
+        description: The config data to add
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/config_body"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+  /v1/config/{config_key}:
+    delete:
+      operationId: delete-a-configuration
+      tags:
+        - Configuration
+      summary: Delete a Specific Configuration Value
+      description: |
+        Delete a specific configuration value. This will restore the original
+        environment variable.
+      parameters:
+        - in: path
+          name: config_key
+          required: true
+          description: They key to delete.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Success
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
 components:
   parameters:
-    dsl_group:
-      name: dsl_group
+    dsl_name:
+      name: dsl_name
       in: path
       required: true
       description: The group (category) in which the DSL definition will be created. Specify a group name of your choice. We recommend you place related DSL definitions in the same group.
@@ -820,26 +1003,26 @@ components:
           additionalProperties:
             $ref: '#/components/schemas/artillery_request_schema'
           example: {
-                    	"name": "create-pet",
-                    	"request": {
-                    		"post": {
-                    			"url": "http://127.0.0.1:3000/pets",
-                    			"headers": {
-                                				"Content-Type": "application/json"
-                                		  },
-                    			"json": {
-                    				"name": "mickey",
-                    				"species": "dog"
-                    			},
-                    			"capture": [
-                    				{
-                    					"json": "$.id",
-                    					"as": "petId"
-                    				}
-                    			]
-                    		}
-                    	}
-                    }
+            "name": "create-pet",
+            "request": {
+              "post": {
+                "url": "http://127.0.0.1:3000/pets",
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "json": {
+                  "name": "mickey",
+                  "species": "dog"
+                },
+                "capture": [
+                {
+                  "json": "$.id",
+                  "as": "petId"
+                }
+                ]
+              }
+            }
+          }
     update_definition:
       required:
         - request
@@ -857,6 +1040,9 @@ components:
       type: object
       discriminator:
         propertyName: type
+      oneOf:
+        - $ref: '#/components/schemas/basic'
+        - $ref: '#/components/schemas/dsl'
       required:
         - name
         - description
@@ -871,31 +1057,28 @@ components:
           description: A description of the test.
           example: Performance test for placing orders from the pet store.
         type:
-           $ref: '#/components/schemas/test_type'
+          $ref: '#/components/schemas/test_type'
     test_type:
       type: string
       description: |
         The type of test. Can be one of the following:
-          * `basic`: Tests of this type cannot reuse request templates (DSL definition). All request specifications must be directly included in the test itself.
-            This test type is identical to the type of tests you can create through the Predator UI.
-          * `dsl`: Tests of this type reuse request templates based on previously created DSL definitons.
-      enum:
+        * `basic`: Tests of this type cannot reuse request templates (DSL definition). All request specifications must be directly included in the test itself.
+          This test type is identical to the type of tests you can create through the Predator UI.
+        * `dsl`: Tests of this type reuse request templates based on previously created DSL definitons.
+        enum:
         - dsl
         - basic
-      example: dsl
+        example: dsl
     dsl:
       description: A test that is made of scenarios base on domain specific language
-      allOf:
-        - $ref: '#/components/schemas/test'
-        - type: object
-          required:
-            - scenarios
-          properties:
-            scenarios:
-              description: A scenario is a sequence of HTTP requests aimed to test the performance of specific functionality.
-              type: array
-              items:
-                $ref: '#/components/schemas/scenario'
+      required:
+        - scenarios
+      properties:
+        scenarios:
+          description: A scenario is a sequence of HTTP requests aimed to test the performance of specific functionality.
+          type: array
+          items:
+            $ref: '#/components/schemas/scenario'
     artillery_request_schema:
       description: |
         The request schema used in test scenarios. The property name must be one of the following HTTP methods: `GET`, `HEAD`, `POST`, `PUT`, `DELETE`.
@@ -928,8 +1111,6 @@ components:
         type: string
     basic:
       description: A test that is made of artillery json
-      allOf:
-        - $ref: '#/components/schemas/test'
       required:
         - artillery_test
       properties:
@@ -974,7 +1155,7 @@ components:
         updated_at:
           type: string
           format: date_time
-          description: 	The date and time that the test was created.
+          description:   The date and time that the test was created.
         name:
           type: string
           description: The name of the test.
@@ -985,7 +1166,6 @@ components:
       type: object
       description: A test that is made of scenarios base on domain specific language
       allOf:
-        - $ref: '#/components/schemas/tests_response'
         - $ref: '#/components/schemas/create_test_response'
           required:
             - raw_data
@@ -994,98 +1174,97 @@ components:
           type: object
           description: The entire specification of the DSL that was used to create the test.
           example: {
-                      "name": "Pet store",
-                      "description": "DSL",
-                      "type": "dsl",
-                        "before": {
-                                   "steps": [
-                                       {
-                                           "action": "petstore.create-pet",
-                                           "properties": {
-                                               "name": [
-                                                   "kushkush",
-                                                   "daisy"
-                                               ]
-                                           }
-                                       }
-                                   ]
-                               },
-                        "scenarios": [
-                                   {
-                                       "scenario_name": "Only get pet",
-                                       "steps": [
-                                           {
-                                               "action": "petstore.get-pet"
-                                           }
-                                       ]
-                                   }
-                               ]
-                    }
+            "name": "Pet store",
+            "description": "DSL",
+            "type": "dsl",
+            "before": {
+              "steps": [
+              {
+                "action": "petstore.create-pet",
+                "properties": {
+                  "name": [
+                    "kushkush",
+                    "daisy"
+                  ]
+                }
+              }
+              ]
+            },
+            "scenarios": [
+            {
+              "scenario_name": "Only get pet",
+              "steps": [
+              {
+                "action": "petstore.get-pet"
+              }
+              ]
+            }
+            ]
+          }
         artillery_test:
           type: object
           description: |
             The request JSON created from the DSL specification (as returned in the `raw_data` array).
           example:  {
-                               "config": {
-                                   "target": "",
-                                   "http": {
-                                       "pool": 100
-                                   },
-                                   "phases": [
-                                       {
-                                           "duration": 0,
-                                           "arrivalRate": 0,
-                                           "rampTo": 0
-                                       }
-                                   ],
-                                   "variables": {
-                                       "before_0_petstore.create-pet_name": [
-                                           "kushkush",
-                                           "daisy"
-                                       ]
-                                   }
-                               },
-                               "scenarios": [
-                                   {
-                                       "name": "Only get pet",
-                                       "flow": [
-                                           {
-                                               "get": {
-                                                   "url": "http://127.0.0.1:3000/pets/{{petId}}"
-                                               }
-                                           }
-                                       ],
-                                       "weight": 100
-                                   }
-                               ],
-                               "before": {
-                                   "flow": [
-                                       {
-                                           "post": {
-                                               "url": "http://127.0.0.1:3000/pets",
-                                               "json": {
-                                                   "name": "{{ before_0_petstore.create-pet_name }}",
-                                                   "species": "dog"
-                                               },
-                                               "capture": [
-                                                   {
-                                                       "json": "$.id",
-                                                       "as": "petId"
-                                                   }
-                                               ],
-                                               "headers": {
-                                                   "Content-Type": "application/json"
-                                               }
-                                           }
-                                       }
-                                   ]
-                               }
-                           }
+            "config": {
+              "target": "",
+              "http": {
+                "pool": 100
+              },
+              "phases": [
+              {
+                "duration": 0,
+                "arrivalRate": 0,
+                "rampTo": 0
+              }
+              ],
+              "variables": {
+                "before_0_petstore.create-pet_name": [
+                  "kushkush",
+                  "daisy"
+                ]
+              }
+            },
+            "scenarios": [
+            {
+              "name": "Only get pet",
+              "flow": [
+              {
+                "get": {
+                  "url": "http://127.0.0.1:3000/pets/{{petId}}"
+                }
+              }
+              ],
+              "weight": 100
+            }
+            ],
+            "before": {
+              "flow": [
+              {
+                "post": {
+                  "url": "http://127.0.0.1:3000/pets",
+                  "json": {
+                    "name": "{{ before_0_petstore.create-pet_name }}",
+                    "species": "dog"
+                  },
+                  "capture": [
+                  {
+                    "json": "$.id",
+                    "as": "petId"
+                  }
+                  ],
+                  "headers": {
+                    "Content-Type": "application/json"
+                  }
+                }
+              }
+              ]
+            }
+          }
     basic_test_response:
       type: object
       description: bla
       allOf:
-        - $ref: '#/components/schemas/tests_response'
         - $ref: '#/components/schemas/create_test_response'
         - type: object
           required:
@@ -1096,25 +1275,25 @@ components:
           description: |
             The complete request JSON used in the test.
           example: {
-                               "config": {
-                                   "target": "http://127.0.0.1:3000"
-                               },
-                               "scenarios": [
-                                   {
-                                       "name": "Get Pets",
-                                       "weight": 100,
-                                       "flow": [
-                                           {
-                                               "get": {
-                                                   "url": "/pets",
-                                                   "headers": {},
-                                                   "capture": []
-                                               }
-                                           }
-                                       ]
-                                   }
-                               ]
-                           }
+            "config": {
+              "target": "http://127.0.0.1:3000"
+            },
+            "scenarios": [
+            {
+              "name": "Get Pets",
+              "weight": 100,
+              "flow": [
+              {
+                "get": {
+                  "url": "/pets",
+                  "headers": {},
+                  "capture": []
+                }
+              }
+              ]
+            }
+            ]
+          }
     error_response:
       required:
         - message
@@ -1141,7 +1320,7 @@ components:
               action:
                 type: string
                 description: |
-                  A reference to the DSL definition you want to use. Uses the following syntax: `{dsl_group}.{dsl_name}`.
+                  A reference to the DSL definition you want to use. Uses the following syntax: `{dsl_group_name}.{dsl_name}`.
                 example: petstore.create-pet
               properties:
                 type: object
@@ -1150,12 +1329,12 @@ components:
                   Each key you specify must correspond to the name you specified in the `json` object of the [Create a DSL Defintion](/#operation/create-a-dsl-definition) request.
                   The value must be an `array` of the values that should be used during test execution (when specifying multiple values, the value to be used will be selected randomly).,
                 example: {
-                           	"name":
-                           		[
-                           		  "kushkush",
-                           		  "daisy"
-                           		]
-                          }
+                  "name":
+                    [
+                      "kushkush",
+                      "daisy"
+                    ]
+                }
               wait:
                 type: integer
                 description: The time to wait before starting the request. In seconds.
@@ -1175,20 +1354,11 @@ components:
       allOf:
         - $ref: '#/components/schemas/job_update'
         - type: object
-          properties:
-            variables:
-              type: object
-              description: >-
-                        Variables that the artillery uses and can be defined by the user.
-                        Supported variables: 1) appId - if specifed merchantId must be a
-                        variable too.
-              example:
-                appId: App-name
-                merchantId: cd44fc7a-7719-4383-9981-427ff1210553
-            run_immediately:
-              type: boolean
-              description: Determines if the test will be executed immediately when the job is created.
-              example: true
+      properties:
+        run_immediately:
+          type: boolean
+          description: Determines if the test will be executed immediately when the job is created.
+          example: true
     job_update:
       properties:
         test_id:
@@ -1254,7 +1424,7 @@ components:
               type: string
               pattern: >-
                 ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-              description: The job id.
+                description: The job id.
     create_job_response:
       allOf:
         - $ref: '#/components/schemas/job_response'
@@ -1271,6 +1441,7 @@ components:
         - test_name
         - test_description
         - start_time
+        - runner_id
       properties:
         report_id:
           type: string
@@ -1299,6 +1470,9 @@ components:
         notes:
           type: string
           description: notes about the test
+        runner_id:
+          type: string
+          description: the id of the runner that created the report
     post_report_response:
       required:
         - report_id
@@ -1353,7 +1527,7 @@ components:
           type: string
           description: The job id.
         test_type:
-           $ref: '#/components/schemas/test_type'
+          $ref: '#/components/schemas/test_type'
         status:
           type: string
           description: The status of the running test.
@@ -1377,4 +1551,105 @@ components:
           description: The current report metrics.
         notes:
           type: string
-          description: Notes about the test.
+          description: notes about the test
+    config_body:
+      additionalProperties: false
+      properties:
+        grafana_url:
+          type: string
+          description: The url for grafana.
+        internal_address:
+          type: string
+          description: The local ip address of your machine.
+        docker_name:
+          type: string
+          description: The predator-runner docker image that will run the test.
+        job_platform:
+          type: string
+          description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)
+        runner_cpu:
+          type: number
+          description: Number of CPU use by the each runner.
+        runner_memory:
+          type: number
+          description: Max memory to use by each runner.
+        metrics_plugin_name:
+          type: string
+          enum:
+            - influx
+            - prometheus
+          description: Metrics to use, in case one or both metrics are configured.
+        default_email_address:
+          type: string
+          description: Default email to send final report to, address can be configured
+            only by using API.
+        minimum_wait_for_delayed_report_status_update_in_ms:
+          type: number
+          description: The minimum of time waiting for runner to report before the test considered as finished.
+            configured only by using API.
+        default_webhook_url:
+          type: string
+          description: Default webhook url to send live report statistics to, can be
+            configured only by using API.
+        influx_metrics:
+          additionalProperties: false
+          type: object
+          description: Influx configuration  .
+          required:
+            - host
+            - username
+            - password
+            - database
+          properties:
+            host:
+              type: string
+              description: Influx host.
+            username:
+              type: string
+              description: User name to influx.
+            password:
+              type: string
+              description: Password name to influx.
+            database:
+              type: string
+              description: Influx db name.
+        prometheus_metrics:
+          additionalProperties: false
+          type: object
+          description: prometheus configuration.
+          required:
+            - push_gateway_url
+          properties:
+            push_gateway_url:
+              type: string
+              description: Url of push gateway.
+            buckets_sizes:
+              type: string
+              description: Bucket sizes use to configure prometheus.
+        smtp_server:
+          additionalProperties: false
+          type: object
+          description: Simple mail transfer protocol.
+          required:
+            - from
+            - host
+            - port
+            - username
+            - password
+            - timeout
+          properties:
+            from:
+              type: string
+              format: email
+              description: the 'from' email address that will be used to send emails
+            host:
+              type: string
+            port:
+              type: number
+            username:
+              type: string
+            password:
+              type: string
+            timeout:
+              description: timout to smtp server in milliseconds
+              type: number
