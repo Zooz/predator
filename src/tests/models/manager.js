@@ -3,15 +3,12 @@ const testGenerator = require('./testGenerator'),
     database = require('./database'),
     uuid = require('uuid'),
     request = require('request-promise'),
-    fs = require('fs'),
-    tempFile = 'predator_temp_file_',
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
     upsertTest,
     getTest,
     getAllTestRevisions,
-    saveFileToDbUsingUrl,
     getTests,
     getFile,
     deleteTest

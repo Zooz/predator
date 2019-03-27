@@ -30,7 +30,7 @@ async function initSchemas() {
     const file = client.define('file', {
         id: {
             type: Sequelize.DataTypes.UUID,
-            unique: 'compositeIndex'
+            primaryKey: true
         },
         file: {
             type: Sequelize.DataTypes.STRING
@@ -96,7 +96,7 @@ async function insertTest(testInfo, testJson, id, revisionId){
         test_id: id,
         name: testInfo.name,
         type: testInfo.type,
-        file: testInfo.fileId,
+        file_id: testInfo.fileId,
         description: testInfo.description,
         updated_at: Date.now(),
         raw_data: JSON.stringify(testInfo),
@@ -212,7 +212,7 @@ async function getFile(id) {
     };
     options.where = { id: id };
     const dbResult = await fileClient.find(options);
-    return dbResult;
+    return dbResult ? dbResult.file : dbResult;
 }
 
 function sanitizeTestResult(data) {

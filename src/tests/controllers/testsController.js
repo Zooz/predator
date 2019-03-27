@@ -8,7 +8,6 @@ module.exports = {
     deleteTest,
     getTests,
     getFile,
-    downloadFile,
     getTestRevisions
 };
 
@@ -26,14 +25,6 @@ async function getFile(req, res, next) {
         const result = await manager.getFile(req.params.file_id);
         return res.status(200).json(result);
     } catch (err) {
-        return next(err);
-    }
-}
-async function downloadFile(req, res, next) {
-    try {
-        const result = await manager.saveFileToDbUsingUrl('https://www.dropbox.com/s/dffgjbojwrlz55o/fuleuPLOAD.rtf?dl=1');
-        return res.status(201).json(result);
-    } catch (err){
         return next(err);
     }
 }
