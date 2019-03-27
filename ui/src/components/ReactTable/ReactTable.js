@@ -96,7 +96,7 @@ export default class ReactTableComponent extends React.Component {
           style: { '--header-color': headerColors.default },
           className: css['thead']
         })}
-        getTbodyProps={() => (bodyProps)}
+        getTbodyProps={() => ({...bodyProps,className:css['tbody']})}
         getTheadThProps={(state, rowInfo, column, instance) => ({
           className: css['th'],
           style: { '--cursor': cursor },

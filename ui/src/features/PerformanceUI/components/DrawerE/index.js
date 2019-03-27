@@ -52,7 +52,7 @@ class DrawerE extends Component {
                     open={open}
                     onClose={this.handleClose}>
                     {/* <AppBar showMenuIconButton={false} className={style.appbar}/> */}
-                    <div style={{marginTop:'45px',marginLeft:'9px', width:'100%'}}>
+                    <div style={{marginTop: '45px', paddingLeft: '9px', width: '100%'}}>
                         <Logo/>
                         <List>
                             {listItemData.map((listItem) => {

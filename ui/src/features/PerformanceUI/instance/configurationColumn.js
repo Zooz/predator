@@ -32,7 +32,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Test Name
                 </TableHeader>
             ),
-            accessor: 'name'
+            accessor: 'name',
+            headerClassName: css['header-name'],
+            className:css['header-name']
         },
         {
             id: 'description',
@@ -57,7 +59,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Type
                 </TableHeader>
             ),
-            accessor: 'type'
+            accessor: 'type',
+            className: css['small-header'],
+            headerClassName: css['small-header']
         }, {
             id: 'edit',
             Header: () => (
@@ -66,7 +70,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => data.type ==='basic' ? <ViewButton icon={faPen} onClick={() => onEdit(data)}/> : 'N/A',
-            className: css['icon-cell']
+            className: css['small-header'],
+            headerClassName: css['small-header']
         },
         {
             id: 'test_name',
@@ -75,7 +80,10 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Test Name
                 </TableHeader>
             ),
-            accessor: 'test_name'
+            accessor: 'test_name',
+            headerClassName: css['header-name'],
+            className:css['header-name']
+
         },
         {
             id: 'environment',
@@ -171,7 +179,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Last Run
                 </TableHeader>
             ),
-            accessor: 'last_run'
+            accessor: 'last_run',
+            minWidth:150
         },
 
         {
@@ -217,7 +226,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Report
                 </TableHeader>
             ),
-            accessor: data => <ViewButton onClick={() => onReportView(data)}/>
+            accessor: data => <ViewButton onClick={() => onReportView(data)}/>,
+            className: css['small-header'],
+            headerClassName: css['small-header']
         },
         {
             id: 'grafana_report',
@@ -226,7 +237,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Grafana
                 </TableHeader>
             ),
-            accessor: data => <ViewButton onClick={() => window.open(data.grafana_report, '_blank')}/>
+            accessor: data => <ViewButton onClick={() => window.open(data.grafana_report, '_blank')}/>,
+            className: css['small-header'],
+            headerClassName: css['small-header']
         },
         {
             id: 'raw',
@@ -236,7 +249,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => <ViewButton icon={faEye} onClick={() => onRawView(data)}/>,
-            className: css['icon-cell']
+            className: css['small-header'],
+            headerClassName: css['small-header'],
+
         },
         {
             id: 'delete',
@@ -246,7 +261,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => <ViewButton icon={faTrashAlt} onClick={() => onDelete(data)}/>,
-            className: css['icon-cell']
+            className: css['small-header'],
+            headerClassName: css['small-header']
         },
         {
             id: 'run_test',
@@ -256,7 +272,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => <ViewButton text={'Run'} onClick={() => onRunTest(data)}/>,
-            className: css['icon-cell']
+            className: css['small-header'],
+            headerClassName: css['small-header']
         }, {
             id: 'logs',
             Header: () => (
@@ -266,7 +283,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             ),
             accessor: data => (<ViewButton icon={faCloudDownloadAlt}
                                            onClick={() => window.open(`${env.PREDATOR_URL}/jobs/${data.job_id}/runs/${data.report_id}/logs`, '_blank')}/>),
-            className: css['icon-cell']
+            className: css['small-header'],
+            headerClassName: css['small-header']
         }, {
             id: 'stop',
             Header: () => (
@@ -278,7 +296,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 const disabled = (data.status !== 'in_progress' && data.status !== 'started');
                 return (<ViewButton disabled={disabled} icon={faStopCircle} onClick={() => onStop(data)}/>)
             },
-            className: css['icon-cell']
+            className: css['small-header'],
+            headerClassName: css['small-header']
 
         }
     ];
@@ -309,12 +328,13 @@ const dateFormatter = (cell, row) => {
 };
 
 const ViewButton = ({onClick, icon, disabled,text}) => {
-    if (icon) {
-        return (<FontAwesomeIcon
-            className={classnames(css['icon'], {[css['action-style']]: !disabled, [css['disabled-button']]: disabled})}
-            onClick={!disabled && onClick} icon={icon}/>)
-    }
-    return (<div className={css['action-style']} onClick={onClick}>{text || 'View'}</div>)
+
+    const element = icon ? <FontAwesomeIcon
+        className={classnames(css['icon'], {[css['action-style']]: !disabled, [css['disabled-button']]: disabled})}
+        onClick={!disabled && onClick} icon={icon}/> : text || 'View';
+
+
+    return (<div className={css['action-style']} onClick={onClick}>{element}</div>)
 };
 
 

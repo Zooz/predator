@@ -9,6 +9,9 @@
 .action-style {
   color:#557eff;
   cursor: pointer;
+  height:46px;
+  display:flex;
+  align-items: center;
 }
 
 .disabled-button {
@@ -16,10 +19,7 @@
   cursor: not-allowed;
 }
 
-.icon-cell{
-  display:flex;
-  align-items:center;
-}
+
 
 .icon {
   font-size:20px;
@@ -31,3 +31,13 @@
   text-overflow: ellipsis;
   max-width: 164px;
 }
+
+.header-name {
+  width:15% !important;
+}
+
+.small-header {
+  width:50px !important;
+}
+
+
