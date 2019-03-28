@@ -92,7 +92,7 @@ describe('the tests api', function() {
                 getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
                 getTestResponse.statusCode.should.eql(404);
             });
-            it('Create test,  with a file ', async () => {
+            it('Create test, with a file ', async () => {
                 let requestBody = Object.assign({ file_url: dropboxUrl }, simpleTest.test);
                 const createTestResponse = await requestSender.createTest(requestBody, validHeaders);
                 createTestResponse.statusCode.should.eql(201);
