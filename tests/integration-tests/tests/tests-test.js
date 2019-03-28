@@ -96,7 +96,7 @@ describe('the tests api', function() {
             it('Create test, with a file ', async () => {
                 let requestBody = Object.assign({ file_url: dropboxUrl }, simpleTest.test);
                 const createTestResponse = await requestSender.createTest(requestBody, validHeaders);
-                console.log('error reponse: ' + createTestResponse);
+                console.log('error reponse: ' + createTestResponse.body);
                 createTestResponse.statusCode.should.eql(201);
                 const resGetTest = await requestSender.getTest(createTestResponse.body.id, validHeaders);
                 resGetTest.statusCode.should.eql(200);
