@@ -12,12 +12,14 @@ describe('Testing sequelize connector', function () {
         clock,
         destroyStub,
         findAllStub,
+        findStub,
         updateStub,
         authenticateStub;
     before(async function () {
         sandbox = sinon.sandbox.create();
         syncStub = sandbox.stub();
         createStub = sandbox.stub();
+        findStub = sandbox.stub();
         findAllStub = sandbox.stub();
         updateStub = sandbox.stub();
         authenticateStub = sandbox.stub();
@@ -27,7 +29,8 @@ describe('Testing sequelize connector', function () {
             model: sandbox.stub().returns({ create: createStub,
                 findAll: findAllStub,
                 destroy: destroyStub,
-                update: updateStub
+                update: updateStub,
+                find: findStub
             }),
             define: sandbox.stub().returns({ sync: syncStub })
         };
@@ -45,6 +48,46 @@ describe('Testing sequelize connector', function () {
     after(function () {
         sandbox.restore();
         clock.restore();
+    });
+    describe('handle file insert and gey', function () {
+        it('when succeed insert file', async function () {
+            const fileId = uuid();
+            await sequelizeConnector.saveFile(fileId, 'File for test content');
+            const client = sequelizeConnector.__get__('client');
+            should(client.model.args).eql([['file']]);
+            should(createStub.args[0][0].id).eql(fileId);
+            should(createStub.args[0][0].file).eql('File for test content');
+        });
+        it('when fail to insert file', async function () {
+            const error = new Error('error');
+            createStub.rejects(error);
+            const fileId = uuid();
+            try {
+                await sequelizeConnector.saveFile(fileId, 'File for test content');
+                throw new Error('should not get here');
+            } catch (err) {
+                should(err).eql(error);
+            }
+        });
+        it('when succeed to get file', async function () {
+            findStub.returns({});
+            const fileId = uuid();
+            await sequelizeConnector.getFile(fileId);
+            const client = sequelizeConnector.__get__('client');
+            should(client.model.args).eql([['file']]);
+            should(findStub.getCall(0).args[0].where.id).eql(fileId);
+        });
+        it('when fail to get file', async function () {
+            const error = new Error('error');
+            findStub.rejects(error);
+            const fileId = uuid();
+            try {
+                await sequelizeConnector.getFile(fileId);
+                throw new Error('should not get here');
+            } catch (err) {
+                should(err).eql(error);
+            }
+        });
     });
 
     describe('insertTest', function () {
@@ -74,7 +117,7 @@ describe('Testing sequelize connector', function () {
             try {
                 await sequelizeConnector.insertTest({ name: 'name', type: 'type', scenarios: { s: '1' } }, { name: 'name', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId');
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 should(err).eql(error);
             }
         });
@@ -149,7 +192,7 @@ describe('Testing sequelize connector', function () {
             try {
                 await sequelizeConnector.getTest('id');
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 const client = sequelizeConnector.__get__('client');
                 should(client.model.args).eql([['test']]);
                 should(findAllStub.args).eql([
@@ -178,8 +221,20 @@ describe('Testing sequelize connector', function () {
     describe('get all test revisions', function () {
         it('when succeed get all revisions', async function () {
             findAllStub.returns([
-                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), raw_data: JSON.stringify({ raw: '1' }), test_id: 'test_id1' } },
-                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), raw_data: JSON.stringify({ raw: '2' }), test_id: 'test_id1' } }
+                {
+                    dataValues: {
+                        artillery_json: JSON.stringify({ art: '1' }),
+                        raw_data: JSON.stringify({ raw: '1' }),
+                        test_id: 'test_id1'
+                    }
+                },
+                {
+                    dataValues: {
+                        artillery_json: JSON.stringify({ art: '2' }),
+                        raw_data: JSON.stringify({ raw: '2' }),
+                        test_id: 'test_id1'
+                    }
+                }
             ]);
             const result = await sequelizeConnector.getAllTestRevisions('id');
             const client = sequelizeConnector.__get__('client');
@@ -256,7 +311,7 @@ describe('Testing sequelize connector', function () {
             try {
                 await sequelizeConnector.getAllTestRevisions('id');
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 const client = sequelizeConnector.__get__('client');
                 should(client.model.args).eql([['test']]);
                 should(findAllStub.args).eql([
@@ -285,8 +340,20 @@ describe('Testing sequelize connector', function () {
     describe('getTests', function () {
         it('when succeed getTests', async function () {
             findAllStub.returns([
-                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), raw_data: JSON.stringify({ raw: '1' }), test_id: 'test_id1' } },
-                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), raw_data: JSON.stringify({ raw: '2' }), test_id: 'test_id2' } }
+                {
+                    dataValues: {
+                        artillery_json: JSON.stringify({ art: '1' }),
+                        raw_data: JSON.stringify({ raw: '1' }),
+                        test_id: 'test_id1'
+                    }
+                },
+                {
+                    dataValues: {
+                        artillery_json: JSON.stringify({ art: '2' }),
+                        raw_data: JSON.stringify({ raw: '2' }),
+                        test_id: 'test_id2'
+                    }
+                }
             ]);
             const result = await sequelizeConnector.getTests();
             const client = sequelizeConnector.__get__('client');
@@ -357,7 +424,7 @@ describe('Testing sequelize connector', function () {
             try {
                 const result = await sequelizeConnector.getTests();
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 const client = sequelizeConnector.__get__('client');
                 should(client.model.args).eql([['test']]);
                 should(findAllStub.args).eql([
@@ -403,7 +470,7 @@ describe('Testing sequelize connector', function () {
             try {
                 await sequelizeConnector.deleteTest('id');
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 const client = sequelizeConnector.__get__('client');
                 should(client.model.args).eql([['test']]);
                 should(destroyStub.args).eql([
@@ -459,7 +526,7 @@ describe('Testing sequelize connector', function () {
             try {
                 await sequelizeConnector.insertDslDefinition('dslName', 'definitionName', { data: 'data' });
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 const client = sequelizeConnector.__get__('client');
                 should(client.model.args).eql([['dsl_definition']]);
                 should(createStub.args).eql([
@@ -517,7 +584,7 @@ describe('Testing sequelize connector', function () {
             try {
                 await sequelizeConnector.getDslDefinition('dslName', 'definitionName');
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 const client = sequelizeConnector.__get__('client');
                 should(client.model.args).eql([['dsl_definition']]);
                 should(findAllStub.args).eql([
@@ -584,7 +651,7 @@ describe('Testing sequelize connector', function () {
             try {
                 await sequelizeConnector.getDslDefinitions('dslName');
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 const client = sequelizeConnector.__get__('client');
                 should(client.model.args).eql([['dsl_definition']]);
                 should(findAllStub.args).eql([
@@ -651,7 +718,7 @@ describe('Testing sequelize connector', function () {
             try {
                 await sequelizeConnector.updateDslDefinition('dslName', 'definitionName', { data: 'data' });
                 throw new Error('should not get here');
-            } catch (err){
+            } catch (err) {
                 const client = sequelizeConnector.__get__('client');
                 should(client.model.args).eql([['dsl_definition']]);
                 should(updateStub.args).eql([
