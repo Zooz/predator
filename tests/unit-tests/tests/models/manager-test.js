@@ -4,6 +4,7 @@ let manager = require('../../../../src/tests/models/manager');
 let sinon = require('sinon');
 let database = require('../../../../src/tests/models/database');
 let testGenerator = require('../../../../src/tests/models/testGenerator');
+let request = require('request-promise');
 let uuid = require('uuid');
 
 describe('Scenario generator tests', function () {
@@ -14,6 +15,8 @@ describe('Scenario generator tests', function () {
     let getTestsStub;
     let testGeneratorStub;
     let getTestRevisionsStub;
+    let saveFileStub;
+    let getRequestStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -22,6 +25,8 @@ describe('Scenario generator tests', function () {
         getTestsStub = sandbox.stub(database, 'getTests');
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
         deleteStub = sandbox.stub(database, 'deleteTest');
+        getRequestStub = sandbox.stub(request, 'get');
+        saveFileStub = sandbox.stub(database, 'saveFile');
         testGeneratorStub = sandbox.stub(testGenerator, 'createTest');
     });
 
@@ -46,6 +51,27 @@ describe('Scenario generator tests', function () {
                     result.should.have.keys('id', 'revision_id');
                     Object.keys(result).length.should.eql(2);
                 });
+        });
+    });
+    describe('Create new file for test', function () {
+        it('Should save new file to database', async () => {
+            testGeneratorStub.resolves({
+                testjson: 'json'
+            });
+            insertStub.resolves();
+            getRequestStub.resolves('this is js code from dropbox');
+            saveFileStub.resolves();
+
+            let result = await manager.upsertTest({
+                testInfo: 'info', file_url: 'path to dropbox'
+            });
+
+            insertStub.calledOnce.should.eql(true);
+            saveFileStub.calledOnce.should.eql(true);
+            should.notEqual(insertStub.getCall(0).args[0].fileId, undefined);
+            should(getRequestStub.getCall(0).args[0].url).eql('path to dropbox');
+            result.should.have.keys('id', 'revision_id');
+            Object.keys(result).length.should.eql(2);
         });
     });
 
