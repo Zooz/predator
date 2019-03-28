@@ -57,8 +57,11 @@ async function downloadFile(fileUrl) {
         const base64Value = Buffer.from(response).toString('base64');
         return base64Value;
     } catch (err) {
-        console.log('Error to read file, throw exception: ' + err);
-        throw new Error();
+        const errMsg = 'Error to read file, throw exception: ' + err;
+        console.log(errMsg);
+        const error = new Error(errMsg);
+        error.statusCode = 400;
+        throw error;
     }
 }
 
