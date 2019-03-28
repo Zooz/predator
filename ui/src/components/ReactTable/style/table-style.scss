@@ -1,0 +1,57 @@
+@import "../../styles/colors";
+
+$left-spacing: 0.7rem;
+
+@mixin header-border {
+  border-bottom: solid 1px $border-grey !important;
+}
+
+.table {
+  background: white;
+  margin-top:10px;
+}
+
+.thead {
+  color: var(--header-color) !important;
+  box-shadow: none !important;
+  @include header-border;
+}
+
+.th {
+  padding: 0.8rem 0rem !important;
+  border-right: none  !important;
+  cursor: var(--cursor)  !important;
+  flex: 20 0 auto !important;
+  outline: none !important;
+}
+
+.td {
+  border-right: none !important;
+  padding: 0.3rem var(--cell-side-padding) !important;
+
+  &:not(.td--autoheight) {
+    padding: 0 var(--cell-side-padding) !important;
+    line-height: var(--row-height);
+  }
+}
+
+.tr {
+  cursor: var(--cursor)  !important;
+  background: var(--background-default);
+  color: var(--text-default);
+
+  &:not(.tr--autoheight) {
+    line-height: var(--row-height);
+  }
+
+  &.tr--selected {
+    background: var(--background-selected);
+    color: var(--text-selected);
+  }
+}
+
+.tr-group {
+  @include header-border;
+}
+
+.tbody { overflow: visible!important;}

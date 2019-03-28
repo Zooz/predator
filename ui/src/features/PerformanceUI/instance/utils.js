@@ -44,15 +44,13 @@ function quantify(data, unit, value, allowZero) {
 }
 
 export const prettySeconds =(seconds)=> {
-
+  function fix10(number) {
+    return number.toFixed(10)
+  }
   var prettyString = '',
       data = []
 
   if (typeof seconds === 'number') {
-
-    function fix10(number) {
-      return number.toFixed(10)
-    }
 
     data = quantify(data, 'd',    parseInt(fix10(seconds / 86400)))
     data = quantify(data, 'h',   parseInt(fix10((seconds % 86400) / 3600)))

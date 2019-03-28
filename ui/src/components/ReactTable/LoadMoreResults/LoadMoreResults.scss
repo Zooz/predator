@@ -1,0 +1,11 @@
+@import "../../styles/colors";
+
+$color: $default-blue;
+
+.load-more-results {
+  cursor: pointer;
+  color: $color;
+  font-size: 10px;
+  text-align: center;
+  font-weight: 900;
+}

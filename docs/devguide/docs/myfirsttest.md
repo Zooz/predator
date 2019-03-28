@@ -9,10 +9,7 @@ In this section, we will walk you through the steps of creating a simple test in
     docker run -d -p 3000:3000 --name predator-petstore zooz/predator-builds:petstore    
     ```
 
-<!-- base http://{machineip}:3000 -->
 
-GET:
-<!-- base http://{machineip}:3000/pets -->
     
 Adding a new test is easy. From the Predator web interface, choose **Tests** > **View Tests**. Then click **Create Test** and complete all fields on the form, like so:
 

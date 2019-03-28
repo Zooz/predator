@@ -39,7 +39,9 @@ describe('Docker hub connector tests', () => {
 
     [{ results: [{ name: '1.0.0' }, { name: '0.9.9' }, { name: '1.0.1' }, { name: 'latest' }], expected: 'runner:1.0.1' },
         { results: [{ name: '0.2.0' }, { name: '0.1.1' }, { name: '0.1.0' }, { name: 'latest' }], expected: 'runner:0.2.0' },
-        { results: [{ name: '5.0.2' }, { name: '5.2.1' }, { name: 'xyz' }, { name: 'latest' }], expected: 'runner:5.2.1' }
+        { results: [{ name: '5.0.2' }, { name: '5.2.1' }, { name: 'xyz' }, { name: 'latest' }], expected: 'runner:5.2.1' },
+        { results: [{ name: 'latest' }], expected: 'runner:latest' }
+
     ].forEach(testData => {
         it(`Should get newest tag: ${JSON.stringify(testData)}`, async () => {
             requestSenderSendStub.resolves({

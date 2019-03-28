@@ -26,7 +26,7 @@ class App extends React.Component {
       return (
         <Fragment>
           <ConnectedRouter history={history}>
-            <DrawerE history={history} open={false} listItemData={menuList}>
+            <DrawerE history={history} open={true} listItemData={menuList}>
               <Route exact path='/' render={() => (
                 <Redirect to='/last_reports' />
               )} />

@@ -1,22 +1,18 @@
 import React from 'react';
 import Snackbar from 'material-ui/Snackbar';
-import RaisedButton from 'material-ui/RaisedButton';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {
-  tests,
-  test,
-  processingGetTests,
-  errorOnGetTests,
-  errorOnGetTest,
-  processingDeleteTest,
-  deleteTestSuccess
+    tests,
+    test,
+    processingGetTests,
+    errorOnGetTests,
+    errorOnGetTest,
+    processingDeleteTest,
+    deleteTestSuccess
 } from './redux/selectors/testsSelector';
-import { createJobSuccess } from './redux/selectors/jobsSelector';
-import classNames from 'classnames'
-import { BootstrapTable, TableHeaderColumn, SearchField } from 'react-bootstrap-table';
+import {createJobSuccess} from './redux/selectors/jobsSelector';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import style from './style.scss';
-import Moment from 'moment';
 import Dialog from '../components/Dialog';
 import InputDialog from '../components/InputDialog';
 import JobForm from '../components/JobForm';
@@ -25,279 +21,243 @@ import Loader from '../components/Loader';
 import history from '../../../store/history'
 import DeleteDialog from '../components/DeleteDialog';
 import Page from '../../../components/Page';
-import { sortDates, createCustomSearchField } from './utils';
 import TestForm from '../components/TestForm';
-const timePattern = 'DD-MM-YYYY hh:mm:ss a';
+import {ReactTableComponent} from "../../../components/ReactTable";
+import {getColumns} from "./configurationColumn";
+import Button from '../../../components/Button';
+import _ from "lodash";
+
+
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
+const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test','report', 'edit', 'raw', 'delete'];
+const DESCRIPTION = 'Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.';
 
 class getTests extends React.Component {
-  constructor (props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.state = {
-      openViewTest: false,
-      openViewCreateJob: false,
-      openNewTestDialog: false,
-      deleteDialog: false,
-      testToDelete: undefined,
-      createTest: false,
-      testForEdit: null
+        this.state = {
+            openViewTest: false,
+            openViewCreateJob: false,
+            openNewTestDialog: false,
+            deleteDialog: false,
+            testToDelete: undefined,
+            createTest: false,
+            testForEdit: null,
+            sortedTests: []
+        }
     }
-  }
 
-    deleteFormatter = (cell, row) => {
-      const classes = classNames('material-icons', style.deleteIcon, {});
-      return (
-        <i onClick={() => {
-          this.setState({
+    componentDidUpdate(prevProps) {
+        if (prevProps.tests !== this.props.tests) {
+            this.setState({sortedTests: [...this.props.tests]})
+        }
+    }
+
+
+    onDelete= (data)=>{
+        this.setState({
             deleteDialog: true,
-            testToDelete: row
-          })
-        }} className={classes}>delete_forever</i>
-      );
-    };
+            testToDelete: data
+        })
+    }
+    onSearch = (value) => {
+        if (!value) {
+            this.setState({sortedTests: [...this.props.tests]})
+        }
+        const newSorted = _.filter(this.props.tests, (test) => {
+            return (
+                _.includes(String(test.name).toLowerCase(),value.toLowerCase()) ||
+                _.includes(String(test.type).toLowerCase(),value.toLowerCase()) ||
+                _.includes(String(test.description).toLowerCase(),value.toLowerCase())
+            )
 
+        });
+        this.setState({sortedTests: newSorted})
+    };
     submitDelete = () => {
-      this.props.deleteTest(this.state.testToDelete.id);
-      this.props.getAllTests();
-      this.setState({
-        deleteDialog: false
-      });
+        this.props.deleteTest(this.state.testToDelete.id);
+        this.props.getAllTests();
+        this.setState({
+            deleteDialog: false
+        });
     };
 
     clearDeleteError = () => {
-      this.props.getAllTests();
-      this.props.clearErrorOnDelete();
+        this.props.getAllTests();
+        this.props.clearErrorOnDelete();
     };
 
     cancelDelete = () => {
-      this.setState({
-        deleteDialog: false
-      });
+        this.setState({
+            deleteDialog: false
+        });
 
-      this.props.deleteError ? this.clearDeleteError() : undefined
-    };
-    /* formatters */
-
-    viewFormatter = (cell, row) => {
-      return (
-        <i onClick={() => {
-          this.setState({ openViewTest: true });
-          this.props.chooseTest(row);
-        }} className='material-icons' style={{ color: '#2a3f53' }}>visibility</i>
-      );
+        this.props.deleteError ? this.clearDeleteError() : undefined
     };
 
-  editFormatter = (cell, row) => {
-    if (row.type === 'basic') {
-      return (
-        <i onClick={() => {
-          this.setState({ createTest: true, testForEdit: row });
-          this.props.chooseTest(row);
-        }} className='material-icons' style={{ color: '#2a3f53' }}>edit</i>
-      );
-    }
-  };
+    onRawView = (data) => {
+        this.setState({openViewTest: data});
 
-    dateFormatter = (value) => {
-      return (
-        new Moment(value).local().format(timePattern)
-      );
     };
 
-    reportFormatter = (cell, row) => {
-      return (
-        <RaisedButton primary className={style.button} onClick={() => {
-          history.push(`/tests/${row.id}/reports`)
-        }} label='View' />
-      );
+    onEdit = (data)=>{
+        this.setState({createTest: true, testForEdit: data});
+        this.props.chooseTest(data);
     };
 
-    runJobFormatter = (cell, row) => {
-      return (
-        <RaisedButton primary className={style.button} onClick={() => {
-          this.setState({
-            openViewCreateJob: true
-          });
-          this.props.chooseTest(row);
-        }} label='Run' />
-      );
+    onReportView=(data)=>{
+        history.push(`/tests/${data.id}/reports`)
     };
 
-    /* end formatters */
-
-    /* views */
+    onRunTest=(data)=>{
+        this.setState({
+            openViewCreateJob: data
+        });
+    };
 
     closeViewTestDialog = () => {
-      this.setState({
-        openViewTest: false
-      });
-      this.props.clearSelectedTest();
+        this.setState({
+            openViewTest: false
+        });
+        this.props.clearSelectedTest();
     };
-  closeCreateTest = () => {
-    this.setState({
-      createTest: false,
-      testForEdit: null
-    });
-  };
+    closeCreateTest = () => {
+        this.setState({
+            createTest: false,
+            testForEdit: null
+        });
+    };
 
     closeViewCreateJobDialog = () => {
-      this.setState({
-        openViewCreateJob: false
-      });
-      this.props.clearSelectedTest();
+        this.setState({
+            openViewCreateJob: false
+        });
+        this.props.clearSelectedTest();
     };
 
-    renderPaginationPanel = (props) => {
-      return (
-        <div className={style.pagination}>
-          <div>{props.components.pageList}</div>
-          <div>
-            {props.components.sizePerPageDropdown}
-          </div>
-        </div>
-      );
-    };
 
     handleSnackbarClose = () => {
-      this.props.getAllTests();
-      this.props.clearSelectedJob();
-      this.props.clearSelectedTest();
-      this.props.clearDeleteTestSuccess();
-      this.setState({
-        testToDelete: undefined
-      });
+        this.props.getAllTests();
+        this.props.clearSelectedJob();
+        this.props.clearSelectedTest();
+        this.props.clearDeleteTestSuccess();
+        this.setState({
+            testToDelete: undefined
+        });
     };
 
-    /* end views */
-
-    loader () {
-      return this.props.processingGetTests ? <Loader /> : noDataMsg
+    loader() {
+        return this.props.processingGetTests ? <Loader/> : noDataMsg
     }
 
-    componentDidMount () {
-      this.props.clearErrorOnGetTests();
-      this.props.getAllTests();
+    componentDidMount() {
+        this.props.clearErrorOnGetTests();
+        this.props.getAllTests();
     }
 
-    componentWillUnmount () {
-      this.props.clearErrorOnGetTests();
-      this.props.clearSelectedTest();
+    componentWillUnmount() {
+        this.props.clearErrorOnGetTests();
+        this.props.clearSelectedTest();
     }
 
-    componentWillReceiveProps () {
-      if (this.props.createJobSuccess) {
-        this.setState({
-          openViewCreateJob: false
+    componentWillReceiveProps() {
+        if (this.props.createJobSuccess) {
+            this.setState({
+                openViewCreateJob: false
+            });
+        }
+    }
+
+    render() {
+        const {sortedTests} = this.state;
+        const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
+        const columns = getColumns({
+            columnsNames,
+            onReportView: this.onReportView,
+            onRawView: this.onRawView,
+            onDelete: this.onDelete,
+            onEdit: this.onEdit,
+            onRunTest: this.onRunTest
         });
-      }
-    }
 
-    render () {
-      let options = {
-        clearSearch: true,
-        paginationPanel: this.renderPaginationPanel,
-        noDataText: this.props.errorOnGetTests ? errorMsgGetTests : this.loader(),
-        searchField: createCustomSearchField,
-        defaultSortName: 'updated_at',
-        defaultSortOrder: 'desc'
-      };
+        return (
+            <Page title={'Tests'} description={DESCRIPTION}>
+                <Button className={style['create-button']} onClick={() => {
+                    this.setState({
+                        createTest: true
+                    });
+                }}>CREATE TEST</Button>
+                <ReactTableComponent
+                    onSearch={this.onSearch}
+                    rowHeight={'46px'}
+                    manual={false}
+                    data={sortedTests}
+                    pageSize={10}
+                    columns={columns}
+                    noDataText={noDataText}
+                    showPagination
+                    resizable={false}
+                    cursor={'default'}
+                    // className={style.table}
+                />
 
-      return (
-        <Page title={'Tests'}>
-          <div className={style.getTests}>
-            <div className={style.tableDiv}>
-              <RaisedButton primary className={style.button} onClick={() => {
-                this.setState({
-                  createTest: true
-                });
-              }} label='Create Test' />
-              <BootstrapTable options={options} bodyContainerClass={style.container}
-                tableStyle={{ height: 'auto !important' }} trClassName={style.row} pagination
-                search
-                data={this.props.tests}
-                striped hover>
-                <TableHeaderColumn dataField='id' isKey hidden dataAlign='left' width={'150'}>Test
-                                ID</TableHeaderColumn>
-                <TableHeaderColumn dataField='name' width={'80'} filterFormatted
-                  tdStyle={{ whiteSpace: 'normal' }}
-                  thStyle={{ whiteSpace: 'normal' }}>Name</TableHeaderColumn>
-                <TableHeaderColumn dataField='description' width={'200'} filterFormatted
-                  tdStyle={{ whiteSpace: 'normal' }}
-                  thStyle={{ whiteSpace: 'normal' }}>Description</TableHeaderColumn>
-                <TableHeaderColumn dataField='updated_at' width={'100'} dataAlign='left'
-                  dataFormat={this.dateFormatter} dataSort sortFunc={sortDates}>Last
-                                modified</TableHeaderColumn>
-                <TableHeaderColumn dataField='type' width={'75'} dataAlign='left'>Type</TableHeaderColumn>
-                <TableHeaderColumn width={'75'} dataAlign='left' dataFormat={this.runJobFormatter}>Run
-                                test</TableHeaderColumn>
-                <TableHeaderColumn dataField='report' width={'75'} dataAlign='left'
-                  dataFormat={this.reportFormatter}>Reports</TableHeaderColumn>
-                <TableHeaderColumn dataField='edit' dataAlign='center' dataFormat={this.editFormatter}
-                  width={'25'} />
-                <TableHeaderColumn dataField='view' dataAlign='center' dataFormat={this.viewFormatter}
-                  width={'25'} />
-                <TableHeaderColumn dataField='delete' dataAlign='center'
-                  dataFormat={this.deleteFormatter}
-                  width={'25'} />
-              </BootstrapTable>
-            </div>
+                    {this.state.openViewTest
+                        ?
+                        <Dialog title_key={'id'} data={this.state.openViewTest} closeDialog={this.closeViewTestDialog}/> : null}
+                    {this.state.createTest &&
+                    <TestForm data={this.state.testForEdit} closeDialog={this.closeCreateTest}/>}
+                    {(this.state.openViewCreateJob && !this.props.createJobSuccess)
+                        ? <InputDialog input={<JobForm/>} history={history}
+                                       title={'Create new job'} data={this.state.openViewCreateJob}
+                                       closeDialog={this.closeViewCreateJobDialog}/> : null}
 
-            {this.state.openViewTest
-              ? <Dialog title_key={'id'} data={this.props.test} closeDialog={this.closeViewTestDialog} /> : null}
-            {this.state.createTest && <TestForm data={this.state.testForEdit} closeDialog={this.closeCreateTest} />}
-            {(this.state.openViewCreateJob && !this.props.createJobSuccess)
-              ? <InputDialog input={<JobForm />} history={history}
-                title={'Create new job'} data={this.props.test}
-                closeDialog={this.closeViewCreateJobDialog} /> : null}
-
-            {(this.state.deleteDialog && !this.props.deleteTestSuccess)
-              ? <DeleteDialog loader={this.props.processingDeleteTest}
-                display={this.state.testToDelete ? this.state.testToDelete.name : ''}
-                onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
-                onCancel={this.cancelDelete} /> : null}
-            {/* TODO snack bar is common to al; page, need to extract it
+                    {(this.state.deleteDialog && !this.props.deleteTestSuccess)
+                        ? <DeleteDialog loader={this.props.processingDeleteTest}
+                                        display={this.state.testToDelete ? this.state.testToDelete.name : ''}
+                                        onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
+                                        onCancel={this.cancelDelete}/> : null}
+                    {/* TODO snack bar is common to al; page, need to extract it
                     fix using redux to be with less variables.
                   */}
-            <Snackbar
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'center'
-              }}
-              open={this.props.createJobSuccess || this.props.deleteTestSuccess}
-              bodyStyle={{ backgroundColor: '#2fbb67' }}
-              message={(this.props.createJobSuccess && this.props.createJobSuccess.run_id) ? `Job created successfully with Run ID: ${this.props.createJobSuccess.run_id}` : 'Test deleted successfully'}
-              autoHideDuration={4000}
-              onRequestClose={this.handleSnackbarClose}
-            />
-          </div>
-        </Page>
-      )
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center'
+                        }}
+                        open={this.props.createJobSuccess || this.props.deleteTestSuccess}
+                        bodyStyle={{backgroundColor: '#2fbb67'}}
+                        message={(this.props.createJobSuccess && this.props.createJobSuccess.run_id) ? `Job created successfully with Run ID: ${this.props.createJobSuccess.run_id}` : 'Test deleted successfully'}
+                        autoHideDuration={4000}
+                        onRequestClose={this.handleSnackbarClose}
+                    />
+            </Page>
+        )
     }
 }
 
-function mapStateToProps (state) {
-  return {
-    tests: tests(state),
-    test: test(state),
-    processingGetTests: processingGetTests(state),
-    errorOnGetTests: errorOnGetTests(state),
-    errorOnGetTest: errorOnGetTest(state),
-    createJobSuccess: createJobSuccess(state),
-    processingDeleteTest: processingDeleteTest(state),
-    deleteTestSuccess: deleteTestSuccess(state)
-  }
+function mapStateToProps(state) {
+    return {
+        tests: tests(state),
+        test: test(state),
+        processingGetTests: processingGetTests(state),
+        errorOnGetTests: errorOnGetTests(state),
+        errorOnGetTest: errorOnGetTest(state),
+        createJobSuccess: createJobSuccess(state),
+        processingDeleteTest: processingDeleteTest(state),
+        deleteTestSuccess: deleteTestSuccess(state)
+    }
 }
 
 const mapDispatchToProps = {
-  clearSelectedTest: Actions.clearSelectedTest,
-  clearSelectedJob: Actions.clearSelectedJob,
-  clearErrorOnGetTests: Actions.clearErrorOnGetTests,
-  getAllTests: Actions.getTests,
-  chooseTest: Actions.chooseTest,
-  deleteTest: Actions.deleteTest,
-  clearDeleteTestSuccess: Actions.clearDeleteTestSuccess
+    clearSelectedTest: Actions.clearSelectedTest,
+    clearSelectedJob: Actions.clearSelectedJob,
+    clearErrorOnGetTests: Actions.clearErrorOnGetTests,
+    getAllTests: Actions.getTests,
+    chooseTest: Actions.chooseTest,
+    deleteTest: Actions.deleteTest,
+    clearDeleteTestSuccess: Actions.clearDeleteTestSuccess
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);

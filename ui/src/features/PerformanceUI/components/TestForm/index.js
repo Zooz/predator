@@ -67,10 +67,10 @@ export class TestForm extends React.Component {
   }
 
   render () {
-    const { createTestError } = this.props;
+    const { createTestError,closeDialog } = this.props;
     const { name, description, baseUrl } = this.state;
     return (
-      <Modal>
+      <Modal onExit={closeDialog}>
         <h1>Create Test</h1>
         <div className={style['top']}>
           <div className={style['top-inputs']}>

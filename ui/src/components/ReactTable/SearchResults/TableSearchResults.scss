@@ -1,0 +1,12 @@
+@import "../../styles/colors";
+
+$color: $disabled-grey-text;
+
+.results {
+  font-size: 12px;
+  color: $color;
+
+  .number {
+    font-weight: bold;
+  }
+}
