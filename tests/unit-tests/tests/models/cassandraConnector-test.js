@@ -32,7 +32,7 @@ describe('Cassandra client tests', function() {
             let id = uuid.v4();
             let revisionId = uuid.v4();
 
-            let query = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id) values(?,?,?,?,?,?,?,?)';
+            let query = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id,file_id) values(?,?,?,?,?,?,?,?,?)';
             return cassandraClient.insertTest({ scenarios: { raw_data: 'raw' } }, { json: 'artillery' }, id, revisionId)
                 .then(function(){
                     loggerErrorStub.callCount.should.eql(0);
