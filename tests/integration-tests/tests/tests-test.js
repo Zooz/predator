@@ -8,6 +8,7 @@ const requestSender = require('./helpers/requestCreator');
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
 const dropboxUrl = 'https://www.dropbox.com/s/61sy7fe7ee6ljer/Test.txt?dl=1';
 describe('the tests api', function() {
+    this.timeout(5000000);
     let simpleTest;
     let dslName;
     before(async function () {
@@ -95,6 +96,7 @@ describe('the tests api', function() {
             it('Create test, with a file ', async () => {
                 let requestBody = Object.assign({ file_url: dropboxUrl }, simpleTest.test);
                 const createTestResponse = await requestSender.createTest(requestBody, validHeaders);
+                console.log('error reponse: ' + createTestResponse);
                 createTestResponse.statusCode.should.eql(201);
                 const resGetTest = await requestSender.getTest(createTestResponse.body.id, validHeaders);
                 resGetTest.statusCode.should.eql(200);
