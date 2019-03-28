@@ -16,6 +16,7 @@ describe('Scenario generator tests', function () {
     let testGeneratorStub;
     let getTestRevisionsStub;
     let saveFileStub;
+    let getFileStub;
     let getRequestStub;
 
     before(() => {
@@ -26,6 +27,7 @@ describe('Scenario generator tests', function () {
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
         deleteStub = sandbox.stub(database, 'deleteTest');
         getRequestStub = sandbox.stub(request, 'get');
+        getFileStub = sandbox.stub(database,'getFile');
         saveFileStub = sandbox.stub(database, 'saveFile');
         testGeneratorStub = sandbox.stub(testGenerator, 'createTest');
     });
@@ -72,6 +74,27 @@ describe('Scenario generator tests', function () {
             should(getRequestStub.getCall(0).args[0].url).eql('path to dropbox');
             result.should.have.keys('id', 'revision_id');
             Object.keys(result).length.should.eql(2);
+        });
+    });
+    describe('get afile for test', function () {
+        it('Should get new file to database', async () => {
+            getFileStub.resolves('File content');
+
+            let result = await manager.getFile('somneId');
+
+            getFileStub.calledOnce.should.eql(true);
+            should(getFileStub.getCall(0).args[0]).eql('somneId');
+            should(result).eql('File content');
+        });
+        it('Should  throw 404 not found', async () => {
+            getFileStub.resolves(undefined);
+            try {
+                await manager.getFile('idNotExist');
+                throw new Error('never should arrived here');
+            } catch (error) {
+                should(error.statusCode).eql(404);
+                should(error.message).eql('Not found');
+            }
         });
     });
 
