@@ -33,7 +33,7 @@ async function initSchemas() {
             primaryKey: true
         },
         file: {
-            type: Sequelize.DataTypes.STRING
+            type: Sequelize.DataTypes.TEXT('long')
         }
     });
     const test = client.define('test', {

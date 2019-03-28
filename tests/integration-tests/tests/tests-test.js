@@ -65,7 +65,6 @@ describe('the tests api', function() {
                 });
         });
         describe('simple test with dsl', function () {
-            this.timeout(5000000);
             it('Create test, update test, delete test, get test', async () => {
                 let requestBody = simpleTest.test;
                 let createTestResponse = await requestSender.createTest(requestBody, validHeaders);
