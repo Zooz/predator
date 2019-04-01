@@ -21,7 +21,7 @@ Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps
 - **Scheduled jobs**: Run any tests in recurring mode by cron expression.
 - **3rd partry metrics**:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.
 - **Rich UI**: Predator offers rich UI side by side powerful REST API.
-- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as it's engine to fire the requests. the schema of creating tests via api is based on artillery schema.
+- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as it's engine to fire the requests. The schema of creating tests via api is based on artillery schema.
 
 
 ## Getting Started
@@ -35,18 +35,20 @@ Predator is designed to seamlessly deploy into your Kubernetes cluster. This is 
 
 <br>follow the simple guidelines in the [README](https://zooz.github.io/helm/) to configure the appropriate variables.
 
+### DC/OS
+Predator is included in Mesosphere Universe. Please refer to https://github.com/dcos/examples/tree/master/predator for a quick start guide and examples for installing the package.
+
 ### Docker
 `docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator`
 
 where $MACHINE_IP=local ip address of your machine
 
-### DC/OS
-Predator has a PR open waiting for approval to be included in the Mesosphere Universe.
-
 ### Developers
-Predator runs using Docker. In order to source code locally, clone this repository and then run the following command:
+Predator runs using Docker. In order to run Predator locally, clone this repository and then run the following command:
 
 `runPredatorLocal.sh`
+
+or refer to the [Docker](#docker) instructions above.
 
 #### Running the tests
 
