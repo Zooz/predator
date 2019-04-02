@@ -33,7 +33,7 @@ Predator is designed to seamlessly deploy into your Kubernetes cluster. This is 
 <br>
 `helm install predator`
 
-<br>follow the simple guidelines in the [README](https://zooz.github.io/helm/) to configure the appropriate variables.
+<br>follow the simple guidelines in the [README](https://github.com/Zooz/helm/blob/master/predator/README.md) to configure the appropriate variables.
 
 ### DC/OS
 Predator is included in Mesosphere Universe. Please refer to https://github.com/dcos/examples/tree/master/predator for a quick start guide and examples for installing the package.
