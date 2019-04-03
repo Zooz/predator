@@ -21,7 +21,7 @@ Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps
 - **Scheduled jobs**: Run any tests in recurring mode by cron expression.
 - **3rd partry metrics**:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.
 - **Rich UI**: Predator offers rich UI side by side powerful REST API.
-- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as it's engine to fire the requests. The schema of creating tests via api is based on artillery schema.
+- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as its load engine to fire the requests. The schema of creating tests via api is based on artillery schema.
 
 
 ## Getting Started
