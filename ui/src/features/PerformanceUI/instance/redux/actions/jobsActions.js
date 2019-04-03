@@ -1,7 +1,7 @@
 import * as Types from '../types/jobsTypes';
 
-export const getJobs = (instance) => (
-  { type: Types.GET_JOBS, instance }
+export const getJobs = () => (
+  { type: Types.GET_JOBS }
 );
 
 export const getJobsSuccess = (jobs) => (

@@ -14,6 +14,9 @@ function generatePredatorUrl() {
 }
 
 function generateBucketPath() {
+    if(process.env.NODE_ENV !== 'production'){
+        return ''
+    }
     if (process.env.BUCKET_PATH) {
         return `${process.env.BUCKET_PATH}/ui/`
     }
