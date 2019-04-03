@@ -34,8 +34,8 @@ module.exports = () => {
                 next();
             });
             // all root request are suppose to be the ui , so we put the route before the audit to avoid audit.
-            app.use(express.static('./ui/dist'));
-            app.use('/predator', function (req, res, next) {
+            app.use('/ui', express.static('./ui/dist'));
+            app.use('/ui', function (req, res, next) {
                 res.sendFile(path.resolve('ui/dist/index.html'));
             });
 
@@ -43,7 +43,7 @@ module.exports = () => {
 
             app.use(audit({
                 logger: logger,
-                excludeURLs: ['health', 'predator', 'favicon.png'],
+                excludeURLs: ['health', 'ui', 'favicon.png'],
                 response: {
                     excludeBody: ['*']
                 }
@@ -56,10 +56,6 @@ module.exports = () => {
             app.use('/v1/dsl', dslRouter);
             app.use('/v1/tests', reportsRouter);
             app.use('/v1/tests', testsRouter);
-            app.use(express.static('./ui/dist'));
-            app.use('/predator', function (req, res, next) {
-                res.sendFile(path.resolve('ui/dist/index.html'));
-            });
             app.use(function (err, req, res, next) {
                 if (err instanceof swaggerValidator.InputValidationError) {
                     res.status(400).json({ message: 'Input validation error', validation_errors: err.errors });

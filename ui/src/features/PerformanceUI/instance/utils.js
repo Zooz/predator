@@ -14,9 +14,9 @@ export const sortDates = (a, b, order) => {
 
 export const createCustomSearchField = (props) => {
   return (
-    <SearchField style={{ width: '40%', float: 'right' }}
-      defaultValue={props.defaultSearch}
-      placeholder={props.searchPlaceholder} />
+      <SearchField style={{ width: '40%', float: 'right' }}
+                   defaultValue={props.defaultSearch}
+                   placeholder={props.searchPlaceholder} />
   );
 };
 

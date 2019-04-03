@@ -20,12 +20,12 @@ const BY_DATABASE_MANDATORY_VARS = {
 const SUPPORTED_DATABASES = Object.keys(BY_DATABASE_MANDATORY_VARS);
 
 env.init = function () {
-    if (!SUPPORTED_PLATFORMS.includes(process.env.JOB_PLATFORM.toUpperCase())) {
+    if (!SUPPORTED_PLATFORMS.includes(String(process.env.JOB_PLATFORM).toUpperCase())) {
         log.error(`JOB_PLATFORM should be one of: ${SUPPORTED_PLATFORMS}`);
         process.exit(1);
     }
 
-    if (process.env.DATABASE_TYPE && !SUPPORTED_DATABASES.includes(process.env.DATABASE_TYPE.toUpperCase())) {
+    if (process.env.DATABASE_TYPE && !SUPPORTED_DATABASES.includes(String(process.env.DATABASE_TYPE).toUpperCase())) {
         log.error(`DATABASE_TYPE should be one of: ${SUPPORTED_DATABASES}`);
         process.exit(1);
     }
@@ -35,10 +35,10 @@ env.init = function () {
         'INTERNAL_ADDRESS'
     ];
 
-    mandatoryVars = mandatoryVars.concat(BY_PLATFORM_MANDATORY_VARS[process.env.JOB_PLATFORM.toUpperCase()]);
+    mandatoryVars = mandatoryVars.concat(BY_PLATFORM_MANDATORY_VARS[String(process.env.JOB_PLATFORM).toUpperCase()]);
 
     if (process.env.DATABASE_TYPE) {
-        mandatoryVars = mandatoryVars.concat(BY_DATABASE_MANDATORY_VARS[process.env.DATABASE_TYPE.toUpperCase()]);
+        mandatoryVars = mandatoryVars.concat(BY_DATABASE_MANDATORY_VARS[String(process.env.DATABASE_TYPE).toUpperCase()]);
     }
 
     let missingFields = mandatoryVars.filter((currVar) => {
