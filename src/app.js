@@ -35,7 +35,7 @@ module.exports = () => {
             });
             // all root request are suppose to be the ui , so we put the route before the audit to avoid audit.
             app.use('/ui',express.static('./ui/dist'));
-            app.use('/ui', function (req, res, next) {
+            app.use('/ui', function (req, res,  next) {
                 res.sendFile(path.resolve('ui/dist/index.html'));
             });
 
