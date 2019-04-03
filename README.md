@@ -38,21 +38,6 @@ Predator is designed to seamlessly deploy into your Kubernetes cluster. This is 
 ### DC/OS
 Predator is included in Mesosphere Universe. Please refer to https://github.com/dcos/examples/tree/master/predator for a quick start guide and examples for installing the package.
 
-### UI
-
-The path for getting the ui is: server/predator
-<br> The ui needs the path for the server to find his assets,
-<br>So if you are running the server under specific bucket path(and not on the domain root), you should build the docker yourself and configure the bucket path.
-<br>
-Example:
-
-Lets say that predator is running under www.server.com/example-path
-<br>For building the docker you should run this command:
-`docker build --build-arg BUCKET_PATH=example-path . -t company/predator`
-<br>
-Then you can run the docker by docker run ... company/predator
-
-
 ### Docker
 `docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator`
 
@@ -65,12 +50,21 @@ Predator runs using Docker. In order to run Predator locally, clone this reposit
 
 or refer to the [Docker](#docker) instructions above.
 
-#### Running the tests
+##### Running the tests
 
 Run `npm test` in order to run tests in your local machine. The script runs the following tests:
 * lint
 * unit-tests
 * integration-tests
+
+## Opening the Predator UI
+The path for accessing the Predator UI is: http://localhost/ui (in the case that Predator is running locally under port 80)
+<br>
+
+In case Predator is not running under the root domain, (for example, running under http://localhost/example-path) in order to access the UI follow the below steps:
+1. `docker build --build-arg BUCKET_PATH=example-path . -t predator`
+2. `docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock predator`
+3. Access the Predator UI at http://localhost/example-path/ui
 
 ## Contributing
 
