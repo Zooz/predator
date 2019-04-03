@@ -4,7 +4,6 @@ const rules = require('./rules');
 const entries = require('./entries');
 const ip = require('ip');
 const env = require('../src/App/common/env');
-console.log("webpack env",env)
 module.exports = {
   // Tell webpack to start bundling our app at app/get-apis.js
   entry: entries,
