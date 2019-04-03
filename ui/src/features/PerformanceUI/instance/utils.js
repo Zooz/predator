@@ -1,7 +1,6 @@
 import { SearchField } from 'react-bootstrap-table';
 import React from 'react';
 import cronstrue from 'cronstrue';
-const window = require("global/window");
 
 export const sortDates = (a, b, order) => {
   let dateA = new Date(a.updated_at);
@@ -15,9 +14,9 @@ export const sortDates = (a, b, order) => {
 
 export const createCustomSearchField = (props) => {
   return (
-    <SearchField style={{ width: '40%', float: 'right' }}
-      defaultValue={props.defaultSearch}
-      placeholder={props.searchPlaceholder} />
+      <SearchField style={{ width: '40%', float: 'right' }}
+                   defaultValue={props.defaultSearch}
+                   placeholder={props.searchPlaceholder} />
   );
 };
 
@@ -73,13 +72,4 @@ export const prettySeconds =(seconds)=> {
   }
 
   return prettyString
-}
-
-export const getUrlPrefix =  () => {
-  const path = window.location.pathname.split('/predator');
-  let predatorUrlPrefix = '';
-  if (path.length > 1) {
-    predatorUrlPrefix = path[0];
-  }
-  return predatorUrlPrefix;
 }

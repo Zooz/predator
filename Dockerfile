@@ -16,10 +16,10 @@ COPY /ui/src /usr/ui/src
 COPY /ui/config /usr/ui/config
 COPY /ui/package*.json /usr/ui/
 COPY /ui/.babelrc /usr/ui
-
+ARG BUCKET_PATH
 WORKDIR /usr/ui
 RUN npm ci --silent
-RUN npm run build
+RUN BUCKET_PATH=$BUCKET_PATH npm run build
 
 WORKDIR /usr
 

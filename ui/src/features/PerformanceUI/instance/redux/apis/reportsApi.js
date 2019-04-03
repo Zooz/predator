@@ -1,9 +1,8 @@
 import axios from 'axios';
 import env from '../../../../../App/common/env';
-import {getUrlPrefix} from "../../utils";
 
 export const getReportsFromFramework = (queryParams, testId) => {
-  let url = queryParams ? `${getUrlPrefix()}${env.PREDATOR_URL}/tests/${testId}/reports${queryParams}` : `${env.PREDATOR_URL}/tests/${testId}/reports`;
+  let url = queryParams ? `${env.PREDATOR_URL}/tests/${testId}/reports${queryParams}` : `${env.PREDATOR_URL}/tests/${testId}/reports`;
 
   return axios.get(url, {
     headers: {
@@ -12,14 +11,14 @@ export const getReportsFromFramework = (queryParams, testId) => {
 };
 
 export const getReportFromFramework = (testId, runId) => {
-  return axios.get(`${getUrlPrefix()}${env.PREDATOR_URL}/tests/${testId}/reports/${runId}`, {
+  return axios.get(`${env.PREDATOR_URL}/tests/${testId}/reports/${runId}`, {
     headers: {
     }
   });
 };
 
 export const getAggregateFromFramework = (testId,reportId) => {
-  return axios.get(`${getUrlPrefix()}${env.PREDATOR_URL}/tests/${testId}/reports/${reportId}/aggregate`, {
+  return axios.get(`${env.PREDATOR_URL}/tests/${testId}/reports/${reportId}/aggregate`, {
     headers: {
     }
   });
