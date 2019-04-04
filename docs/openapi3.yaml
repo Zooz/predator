@@ -1052,6 +1052,12 @@ components:
           type: string
           description: The name of the test.
           example: Order from Pet Store
+        file_url:
+          type: string
+          format: uri
+          example: http://www.example.com/file.txt
+          description: Url to text file location , will be used by the processor
+
         description:
           type: string
           description: A description of the test.

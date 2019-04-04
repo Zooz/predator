@@ -12,5 +12,5 @@ router.get('/:test_id', swaggerValidator.validate, tests.getTest);
 router.delete('/:test_id', swaggerValidator.validate, tests.deleteTest);
 router.put('/:test_id', swaggerValidator.validate, artilleryValidator.verifyArtillery, tests.upsertTest);
 router.get('/:test_id/revisions', swaggerValidator.validate, tests.getTestRevisions);
-router.get('/file/:file_id', tests.getFile);
+router.get('/file/:file_id',swaggerValidator.validate, tests.getFile);
 module.exports = router;
