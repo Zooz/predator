@@ -154,8 +154,9 @@ function calculateReportStatus(report, config) {
     const reportDurationMs = report.duration * 1000;
     const reportStartTimeMs = new Date(report.start_time).getTime();
 
-    if (allSubscribersFinished(uniqueSubscribersStages)) {
-        return constants.REPORT_FINISHED_STATUS;
+    const isFinishedStatus = allSubscribersFinishedStatus(uniqueSubscribersStages);
+    if (isFinishedStatus) {
+        return isFinishedStatus;
     } else if (Date.now() >= reportStartTimeMs + reportDurationMs + delayedTimeInMs) {
         if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_DONE_STAGE)) {
             return constants.REPORT_PARTIALLY_FINISHED_STATUS;
@@ -188,9 +189,12 @@ function getListOfSubscribersStages(report) {
     return runnerStates;
 }
 
-function allSubscribersFinished(subscriberStages) {
-    if (subscriberStages.length === 1) {
-        return subscriberStageToReportStatusMap(subscriberStages) === constants.REPORT_FINISHED_STATUS;
+function allSubscribersFinishedStatus(subscribersStages) {
+    if (subscribersStages.length === 1) {
+        const mappedStatus = subscriberStageToReportStatusMap(subscribersStages);
+        if ([constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS].includes(mappedStatus)) {
+            return mappedStatus;
+        }
     }
     return false;
 }
