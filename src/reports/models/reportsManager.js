@@ -9,6 +9,11 @@ const databaseConnector = require('./databaseConnector'),
     notifier = require('./notifier'),
     constants = require('../utils/constants');
 
+const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
+
+const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
+    constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
+
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
 
@@ -129,10 +134,7 @@ function getReportResponse(summaryRow, config) {
 
     report.status = calculateReportStatus(report, config);
 
-    const STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
-        constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
-
-    if (STATUSES_WITH_END_TIME.includes(report.status)) {
+    if (FINAL_REPORT_STATUSES_WITH_END_TIME.includes(report.status)) {
         report.end_time = report.last_updated_at;
     }
     return report;
@@ -154,7 +156,7 @@ function calculateReportStatus(report, config) {
     const reportDurationMs = report.duration * 1000;
     const reportStartTimeMs = new Date(report.start_time).getTime();
 
-    const isFinishedStatus = allSubscribersFinishedStatus(uniqueSubscribersStages);
+    const isFinishedStatus = isAllSubscribersFinishedStatus(uniqueSubscribersStages);
     if (isFinishedStatus) {
         return isFinishedStatus;
     } else if (Date.now() >= reportStartTimeMs + reportDurationMs + delayedTimeInMs) {
@@ -189,14 +191,13 @@ function getListOfSubscribersStages(report) {
     return runnerStates;
 }
 
-function allSubscribersFinishedStatus(subscribersStages) {
+function isAllSubscribersFinishedStatus(subscribersStages) {
     if (subscribersStages.length === 1) {
         const mappedStatus = subscriberStageToReportStatusMap(subscribersStages);
-        if ([constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS].includes(mappedStatus)) {
+        if (FINAL_REPORT_STATUSES.includes(mappedStatus)) {
             return mappedStatus;
         }
     }
-    return false;
 }
 
 function subscriberStageToReportStatusMap(subscriberStage) {
