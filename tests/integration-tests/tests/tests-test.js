@@ -37,7 +37,7 @@ describe('the tests api', function() {
         it('Should return error for file url not exists ', async () => {
             let requestBody = Object.assign({ file_url: 'not real path' }, simpleTest.test);
             const res = await requestSender.createTest(requestBody, validHeaders);
-            res.statusCode.should.eql(400);
+            res.statusCode.should.eql(422);
             res.body.message.should.eql('Error to read file, throw exception: RequestError: Error: Invalid URI "not%20real%20path"');
         });
         let badBodyScenarios = ['Body_with_illegal_artillery', 'Body_with_no_artillery_schema', 'Body_with_no_test_type', 'Body_with_no_description', 'Body_with_no_name', 'Body_with_no_scenarios', 'Body_with_no_step_action',
