@@ -61,10 +61,12 @@ Run `npm test` in order to run tests in your local machine. The script runs the 
 The path for accessing the Predator UI is: http://localhost/ui (in the case that Predator is running locally under port 80)
 <br>
 
-In case Predator is not running under the root domain, (for example, running under http://localhost/example-path) in order to access the UI follow the below steps:
+In case Predator is not running under the root domain, (for example, running under http://your.domain.com/example-path) in order to access the UI follow the below steps:
 1. `docker build --build-arg BUCKET_PATH=example-path . -t predator`
-2. `docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock predator`
-3. Access the Predator UI at http://localhost/example-path/ui
+2. Deploy the tagged docker image to your preferred platform
+3. Access the Predator UI at http://your.domain.com/example-path/ui
+
+![](https://zooz.github.io/predator/img/ui.png =250x)
 
 ## Contributing
 
