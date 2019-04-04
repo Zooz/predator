@@ -66,7 +66,9 @@ In case Predator is not running under the root domain, (for example, running und
 2. Deploy the tagged docker image to your preferred platform
 3. Access the Predator UI at http://your.domain.com/example-path/ui
 
-![](https://zooz.github.io/predator/img/ui.png)
+![](https://zooz.github.io/predator/img/tests.png)
+![](https://zooz.github.io/predator/img/report.png)
+
 
 ## Contributing
 
