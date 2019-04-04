@@ -1,6 +1,7 @@
 'use strict';
 
-const manager = require('../models/manager');
+const manager = require('../models/manager'),
+    fileManager = require('../models/fileManager');
 
 module.exports = {
     upsertTest,
@@ -22,7 +23,7 @@ async function upsertTest(req, res, next) {
 
 async function getFile(req, res, next) {
     try {
-        const result = await manager.getFile(req.params.file_id);
+        const result = await fileManager.getFile(req.params.file_id);
         return res.status(200).json(result);
     } catch (err) {
         return next(err);
