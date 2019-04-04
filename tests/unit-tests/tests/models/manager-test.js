@@ -1,6 +1,7 @@
 'use strict';
 let should = require('should');
 let manager = require('../../../../src/tests/models/manager');
+let fileManager = require('../../../../src/tests/models/fileManager');
 let sinon = require('sinon');
 let database = require('../../../../src/tests/models/database');
 let testGenerator = require('../../../../src/tests/models/testGenerator');
@@ -75,12 +76,29 @@ describe('Scenario generator tests', function () {
             result.should.have.keys('id', 'revision_id');
             Object.keys(result).length.should.eql(2);
         });
+        it('Should fail to download file throw error', async () => {
+            testGeneratorStub.resolves({
+                testjson: 'json'
+            });
+            insertStub.resolves();
+            getRequestStub.throws();
+            saveFileStub.resolves();
+            try {
+                let result = await manager.upsertTest({
+                    testInfo: 'info', file_url: 'path to dropbox'
+                });
+                console.log(result);
+                should.fail('Expected error to throw');
+            } catch (err) {
+                should(err.statusCode).eql(422);
+            }
+        });
     });
-    describe('get afile for test', function () {
+    describe('get a file for test', function () {
         it('Should get new file to database', async () => {
             getFileStub.resolves('File content');
 
-            let result = await manager.getFile('somneId');
+            let result = await fileManager.getFile('somneId');
 
             getFileStub.calledOnce.should.eql(true);
             should(getFileStub.getCall(0).args[0]).eql('somneId');
@@ -89,7 +107,7 @@ describe('Scenario generator tests', function () {
         it('Should  throw 404 not found', async () => {
             getFileStub.resolves(undefined);
             try {
-                await manager.getFile('idNotExist');
+                await fileManager.getFile('idNotExist');
                 throw new Error('never should arrived here');
             } catch (error) {
                 should(error.statusCode).eql(404);
