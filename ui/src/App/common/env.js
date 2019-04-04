@@ -4,7 +4,7 @@ module.exports = {
 };
 
 function generatePredatorUrl() {
-    if(process.env.PREDATOR_URL){
+    if (process.env.PREDATOR_URL){
         return process.env.PREDATOR_URL;
     }
     if (process.env.BUCKET_PATH) {
@@ -14,10 +14,12 @@ function generatePredatorUrl() {
 }
 
 function generateBucketPath() {
-    if (process.env.BUCKET_PATH) {
-        return `${process.env.BUCKET_PATH}/ui/`
+    let path = '/ui/';
+    if (process.env.NODE_ENV !== 'production'){
+        path = '';
     }
-    return '/ui/';
-
-
+    if (process.env.BUCKET_PATH) {
+        path = `${process.env.BUCKET_PATH}/ui/`;
+    }
+    return path;
 }

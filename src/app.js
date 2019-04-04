@@ -56,6 +56,11 @@ module.exports = () => {
             app.use('/v1/dsl', dslRouter);
             app.use('/v1/tests', reportsRouter);
             app.use('/v1/tests', testsRouter);
+
+            app.use('/', function (req, res, next) {
+                res.redirect('/ui');
+            });
+
             app.use(function (err, req, res, next) {
                 if (err instanceof swaggerValidator.InputValidationError) {
                     res.status(400).json({ message: 'Input validation error', validation_errors: err.errors });
