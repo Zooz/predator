@@ -81,7 +81,6 @@ module.exports = (dslName) => {
                 ]
             },
             'description': 'test',
-            'file_id': null,
             'name': 'test',
             'raw_data': {
                 'description': 'test',
@@ -245,7 +244,6 @@ module.exports = (dslName) => {
                 ]
             },
             'description': 'test',
-            'file_id': null,
             'name': 'test',
             'raw_data': {
                 'description': 'test',

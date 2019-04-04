@@ -113,7 +113,6 @@ module.exports = function (dslName, id, revision_id) {
             ]
         },
         'description': 'test',
-        'file_id': null,
         'id': id,
         revision_id,
         'name': 'test',

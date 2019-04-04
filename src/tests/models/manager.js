@@ -16,10 +16,7 @@ module.exports = {
 async function upsertTest(testRawData, existingTestId) {
     const testArtilleryJson = await testGenerator.createTest(testRawData);
     let id = existingTestId || uuid();
-    const fileId = await fileManager.createFileFromUrl(testRawData);
-    if (fileId) {
-        testRawData.fileId = fileId;
-    }
+    testRawData.fileId = await fileManager.createFileFromUrl(testRawData);
     let revisionId = uuid.v4();
     await database.insertTest(testRawData, testArtilleryJson, id, revisionId);
     return { id: id, revision_id: revisionId };
@@ -28,6 +25,9 @@ async function upsertTest(testRawData, existingTestId) {
 async function getTest(testId) {
     const result = await database.getTest(testId);
     if (result) {
+        if (result.file_id) {
+            delete result.file_id;
+        }
         result.artillery_test = result.artillery_json;
         delete result.artillery_json;
         return result;
