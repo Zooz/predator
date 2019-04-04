@@ -6,7 +6,7 @@ JSCK.Draft4 = JSCK.draft4;
 let artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const requestSender = require('./helpers/requestCreator');
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
-const dropboxUrl = 'https://www.dropbox.com/s/61sy7fe7ee6ljer/Test.txt?dl=1';
+const fileUrl = 'https://sample-videos.com/text/Sample-text-file-10kb.txt';
 describe('the tests api', function() {
     this.timeout(5000000);
     let simpleTest;
@@ -93,7 +93,7 @@ describe('the tests api', function() {
                 getTestResponse.statusCode.should.eql(404);
             });
             it('Create test, with a file ', async () => {
-                let requestBody = Object.assign({ file_url: dropboxUrl }, simpleTest.test);
+                let requestBody = Object.assign({ file_url: fileUrl }, simpleTest.test);
                 const createTestResponse = await requestSender.createTest(requestBody, validHeaders);
                 console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
                 createTestResponse.statusCode.should.eql(201);
