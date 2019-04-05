@@ -2,9 +2,11 @@
 
 [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Predator is an open-source distributed performance testing framework. Predator manages the entire lifecycle of stress-testing a server, 
-from creating a test file, to running scheduled and on-demand tests, and finally viewing the test results in a highly informative report. 
-Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
+Predator is the next generation open source performance testing platform for APIs.
+
+Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
+
+It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
 
 ## Documentation
 
@@ -21,7 +23,7 @@ Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps
 - **Scheduled jobs**: Run any tests in recurring mode by cron expression.
 - **3rd partry metrics**:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.
 - **Rich UI**: Predator offers rich UI side by side powerful REST API.
-- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as it's engine to fire the requests. The schema of creating tests via api is based on artillery schema.
+- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as its load engine to fire the requests. The schema of creating tests via api is based on artillery schema.
 
 
 ## Getting Started
@@ -61,10 +63,14 @@ Run `npm test` in order to run tests in your local machine. The script runs the 
 The path for accessing the Predator UI is: http://localhost/ui (in the case that Predator is running locally under port 80)
 <br>
 
-In case Predator is not running under the root domain, (for example, running under http://localhost/example-path) in order to access the UI follow the below steps:
+In case Predator is not running under the root domain, (for example, running under http://your.domain.com/example-path) in order to access the UI follow the below steps:
 1. `docker build --build-arg BUCKET_PATH=example-path . -t predator`
-2. `docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock predator`
-3. Access the Predator UI at http://localhost/example-path/ui
+2. Deploy the tagged docker image to your preferred platform
+3. Access the Predator UI at http://your.domain.com/example-path/ui
+
+![](https://zooz.github.io/predator/img/tests.png)
+![](https://zooz.github.io/predator/img/report.png)
+
 
 ## Contributing
 
