@@ -26,9 +26,9 @@ export function * getTests () {
   }
 }
 
-export function* getTest({testId, instance}) {
+export function* getTest({testId}) {
   try {
-    const test = yield call(getTestFromFramework, testId, token, instance);
+    const test = yield call(getTestFromFramework, testId, token);
     yield put(Actions.getTestSuccess(test.data))
 
   } catch (e) {
