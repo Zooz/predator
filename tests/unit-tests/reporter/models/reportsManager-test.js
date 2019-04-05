@@ -20,54 +20,19 @@ const REPORT = {
     'test_name': 'test name',
     'report_url': 'http://www.zooz.com',
     'status': constants.REPORT_INITIALIZING_STATUS,
-    'last_stats': JSON.stringify({
-        'timestamp': '2018-05-28T15:40:10.044Z',
-        'scenariosCreated': 289448,
-        'scenariosCompleted': 289447,
-        'requestsCompleted': 694611,
-        'latency': {
-            'min': 6.3,
-            'max': 3822.8,
-            'median': 58.8,
-            'p95': 115.5,
-            'p99': 189.4
-        },
-        'rps': {
-            'count': 694611,
-            'mean': 178.61
-        },
-        'scenarioDuration': {
-            'min': 80.4,
-            'max': 5251.7,
-            'median': 146.8,
-            'p95': 244.4,
-            'p99': 366.6
-        },
-        'scenarioCounts': {
-            'Create token and get token': 173732,
-            'Create token, create customer and assign token to customer': 115716
-        },
-        'errors': { EAI_AGAIN: 112, NOTREACH: 123 },
-        'codes': {
-            '200': 173732,
-            '201': 520878,
-            '503': 1
-        },
-        'matches': 0,
-        'customStats': {},
-        'concurrency': 1510,
-        'pendingRequests': 1471
-    }),
-    'end_time': 1527533519591,
     'start_time': 1527533459591,
     'grafana_report': 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
     'subscribers': [
         {
             'runner_id': '1234',
-            'stage': constants.SUBSCRIBER_STARTED_STAGE,
+            'phase_status': constants.SUBSCRIBER_STARTED_STAGE,
             'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
         }
-    ]
+    ],
+    'test_configuration': JSON.stringify({
+        duration: 10
+    }),
+    last_updated_at: Date.now()
 };
 
 const JOB = {
@@ -142,7 +107,7 @@ describe('Reports manager tests', function () {
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
-            should(report.grafana_report).eql(REPORT.grafana_report);
+            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&from=1527533459591');
         });
 
         it('Database connector returns an array with one report without grafana url configured', async () => {
@@ -169,6 +134,167 @@ describe('Reports manager tests', function () {
                 should(e.message).eql('Report not found');
                 should(e.statusCode).eql(404);
             }
+        });
+    });
+
+    describe('Report status', function () {
+        describe('No parallelism', function () {
+            let testReport;
+            before(() => {
+                testReport = Object.assign({}, REPORT);
+                should(testReport.subscribers.length).eql(1);
+            });
+
+            it('Report should be started', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_STARTED_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_STARTED_STATUS);
+                should.not.exist(report.end_time);
+            });
+            it('Report should be in progress', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_IN_PROGRESS_STATUS);
+                should.not.exist(report.end_time);
+            });
+            it('Report should be in progress', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_INTERMEDIATE_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_IN_PROGRESS_STATUS);
+                should.not.exist(report.end_time);
+            });
+            it('Report should be finished', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_DONE_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_FINISHED_STATUS);
+                should.exist(report.end_time);
+            });
+            it('Report should be aborted', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_ABORTED_STATUS);
+                should.exist(report.end_time);
+            });
+            it('Report should be failed', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_FAILED_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_FAILED_STATUS);
+                should.exist(report.end_time);
+            });
+        });
+        describe('With parallelism', function () {
+            let testReport;
+            before(() => {
+                testReport = Object.assign({}, REPORT);
+                let secondSubscriber = Object.assign({}, testReport.subscribers[0]);
+                testReport.subscribers.push(secondSubscriber);
+                should(testReport.subscribers.length).eql(2);
+            });
+
+            it('Report should be started', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_STARTED_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_STARTED_STATUS);
+                should.not.exist(report.end_time);
+            });
+            it('Report should be in progress', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_IN_PROGRESS_STATUS);
+                should.not.exist(report.end_time);
+            });
+            it('Report should be in progress', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_INTERMEDIATE_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_IN_PROGRESS_STATUS);
+                should.not.exist(report.end_time);
+            });
+            it('Report should be finished', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_DONE_STAGE;
+                testReport.subscribers[1].phase_status = constants.SUBSCRIBER_DONE_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_FINISHED_STATUS);
+                should.exist(report.end_time);
+            });
+            it('Report should be aborted', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
+                testReport.subscribers[1].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_ABORTED_STATUS);
+                should.exist(report.end_time);
+            });
+            it('Report should be failed', async () => {
+                testReport.subscribers[0].phase_status = constants.SUBSCRIBER_FAILED_STAGE;
+                testReport.subscribers[1].phase_status = constants.SUBSCRIBER_FAILED_STAGE;
+                databaseGetReportStub.resolves([testReport]);
+                const report = await manager.getReport();
+                should(report.status).eql(constants.REPORT_FAILED_STATUS);
+                should.exist(report.end_time);
+            });
+
+            [constants.SUBSCRIBER_FAILED_STAGE, constants.SUBSCRIBER_ABORTED_STAGE,
+                constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE, constants.SUBSCRIBER_INTERMEDIATE_STAGE,
+                constants.SUBSCRIBER_INITIALIZING_STAGE, constants.SUBSCRIBER_STARTED_STAGE]
+                .forEach((unfinishedSubscriberStage) => {
+                    it('Report should be partially finished with unfinished subscriber stage: ' + unfinishedSubscriberStage, async () => {
+                        testReport.subscribers[0].phase_status = unfinishedSubscriberStage;
+                        testReport.subscribers[1].phase_status = constants.SUBSCRIBER_DONE_STAGE;
+                        databaseGetReportStub.resolves([testReport]);
+                        const report = await manager.getReport();
+                        should(report.status).eql(constants.REPORT_PARTIALLY_FINISHED_STATUS);
+                        should.exist(report.end_time);
+                    });
+                });
+
+            [constants.SUBSCRIBER_FAILED_STAGE, constants.SUBSCRIBER_ABORTED_STAGE,
+                constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE, constants.SUBSCRIBER_INTERMEDIATE_STAGE,
+                constants.SUBSCRIBER_INITIALIZING_STAGE, constants.SUBSCRIBER_STARTED_STAGE]
+                .forEach((unfinishedSubscriberStage) => {
+                    it('DELAYED - Report should be partially finished with one unfinished subscriber stage: ' + unfinishedSubscriberStage, (done) => {
+                        manager.__set__('configHandler', {
+                            getConfig: () => {
+                                return { minimum_wait_for_delayed_report_status_update_in_ms: 10 };
+                            }
+                        });
+                        setTimeout(async () => {
+                            testReport.subscribers[0].phase_status = unfinishedSubscriberStage;
+                            testReport.subscribers[1].phase_status = constants.SUBSCRIBER_DONE_STAGE;
+                            databaseGetReportStub.resolves([testReport]);
+                            const report = await manager.getReport();
+                            should(report.status).eql(constants.REPORT_PARTIALLY_FINISHED_STATUS);
+                            should.exist(report.end_time);
+                            done();
+                        }, 100);
+                    });
+                });
+
+            it('DELAYED - Report should be failed - no subscribers finished', function (done) {
+                manager.__set__('configHandler', {
+                    getConfig: () => {
+                        return { minimum_wait_for_delayed_report_status_update_in_ms: 10 };
+                    }
+                });
+                setTimeout(async () => {
+                    testReport.subscribers[0].phase_status = constants.SUBSCRIBER_STARTED_STAGE;
+                    testReport.subscribers[1].phase_status = constants.SUBSCRIBER_INTERMEDIATE_STAGE;
+                    databaseGetReportStub.resolves([testReport]);
+                    const report = await manager.getReport();
+                    should(report.status).eql(constants.REPORT_FAILED_STATUS);
+                    should.exist(report.end_time);
+                    done();
+                }, 100);
+            });
         });
     });
 
