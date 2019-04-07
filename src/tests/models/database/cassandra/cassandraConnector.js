@@ -124,6 +124,7 @@ function sanitizeTestResult(data) {
     const result = data.map(function (row) {
         row.artillery_json = JSON.parse(row.artillery_json);
         row.raw_data = JSON.parse(row.raw_data);
+        row.file_id = row.file_id || undefined;
         return row;
     });
     return result;

@@ -278,6 +278,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  '/v1/tests/file/{file_id}':
+    get:
+      operationId: retrieve-a-file
+      tags:
+        - Tests
+      summary: Retrieve a file encoding to base 64
+      description: Retrieve a specific f.
+      parameters:
+        - in: path
+          name: file_id
+          description: The file id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}':
     get:
       operationId: retrieve-a-test
@@ -1168,6 +1205,9 @@ components:
         description:
           type: string
           description: The description of the test.
+        file_id:
+          type: string
+          description: File id.
     dsl_test_response:
       type: object
       description: A test that is made of scenarios base on domain specific language

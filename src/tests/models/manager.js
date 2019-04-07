@@ -25,7 +25,6 @@ async function upsertTest(testRawData, existingTestId) {
 async function getTest(testId) {
     const result = await database.getTest(testId);
     if (result) {
-        handleFileIdValue(result);
         result.artillery_test = result.artillery_json;
         delete result.artillery_json;
         return result;
@@ -40,7 +39,6 @@ async function getAllTestRevisions(testId) {
     const rows = await database.getAllTestRevisions(testId);
     const testRevisions = [];
     rows.forEach(function (row) {
-        handleFileIdValue(row);
         row.artillery_test = row.artillery_json;
         delete row.artillery_json;
         testRevisions.push(row);
@@ -54,17 +52,10 @@ async function getAllTestRevisions(testId) {
     }
 }
 
-function handleFileIdValue(data) {
-    if (!data.file_id) {
-        delete data.file_id;
-    }
-}
-
 async function getTests() {
     const rows = await database.getTests();
     const testsById = {};
     rows.forEach(function (row) {
-        handleFileIdValue(row);
         if (!testsById[row.id] || row.updated_at > testsById[row.id].updated_at) {
             testsById[row.id] = row;
         }

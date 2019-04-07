@@ -6,7 +6,7 @@ JSCK.Draft4 = JSCK.draft4;
 let artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const requestSender = require('./helpers/requestCreator');
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
-const fileUrl = 'https://sample-videos.com/text/Sample-text-file-10kb.txt';
+const fileUrl = 'https://raw.githubusercontent.com/Zooz/predator/master/README.md';
 describe('the tests api', function() {
     this.timeout(5000000);
     let simpleTest;
