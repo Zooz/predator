@@ -7,10 +7,11 @@ const configValues = require('../../../src/common/consts').CONFIG;
 
 const defaultBody = {
     internal_address: 'http://localhost:80',
-    docker_name: 'zooz/predator-runner:latest',
+    runner_docker_image: 'zooz/predator-runner:latest',
     job_platform: process.env.JOB_PLATFORM || 'DOCKER',
     runner_cpu: 1,
-    runner_memory: 2048,
+    runner_memory: 256,
+    delay_runner_ms: 0,
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 const updateBodyWithTypes = {
@@ -39,8 +40,9 @@ const requestBody =
     {
         grafana_url: 'string_value_grafana_url',
         internal_address: 'string_value_internal_address',
-        docker_name: 'string_value_docker_name',
+        runner_docker_image: 'string_value_docker_name',
         job_platform: 'string_value_job_platform',
+        delay_runner_ms: 0,
         runner_cpu: 0,
         runner_memory: 0,
         metrics_plugin_name: 'prometheus',

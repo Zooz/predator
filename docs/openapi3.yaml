@@ -1561,7 +1561,7 @@ components:
         internal_address:
           type: string
           description: The local ip address of your machine.
-        docker_name:
+        runner_docker_image:
           type: string
           description: The predator-runner docker image that will run the test.
         job_platform:
@@ -1591,6 +1591,11 @@ components:
           type: string
           description: Default webhook url to send live report statistics to, can be
             configured only by using API.
+        delay_runner_ms:
+          type: number
+          description: Delay before the runners will start the test,
+            useful for enviroments like kubernetes with sidecars that should be
+            initilizaed before the runner starts
         influx_metrics:
           additionalProperties: false
           type: object
