@@ -2,7 +2,7 @@
 [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <p align="center">
-  <img width="25%" height="25%" src="https://zooz.github.io/predator/img/mickeythepredator.png">
+  <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/img/mickeythepredator.png">
 </p>
 
 
