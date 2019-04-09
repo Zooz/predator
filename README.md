@@ -31,6 +31,10 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 - **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as its load engine to fire the requests. The schema of creating tests via api is based on artillery schema.
 
 
+## System Overview
+
+![](https://zooz.github.io/predator/img/overviewnobanner.png)
+
 ## Getting Started
 
 ### Kubernetes
