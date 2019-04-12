@@ -94,19 +94,33 @@ async function insertTest(testInfo, testJson, id, revisionId){
 
 async function getTest(id) {
     const test = client.model('test');
-    let allTests = await test.findAll({ where: { test_id: id }, order: [['updated_at', 'DESC'], ['id', 'DESC']] });
+    const options = {
+        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        where: { test_id: id },
+        order: [['updated_at', 'DESC'], ['id', 'DESC']]
+    };
+    let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
     return allTests[0];
 }
 async function getTests() {
     const test = client.model('test');
-    let allTests = await test.findAll({ order: [['updated_at', 'DESC'], ['id', 'DESC']] });
+    const options = {
+        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        order: [['updated_at', 'DESC'], ['id', 'DESC']]
+    };
+    let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
     return allTests;
 }
 async function getAllTestRevisions(id){
     const test = client.model('test');
-    let allTests = await test.findAll({ where: { test_id: id }, order: [['updated_at', 'ASC'], ['id', 'ASC']] });
+    const options = {
+        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        where: { test_id: id },
+        order: [['updated_at', 'ASC'], ['id', 'ASC']]
+    };
+    let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
     return allTests;
 }
@@ -141,14 +155,22 @@ async function insertDslDefinition(dslName, definitionName, data){
 
 async function getDslDefinition(dslName, definitionName){
     const dslDefinition = client.model('dsl_definition');
-    let result = await dslDefinition.findAll({ where: { dsl_name: dslName, definition_name: definitionName } });
+    const options = {
+        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        where: { dsl_name: dslName, definition_name: definitionName }
+    };
+    let result = await dslDefinition.findAll(options);
     result = sanitizeDslResult(result);
     return result[0];
 }
 
 async function getDslDefinitions(dslName){
     const dslDefinition = client.model('dsl_definition');
-    let result = await dslDefinition.findAll({ where: { dsl_name: dslName } });
+    const options = {
+        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        where: { dsl_name: dslName }
+    };
+    let result = await dslDefinition.findAll(options);
     result = sanitizeDslResult(result);
     return result;
 }
@@ -185,7 +207,6 @@ function sanitizeTestResult(data) {
         dataValues.raw_data = JSON.parse(dataValues.raw_data);
         dataValues.id = dataValues.test_id;
         delete dataValues.test_id;
-        delete dataValues.created_at;
         return dataValues;
     });
     return result;

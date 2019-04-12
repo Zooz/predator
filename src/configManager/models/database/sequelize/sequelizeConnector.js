@@ -40,7 +40,7 @@ async function deleteConfig(key) {
 async function getConfig() {
     const configClient = client.model('config');
     const options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: { exclude: ['updatedAt', 'createdAt'] }
     };
     const dbResults = await configClient.findAll(options);
     let resultArr = dbResults.map(result => (result.dataValues));
@@ -50,10 +50,10 @@ async function getConfig() {
 async function getConfigValue(configValue) {
     const configClient = client.model('config');
     const options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: { exclude: ['updatedAt', 'createdAt'] }
     };
     options.where = { key: configValue };
-    let dbResult = await configClient.find(options);
+    let dbResult = await configClient.findOne(options);
     return dbResult || [];
 }
 

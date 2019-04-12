@@ -119,7 +119,7 @@ async function getReportsAndParse(query) {
     const report = client.model('report');
 
     let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] },
+        attributes: { exclude: ['updatedAt', 'createdAt'] },
         include: [report.subscriber]
     };
 
@@ -162,7 +162,7 @@ async function getStatsAndParse(query) {
     const stats = client.model('stats');
 
     let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: { exclude: ['updatedAt', 'createdAt'] }
     };
 
     Object.assign(options, query);
