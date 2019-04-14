@@ -1,13 +1,13 @@
 # Predator
-[![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## Next generation open source performance testing platform for APIs.
+[![Known Vulnerabilities](https://snyk.io/test/github/zooz/predator/badge.svg)](https://snyk.io/test/github/zooz/predator) [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![](https://zooz.github.io/predator/img/predator-screens.gif)
+
+
 
 <p align="center">
-  <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/img/mickeythepredator.png">
+  <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/img/mickeythepredator-logo.png">
 </p>
-
-
-
-Predator is the next generation open source performance testing platform for APIs.
 
 Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
 
@@ -76,10 +76,6 @@ In case Predator is not running under the root domain, (for example, running und
 1. `docker build --build-arg BUCKET_PATH=example-path . -t predator`
 2. Deploy the tagged docker image to your preferred platform
 3. Access the Predator UI at http://your.domain.com/example-path/ui
-
-![](https://zooz.github.io/predator/img/tests.png)
-![](https://zooz.github.io/predator/img/report.png)
-
 
 ## Contributing
 
