@@ -1,8 +1,8 @@
 # Predator
-# Next generation open source performance testing platform for APIs.
-![](https://zooz.github.io/predator/img/tests.png)
-
+## Next generation open source performance testing platform for APIs.
 [![Known Vulnerabilities](https://snyk.io/test/github/zooz/predator/badge.svg)](https://snyk.io/test/github/zooz/predator) [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![](https://zooz.github.io/predator/img/predator.gif)
+
 
 
 <p align="center">
