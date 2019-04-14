@@ -205,16 +205,16 @@ describe('Sequelize client tests', function () {
                         dataValues: {
                             'id': '8138e406-0d5f-4caf-a143-a758b9545b75',
                             'url': 'https://hooks.slack.com/services/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',
-                            'createdAt': '2019-01-20T12:56:31.000Z',
-                            'updatedAt': '2019-01-20T12:56:31.000Z',
+                            'created_at': '2019-01-20T12:56:31.000Z',
+                            'updated_at': '2019-01-20T12:56:31.000Z',
                             'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }, {
                         dataValues: {
                             'id': 'e38b985f-efec-4315-93bf-6f04eb2b7438',
                             'url': 'http://www.one.com',
-                            'createdAt': '2019-01-20T12:56:31.000Z',
-                            'updatedAt': '2019-01-20T12:56:31.000Z',
+                            'created_at': '2019-01-20T12:56:31.000Z',
+                            'updated_at': '2019-01-20T12:56:31.000Z',
                             'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }],
@@ -222,16 +222,16 @@ describe('Sequelize client tests', function () {
                         dataValues: {
                             'id': '8bd6a285-9d9f-4e07-a8e3-387f5936c347',
                             'address': 'eli.nudler@zooz.com',
-                            'createdAt': '2019-01-20T12:56:31.000Z',
-                            'updatedAt': '2019-01-20T12:56:31.000Z',
+                            'created_at': '2019-01-20T12:56:31.000Z',
+                            'updated_at': '2019-01-20T12:56:31.000Z',
                             'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }, {
                         dataValues: {
                             'id': 'edc77399-ea72-4b0a-97da-c6169e59bb52',
                             'address': 'xyz@om.ds',
-                            'createdAt': '2019-01-20T12:56:31.000Z',
-                            'updatedAt': '2019-01-20T12:56:31.000Z',
+                            'created_at': '2019-01-20T12:56:31.000Z',
+                            'updated_at': '2019-01-20T12:56:31.000Z',
                             'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }]
@@ -324,16 +324,16 @@ describe('Sequelize client tests', function () {
                         dataValues: {
                             'id': '8138e406-0d5f-4caf-a143-a758b9545b75',
                             'url': 'https://hooks.slack.com/services/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',
-                            'createdAt': '2019-01-20T12:56:31.000Z',
-                            'updatedAt': '2019-01-20T12:56:31.000Z',
+                            'created_at': '2019-01-20T12:56:31.000Z',
+                            'updated_at': '2019-01-20T12:56:31.000Z',
                             'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }, {
                         dataValues: {
                             'id': 'e38b985f-efec-4315-93bf-6f04eb2b7438',
                             'url': 'http://www.one.com',
-                            'createdAt': '2019-01-20T12:56:31.000Z',
-                            'updatedAt': '2019-01-20T12:56:31.000Z',
+                            'created_at': '2019-01-20T12:56:31.000Z',
+                            'updated_at': '2019-01-20T12:56:31.000Z',
                             'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }],
@@ -341,16 +341,16 @@ describe('Sequelize client tests', function () {
                         dataValues: {
                             'id': '8bd6a285-9d9f-4e07-a8e3-387f5936c347',
                             'address': 'eli.nudler@zooz.com',
-                            'createdAt': '2019-01-20T12:56:31.000Z',
-                            'updatedAt': '2019-01-20T12:56:31.000Z',
+                            'created_at': '2019-01-20T12:56:31.000Z',
+                            'updated_at': '2019-01-20T12:56:31.000Z',
                             'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }, {
                         dataValues: {
                             'id': 'edc77399-ea72-4b0a-97da-c6169e59bb52',
                             'address': 'xyz@om.ds',
-                            'createdAt': '2019-01-20T12:56:31.000Z',
-                            'updatedAt': '2019-01-20T12:56:31.000Z',
+                            'created_at': '2019-01-20T12:56:31.000Z',
+                            'updated_at': '2019-01-20T12:56:31.000Z',
                             'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }]
@@ -381,8 +381,8 @@ describe('Sequelize client tests', function () {
             should(sequelizeGetStub.args[0][0]).eql({
                 'attributes': {
                     'exclude': [
-                        'updatedAt',
-                        'createdAt'
+                        'updated_at',
+                        'created_at'
                     ]
                 },
                 'include': [

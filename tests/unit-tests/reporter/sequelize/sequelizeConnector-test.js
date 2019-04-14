@@ -276,8 +276,8 @@ describe('Sequelize client tests', function () {
             should(sequelizeGetStub.args[0][0]).containEql({
                 'attributes': {
                     'exclude': [
-                        'updatedAt',
-                        'createdAt'
+                        'updated_at',
+                        'created_at'
                     ]
                 },
                 'where': {
@@ -364,8 +364,8 @@ describe('Sequelize client tests', function () {
             should(sequelizeGetStub.args[0][0]).eql({
                 'attributes': {
                     'exclude': [
-                        'updatedAt',
-                        'createdAt'
+                        'updated_at',
+                        'created_at'
                     ]
                 },
                 'where': {

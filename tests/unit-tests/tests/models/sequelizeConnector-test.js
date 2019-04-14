@@ -13,8 +13,7 @@ describe('Testing sequelize connector', function () {
         destroyStub,
         findAllStub,
         updateStub,
-        authenticateStub,
-        updatedAtDate;
+        authenticateStub;
     before(async function () {
         sandbox = sinon.sandbox.create();
         syncStub = sandbox.stub();
@@ -93,8 +92,7 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'created_at'
                             ]
                         },
                         'order': [
@@ -133,8 +131,7 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'created_at'
                             ]
                         },
                         'order': [
@@ -169,8 +166,7 @@ describe('Testing sequelize connector', function () {
                         {
                             'attributes': {
                                 'exclude': [
-                                    'updatedAt',
-                                    'createdAt'
+                                    'created_at'
                                 ]
                             },
                             'order': [
@@ -207,8 +203,7 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'created_at'
                             ]
                         },
                         'order': [
@@ -258,8 +253,7 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'created_at'
                             ]
                         },
                         'order': [
@@ -294,8 +288,7 @@ describe('Testing sequelize connector', function () {
                         {
                             'attributes': {
                                 'exclude': [
-                                    'updatedAt',
-                                    'createdAt'
+                                    'created_at'
                                 ]
                             },
                             'order': [
@@ -332,8 +325,7 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'created_at'
                             ]
                         },
                         'order': [
@@ -380,8 +372,7 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'created_at'
                             ]
                         },
                         'order': [
@@ -413,8 +404,7 @@ describe('Testing sequelize connector', function () {
                         {
                             'attributes': {
                                 'exclude': [
-                                    'updatedAt',
-                                    'createdAt'
+                                    'created_at'
                                 ]
                             },
                             'order': [
@@ -541,8 +531,8 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'updated_at',
+                                'created_at'
                             ]
                         },
                         'where': {
@@ -564,8 +554,8 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'updated_at',
+                                'created_at'
                             ]
                         },
                         'where': {
@@ -591,8 +581,8 @@ describe('Testing sequelize connector', function () {
                         {
                             'attributes': {
                                 'exclude': [
-                                    'updatedAt',
-                                    'createdAt'
+                                    'updated_at',
+                                    'created_at'
                                 ]
                             },
                             'where': {
@@ -617,8 +607,8 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'updated_at',
+                                'created_at'
                             ]
                         },
                         'where': {
@@ -650,8 +640,8 @@ describe('Testing sequelize connector', function () {
                     {
                         'attributes': {
                             'exclude': [
-                                'updatedAt',
-                                'createdAt'
+                                'updated_at',
+                                'created_at'
                             ]
                         },
                         'where': {
@@ -676,8 +666,8 @@ describe('Testing sequelize connector', function () {
                         {
                             'attributes': {
                                 'exclude': [
-                                    'updatedAt',
-                                    'createdAt'
+                                    'updated_at',
+                                    'created_at'
                                 ]
                             },
                             'where': {

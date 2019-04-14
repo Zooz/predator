@@ -110,16 +110,16 @@ describe('Cassandra client tests', function () {
         it('should succeed to get  multiple configs', async () => {
             sequelizeGetStub.resolves([]);
             await sequelizeConnector.getConfig();
-            should(sequelizeGetStub.args[0][0].attributes.exclude[0]).eql('updatedAt');
-            should(sequelizeGetStub.args[0][0].attributes.exclude[1]).eql('createdAt');
+            should(sequelizeGetStub.args[0][0].attributes.exclude[0]).eql('updated_at');
+            should(sequelizeGetStub.args[0][0].attributes.exclude[1]).eql('created_at');
         });
     });
     describe('Get  config value with no data ', () => {
         it('should succeed to get  multiple configs', async () => {
             sequelizeGetStub.resolves([]);
             await sequelizeConnector.getConfigValue('key_value');
-            should(sequelizeGeValueetStub.args[0][0].attributes.exclude[0]).eql('updatedAt');
-            should(sequelizeGeValueetStub.args[0][0].attributes.exclude[1]).eql('createdAt');
+            should(sequelizeGeValueetStub.args[0][0].attributes.exclude[0]).eql('updated_at');
+            should(sequelizeGeValueetStub.args[0][0].attributes.exclude[1]).eql('created_at');
             should(sequelizeGeValueetStub.args[0][0].where.key).eql('key_value');
         });
     });

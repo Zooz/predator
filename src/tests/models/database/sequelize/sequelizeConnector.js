@@ -95,7 +95,7 @@ async function insertTest(testInfo, testJson, id, revisionId){
 async function getTest(id) {
     const test = client.model('test');
     const options = {
-        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        attributes: { exclude: ['created_at'] },
         where: { test_id: id },
         order: [['updated_at', 'DESC'], ['id', 'DESC']]
     };
@@ -106,7 +106,7 @@ async function getTest(id) {
 async function getTests() {
     const test = client.model('test');
     const options = {
-        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        attributes: { exclude: ['created_at'] },
         order: [['updated_at', 'DESC'], ['id', 'DESC']]
     };
     let allTests = await test.findAll(options);
@@ -116,7 +116,7 @@ async function getTests() {
 async function getAllTestRevisions(id){
     const test = client.model('test');
     const options = {
-        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        attributes: { exclude: ['created_at'] },
         where: { test_id: id },
         order: [['updated_at', 'ASC'], ['id', 'ASC']]
     };
@@ -156,7 +156,7 @@ async function insertDslDefinition(dslName, definitionName, data){
 async function getDslDefinition(dslName, definitionName){
     const dslDefinition = client.model('dsl_definition');
     const options = {
-        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        attributes: { exclude: ['updated_at', 'created_at'] },
         where: { dsl_name: dslName, definition_name: definitionName }
     };
     let result = await dslDefinition.findAll(options);
@@ -167,7 +167,7 @@ async function getDslDefinition(dslName, definitionName){
 async function getDslDefinitions(dslName){
     const dslDefinition = client.model('dsl_definition');
     const options = {
-        attributes: { exclude: ['updatedAt', 'createdAt'] },
+        attributes: { exclude: ['updated_at', 'created_at'] },
         where: { dsl_name: dslName }
     };
     let result = await dslDefinition.findAll(options);
