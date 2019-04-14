@@ -41,7 +41,7 @@ describe('Cassandra client tests', function () {
             key: {},
             value: {},
             findAll: sequelizeGetStub,
-            find: sequelizeGeValueetStub,
+            findOne: sequelizeGeValueetStub,
             destroy: sequelizeDeleteStub,
             upsert: sequelizeUpsertStub
         });

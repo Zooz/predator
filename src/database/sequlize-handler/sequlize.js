@@ -32,11 +32,13 @@ module.exports.closeConnection = () => {
 async function createClient() {
     let options = {
         dialect: databaseConfig.type.toLowerCase(),
-        define: {
-            underscored: true
-        },
         logging: false,
-        host: databaseConfig.address
+        host: databaseConfig.address,
+        define: {
+            underscored: true,
+            createdAt: 'created_at',
+            updatedAt: 'updated_at'
+        }
     };
 
     if (databaseConfig.type === 'SQLITE') {
