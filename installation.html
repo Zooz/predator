@@ -89,12 +89,11 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 <p>Before Predator, running two or more tests simultaneously was limited due to third party limitations. Now, you are able to scale tests using our own resources. With support for both Kubernetes and Metronome, all you need to do is provide the platform configuration, sit back, and let Predator deploy runners that load your API from your chosen platform. </p>
 <p>You're probably eager to get your hands dirty, so let's go ahead and install Predator.</p>
 <h2 id="kubernetes">Kubernetes<a class="headerlink" href="#kubernetes" title="Permanent link">#</a></h2>
-<p>Predator is designed to seamlessly deploy into your Kubernetes cluster. This is done with helm charts. For this, run the following command:</p>
-<pre class="codehilite"><code>helm repo add zooz https://zooz.github.io/helm/</code></pre>
-
-<p>After successfully adding the above repository, follow the simple guidelines in the <a href="https://zooz.github.io/helm/predator/">README</a> to configure the appropriate variables.</p>
+<p>Install Predator from the <a href="https://hub.helm.sh/charts/zooz/predator">Helm Hub</a>  </p>
 <h2 id="dcos">DC/OS<a class="headerlink" href="#dcos" title="Permanent link">#</a></h2>
-<p>Predator has a <a href="https://github.com/mesosphere/universe/pull/2229">PR</a> open waiting for approval to be included in the Mesosphere Universe.</p>
+<p>Predator can be installed through DC/OS Universe within the cluster.
+<br>
+For examples and more info check <a href="https://universe.dcos.io/#/package/predator/version/latest">Universe Catalog</a></p>
 <h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">#</a></h2>
 <p>Predator runs using Docker. In order to run Predator locally, clone the <a href="https://github.com/Zooz/predator">repository</a> and run the following command:</p>
 <p><code>runPredatorLocal.sh</code></p>
