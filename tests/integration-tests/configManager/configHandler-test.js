@@ -33,7 +33,7 @@ const updateBodyWithTypes = {
         password: 'string_value',
         timeout: 2
     },
-    runner_memory: 2
+    runner_memory: 256
 };
 
 const requestBody =
@@ -44,7 +44,7 @@ const requestBody =
         job_platform: 'string_value_job_platform',
         delay_runner_ms: 0,
         runner_cpu: 0,
-        runner_memory: 0,
+        runner_memory: 256,
         metrics_plugin_name: 'prometheus',
         default_email_address: 'string_value_default_email_address',
         default_webhook_url: 'string_value_default_webhook_url',
@@ -149,6 +149,25 @@ describe('update and get config', () => {
             let response = await configRequestCreator.updateConfig(requestBodyNotValidType);
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);
+        });
+    });
+
+    describe('Update config with values below minimum', () => {
+        it('params below minimum', async () => {
+            let response = await configRequestCreator.updateConfig({
+                runner_memory: 100,
+                runner_cpu: -1,
+                minimum_wait_for_delayed_report_status_update_in_ms: -1,
+                delay_runner_ms: -1
+            });
+            should(response.statusCode).eql(400);
+            should(response.body.message).eql(validationError);
+            should(response.body.validation_errors).eql([
+                'body/runner_cpu should be >= 0',
+                'body/runner_memory should be >= 128',
+                'body/minimum_wait_for_delayed_report_status_update_in_ms should be >= 0',
+                'body/delay_runner_ms should be >= 0'
+            ]);
         });
     });
 });

@@ -6,7 +6,7 @@ const schedulerSequlizeConnector = require('../../jobs/models/database/sequelize
 const reportsSequlizeConnector = require('../../reports/models/database/sequelize/sequelizeConnector');
 const testsSequlizeConnector = require('../../tests/models/database/sequelize/sequelizeConnector');
 const configSequlizeConnector = require('../../configManager/models/database/sequelize/sequelizeConnector');
-
+const logger = require('../../../src/common/logger');
 const databaseConfig = require('../../config/databaseConfig');
 const Sequelize = require('sequelize');
 let sequlizeClient;
@@ -70,5 +70,11 @@ async function runSequlizeMigrations() {
         }
     });
 
-    await umzug.up();
+    try {
+        await umzug.up();
+    } catch (error) {
+        logger.error(error, 'Failed to run sequlize migration, doing rollback');
+        await umzug.down();
+        throw error;
+    }
 }

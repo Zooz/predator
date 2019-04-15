@@ -1576,10 +1576,12 @@ components:
           type: string
           description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)
         runner_cpu:
+          minimum: 0
           type: number
           description: Number of CPU use by the each runner.
         runner_memory:
           type: number
+          minimum: 128
           description: Max memory to use by each runner.
         metrics_plugin_name:
           type: string
@@ -1592,6 +1594,7 @@ components:
           description: Default email to send final report to, address can be configured
             only by using API.
         minimum_wait_for_delayed_report_status_update_in_ms:
+          minimum: 0
           type: number
           description: The minimum of time waiting for runner to report before the test considered as finished.
             configured only by using API.
@@ -1601,9 +1604,10 @@ components:
             configured only by using API.
         delay_runner_ms:
           type: number
+          minimum: 0
           description: Delay before the runners will start the test,
             useful for enviroments like kubernetes with sidecars that should be
-            initilizaed before the runner starts
+            initialized before the runner starts
         influx_metrics:
           additionalProperties: false
           type: object
