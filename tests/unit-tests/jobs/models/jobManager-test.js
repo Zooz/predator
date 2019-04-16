@@ -134,7 +134,8 @@ describe('Manager tests', function () {
             getConfig: () => {
                 return {
                     job_platform: 'KUBERNETES',
-                    concurrency_limit: 100
+                    concurrency_limit: 100,
+                    delay_runner_ms: 0
                 };
             }
         });
@@ -195,7 +196,8 @@ describe('Manager tests', function () {
                     return {
                         job_platform: 'KUBERNETES',
                         base_url: '',
-                        internal_address: 'localhost:80'
+                        internal_address: 'localhost:80',
+                        delay_runner_ms: 0
                     };
                 }
             });
@@ -520,7 +522,8 @@ describe('Manager tests', function () {
                     return {
                         job_platform: 'KUBERNETES',
                         base_url: '',
-                        internal_address: 'localhost:80'
+                        internal_address: 'localhost:80',
+                        delay_runner_ms: 0
                     };
                 }
             });
@@ -573,7 +576,8 @@ describe('Manager tests', function () {
                     return {
                         job_platform: 'KUBERNETES',
                         base_url: '',
-                        internal_address: 'localhost:80'
+                        internal_address: 'localhost:80',
+                        delay_runner_ms: 0
                     };
                 }
             });

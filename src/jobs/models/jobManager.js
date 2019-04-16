@@ -190,7 +190,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
         PREDATOR_URL: configData.internal_address,
-        DELAY_RUNNER_MS: configData.delay_runner_ms,
+        DELAY_RUNNER_MS: configData.delay_runner_ms.toString(),
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
         DURATION: jobBody.duration.toString()
     };
