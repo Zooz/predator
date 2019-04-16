@@ -55,7 +55,8 @@ describe('Reports manager tests', function () {
     let databasePostReportStub;
     let databasePostStatsStub;
     let databaseSubscribeRunnerStub;
-    let databaseUpdateSubscribersStub;
+    let databaseUpdateSubscriberStub;
+    let databaseUpdateSubscriberWithStatsStub;
     let databaseUpdateReportStub;
     let getJobStub;
     let configStub;
@@ -70,7 +71,8 @@ describe('Reports manager tests', function () {
         databasePostReportStub = sandbox.stub(databaseConnector, 'insertReport');
         databasePostStatsStub = sandbox.stub(databaseConnector, 'insertStats');
         databaseSubscribeRunnerStub = sandbox.stub(databaseConnector, 'subscribeRunner');
-        databaseUpdateSubscribersStub = sandbox.stub(databaseConnector, 'updateSubscribers');
+        databaseUpdateSubscriberStub = sandbox.stub(databaseConnector, 'updateSubscriber');
+        databaseUpdateSubscriberWithStatsStub = sandbox.stub(databaseConnector, 'updateSubscriberWithStats');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
@@ -352,16 +354,36 @@ describe('Reports manager tests', function () {
     });
 
     describe('Create new stats', function () {
-        it('Stats consumer handles message', async () => {
+        it('Stats consumer handles message with status intermediate', async () => {
             configStub.resolves({});
             databaseGetReportStub.resolves([REPORT]);
             databasePostStatsStub.resolves();
             getJobStub.resolves(JOB);
-            databaseUpdateSubscribersStub.resolves();
             notifierStub.resolves();
             const stats = { phase_status: 'intermediate', data: JSON.stringify({ median: 4 }) };
 
             const statsResponse = await manager.postStats('test_id', stats);
+
+            databaseUpdateSubscriberStub.callCount.should.eql(0);
+            databaseUpdateSubscriberWithStatsStub.callCount.should.eql(1);
+
+            should.exist(statsResponse);
+            statsResponse.should.eql(stats);
+        });
+
+        it('Stats consumer handles message with status done', async () => {
+            configStub.resolves({});
+            databaseGetReportStub.resolves([REPORT]);
+            databasePostStatsStub.resolves();
+            getJobStub.resolves(JOB);
+            notifierStub.resolves();
+            const stats = { phase_status: 'done', data: JSON.stringify({ median: 4 }) };
+
+            const statsResponse = await manager.postStats('test_id', stats);
+
+            databaseUpdateSubscriberStub.callCount.should.eql(1);
+            databaseUpdateSubscriberWithStatsStub.callCount.should.eql(0);
+
             should.exist(statsResponse);
             statsResponse.should.eql(stats);
         });

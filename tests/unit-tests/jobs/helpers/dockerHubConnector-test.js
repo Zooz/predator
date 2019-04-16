@@ -16,8 +16,8 @@ describe('Docker hub connector tests', () => {
 
     beforeEach(() => {
         dockerHubConnector.__set__('configHandler', {
-            getConfig: () => {
-                return { docker_name: 'runner' };
+            getConfigValue: () => {
+                return 'runner';
             }
         });
         sandbox.resetHistory();
@@ -29,8 +29,8 @@ describe('Docker hub connector tests', () => {
 
     it('Docker version is provided, no need to fetch latest version', async () => {
         dockerHubConnector.__set__('configHandler', {
-            getConfig: () => {
-                return { docker_name: 'zooz/predator-runner:1.0.0' };
+            getConfigValue: () => {
+                return 'zooz/predator-runner:1.0.0';
             }
         });
         let newestTag = await dockerHubConnector.getMostRecentRunnerTag();

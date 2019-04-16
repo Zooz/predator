@@ -11,8 +11,9 @@ module.exports = {
 
     CONFIG: {
         GRFANA_URL: 'grafana_url',
+        DELAY_RUNNER_MS: 'delay_runner_ms',
         INTERNAL_ADDRESS: 'internal_address',
-        DOCKER_NAME: 'docker_name',
+        RUNNER_DOCKER_IMAGE: 'runner_docker_image',
         JOB_PLATFORM: 'job_platform',
         RUNNER_CPU: 'runner_cpu',
         RUNNER_MEMORY: 'runner_memory',

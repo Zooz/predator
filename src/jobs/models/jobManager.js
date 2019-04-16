@@ -155,7 +155,9 @@ function createResponse(jobId, jobBody, runId) {
         arrival_rate: jobBody.arrival_rate,
         duration: jobBody.duration,
         environment: jobBody.environment,
-        notes: jobBody.notes
+        notes: jobBody.notes,
+        proxy_url: jobBody.proxy_url,
+        debug: jobBody.debug
     };
 
     Object.keys(response).forEach(key => {
@@ -188,6 +190,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
         PREDATOR_URL: configData.internal_address,
+        DELAY_RUNNER_MS: configData.delay_runner_ms,
         ARRIVAL_RATE: arrivalRatePerRunner.toString(),
         DURATION: jobBody.duration.toString()
     };
@@ -201,6 +204,12 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(metricsExport).toString('base64');
     }
 
+    if (jobBody.proxy_url) {
+        environmentVariables.PROXY_URL = jobBody.proxy_url;
+    }
+    if (jobBody.debug) {
+        environmentVariables.DEBUG = jobBody.debug;
+    }
     if (jobBody.emails) {
         environmentVariables.EMAILS = jobBody.emails.join(';');
     }

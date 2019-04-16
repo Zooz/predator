@@ -72,7 +72,12 @@ module.exports.postReport = async (testId, reportBody) => {
 module.exports.postStats = async (report, stats) => {
     const statsParsed = JSON.parse(stats.data);
     const statsTime = statsParsed.timestamp;
-    await databaseConnector.updateSubscribers(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
+
+    if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE) {
+        await databaseConnector.updateSubscriber(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
+    } else {
+        await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
+    }
 
     if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
         await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);

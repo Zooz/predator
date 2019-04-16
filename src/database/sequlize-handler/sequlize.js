@@ -1,10 +1,12 @@
 'use strict';
 
+const path = require('path');
+const Umzug = require('umzug');
 const schedulerSequlizeConnector = require('../../jobs/models/database/sequelize/sequelizeConnector');
 const reportsSequlizeConnector = require('../../reports/models/database/sequelize/sequelizeConnector');
 const testsSequlizeConnector = require('../../tests/models/database/sequelize/sequelizeConnector');
 const configSequlizeConnector = require('../../configManager/models/database/sequelize/sequelizeConnector');
-
+const logger = require('../../../src/common/logger');
 const databaseConfig = require('../../config/databaseConfig');
 const Sequelize = require('sequelize');
 let sequlizeClient;
@@ -15,6 +17,7 @@ module.exports.init = async () => {
     await reportsSequlizeConnector.init(sequlizeClient);
     await testsSequlizeConnector.init(sequlizeClient);
     await configSequlizeConnector.init(sequlizeClient);
+    await runSequlizeMigrations();
 };
 
 module.exports.ping = async () => {
@@ -48,4 +51,30 @@ async function createClient() {
     let client = new Sequelize(databaseConfig.name.toLowerCase(), databaseConfig.username, databaseConfig.password, options);
     await client.authenticate();
     return client;
+}
+
+async function runSequlizeMigrations() {
+    const umzug = new Umzug({
+        storage: 'sequelize',
+
+        storageOptions: {
+            sequelize: sequlizeClient
+        },
+
+        migrations: {
+            params: [
+                sequlizeClient.getQueryInterface(),
+                Sequelize
+            ],
+            path: path.join(__dirname, './migrations')
+        }
+    });
+
+    try {
+        await umzug.up();
+    } catch (error) {
+        logger.error(error, 'Failed to run sequlize migration, doing rollback');
+        await umzug.down();
+        throw error;
+    }
 }
