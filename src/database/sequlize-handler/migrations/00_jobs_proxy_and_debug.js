@@ -1,13 +1,19 @@
 const Sequelize = require('sequelize');
 
 module.exports.up = async (query, DataTypes) => {
-    await query.addColumn(
-        'jobs', 'proxy_url',
-        Sequelize.DataTypes.STRING);
+    let jobsTable = await query.describeTable('jobs');
 
-    await query.addColumn(
-        'jobs', 'debug',
-        Sequelize.DataTypes.STRING);
+    if (!jobsTable.proxy_url) {
+        await query.addColumn(
+            'jobs', 'proxy_url',
+            Sequelize.DataTypes.STRING);
+    }
+
+    if (!jobsTable.debug) {
+        await query.addColumn(
+            'jobs', 'debug',
+            Sequelize.DataTypes.STRING);
+    }
 };
 
 module.exports.down = async (query, DataTypes) => {
