@@ -37,6 +37,10 @@
         
         var pageToc = [
           {title: "Introducing Predator", url: "#_top", children: [
+              {title: "Main Features", url: "#main-features" },
+              {title: "UI", url: "#ui" },
+              {title: "Under the hood", url: "#under-the-hood" },
+              {title: "Feature Comparison", url: "#feature-comparison" },
           ]},
         ];
 
@@ -157,7 +161,23 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 <p>Requests per second, request latency, and overall system performance and reliability are some fundamental concepts that need to be taken into account when designing a high capacity API. With CI/CD becoming a common deployment methodology, deployments to production are a constant occurrence. So how can you ensure that the core capabilities you initially designed your system to have remain intact? </p>
 <p>The answer is: use Predator! </p>
 <p>Predator is a performance platform that can be configured to automatically load your API with scheduled tests that provide in-depth performance metrics. While sipping on your (morning) coffee, you can simply check the test summaries to make sure your system is performing as expected. By comparing test results to results from previous test runs, you can easily identify system-wide regressions. Predator’s integration with custom dashboards, test metrics, and service logs make pinpointing performance bugs painless,especially when you check up on the system on a daily basis.</p>
-<p>The following features guided us throughout our development, and they shape the core ideology of Predator.</p>
+<h2 id="main-features">Main Features<a class="headerlink" href="#main-features" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Distributed load</strong>:  Predator supports unlimited number of load generators that produce load concurrently.</li>
+<li><strong>Real time reports</strong>: Predator aggregate all concurrent runs into one beautiful report in real time (latency, rps, status codes and more)</li>
+<li><strong>Built for the cloud</strong>:  Predator is built to take advantage of Kubernetes and DC/OS. it's integrated with those platform and is able to manage the load generators life cycles by it self.</li>
+<li><strong>One click installation</strong>:  Installed via one click in Kubernetes, DC/OS, or any other machine that has Docker.</li>
+<li><strong>Supports 5 Different databases</strong>: Predator can adjust it self to persist data in Cassandra, Postgres, MySQL, MSSQL and SQLITE out of the box.</li>
+<li><strong>Scheduled jobs</strong>: Run any tests in recurring mode by cron expression.</li>
+<li><strong>3rd partry metrics</strong>:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.</li>
+<li><strong>Rich UI</strong>: Predator offers rich UI side by side powerful REST API.</li>
+<li><strong>Based on <a href="https://github.com/artilleryio/artillery">artilliery.io</a></strong>: Predator uses artillery as its load engine to fire the requests. The schema of creating tests via api is based on artillery schema.</li>
+</ul>
+<h2 id="ui">UI<a class="headerlink" href="#ui" title="Permanent link">#</a></h2>
+<p><img src="images/predator-screens.gif"/></p>
+<h2 id="under-the-hood">Under the hood<a class="headerlink" href="#under-the-hood" title="Permanent link">#</a></h2>
+<p><img alt="Screenshot" src="images/predator-overview.png" /></p>
+<h2 id="feature-comparison">Feature Comparison<a class="headerlink" href="#feature-comparison" title="Permanent link">#</a></h2>
 <p><img alt="Screenshot" src="images/features.png" /></p>
 
   <br>
@@ -193,5 +213,5 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 </html>
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-04-15 15:34:23
+Build Date UTC : 2019-04-16 05:49:17
 -->
