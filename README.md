@@ -1,12 +1,12 @@
 # Predator
 ## Next generation open source performance testing platform for APIs.
 [![Known Vulnerabilities](https://snyk.io/test/github/zooz/predator/badge.svg)](https://snyk.io/test/github/zooz/predator) [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-![](https://zooz.github.io/predator/img/predator-screens.gif)
+![](https://zooz.github.io/predator/images/predator-screens.gif)
 
 
 
 <p align="center">
-  <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/img/mickeythepredator-logo.png">
+  <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/images/mickeythepredator-logo.png">
 </p>
 
 Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
@@ -33,7 +33,7 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 
 ## System Overview
 
-![](https://zooz.github.io/predator/img/overviewnobanner.png)
+![](https://zooz.github.io/predator/images/predator-overview.png)
 
 ## Getting Started
 
