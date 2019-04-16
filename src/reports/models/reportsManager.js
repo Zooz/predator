@@ -142,7 +142,7 @@ function getReportResponse(summaryRow, config) {
         report.end_time = report.last_updated_at;
     }
 
-    report.grafana_report = generateGrafanaUrl(summaryRow, config.grafana_url);
+    report.grafana_report = generateGrafanaUrl(report, config.grafana_url);
 
     return report;
 }
