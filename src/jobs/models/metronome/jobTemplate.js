@@ -3,8 +3,8 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
         id: jobName,
         description: 'Runs a performance test',
         run: {
-            cpus: configData['runner_cpu'] || 1,
-            mem: configData['runner_memory'] || 2048,
+            cpus: configData['runner_cpu'],
+            mem: configData['runner_memory'],
             disk: 0,
             maxLaunchDelay: 30,
             docker: {
