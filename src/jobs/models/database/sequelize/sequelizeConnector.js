@@ -168,6 +168,12 @@ async function initSchemas() {
         },
         notes: {
             type: Sequelize.DataTypes.STRING
+        },
+        proxy_url: {
+            type: Sequelize.DataTypes.STRING
+        },
+        debug: {
+            type: Sequelize.DataTypes.STRING
         }
     });
 

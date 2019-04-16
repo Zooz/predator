@@ -89,7 +89,7 @@
     "rewire": "^4.0.1",
     "should": "^13.2.1",
     "sinon": "^4.5.0",
-    "standard-version": "^4.4.0",
+    "standard-version": "^5.0.2",
     "supertest": "^3.4.2"
   },
   "husky": {

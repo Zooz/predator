@@ -11,8 +11,6 @@ module.exports.up = async (query, DataTypes) => {
 };
 
 module.exports.down = async (query, DataTypes) => {
-    await query.sequelize.query([
-        'ALTER TABLE "jobs" DROP COLUMN "proxy_ul";',
-        'ALTER TABLE "jobs" DROP COLUMN "debug";'
-    ].join(''), { raw: true });
+    await query.removeColumn('jobs', 'proxy_url');
+    await query.removeColumn('jobs', 'debug');
 };
