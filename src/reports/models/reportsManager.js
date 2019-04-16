@@ -129,7 +129,6 @@ function getReportResponse(summaryRow, config) {
         parallelism: testConfiguration.parallelism,
         max_virtual_users: testConfiguration.max_virtual_users,
         last_updated_at: summaryRow.last_updated_at,
-        grafana_report: generateGraphanaUrl(summaryRow, config.grafana_url),
         notes: summaryRow.notes,
         environment: testConfiguration.environment,
         subscribers: summaryRow.subscribers,
@@ -142,10 +141,13 @@ function getReportResponse(summaryRow, config) {
     if (FINAL_REPORT_STATUSES_WITH_END_TIME.includes(report.status)) {
         report.end_time = report.last_updated_at;
     }
+
+    report.grafana_report = generateGrafanaUrl(summaryRow, config.grafana_url);
+
     return report;
 }
 
-function generateGraphanaUrl(report, grafanaUrl) {
+function generateGrafanaUrl(report, grafanaUrl) {
     if (grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
         const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
