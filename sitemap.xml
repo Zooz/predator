@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-     <loc>None</loc>
-     <lastmod>2019-04-16</lastmod>
+     <loc>https://zooz.github.io/predator/index.html</loc>
+     <lastmod>2019-04-17</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
-     <lastmod>2019-04-16</lastmod>
+     <loc>https://zooz.github.io/predator/installation.html</loc>
+     <lastmod>2019-04-17</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
-     <lastmod>2019-04-16</lastmod>
+     <loc>https://zooz.github.io/predator/myfirsttest.html</loc>
+     <lastmod>2019-04-17</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
-     <lastmod>2019-04-16</lastmod>
+     <loc>https://zooz.github.io/predator/tests.html</loc>
+     <lastmod>2019-04-17</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
-     <lastmod>2019-04-16</lastmod>
+     <loc>https://zooz.github.io/predator/schedulesandreports.html</loc>
+     <lastmod>2019-04-17</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
-     <lastmod>2019-04-16</lastmod>
+     <loc>https://zooz.github.io/predator/configuration.html</loc>
+     <lastmod>2019-04-17</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
-     <lastmod>2019-04-16</lastmod>
+     <loc>https://zooz.github.io/predator/contributing.html</loc>
+     <lastmod>2019-04-17</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
-     <lastmod>2019-04-16</lastmod>
+     <loc>https://zooz.github.io/predator/apireference.html</loc>
+     <lastmod>2019-04-17</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>
