@@ -7,7 +7,7 @@
 
   {%- block site_meta %}
     <meta name="description" content="Predator manages the lifecycle of load-testing APIs, from creating the tests, to running them on a scheduled and on-demand, and viewing the results in real time">
-    <meta name="keywords" content="performance testing, load testing, continuous integration tools,performance testing tools, load testing tools, load test,software,kuberntes,dcos,docker,stress,api">
+    <meta name="keywords" content="performance testing,load testing,blazemeter,jmeter,performance testing tools,load testing tools,load test,kuberntes,dcos,docker,stress,api">
     <meta name="author" content="ZOOZ">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   {%- endblock %}
 
-  <title>Next generation open source performance testing platform for APIs</title>
+  <title>Next generation distributed open source performance testing platform for APIs</title>
 
   {%- block styles %}
     <link href="{{ base_url }}/css/bootstrap-3.3.7.min.css" rel="stylesheet">
@@ -74,15 +74,15 @@
 
   {%- block analytics %}
     {%- if config.google_analytics %}
-    <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-40865650-2"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-        ga('create', '{{ config.google_analytics[0] }}', '{{ config.google_analytics[1] }}');
-        ga('send', 'pageview');
-    </script>
+      gtag('config', 'UA-40865650-2');
+  </script>
     {%- endif %}
   {%- endblock %}
 

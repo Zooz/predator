@@ -1,4 +1,10 @@
 site_name: Predator
+site_url: https://zooz.github.io/predator
+repo_url: https://github.com/Zooz/predator
+edit_uri: https://github.com/Zooz/predator/blob/master/docs/devguide/docs/
+site_description: Next generation distributed open source performance testing platform for APIs
+site_author: ZOOZ
+google_analytics: ['UA-40865650-2', 'zooz.github.io/predator']
 
 nav:
   - About: index.md
