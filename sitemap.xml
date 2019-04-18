@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-     <loc>https://zooz.github.io/predator/index.html</loc>
-     <lastmod>2019-04-17</lastmod>
+     <loc>http://predator-ng.com/index.html</loc>
+     <lastmod>2019-04-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://zooz.github.io/predator/installation.html</loc>
-     <lastmod>2019-04-17</lastmod>
+     <loc>http://predator-ng.com/installation.html</loc>
+     <lastmod>2019-04-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://zooz.github.io/predator/myfirsttest.html</loc>
-     <lastmod>2019-04-17</lastmod>
+     <loc>http://predator-ng.com/myfirsttest.html</loc>
+     <lastmod>2019-04-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://zooz.github.io/predator/tests.html</loc>
-     <lastmod>2019-04-17</lastmod>
+     <loc>http://predator-ng.com/tests.html</loc>
+     <lastmod>2019-04-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://zooz.github.io/predator/schedulesandreports.html</loc>
-     <lastmod>2019-04-17</lastmod>
+     <loc>http://predator-ng.com/schedulesandreports.html</loc>
+     <lastmod>2019-04-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://zooz.github.io/predator/configuration.html</loc>
-     <lastmod>2019-04-17</lastmod>
+     <loc>http://predator-ng.com/configuration.html</loc>
+     <lastmod>2019-04-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://zooz.github.io/predator/contributing.html</loc>
-     <lastmod>2019-04-17</lastmod>
+     <loc>http://predator-ng.com/contributing.html</loc>
+     <lastmod>2019-04-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://zooz.github.io/predator/apireference.html</loc>
-     <lastmod>2019-04-17</lastmod>
+     <loc>http://predator-ng.com/apireference.html</loc>
+     <lastmod>2019-04-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>
