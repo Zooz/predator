@@ -38,13 +38,7 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 ## Getting Started
 
 ### Kubernetes
-Predator is designed to seamlessly deploy into your Kubernetes cluster. This is done with helm charts. For this, run the following command:
-
-`helm repo add zooz https://zooz.github.io/helm/`
-<br>
-`helm install predator`
-
-<br>follow the simple guidelines in the [README](https://github.com/Zooz/helm/blob/master/predator/README.md) to configure the appropriate variables.
+Predator is designed to seamlessly deploy into your Kubernetes cluster. Install Predator from the [Helm Hub](https://hub.helm.sh/charts/zooz/predator)
 
 ### DC/OS
 Predator is included in Mesosphere Universe. Please refer to https://github.com/dcos/examples/tree/master/predator for a quick start guide and examples for installing the package.
