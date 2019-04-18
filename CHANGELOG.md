@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.9"></a>
+## [1.0.9](https://github.com/Zooz/predator/compare/v1.0.8...v1.0.9) (2019-04-18)
+
+
+### Bug Fixes
+
+* **jobs:** fixing delay_runner_ms to send as env variable string ([8c9d2a2](https://github.com/Zooz/predator/commit/8c9d2a2))
+* **reports:** fixing end time of finished grafana reports ([15ed10f](https://github.com/Zooz/predator/commit/15ed10f))
+* **reports:** fixing end time of finished grafana reports ([316683b](https://github.com/Zooz/predator/commit/316683b))
+* **vulnerabilites:** upgrade sequelize to v5 + fix other vulnerabilities ([#128](https://github.com/Zooz/predator/issues/128)) ([41603b6](https://github.com/Zooz/predator/commit/41603b6))
+
+
+### Features
+
+* **general:** support for proxy url and debug for runners ([#124](https://github.com/Zooz/predator/issues/124)) ([5d554f1](https://github.com/Zooz/predator/commit/5d554f1))
+
+
+
 <a name="1.0.8"></a>
 ## [1.0.8](https://github.com/Zooz/predator/compare/v1.0.7...v1.0.8) (2019-04-05)
 
