@@ -28,4 +28,4 @@ where `$MACHINE_IP` is the local ip address of your machine.
 
 After successfully mounting the Predator docker image, access Predator by typing the following URL in your browser:
 
-```http://{$MACHINE_IP}/predator```
+```http://{$MACHINE_IP}/ui```
