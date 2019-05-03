@@ -1,5 +1,5 @@
 site_name: Predator
-site_url: http://predator-ng.com
+site_url: https://predator-ng.com
 repo_url: https://github.com/Zooz/predator
 edit_uri: https://github.com/Zooz/predator/blob/master/docs/devguide/docs/
 site_description: Next generation distributed open source performance testing platform for APIs
@@ -17,8 +17,8 @@ nav:
   - API Reference: apireference.md
 
 theme:
-   name: windmill
-   custom_dir: 'mkdocs-windmill/mkdocs_windmill'
+   name: material
+   custom_dir: 'material'
 
 use_directory_urls: False
 
@@ -35,4 +35,4 @@ markdown_extensions:
 
 extra:
     version: 1.0
-    logo: logo.png
+    logo: favicon.png

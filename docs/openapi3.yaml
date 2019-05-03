@@ -3,7 +3,7 @@ info:
   version: 1.0.0
   title: Predator
   x-logo:
-    url: logo.png
+    url: favicon.png
     backgroundColor: white
   description: |
     # Overview
