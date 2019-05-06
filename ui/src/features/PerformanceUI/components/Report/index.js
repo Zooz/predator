@@ -46,7 +46,7 @@ class Report extends React.Component {
                     {
                         keys.map((key, index) => {
                             const color = COLORS[index % COLORS.length];
-                            return (<Area key={index} type="monotone" dataKey={key} stackId={1}
+                            return (<Area key={index} type="monotone" dataKey={key}
                                           stroke={color.stroke} fill={color.fill}/>)
                         })
                     }
@@ -73,7 +73,7 @@ class Report extends React.Component {
                     {
                         keys.map((key, index) => {
                             const color = COLORS[index % COLORS.length];
-                            return (<Line key={index} type="monotone" dataKey={key} stackId={index + 1} dot={null}
+                            return (<Line key={index} type="monotone" dataKey={key} dot={null}
                                           stroke={color.stroke}/>)
                         })
                     }
@@ -98,7 +98,7 @@ class Report extends React.Component {
                     {
                         keys.map((key, index) => {
                             const color = COLORS[index % COLORS.length];
-                            return (<Bar barSize={50} key={index} dataKey={key} stackId={index + 1} fill={color.fill}/>)
+                            return (<Bar barSize={50} key={index} dataKey={key} fill={color.fill}/>)
                         })
                     }
                 </BarChart>
