@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "NODE_ENV=production webpack --env --config ./config/webpack.config.js",
-    "start": "webpack-dev-server  --open --history-api-fallback --config ./config/webpack.config.js --devtool eval --hot"
+    "start": "webpack-dev-server  --open --history-api-fallback --config ./config/webpack.config.js --devtool eval --hot",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -94,6 +96,8 @@
     "redux-thunk": "^2.2.0",
     "replace-in-file": "^3.4.3",
     "reselect": "^4.0.0",
-    "uuid": "^3.3.2"
-  }
+    "uuid": "^3.3.2",
+    "snyk": "^1.161.1"
+  },
+  "snyk": true
 }
