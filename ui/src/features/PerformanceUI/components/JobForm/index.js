@@ -53,8 +53,8 @@ class Form extends React.Component {
         width: 350,
         name: 'duration',
         key: 'duration',
-        floatingLabelText: 'Duration (seconds)',
-        info: 'The duration of the test in seconds.'
+        floatingLabelText: 'Duration (Minutes)',
+        info: 'The duration of the test in minutes.'
       },
       {
         width: 350,
@@ -336,7 +336,7 @@ class Form extends React.Component {
       let body = {
         test_id: this.props.data.id,
         arrival_rate: parseInt(this.state.arrival_rate),
-        duration: parseInt(this.state.duration),
+        duration: parseInt(this.state.duration) * 60,
         ramp_to: this.state.ramp_to ? parseInt(this.state.ramp_to) : undefined,
         environment: this.state.environment,
         cron_expression: this.state.cron_expression,

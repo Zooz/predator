@@ -23,9 +23,8 @@ const rules = [
                   {
                     loader: 'css-loader',
                     options: {
-                      minimize: true,
                       modules: true,
-                      import: 1,
+                      import: true,
                       localIdentName: '[name]__[local]___[hash:base64:5]'
                     }
                   },

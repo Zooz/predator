@@ -4,7 +4,6 @@ import * as selectors from './redux/selectors/reportsSelector';
 import {errorOnStopRunningJob, stopRunningJobSuccess} from './redux/selectors/jobsSelector';
 import {tests} from './redux/selectors/testsSelector';
 import Snackbar from 'material-ui/Snackbar';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import style from './style.scss';
 import Dialog from '../components/Dialog';
 import * as Actions from './redux/action';

@@ -1,5 +1,5 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import Snackbar from 'material-ui/Snackbar';
 import {
     job,
@@ -10,18 +10,17 @@ import {
     deleteJobSuccess,
     getJobsWithTestNameAndLastRun
 } from './redux/selectors/jobsSelector';
-import {tests} from './redux/selectors/testsSelector';
-import {reports} from './redux/selectors/reportsSelector';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import { tests } from './redux/selectors/testsSelector';
+import { reports } from './redux/selectors/reportsSelector';
 import style from './style.scss';
 import Dialog from '../components/Dialog';
 import DeleteDialog from '../components/DeleteDialog';
 import * as Actions from './redux/action';
 import Loader from '../components/Loader';
 import Page from '../../../components/Page';
-import {ReactTableComponent} from "../../../components/ReactTable";
-import {getColumns} from "./configurationColumn";
-import _ from "lodash";
+import { ReactTableComponent } from '../../../components/ReactTable';
+import { getColumns } from './configurationColumn';
+import _ from 'lodash';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
@@ -44,32 +43,30 @@ class getJobs extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (prevProps.jobs !== this.props.jobs) {
-            this.setState({sortedJobs: [...this.props.jobs]})
+            this.setState({ sortedJobs: [...this.props.jobs] });
         }
     }
 
     onSearch = (value) => {
         if (!value) {
-            this.setState({sortedJobs: [...this.props.jobs]})
+            this.setState({ sortedJobs: [...this.props.jobs] });
         }
         const newSorted = _.filter(this.props.jobs, (job) => {
-            return (_.includes(String(job.test_name).toLowerCase(),value.toLowerCase()) ||
-                _.includes(String(job.environment).toLowerCase(),value.toLowerCase()))
+            return (_.includes(String(job.test_name).toLowerCase(), value.toLowerCase()) ||
+                _.includes(String(job.environment).toLowerCase(), value.toLowerCase()));
         });
-        this.setState({sortedJobs: newSorted})
+        this.setState({ sortedJobs: newSorted });
     };
-
 
     onDelete = (data) => {
         this.setState({
             deleteDialog: true,
             jobToDelete: data
-        })
+        });
     };
 
     onRawView = (job) => {
-        this.setState({openViewJob: job});
-
+        this.setState({ openViewJob: job });
     };
 
     submitDelete = () => {
@@ -90,7 +87,7 @@ class getJobs extends React.Component {
             deleteDialog: false
         });
 
-        this.props.deleteError ? this.clearDeleteError() : undefined
+        this.props.deleteError ? this.clearDeleteError() : undefined;
     };
 
     closeViewJobDialog = () => {
@@ -100,10 +97,9 @@ class getJobs extends React.Component {
         this.props.clearSelectedJob();
     };
 
-
     componentDidMount() {
         this.loadPageData();
-        this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL)
+        this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL);
     }
 
     loadPageData = () => {
@@ -120,13 +116,13 @@ class getJobs extends React.Component {
     }
 
     loader() {
-        return this.props.processingGetJobs ? <Loader/> : noDataMsg
+        return this.props.processingGetJobs ? <Loader /> : noDataMsg;
     }
 
     render() {
         const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
-        const {sortedJobs} = this.state;
+        const { sortedJobs } = this.state;
         const columns = getColumns({
             columnsNames,
             onSort: this.onSort,
@@ -138,11 +134,11 @@ class getJobs extends React.Component {
             <Page title={'Scheduled Jobs'} description={DESCRIPTION}>
                 <ReactTableComponent
                     // tableRowId={'report_id'}
-                    onSearch={this.onSearch}
-                    rowHeight={'46px'}
+                onSearch={this.onSearch}
+                rowHeight={'46px'}
                     manual={false}
                     data={sortedJobs}
-                    pageSize={10}
+                pageSize={10}
                     columns={columns}
                     noDataText={noDataText}
                     showPagination
@@ -152,21 +148,21 @@ class getJobs extends React.Component {
 
                 {this.state.openViewJob
                     ? <Dialog title_key={'id'} data={this.state.openViewJob}
-                              closeDialog={this.closeViewJobDialog}/> : null}
+                      closeDialog={this.closeViewJobDialog} /> : null}
 
-                {this.state.deleteDialog && !this.props.deleteJobSuccess
+            {this.state.deleteDialog && !this.props.deleteJobSuccess
                     ? <DeleteDialog loader={this.props.processingDeleteJob}
-                                    display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}
-                                    onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
-                                    onCancel={this.cancelDelete}/> : null}
-                {/*//TODO seems deleteError will not work*/}
+                      display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}
+                      onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
+                      onCancel={this.cancelDelete} /> : null}
+                {/* //TODO seems deleteError will not work */}
                 <Snackbar
                     anchorOrigin={{
                         vertical: 'top',
                         horizontal: 'center'
                     }}
                     open={this.props.deleteJobSuccess}
-                    bodyStyle={{backgroundColor: '#2fbb67'}}
+                    bodyStyle={{ backgroundColor: '#2fbb67' }}
                     message={(this.state.jobToDelete && this.state.jobToDelete.id) ? `Job deleted successfully: ${this.state.jobToDelete.id}` : ''}
                     autoHideDuration={4000}
                     onRequestClose={() => {
@@ -177,8 +173,8 @@ class getJobs extends React.Component {
                         });
                     }}
                 />
-            </Page>
-        )
+          </Page>
+        );
     }
 }
 
@@ -193,7 +189,7 @@ function mapStateToProps(state) {
         deleteJobSuccess: deleteJobSuccess(state),
         tests: tests(state),
         reports: reports(state)
-    }
+    };
 }
 
 const mapDispatchToProps = {

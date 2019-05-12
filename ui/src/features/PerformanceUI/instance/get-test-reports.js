@@ -7,7 +7,6 @@ import {
     errorOnGetReports,
     errorOnGetReport
 } from './redux/selectors/reportsSelector';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import style from './style.scss';
 import Dialog from '../components/Dialog';
 import * as Actions from './redux/action';
