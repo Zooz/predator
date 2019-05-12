@@ -11,7 +11,6 @@ import {
     deleteTestSuccess
 } from './redux/selectors/testsSelector';
 import {createJobSuccess} from './redux/selectors/jobsSelector';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import style from './style.scss';
 import Dialog from '../components/Dialog';
 import InputDialog from '../components/InputDialog';

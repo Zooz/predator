@@ -12,7 +12,6 @@ import {
 } from './redux/selectors/jobsSelector';
 import { tests } from './redux/selectors/testsSelector';
 import { reports } from './redux/selectors/reportsSelector';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import style from './style.scss';
 import Dialog from '../components/Dialog';
 import DeleteDialog from '../components/DeleteDialog';

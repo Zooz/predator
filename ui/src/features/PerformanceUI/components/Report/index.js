@@ -54,7 +54,7 @@ class Report extends React.Component {
             </ResponsiveContainer>
         )
     }
-    lineChart = (data, keys) => {
+    lineChart = (data, keys, labelY) => {
         return (
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
@@ -67,7 +67,7 @@ class Report extends React.Component {
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="name"/>
-                    <YAxis domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
+                    <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
                     <Legend/>
                     <Tooltip/>
                     {
@@ -122,7 +122,7 @@ class Report extends React.Component {
                 <span>Started at {dateFormat(new Date(report.start_time), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</span>
                 <div>
                     <h3>Overall Latency</h3>
-                    {this.generateAreaChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms')}
+                    {this.lineChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms' )}
                     <h3>Status Codes</h3>
                     {this.lineChart(aggregateReport.errorsCodeGraph, Object.keys(aggregateReport.errorCodes))}
                     <h3>RPS</h3>
