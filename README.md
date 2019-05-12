@@ -5,7 +5,6 @@
 ![](https://zooz.github.io/predator/images/predator-screens.gif)
 
 
-
 <p align="center">
   <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/images/mickeythepredator-logo.png">
 </p>
