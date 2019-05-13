@@ -30,7 +30,7 @@ describe('Testing sequelize connector', function () {
                 findAll: findAllStub,
                 destroy: destroyStub,
                 update: updateStub,
-                find: findStub
+                findOne: findStub
             }),
             define: sandbox.stub().returns({ sync: syncStub })
         };
