@@ -211,7 +211,7 @@ async function getFile(id) {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     options.where = { id: id };
-    const dbResult = await fileClient.find(options);
+    const dbResult = await fileClient.findOne(options);
     return dbResult ? dbResult.file : dbResult;
 }
 

@@ -49,7 +49,7 @@ describe('Testing sequelize connector', function () {
         sandbox.restore();
         clock.restore();
     });
-    describe('handle file insert and gey', function () {
+    describe('handle file insert and get', function () {
         it('when succeed insert file', async function () {
             const fileId = uuid();
             await sequelizeConnector.saveFile(fileId, 'File for test content');
@@ -125,8 +125,21 @@ describe('Testing sequelize connector', function () {
     describe('getTest', function () {
         it('when succeed getTest', async function () {
             findAllStub.returns([
-                { dataValues: { artillery_json: JSON.stringify({ art: '1' }), raw_data: JSON.stringify({ raw: '1' }), test_id: 'test_id1' } },
-                { dataValues: { artillery_json: JSON.stringify({ art: '2' }), raw_data: JSON.stringify({ raw: '1' }), test_id: 'test_id2' } }
+                {
+                    dataValues: {
+                        artillery_json: JSON.stringify({ art: '1' }),
+                        raw_data: JSON.stringify({ raw: '1' }),
+                        test_id: 'test_id1',
+                        file_id: 'test_file_id'
+                    }
+                },
+                {
+                    dataValues: {
+                        artillery_json: JSON.stringify({ art: '2' }),
+                        raw_data: JSON.stringify({ raw: '1' }),
+                        test_id: 'test_id2'
+                    }
+                }
             ]);
             const result = await sequelizeConnector.getTest('id');
             const client = sequelizeConnector.__get__('client');
@@ -155,6 +168,7 @@ describe('Testing sequelize connector', function () {
                     'art': '1'
                 },
                 'id': 'test_id1',
+                'file_id': 'test_file_id',
                 'raw_data': {
                     'raw': '1'
                 }
