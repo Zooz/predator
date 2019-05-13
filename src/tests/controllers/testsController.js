@@ -23,7 +23,7 @@ async function upsertTest(req, res, next) {
 
 async function getFile(req, res, next) {
     try {
-        const result = await fileManager.getFile(req.params.file_id);
+        const result = await fileManager.getFile(req.params.file_id, req.query.format);
         return res.status(200).json(result);
     } catch (err) {
         return next(err);

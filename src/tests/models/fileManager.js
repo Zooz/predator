@@ -31,10 +31,11 @@ async function downloadFile(fileUrl) {
     }
 }
 
-async function getFile(fileId) {
+async function getFile(fileId, foramt = 'base64') {
     const file = await database.getFile(fileId);
     if (file) {
-        return file;
+        const contentFile = foramt === 'utf8' ? Buffer.from(file, 'base64').toString('utf8') : file;
+        return contentFile;
     } else {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
