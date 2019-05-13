@@ -1,16 +1,24 @@
 # Predator
+## Distributed performance testing platform for APIs.
+[![Known Vulnerabilities](https://snyk.io/test/github/zooz/predator/badge.svg)](https://snyk.io/test/github/zooz/predator) [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786)
+![](https://zooz.github.io/predator/images/predator-screens.gif)
 
-[![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Predator is an open-source distributed performance testing framework. Predator manages the entire lifecycle of stress-testing a server, 
-from creating a test file, to running scheduled and on-demand tests, and finally viewing the test results in a highly informative report. 
-Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
+
+<p align="center">
+  <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/images/mickeythepredator-logo.png">
+</p>
+
+Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
+
+It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
 
 ## Documentation
 
-[Starting Guide](https://zooz.github.io/predator/)
+[Starting Guide](http://predator-ng.com)
 <br>
-[API Reference](https://zooz.github.io/predator/#indexapiref.html)
+[API Reference](http://predator-ng.com/#indexapiref.html)
 
 ## Features
 - **Distributed load**:  Predator supports unlimited number of load generators that produce load concurrently.
@@ -21,39 +29,48 @@ Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps
 - **Scheduled jobs**: Run any tests in recurring mode by cron expression.
 - **3rd partry metrics**:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.
 - **Rich UI**: Predator offers rich UI side by side powerful REST API.
-- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as it's engine to fire the requests. the schema of creating tests via api is based on artillery schema.
+- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as its load engine to fire the requests. The schema of creating tests via api is based on artillery schema.
 
+
+## System Overview
+
+![](https://zooz.github.io/predator/images/predator-overview.png)
 
 ## Getting Started
 
 ### Kubernetes
-Predator is designed to seamlessly deploy into your Kubernetes cluster. This is done with helm charts. For this, run the following command:
+Predator is designed to seamlessly deploy into your Kubernetes cluster. Install Predator from the [Helm Hub](https://hub.helm.sh/charts/zooz/predator)
 
-`helm repo add zooz https://zooz.github.io/helm/`
-<br>
-`helm install predator`
-
-<br>follow the simple guidelines in the [README](https://zooz.github.io/helm/) to configure the appropriate variables.
+### DC/OS
+Predator is included in Mesosphere Universe. Please refer to https://github.com/dcos/examples/tree/master/predator for a quick start guide and examples for installing the package.
 
 ### Docker
 `docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator`
 
 where $MACHINE_IP=local ip address of your machine
 
-### DC/OS
-Predator has a PR open waiting for approval to be included in the Mesosphere Universe.
-
 ### Developers
-Predator runs using Docker. In order to source code locally, clone this repository and then run the following command:
+Predator runs using Docker. In order to run Predator locally, clone this repository and then run the following command:
 
 `runPredatorLocal.sh`
 
-#### Running the tests
+or refer to the [Docker](#docker) instructions above.
+
+##### Running the tests
 
 Run `npm test` in order to run tests in your local machine. The script runs the following tests:
 * lint
 * unit-tests
 * integration-tests
+
+## Opening the Predator UI
+The path for accessing the Predator UI is: http://localhost/ui (in the case that Predator is running locally under port 80)
+<br>
+
+In case Predator is not running under the root domain, (for example, running under http://your.domain.com/example-path) in order to access the UI follow the below steps:
+1. `docker build --build-arg BUCKET_PATH=example-path . -t predator`
+2. Deploy the tagged docker image to your preferred platform
+3. Access the Predator UI at http://your.domain.com/example-path/ui
 
 ## Contributing
 
@@ -71,5 +88,3 @@ We use [SemVer](http://semver.org/) for versioning. For a complete list of Docke
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE.md](LICENSE.md) file for details
-
-![](https://i.ibb.co/Gk7Dyxr/9c8b2df98bd1dc4cb8acc1472e74e00e-predatorlogo.png)

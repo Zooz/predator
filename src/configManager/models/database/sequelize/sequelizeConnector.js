@@ -53,8 +53,9 @@ async function getConfigValue(configValue) {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     options.where = { key: configValue };
-    let dbResult = await configClient.find(options);
-    return dbResult || [];
+    let value = await configClient.findOne(options);
+    let response = value ? [value] : [];
+    return response;
 }
 
 async function initSchemas() {

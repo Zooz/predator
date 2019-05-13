@@ -4,13 +4,13 @@ const should = require('should');
 const rewire = require('rewire');
 const configConstants = require('../../../../src/common/consts').CONFIG;
 
-const valuesToCheck = ['grafana_url', 'internal_address', 'docker_name', 'job_platform', 'runner_memory', 'runner_cpu', 'metrics_plugin_name', 'minimum_wait_for_delayed_report_status_update_in_ms'];
+const valuesToCheck = ['grafana_url', 'internal_address', 'runner_docker_image', 'job_platform', 'runner_memory', 'runner_cpu', 'metrics_plugin_name', 'minimum_wait_for_delayed_report_status_update_in_ms'];
 
 let manager;
 const expectedTypes = {
     grafana_url: undefined,
     internal_address: undefined,
-    docker_name: undefined,
+    runner_docker_image: undefined,
     job_platform: undefined,
     runner_memory: 'int',
     runner_cpu: 'int',
@@ -20,13 +20,14 @@ const expectedTypes = {
     default_webhook_url: undefined,
     influx_metrics: 'json',
     prometheus_metrics: 'json',
-    smtp_server: 'json'
+    smtp_server: 'json',
+    delay_runner_ms: 'int'
 };
 
 function changeAllEnvData() {
     process.env.GRAFANA_URL = 'grafana_url_test';
     process.env.INTERNAL_ADDRESS = 'internal_address_test';
-    process.env.DOCKER_NAME = 'docker_name_test';
+    process.env.RUNNER_DOCKER_IMAGE = 'runner_docker_image_test';
     process.env.JOB_PLATFORM = 'job_platform_test';
     process.env.RUNNER_CPU = 'runner_cpu_test';
     process.env.RUNNER_MEMORY = 'runner_memory_test';

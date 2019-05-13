@@ -46,7 +46,7 @@ class Report extends React.Component {
                     {
                         keys.map((key, index) => {
                             const color = COLORS[index % COLORS.length];
-                            return (<Area key={index} type="monotone" dataKey={key} stackId={1}
+                            return (<Area key={index} type="monotone" dataKey={key}
                                           stroke={color.stroke} fill={color.fill}/>)
                         })
                     }
@@ -54,7 +54,7 @@ class Report extends React.Component {
             </ResponsiveContainer>
         )
     }
-    lineChart = (data, keys) => {
+    lineChart = (data, keys, labelY) => {
         return (
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
@@ -67,13 +67,13 @@ class Report extends React.Component {
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="name"/>
-                    <YAxis domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
+                    <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
                     <Legend/>
                     <Tooltip/>
                     {
                         keys.map((key, index) => {
                             const color = COLORS[index % COLORS.length];
-                            return (<Line key={index} type="monotone" dataKey={key} stackId={index + 1} dot={null}
+                            return (<Line key={index} type="monotone" dataKey={key} dot={null}
                                           stroke={color.stroke}/>)
                         })
                     }
@@ -98,7 +98,7 @@ class Report extends React.Component {
                     {
                         keys.map((key, index) => {
                             const color = COLORS[index % COLORS.length];
-                            return (<Bar barSize={50} key={index} dataKey={key} stackId={index + 1} fill={color.fill}/>)
+                            return (<Bar barSize={50} key={index} dataKey={key} fill={color.fill}/>)
                         })
                     }
                 </BarChart>
@@ -122,7 +122,7 @@ class Report extends React.Component {
                 <span>Started at {dateFormat(new Date(report.start_time), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</span>
                 <div>
                     <h3>Overall Latency</h3>
-                    {this.generateAreaChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms')}
+                    {this.lineChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms' )}
                     <h3>Status Codes</h3>
                     {this.lineChart(aggregateReport.errorsCodeGraph, Object.keys(aggregateReport.errorCodes))}
                     <h3>RPS</h3>

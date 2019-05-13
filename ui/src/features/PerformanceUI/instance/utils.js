@@ -1,4 +1,3 @@
-import { SearchField } from 'react-bootstrap-table';
 import React from 'react';
 import cronstrue from 'cronstrue';
 
@@ -12,13 +11,7 @@ export const sortDates = (a, b, order) => {
   }
 };
 
-export const createCustomSearchField = (props) => {
-  return (
-    <SearchField style={{ width: '40%', float: 'right' }}
-      defaultValue={props.defaultSearch}
-      placeholder={props.searchPlaceholder} />
-  );
-};
+
 
 export const getTimeFromCronExpr = (cronValue) => {
   let result;

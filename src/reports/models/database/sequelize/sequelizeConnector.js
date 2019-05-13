@@ -16,7 +16,8 @@ module.exports = {
     getLastReports,
     getStats,
     subscribeRunner,
-    updateSubscribers
+    updateSubscriberWithStats,
+    updateSubscriber
 };
 
 async function init(sequlizeClient) {
@@ -95,23 +96,17 @@ async function subscribeRunner(testId, reportId, runnerId) {
     return reportToSubscribeRunner.createSubscriber(newSubscriber);
 }
 
-async function updateSubscribers(testId, reportId, runnerId, phaseStatus, lastStats) {
-    const reportModel = client.model('report');
-    const getReportOptions = {
-        where: {
-            test_id: testId,
-            report_id: reportId
-        }
-    };
-    let report = await reportModel.findAll(getReportOptions);
-    report = report[0];
-
-    const subscribers = await report.getSubscribers();
-    const subscriberToUpdate = await subscribers.find((subscriber) => {
-        return subscriber.dataValues.runner_id === runnerId;
-    });
+async function updateSubscriberWithStats(testId, reportId, runnerId, phaseStatus, lastStats) {
+    const subscriberToUpdate = await getSubscriber(testId, reportId, runnerId);
 
     await subscriberToUpdate.set({ 'phase_status': phaseStatus, last_stats: lastStats });
+    return subscriberToUpdate.save();
+}
+
+async function updateSubscriber(testId, reportId, runnerId, phaseStatus) {
+    const subscriberToUpdate = await getSubscriber(testId, reportId, runnerId);
+
+    await subscriberToUpdate.set({ 'phase_status': phaseStatus });
     return subscriberToUpdate.save();
 }
 
@@ -265,4 +260,22 @@ async function initSchemas() {
     await report.sync();
     await stats.sync();
     await subscriber.sync();
+}
+
+async function getSubscriber(testId, reportId, runnerId) {
+    const reportModel = client.model('report');
+    const getReportOptions = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+    let report = await reportModel.findAll(getReportOptions);
+    report = report[0];
+
+    const subscribers = await report.getSubscribers();
+    const subscriberToUpdate = await subscribers.find((subscriber) => {
+        return subscriber.dataValues.runner_id === runnerId;
+    });
+    return subscriberToUpdate;
 }

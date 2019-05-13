@@ -47,7 +47,9 @@ describe('Create job specific docker tests', async function () {
                     test_id: testId,
                     duration: 1,
                     arrival_rate: 1,
-                    max_virtual_users: 100
+                    max_virtual_users: 100,
+                    proxy_url: 'http://proxy.com',
+                    debug: '*'
                 };
             });
             after(async () => {
@@ -76,7 +78,9 @@ describe('Create job specific docker tests', async function () {
                             duration: 1,
                             environment: 'test',
                             run_immediately: true,
-                            max_virtual_users: 100
+                            max_virtual_users: 100,
+                            proxy_url: 'http://proxy.com',
+                            debug: '*'
                         };
 
                         createJobResponse = await schedulerRequestCreator.createJob(validBody, {
@@ -111,7 +115,7 @@ describe('Create job specific docker tests', async function () {
                     it('Get logs', async () => {
                         let logs = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {});
                         should(logs.status).eql(200);
-                        should(logs.headers['content-type']).eql('application/zip')
+                        should(logs.headers['content-type']).eql('application/zip');
                     });
 
                     it('Stop run', async () => {

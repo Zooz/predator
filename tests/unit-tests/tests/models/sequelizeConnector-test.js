@@ -147,6 +147,11 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'created_at'
+                            ]
+                        },
                         'order': [
                             [
                                 'updated_at',
@@ -182,6 +187,11 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'created_at'
+                            ]
+                        },
                         'order': [
                             [
                                 'updated_at',
@@ -212,6 +222,11 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
+                            'attributes': {
+                                'exclude': [
+                                    'created_at'
+                                ]
+                            },
                             'order': [
                                 [
                                     'updated_at',
@@ -256,6 +271,11 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'created_at'
+                            ]
+                        },
                         'order': [
                             [
                                 'updated_at',
@@ -301,6 +321,11 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'created_at'
+                            ]
+                        },
                         'order': [
                             [
                                 'updated_at',
@@ -331,6 +356,11 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
+                            'attributes': {
+                                'exclude': [
+                                    'created_at'
+                                ]
+                            },
                             'order': [
                                 [
                                     'updated_at',
@@ -375,6 +405,11 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'created_at'
+                            ]
+                        },
                         'order': [
                             [
                                 'updated_at',
@@ -417,6 +452,11 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'created_at'
+                            ]
+                        },
                         'order': [
                             [
                                 'updated_at',
@@ -444,6 +484,11 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
+                            'attributes': {
+                                'exclude': [
+                                    'created_at'
+                                ]
+                            },
                             'order': [
                                 [
                                     'updated_at',
@@ -566,6 +611,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'updated_at',
+                                'created_at'
+                            ]
+                        },
                         'where': {
                             'definition_name': 'definitionName',
                             'dsl_name': 'dslName'
@@ -583,6 +634,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'updated_at',
+                                'created_at'
+                            ]
+                        },
                         'where': {
                             'definition_name': 'definitionName',
                             'dsl_name': 'dslName'
@@ -604,6 +661,12 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
+                            'attributes': {
+                                'exclude': [
+                                    'updated_at',
+                                    'created_at'
+                                ]
+                            },
                             'where': {
                                 'definition_name': 'definitionName',
                                 'dsl_name': 'dslName'
@@ -624,6 +687,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'updated_at',
+                                'created_at'
+                            ]
+                        },
                         'where': {
                             'dsl_name': 'dslName'
                         }
@@ -651,6 +720,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
+                        'attributes': {
+                            'exclude': [
+                                'updated_at',
+                                'created_at'
+                            ]
+                        },
                         'where': {
                             'dsl_name': 'dslName'
                         }
@@ -671,6 +746,12 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
+                            'attributes': {
+                                'exclude': [
+                                    'updated_at',
+                                    'created_at'
+                                ]
+                            },
                             'where': {
                                 'dsl_name': 'dslName'
                             }
@@ -796,57 +877,3 @@ describe('Testing sequelize connector', function () {
         });
     });
 });
-
-const defineExpectation = [
-    [
-        'test',
-        {
-            'artillery_json': {
-                'type': 'long'
-            },
-            'description': {
-                'type': 'string'
-            },
-            'name': {
-                'type': 'string'
-            },
-            'raw_data': {
-                'type': 'long'
-            },
-            'revision_id': {
-                'type': 'uuid',
-                'unique': 'compositeIndex'
-            },
-            'test_id': {
-                'type': 'uuid',
-                'unique': 'compositeIndex'
-            },
-            'type': {
-                'type': 'string'
-            },
-            'updated_at': {
-                'type': 'date'
-            }
-        }
-    ],
-    [
-        'dsl_definition',
-        {
-            'artillery_json': {
-                'type': 'long'
-            },
-            'definition_name': {
-                'type': 'string',
-                'unique': 'compositeIndex'
-            },
-            'dsl_name': {
-                'type': 'string',
-                'unique': 'compositeIndex'
-            },
-            'id': {
-                'primaryKey': true,
-                'type': 'uuid'
-            }
-        }
-    ]
-];

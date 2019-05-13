@@ -9,6 +9,11 @@ const databaseConnector = require('./databaseConnector'),
     notifier = require('./notifier'),
     constants = require('../utils/constants');
 
+const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
+
+const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
+    constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
+
 module.exports.getReport = async (testId, reportId) => {
     let reportSummary = await databaseConnector.getReport(testId, reportId);
 
@@ -67,7 +72,12 @@ module.exports.postReport = async (testId, reportBody) => {
 module.exports.postStats = async (report, stats) => {
     const statsParsed = JSON.parse(stats.data);
     const statsTime = statsParsed.timestamp;
-    await databaseConnector.updateSubscribers(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
+
+    if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE) {
+        await databaseConnector.updateSubscriber(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
+    } else {
+        await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
+    }
 
     if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
         await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
@@ -119,7 +129,6 @@ function getReportResponse(summaryRow, config) {
         parallelism: testConfiguration.parallelism,
         max_virtual_users: testConfiguration.max_virtual_users,
         last_updated_at: summaryRow.last_updated_at,
-        grafana_report: generateGraphanaUrl(summaryRow, config.grafana_url),
         notes: summaryRow.notes,
         environment: testConfiguration.environment,
         subscribers: summaryRow.subscribers,
@@ -129,16 +138,16 @@ function getReportResponse(summaryRow, config) {
 
     report.status = calculateReportStatus(report, config);
 
-    const STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
-        constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
-
-    if (STATUSES_WITH_END_TIME.includes(report.status)) {
+    if (FINAL_REPORT_STATUSES_WITH_END_TIME.includes(report.status)) {
         report.end_time = report.last_updated_at;
     }
+
+    report.grafana_report = generateGrafanaUrl(report, config.grafana_url);
+
     return report;
 }
 
-function generateGraphanaUrl(report, grafanaUrl) {
+function generateGrafanaUrl(report, grafanaUrl) {
     if (grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
         const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
@@ -154,8 +163,9 @@ function calculateReportStatus(report, config) {
     const reportDurationMs = report.duration * 1000;
     const reportStartTimeMs = new Date(report.start_time).getTime();
 
-    if (allSubscribersFinished(uniqueSubscribersStages)) {
-        return constants.REPORT_FINISHED_STATUS;
+    const isFinishedStatus = isAllSubscribersFinishedStatus(uniqueSubscribersStages);
+    if (isFinishedStatus) {
+        return isFinishedStatus;
     } else if (Date.now() >= reportStartTimeMs + reportDurationMs + delayedTimeInMs) {
         if (uniqueSubscribersStages.includes(constants.SUBSCRIBER_DONE_STAGE)) {
             return constants.REPORT_PARTIALLY_FINISHED_STATUS;
@@ -188,11 +198,13 @@ function getListOfSubscribersStages(report) {
     return runnerStates;
 }
 
-function allSubscribersFinished(subscriberStages) {
-    if (subscriberStages.length === 1) {
-        return subscriberStageToReportStatusMap(subscriberStages) === constants.REPORT_FINISHED_STATUS;
+function isAllSubscribersFinishedStatus(subscribersStages) {
+    if (subscribersStages.length === 1) {
+        const mappedStatus = subscriberStageToReportStatusMap(subscribersStages);
+        if (FINAL_REPORT_STATUSES.includes(mappedStatus)) {
+            return mappedStatus;
+        }
     }
-    return false;
 }
 
 function subscriberStageToReportStatusMap(subscriberStage) {

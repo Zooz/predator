@@ -14,7 +14,9 @@ module.exports = {
     getLastReports,
     getStats,
     subscribeRunner,
-    updateSubscribers
+    updateSubscriberWithStats,
+    updateSubscriber
+
 };
 
 function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
@@ -49,6 +51,10 @@ function subscribeRunner(testId, reportId, runnerId, phaseStatus) {
     return databaseConnector.subscribeRunner(testId, reportId, runnerId, phaseStatus);
 }
 
-function updateSubscribers(testId, reportId, runnerId, phaseStatus, lastStats) {
-    return databaseConnector.updateSubscribers(testId, reportId, runnerId, phaseStatus, lastStats);
+function updateSubscriberWithStats(testId, reportId, runnerId, phaseStatus, lastStats) {
+    return databaseConnector.updateSubscriberWithStats(testId, reportId, runnerId, phaseStatus, lastStats);
+}
+
+function updateSubscriber(testId, reportId, runnerId, phaseStatus) {
+    return databaseConnector.updateSubscriber(testId, reportId, runnerId, phaseStatus);
 }

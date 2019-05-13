@@ -31,6 +31,8 @@ async function insertJob(jobId, jobInfo) {
         parallelism: jobInfo.parallelism,
         max_virtual_users: jobInfo.max_virtual_users,
         notes: jobInfo.notes,
+        proxy_url: jobInfo.proxy_url,
+        debug: jobInfo.debug,
         webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => {
             return { id: uuid(), url: webhookUrl };
         }) : undefined,
@@ -91,7 +93,9 @@ async function updateJob(jobId, jobInfo) {
         environment: jobInfo.environment,
         ramp_to: jobInfo.ramp_to,
         parallelism: jobInfo.parallelism,
-        max_virtual_users: jobInfo.max_virtual_users
+        max_virtual_users: jobInfo.max_virtual_users,
+        proxy_url: jobInfo.proxy_url,
+        debug: jobInfo.debug
     };
 
     let options = {
@@ -163,6 +167,12 @@ async function initSchemas() {
             type: Sequelize.DataTypes.INTEGER
         },
         notes: {
+            type: Sequelize.DataTypes.STRING
+        },
+        proxy_url: {
+            type: Sequelize.DataTypes.STRING
+        },
+        debug: {
             type: Sequelize.DataTypes.STRING
         }
     });

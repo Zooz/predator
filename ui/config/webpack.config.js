@@ -9,7 +9,7 @@ module.exports = {
   entry: entries,
   // Output our app to the dist/ directory
   output: {
-    publicPath: '/',//`/${env.PERFORMANCE_FRAMEWORK_BUCKET_PATH}`,
+    publicPath: env.BUCKET_PATH,
     path: __dirname + '/../dist', // or path: path.join(__dirname, "dist/js"),
     filename: process.env.NODE_ENV === 'production' ? 'bundle.[chunkhash:8].js' : 'bundle.js'
   },
@@ -26,9 +26,9 @@ module.exports = {
       template: 'src/index.html',
       favicon: 'src/images/favicon.png',
       inject: true,
-      PERFORMANCE_FRAMEWORK_BUCKET_PATH: process.env.PERFORMANCE_FRAMEWORK_BUCKET_PATH
+      BUCKET_PATH: env.BUCKET_PATH || '/',
     }),
     new webpack.NamedModulesPlugin(),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'PREDATOR_BUCKET_PATH', 'PREDATOR_URL'])
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'BUCKET_PATH', 'PREDATOR_URL'])
   ]
 };

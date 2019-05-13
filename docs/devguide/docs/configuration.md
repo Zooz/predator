@@ -9,9 +9,9 @@ Below are variables Predator can be configured with.
 | Environment Variable        | Configuration key      	| Description                                                                             	| Configurable from UI/API 	| Default value               	|
 |-----------------------------|-----------------------	|-----------------------------------------------------------------------------------------	|--------------------------	|-----------------------------	|
 | INTERNAL_ADDRESS            | internal_address       	| The local ip address of your machine                                                    	| ✓                        	|                             	|
-| DOCKER_NAME                 | docker_name         	| The predator-runner docker image that will run the test                                 	| ✓                        	| zooz/predator-runner:latest 	|
+| RUNNER_DOCKER_IMAGE         | runner_docker_image    	| The predator-runner docker image that will run the test                                 	| ✓                        	| zooz/predator-runner:latest 	|
 | RUNNER_CPU                  | runner_cpu          	| Number of CPU use by the each runner                                                    	| ✓                        	| 1                           	|
-| RUNNER_MEMORY               | runner_memory       	| Max memory to use by each runner                                                        	| ✓                        	| 2048                      	|
+| RUNNER_MEMORY               | runner_memory       	| Max memory to use by each runner                                                        	| ✓                        	| 256                      	|
 | DEFAULT_EMAIL_ADDRESS       | default_email_address   | Default email to send final report to, address can be configured                        	| ✓                        	|                             	|
 | DEFAULT_WEBHOOK_URL         | default_webhook_url    	| Default webhook url to send live report statistics to                                   	| ✓                        	|                             	|
 

@@ -306,7 +306,7 @@ describe('Sequelize client tests', function () {
 
             should(sequelizeUpdateStub.args[0][0]).eql({
                 'last_updated_at': lastUpdatedAt,
-                'phase': '0',
+                'phase': '0'
             });
 
             should(sequelizeUpdateStub.args[0][1]).eql({
@@ -401,7 +401,7 @@ describe('Sequelize client tests', function () {
     });
 
     describe('Update subscribers', () => {
-        it('Should successfully subscribe runner', async () => {
+        it('Should successfully update subscriber with stats', async () => {
             sequelizeGetSubscribersStatsStub.resolves([{
                 dataValues: {
                     runner_id: 'runner_id',
@@ -416,23 +416,35 @@ describe('Sequelize client tests', function () {
 
             let sequelizeResponse = [{
                 dataValues: {
-                    reportId,
-                    testId,
-                    jobId,
-                    revisionId,
-                    testType,
-                    startTime,
-                    testName,
-                    testDescription,
-                    testConfiguration,
-                    notes
                 },
-                getSubscribers: sequelizeGetSubscribersStatsStub,
-                createSubscriber: sequelizeCreateSubscriberStatsStub
+                getSubscribers: sequelizeGetSubscribersStatsStub
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            await sequelizeConnector.updateSubscribers('test_id', 'report_id', 'runner_id', 'started_phase');
+            await sequelizeConnector.updateSubscriberWithStats('test_id', 'report_id', 'runner_id', 'started_phase', {codes: {}, errors: {}});
         });
+        it('Should successfully update subscriber without stats', async () => {
+            sequelizeGetSubscribersStatsStub.resolves([{
+                dataValues: {
+                    runner_id: 'runner_id',
+                    phase_status: 'initializing'
+                },
+                set: () => {
+                },
+                save: () => {
+                }
+            }]);
+
+
+            let sequelizeResponse = [{
+                dataValues: {
+                },
+                getSubscribers: sequelizeGetSubscribersStatsStub,
+            }];
+
+            sequelizeGetStub.resolves(sequelizeResponse);
+            await sequelizeConnector.updateSubscriber('test_id', 'report_id', 'runner_id', 'started_phase');
+        });
+
     });
 });

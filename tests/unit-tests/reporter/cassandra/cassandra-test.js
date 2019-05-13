@@ -41,7 +41,7 @@ const REPORT = {
             'Create token and get token': 173732,
             'Create token, create customer and assign token to customer': 115716
         },
-        'errors': {EAI_AGAIN: 112, NOTREACH: 123 },
+        'errors': { EAI_AGAIN: 112, NOTREACH: 123 },
         'codes': {
             '200': 173732,
             '201': 520878,
@@ -283,12 +283,28 @@ describe('Cassandra client tests', function() {
     });
 
     describe('Update Subscriber', function(){
-        it('should update subscriber stage in report', function(){
+        it('should update subscriber stage in report without stats', function(){
+            let cassandraResponse = { rows: [REPORT] };
+            clientExecuteStub.resolves(cassandraResponse);
+
+            let query = 'UPDATE report_subscribers SET phase_status=? WHERE test_id=? AND report_id=? AND runner_id=?';
+            return cassandraClient.updateSubscriber('test_id', 'report_id', 'runner_id', 'intermediate')
+                .then(function(result){
+                    loggerErrorStub.callCount.should.eql(0);
+                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql('intermediate');
+                    clientExecuteStub.getCall(0).args[1][1].should.eql('test_id');
+                    clientExecuteStub.getCall(0).args[1][2].should.eql('report_id');
+                    clientExecuteStub.getCall(0).args[1][3].should.eql('runner_id');
+                });
+        });
+
+        it('should update subscriber stage in report with stats', function(){
             let cassandraResponse = { rows: [REPORT] };
             clientExecuteStub.resolves(cassandraResponse);
 
             let query = 'UPDATE report_subscribers SET phase_status=?, last_stats=? WHERE test_id=? AND report_id=? AND runner_id=?';
-            return cassandraClient.updateSubscribers('test_id', 'report_id', 'runner_id', 'intermediate', 'last_stats')
+            return cassandraClient.updateSubscriberWithStats('test_id', 'report_id', 'runner_id', 'intermediate', 'last_stats')
                 .then(function(result){
                     loggerErrorStub.callCount.should.eql(0);
                     clientExecuteStub.getCall(0).args[0].should.eql(query);

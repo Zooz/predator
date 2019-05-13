@@ -6,17 +6,13 @@ You're probably eager to get your hands dirty, so let's go ahead and install Pre
 
 ## Kubernetes
 
-Predator is designed to seamlessly deploy into your Kubernetes cluster. This is done with helm charts. For this, run the following command:
-
-```
-helm repo add zooz https://zooz.github.io/helm/
-```
-
-After successfully adding the above repository, follow the simple guidelines in the [README](https://zooz.github.io/helm/predator/) to configure the appropriate variables.
+Install Predator from the [Helm Hub](https://hub.helm.sh/charts/zooz/predator)  
 
 ## DC/OS
 
-Predator has a [PR](https://github.com/mesosphere/universe/pull/2229) open waiting for approval to be included in the Mesosphere Universe.
+Predator can be installed through DC/OS Universe within the cluster.
+<br>
+For examples and more info check [Universe Catalog](https://universe.dcos.io/#/package/predator/version/latest)
 
 ## Docker
 
@@ -32,4 +28,4 @@ where `$MACHINE_IP` is the local ip address of your machine.
 
 After successfully mounting the Predator docker image, access Predator by typing the following URL in your browser:
 
-```http://{$MACHINE_IP}/predator```
+```http://{$MACHINE_IP}/ui```
