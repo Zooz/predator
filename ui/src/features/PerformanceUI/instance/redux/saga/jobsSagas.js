@@ -41,11 +41,10 @@ export function * createJob ({ body }) {
     yield put(Actions.processingCreateJob(true));
     let job = yield call(createJobInFramework, body);
     yield put(Actions.createJobSuccess(job.data));
-    yield put(Actions.processingCreateJob(false));
   } catch (e) {
-    yield put(Actions.processingCreateJob(false));
     yield put(Actions.createJobFailure(e))
   }
+  yield put(Actions.processingCreateJob(false));
 }
 
 export function * stopRunningJob ({ jobId, runId }) {

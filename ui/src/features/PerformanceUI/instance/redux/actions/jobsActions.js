@@ -48,8 +48,8 @@ export const createJobSuccess = (job) => (
   { type: Types.CREATE_JOB_SUCCESS, job }
 );
 
-export const processingCreateJob = () => (
-  { type: Types.PROCESSING_CREATE_JOB }
+export const processingCreateJob = (state) => (
+    {type: Types.PROCESSING_CREATE_JOB, state}
 );
 
 export const createJobFailure = (error) => (
