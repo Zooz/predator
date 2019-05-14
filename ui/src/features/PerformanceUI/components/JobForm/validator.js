@@ -60,17 +60,15 @@ function rampToValidator (value, allState) {
 }
 
 function cronValidator (value, allState) {
-  if (allState.run_immediately) {
-    return;
-  }
-  if (isRequired(value)) {
+  if (isRequired(value) && !allState.run_immediately) {
     return 'Required if run immediately is unchecked'
   }
-
-  try {
-    cronstrue.toString(value)
-  } catch (err) {
-    return 'illegal cron input'
+  if(value){
+    try {
+      cronstrue.toString(value)
+    } catch (err) {
+      return 'illegal cron input'
+    }
   }
 }
 function emailsValidator () {

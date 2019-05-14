@@ -328,13 +328,13 @@ class Form extends React.Component {
     }
 
     whenSubmit = () => {
+
         let body = {
             test_id: this.props.data.id,
             arrival_rate: parseInt(this.state.arrival_rate),
             duration: parseInt(this.state.duration) * 60,
             ramp_to: this.state.ramp_to ? parseInt(this.state.ramp_to) : undefined,
             environment: this.state.environment,
-            cron_expression: this.state.cron_expression,
             run_immediately: (this.state.run_immediately === undefined) ? false : this.state.run_immediately,
             emails: this.state.emails,
             webhooks: this.state.webhooks,
@@ -342,7 +342,9 @@ class Form extends React.Component {
             parallelism: this.state.parallelism ? parseInt(this.state.parallelism) : undefined,
             max_virtual_users: this.state.max_virtual_users ? parseInt(this.state.max_virtual_users) : undefined
         };
-
+        if(this.state.cron_expression){//should exist and not empty
+            body.cron_expression=this.state.cron_expression
+        }
         body = JSON.parse(JSON.stringify(body));
         this.props.createJob(body);
     };
