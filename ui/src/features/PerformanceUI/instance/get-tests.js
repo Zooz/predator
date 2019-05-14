@@ -13,7 +13,6 @@ import {
 import {createJobSuccess} from './redux/selectors/jobsSelector';
 import style from './style.scss';
 import Dialog from '../components/Dialog';
-import InputDialog from '../components/InputDialog';
 import JobForm from '../components/JobForm';
 import * as Actions from './redux/action';
 import Loader from '../components/Loader';
@@ -208,9 +207,8 @@ class getTests extends React.Component {
                     {this.state.createTest &&
                     <TestForm data={this.state.testForEdit} closeDialog={this.closeCreateTest}/>}
                     {(this.state.openViewCreateJob && !this.props.createJobSuccess)
-                        ? <InputDialog input={<JobForm/>} history={history}
-                                       title={'Create new job'} data={this.state.openViewCreateJob}
-                                       closeDialog={this.closeViewCreateJobDialog}/> : null}
+                        ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog}/> : null}
+
 
                     {(this.state.deleteDialog && !this.props.deleteTestSuccess)
                         ? <DeleteDialog loader={this.props.processingDeleteTest}

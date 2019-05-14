@@ -1,13 +1,14 @@
 import React from 'react'
 import {faTimes} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import classnames from 'classnames';
 
 import style from './style.scss';
 
 class Modal extends React.Component {
 
-    onEscape=()=>{
-        if(this.props.onExit){
+    onEscape = () => {
+        if (this.props.onExit) {
             this.props.onExit();
         }
     };
@@ -20,16 +21,16 @@ class Modal extends React.Component {
         }, false);
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         document.removeEventListener("keydown", this.onEscape, false);
     }
 
 
-    render(){
-        const {children} = this.props;
+    render() {
+        const {children, width} = this.props;
         return (
             <div className={style['modal']}>
-                <div className={style['modal-content']}>
+                <div className={style['modal-content']} style={{width: width}}>
                     <div className={style['icon-wrapper']}>
                         <FontAwesomeIcon className={style["exit-icon"]} onClick={this.onEscape} icon={faTimes}/>
                     </div>

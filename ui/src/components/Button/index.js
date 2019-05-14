@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 
-// import Spinner from '../Spinner'
+import Spinner from '../Spinner'
 import css from './index.scss'
 
 const Button = (props = {}) => {
@@ -43,7 +43,7 @@ const renderContent = ({ icon, spinner, inverted, children }) => {
       {renderIcon({ icon })}
       {spinner
         ? (<span className={css['button-spinner']}>
-          {/*<Spinner inverted={inverted} />*/}
+          <Spinner inverted={inverted} />
         </span>)
         : null}
       {renderChildren({ children })}

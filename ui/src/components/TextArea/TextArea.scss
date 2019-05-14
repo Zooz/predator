@@ -1,0 +1,36 @@
+@import "../styles/inputs";
+
+.textarea {
+  font-family: Roboto;
+  transition: border 0.2s, background 0.2s, box-shadow 0.2s;
+  font-size: 13px;
+  width: 100%;
+  padding: $box-padding;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  @include default;
+  height: var(--textarea-height);
+  min-height: var(--textarea-height);
+  resize: none;
+
+  &.textarea--error {
+    @include error;
+  }
+
+  &.textarea--disabled {
+    @include disabled;
+  }
+
+  &:hover {
+    @include hover;
+  }
+
+  &:active, &:focus, &:focus-within {
+    outline: none;
+    @include active;
+  }
+
+  &::placeholder{
+    color: $placeholder-color;
+  }
+}
