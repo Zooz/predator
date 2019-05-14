@@ -80,7 +80,7 @@ function buildStepsFromFlow (flow) {
 }
 
 function buildHeadersState (headers) {
-  const keys = Object.keys(headers);
+  const keys = headers ? Object.keys(headers) : [];
   const result = keys.map((key) => {
     return {
       key: key,
