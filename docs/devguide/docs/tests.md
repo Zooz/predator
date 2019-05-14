@@ -117,40 +117,11 @@ Tests can use custom Javascript functions , for using Javascript functions in yo
 and upload it to public repository. (S3, dropbox,google docs etc... ).
 when creating a test use file_url parameter to send URL path to your Javascript file .
 Predator will download and save this file (Any changes after creating test will not be reflected.)
-
-Here's an example:
-
-
-```JSON
-{
-  "name": "custom logic in Javascript example",
-  "description": "custom logic in Javascript",
-  "file_url": "https://www.dropbox.com/s/yourFilePath/fileName.txt?dl=1",
-  "type": "basic",
-  "before": {
-  	"steps": [
-  		{
-  			"action": "petstore.create-pet"
-  		}	
-  	]
-  },
-  "scenarios": [
-  	{
-  		"scenario_name": "Only get pet",
-  		"steps": [
-  			{
-  				"action": "petstore.get-pet"
-  			}	
-  		]
-  	}
-  ]
-}
-```
-To create your scenarios with Javascript function , work with Artillery guidelines.
+To create your scenarios with Javascript function , work alongside Artillery guidelines.
 
 * Artillery documentation: https://artillery.io/docs/http-reference/#loading-custom-js-code
 
-Here's an example for test using JS code:
+Here's an example for test using custom JS code:
 
 ```JSON
 {
@@ -158,13 +129,6 @@ Here's an example for test using JS code:
   "description": "custom logic in Javascript",
   "file_url": "https://www.dropbox.com/s/yourFilePath/fileName.txt?dl=1",
   "type": "basic",
-  "before": {
-    "steps": [
-      {
-        "action": "petstore.create-pet"
-      }
-    ]
-  },
   "scenarios": [
     {
       "name": "Processor exmaple",
@@ -174,12 +138,12 @@ Here's an example for test using JS code:
         },
         {
           "get": {
-            "url": "http://www.google.com/{{randomPath}}",
+            "url": "http://www.google.com/{{ randomPath }}",
             "afterResponse": "logResponse"
           }
         },
         {
-          "log": "********************* Sent a request to /users with {{name }}, {{ email }}, {{ password }}"
+          "log": "********************* Sent a request to /users with {{ name }}, {{ email }}, {{ password }}"
         }
       ]
     }
@@ -209,14 +173,14 @@ module.exports = {
 
 
 function generateRandomDataGlobal(userContext, events, done) {
-console.log('userContext is: '+JSON.stringify(userContext));
-  userContext.vars.randomPath = 'random_path_'+uuid();
-  userContext.vars.name = 'name_random_'+uuid();
-  userContext.vars.email = 'email_random_'+uuid();
-  userContext.vars.password = 'password_random_'+uuid();
+console.log('userContext is: ' + JSON.stringify(userContext));
+  userContext.vars.randomPath = 'random_path_' + uuid();
+  userContext.vars.name = 'name_random_' + uuid();
+  userContext.vars.email = 'email_random_' + uuid();
+  userContext.vars.password = 'password_random_' + uuid();
   return done();
 }
 ```
-In this example we creating a test with 2 JS functions. when will be log the result if result is different from 200 ok 'logResponse'
-and will be call after the response, using: afterResponse command.
-Second function is a global function created global variables 'generateRandomDataGlobal' and can be used in the scope. 
+In this example we creating a test with 2 JS functions:
+`logResponse` will log the result received if the statusCode is different from 200. The function will be called after each response using the afterResponse command.
+`generateRandomDataGlobal` is a global function that creates global variables that can be used in the scope of the test with the {{ }} syntax.
