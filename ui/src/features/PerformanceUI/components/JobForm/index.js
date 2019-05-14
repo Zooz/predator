@@ -22,7 +22,7 @@ import MultiValueInput from '../../../../components/MultiValueInput';
 import UiSwitcher from '../../../../components/UiSwitcher';
 import {filter} from 'lodash';
 
-const DESCRIPTION='Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
+const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const inputTypes = {
     INPUT_LIST: 'INPUT_LIST',
     SWITCHER: 'SWITCHER',
@@ -194,7 +194,7 @@ class Form extends React.Component {
 
     handleInputListRemove = (target, element) => {
         this.setState({
-            [target]: filter(this.state[target],(cur)=>(cur!==element))
+            [target]: filter(this.state[target], (cur) => (cur !== element))
         });
     };
 
@@ -208,7 +208,7 @@ class Form extends React.Component {
     }
 
     showInfo(item) {
-        if(!item || !item.info){
+        if (!item || !item.info) {
             return null;
         }
         return (<TooltipWrapper
@@ -221,7 +221,7 @@ class Form extends React.Component {
             offset={{top: 1}}
         >
             <div data-tip data-for={`tooltipKey_${item.info}`} style={{cursor: 'pointer'}}>
-                <FontAwesomeIcon style={{color:'#557eff',fontSize:'13px'}} icon={faQuestionCircle}/>
+                <FontAwesomeIcon style={{color: '#557eff', fontSize: '13px'}} icon={faQuestionCircle}/>
             </div>
 
         </TooltipWrapper>);
@@ -232,24 +232,24 @@ class Form extends React.Component {
         return (
             <Modal width={'50%'} onExit={closeDialog}>
                 <FormWrapper title={'Create a new job'} description={DESCRIPTION}>
-                    <div style={{width:'100%'}}>
-                            {this.FormList.map((oneItem, index) => {
-                                return (<Fragment key={index}>
-                                    {!oneItem.hidden &&
-                                    <RactangleAlignChildrenLeft className={style['input-wrapper']}>
-                                        <div style={{flex:'1'}}>
+                    <div style={{width: '100%'}}>
+                        {this.FormList.map((oneItem, index) => {
+                            return (<Fragment key={index}>
+                                {!oneItem.hidden &&
+                                <RactangleAlignChildrenLeft className={style['input-wrapper']}>
+                                    <div style={{flex: '1'}}>
                                         {this.generateInput(oneItem)}
-                                        </div>
-                                    </RactangleAlignChildrenLeft>}
-                                </Fragment>);
-                            }, this)}
-                            <div className={style.buttons}>
-                                <Button inverted onClick={closeDialog}>Cancel</Button>
-                                <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
-                                        onClick={this.whenSubmit}>Submit</Button>
-                            </div>
-                            {this.props.serverError ? <ErrorDialog showMessage={this.props.serverError} /> : null}
+                                    </div>
+                                </RactangleAlignChildrenLeft>}
+                            </Fragment>);
+                        }, this)}
+                        <div className={style.buttons}>
+                            <Button inverted onClick={closeDialog}>Cancel</Button>
+                            <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
+                                    onClick={this.whenSubmit}>Submit</Button>
                         </div>
+                        {this.props.serverError ? <ErrorDialog showMessage={this.props.serverError}/> : null}
+                    </div>
                 </FormWrapper>
             </Modal>
         );
@@ -259,17 +259,6 @@ class Form extends React.Component {
         const {cron_expression} = this.state;
         switch (oneItem.type) {
             case inputTypes.SWITCHER:
-
-                {/*<Checkbox style={{width: oneItem.width, marginTop: '10px'}} key={oneItem.key}*/}
-                          {/*disabled={oneItem.disabled}*/}
-                          {/*errorText={this.state.errors[oneItem.name]}*/}
-                          {/*onCheck={(evt) => {*/}
-                              {/*this.handleChangeForCheckBox(oneItem.name, evt)*/}
-                          {/*}}*/}
-                          {/*label={oneItem.label}*/}
-                          {/*name={oneItem.name}*/}
-                          {/*value={false}*/}
-                {/*/>*/}
                 return (
                     <RactangleAlignChildrenLeft>
                         <UiSwitcher
@@ -282,13 +271,11 @@ class Form extends React.Component {
                     </RactangleAlignChildrenLeft>
 
 
-
-
-
                 );
             case inputTypes.INPUT_LIST:
                 return (
-                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText} rightComponent={this.showInfo(oneItem)}>
+                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+                                rightComponent={this.showInfo(oneItem)}>
                         <MultiValueInput
                             values={this.state[oneItem.name].map((value) => ({value, label: value}))}
                             onAddItem={(evt) => this.handleInputListAdd(oneItem.name, evt)}
@@ -301,7 +288,8 @@ class Form extends React.Component {
 
             case inputTypes.TEXT_FIELD:
                 return (
-                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText} rightComponent={this.showInfo(oneItem)}>
+                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+                                rightComponent={this.showInfo(oneItem)}>
                         <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
                             <TextArea
                                 disabled={oneItem.disabled}
@@ -312,16 +300,18 @@ class Form extends React.Component {
                     </TitleInput>
                 );
             default:
-                console.log('oneItem',oneItem)
+                console.log('oneItem', oneItem)
                 return (
-                        <div>
-                            <TitleInput key={oneItem.key} title={oneItem.floatingLabelText} rightComponent={this.showInfo(oneItem)}>
-                                <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
-                                <Input disabled={oneItem.disabled} value={this.state[oneItem.name]} onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}/>
-                                </ErrorWrapper>
-                            </TitleInput>
-                            {oneItem.name === 'cron_expression' && <CronViewer value={cron_expression}/>}
-                        </div>
+                    <div>
+                        <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+                                    rightComponent={this.showInfo(oneItem)}>
+                            <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
+                                <Input disabled={oneItem.disabled} value={this.state[oneItem.name]}
+                                       onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}/>
+                            </ErrorWrapper>
+                        </TitleInput>
+                        {oneItem.name === 'cron_expression' && <CronViewer value={cron_expression}/>}
+                    </div>
 
                 );
         }
@@ -342,8 +332,8 @@ class Form extends React.Component {
             parallelism: this.state.parallelism ? parseInt(this.state.parallelism) : undefined,
             max_virtual_users: this.state.max_virtual_users ? parseInt(this.state.max_virtual_users) : undefined
         };
-        if(this.state.cron_expression){//should exist and not empty
-            body.cron_expression=this.state.cron_expression
+        if (this.state.cron_expression) {//should exist and not empty
+            body.cron_expression = this.state.cron_expression
         }
         body = JSON.parse(JSON.stringify(body));
         this.props.createJob(body);
