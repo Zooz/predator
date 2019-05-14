@@ -249,8 +249,7 @@ class Form extends React.Component {
         switch (oneItem.type) {
             case inputTypes.CHECKBOX:
                 return (
-                    <Checkbox className={style.TextFieldAndCheckBoxToolTip}
-                              style={{width: oneItem.width, marginTop: '10px'}} key={oneItem.key}
+                    <Checkbox style={{width: oneItem.width, marginTop: '10px'}} key={oneItem.key}
                               disabled={oneItem.disabled}
                               errorText={this.state.errors[oneItem.name]}
                               onCheck={(evt) => {
