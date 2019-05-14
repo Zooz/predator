@@ -70,7 +70,6 @@
     "pretty-seconds": "^0.2.1",
     "query-string": "^6.1.0",
     "react": "^16.6.3",
-    "react-autosize-textarea": "^6.0.0",
     "react-dnd": "^7.0.2",
     "react-dnd-html5-backend": "^7.0.2",
     "react-dom": "^16.8.3",

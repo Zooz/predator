@@ -21,9 +21,10 @@ As an open-source project, we welcome and encourage the community to submit patc
 2. Create an upstream remote and sync your local copy before you branch.
 3. Branch for each separate piece of work.
 4. Do the work, write good commit messages. Commit messages must adhere to [commitlint](https://github.com/conventional-changelog/commitlint) standards.
-5. Push to your origin repository.
-6. Create a new PR in GitHub.
-7. Respond to any code review feedback.
+5. For new functionality, add tests (unit, integration, system) that test the feature
+6. Push to your origin repository.
+7. Create a new PR in GitHub.
+8. Respond to any code review feedback.
 
 ## Contributing Documentation Changes
 
