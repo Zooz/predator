@@ -74,7 +74,8 @@ class DrawerE extends Component {
                                                                 // className={url.includes(nestedItem.navigateTo) ? style['menu-selected'] : undefined}
                                                                 primaryText={nestedItem.primaryText}
                                                                 onClick={nestedItem.linkUrl ? () => window.open(nestedItem.linkUrl, '_blank') : () => this.apiClick(`/${nestedItem.navigateTo}`)}
-                                                          // leftIcon={<ActionGrade />}
+                                                                leftIcon={nestedItem.icon && <FontAwesomeIcon className={style.icon} icon={nestedItem.icon}/>}
+
                                                       />
                                                   )
                                               })}

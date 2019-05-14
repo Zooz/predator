@@ -19,12 +19,13 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons'
 import TextArea from '../../../../components/TextArea';
 import MultiValueInput from '../../../../components/MultiValueInput';
+import UiSwitcher from '../../../../components/UiSwitcher';
 import {filter} from 'lodash';
 
-const DESCRIPTION='Here you can configure your job';
+const DESCRIPTION='Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const inputTypes = {
     INPUT_LIST: 'INPUT_LIST',
-    CHECKBOX: 'CHECKBOX',
+    SWITCHER: 'SWITCHER',
     TEXT_FIELD: 'TEXT_FIELD'
 };
 
@@ -39,6 +40,14 @@ class Form extends React.Component {
                 disabled: true,
                 floatingLabelText: 'Test Id',
                 info: 'The test id used to find the test in the API.'
+            },
+            {
+                width: 350,
+                name: 'test_name',
+                key: 'test_name',
+                disabled: true,
+                floatingLabelText: 'Test Name',
+                info: 'The test name that you are going to run.'
             },
             {
                 width: 350,
@@ -105,8 +114,8 @@ class Form extends React.Component {
                 name: 'run_immediately',
                 key: 'run_immediately',
                 label: 'Run immediately',
-                info: 'Schedule a one time job, which will run the test now.',
-                type: inputTypes.CHECKBOX
+                // info: 'Schedule a one time job, which will run the test now.',
+                type: inputTypes.SWITCHER
             },
             {
                 width: 350,
@@ -130,6 +139,7 @@ class Form extends React.Component {
         ];
         this.state = {
             test_id: this.props.data ? this.props.data.id : '',
+            test_name: this.props.data ? this.props.data.name : '',
             arrival_rate: undefined,
             duration: undefined,
             ramp_to: undefined,
@@ -160,8 +170,8 @@ class Form extends React.Component {
         });
     }
 
-    handleChangeForCheckBox = (name, evt) => {
-        const newState = Object.assign({}, this.state, {[name]: evt.target.checked});
+    handleChangeForCheckBox = (name, value) => {
+        const newState = Object.assign({}, this.state, {[name]: value});
         newState.errors = validate(newState);
         this.setState(newState);
     };
@@ -198,6 +208,9 @@ class Form extends React.Component {
     }
 
     showInfo(item) {
+        if(!item || !item.info){
+            return null;
+        }
         return (<TooltipWrapper
             content={
                 <div>
@@ -207,8 +220,8 @@ class Form extends React.Component {
             place='top'
             offset={{top: 1}}
         >
-            <div data-tip data-for={`tooltipKey_${item.info}`} style={{cursor: 'pointer', marginTop: '23px',marginLeft:'7px'}}>
-                <FontAwesomeIcon style={{color:'#557eff',fontSize:'16px'}} icon={faQuestionCircle}/>
+            <div data-tip data-for={`tooltipKey_${item.info}`} style={{cursor: 'pointer'}}>
+                <FontAwesomeIcon style={{color:'#557eff',fontSize:'13px'}} icon={faQuestionCircle}/>
             </div>
 
         </TooltipWrapper>);
@@ -227,7 +240,6 @@ class Form extends React.Component {
                                         <div style={{flex:'1'}}>
                                         {this.generateInput(oneItem)}
                                         </div>
-                                        {this.showInfo(oneItem)}
                                     </RactangleAlignChildrenLeft>}
                                 </Fragment>);
                             }, this)}
@@ -236,8 +248,7 @@ class Form extends React.Component {
                                 <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
                                         onClick={this.whenSubmit}>Submit</Button>
                             </div>
-                            {this.props.serverError ? <ErrorDialog showMessage={this.props.serverError}
-                                                                   closeDialog={this.closeViewErrorDialog}/> : null}
+                            {this.props.serverError ? <ErrorDialog showMessage={this.props.serverError} /> : null}
                         </div>
                 </FormWrapper>
             </Modal>
@@ -247,22 +258,37 @@ class Form extends React.Component {
     generateInput = (oneItem) => {
         const {cron_expression} = this.state;
         switch (oneItem.type) {
-            case inputTypes.CHECKBOX:
+            case inputTypes.SWITCHER:
+
+                {/*<Checkbox style={{width: oneItem.width, marginTop: '10px'}} key={oneItem.key}*/}
+                          {/*disabled={oneItem.disabled}*/}
+                          {/*errorText={this.state.errors[oneItem.name]}*/}
+                          {/*onCheck={(evt) => {*/}
+                              {/*this.handleChangeForCheckBox(oneItem.name, evt)*/}
+                          {/*}}*/}
+                          {/*label={oneItem.label}*/}
+                          {/*name={oneItem.name}*/}
+                          {/*value={false}*/}
+                {/*/>*/}
                 return (
-                    <Checkbox style={{width: oneItem.width, marginTop: '10px'}} key={oneItem.key}
-                              disabled={oneItem.disabled}
-                              errorText={this.state.errors[oneItem.name]}
-                              onCheck={(evt) => {
-                                  this.handleChangeForCheckBox(oneItem.name, evt)
-                              }}
-                              label={oneItem.label}
-                              name={oneItem.name}
-                              value={false}
-                    />
+                    <RactangleAlignChildrenLeft>
+                        <UiSwitcher
+                            onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
+                            disabledInp={false}
+                            activeState={this.state[oneItem.name]}
+                            height={12}
+                            width={22}/>
+                        <div className={style['run-immediately']}>{oneItem.label}</div>
+                    </RactangleAlignChildrenLeft>
+
+
+
+
+
                 );
             case inputTypes.INPUT_LIST:
                 return (
-                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}>
+                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText} rightComponent={this.showInfo(oneItem)}>
                         <MultiValueInput
                             values={this.state[oneItem.name].map((value) => ({value, label: value}))}
                             onAddItem={(evt) => this.handleInputListAdd(oneItem.name, evt)}
@@ -275,7 +301,7 @@ class Form extends React.Component {
 
             case inputTypes.TEXT_FIELD:
                 return (
-                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}>
+                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText} rightComponent={this.showInfo(oneItem)}>
                         <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
                             <TextArea
                                 disabled={oneItem.disabled}
@@ -286,9 +312,10 @@ class Form extends React.Component {
                     </TitleInput>
                 );
             default:
+                console.log('oneItem',oneItem)
                 return (
                         <div>
-                            <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}>
+                            <TitleInput key={oneItem.key} title={oneItem.floatingLabelText} rightComponent={this.showInfo(oneItem)}>
                                 <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
                                 <Input disabled={oneItem.disabled} value={this.state[oneItem.name]} onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}/>
                                 </ErrorWrapper>
