@@ -232,7 +232,7 @@ class Form extends React.Component {
                                 </Fragment>);
                             }, this)}
                             <div className={style.buttons}>
-                                <Button onClick={closeDialog}>Cancel</Button>
+                                <Button inverted onClick={closeDialog}>Cancel</Button>
                                 <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
                                         onClick={this.whenSubmit}>Submit</Button>
                             </div>
