@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import * as selectors from './redux/selectors/reportsSelector';
-import {errorOnStopRunningJob, stopRunningJobSuccess} from './redux/selectors/jobsSelector';
+import {createJobSuccess, errorOnStopRunningJob, stopRunningJobSuccess} from './redux/selectors/jobsSelector';
 import {tests} from './redux/selectors/testsSelector';
 import Snackbar from 'material-ui/Snackbar';
 import style from './style.scss';
@@ -10,6 +10,7 @@ import * as Actions from './redux/action';
 import Page from '../../../components/Page';
 import _ from 'lodash';
 import Report from '../components/Report';
+import {createJobRequest} from './requestBuilder';
 
 import {ReactTableComponent} from './../../../components/ReactTable';
 import {getColumns} from './configurationColumn'
@@ -17,8 +18,8 @@ import {getColumns} from './configurationColumn'
 const REFRESH_DATA_INTERVAL = 30000;
 
 const columnsNames = ['test_name', 'start_time', 'end_time', 'duration', 'status', 'arrival_rate',
-    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'report', 'grafana_report', 'raw', 'logs', 'stop'];
-const DESCRIPTION='Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.';
+    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'report', 'grafana_report', 'rerun', 'raw', 'logs', 'stop'];
+const DESCRIPTION = 'Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.';
 
 class getReports extends React.Component {
     constructor(props) {
@@ -27,7 +28,9 @@ class getReports extends React.Component {
         this.state = {
             showReport: false,
             sortedReports: [],
-            sortHeader: ''
+            sortHeader: '',
+            rerunJob: null
+
         };
     }
 
@@ -42,6 +45,13 @@ class getReports extends React.Component {
         this.setState({openViewReport: report});
     };
 
+    onRerun = (job) => {
+        const requestBody = createJobRequest(job);
+        delete requestBody.cron_expression;
+        requestBody.run_immediately = true;
+        this.props.createJob(requestBody);
+        this.setState({rerunJob: job});
+    };
 
     closeViewReportDialog = () => {
         this.setState({
@@ -114,7 +124,8 @@ class getReports extends React.Component {
             onSort: this.onSort,
             onReportView: this.onReportView,
             onRawView: this.onRawView,
-            onStop: this.onStop
+            onStop: this.onStop,
+            onRerun: this.onRerun
         });
 
         return (
@@ -144,22 +155,36 @@ class getReports extends React.Component {
                         vertical: 'top',
                         horizontal: 'center'
                     }}
-                    open={(!!this.props.stopRunningJobSuccess)}
+                    open={(!!(this.props.stopRunningJobSuccess || this.props.jobSuccess))}
                     bodyStyle={{backgroundColor: '#2fbb67'}}
-                    message={this.props.stopRunningJobSuccess ? 'Job successfully aborted' : ''}
+                    message={this.generateFeedbackMessage()}
                     autoHideDuration={4000}
                     onRequestClose={() => {
                         this.props.getAllReports();
                         this.props.clearStopJobSuccess();
                         this.props.clearStoppedJobError();
+                        this.props.createJobSuccess(undefined);
                         this.setState({
-                            showSnackbar: false
+                            showSnackbar: false,
+                            rerunJob: null
                         });
                     }}
                 />
             </Page>
         )
     }
+
+    generateFeedbackMessage = () => {
+        if (this.props.stopRunningJobSuccess) {
+            return 'Job successfully aborted'
+        }
+        if (this.props.jobSuccess && this.state.rerunJob) {
+            return `Job created successfully: ${this.props.jobSuccess.id}`;
+        }
+
+    }
+
+
 }
 
 function mapStateToProps(state) {
@@ -171,7 +196,8 @@ function mapStateToProps(state) {
         errorOnGetReport: selectors.errorOnGetReport(state),
         errorOnStopRunningJob: errorOnStopRunningJob(state),
         stopRunningJobSuccess: stopRunningJobSuccess(state),
-        tests: tests(state)
+        tests: tests(state),
+        jobSuccess: createJobSuccess(state)
     }
 }
 
@@ -183,7 +209,9 @@ const mapDispatchToProps = {
     stopRunningJob: Actions.stopRunningJob,
     clearStopJobSuccess: Actions.clearStopJobSuccess,
     clearStoppedJobError: Actions.clearErrorOnStopJob,
-    getTests: Actions.getTests
+    createJob: Actions.createJob,
+    getTests: Actions.getTests,
+    createJobSuccess: Actions.createJobSuccess
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getReports);
