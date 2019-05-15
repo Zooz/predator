@@ -26,6 +26,34 @@
   
 </head>
 <body>
+
+<!-- Google Analytics -->
+  <script>
+  window.ga = window.ga || function() {
+    (ga.q = ga.q || []).push(arguments)
+  }
+  ga.l = +new Date
+  /* Setup integration and send page view */
+  ga("create", "UA-40865650-2", "predator-ng.com")
+  ga("set", "anonymizeIp", true)
+  ga("send", "pageview")
+  /* Register handler to log search on blur */
+  document.addEventListener("DOMContentLoaded", () => {
+    if (document.forms.search) {
+      var query = document.forms.search.query
+      query.addEventListener("blur", function() {
+        if (this.value) {
+          var path = document.location.pathname;
+          ga("send", "pageview", path + "?q=" + this.value)
+        }
+      })
+    }
+  })
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- /Google Analytics -->
+
+
   <section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-0">
 
     
@@ -66,7 +94,7 @@
     </nav>
 </section>
 
-<section class="engine"><a href="https://mobirise.info/q">free responsive web templates</a></section><section class="cid-rqySRX5hzy mbr-parallax-background" id="header2-4">
+<section class="engine"><a href="https://mobirise.info/a">online web builder</a></section><section class="cid-rqySRX5hzy mbr-parallax-background" id="header2-4">
 
     
 

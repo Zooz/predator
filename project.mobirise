@@ -6,7 +6,7 @@
       "name": "mobirise4",
       "title": "Mobirise 4",
       "styling": {
-        "primaryColor": "#2d3347",
+        "primaryColor": "#149dcc",
         "secondaryColor": "#ff3366",
         "successColor": "#F7ED4A",
         "infoColor": "#82786E",
@@ -27,18 +27,17 @@
         "isAnimatedOnScroll": false,
         "isScrollToTopButton": false
       },
-      "additionalSetColors": [
-        "#2d3347"
-      ]
+      "additionalSetColors": []
     },
     "path": "@PROJECT_PATH@",
     "siteFonts": [],
     "versionFirst": "4.7.6",
-    "uniqCompNum": 15,
+    "uniqCompNum": 7,
     "versionPublish": "4.10.0",
     "screenshot": "screenshot.png",
     "favicon": "",
-    "noImageResize": ""
+    "noImageResize": "",
+    "google-analytics": "  <script>\r\n  window.ga = window.ga || function() {\r\n    (ga.q = ga.q || []).push(arguments)\r\n  }\r\n  ga.l = +new Date\r\n  /* Setup integration and send page view */\r\n  ga(\"create\", \"UA-40865650-2\", \"predator-ng.com\")\r\n  ga(\"set\", \"anonymizeIp\", true)\r\n  ga(\"send\", \"pageview\")\r\n  /* Register handler to log search on blur */\r\n  document.addEventListener(\"DOMContentLoaded\", () => {\r\n    if (document.forms.search) {\r\n      var query = document.forms.search.query\r\n      query.addEventListener(\"blur\", function() {\r\n        if (this.value) {\r\n          var path = document.location.pathname;\r\n          ga(\"send\", \"pageview\", path + \"?q=\" + this.value)\r\n        }\r\n      })\r\n    }\r\n  })\r\n</script>\r\n<script async src=\"https://www.google-analytics.com/analytics.js\"></script>"
   },
   "pages": {
     "index.html": {
