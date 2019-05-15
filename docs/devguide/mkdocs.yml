@@ -7,7 +7,7 @@ site_author: ZOOZ
 google_analytics: ['UA-40865650-2', 'predator-ng.com']
 
 nav:
-  - About: index.md
+  - About: about.md
   - Installation: installation.md
   - My First Test: myfirsttest.md
   - Advanced Test Setup: tests.md
