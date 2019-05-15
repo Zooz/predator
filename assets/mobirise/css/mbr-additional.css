@@ -1827,6 +1827,29 @@ body {
   font-size: 72px;
   color: #707070;
 }
+.cid-rqzjmYAM5g {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  background-color: #ffffff;
+}
+.cid-rqzjmYAM5g .line {
+  background-color: #149dcc;
+  color: #149dcc;
+  align: center;
+  height: 2px;
+  margin: 0 auto;
+}
+.cid-rqzjmYAM5g .section-text {
+  padding: 2rem 0;
+}
+.cid-rqzjmYAM5g .inner-container {
+  margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .cid-rqzjmYAM5g .inner-container {
+    width: 100% !important;
+  }
+}
 .cid-rqz7jVs8VY {
   padding-top: 90px;
   padding-bottom: 90px;
