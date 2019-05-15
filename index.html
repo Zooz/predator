@@ -1,560 +1,194 @@
-
-
-
-
-<!doctype html>
-<html lang="en" class="no-js">
+<!DOCTYPE html>
+<html  >
 <head>
-    
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description"
-          content="Predator manages the lifecycle of load-testing APIs, from creating the tests, to running them on a scheduled and on-demand, and viewing the results in real time">
-    <meta name="keywords"
-          content="performance testing api,load testing api,blazemeter,jmeter,performance testing tools,load testing tools,load test,kuberntes,dcos,docker,stress,api">
-    <meta name="author" content="ZOOZ">
-    
-    <meta name="lang:clipboard.copy" content="Copy to clipboard">
-    
-    <meta name="lang:clipboard.copied" content="Copied to clipboard">
-    
-    <meta name="lang:search.language" content="en">
-    
-    <meta name="lang:search.pipeline.stopwords" content="True">
-    
-    <meta name="lang:search.pipeline.trimmer" content="True">
-    
-    <meta name="lang:search.result.none" content="No matching documents">
-    
-    <meta name="lang:search.result.one" content="1 matching document">
-    
-    <meta name="lang:search.result.other" content="# matching documents">
-    
-    <meta name="lang:search.tokenizer" content="[\s\-]+">
-    
-    <link rel="shortcut icon" href="assets/images/favicon.png">
-    <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.1.2">
-    
-
-    <title>Predator - Distributed performance testing platform</title>
-
-    
-    <link rel="stylesheet" href="assets/stylesheets/application.3020aac5.css">
-    
-    
-    
-    
-    <script src="assets/javascripts/modernizr.74668098.js"></script>
-    
-    
-    
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
-    <style>body, input {
-        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
-    }
-
-    code, kbd, pre {
-        font-family: "Roboto Mono", "Courier New", Courier, monospace
-    }</style>
-    
-    
-    <link rel="stylesheet" href="assets/fonts/material-icons.css">
-    
-    
-    
-    
-    
-<script>
-  window.ga = window.ga || function() {
-    (ga.q = ga.q || []).push(arguments)
-  }
-  ga.l = +new Date
-  /* Setup integration and send page view */
-  ga("create", "UA-40865650-2", "predator-ng.com")
-  ga("set", "anonymizeIp", true)
-  ga("send", "pageview")
-  /* Register handler to log search on blur */
-  document.addEventListener("DOMContentLoaded", () => {
-    if (document.forms.search) {
-      var query = document.forms.search.query
-      query.addEventListener("blur", function() {
-        if (this.value) {
-          var path = document.location.pathname;
-          ga("send", "pageview", path + "?q=" + this.value)
-        }
-      })
-    }
-  })
-</script>
-<script async src="https://www.google-analytics.com/analytics.js"></script>
-    
-    
-    
+  <!-- Site made with Mobirise Website Builder v4.10.0, https://mobirise.com -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Mobirise v4.10.0, mobirise.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="assets/images/predator-184x212.png" type="image/x-icon">
+  <meta name="description" content="">
+  
+  <title>Home</title>
+  <link rel="stylesheet" href="assets/web/assets/mobirise-icons2/mobirise2.css">
+  <link rel="stylesheet" href="assets/web/assets/mobirise-icons/mobirise-icons.css">
+  <link rel="stylesheet" href="assets/web/assets/mobirise-icons-bold/mobirise-icons-bold.css">
+  <link rel="stylesheet" href="assets/tether/tether.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
+  <link rel="stylesheet" href="assets/dropdown/css/style.css">
+  <link rel="stylesheet" href="assets/theme/css/style.css">
+  <link rel="stylesheet" href="assets/gallery/style.css">
+  <link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
+  
+  
+  
 </head>
-
-<body dir="ltr">
-
-<svg class="md-svg">
-    <defs>
-        
-        
-        <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
-    viewBox="0 0 416 448" id="__github">
-  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
-        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
-        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
-        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
-        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
-        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
-        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
-        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
-        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
-        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
-        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
-        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
-        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
-        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
-        99.5z" />
-</svg>
-        
-    </defs>
-</svg>
-<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-<input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-<label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
-
-<a href="#introducing-predator" tabindex="1" class="md-skip">
-    Skip to content
-</a>
-
-
-<header class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid">
-    <div class="md-flex">
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="https://predator-ng.com" title="Predator" class="md-header-nav__button md-logo">
-          <img src="https://zooz.github.io/predator/images/logo.png" width="60" height="30">
-        </a>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
-      </div>
-      <div class="md-flex__cell md-flex__cell--stretch">
-        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
-          
-            <span class="md-header-nav__topic">
-              Predator
-            </span>
-            <span class="md-header-nav__topic">
-              About
-            </span>
-          
-        </div>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        
-          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
-          
-<div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
-      <label class="md-icon md-search__icon" for="__search"></label>
-      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
-        &#xE5CD;
-      </button>
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result">
-          <div class="md-search-result__meta">
-            Type to start searching
-          </div>
-          <ol class="md-search-result__list"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-        
-      </div>
-      
-        <div class="md-flex__cell md-flex__cell--shrink">
-          <div class="md-header-nav__source">
-            
-
-
-  
-
-<a href="https://github.com/Zooz/predator/" title="Go to repository" class="md-source" data-md-source="github">
-  
-    <div class="md-source__icon">
-      <svg viewBox="0 0 24 24" width="24" height="24">
-        <use xlink:href="#__github" width="24" height="24"></use>
-      </svg>
-    </div>
-  
-  <div class="md-source__repository">
-    GitHub
-  </div>
-</a>
-          </div>
-        </div>
-      
-    </div>
-  </nav>
-</header>
-
-<div class="md-container">
-    
-    
-    
-    
-    <main class="md-main">
-        <div class="md-main__inner md-grid" data-md-component="container">
-            
-            
-            <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-                <div class="md-sidebar__scrollwrap">
-                    <div class="md-sidebar__inner">
-                        <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="https://predator-ng.com" title="Predator" class="md-nav__button md-logo">
-      <img src="https://zooz.github.io/predator/images/logo.png" width="60" height="30">
-    </a>
-    Predator
-  </label>
-  
-    <div class="md-nav__source">
-      
-
-
-  
-
-<a href="https://github.com/Zooz/predator/" title="Go to repository" class="md-source" data-md-source="github">
-  
-    <div class="md-source__icon">
-      <svg viewBox="0 0 24 24" width="24" height="24">
-        <use xlink:href="#__github" width="24" height="24"></use>
-      </svg>
-    </div>
-  
-  <div class="md-source__repository">
-    GitHub
-  </div>
-</a>
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-      
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        About
-      </label>
-    
-    <a href="index.html" title="About" class="md-nav__link md-nav__link--active">
-      About
-    </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#main-features" title="Main Features" class="md-nav__link">
-    Main Features
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ui" title="UI" class="md-nav__link">
-    UI
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#under-the-hood" title="Under the hood" class="md-nav__link">
-    Under the hood
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#feature-comparison" title="Feature Comparison" class="md-nav__link">
-    Feature Comparison
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
-  </li>
+<body>
+  <section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-0">
 
     
-      
-      
-      
 
-
-  <li class="md-nav__item">
-    <a href="installation.html" title="Installation" class="md-nav__link">
-      Installation
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="myfirsttest.html" title="My First Test" class="md-nav__link">
-      My First Test
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="tests.html" title="Advanced Test Setup" class="md-nav__link">
-      Advanced Test Setup
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="schedulesandreports.html" title="Schedules and Reports" class="md-nav__link">
-      Schedules and Reports
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="configuration.html" title="Configuration" class="md-nav__link">
-      Configuration
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="contributing.html" title="Contributing" class="md-nav__link">
-      Contributing
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="apireference.html" title="API Reference" class="md-nav__link">
-      API Reference
-    </a>
-  </li>
-
-    
-  </ul>
-</nav>
-                    </div>
-                </div>
+    <nav class="navbar navbar-expand beta-menu navbar-dropdown align-items-center navbar-fixed-top navbar-toggleable-sm">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
-            
-            
-            <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                    <div class="md-sidebar__inner">
-                        
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#main-features" title="Main Features" class="md-nav__link">
-    Main Features
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ui" title="UI" class="md-nav__link">
-    UI
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#under-the-hood" title="Under the hood" class="md-nav__link">
-    Under the hood
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#feature-comparison" title="Feature Comparison" class="md-nav__link">
-    Feature Comparison
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-                    </div>
-                </div>
-            </div>
-            
-            
-            <div class="md-content">
-                <article class="md-content__inner md-typeset">
-                    
-                    
-                    <a href="https://github.com/Zooz/predator/blob/master/docs/devguide/docs/index.md" title="Edit this page"
-                       class="md-icon md-content__icon">&#xE3C9;</a>
-                    
-                    
-                    <h1 id="introducing-predator">Introducing Predator<a class="headerlink" href="#introducing-predator" title="Permanent link">#</a></h1>
-<p><strong>Distributed open source performance testing platform for APIs.</strong></p>
-<p>Requests per second, request latency, and overall system performance and reliability are some fundamental concepts that need to be taken into account when designing a high capacity API. With CI/CD becoming a common deployment methodology, deployments to production are a constant occurrence. So how can you ensure that the core capabilities you initially designed your system to have remain intact? </p>
-<p>The answer is: use Predator! </p>
-<p>Predator is a performance platform that can be configured to automatically load your API with scheduled tests that provide in-depth performance metrics. While sipping on your (morning) coffee, you can simply check the test summaries to make sure your system is performing as expected. By comparing test results to results from previous test runs, you can easily identify system-wide regressions. Predator’s integration with custom dashboards, test metrics, and service logs make pinpointing performance bugs painless,especially when you check up on the system on a daily basis.</p>
-<h2 id="main-features">Main Features<a class="headerlink" href="#main-features" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>Distributed load</strong>:  Predator supports unlimited number of load generators that produce load concurrently.</li>
-<li><strong>Real time reports</strong>: Predator aggregate all concurrent runs into one beautiful report in real time (latency, rps, status codes and more)</li>
-<li><strong>Built for the cloud</strong>:  Predator is built to take advantage of Kubernetes and DC/OS. it's integrated with those platform and is able to manage the load generators life cycles by it self.</li>
-<li><strong>One click installation</strong>:  Installed via one click in Kubernetes, DC/OS, or any other machine that has Docker.</li>
-<li><strong>Supports 5 Different databases</strong>: Predator can adjust it self to persist data in Cassandra, Postgres, MySQL, MSSQL and SQLITE out of the box.</li>
-<li><strong>Scheduled jobs</strong>: Run any tests in recurring mode by cron expression.</li>
-<li><strong>3rd partry metrics</strong>:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.</li>
-<li><strong>Rich UI</strong>: Predator offers rich UI side by side powerful REST API.</li>
-<li><strong>Based on <a href="https://github.com/artilleryio/artillery">artilliery.io</a></strong>: Predator uses artillery as its load engine to fire the requests. The schema of creating tests via api is based on artillery schema.</li>
-</ul>
-<h2 id="ui">UI<a class="headerlink" href="#ui" title="Permanent link">#</a></h2>
-<p><img src="images/predator-screens.gif"/></p>
-<h2 id="under-the-hood">Under the hood<a class="headerlink" href="#under-the-hood" title="Permanent link">#</a></h2>
-<p><img alt="Screenshot" src="images/predator-overview.png" /></p>
-<h2 id="feature-comparison">Feature Comparison<a class="headerlink" href="#feature-comparison" title="Permanent link">#</a></h2>
-<p><img alt="Screenshot" src="images/features.png" /></p>
-                    
-                    
-                    
-                    
-                    
-                    
-
-
-                    
-                </article>
-            </div>
-        </div>
-    </main>
-    
-    
-<footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-        
-          <a href="installation.html" title="Installation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
+        </button>
+        <div class="menu-logo">
+            <div class="navbar-brand">
+                <span class="navbar-logo">
+                    <a href="https://mobirise.com">
+                         <img src="assets/images/predator-184x212.png" alt="Mobirise" title="" style="height: 3.9rem;">
+                    </a>
                 </span>
-                Installation
-              </span>
+                
             </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-        powered by
-        <a href="https://www.mkdocs.org">MkDocs</a>
-        and
-        <a href="https://squidfunk.github.io/mkdocs-material/">
-          Material for MkDocs</a>
-      </div>
-      
-    </div>
-  </div>
-</footer>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav nav-dropdown nav-right" data-app-modern-menu="true"><li class="nav-item">
+                    <a class="nav-link link text-white display-4" href="https://mobirise.com">
+                        </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link link text-white display-4" href="https://predator-ng.com/about.html"><span class="mbrib-bookmark mbr-iconfont mbr-iconfont-btn"></span>
+                        
+                        Docs</a>
+                </li><li class="nav-item"><a class="nav-link link text-white display-4" href="https://github.com/Zooz/predator" target="_blank"><span class="mbrib-github mbr-iconfont mbr-iconfont-btn"></span>
+                        
+                        Github</a></li></ul>
+            
+        </div>
+    </nav>
+</section>
+
+<section class="engine"><a href="https://mobirise.info/x">free css templates</a></section><section class="cid-rqySRX5hzy mbr-parallax-background" id="header2-4">
+
     
-</div>
 
-<script src="assets/javascripts/application.48c2c9de.js"></script>
+    <div class="mbr-overlay" style="opacity: 0.5; background-color: rgb(35, 35, 35);"></div>
 
-<script>app.initialize({version: "1.0.4", url: {base: "."}})</script>
+    <div class="container align-center">
+        <div class="row justify-content-md-center">
+            <div class="mbr-white col-md-10">
+                <h1 class="mbr-section-title mbr-bold pb-3 mbr-fonts-style display-2">
+                    Predator</h1>
+                <h3 class="mbr-section-subtitle align-center mbr-light pb-3 mbr-fonts-style display-5">Distributed opensource performance testing platform for APIs</h3>
+                <p class="mbr-text pb-3 mbr-fonts-style display-7">Predator is an end-to-end solution that manages the entire lifecycle of load testing APIs, from creating and managing existing performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live, built-in report. It has a simple, one-click installation, built with support for Kubernetes (helm charts), DC/OS (mesosphere universe), and Docker Engine, making it accessible for anyone and deployable in every machine that supports Docker. Predator has no limit on the amount of virtual users that can run in a test, it supports running distributed load out of the box, enabling an unlimited amount of virtual users that can bombard your servers. Unlike all other testing tools, Predator has a built in DSL feature, allowing developers to write functional and non-functional performance tests using their own business logic. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.</p>
+                
+            </div>
+        </div>
+    </div>
+    <div class="mbr-arrow hidden-sm-down" aria-hidden="true">
+        <a href="#next">
+            <i class="mbri-down mbr-iconfont"></i>
+        </a>
+    </div>
+</section>
+
+<section class="features5 cid-rqyVDU3s7P" id="features5-7">
+    
+    
+
+    
+    <div class="container">
+        <div class="media-container-row">
+
+            <div class="card p-3 col-12 col-md-6 col-lg-3">
+                <div class="card-img pb-3">
+                    <span class="mbr-iconfont mbri-cloud"></span>
+                </div>
+                <div class="card-box">
+                    <h4 class="card-title py-3 mbr-fonts-style display-7">
+                        Build for the cloud</h4>
+                    <p class="mbr-text mbr-fonts-style display-7">Predator is built to take advantage of Kubernetes and DC/OS. it's integrated with those platform and is able to manage the load generators life cycles by it self.</p>
+                </div>
+            </div>
+
+            <div class="card p-3 col-12 col-md-6 col-lg-3">
+                <div class="card-img pb-3">
+                    <span class="mbr-iconfont mbri-globe"></span>
+                </div>
+                <div class="card-box">
+                    <h4 class="card-title py-3 mbr-fonts-style display-7">
+                        Distributed Load</h4>
+                    <p class="mbr-text mbr-fonts-style display-7">Predator supports unlimited number of load generators that produce load concurrently.<br>Predator will aggreate the result of this runners in real time into a beautiful report.</p>
+                </div>
+            </div>
+
+            <div class="card p-3 col-12 col-md-6 col-lg-3">
+                <div class="card-img pb-3">
+                    <span class="mbr-iconfont mbri-touch"></span>
+                </div>
+                <div class="card-box">
+                    <h4 class="card-title py-3 mbr-fonts-style display-7">
+                        One click installation</h4>
+                    <p class="mbr-text mbr-fonts-style display-7">Predator can be installed via one click in Kubernetes, DC/OS, or any other machine that has Docker.</p>
+                </div>
+            </div>
+
+            <div class="card p-3 col-12 col-md-6 col-lg-3">
+                <div class="card-img pb-3">
+                    <span class="mbr-iconfont mobi-mbri-database mobi-mbri"></span>
+                </div>
+                <div class="card-box mbr-fonts-style">
+                    <h4 class="card-title py-3 display-7">Supports 5 storage backends</h4>
+                    <p class="mbr-text mbr-fonts-style display-7">Predator can adjust it self to persist data in Cassandra, Postgres, MySQL, MSSQL and SQLITE out of the box.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mbr-gallery mbr-slider-carousel cid-rqz7jVs8VY" id="gallery4-h">
+
+    
+
+    <div class="container">
+        <div><!-- Gallery --><div class="gallery-row"><div class="mbr-gallery-layout-default"><div><div class="row-first row justify-content-center m-0"><div class="mbr-gallery-item col-lg-4 col-md-4 col-sm-12 p-2" data-video-url="false"><div href="#lb-gallery4-h" data-slide-to="0" data-toggle="modal"><img src="assets/images/create-2-2000x971-800x388.png" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Create test<br></span></div></div><div class="mbr-gallery-item col-lg-4 col-md-4 col-sm-12 p-2" data-video-url="false"><div href="#lb-gallery4-h" data-slide-to="1" data-toggle="modal"><img src="assets/images/grafana-1-2000x927-800x370.png" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Integration with prometheus/influx and grafana</span></div></div><div class="mbr-gallery-item col-lg-4 col-md-4 col-sm-12 p-2" data-video-url="false"><div href="#lb-gallery4-h" data-slide-to="2" data-toggle="modal"><img src="assets/images/see-results-2000x922-800x369.png" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">See realtime results<br></span></div></div></div><div class="row-second row justify-content-center m-0"><div class="mbr-gallery-item col-lg-4 col-md-4 col-sm-12 p-2" data-video-url="false"><div href="#lb-gallery4-h" data-slide-to="3" data-toggle="modal"><img src="assets/images/runtest-2000x1250-800x500.png" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Run test</span></div></div><div class="mbr-gallery-item col-lg-4 col-md-4 col-sm-12 p-2" data-video-url="false"><div href="#lb-gallery4-h" data-slide-to="4" data-toggle="modal"><img src="assets/images/see-all-tests-1148x598-800x417.png" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">All tests are persisted</span></div></div></div></div><div class="clearfix"></div></div></div><!-- Lightbox --><div data-app-prevent-settings="" class="mbr-slider modal fade carousel slide" tabindex="-1" data-keyboard="true" data-interval="false" id="lb-gallery4-h"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><div class="carousel-inner"><div class="carousel-item"><img src="assets/images/create-2-2000x971.png" alt="" title=""></div><div class="carousel-item active"><img src="assets/images/grafana-1-2000x927.png" alt="" title=""></div><div class="carousel-item"><img src="assets/images/see-results-2000x922.png" alt="" title=""></div><div class="carousel-item"><img src="assets/images/runtest-2000x1250.png" alt="" title=""></div><div class="carousel-item"><img src="assets/images/see-all-tests-1148x598.png" alt="" title=""></div></div><a class="carousel-control carousel-control-prev" role="button" data-slide="prev" href="#lb-gallery4-h"><span class="mbri-left mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control carousel-control-next" role="button" data-slide="next" href="#lb-gallery4-h"><span class="mbri-right mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Next</span></a><a class="close" href="#" role="button" data-dismiss="modal"><span class="sr-only">Close</span></a></div></div></div></div></div>
+    </div>
+
+</section>
+
+<section once="footers" class="cid-rqz9hYdzyu" id="footer6-i">
+
+    
+
+    
+
+    <div class="container">
+        <div class="media-container-row align-center mbr-white">
+            <div class="col-12">
+                <p class="mbr-text mb-0 mbr-fonts-style display-7">
+                    © Copyright 2019 Predator - All Rights Reserved
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
 
 
+  <script src="assets/web/assets/jquery/jquery.min.js"></script>
+  <script src="assets/popper/popper.min.js"></script>
+  <script src="assets/tether/tether.min.js"></script>
+  <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/bootstrapcarouselswipe/bootstrap-carousel-swipe.js"></script>
+  <script src="assets/parallax/jarallax.min.js"></script>
+  <script src="assets/masonry/masonry.pkgd.min.js"></script>
+  <script src="assets/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/smoothscroll/smooth-scroll.js"></script>
+  <script src="assets/dropdown/js/script.min.js"></script>
+  <script src="assets/vimeoplayer/jquery.mb.vimeo_player.js"></script>
+  <script src="assets/touchswipe/jquery.touch-swipe.min.js"></script>
+  <script src="assets/theme/js/script.js"></script>
+  <script src="assets/slidervideo/script.js"></script>
+  <script src="assets/gallery/player.min.js"></script>
+  <script src="assets/gallery/script.js"></script>
+  
+  
 </body>
 </html>
