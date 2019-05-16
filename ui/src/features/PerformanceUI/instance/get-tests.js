@@ -219,10 +219,6 @@ class getTests extends React.Component {
                     fix using redux to be with less variables.
                   */}
                     <Snackbar
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'center'
-                        }}
                         open={this.props.createJobSuccess || this.props.deleteTestSuccess}
                         bodyStyle={{backgroundColor: '#2fbb67'}}
                         message={(this.props.createJobSuccess && this.props.createJobSuccess.run_id) ? `Job created successfully with Run ID: ${this.props.createJobSuccess.run_id}` : 'Test deleted successfully'}
