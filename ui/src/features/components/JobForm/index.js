@@ -111,7 +111,7 @@ class Form extends React.Component {
                 name: 'debug',
                 key: 'debug',
                 label: 'Debug',
-                info: 'Turn on debug for getting more informative logs',
+                info: 'Turn on debug to log request and response in the load generators',
                 type: inputTypes.SWITCHER
             },
             {
