@@ -40,7 +40,7 @@ const TitleInput = ({title, disabled, className, children, prefix, suffix, alert
 }
 
 TitleInput.propTypes = {
-    title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
+    title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     suffix: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     alert: PropTypes.bool,
