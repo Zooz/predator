@@ -113,11 +113,11 @@ You can now run the test as you would any other.
 ![Screenshot](images/dsltestinui.png)
 
 ## Creating a Test with custom logic in Javascript
-Tests can use custom Javascript functions , for using Javascript functions in your tests you should first create text file, with your Javascript code,
+Tests can use custom Javascript functions, for using Javascript functions in your tests you should first create text file, with your Javascript code,
 and upload it to public repository. (S3, dropbox,google docs etc... ).
-when creating a test use processor_file_url parameter to send URL path to your Javascript file .
+when creating a test use processor_file_url parameter to send URL path to your Javascript file.
 Predator will download and save this file (Any changes after creating test will not be reflected.)
-To create your scenarios with Javascript function , work alongside Artillery guidelines.
+To create your scenarios with Javascript function, work alongside Artillery guidelines.
 
 * Artillery documentation: https://artillery.io/docs/http-reference/#loading-custom-js-code
 
