@@ -3,9 +3,13 @@
 const _ = require('lodash'),
     uuid = require('uuid/v4');
 
+module.exports.getLastMonthDate = async (numberOfMonthBack) => {
+    Array(numberOfMonthBack).map((_, x) => {
 
-
-
-module.exports.getLastMothDate = async (numberOfmonthBack) => {
-
+    });
 };
+
+function dateMonthAgo(numberOfMonthBack) {
+
+
+}
