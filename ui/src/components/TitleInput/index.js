@@ -23,7 +23,7 @@ const TitleInput = ({title, disabled, className, children, prefix, suffix, alert
     const childrenExist = Boolean(children)
     return (
         <ParentWrap wrap={childrenExist}>
-            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: !title ? 'flex-end' : 'space-between'}}>
                 <label {...rest} className={classnames(className, css.title, {
                     [css['title--disabled']]: disabled,
                     [css['title--alert']]: alert

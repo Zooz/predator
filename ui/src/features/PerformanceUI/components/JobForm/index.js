@@ -35,7 +35,6 @@ class Form extends React.Component {
         super(props);
         this.FormList = [
             {
-                width: 350,
                 name: 'test_id',
                 key: 'id',
                 disabled: true,
@@ -43,7 +42,6 @@ class Form extends React.Component {
                 info: 'The test id used to find the test in the API.'
             },
             {
-                width: 350,
                 name: 'test_name',
                 key: 'test_name',
                 disabled: true,
@@ -51,7 +49,6 @@ class Form extends React.Component {
                 info: 'The test name that you are going to run.'
             },
             {
-                width: 350,
                 name: 'notes',
                 key: 'notes',
                 floatingLabelText: 'Notes',
@@ -60,28 +57,24 @@ class Form extends React.Component {
                 type: inputTypes.TEXT_FIELD
             },
             {
-                width: 350,
                 name: 'arrival_rate',
                 key: 'arrival_rate',
                 floatingLabelText: 'Arrival rate',
                 info: 'Number of scenarios per second that the test fires.'
             },
             {
-                width: 350,
                 name: 'duration',
                 key: 'duration',
                 floatingLabelText: 'Duration (Minutes)',
                 info: 'The duration of the test in minutes.'
             },
             {
-                width: 350,
                 name: 'ramp_to',
                 key: 'ramp_to',
                 floatingLabelText: 'Ramp to',
                 info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.'
             },
             {
-                width: 350,
                 name: 'parallelism',
                 key: 'parallelism',
                 floatingLabelText: 'Parallelism',
@@ -89,7 +82,6 @@ class Form extends React.Component {
                 defaultValue: '1'
             },
             {
-                width: 350,
                 name: 'max_virtual_users',
                 key: 'max_virtual_users',
                 floatingLabelText: 'Max virtual users',
@@ -97,21 +89,18 @@ class Form extends React.Component {
                 defaultValue: '500'
             },
             {
-                width: 350,
                 name: 'environment',
                 key: 'environment',
                 floatingLabelText: 'Environment',
                 info: 'The chosen environment to test. Free text used to logically separate between tests runs'
             },
             {
-                width: 350,
                 name: 'cron_expression',
                 key: 'cron_expression',
                 floatingLabelText: 'Cron expression',
                 info: 'Schedule a reoccurring job using this. For example, cron expression: "0 0 22 * * *" runs the test every day at 22:00 UTC.'
             },
             {
-                width: 350,
                 name: 'run_immediately',
                 key: 'run_immediately',
                 label: 'Run immediately',
@@ -119,7 +108,13 @@ class Form extends React.Component {
                 type: inputTypes.SWITCHER
             },
             {
-                width: 350,
+                name: 'debug',
+                key: 'debug',
+                label: 'Debug',
+                info: 'Turn on debug for getting more informative logs',
+                type: inputTypes.SWITCHER
+            },
+            {
                 name: 'emails',
                 key: 'emails',
                 floatingLabelText: 'Emails',
@@ -128,7 +123,6 @@ class Form extends React.Component {
                 type: inputTypes.INPUT_LIST
             },
             {
-                width: 350,
                 name: 'webhooks',
                 key: 'webhooks',
                 floatingLabelText: 'Webhooks',
@@ -264,6 +258,8 @@ class Form extends React.Component {
         switch (oneItem.type) {
             case inputTypes.SWITCHER:
                 return (
+                    <TitleInput style={{flex:'1'}} key={oneItem.key} title={oneItem.floatingLabelText}
+                                rightComponent={this.showInfo(oneItem)}>
                     <RactangleAlignChildrenLeft>
                         <UiSwitcher
                             onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
@@ -273,9 +269,11 @@ class Form extends React.Component {
                             width={22}/>
                         <div className={style['run-immediately']}>{oneItem.label}</div>
                     </RactangleAlignChildrenLeft>
+            </TitleInput>
 
 
-                );
+
+            );
             case inputTypes.INPUT_LIST:
                 return (
                     <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
@@ -321,10 +319,14 @@ class Form extends React.Component {
     }
 
     whenSubmit = () => {
-        this.props.createJob(createJobRequest(Object.assign({}, this.state, {
+        const convertedArgs = {
             test_id: this.props.data.id,
             duration: parseInt(this.state.duration) * 60,
-        })));
+        };
+        if(this.state.debug){
+            convertedArgs.debug='*';
+        }
+        this.props.createJob(createJobRequest(Object.assign({}, this.state, convertedArgs)));
     };
 }
 
