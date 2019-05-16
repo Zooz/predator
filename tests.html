@@ -475,8 +475,77 @@
 </li>
 </ul>
 <p>If you login to the Predator UI after creating the test, you will notice that the test has been added with a type of <strong>dsl</strong>. </p>
-<p><img alt="Screenshot" src="images/dsltestinui.png" /></p>
 <p>You can now run the test as you would any other. </p>
+<p><img alt="Screenshot" src="images/dsltestinui.png" /></p>
+<h2 id="creating-a-test-with-custom-logic-in-javascript">Creating a Test with custom logic in Javascript<a class="headerlink" href="#creating-a-test-with-custom-logic-in-javascript" title="Permanent link">#</a></h2>
+<p>Tests can use custom Javascript functions , for using Javascript functions in your tests you should first create text file, with your Javascript code,
+and upload it to public repository. (S3, dropbox,google docs etc... ).
+when creating a test use processor_file_url parameter to send URL path to your Javascript file .
+Predator will download and save this file (Any changes after creating test will not be reflected.)
+To create your scenarios with Javascript function , work alongside Artillery guidelines.</p>
+<ul>
+<li>Artillery documentation: https://artillery.io/docs/http-reference/#loading-custom-js-code</li>
+</ul>
+<p>Here's an example for test using custom JS code:</p>
+<p><div class="codehilite"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;custom logic in Javascript example&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;custom logic in Javascript&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;processor_file_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.dropbox.com/s/yourFilePath/fileName.txt?dl=1&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;basic&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;scenarios&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Processor exmaple&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;flow&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;function&quot;</span><span class="p">:</span> <span class="s2">&quot;generateRandomDataGlobal&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;get&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.google.com/{{ randomPath }}&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;afterResponse&quot;</span><span class="p">:</span> <span class="s2">&quot;logResponse&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;log&quot;</span><span class="p">:</span> <span class="s2">&quot;********************* Sent a request to /users with {{ name }}, {{ email }}, {{ password }}&quot;</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+Java script code:
+<div class="codehilite"><pre><span></span><span class="err">&#39;use</span> <span class="err">strict&#39;;</span>
+<span class="err">const</span> <span class="err">uuid</span> <span class="err">=</span> <span class="err">require(&#39;uuid/v</span><span class="mi">4</span><span class="err">&#39;);</span>
+<span class="err">module.exports</span> <span class="err">=</span> <span class="p">{</span>
+  <span class="err">logResponse,</span>
+  <span class="err">generateRandomDataGlobal</span>
+<span class="p">}</span><span class="err">;</span>
+
+
+  <span class="err">function</span> <span class="err">logResponse(requestParams,</span> <span class="err">response,</span> <span class="err">context,</span> <span class="err">ee,</span> <span class="err">next)</span> <span class="p">{</span>
+  <span class="err">if(response.statusCode</span> <span class="err">!==</span> <span class="err">200){</span>
+       <span class="err">console.log(&#39;****************</span> <span class="err">fail</span> <span class="err">with</span> <span class="err">status</span> <span class="err">code:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(response.statusCode));</span>
+       <span class="err">console.log(&#39;****************</span> <span class="err">host</span> <span class="err">is:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(response.request.uri.host));</span>
+       <span class="err">console.log(&#39;****************</span> <span class="err">path</span> <span class="err">is:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(response.request.uri.pathname));</span>
+       <span class="err">console.log(&#39;****************</span> <span class="err">response</span> <span class="err">headers</span> <span class="err">is:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(response.headers));</span>
+
+    <span class="p">}</span>
+     <span class="err">return</span> <span class="err">next();</span> <span class="err">//</span> <span class="err">MUST</span> <span class="err">be</span> <span class="err">called</span> <span class="err">for</span> <span class="err">the</span> <span class="err">scenario</span> <span class="err">to</span> <span class="err">continue</span>
+  <span class="err">}</span>
+
+
+<span class="err">function</span> <span class="err">generateRandomDataGlobal(userContext,</span> <span class="err">events,</span> <span class="err">done)</span> <span class="p">{</span>
+<span class="err">console.log(&#39;userContext</span> <span class="err">is:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(userContext));</span>
+  <span class="err">userContext.vars.randomPath</span> <span class="err">=</span> <span class="err">&#39;random_path_&#39;</span> <span class="err">+</span> <span class="err">uuid();</span>
+  <span class="err">userContext.vars.name</span> <span class="err">=</span> <span class="err">&#39;name_random_&#39;</span> <span class="err">+</span> <span class="err">uuid();</span>
+  <span class="err">userContext.vars.email</span> <span class="err">=</span> <span class="err">&#39;email_random_&#39;</span> <span class="err">+</span> <span class="err">uuid();</span>
+  <span class="err">userContext.vars.password</span> <span class="err">=</span> <span class="err">&#39;password_random_&#39;</span> <span class="err">+</span> <span class="err">uuid();</span>
+  <span class="err">return</span> <span class="err">done();</span>
+<span class="p">}</span>
+</pre></div>
+In this example we creating a test with 2 JS functions:
+<code>logResponse</code> will log the result received if the statusCode is different from 200. The function will be called after each response using the afterResponse command.
+<code>generateRandomDataGlobal</code> is a global function that creates global variables that can be used in the scope of the test with the {{ }} syntax.</p>
                     
                     
                     
