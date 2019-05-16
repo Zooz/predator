@@ -21,8 +21,6 @@ export default function reduce (state = initialState, action = {}) {
     return state.set('error_get_jobs', action.error);
   case Types.GET_JOBS_SUCCESS:
     return state.set('jobs', action.jobs);
-  case Types.CLEAR_JOBS:
-    return state.set('jobs', []);
   case Types.CLEAR_ERROR_ON_GET_JOBS:
     return state.set('error_get_jobs', undefined);
   case Types.GET_JOB_FAILURE:

@@ -16,10 +16,6 @@ export const clearErrorOnGetJobs = () => (
   { type: Types.CLEAR_ERROR_ON_GET_JOBS }
 );
 
-export const clearJobs = () => (
-  { type: Types.CLEAR_JOBS }
-);
-
 export const getJob = (jobId) => (
   { type: Types.GET_JOB, jobId }
 );

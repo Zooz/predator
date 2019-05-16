@@ -4,7 +4,6 @@ import {reports} from './reportsSelector';
 export const jobs = (state) => state.JobsReducer.get('jobs');
 export const errorOnGetJobs = (state) => state.JobsReducer.get('error_get_jobs');
 export const job = (state) => state.JobsReducer.get('job');
-export const errorOnGetJob = (state) => state.JobsReducer.get('error_get_job');
 export const processingGetJobs = (state) => state.JobsReducer.get('processing_get_jobs');
 export const processingCreateJob = (state) => state.JobsReducer.get('processing_create_job');
 export const errorOnNewJob = (state) => state.JobsReducer.get('error_new_job');

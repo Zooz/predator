@@ -21,6 +21,7 @@ import TextArea from '../../../../components/TextArea';
 import MultiValueInput from '../../../../components/MultiValueInput';
 import UiSwitcher from '../../../../components/UiSwitcher';
 import {filter} from 'lodash';
+import {createJobRequest} from '../../instance/requestBuilder';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const inputTypes = {
@@ -228,7 +229,7 @@ class Form extends React.Component {
     }
 
     render() {
-        const {closeDialog, processingAction} = this.props;
+        const {closeDialog, processingAction, serverError,clearErrorOnCreateJob} = this.props;
         return (
             <Modal width={'50%'} onExit={closeDialog}>
                 <FormWrapper title={'Create a new job'} description={DESCRIPTION}>
@@ -248,7 +249,10 @@ class Form extends React.Component {
                             <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
                                     onClick={this.whenSubmit}>Submit</Button>
                         </div>
-                        {this.props.serverError ? <ErrorDialog showMessage={this.props.serverError}/> : null}
+                        { serverError &&
+                        <ErrorDialog closeDialog={() => {clearErrorOnCreateJob()}} showMessage={serverError}/>
+                        }
+
                     </div>
                 </FormWrapper>
             </Modal>
@@ -300,7 +304,6 @@ class Form extends React.Component {
                     </TitleInput>
                 );
             default:
-                console.log('oneItem', oneItem)
                 return (
                     <div>
                         <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
@@ -318,25 +321,10 @@ class Form extends React.Component {
     }
 
     whenSubmit = () => {
-
-        let body = {
+        this.props.createJob(createJobRequest(Object.assign({}, this.state, {
             test_id: this.props.data.id,
-            arrival_rate: parseInt(this.state.arrival_rate),
             duration: parseInt(this.state.duration) * 60,
-            ramp_to: this.state.ramp_to ? parseInt(this.state.ramp_to) : undefined,
-            environment: this.state.environment,
-            run_immediately: (this.state.run_immediately === undefined) ? false : this.state.run_immediately,
-            emails: this.state.emails,
-            webhooks: this.state.webhooks,
-            notes: this.state.notes,
-            parallelism: this.state.parallelism ? parseInt(this.state.parallelism) : undefined,
-            max_virtual_users: this.state.max_virtual_users ? parseInt(this.state.max_virtual_users) : undefined
-        };
-        if (this.state.cron_expression) {//should exist and not empty
-            body.cron_expression = this.state.cron_expression
-        }
-        body = JSON.parse(JSON.stringify(body));
-        this.props.createJob(body);
+        })));
     };
 }
 
