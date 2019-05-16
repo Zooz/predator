@@ -108,6 +108,79 @@ There are two additional items to note:
 
 If you login to the Predator UI after creating the test, you will notice that the test has been added with a type of **dsl**. 
 
+You can now run the test as you would any other. 
+
 ![Screenshot](images/dsltestinui.png)
 
-You can now run the test as you would any other. 
+## Creating a Test with custom logic in Javascript
+Tests can use custom Javascript functions , for using Javascript functions in your tests you should first create text file, with your Javascript code,
+and upload it to public repository. (S3, dropbox,google docs etc... ).
+when creating a test use processor_file_url parameter to send URL path to your Javascript file .
+Predator will download and save this file (Any changes after creating test will not be reflected.)
+To create your scenarios with Javascript function , work alongside Artillery guidelines.
+
+* Artillery documentation: https://artillery.io/docs/http-reference/#loading-custom-js-code
+
+Here's an example for test using custom JS code:
+
+```JSON
+{
+  "name": "custom logic in Javascript example",
+  "description": "custom logic in Javascript",
+  "processor_file_url": "https://www.dropbox.com/s/yourFilePath/fileName.txt?dl=1",
+  "type": "basic",
+  "scenarios": [
+    {
+      "name": "Processor exmaple",
+      "flow": [
+        {
+          "function": "generateRandomDataGlobal"
+        },
+        {
+          "get": {
+            "url": "http://www.google.com/{{ randomPath }}",
+            "afterResponse": "logResponse"
+          }
+        },
+        {
+          "log": "********************* Sent a request to /users with {{ name }}, {{ email }}, {{ password }}"
+        }
+      ]
+    }
+  ]
+}
+```
+Java script code:
+```JSON
+'use strict';
+const uuid = require('uuid/v4');
+module.exports = {
+  logResponse,
+  generateRandomDataGlobal
+};
+
+
+  function logResponse(requestParams, response, context, ee, next) {
+  if(response.statusCode !== 200){
+       console.log('**************** fail with status code: ' + JSON.stringify(response.statusCode));
+       console.log('**************** host is: ' + JSON.stringify(response.request.uri.host));
+       console.log('**************** path is: ' + JSON.stringify(response.request.uri.pathname));
+       console.log('**************** response headers is: ' + JSON.stringify(response.headers));
+
+    }
+     return next(); // MUST be called for the scenario to continue
+  }
+
+
+function generateRandomDataGlobal(userContext, events, done) {
+console.log('userContext is: ' + JSON.stringify(userContext));
+  userContext.vars.randomPath = 'random_path_' + uuid();
+  userContext.vars.name = 'name_random_' + uuid();
+  userContext.vars.email = 'email_random_' + uuid();
+  userContext.vars.password = 'password_random_' + uuid();
+  return done();
+}
+```
+In this example we creating a test with 2 JS functions:
+`logResponse` will log the result received if the statusCode is different from 200. The function will be called after each response using the afterResponse command.
+`generateRandomDataGlobal` is a global function that creates global variables that can be used in the scope of the test with the {{ }} syntax.

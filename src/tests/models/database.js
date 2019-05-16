@@ -9,10 +9,12 @@ module.exports = {
     getTest,
     getTests,
     deleteTest,
+    saveFile,
     insertDslDefinition,
     getDslDefinition,
     getDslDefinitions,
     updateDslDefinition,
+    getFile,
     deleteDefinition
 };
 
@@ -46,4 +48,11 @@ async function getDslDefinition(dslName, definitionName) {
 }
 async function getDslDefinitions(dslName) {
     return databaseConnector.getDslDefinitions(dslName);
+}
+
+async function saveFile(id, file) {
+    return databaseConnector.saveFile(id, file);
+}
+async function getFile(id) {
+    return databaseConnector.getFile(id);
 }

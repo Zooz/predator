@@ -9,6 +9,8 @@ module.exports = {
     getTests,
     deleteTest,
     getAllTestRevisions,
+    saveFile,
+    getFile,
     insertDslDefinition,
     getDslDefinitions,
     getDslDefinition,
@@ -25,10 +27,22 @@ async function init(sequlizeClient) {
 }
 
 async function initSchemas() {
+    const file = client.define('file', {
+        id: {
+            type: Sequelize.DataTypes.UUID,
+            primaryKey: true
+        },
+        file: {
+            type: Sequelize.DataTypes.TEXT('long')
+        }
+    });
     const test = client.define('test', {
         test_id: {
             type: Sequelize.DataTypes.UUID,
             unique: 'compositeIndex'
+        },
+        file_id: {
+            type: Sequelize.DataTypes.UUID
         },
         name: {
             type: Sequelize.DataTypes.STRING
@@ -73,6 +87,7 @@ async function initSchemas() {
     });
     await test.sync();
     await dslDefinition.sync();
+    await file.sync();
 }
 
 async function insertTest(testInfo, testJson, id, revisionId){
@@ -81,6 +96,7 @@ async function insertTest(testInfo, testJson, id, revisionId){
         test_id: id,
         name: testInfo.name,
         type: testInfo.type,
+        file_id: testInfo.fileId,
         description: testInfo.description,
         updated_at: Date.now(),
         raw_data: JSON.stringify(testInfo),
@@ -200,12 +216,34 @@ function sanitizeDslResult(data) {
     return result;
 }
 
+async function saveFile(id, file) {
+    const fileClient = client.model('file');
+    let params = {
+        id: id,
+        file: file
+    };
+
+    const result = fileClient.create(params);
+    return result;
+}
+
+async function getFile(id) {
+    const fileClient = client.model('file');
+    const options = {
+        attributes: { exclude: ['updated_at', 'created_at'] }
+    };
+    options.where = { id: id };
+    const dbResult = await fileClient.findOne(options);
+    return dbResult ? dbResult.file : dbResult;
+}
+
 function sanitizeTestResult(data) {
     const result = data.map(function (test) {
         const dataValues = test.dataValues;
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
         dataValues.raw_data = JSON.parse(dataValues.raw_data);
         dataValues.id = dataValues.test_id;
+        dataValues.file_id = dataValues.file_id || undefined;
         delete dataValues.test_id;
         return dataValues;
     });
