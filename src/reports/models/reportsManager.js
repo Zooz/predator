@@ -82,7 +82,7 @@ module.exports.postStats = async (report, stats) => {
     if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
         await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
     }
-    await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime);
+    await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime, report.start_time);
     report = await module.exports.getReport(report.test_id, report.report_id);
     notifier.notifyIfNeeded(report, stats);
 

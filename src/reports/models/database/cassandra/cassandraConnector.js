@@ -5,10 +5,12 @@ const logger = require('../../../../common/logger');
 let client;
 
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
+const INSERT_LAST_REPORT_SUMMARY = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=?';
+const UPDATE_LAST_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=? AND start_time_year=? AND start_time_month=?';
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
-const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports LIMIT ?';
+const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports WHERE start_time_year=? AND start_time_month=? LIMIT ?';
 const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(runner_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
 const GET_REPORT_STATS = 'SELECT * FROM reports_stats WHERE test_id=? AND report_id=?';
 const SUBSCRIBE_RUNNER = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, phase_status) values(?,?,?,?)';
@@ -43,31 +45,52 @@ function insertReport(testId, revisionId, reportId, jobId, testType, phase, star
     let params;
     const testNotes = notes || '';
     params = [testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
+    insertLastReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
     return executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
 }
 
-function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
+function insertLastReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+    let params;
+    const testNotes = notes || '';
+    const startTimeDate = new Date(startTime);
+    const startTimeYear = startTimeDate.getUTCFullYear();
+    const startTimeMonth = startTimeDate.getUTCMonth() + 1;
+    params = [startTimeYear, startTimeMonth, testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
+    return executeQuery(INSERT_LAST_REPORT_SUMMARY, params, queryOptions);
+}
+
+function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
     let params;
     params = [phaseIndex, lastUpdatedAt, testId, reportId];
+    updateLastReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime);
     return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
+}
+
+function updateLastReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
+    let params;
+    const startTimeDate = new Date(startTime);
+    const startTimeYear = startTimeDate.getUTCFullYear();
+    const startTimeMonth = startTimeDate.getUTCMonth() + 1;
+    params = [phaseIndex, lastUpdatedAt, testId, reportId, startTimeYear, startTimeMonth];
+    return executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions);
 }
 
 function getReport(testId, reportId) {
     let params;
     params = [testId, reportId];
-    return joinReportsWIthSubscribers(GET_REPORT_SUMMARY, params, queryOptions);
+    return getReportsWIthSubscribers(GET_REPORT_SUMMARY, params, queryOptions);
 }
 
 function getReports(testId) {
     let params;
     params = [testId];
-    return joinReportsWIthSubscribers(GET_REPORTS_SUMMARIES, params, queryOptions);
+    return getReportsWIthSubscribers(GET_REPORTS_SUMMARIES, params, queryOptions);
 }
 
 function getLastReports(limit) {
     let params;
     params = [limit];
-    return joinReportsWIthSubscribers(GET_LAST_SUMMARIES, params, queryOptions);
+    return getReportsWIthSubscribers(GET_LAST_SUMMARIES, params, queryOptions);
 }
 
 function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
@@ -120,10 +143,24 @@ function executeQuery(query, params, queryOptions) {
     });
 }
 
-async function joinReportsWIthSubscribers(query, params, queryOptions) {
-    let subscribers, report;
+async function getReportsWIthSubscribers(query, params, queryOptions) {
     const reports = await executeQuery(query, params, queryOptions);
+    let reportsWithSubscribers = await joinReportsWIthSubscribers(reports);
+    return reportsWithSubscribers;
+}
 
+async function getLastReportsWIthSubscribers(limit) {
+    var dateObj = new Date();
+    const month = dateObj.getUTCMonth() + 1; //months from 1-12
+    const day = dateObj.getUTCDate();
+    const year = dateObj.getUTCFullYear();
+    const reports = await executeQuery(query, params, queryOptions);
+    let reportsWithSubscribers = await joinReportsWIthSubscribers(reports);
+    return reportsWithSubscribers;
+}
+
+async function joinReportsWIthSubscribers(reports) {
+    let subscribers, report;
     for (let reportIndex = 0; reportIndex < reports.length; reportIndex++) {
         report = reports[reportIndex];
         subscribers = await getReportSubscribers(report.test_id, report.report_id);
