@@ -36,9 +36,7 @@ class getReports extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (prevProps.reports !== this.props.reports) {
-            this.setState({sortedReports: [...this.props.reports],sortHeader: 'start_time+'},()=>{
-                this.onSort('start_time');
-            })
+            this.setState({sortedReports: [...this.props.reports]})
         }
     }
 

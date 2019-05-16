@@ -140,7 +140,7 @@ class getJobs extends React.Component {
             onRunTest: this.onRunTest,
             onDelete: this.onDelete
         });
-
+        const feedbackMessage = this.generateFeedbackMessage();
         return (
             <Page title={'Scheduled Jobs'} description={DESCRIPTION}>
                 <ReactTableComponent
@@ -166,14 +166,10 @@ class getJobs extends React.Component {
                       display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}
                       onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
                       onCancel={this.cancelDelete} /> : null}
-                <Snackbar
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center'
-                    }}
+                {feedbackMessage && <Snackbar
                     open={!!(this.props.deleteJobSuccess || this.props.jobSuccess)}
                     bodyStyle={{ backgroundColor: '#2fbb67' }}
-                    message={this.generateFeedbackMessage()}
+                    message={feedbackMessage}
                     autoHideDuration={4000}
                     onRequestClose={() => {
                         this.props.getAllJobs();
@@ -184,7 +180,7 @@ class getJobs extends React.Component {
                             rerunJob: null
                         });
                     }}
-                />
+                />}
           </Page>
         );
     }

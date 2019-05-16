@@ -132,6 +132,7 @@ class getTests extends React.Component {
             onRunTest: this.onRunTest
         });
         const {showReport} = this.state;
+        const feedbackMessage = this.generateFeedbackMessage();
         return (
             <Page
                 title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
@@ -153,11 +154,7 @@ class getTests extends React.Component {
                 <Report onClose={this.closeReport} key={showReport.report_id + 'reports'} report={showReport}/>}
                 {this.state.openViewReport ? <Dialog title_key={'report_id'} data={this.state.openViewReport}
                                                      closeDialog={this.closeViewReportDialog}/> : null}
-                <Snackbar
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center'
-                    }}
+                {feedbackMessage && <Snackbar
                     open={!!this.props.jobSuccess}
                     bodyStyle={{backgroundColor: '#2fbb67'}}
                     message={this.generateFeedbackMessage()}
@@ -168,7 +165,7 @@ class getTests extends React.Component {
                             rerunJob: null
                         });
                     }}
-                />
+                />}
             </Page>
         )
     }

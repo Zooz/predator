@@ -5,7 +5,7 @@ import Moment from 'moment';
 import prettySeconds from 'pretty-seconds';
 import 'font-awesome/css/font-awesome.min.css';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faEye,faRedo, faCloudDownloadAlt, faStopCircle, faTrashAlt, faPen} from '@fortawesome/free-solid-svg-icons'
+import {faEye,faRedo, faRunning, faCloudDownloadAlt, faStopCircle, faTrashAlt, faPen} from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames';
 import css from './configurationColumn.scss';
 import env from "../../../App/common/env";
@@ -282,7 +282,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Run Now
                 </TableHeader>
             ),
-            accessor: data => <ViewButton icon={faRedo} onClick={(e) => {
+            accessor: data => <ViewButton icon={faRunning} onClick={(e) => {
                 e.stopPropagation();
                 onRunTest(data)}}/>,
             className: css['small-header'],
