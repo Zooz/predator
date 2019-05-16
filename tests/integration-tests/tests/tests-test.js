@@ -35,7 +35,7 @@ describe('the tests api', function() {
                 });
         });
         it('Should return error for file url not exists ', async () => {
-            let requestBody = Object.assign({ file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
+            let requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
             const res = await requestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(422);
             res.body.message.should.eql('Error to read file, throw exception: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com www.notrealurl.com:443');
@@ -93,7 +93,7 @@ describe('the tests api', function() {
                 getTestResponse.statusCode.should.eql(404);
             });
             it('Create test, with a file ', async () => {
-                let requestBody = Object.assign({ file_url: fileUrl }, simpleTest.test);
+                let requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
                 const createTestResponse = await requestSender.createTest(requestBody, validHeaders);
                 console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
                 createTestResponse.statusCode.should.eql(201);

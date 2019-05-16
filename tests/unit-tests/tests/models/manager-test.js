@@ -66,7 +66,7 @@ describe('Scenario generator tests', function () {
             saveFileStub.resolves();
 
             let result = await manager.upsertTest({
-                testInfo: 'info', file_url: 'path to dropbox'
+                testInfo: 'info', processor_file_url: 'path to dropbox'
             });
 
             insertStub.calledOnce.should.eql(true);
@@ -85,7 +85,7 @@ describe('Scenario generator tests', function () {
             saveFileStub.resolves();
             try {
                 let result = await manager.upsertTest({
-                    testInfo: 'info', file_url: 'path to dropbox'
+                    testInfo: 'info', processor_file_url: 'path to dropbox'
                 });
                 console.log(result);
                 should.fail('Expected error to throw');

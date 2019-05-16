@@ -1094,7 +1094,7 @@ components:
           type: string
           description: The name of the test.
           example: Order from Pet Store
-        file_url:
+        processor_file_url:
           type: string
           format: uri
           example: http://www.example.com/file.txt

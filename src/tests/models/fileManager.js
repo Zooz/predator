@@ -9,8 +9,8 @@ module.exports = {
     getFile
 };
 async function createFileFromUrl(testRawData) {
-    if (testRawData['file_url']) {
-        const fileId = await saveFile(testRawData['file_url']);
+    if (testRawData['processor_file_url']) {
+        const fileId = await saveFile(testRawData['processor_file_url']);
         return fileId;
     }
     return undefined;
