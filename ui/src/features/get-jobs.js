@@ -13,12 +13,12 @@ import {
 import { tests } from './redux/selectors/testsSelector';
 import { reports } from './redux/selectors/reportsSelector';
 import style from './style.scss';
-import Dialog from '../components/Dialog';
-import DeleteDialog from '../components/DeleteDialog';
+import Dialog from './components/Dialog';
+import DeleteDialog from './components/DeleteDialog';
 import * as Actions from './redux/action';
-import Loader from '../components/Loader';
-import Page from '../../../components/Page';
-import { ReactTableComponent } from '../../../components/ReactTable';
+import Loader from './components/Loader';
+import Page from '../components/Page';
+import { ReactTableComponent } from '../components/ReactTable';
 import { getColumns } from './configurationColumn';
 import _ from 'lodash';
 import {createJobRequest} from './requestBuilder';

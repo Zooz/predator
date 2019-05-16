@@ -1,4 +1,4 @@
-import {TableHeader} from "../../../components/ReactTable";
+import {TableHeader} from "../components/ReactTable";
 import React from "react";
 import {filter, sortedUniqBy} from 'lodash';
 import Moment from 'moment';
@@ -8,9 +8,9 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faEye,faRedo, faRunning, faCloudDownloadAlt, faStopCircle, faTrashAlt, faPen} from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames';
 import css from './configurationColumn.scss';
-import env from "../../../App/common/env";
+import env from "../App/common/env";
 import {v4 as uuid} from "uuid";
-import TooltipWrapper from '../../../components/TooltipWrapper';
+import TooltipWrapper from '../components/TooltipWrapper';
 import {getTimeFromCronExpr} from './utils';
 
 

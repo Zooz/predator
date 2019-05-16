@@ -12,17 +12,17 @@ import {
 } from './redux/selectors/testsSelector';
 import {createJobSuccess} from './redux/selectors/jobsSelector';
 import style from './style.scss';
-import Dialog from '../components/Dialog';
-import JobForm from '../components/JobForm';
+import Dialog from './components/Dialog';
+import JobForm from './components/JobForm';
 import * as Actions from './redux/action';
-import Loader from '../components/Loader';
-import history from '../../../store/history'
-import DeleteDialog from '../components/DeleteDialog';
-import Page from '../../../components/Page';
-import TestForm from '../components/TestForm';
-import {ReactTableComponent} from "../../../components/ReactTable";
+import Loader from './components/Loader';
+import history from '../store/history'
+import DeleteDialog from './components/DeleteDialog';
+import Page from '../components/Page';
+import TestForm from './components/TestForm';
+import {ReactTableComponent} from "../components/ReactTable";
 import {getColumns} from "./configurationColumn";
-import Button from '../../../components/Button';
+import Button from '../components/Button';
 import _ from "lodash";
 
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import env from '../../../../../App/common/env';
+import env from '../../../App/common/env';
 import {getAuthorizationHeader} from './apiUtils';
 
 export const getReportsFromFramework = (queryParams, testId) => {

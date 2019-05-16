@@ -2,26 +2,26 @@ import React, {Fragment} from 'react';
 import style from './style.scss';
 import Checkbox from 'material-ui/Checkbox';
 import {connect} from 'react-redux';
-import {processingCreateJob, createJobSuccess, createJobFailure} from '../../instance/redux/selectors/jobsSelector';
-import * as Actions from '../../instance/redux/action';
+import {processingCreateJob, createJobSuccess, createJobFailure} from '../../redux/selectors/jobsSelector';
+import * as Actions from '../../redux/action';
 import ErrorDialog from '../ErrorDialog';
-import TooltipWrapper from '../../../../components/TooltipWrapper';
-import RactangleAlignChildrenLeft from '../../../../components/RectangleAlign/RectangleAlignChildrenLeft';
+import TooltipWrapper from '../../../components/TooltipWrapper';
+import RactangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft';
 import {validate} from './validator';
 import CronViewer from './cronViewer';
 import Modal from '../Modal';
-import Button from '../../../../components/Button'
-import TitleInput from '../../../../components/TitleInput'
-import Input from '../../../../components/Input'
-import FormWrapper from "../../../../components/FormWrapper";
-import ErrorWrapper from "../../../../components/ErrorWrapper";
+import Button from '../../../components/Button'
+import TitleInput from '../../../components/TitleInput'
+import Input from '../../../components/Input'
+import FormWrapper from "../../../components/FormWrapper";
+import ErrorWrapper from "../../../components/ErrorWrapper";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons'
-import TextArea from '../../../../components/TextArea';
-import MultiValueInput from '../../../../components/MultiValueInput';
-import UiSwitcher from '../../../../components/UiSwitcher';
+import TextArea from '../../../components/TextArea';
+import MultiValueInput from '../../../components/MultiValueInput';
+import UiSwitcher from '../../../components/UiSwitcher';
 import {filter} from 'lodash';
-import {createJobRequest} from '../../instance/requestBuilder';
+import {createJobRequest} from '../../requestBuilder';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const inputTypes = {

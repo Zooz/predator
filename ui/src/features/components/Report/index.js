@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Modal from '../Modal';
-import {prettySeconds} from '../../instance/utils';
+import {prettySeconds} from '../../utils';
 import PieChart from '../PieChart'
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -11,8 +11,8 @@ import {
     Line
 } from 'recharts';
 
-import * as Actions from "../../instance/redux/actions/reportsActions";
-import * as selectors from "../../instance/redux/selectors/reportsSelector";
+import * as Actions from "../../redux/actions/reportsActions";
+import * as selectors from "../../redux/selectors/reportsSelector";
 import {connect} from "react-redux";
 import Box from '../Box';
 import dateFormat from 'dateformat';

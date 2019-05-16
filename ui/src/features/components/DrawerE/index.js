@@ -2,9 +2,8 @@ import React, {Component} from 'react'
 import {Drawer, AppBar, ListItem, List} from 'material-ui'
 import style from './style.scss'
 import {connect} from 'react-redux'
-import RactangleAlignChildrenLeft from '../../../../components/RectangleAlign/RectangleAlignChildrenLeft';
-import history from '../../../../store/history';
-import logo from '../../../../images/logo.png';
+import history from '../../../store/history';
+import logo from '../../../images/logo.png';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 
