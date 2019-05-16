@@ -292,6 +292,7 @@ describe('Testing sequelize connector', function () {
                     }
                 ]
             ]);
+            result.forEach(value => delete value.file_id);
             should(result).eql([
                 {
                     'artillery_json': {
@@ -423,6 +424,7 @@ describe('Testing sequelize connector', function () {
                     }
                 ]
             ]);
+            result.forEach(value => delete value.file_id);
             should(result).eql([
                 {
                     'artillery_json': {
