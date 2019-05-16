@@ -5,14 +5,14 @@ import {createJobSuccess, errorOnStopRunningJob, stopRunningJobSuccess} from './
 import {tests} from './redux/selectors/testsSelector';
 import Snackbar from 'material-ui/Snackbar';
 import style from './style.scss';
-import Dialog from '../components/Dialog';
+import Dialog from './components/Dialog';
 import * as Actions from './redux/action';
-import Page from '../../../components/Page';
+import Page from '../components/Page';
 import _ from 'lodash';
-import Report from '../components/Report';
+import Report from './components/Report';
 import {createJobRequest} from './requestBuilder';
 
-import {ReactTableComponent} from './../../../components/ReactTable';
+import {ReactTableComponent} from './../components/ReactTable';
 import {getColumns} from './configurationColumn'
 
 const REFRESH_DATA_INTERVAL = 30000;

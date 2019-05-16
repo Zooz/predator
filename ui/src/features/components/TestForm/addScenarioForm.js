@@ -1,4 +1,4 @@
-import RectangleAlignChildrenLeft from '../../../../components/RectangleAlign/RectangleAlignChildrenLeft'
+import RectangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft'
 import TextField from 'material-ui/TextField';
 import Slider from 'material-ui/Slider';
 

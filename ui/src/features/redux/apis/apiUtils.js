@@ -1,5 +1,5 @@
 
-import store from '../../../../../store';
+import store from '../../../store';
 
 export const getAuthorizationHeader = ()=>{
     const token = store.getState().authReducer.get('token');

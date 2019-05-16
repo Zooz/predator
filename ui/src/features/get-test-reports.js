@@ -8,13 +8,13 @@ import {
     errorOnGetReport
 } from './redux/selectors/reportsSelector';
 import style from './style.scss';
-import Dialog from '../components/Dialog';
+import Dialog from './components/Dialog';
 import * as Actions from './redux/action';
-import Loader from '../components/Loader';
-import Page from '../../../components/Page';
+import Loader from './components/Loader';
+import Page from '../components/Page';
 import _ from 'lodash';
-import Report from "../components/Report";
-import {ReactTableComponent} from "../../../components/ReactTable";
+import Report from "./components/Report";
+import {ReactTableComponent} from "../components/ReactTable";
 import {getColumns} from "./configurationColumn";
 import {createJobRequest} from "./requestBuilder";
 import {createJobSuccess} from "./redux/selectors/jobsSelector";
