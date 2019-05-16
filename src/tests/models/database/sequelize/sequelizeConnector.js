@@ -243,7 +243,7 @@ function sanitizeTestResult(data) {
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
         dataValues.raw_data = JSON.parse(dataValues.raw_data);
         dataValues.id = dataValues.test_id;
-        test.file_id = test.file_id || undefined;
+        dataValues.file_id = dataValues.file_id || undefined;
         delete dataValues.test_id;
         return dataValues;
     });
