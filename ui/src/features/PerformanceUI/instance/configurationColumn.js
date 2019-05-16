@@ -14,7 +14,7 @@ import TooltipWrapper from '../../../components/TooltipWrapper';
 import {getTimeFromCronExpr} from './utils';
 
 
-export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onRerun, onStop, onDelete, onEdit, onRunTest}) => {
+export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest}) => {
 
     const columns = [
         {
@@ -270,7 +270,21 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             ),
             accessor: data => <ViewButton icon={faRedo} onClick={(e) => {
                 e.stopPropagation();
-                onRerun(data)}}/>,
+                onRunTest(data)}}/>,
+            className: css['small-header'],
+            headerClassName: css['small-header'],
+
+        },
+        {
+            id: 'run_now',
+            Header: () => (
+                <TableHeader sortable={false}>
+                    Run Now
+                </TableHeader>
+            ),
+            accessor: data => <ViewButton icon={faRedo} onClick={(e) => {
+                e.stopPropagation();
+                onRunTest(data)}}/>,
             className: css['small-header'],
             headerClassName: css['small-header'],
 

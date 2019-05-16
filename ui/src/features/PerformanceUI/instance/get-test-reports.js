@@ -44,7 +44,7 @@ class getTests extends React.Component {
         };
     }
 
-    onRerun = (job) => {
+    onRunTest = (job) => {
         const request = createJobRequest(job);
         delete request.cron_expression;
         request.run_immediately = true;
@@ -129,7 +129,7 @@ class getTests extends React.Component {
             onReportView: this.onReportView,
             onRawView: this.onRawView,
             onStop: this.onStop,
-            onRerun: this.onRerun
+            onRunTest: this.onRunTest
         });
         const {showReport} = this.state;
         return (

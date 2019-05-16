@@ -229,7 +229,7 @@ class Form extends React.Component {
     }
 
     render() {
-        const {closeDialog, processingAction} = this.props;
+        const {closeDialog, processingAction, serverError,clearErrorOnCreateJob} = this.props;
         return (
             <Modal width={'50%'} onExit={closeDialog}>
                 <FormWrapper title={'Create a new job'} description={DESCRIPTION}>
@@ -249,7 +249,10 @@ class Form extends React.Component {
                             <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
                                     onClick={this.whenSubmit}>Submit</Button>
                         </div>
-                        {this.props.serverError ? <ErrorDialog showMessage={this.props.serverError}/> : null}
+                        { serverError &&
+                        <ErrorDialog closeDialog={() => {clearErrorOnCreateJob()}} showMessage={serverError}/>
+                        }
+
                     </div>
                 </FormWrapper>
             </Modal>
@@ -301,7 +304,6 @@ class Form extends React.Component {
                     </TitleInput>
                 );
             default:
-                console.log('oneItem', oneItem)
                 return (
                     <div>
                         <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
@@ -319,7 +321,10 @@ class Form extends React.Component {
     }
 
     whenSubmit = () => {
-        this.props.createJob(createJobRequest({test_id:this.props.data.id,...this.state}));
+        this.props.createJob(createJobRequest(Object.assign({}, this.state, {
+            test_id: this.props.data.id,
+            duration: parseInt(this.state.duration) * 60,
+        })));
     };
 }
 

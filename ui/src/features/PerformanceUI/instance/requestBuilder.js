@@ -3,7 +3,7 @@ export const createJobRequest = (opts) => {
     let body = {
         test_id: opts.test_id,
         arrival_rate: parseInt(opts.arrival_rate),
-        duration: parseInt(opts.duration) * 60,
+        duration: parseInt(opts.duration),
         ramp_to: opts.ramp_to ? parseInt(opts.ramp_to) : undefined,
         environment: opts.environment,
         run_immediately: (opts.run_immediately === undefined) ? false : opts.run_immediately,

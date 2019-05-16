@@ -26,7 +26,7 @@ import {createJobRequest} from './requestBuilder';
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
 const REFRESH_DATA_INTERVAL = 30000;
-const columnsNames = ['test_name', 'environment', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'rerun', 'raw', 'delete'];
+const columnsNames = ['test_name', 'environment', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'raw', 'delete'];
 const DESCRIPTION = 'Scheduled jobs configured with a cron expression.';
 
 class getJobs extends React.Component {
@@ -71,7 +71,7 @@ class getJobs extends React.Component {
         this.setState({ openViewJob: job });
     };
 
-    onRerun = (job) => {
+    onRunTest = (job) => {
         const request = createJobRequest(job);
         delete request.cron_expression;
         request.run_immediately = true;
@@ -137,7 +137,7 @@ class getJobs extends React.Component {
             columnsNames,
             onSort: this.onSort,
             onRawView: this.onRawView,
-            onRerun: this.onRerun,
+            onRunTest: this.onRunTest,
             onDelete: this.onDelete
         });
 

@@ -36,7 +36,9 @@ class getReports extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (prevProps.reports !== this.props.reports) {
-            this.setState({sortedReports: [...this.props.reports]})
+            this.setState({sortedReports: [...this.props.reports],sortHeader: 'start_time+'},()=>{
+                this.onSort('start_time');
+            })
         }
     }
 
@@ -45,7 +47,7 @@ class getReports extends React.Component {
         this.setState({openViewReport: report});
     };
 
-    onRerun = (job) => {
+    onRunTest = (job) => {
         const requestBody = createJobRequest(job);
         delete requestBody.cron_expression;
         requestBody.run_immediately = true;
@@ -125,9 +127,9 @@ class getReports extends React.Component {
             onReportView: this.onReportView,
             onRawView: this.onRawView,
             onStop: this.onStop,
-            onRerun: this.onRerun
+            onRunTest: this.onRunTest
         });
-
+        const feedbackMessage = this.generateFeedbackMessage();
         return (
             <Page title={'Last Reports'} description={DESCRIPTION}>
                 <div style={{width: '100%'}}>
@@ -150,14 +152,10 @@ class getReports extends React.Component {
                     ? <Dialog title_key={'id'} data={this.state.openViewReport}
                               closeDialog={this.closeViewReportDialog}/> : null}
 
-                <Snackbar
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center'
-                    }}
+                {feedbackMessage && <Snackbar
                     open={(!!(this.props.stopRunningJobSuccess || this.props.jobSuccess))}
                     bodyStyle={{backgroundColor: '#2fbb67'}}
-                    message={this.generateFeedbackMessage()}
+                    message={feedbackMessage}
                     autoHideDuration={4000}
                     onRequestClose={() => {
                         this.props.getAllReports();
@@ -169,7 +167,7 @@ class getReports extends React.Component {
                             rerunJob: null
                         });
                     }}
-                />
+                />}
             </Page>
         )
     }
