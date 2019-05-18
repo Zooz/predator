@@ -297,65 +297,12 @@
     
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
+      
     
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Advanced Test Setup
-      </label>
     
     <a href="tests.html" title="Advanced Test Setup" class="md-nav__link md-nav__link--active">
       Advanced Test Setup
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#data-reuse-with-variables" title="Data Reuse with Variables" class="md-nav__link">
-    Data Reuse with Variables
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#request-reuse-with-dsl-definitions" title="Request Reuse with DSL Definitions" class="md-nav__link">
-    Request Reuse with DSL Definitions
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-a-dsl-definition" title="Creating a DSL Definition" class="md-nav__link">
-    Creating a DSL Definition
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-a-test-that-uses-the-dsl" title="Creating a Test that Uses the DSL" class="md-nav__link">
-    Creating a Test that Uses the DSL
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-a-test-with-custom-logic-in-javascript" title="Creating a Test with custom logic in Javascript" class="md-nav__link">
-    Creating a Test with custom logic in Javascript
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
     
   </li>
 
@@ -422,50 +369,8 @@
 <nav class="md-nav md-nav--secondary">
   
   
+    
   
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#data-reuse-with-variables" title="Data Reuse with Variables" class="md-nav__link">
-    Data Reuse with Variables
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#request-reuse-with-dsl-definitions" title="Request Reuse with DSL Definitions" class="md-nav__link">
-    Request Reuse with DSL Definitions
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-a-dsl-definition" title="Creating a DSL Definition" class="md-nav__link">
-    Creating a DSL Definition
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-a-test-that-uses-the-dsl" title="Creating a Test that Uses the DSL" class="md-nav__link">
-    Creating a Test that Uses the DSL
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-a-test-with-custom-logic-in-javascript" title="Creating a Test with custom logic in Javascript" class="md-nav__link">
-    Creating a Test with custom logic in Javascript
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
   
 </nav>
                     </div>
@@ -481,20 +386,18 @@
                        class="md-icon md-content__icon">&#xE3C9;</a>
                     
                     
-                    <h1>Advanced Test Setup</h1>
-                    
                     <div class="admonition note">
 <p class="admonition-title">What you should already know</p>
 <p>We assume you have already familiarized yourself with the basic concepts used in Predator and that you successfully created your first test. If not, we strongly recommend you first complete the steps in the <a href="myfirsttest.html">My First Test</a> topic before proceeding with the instructions below.</p>
 </div>
-<h2 id="data-reuse-with-variables">Data Reuse with Variables<a class="headerlink" href="#data-reuse-with-variables" title="Permanent link">#</a></h2>
+<h1 id="data-reuse-with-variables">Data Reuse with Variables<a class="headerlink" href="#data-reuse-with-variables" title="Permanent link">#</a></h1>
 <p>The <strong>Captures</strong> field of the <a href="myfirsttest.html#http-request-properties">HTTP request properties</a> allows you to extract (capture) data from the request response and store it in a variable for reuse in another request. Use JSONPath syntax to extract the data of your choice. In the following example we extract the <code>id</code> field and store it in a <code>petId</code> variable:</p>
 <p><img alt="Screenshot" src="images/extract_data_to_variable.png" /></p>
 <p>You can then use <code>petId</code> in a request by placing it between double brackets, like so:</p>
 <p><code>{{petId}}</code></p>
 <p>Here's an example of using <code>{{petId}}</code> in the request path:</p>
 <p><img alt="Screenshot" src="images/variable_in_path.png" /></p>
-<h2 id="request-reuse-with-dsl-definitions">Request Reuse with DSL Definitions<a class="headerlink" href="#request-reuse-with-dsl-definitions" title="Permanent link">#</a></h2>
+<h1 id="request-reuse-with-dsl-definitions">Request Reuse with DSL Definitions<a class="headerlink" href="#request-reuse-with-dsl-definitions" title="Permanent link">#</a></h1>
 <p>This is the moment where Predator shows its teeth and unleashes its true power. </p>
 <p>Writing a performance test that checks specific parts of your API end-to-end can be a huge hassle, but now it is effortless. By creating DSL definitions using Predator's Domain Specific Language (DSL), request templates are generated which you can then reuse in the same test and in other tests under the same DSL type, reducing replication.</p>
 <p>Let's dive right in and get going with our first DSL definition. </p>
@@ -575,11 +478,11 @@
 <p>You can now run the test as you would any other. </p>
 <p><img alt="Screenshot" src="images/dsltestinui.png" /></p>
 <h2 id="creating-a-test-with-custom-logic-in-javascript">Creating a Test with custom logic in Javascript<a class="headerlink" href="#creating-a-test-with-custom-logic-in-javascript" title="Permanent link">#</a></h2>
-<p>Tests can use custom Javascript functions, for using Javascript functions in your tests you should first create text file, with your Javascript code,
+<p>Tests can use custom Javascript functions , for using Javascript functions in your tests you should first create text file, with your Javascript code,
 and upload it to public repository. (S3, dropbox,google docs etc... ).
 when creating a test use processor_file_url parameter to send URL path to your Javascript file .
 Predator will download and save this file (Any changes after creating test will not be reflected.)
-To create your scenarios with Javascript function, work alongside Artillery guidelines.</p>
+To create your scenarios with Javascript function , work alongside Artillery guidelines.</p>
 <ul>
 <li>Artillery documentation: https://artillery.io/docs/http-reference/#loading-custom-js-code</li>
 </ul>
