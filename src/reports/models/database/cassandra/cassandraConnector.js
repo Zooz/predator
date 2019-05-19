@@ -9,7 +9,7 @@ let client;
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const INSERT_LAST_REPORT_SUMMARY = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=?';
-const UPDATE_LAST_REPORT_SUMMARY = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=? AND start_time_year=? AND start_time_month=? AND start_time =?';
+const UPDATE_LAST_REPORT_SUMMARY = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time =? test_id=? AND report_id=?';
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
 const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports WHERE start_time_year=? AND start_time_month=? LIMIT ?';
@@ -55,8 +55,8 @@ function insertLastReport(testId, revisionId, reportId, jobId, testType, phase, 
     let params;
     const testNotes = notes || '';
     const startTimeDate = new Date(startTime);
-    const startTimeYear = startTimeDate.getUTCFullYear();
-    const startTimeMonth = startTimeDate.getUTCMonth() + 1;
+    const startTimeYear = startTimeDate.getFullYear();
+    const startTimeMonth = startTimeDate.getMonth() + 1;
     params = [startTimeYear, startTimeMonth, testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
     return executeQuery(INSERT_LAST_REPORT_SUMMARY, params, queryOptions);
 }
@@ -71,9 +71,9 @@ function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
 function updateLastReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
     let params;
     const startTimeDate = new Date(startTime);
-    const startTimeYear = startTimeDate.getUTCFullYear();
-    const startTimeMonth = startTimeDate.getUTCMonth() + 1;
-    params = [phaseIndex, lastUpdatedAt, testId, reportId, startTimeYear, startTimeMonth, startTime];
+    const startTimeYear = startTimeDate.getFullYear();
+    const startTimeMonth = startTimeDate.getMonth() + 1;
+    params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
     return executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions);
 }
 

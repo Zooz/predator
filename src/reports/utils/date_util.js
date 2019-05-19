@@ -5,8 +5,8 @@ module.exports.dateXMonthAgo = (numberOfMonthBack) => {
     date.setMonth(date.getMonth() - numberOfMonthBack);
     const result =
         {
-            month: date.getUTCMonth() + 1,
-            year: date.getUTCFullYear()
+            month: date.getMonth() + 1,
+            year: date.getFullYear()
         };
 
     return result;
