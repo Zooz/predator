@@ -256,20 +256,29 @@ describe('Integration tests for the reports api', function() {
                 const lastReportId = uuid();
                 reportBody.report_id = lastReportId;
                 reportBody.runner_id = uuid();
-                reportBody.start_time = Date.now().toString();
-                await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                const lastDate = new Date();
+                reportBody.start_time = lastDate.setMinutes(lastDate.getMinutes() + 10).toString();
+                reportBody.test_name = 'last report test1';
+                let createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
 
                 const scondReportId = uuid();
                 reportBody.report_id = scondReportId;
                 reportBody.runner_id = uuid();
-                reportBody.start_time = Date.now().toString();
-                await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                const secondDate = new Date();
+                reportBody.start_time = secondDate.setMinutes(secondDate.getMinutes() + 20).toString();
+                reportBody.test_name = 'last report test1';
+                createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
 
                 const firstReportId = uuid();
                 reportBody.report_id = firstReportId;
                 reportBody.runner_id = uuid();
-                reportBody.start_time = Date.now().toString();
-                await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                const firstDate = new Date();
+                reportBody.start_time = firstDate.setMinutes(firstDate.getMinutes() + 30).toString();
+                reportBody.test_name = 'last report test1';
+                createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
 
                 let getLastReportsResponse = await reportsRequestCreator.getLastReports(3);
                 const lastReports = getLastReportsResponse.body;
@@ -711,7 +720,6 @@ describe('Integration tests for the reports api', function() {
         });
     });
 });
-
 
 function validateFinishedReport(report, expectedValues = {}) {
     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
