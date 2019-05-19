@@ -257,17 +257,15 @@ describe('Integration tests for the reports api', function() {
                 reportBody.report_id = lastReportId;
                 reportBody.runner_id = uuid();
                 const lastDate = new Date();
-                reportBody.start_time = lastDate.setMinutes(lastDate.getMinutes() + 10).toString();
-                reportBody.test_name = 'last report test1';
+                reportBody.start_time = lastDate.setMinutes(lastDate.getMinutes()).toString();
                 let createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
-                const scondReportId = uuid();
-                reportBody.report_id = scondReportId;
+                const secondReportId = uuid();
+                reportBody.report_id = secondReportId;
                 reportBody.runner_id = uuid();
                 const secondDate = new Date();
-                reportBody.start_time = secondDate.setMinutes(secondDate.getMinutes() + 20).toString();
-                reportBody.test_name = 'last report test1';
+                reportBody.start_time = secondDate.setMinutes(secondDate.getMinutes() + 1).toString();
                 createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
@@ -275,17 +273,20 @@ describe('Integration tests for the reports api', function() {
                 reportBody.report_id = firstReportId;
                 reportBody.runner_id = uuid();
                 const firstDate = new Date();
-                reportBody.start_time = firstDate.setMinutes(firstDate.getMinutes() + 30).toString();
-                reportBody.test_name = 'last report test1';
+                reportBody.start_time = firstDate.setMinutes(firstDate.getMinutes() + 2).toString();
                 createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
-                let getLastReportsResponse = await reportsRequestCreator.getLastReports(3);
+                let getLastReportsResponse = await reportsRequestCreator.getLastReports(10);
                 const lastReports = getLastReportsResponse.body;
-                should(lastReports.length).eql(3);
-                should(lastReports[2].report_id).eql(lastReportId);
-                should(lastReports[1].report_id).eql(scondReportId);
-                should(lastReports[0].report_id).eql(firstReportId);
+                const sortReports = Object.assign([], lastReports);
+                sortReports.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+
+                should(lastReports).eql(sortReports);
+                const allRelvntResults = lastReports.filter(x => [lastReportId, secondReportId, firstReportId].includes(x.report_id));
+                should(allRelvntResults[0].report_id).eql(firstReportId);
+                should(allRelvntResults[1].report_id).eql(secondReportId);
+                should(allRelvntResults[2].report_id).eql(lastReportId);
             });
         });
 
