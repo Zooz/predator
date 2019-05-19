@@ -251,6 +251,33 @@ describe('Integration tests for the reports api', function() {
                     });
                 });
             });
+            it('Get last reports in right order', async function () {
+                let lastReportsIdtestId = uuid();
+                const lastReportId = uuid();
+                reportBody.report_id = lastReportId;
+                reportBody.runner_id = uuid();
+                reportBody.start_time = Date.now().toString();
+                await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+
+                const scondReportId = uuid();
+                reportBody.report_id = scondReportId;
+                reportBody.runner_id = uuid();
+                reportBody.start_time = Date.now().toString();
+                await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+
+                const firstReportId = uuid();
+                reportBody.report_id = firstReportId;
+                reportBody.runner_id = uuid();
+                reportBody.start_time = Date.now().toString();
+                await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+
+                let getLastReportsResponse = await reportsRequestCreator.getLastReports(3);
+                const lastReports = getLastReportsResponse.body;
+                should(lastReports.length).eql(3);
+                should(lastReports[2].report_id).eql(lastReportId);
+                should(lastReports[1].report_id).eql(scondReportId);
+                should(lastReports[0].report_id).eql(firstReportId);
+            });
         });
 
         describe('Post stats', function () {
