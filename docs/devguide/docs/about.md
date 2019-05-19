@@ -1,6 +1,6 @@
 # Introducing Predator
 
-**Distributed open source performance testing platform for APIs.**
+**Distribute open source performance testing platform for APIs.**
 
 Requests per second, request latency, and overall system performance and reliability are some fundamental concepts that need to be taken into account when designing a high capacity API. With CI/CD becoming a common deployment methodology, deployments to production are a constant occurrence. So how can you ensure that the core capabilities you initially designed your system to have remain intact? 
 

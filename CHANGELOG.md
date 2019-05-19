@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/Zooz/predator/compare/v1.0.10...v1.1.0) (2019-05-16)
+
+
+### Bug Fixes
+
+* **fix edit test bug:** fix edit test bug ([#135](https://github.com/Zooz/predator/issues/135)) ([7f38d57](https://github.com/Zooz/predator/commit/7f38d57))
+
+
+
 <a name="1.0.10"></a>
 ## [1.0.10](https://github.com/Zooz/predator/compare/v1.0.9...v1.0.10) (2019-05-12)
 

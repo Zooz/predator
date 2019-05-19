@@ -1,0 +1,32 @@
+@import "../../styles/colors";
+
+@mixin defaultFont() {
+  font-size: 13px;
+  text-align: left;
+  color: $text-black;
+}
+
+$remove-button-color: $disabled-grey-button;
+$hover-remove-button-color: $disabled-grey-button-hover;
+
+.item {
+  @include defaultFont();
+  display: inline-flex;
+  border: solid 1px $border-grey;
+  background-color: $list-item-grey;
+  border-radius: 3px;
+  align-items: center;
+  padding: 3px 6px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  > .button-remove {
+    color: $remove-button-color;
+    font-size: 10px;
+    cursor: pointer;
+    margin-left: 5px;
+    margin-bottom: 2px;
+    &:hover{
+      color: $hover-remove-button-color;
+    }
+  }
+}

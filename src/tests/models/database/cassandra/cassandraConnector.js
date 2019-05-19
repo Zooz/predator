@@ -3,7 +3,7 @@ let cassandra = require('cassandra-driver');
 let client = {};
 let uuid = require('cassandra-driver').types.Uuid;
 
-const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id) values(?,?,?,?,?,?,?,?)';
+const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id,file_id) values(?,?,?,?,?,?,?,?,?)';
 const GET_TEST = 'SELECT * FROM tests WHERE id = ? ORDER BY updated_at DESC limit 1';
 const GET_TEST_REVISIONS = 'SELECT * FROM tests WHERE id = ?';
 const GET_TESTS = 'SELECT * FROM tests';
@@ -14,6 +14,9 @@ const UPDATE_DSL_DEFINITION = 'UPDATE dsl SET artillery_json= ? WHERE dsl_name =
 const DELETE_DSL_DEFINITION = 'DELETE FROM dsl WHERE dsl_name = ? AND definition_name = ? IF EXISTS;';
 const GET_DSL_DEFINITION = 'SELECT * FROM dsl WHERE dsl_name = ? AND definition_name = ? limit 1';
 const GET_DSL_DEFINITIONS = 'SELECT * FROM dsl WHERE dsl_name = ?';
+
+const INSERT_FILE = 'INSERT INTO files(id,file) values(?,?)';
+const GET_FILE = 'SELECT file FROM files WHERE id = ?';
 
 module.exports = {
     init,
@@ -26,6 +29,8 @@ module.exports = {
     getDslDefinition,
     getDslDefinitions,
     updateDslDefinition,
+    saveFile,
+    getFile,
     deleteDefinition
 };
 
@@ -65,7 +70,7 @@ async function getAllTestRevisions(id) {
 
 async function insertTest(testInfo, testJson, id, revisionId) {
     let params;
-    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId];
+    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, testInfo.fileId];
     const result = await executeQuery(INSERT_TEST_DETAILS, params, queryOptions);
     return result;
 }
@@ -119,6 +124,7 @@ function sanitizeTestResult(data) {
     const result = data.map(function (row) {
         row.artillery_json = JSON.parse(row.artillery_json);
         row.raw_data = JSON.parse(row.raw_data);
+        row.file_id = row.file_id || undefined;
         return row;
     });
     return result;
@@ -129,4 +135,15 @@ function sanitizeDslResult(data) {
         return row;
     });
     return result;
+}
+
+async function saveFile(id, file) {
+    let params = [id, file];
+    const result = await executeQuery(INSERT_FILE, params, queryOptions);
+    return result;
+}
+
+async function getFile(id) {
+    const result = await executeQuery(GET_FILE, [id], queryOptions);
+    return result.rows[0] ? result.rows[0].file : undefined;
 }

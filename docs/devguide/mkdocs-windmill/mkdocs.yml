@@ -14,7 +14,7 @@ theme:
 
 # This should be renamed to nav for mkdocs 1.0+
 pages:
-- Usage: index.md
+- Usage: about.md
 - Customization: customization.md
 - Samples:
   - Sample Page A: sample-a.md

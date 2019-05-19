@@ -2,6 +2,7 @@
 const testGenerator = require('./testGenerator'),
     database = require('./database'),
     uuid = require('uuid'),
+    fileManager = require('./fileManager'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
@@ -15,6 +16,7 @@ module.exports = {
 async function upsertTest(testRawData, existingTestId) {
     const testArtilleryJson = await testGenerator.createTest(testRawData);
     let id = existingTestId || uuid();
+    testRawData.fileId = await fileManager.createFileFromUrl(testRawData);
     let revisionId = uuid.v4();
     await database.insertTest(testRawData, testArtilleryJson, id, revisionId);
     return { id: id, revision_id: revisionId };

@@ -1,12 +1,14 @@
 'use strict';
 
-const manager = require('../models/manager');
+const manager = require('../models/manager'),
+    fileManager = require('../models/fileManager');
 
 module.exports = {
     upsertTest,
     getTest,
     deleteTest,
     getTests,
+    getFile,
     getTestRevisions
 };
 
@@ -15,6 +17,15 @@ async function upsertTest(req, res, next) {
         const result = await manager.upsertTest(req.body, req.params.test_id);
         return res.status(201).json(result);
     } catch (err){
+        return next(err);
+    }
+}
+
+async function getFile(req, res, next) {
+    try {
+        const result = await fileManager.getFile(req.params.file_id, req.query.format);
+        return res.status(200).json(result);
+    } catch (err) {
         return next(err);
     }
 }

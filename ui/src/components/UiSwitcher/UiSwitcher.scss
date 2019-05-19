@@ -1,0 +1,57 @@
+@import "../styles/colors";
+
+.switch-container[data-active="true"] {
+  .switch-ball {
+    transform: translate3d(var(--switch-space), 0, 0);
+    background-color: $white;
+  }
+}
+
+.switch-ball {
+  width: var(--ball-size);
+  height: var(--ball-size);
+}
+
+input[type="checkbox"].switch {
+  position: absolute;
+  cursor: pointer;
+  opacity: 0;
+}
+
+input[type="checkbox"].switch + div {
+  vertical-align: middle;
+  border-radius: 999px;
+  -webkit-transition-duration: .4s;
+  transition-duration: .4s;
+  -webkit-transition-property: background-color, box-shadow;
+  transition-property: background-color, box-shadow;
+  cursor: pointer;
+}
+
+.onColor {
+  background-color: #3b89ec;
+}
+
+.offColor {
+  background-color: #d66969;
+}
+
+input[type="checkbox"].switch:checked + div {
+  background-position: 0 0;
+}
+
+input[type="checkbox"].switch:checked + div {
+  background-color: #57BB00;
+}
+
+input[type="checkbox"].switch + div > div {
+  float: left;
+  border-radius: inherit;
+  background: $white;
+  transition-timing-function: cubic-bezier(1, 0, 0, 1);
+  transition-duration: 0.4s;
+  transition-property: transform, background-color;
+  pointer-events: none;
+  margin-top: 1px;
+  margin-left: 1px;
+}

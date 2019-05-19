@@ -13,7 +13,7 @@ let statsFormatter = require('../../../../src/reports/models/statsFormatter');
 let aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
 let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
 
-describe('Webhook/email notifier test', () => {
+describe('Webhook/email notifier test ', () => {
     let sandbox, loggerInfoStub, loggerWarnStub, reportWebhookSenderSendStub,
         statsFormatterStub, jobsManagerStub, getConfigStub, aggregateReportGeneratorStub, reportEmailSenderStub;
     before(() => {

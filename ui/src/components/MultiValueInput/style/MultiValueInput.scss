@@ -1,0 +1,58 @@
+@import "../../styles/colors";
+@import "../../styles/inputs";
+
+.wrapper {
+  width: 100%;
+  position: relative;
+  line-height: 18px;
+
+  &:focus, &:focus-within {
+    @include active;
+  }
+}
+
+.wrapper {
+  @include default;
+  width: 100%;
+  background-color: $white;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  padding: 0 5px 3px 5px;
+  position: relative;
+  min-height: 35px;
+
+  > .list-item {
+    margin-top: 3px;
+    margin-right: 5px;
+  }
+
+  &[disable=true] {
+    pointer-events: none;
+  }
+}
+
+.placeholder {
+  color: $disabled-grey-text;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+
+.input-field {
+  transform: translateY(2px);
+  margin: 0;
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+
+  &:focus, &:active {
+    outline: none;
+    box-shadow: none;
+  }
+
+  height: 25px;
+  flex: 1;
+}

@@ -6,7 +6,9 @@ JSCK.Draft4 = JSCK.draft4;
 let artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const requestSender = require('./helpers/requestCreator');
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
+const fileUrl = 'https://raw.githubusercontent.com/Zooz/predator/master/README.md';
 describe('the tests api', function() {
+    this.timeout(5000000);
     let simpleTest;
     let dslName;
     before(async function () {
@@ -31,6 +33,12 @@ describe('the tests api', function() {
                     res.statusCode.should.eql(400);
                     res.body.should.eql({ message: 'action must be this pattern: {dsl_name}.{definition_name}.' });
                 });
+        });
+        it('Should return error for file url not exists ', async () => {
+            let requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
+            const res = await requestSender.createTest(requestBody, validHeaders);
+            res.statusCode.should.eql(422);
+            res.body.message.should.eql('Error to read file, throw exception: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com www.notrealurl.com:443');
         });
         let badBodyScenarios = ['Body_with_illegal_artillery', 'Body_with_no_artillery_schema', 'Body_with_no_test_type', 'Body_with_no_description', 'Body_with_no_name', 'Body_with_no_scenarios', 'Body_with_no_step_action',
             'Body_with_no_steps'];
@@ -84,12 +92,23 @@ describe('the tests api', function() {
                 getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
                 getTestResponse.statusCode.should.eql(404);
             });
+            it('Create test, with a file ', async () => {
+                let requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
+                const createTestResponse = await requestSender.createTest(requestBody, validHeaders);
+                console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
+                createTestResponse.statusCode.should.eql(201);
+                const resGetTest = await requestSender.getTest(createTestResponse.body.id, validHeaders);
+                resGetTest.statusCode.should.eql(200);
+                should.notEqual(resGetTest.body.file_id, undefined);
+                const resGetFile = await requestSender.getFile(resGetTest.body.file_id, validHeaders);
+                resGetFile.statusCode.should.eql(200);
+            });
             it('create test with before, and get it', async function () {
                 const simpleTestWithBefore = require('../../testExamples/Simple_test_before_feature')(dslName);
                 let createTestResponse = await requestSender.createTest(simpleTestWithBefore.test, validHeaders);
                 should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
                 createTestResponse.body.should.have.only.keys('id', 'revision_id');
-                const expected  = require('../../testResults/Simple_test_before_feature')(dslName,createTestResponse.body.id,createTestResponse.body.revision_id);
+                const expected = require('../../testResults/Simple_test_before_feature')(dslName, createTestResponse.body.id, createTestResponse.body.revision_id);
                 const getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
                 should(getTestResponse.statusCode).eql(200, JSON.stringify(createTestResponse.body));
                 should.exists(getTestResponse.body.updated_at);

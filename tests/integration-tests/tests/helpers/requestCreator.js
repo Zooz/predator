@@ -16,6 +16,7 @@ module.exports = {
     updateTest,
     deleteTest,
     getTests,
+    getFile,
     getTest,
     getAllRevisions
 };
@@ -107,6 +108,14 @@ function getTest(id, headers) {
             return res;
         });
 }
+
+function getFile(id, headers) {
+    return request(app).get('/v1/tests/file/' + id)
+        .set(headers)
+        .expect(function (res) {
+            return res;
+        });
+}
 function getAllRevisions(id, headers) {
     return request(app).get(`/v1/tests/${id}/revisions`)
         .set(headers)
@@ -129,7 +138,7 @@ async function createDslRequests(dslName, dslRequests) {
             .map(function (dslRequest) {
                 return createDsl(dslName, dslRequest.name, dslRequest.request)
                     .then(function (response) {
-                        return should(response.statusCode).eql(201,JSON.stringify(response.body));
+                        return should(response.statusCode).eql(201, JSON.stringify(response.body));
                     });
             })
     );
