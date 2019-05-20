@@ -29,7 +29,7 @@ Let's dive right in and get going with our first DSL definition.
    
     This functionality is only available through the <a href="https://zooz.github.io/predator/indexapiref.html#section/Overview#section" target="_blank">Predator API</a>.
 
-## Creating a DSL Definition
+### Creating a DSL Definition
 
 Before you can use a DSL definition, you must create it first. You do so by invoking the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-dsl-definition" target="_blank">Create DSL Definition</a> request. Here's an example request body for creating a DSL definition of a GET request. Notice how we use the `{{petId}}` in the url endpoint (we will create this variable in the example of a POST request DSL definition):
 
@@ -68,7 +68,7 @@ The request body for creating a DSL definition of a POST request is a bit more e
 ```
 
 
-## Creating a Test that Uses the DSL
+### Creating a Test that Uses the DSL
 
 Tests that use a DSL definition can only be created using the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request. The <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request body must include all components that make up a test, including pre-scenario requests and scenarios. However, instead of defining the entire HTTP request in each scenario step (as you would through the Predator UI), you can now reference the HTTP request through its DSL definition. You do so, using the `action` property (in the `steps` array). 
 
@@ -112,16 +112,17 @@ You can now run the test as you would any other.
 
 ![Screenshot](images/dsltestinui.png)
 
-## Creating a Test with custom logic in Javascript
-Tests can use custom Javascript functions, for using Javascript functions in your tests you should first create text file, with your Javascript code,
-and upload it to public repository. (S3, dropbox,google docs etc... ).
-when creating a test use processor_file_url parameter to send URL path to your Javascript file.
-Predator will download and save this file (Any changes after creating test will not be reflected.)
-To create your scenarios with Javascript function, work alongside Artillery guidelines.
+## Creating a Test with Custom Logic in Javascript
 
-* Artillery documentation: https://artillery.io/docs/http-reference/#loading-custom-js-code
+Tests can use custom Javascript functions. To use custom Javascript functions in your tests, first create a text file holding your Javascript code 
+and upload it to public repository (such as S3, Dropbox, Google Docs etc.). Then create the test, passing the `processor_file_url` field in the request body to inform Predator of the URL path to your Javascript file. Predator will download and save this file (any changes done to your Javascript code after creating the test will not be reflected).
 
-Here's an example for test using custom JS code:
+!!! note "Artillery guidelines"
+   
+    To include Javascript functions in your scenarios, make sure to follow the [Artillery guidelines](https://artillery.io/docs/http-reference/#loading-custom-js-code).
+
+
+Here's an example of a test using custom Javascript code:
 
 ```JSON
 {
@@ -150,8 +151,10 @@ Here's an example for test using custom JS code:
   ]
 }
 ```
-Java script code:
-```JSON
+
+Here's some sample Javascript code:
+
+```javascript
 'use strict';
 const uuid = require('uuid/v4');
 module.exports = {
@@ -181,6 +184,9 @@ console.log('userContext is: ' + JSON.stringify(userContext));
   return done();
 }
 ```
-In this example we creating a test with 2 JS functions:
-`logResponse` will log the result received if the statusCode is different from 200. The function will be called after each response using the afterResponse command.
-`generateRandomDataGlobal` is a global function that creates global variables that can be used in the scope of the test with the {{ }} syntax.
+
+In the example above, we created a test with 2 Javascript functions:
+
+* `logResponse()` will log the result received, if the `statusCode` is different from 200. The function will be called after each response using the `afterResponse` command.
+
+* `generateRandomDataGlobal()` is a global function that creates global variables. Those variables can be used in the scope of the test by using the `{{ }}` syntax.
