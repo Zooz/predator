@@ -13,4 +13,4 @@ module.exports.REPORT_FINISHED_STATUS = 'finished';
 module.exports.REPORT_ABORTED_STATUS = 'aborted';
 module.exports.REPORT_FAILED_STATUS = 'failed';
 module.exports.REPORT_PARTIALLY_FINISHED_STATUS = 'partially_finished';
-module.exports.NUMBER_OF_MONTH_LAST_REPORTS = '6';
+module.exports.MAX_MONTH_OF_LAST_REPORTS = '6';
