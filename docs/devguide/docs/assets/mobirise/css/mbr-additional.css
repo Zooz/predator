@@ -1884,6 +1884,27 @@ body {
     width: 100% !important;
   }
 }
+.cid-rr8fqHR9CO {
+  padding-top: 90px;
+  padding-bottom: 90px;
+  background-color: #ffffff;
+}
+.cid-rr8fqHR9CO .title {
+  margin-bottom: 2rem;
+}
+.cid-rr8fqHR9CO .mbr-section-subtitle {
+  color: #767676;
+}
+.cid-rr8fqHR9CO a:not([href]):not([tabindex]) {
+  color: #fff;
+  border-radius: 3px;
+}
+.cid-rr8fqHR9CO a.btn-white:not([href]):not([tabindex]) {
+  color: #333;
+}
+.cid-rr8fqHR9CO textarea.form-control {
+  min-height: 188px;
+}
 .cid-rqz7jVs8VY {
   padding-top: 60px;
   padding-bottom: 90px;
