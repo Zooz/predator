@@ -1,4 +1,3 @@
-
 openapi: 3.0.0
 info:
   version: 1.0.0
@@ -1115,6 +1114,28 @@ components:
       properties:
         artillery_test:
           type: object
+          description: |
+            The complete request JSON used in the test.
+          example: {
+            "config": {
+              "target": "http://127.0.0.1:3000"
+            },
+            "scenarios": [
+            {
+              "name": "Get Pets",
+              "weight": 100,
+              "flow": [
+              {
+                "get": {
+                  "url": "/pets",
+                  "headers": {},
+                  "capture": []
+                }
+              }
+              ]
+            }
+            ]
+          }
     test_id:
       required:
       - id
@@ -1262,7 +1283,6 @@ components:
           }
     basic_test_response:
       type: object
-      description: bla
       allOf:
       - $ref: '#/components/schemas/create_test_response'
       - type: object
