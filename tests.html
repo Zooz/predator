@@ -297,12 +297,71 @@
     
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
-      
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Advanced Test Setup
+      </label>
     
     <a href="tests.html" title="Advanced Test Setup" class="md-nav__link md-nav__link--active">
       Advanced Test Setup
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-reuse-with-variables" title="Data Reuse with Variables" class="md-nav__link">
+    Data Reuse with Variables
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-reuse-with-dsl-definitions" title="Request Reuse with DSL Definitions" class="md-nav__link">
+    Request Reuse with DSL Definitions
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creating-a-dsl-definition" title="Creating a DSL Definition" class="md-nav__link">
+    Creating a DSL Definition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-a-test-that-uses-the-dsl" title="Creating a Test that Uses the DSL" class="md-nav__link">
+    Creating a Test that Uses the DSL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-test-with-custom-logic-in-javascript" title="Creating a Test with Custom Logic in Javascript" class="md-nav__link">
+    Creating a Test with Custom Logic in Javascript
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -369,8 +428,56 @@
 <nav class="md-nav md-nav--secondary">
   
   
-    
   
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-reuse-with-variables" title="Data Reuse with Variables" class="md-nav__link">
+    Data Reuse with Variables
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-reuse-with-dsl-definitions" title="Request Reuse with DSL Definitions" class="md-nav__link">
+    Request Reuse with DSL Definitions
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creating-a-dsl-definition" title="Creating a DSL Definition" class="md-nav__link">
+    Creating a DSL Definition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-a-test-that-uses-the-dsl" title="Creating a Test that Uses the DSL" class="md-nav__link">
+    Creating a Test that Uses the DSL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-test-with-custom-logic-in-javascript" title="Creating a Test with Custom Logic in Javascript" class="md-nav__link">
+    Creating a Test with Custom Logic in Javascript
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
   
 </nav>
                     </div>
@@ -386,18 +493,20 @@
                        class="md-icon md-content__icon">&#xE3C9;</a>
                     
                     
+                    <h1>Advanced Test Setup</h1>
+                    
                     <div class="admonition note">
 <p class="admonition-title">What you should already know</p>
 <p>We assume you have already familiarized yourself with the basic concepts used in Predator and that you successfully created your first test. If not, we strongly recommend you first complete the steps in the <a href="myfirsttest.html">My First Test</a> topic before proceeding with the instructions below.</p>
 </div>
-<h1 id="data-reuse-with-variables">Data Reuse with Variables<a class="headerlink" href="#data-reuse-with-variables" title="Permanent link">#</a></h1>
+<h2 id="data-reuse-with-variables">Data Reuse with Variables<a class="headerlink" href="#data-reuse-with-variables" title="Permanent link">#</a></h2>
 <p>The <strong>Captures</strong> field of the <a href="myfirsttest.html#http-request-properties">HTTP request properties</a> allows you to extract (capture) data from the request response and store it in a variable for reuse in another request. Use JSONPath syntax to extract the data of your choice. In the following example we extract the <code>id</code> field and store it in a <code>petId</code> variable:</p>
 <p><img alt="Screenshot" src="images/extract_data_to_variable.png" /></p>
 <p>You can then use <code>petId</code> in a request by placing it between double brackets, like so:</p>
 <p><code>{{petId}}</code></p>
 <p>Here's an example of using <code>{{petId}}</code> in the request path:</p>
 <p><img alt="Screenshot" src="images/variable_in_path.png" /></p>
-<h1 id="request-reuse-with-dsl-definitions">Request Reuse with DSL Definitions<a class="headerlink" href="#request-reuse-with-dsl-definitions" title="Permanent link">#</a></h1>
+<h2 id="request-reuse-with-dsl-definitions">Request Reuse with DSL Definitions<a class="headerlink" href="#request-reuse-with-dsl-definitions" title="Permanent link">#</a></h2>
 <p>This is the moment where Predator shows its teeth and unleashes its true power. </p>
 <p>Writing a performance test that checks specific parts of your API end-to-end can be a huge hassle, but now it is effortless. By creating DSL definitions using Predator's Domain Specific Language (DSL), request templates are generated which you can then reuse in the same test and in other tests under the same DSL type, reducing replication.</p>
 <p>Let's dive right in and get going with our first DSL definition. </p>
@@ -405,7 +514,7 @@
 <p class="admonition-title">Predator API</p>
 <p>This functionality is only available through the <a href="https://zooz.github.io/predator/indexapiref.html#section/Overview#section" target="_blank">Predator API</a>.</p>
 </div>
-<h2 id="creating-a-dsl-definition">Creating a DSL Definition<a class="headerlink" href="#creating-a-dsl-definition" title="Permanent link">#</a></h2>
+<h3 id="creating-a-dsl-definition">Creating a DSL Definition<a class="headerlink" href="#creating-a-dsl-definition" title="Permanent link">#</a></h3>
 <p>Before you can use a DSL definition, you must create it first. You do so by invoking the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-dsl-definition" target="_blank">Create DSL Definition</a> request. Here's an example request body for creating a DSL definition of a GET request. Notice how we use the <code>{{petId}}</code> in the url endpoint (we will create this variable in the example of a POST request DSL definition):</p>
 <div class="codehilite"><pre><span></span><span class="p">{</span>
     <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;get-pet&quot;</span><span class="p">,</span>
@@ -438,7 +547,7 @@
 <span class="p">}</span>
 </pre></div>
 
-<h2 id="creating-a-test-that-uses-the-dsl">Creating a Test that Uses the DSL<a class="headerlink" href="#creating-a-test-that-uses-the-dsl" title="Permanent link">#</a></h2>
+<h3 id="creating-a-test-that-uses-the-dsl">Creating a Test that Uses the DSL<a class="headerlink" href="#creating-a-test-that-uses-the-dsl" title="Permanent link">#</a></h3>
 <p>Tests that use a DSL definition can only be created using the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request. The <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request body must include all components that make up a test, including pre-scenario requests and scenarios. However, instead of defining the entire HTTP request in each scenario step (as you would through the Predator UI), you can now reference the HTTP request through its DSL definition. You do so, using the <code>action</code> property (in the <code>steps</code> array). </p>
 <p>Here's an example:</p>
 <div class="codehilite"><pre><span></span><span class="p">{</span>
@@ -477,17 +586,15 @@
 <p>If you login to the Predator UI after creating the test, you will notice that the test has been added with a type of <strong>dsl</strong>. </p>
 <p>You can now run the test as you would any other. </p>
 <p><img alt="Screenshot" src="images/dsltestinui.png" /></p>
-<h2 id="creating-a-test-with-custom-logic-in-javascript">Creating a Test with custom logic in Javascript<a class="headerlink" href="#creating-a-test-with-custom-logic-in-javascript" title="Permanent link">#</a></h2>
-<p>Tests can use custom Javascript functions , for using Javascript functions in your tests you should first create text file, with your Javascript code,
-and upload it to public repository. (S3, dropbox,google docs etc... ).
-when creating a test use processor_file_url parameter to send URL path to your Javascript file .
-Predator will download and save this file (Any changes after creating test will not be reflected.)
-To create your scenarios with Javascript function , work alongside Artillery guidelines.</p>
-<ul>
-<li>Artillery documentation: https://artillery.io/docs/http-reference/#loading-custom-js-code</li>
-</ul>
-<p>Here's an example for test using custom JS code:</p>
-<p><div class="codehilite"><pre><span></span><span class="p">{</span>
+<h2 id="creating-a-test-with-custom-logic-in-javascript">Creating a Test with Custom Logic in Javascript<a class="headerlink" href="#creating-a-test-with-custom-logic-in-javascript" title="Permanent link">#</a></h2>
+<p>Tests can use custom Javascript functions. To use custom Javascript functions in your tests, first create a text file holding your Javascript code 
+and upload it to public repository (such as S3, Dropbox, Google Docs etc.). Then create the test, passing the <code>processor_file_url</code> field in the request body to inform Predator of the URL path to your Javascript file. Predator will download and save this file (any changes done to your Javascript code after creating the test will not be reflected).</p>
+<div class="admonition note">
+<p class="admonition-title">Artillery guidelines</p>
+<p>To include Javascript functions in your scenarios, make sure to follow the <a href="https://artillery.io/docs/http-reference/#loading-custom-js-code">Artillery guidelines</a>.</p>
+</div>
+<p>Here's an example of a test using custom Javascript code:</p>
+<div class="codehilite"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;custom logic in Javascript example&quot;</span><span class="p">,</span>
   <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;custom logic in Javascript&quot;</span><span class="p">,</span>
   <span class="nt">&quot;processor_file_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.dropbox.com/s/yourFilePath/fileName.txt?dl=1&quot;</span><span class="p">,</span>
@@ -513,39 +620,47 @@ To create your scenarios with Javascript function , work alongside Artillery gui
   <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
-Java script code:
-<div class="codehilite"><pre><span></span><span class="err">&#39;use</span> <span class="err">strict&#39;;</span>
-<span class="err">const</span> <span class="err">uuid</span> <span class="err">=</span> <span class="err">require(&#39;uuid/v</span><span class="mi">4</span><span class="err">&#39;);</span>
-<span class="err">module.exports</span> <span class="err">=</span> <span class="p">{</span>
-  <span class="err">logResponse,</span>
-  <span class="err">generateRandomDataGlobal</span>
-<span class="p">}</span><span class="err">;</span>
+
+<p>Here's some sample Javascript code:</p>
+<div class="codehilite"><pre><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">uuid</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;uuid/v4&#39;</span><span class="p">);</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">logResponse</span><span class="p">,</span>
+  <span class="nx">generateRandomDataGlobal</span>
+<span class="p">};</span>
 
 
-  <span class="err">function</span> <span class="err">logResponse(requestParams,</span> <span class="err">response,</span> <span class="err">context,</span> <span class="err">ee,</span> <span class="err">next)</span> <span class="p">{</span>
-  <span class="err">if(response.statusCode</span> <span class="err">!==</span> <span class="err">200){</span>
-       <span class="err">console.log(&#39;****************</span> <span class="err">fail</span> <span class="err">with</span> <span class="err">status</span> <span class="err">code:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(response.statusCode));</span>
-       <span class="err">console.log(&#39;****************</span> <span class="err">host</span> <span class="err">is:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(response.request.uri.host));</span>
-       <span class="err">console.log(&#39;****************</span> <span class="err">path</span> <span class="err">is:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(response.request.uri.pathname));</span>
-       <span class="err">console.log(&#39;****************</span> <span class="err">response</span> <span class="err">headers</span> <span class="err">is:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(response.headers));</span>
+  <span class="kd">function</span> <span class="nx">logResponse</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">){</span>
+       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** fail with status code: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">));</span>
+       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** host is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">host</span><span class="p">));</span>
+       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** path is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">pathname</span><span class="p">));</span>
+       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** response headers is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">));</span>
 
     <span class="p">}</span>
-     <span class="err">return</span> <span class="err">next();</span> <span class="err">//</span> <span class="err">MUST</span> <span class="err">be</span> <span class="err">called</span> <span class="err">for</span> <span class="err">the</span> <span class="err">scenario</span> <span class="err">to</span> <span class="err">continue</span>
-  <span class="err">}</span>
+     <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+  <span class="p">}</span>
 
 
-<span class="err">function</span> <span class="err">generateRandomDataGlobal(userContext,</span> <span class="err">events,</span> <span class="err">done)</span> <span class="p">{</span>
-<span class="err">console.log(&#39;userContext</span> <span class="err">is:</span> <span class="err">&#39;</span> <span class="err">+</span> <span class="err">JSON.stringify(userContext));</span>
-  <span class="err">userContext.vars.randomPath</span> <span class="err">=</span> <span class="err">&#39;random_path_&#39;</span> <span class="err">+</span> <span class="err">uuid();</span>
-  <span class="err">userContext.vars.name</span> <span class="err">=</span> <span class="err">&#39;name_random_&#39;</span> <span class="err">+</span> <span class="err">uuid();</span>
-  <span class="err">userContext.vars.email</span> <span class="err">=</span> <span class="err">&#39;email_random_&#39;</span> <span class="err">+</span> <span class="err">uuid();</span>
-  <span class="err">userContext.vars.password</span> <span class="err">=</span> <span class="err">&#39;password_random_&#39;</span> <span class="err">+</span> <span class="err">uuid();</span>
-  <span class="err">return</span> <span class="err">done();</span>
+<span class="kd">function</span> <span class="nx">generateRandomDataGlobal</span><span class="p">(</span><span class="nx">userContext</span><span class="p">,</span> <span class="nx">events</span><span class="p">,</span> <span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;userContext is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">userContext</span><span class="p">));</span>
+  <span class="nx">userContext</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">randomPath</span> <span class="o">=</span> <span class="s1">&#39;random_path_&#39;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">();</span>
+  <span class="nx">userContext</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;name_random_&#39;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">();</span>
+  <span class="nx">userContext</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">email</span> <span class="o">=</span> <span class="s1">&#39;email_random_&#39;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">();</span>
+  <span class="nx">userContext</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="s1">&#39;password_random_&#39;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">();</span>
+  <span class="k">return</span> <span class="nx">done</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
-In this example we creating a test with 2 JS functions:
-<code>logResponse</code> will log the result received if the statusCode is different from 200. The function will be called after each response using the afterResponse command.
-<code>generateRandomDataGlobal</code> is a global function that creates global variables that can be used in the scope of the test with the {{ }} syntax.</p>
+
+<p>In the example above, we created a test with 2 Javascript functions:</p>
+<ul>
+<li>
+<p><code>logResponse()</code> will log the result received, if the <code>statusCode</code> is different from 200. The function will be called after each response using the <code>afterResponse</code> command.</p>
+</li>
+<li>
+<p><code>generateRandomDataGlobal()</code> is a global function that creates global variables. Those variables can be used in the scope of the test by using the <code>{{ }}</code> syntax.</p>
+</li>
+</ul>
                     
                     
                     

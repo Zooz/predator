@@ -1,9 +1,10 @@
+
 openapi: 3.0.0
 info:
   version: 1.0.0
   title: Predator
   x-logo:
-    url: favicon.png
+    url: logo.png
     backgroundColor: white
   description: |
     # Overview
@@ -1040,9 +1041,6 @@ components:
       type: object
       discriminator:
         propertyName: type
-      oneOf:
-      - $ref: '#/components/schemas/basic'
-      - $ref: '#/components/schemas/dsl'
       required:
       - name
       - description
@@ -1065,12 +1063,11 @@ components:
         * `basic`: Tests of this type cannot reuse request templates (DSL definition). All request specifications must be directly included in the test itself.
           This test type is identical to the type of tests you can create through the Predator UI.
         * `dsl`: Tests of this type reuse request templates based on previously created DSL definitons.
-        enum:
-        - dsl
-        - basic
-        example: dsl
+      example: dsl
     dsl:
       description: A test that is made of scenarios base on domain specific language
+      allOf:
+        - $ref: '#/components/schemas/test'
       required:
       - scenarios
       properties:
@@ -1111,6 +1108,8 @@ components:
         type: string
     basic:
       description: A test that is made of artillery json
+      allOf:
+        - $ref: '#/components/schemas/test'
       required:
       - artillery_test
       properties:
