@@ -1116,25 +1116,50 @@ components:
           type: object
           description: |
             The complete request JSON used in the test.
-          example: {
-            "config": {
-              "target": "http://127.0.0.1:3000"
-            },
-            "scenarios": [
-            {
-              "name": "Get Pets",
-              "weight": 100,
-              "flow": [
+          example: example: {
+            "artillery_test": {
+              "config": {
+                "target": "http://127.0.0.1:3000"
+              },
+              "scenarios": [
               {
-                "get": {
-                  "url": "/pets",
-                  "headers": {},
-                  "capture": []
+                "name": "Get Pets",
+                "weight": 100,
+                "flow": [
+                {
+                  "post": {
+                    "url": "/pets",
+                    "headers": {
+                      "Content-Type": "application/json",
+                      "request-id": "{{ $randomString() }}"
+                    },
+                    "capture": [
+                    {
+                      "json": "$.id",
+                      "as": "petId"
+                    }
+                    ],
+                    "json": {
+                      "name": "Mickey"
+                    }
+                  }
+                },
+                {
+                  "get": {
+                    "url": "/pets/{{petId}}",
+                    "headers": {
+                      "Content-Type": "application/json",
+                      "request-id": "{{ $randomString() }}"
+                    }
+                  }
                 }
+                ]
               }
               ]
-            }
-            ]
+            },
+            "name": "Order from Pet Store",
+            "description": "Performance test for placing orders from the pet store.",
+            "type": "basic"
           }
     test_id:
       required:
@@ -1294,49 +1319,24 @@ components:
           description: |
             The complete request JSON used in the test.
           example: {
-            "artillery_test": {
-              "config": {
-                "target": "http://127.0.0.1:3000"
-              },
-              "scenarios": [
+            "config": {
+              "target": "http://127.0.0.1:3000"
+            },
+            "scenarios": [
+            {
+              "name": "Get Pets",
+              "weight": 100,
+              "flow": [
               {
-                "name": "Get Pets",
-                "weight": 100,
-                "flow": [
-                {
-                  "post": {
-                    "url": "/pets",
-                    "headers": {
-                      "Content-Type": "application/json",
-                      "request-id": "{{ $randomString() }}"
-                    },
-                    "capture": [
-                    {
-                      "json": "$.id",
-                      "as": "petId"
-                    }
-                    ],
-                    "json": {
-                      "name": "Mickey"
-                    }
-                  }
-                },
-                {
-                  "get": {
-                    "url": "/pets/{{petId}}",
-                    "headers": {
-                      "Content-Type": "application/json",
-                      "request-id": "{{ $randomString() }}"
-                    }
-                  }
+                "get": {
+                  "url": "/pets",
+                  "headers": {},
+                  "capture": []
                 }
-                ]
               }
               ]
-            },
-            "name": "Order from Pet Store",
-            "description": "Performance test for placing orders from the pet store.",
-            "type": "basic"
+            }
+            ]
           }
     error_response:
       required:
