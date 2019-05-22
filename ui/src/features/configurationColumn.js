@@ -47,7 +47,13 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
         }, {
             id: 'updated_at',
             Header: () => (
-                <TableHeader sortable={false}>
+                <TableHeader sortable={true}
+                             up={sortHeader.indexOf('updated_at') > -1 && sortHeader.indexOf('+') > -1}
+                             down={sortHeader.indexOf('updated_at') > -1 && sortHeader.indexOf('-') > -1}
+                             onClick={() => {
+                                 onSort('updated_at')
+                             }}
+                >
                     Modified
                 </TableHeader>
             ),

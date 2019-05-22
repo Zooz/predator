@@ -43,13 +43,16 @@ class getTests extends React.Component {
             testToDelete: undefined,
             createTest: false,
             testForEdit: null,
-            sortedTests: []
+            sortedTests: [],
+            sortHeader:''
         }
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.tests !== this.props.tests) {
-            this.setState({sortedTests: [...this.props.tests]})
+            this.setState({sortedTests: [...this.props.tests]},()=>{
+                this.onSort('updated_at');
+            })
         }
     }
 
@@ -74,6 +77,25 @@ class getTests extends React.Component {
         });
         this.setState({sortedTests: newSorted})
     };
+
+    onSort = (field) => {
+        const {sortHeader} = this.state;
+        let isAsc = false;
+        if (sortHeader.includes(field)) {
+            isAsc = !sortHeader.includes('+')
+        } else {
+            isAsc = true;
+        }
+        let sortedReport;
+        if (isAsc) {
+            sortedReport = _.chain(this.state.sortedTests).sortBy(field).reverse().value();
+        } else {
+            sortedReport = _.chain(this.state.sortedTests).sortBy(field).value();
+        }
+        this.setState({sortedTests: sortedReport, sortHeader: `${field}${isAsc ? '+' : '-'}`})
+    };
+
+
     submitDelete = () => {
         this.props.deleteTest(this.state.testToDelete.id);
         this.props.getAllTests();
@@ -169,7 +191,7 @@ class getTests extends React.Component {
     }
 
     render() {
-        const {sortedTests} = this.state;
+        const {sortedTests, sortHeader} = this.state;
         const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
         const columns = getColumns({
             columnsNames,
@@ -177,7 +199,9 @@ class getTests extends React.Component {
             onRawView: this.onRawView,
             onDelete: this.onDelete,
             onEdit: this.onEdit,
-            onRunTest: this.onRunTest
+            onRunTest: this.onRunTest,
+            onSort: this.onSort,
+            sortHeader: sortHeader
         });
 
         return (
