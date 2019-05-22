@@ -1116,7 +1116,7 @@ components:
           type: object
           description: |
             The complete request JSON used in the test.
-          example: example: {
+          example: {
             "artillery_test": {
               "config": {
                 "target": "http://127.0.0.1:3000"
