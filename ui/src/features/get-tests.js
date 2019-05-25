@@ -50,7 +50,7 @@ class getTests extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (prevProps.tests !== this.props.tests) {
-            this.setState({sortedTests: [...this.props.tests]},()=>{
+            this.setState({sortedTests: [...this.props.tests], sortHeader: 'updated_at-'}, () => {
                 this.onSort('updated_at');
             })
         }
