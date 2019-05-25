@@ -34,12 +34,12 @@ module.exports = [
             {
                 key: 0,
                 primaryText: 'Documentation',
-                linkUrl: 'https://zooz.github.io/predator/index',
+                linkUrl: 'https://predator-ng.com/about.html',
                 icon: faBook
             }, {
                 key: 1,
                 primaryText: 'API Reference',
-                linkUrl: 'https://zooz.github.io/predator/#indexapiref.html',
+                linkUrl: 'https://zooz.github.io/predator/indexapiref.html',
                 icon: faPassport
             }]
     }
