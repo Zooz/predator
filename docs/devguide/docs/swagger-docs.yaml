@@ -3,7 +3,7 @@ info:
   version: 1.0.0
   title: Predator
   x-logo:
-    url: favicon.png
+    url: logo.png
     backgroundColor: white
   description: |
     # Overview
@@ -1040,9 +1040,6 @@ components:
       type: object
       discriminator:
         propertyName: type
-      oneOf:
-      - $ref: '#/components/schemas/basic'
-      - $ref: '#/components/schemas/dsl'
       required:
       - name
       - description
@@ -1065,12 +1062,11 @@ components:
         * `basic`: Tests of this type cannot reuse request templates (DSL definition). All request specifications must be directly included in the test itself.
           This test type is identical to the type of tests you can create through the Predator UI.
         * `dsl`: Tests of this type reuse request templates based on previously created DSL definitons.
-        enum:
-        - dsl
-        - basic
-        example: dsl
+      example: dsl
     dsl:
       description: A test that is made of scenarios base on domain specific language
+      allOf:
+        - $ref: '#/components/schemas/test'
       required:
       - scenarios
       properties:
@@ -1111,11 +1107,60 @@ components:
         type: string
     basic:
       description: A test that is made of artillery json
+      allOf:
+        - $ref: '#/components/schemas/test'
       required:
       - artillery_test
       properties:
         artillery_test:
           type: object
+          description: |
+            The complete request JSON used in the test.
+          example: {
+            "artillery_test": {
+              "config": {
+                "target": "http://127.0.0.1:3000"
+              },
+              "scenarios": [
+              {
+                "name": "Get Pets",
+                "weight": 100,
+                "flow": [
+                {
+                  "post": {
+                    "url": "/pets",
+                    "headers": {
+                      "Content-Type": "application/json",
+                      "request-id": "{{ $randomString() }}"
+                    },
+                    "capture": [
+                    {
+                      "json": "$.id",
+                      "as": "petId"
+                    }
+                    ],
+                    "json": {
+                      "name": "Mickey"
+                    }
+                  }
+                },
+                {
+                  "get": {
+                    "url": "/pets/{{petId}}",
+                    "headers": {
+                      "Content-Type": "application/json",
+                      "request-id": "{{ $randomString() }}"
+                    }
+                  }
+                }
+                ]
+              }
+              ]
+            },
+            "name": "Order from Pet Store",
+            "description": "Performance test for placing orders from the pet store.",
+            "type": "basic"
+          }
     test_id:
       required:
       - id
@@ -1263,7 +1308,6 @@ components:
           }
     basic_test_response:
       type: object
-      description: bla
       allOf:
       - $ref: '#/components/schemas/create_test_response'
       - type: object
