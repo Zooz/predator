@@ -167,7 +167,8 @@ async function getLastReportsWIthSubscribers(limit) {
     }
     const reportsResult = await Promise.all(lastReportsPromise);
     const allReports = _(reportsResult).flatMap(value => value).value().slice(0, limit);
-    return joinReportsWIthSubscribers(allReports);
+    let reportsWIthSubscribers = joinReportsWIthSubscribers(allReports);
+    return reportsWIthSubscribers;
 }
 
 async function joinReportsWIthSubscribers(reports) {
