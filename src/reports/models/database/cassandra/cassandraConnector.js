@@ -1,14 +1,18 @@
 'use strict';
-const databaseConfig = require('../../../../config/databaseConfig');
-
+const databaseConfig = require('../../../../config/databaseConfig'),
+    dateUtil = require('../../../utils/dateUtil'),
+    _ = require('lodash'),
+    constants = require('../../../utils/constants');
 const logger = require('../../../../common/logger');
 let client;
 
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
+const INSERT_LAST_REPORT_SUMMARY = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=?';
+const UPDATE_LAST_REPORT_SUMMARY = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time =? test_id=? AND report_id=?';
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
-const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports LIMIT ?';
+const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports WHERE start_time_year=? AND start_time_month=? LIMIT ?';
 const INSERT_REPORT_STATS = 'INSERT INTO reports_stats(runner_id, test_id, report_id, stats_id, stats_time, phase_index, phase_status, data) values(?,?,?,?,?,?,?,?)';
 const GET_REPORT_STATS = 'SELECT * FROM reports_stats WHERE test_id=? AND report_id=?';
 const SUBSCRIBE_RUNNER = 'INSERT INTO report_subscribers(test_id, report_id, runner_id, phase_status) values(?,?,?,?)';
@@ -43,31 +47,60 @@ function insertReport(testId, revisionId, reportId, jobId, testType, phase, star
     let params;
     const testNotes = notes || '';
     params = [testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
+    insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
     return executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
 }
 
-function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
+function insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+    let params;
+    const testNotes = notes || '';
+    const startTimeDate = new Date(startTime);
+    const startTimeYear = startTimeDate.getFullYear();
+    const startTimeMonth = startTimeDate.getMonth() + 1;
+    params = [startTimeYear, startTimeMonth, testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
+    return executeQuery(INSERT_LAST_REPORT_SUMMARY, params, queryOptions)
+        .catch(err => logger.error(`Cassandra insertLastReportAsync failed \n ${JSON.stringify({
+            INSERT_LAST_REPORT_SUMMARY,
+            params,
+            queryOptions
+        })}`, err));
+}
+
+function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
     let params;
     params = [phaseIndex, lastUpdatedAt, testId, reportId];
+    updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt, startTime);
     return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
+}
+
+function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
+    let params;
+    const startTimeDate = new Date(startTime);
+    const startTimeYear = startTimeDate.getFullYear();
+    const startTimeMonth = startTimeDate.getMonth() + 1;
+    params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
+    return executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions)
+        .catch(err => logger.error(`Cassandra updateLastReportAsync failed \n ${JSON.stringify({
+            INSERT_LAST_REPORT_SUMMARY,
+            params,
+            queryOptions
+        })}`, err));
 }
 
 function getReport(testId, reportId) {
     let params;
     params = [testId, reportId];
-    return joinReportsWIthSubscribers(GET_REPORT_SUMMARY, params, queryOptions);
+    return getReportsWIthSubscribers(GET_REPORT_SUMMARY, params, queryOptions);
 }
 
 function getReports(testId) {
     let params;
     params = [testId];
-    return joinReportsWIthSubscribers(GET_REPORTS_SUMMARIES, params, queryOptions);
+    return getReportsWIthSubscribers(GET_REPORTS_SUMMARIES, params, queryOptions);
 }
 
 function getLastReports(limit) {
-    let params;
-    params = [limit];
-    return joinReportsWIthSubscribers(GET_LAST_SUMMARIES, params, queryOptions);
+    return getLastReportsWIthSubscribers(limit);
 }
 
 function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
@@ -120,10 +153,26 @@ function executeQuery(query, params, queryOptions) {
     });
 }
 
-async function joinReportsWIthSubscribers(query, params, queryOptions) {
-    let subscribers, report;
+async function getReportsWIthSubscribers(query, params, queryOptions) {
     const reports = await executeQuery(query, params, queryOptions);
+    let reportsWithSubscribers = joinReportsWIthSubscribers(reports);
+    return reportsWithSubscribers;
+}
 
+async function getLastReportsWIthSubscribers(limit) {
+    let lastReportsPromise = [];
+    for (let i = 0; i < constants.MAX_MONTH_OF_LAST_REPORTS; i++) {
+        const date = dateUtil.dateXMonthAgo(i);
+        lastReportsPromise.push(executeQuery(GET_LAST_SUMMARIES, [date.year, date.month, limit], queryOptions));
+    }
+    const reportsResult = await Promise.all(lastReportsPromise);
+    const allReports = _(reportsResult).flatMap(value => value).value().slice(0, limit);
+    let reportsWIthSubscribers = joinReportsWIthSubscribers(allReports);
+    return reportsWIthSubscribers;
+}
+
+async function joinReportsWIthSubscribers(reports) {
+    let subscribers, report;
     for (let reportIndex = 0; reportIndex < reports.length; reportIndex++) {
         report = reports[reportIndex];
         subscribers = await getReportSubscribers(report.test_id, report.report_id);
@@ -136,6 +185,5 @@ async function joinReportsWIthSubscribers(query, params, queryOptions) {
         });
         report.subscribers = subscribers;
     }
-
     return reports;
 }
