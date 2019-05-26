@@ -80,7 +80,7 @@ function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt, star
     const startTimeMonth = startTimeDate.getMonth() + 1;
     params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
     return executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions)
-        .catch(err => logger.error(`Cassandra insertLastReportAsync failed \n ${JSON.stringify({
+        .catch(err => logger.error(`Cassandra updateLastReportAsync failed \n ${JSON.stringify({
             INSERT_LAST_REPORT_SUMMARY,
             params,
             queryOptions
