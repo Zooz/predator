@@ -131,7 +131,7 @@ describe('Cassandra client tests', function() {
             clientExecuteStub.rejects();
             return cassandraClient.insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt)
                 .catch(function(){
-                    loggerErrorStub.callCount.should.eql(2);
+                    loggerErrorStub.callCount.should.eql(3);
                 });
         });
     });
