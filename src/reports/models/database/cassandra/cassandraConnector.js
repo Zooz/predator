@@ -47,34 +47,44 @@ function insertReport(testId, revisionId, reportId, jobId, testType, phase, star
     let params;
     const testNotes = notes || '';
     params = [testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
-    insertLastReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
+    insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
     return executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
 }
 
-function insertLastReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+function insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
     let params;
     const testNotes = notes || '';
     const startTimeDate = new Date(startTime);
     const startTimeYear = startTimeDate.getFullYear();
     const startTimeMonth = startTimeDate.getMonth() + 1;
     params = [startTimeYear, startTimeMonth, testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
-    return executeQuery(INSERT_LAST_REPORT_SUMMARY, params, queryOptions);
+    return executeQuery(INSERT_LAST_REPORT_SUMMARY, params, queryOptions)
+        .catch(err => logger.error(`Cassandra insertLastReportAsync failed \n ${JSON.stringify({
+            INSERT_LAST_REPORT_SUMMARY,
+            params,
+            queryOptions
+        })}`, err));
 }
 
 function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
     let params;
     params = [phaseIndex, lastUpdatedAt, testId, reportId];
-    updateLastReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime);
+    updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt, startTime);
     return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
 }
 
-function updateLastReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
+function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
     let params;
     const startTimeDate = new Date(startTime);
     const startTimeYear = startTimeDate.getFullYear();
     const startTimeMonth = startTimeDate.getMonth() + 1;
     params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
-    return executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions);
+    return executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions)
+        .catch(err => logger.error(`Cassandra insertLastReportAsync failed \n ${JSON.stringify({
+            INSERT_LAST_REPORT_SUMMARY,
+            params,
+            queryOptions
+        })}`, err));
 }
 
 function getReport(testId, reportId) {
@@ -145,13 +155,13 @@ function executeQuery(query, params, queryOptions) {
 
 async function getReportsWIthSubscribers(query, params, queryOptions) {
     const reports = await executeQuery(query, params, queryOptions);
-    let reportsWithSubscribers = await joinReportsWIthSubscribers(reports);
+    let reportsWithSubscribers = joinReportsWIthSubscribers(reports);
     return reportsWithSubscribers;
 }
 
 async function getLastReportsWIthSubscribers(limit) {
     let lastReportsPromise = [];
-    for (let i = 0; i < constants.NUMBER_OF_MONTH_LAST_REPORTS; i++) {
+    for (let i = 0; i < constants.MAX_MONTH_OF_LAST_REPORTS; i++) {
         const date = dateUtil.dateXMonthAgo(i);
         lastReportsPromise.push(executeQuery(GET_LAST_SUMMARIES, [date.year, date.month, limit], queryOptions));
     }
@@ -174,6 +184,5 @@ async function joinReportsWIthSubscribers(reports) {
         });
         report.subscribers = subscribers;
     }
-
     return reports;
 }
