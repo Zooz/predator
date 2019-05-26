@@ -1,7 +1,7 @@
 'use strict';
 let sinon = require('sinon');
 let should = require('should');
-let dateUtil = require('../../../../src/reports/utils/date_util');
+let dateUtil = require('../../../../src/reports/utils/dateUtil');
 
 describe('Date util helper', function () {
     let sandbox, clock;

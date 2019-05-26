@@ -1,6 +1,6 @@
 'use strict';
 const databaseConfig = require('../../../../config/databaseConfig'),
-    dateUtil = require('../../../utils/date_util'),
+    dateUtil = require('../../../utils/dateUtil'),
     _ = require('lodash'),
     constants = require('../../../utils/constants');
 const logger = require('../../../../common/logger');
