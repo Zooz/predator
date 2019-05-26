@@ -3,7 +3,7 @@
     We assume you have already familiarized yourself with the basic concepts used in Predator and that you successfully created your first test. If not, we strongly recommend you first complete the steps in the [My First Test](myfirsttest.md) topic before proceeding with the instructions below.
 
 
-# Data Reuse with Variables
+## Data Reuse with Variables
 
 The **Captures** field of the [HTTP request properties](myfirsttest.md#http-request-properties) allows you to extract (capture) data from the request response and store it in a variable for reuse in another request. Use JSONPath syntax to extract the data of your choice. In the following example we extract the `id` field and store it in a `petId` variable:
 
@@ -17,7 +17,7 @@ Here's an example of using `{{petId}}` in the request path:
 
 ![Screenshot](images/variable_in_path.png)
 
-# Request Reuse with DSL Definitions
+## Request Reuse with DSL Definitions
 
 This is the moment where Predator shows its teeth and unleashes its true power. 
 

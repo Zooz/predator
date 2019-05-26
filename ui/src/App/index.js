@@ -1,15 +1,15 @@
 import React, { Fragment } from 'react';
-import GetTests from '../features/PerformanceUI/instance/get-tests';
-import GetJobs from '../features/PerformanceUI/instance/get-jobs';
-import GetReports from '../features/PerformanceUI/instance/get-last-reports';
-import GetTestReports from '../features/PerformanceUI/instance/get-test-reports';
+import GetTests from '../features/get-tests';
+import GetJobs from '../features/get-jobs';
+import GetReports from '../features/get-last-reports';
+import GetTestReports from '../features/get-test-reports';
 import { Route, Redirect } from 'react-router';
 import { connect } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
 import history from '../store/history';
 import { hot } from 'react-hot-loader';
-import DrawerE from '../features/PerformanceUI/components/DrawerE';
-import menuList from '../features/PerformanceUI/mainMenu';
+import DrawerE from '../features/components/DrawerE';
+import menuList from '../features/mainMenu';
 
 class App extends React.Component {
     state = {

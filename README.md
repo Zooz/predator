@@ -16,9 +16,9 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 
 ## Documentation
 
-[Starting Guide](http://predator-ng.com)
+[Starting Guide](https://predator-ng.com/about.html)
 <br>
-[API Reference](http://predator-ng.com/#indexapiref.html)
+[API Reference](http://predator-ng.com/indexapiref.html)
 
 ## Features
 - **Distributed load**:  Predator supports unlimited number of load generators that produce load concurrently.
@@ -42,7 +42,7 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 Predator is designed to seamlessly deploy into your Kubernetes cluster. Install Predator from the [Helm Hub](https://hub.helm.sh/charts/zooz/predator)
 
 ### DC/OS
-Predator is included in Mesosphere Universe. Please refer to https://github.com/dcos/examples/tree/master/predator for a quick start guide and examples for installing the package.
+Predator is included in Mesosphere Universe. Please refer to https://universe.dcos.io/#/package/predator/version/latest for a quick start guide and examples for installing the package.
 
 ### Docker
 `docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator`
