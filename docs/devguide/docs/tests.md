@@ -115,7 +115,7 @@ You can now run the test as you would any other.
 ## Creating a Test with Custom Logic in Javascript
 
 Tests can use custom Javascript functions. To use custom Javascript functions in your tests, first create a text file holding your Javascript code 
-and upload it to public repository (such as S3, Dropbox, Google Docs etc.). Then create the test, passing the `processor_file_url` field in the request body to inform Predator of the URL path to your Javascript file. Predator will download and save this file (any changes done to your Javascript code after creating the test will not be reflected).
+and upload it to a public repository (such as S3, Dropbox, Google Docs etc.). Then create the test, passing the `processor_file_url` field in the request body to inform Predator of the URL path to your Javascript file. Predator will download and save this file (any changes done to your Javascript code after creating the test will not be reflected).
 
 !!! note "Artillery guidelines"
    
