@@ -69,10 +69,10 @@ function insertLastReportAsync(testId, revisionId, reportId, jobId, testType, ph
         })}`, err));
 }
 
-async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
+async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
     let params;
     params = [phaseIndex, lastUpdatedAt, testId, reportId];
-    updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt, startTime);
+    updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt);
     return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
 }
 

@@ -153,24 +153,27 @@ describe('Cassandra client tests', function() {
     });
 
     describe('Update report and verify last report updated', function () {
-        it('should succeed simple insert', function () {
+        it('should succeed simple insert', async function () {
             const phase = uuid();
-            clientExecuteStub.resolves({ result: { rowLength: 0 } });
-            let queryLastReport = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time =? test_id=? AND report_id=?';
-            return cassandraClient.updateReport(testId, reportId, phase, lastUpdatedAt, '01/22/2017')
-                .then(function () {
-                    loggerErrorStub.callCount.should.eql(0);
-                    clientExecuteStub.getCall(0).args[0].should.eql(queryLastReport);
-                    clientExecuteStub.getCall(0).args[1][0].should.eql(phase);
-                    clientExecuteStub.getCall(0).args[1][1].should.eql(lastUpdatedAt);
-                    clientExecuteStub.getCall(0).args[1][2].should.eql(2017);
-                    clientExecuteStub.getCall(0).args[1][3].should.eql(1);
-                    clientExecuteStub.getCall(0).args[1][4].should.eql('01/22/2017');
-                    clientExecuteStub.getCall(0).args[1][5].should.eql(testId);
-                    clientExecuteStub.getCall(0).args[1][6].should.eql(reportId);
-                });
+            const cassandraClientLastReport = cassandraClient.__get__('updateLastReportAsync');
+            clientExecuteStub.onCall(0).resolves({ rowLength: 1, rows: [{ 'start_time': '01/22/2017' }] });
+            clientExecuteStub.onCall(1).resolves({ rowLength: 1 });
+            clientExecuteStub.onCall(2).resolves({ rowLength: 1 });
+            clientExecuteStub.onCall(3).resolves({ rowLength: 1 });
+            let queryLastReport = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time=? AND test_id=? AND report_id=?';
+            await cassandraClientLastReport(testId, reportId, phase, lastUpdatedAt);
+
+            loggerErrorStub.callCount.should.eql(0);
+            clientExecuteStub.getCall(2).args[0].should.eql(queryLastReport);
+            clientExecuteStub.getCall(2).args[1][0].should.eql(phase);
+            clientExecuteStub.getCall(2).args[1][1].should.eql(lastUpdatedAt);
+            clientExecuteStub.getCall(2).args[1][2].should.eql(2017);
+            clientExecuteStub.getCall(2).args[1][3].should.eql(1);
+            clientExecuteStub.getCall(2).args[1][4].should.eql('01/22/2017');
+            clientExecuteStub.getCall(2).args[1][5].should.eql(testId);
+            clientExecuteStub.getCall(2).args[1][6].should.eql(reportId);
         });
-    })
+    });
     describe('Get report', function(){
         it('should get single report', function(){
             let cassandraResponse = { rows: [REPORT] };
