@@ -106,24 +106,24 @@ describe('Cassandra client tests', function() {
         });
     });
 
-    describe('Insert new report', function(){
-        it('should succeed simple insert', function(){
-            clientExecuteStub.resolves({ result: { rowLength: 0 } });
+    describe('Insert new report', function () {
+        it('should succeed simple insert', function () {
+            clientExecuteStub.resolves({ rowLength: 1, rows: [{ '[applied]': true }] });
             let queryReport = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
-            let queryLastReport = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS'
+            let queryLastReport = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
             return cassandraClient.insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt)
-                .then(function(){
+                .then(function () {
+                    clientExecuteStub.getCall(0).args[0].should.eql(queryReport);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql(testId);
+                    clientExecuteStub.getCall(0).args[1][1].should.eql(revisionId);
+                    clientExecuteStub.getCall(0).args[1][2].should.eql(reportId);
                     loggerErrorStub.callCount.should.eql(0);
-                    clientExecuteStub.getCall(0).args[0].should.eql(queryLastReport);
-                    clientExecuteStub.getCall(0).args[1][0].should.eql(2017);
-                    clientExecuteStub.getCall(0).args[1][1].should.eql(1);
-                    clientExecuteStub.getCall(0).args[1][2].should.eql(testId);
-                    clientExecuteStub.getCall(0).args[1][3].should.eql(revisionId);
-                    clientExecuteStub.getCall(0).args[1][4].should.eql(reportId);
-                    clientExecuteStub.getCall(1).args[0].should.eql(queryReport);
-                    clientExecuteStub.getCall(1).args[1][0].should.eql(testId);
-                    clientExecuteStub.getCall(1).args[1][1].should.eql(revisionId);
-                    clientExecuteStub.getCall(1).args[1][2].should.eql(reportId);
+                    clientExecuteStub.getCall(1).args[0].should.eql(queryLastReport);
+                    clientExecuteStub.getCall(1).args[1][0].should.eql(2017);
+                    clientExecuteStub.getCall(1).args[1][1].should.eql(1);
+                    clientExecuteStub.getCall(1).args[1][2].should.eql(testId);
+                    clientExecuteStub.getCall(1).args[1][3].should.eql(revisionId);
+                    clientExecuteStub.getCall(1).args[1][4].should.eql(reportId);
                 });
         });
 
@@ -131,7 +131,7 @@ describe('Cassandra client tests', function() {
             clientExecuteStub.rejects();
             return cassandraClient.insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt)
                 .catch(function(){
-                    loggerErrorStub.callCount.should.eql(3);
+                    loggerErrorStub.callCount.should.eql(1);
                 });
         });
     });

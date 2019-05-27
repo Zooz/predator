@@ -5,7 +5,7 @@ const databaseConfig = require('../../../../config/databaseConfig'),
     constants = require('../../../utils/constants');
 const logger = require('../../../../common/logger');
 let client;
-
+const isRowAppliedField = '[applied]';
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const INSERT_LAST_REPORT_SUMMARY = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=?';
@@ -43,12 +43,15 @@ async function init(cassandraClient) {
     client = cassandraClient;
 }
 
-function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
     let params;
     const testNotes = notes || '';
     params = [testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
-    insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
-    return executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
+    const result = await executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
+    if (result[0][isRowAppliedField]) {
+        insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
+    }
+    return result;
 }
 
 function insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
