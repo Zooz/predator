@@ -78,7 +78,7 @@ async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
 
 async function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt) {
     let params;
-    const reportToUpdate = await getReport(testId, reportId);
+    const reportToUpdate = await executeQuery(GET_REPORT_SUMMARY, [testId, reportId], queryOptions);
     const startTime = reportToUpdate[0].start_time;
     const startTimeDate = new Date(startTime);
     const startTimeYear = startTimeDate.getFullYear();
