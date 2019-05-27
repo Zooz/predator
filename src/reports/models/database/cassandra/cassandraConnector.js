@@ -78,18 +78,21 @@ async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
 
 async function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt) {
     let params;
-    const reportToUpdate = await executeQuery(GET_REPORT_SUMMARY, [testId, reportId], queryOptions);
-    const startTime = reportToUpdate[0].start_time;
-    const startTimeDate = new Date(startTime);
-    const startTimeYear = startTimeDate.getFullYear();
-    const startTimeMonth = startTimeDate.getMonth() + 1;
-    params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
-    return executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions)
-        .catch(err => logger.error(`Cassandra updateLastReportAsync failed \n ${JSON.stringify({
+    try {
+        const reportToUpdate = await executeQuery(GET_REPORT_SUMMARY, [testId, reportId], queryOptions);
+        const startTime = reportToUpdate[0].start_time;
+        const startTimeDate = new Date(startTime);
+        const startTimeYear = startTimeDate.getFullYear();
+        const startTimeMonth = startTimeDate.getMonth() + 1;
+        params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
+        await executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions);
+    } catch (err) {
+        logger.error(`Cassandra updateLastReportAsync failed \n ${JSON.stringify({
             UPDATE_LAST_REPORT_SUMMARY,
             params,
             queryOptions
-        })}`, err));
+        })}`, err);
+    }
 }
 
 function getReport(testId, reportId) {
