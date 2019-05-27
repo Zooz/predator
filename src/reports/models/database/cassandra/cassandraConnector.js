@@ -5,11 +5,11 @@ const databaseConfig = require('../../../../config/databaseConfig'),
     constants = require('../../../utils/constants');
 const logger = require('../../../../common/logger');
 let client;
-
+const isRowAppliedField = '[applied]';
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const INSERT_LAST_REPORT_SUMMARY = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=?';
-const UPDATE_LAST_REPORT_SUMMARY = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time =? test_id=? AND report_id=?';
+const UPDATE_LAST_REPORT_SUMMARY = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time=? AND test_id=? AND report_id=?';
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
 const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports WHERE start_time_year=? AND start_time_month=? LIMIT ?';
@@ -43,12 +43,15 @@ async function init(cassandraClient) {
     client = cassandraClient;
 }
 
-function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
     let params;
     const testNotes = notes || '';
     params = [testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, testNotes, lastUpdatedAt];
-    insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
-    return executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
+    const result = await executeQuery(INSERT_REPORT_SUMMARY, params, queryOptions);
+    if (result[0][isRowAppliedField]) {
+        insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
+    }
+    return result;
 }
 
 function insertLastReportAsync(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
@@ -66,25 +69,30 @@ function insertLastReportAsync(testId, revisionId, reportId, jobId, testType, ph
         })}`, err));
 }
 
-function updateReport(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
+async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
     let params;
     params = [phaseIndex, lastUpdatedAt, testId, reportId];
-    updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt, startTime);
+    updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt);
     return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
 }
 
-function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt, startTime) {
+async function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt) {
     let params;
-    const startTimeDate = new Date(startTime);
-    const startTimeYear = startTimeDate.getFullYear();
-    const startTimeMonth = startTimeDate.getMonth() + 1;
-    params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
-    return executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions)
-        .catch(err => logger.error(`Cassandra updateLastReportAsync failed \n ${JSON.stringify({
-            INSERT_LAST_REPORT_SUMMARY,
+    try {
+        const reportToUpdate = await executeQuery(GET_REPORT_SUMMARY, [testId, reportId], queryOptions);
+        const startTime = reportToUpdate[0].start_time;
+        const startTimeDate = new Date(startTime);
+        const startTimeYear = startTimeDate.getFullYear();
+        const startTimeMonth = startTimeDate.getMonth() + 1;
+        params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
+        await executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions);
+    } catch (err) {
+        logger.error(`Cassandra updateLastReportAsync failed \n ${JSON.stringify({
+            UPDATE_LAST_REPORT_SUMMARY,
             params,
             queryOptions
-        })}`, err));
+        })}`, err);
+    }
 }
 
 function getReport(testId, reportId) {
