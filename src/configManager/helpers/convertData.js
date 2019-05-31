@@ -11,6 +11,9 @@ module.exports.convertByType = (valueToConvert, type) => {
             case 'int':
                 value = isNaN(valueToConvert) ? handleParseError(valueToConvert, type) : parseInt(valueToConvert);
                 break;
+            case 'float':
+                value = isNaN(valueToConvert) ? handleParseError(valueToConvert, type) : parseFloat(valueToConvert);
+                break;
             }
         }
     } catch (err) {
