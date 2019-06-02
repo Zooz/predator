@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-     <loc>https://predator-ng.com/about.html</loc>
-     <lastmod>2019-05-22</lastmod>
+     <loc>https://predator.dev/about.html</loc>
+     <lastmod>2019-06-02</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://predator-ng.com/installation.html</loc>
-     <lastmod>2019-05-22</lastmod>
+     <loc>https://predator.dev/installation.html</loc>
+     <lastmod>2019-06-02</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://predator-ng.com/myfirsttest.html</loc>
-     <lastmod>2019-05-22</lastmod>
+     <loc>https://predator.dev/myfirsttest.html</loc>
+     <lastmod>2019-06-02</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://predator-ng.com/tests.html</loc>
-     <lastmod>2019-05-22</lastmod>
+     <loc>https://predator.dev/tests.html</loc>
+     <lastmod>2019-06-02</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://predator-ng.com/schedulesandreports.html</loc>
-     <lastmod>2019-05-22</lastmod>
+     <loc>https://predator.dev/schedulesandreports.html</loc>
+     <lastmod>2019-06-02</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://predator-ng.com/configuration.html</loc>
-     <lastmod>2019-05-22</lastmod>
+     <loc>https://predator.dev/configuration.html</loc>
+     <lastmod>2019-06-02</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://predator-ng.com/contributing.html</loc>
-     <lastmod>2019-05-22</lastmod>
+     <loc>https://predator.dev/contributing.html</loc>
+     <lastmod>2019-06-02</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://predator-ng.com/apireference.html</loc>
-     <lastmod>2019-05-22</lastmod>
+     <loc>https://predator.dev/apireference.html</loc>
+     <lastmod>2019-06-02</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

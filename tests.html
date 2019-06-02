@@ -72,7 +72,7 @@
   }
   ga.l = +new Date
   /* Setup integration and send page view */
-  ga("create", "UA-40865650-2", "predator-ng.com")
+  ga("create", "UA-40865650-3", "predator.dev")
   ga("set", "anonymizeIp", true)
   ga("send", "pageview")
   /* Register handler to log search on blur */
@@ -134,7 +134,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="https://predator-ng.com" title="Predator" class="md-header-nav__button md-logo">
+        <a href="https://predator.dev" title="Predator" class="md-header-nav__button md-logo">
           <img src="https://zooz.github.io/predator/images/logo.png" width="60" height="30">
         </a>
       </div>
@@ -222,7 +222,7 @@
                     <div class="md-sidebar__inner">
                         <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="https://predator-ng.com" title="Predator" class="md-nav__button md-logo">
+    <a href="https://predator.dev" title="Predator" class="md-nav__button md-logo">
       <img src="https://zooz.github.io/predator/images/logo.png" width="60" height="30">
     </a>
     Predator
@@ -588,7 +588,7 @@
 <p><img alt="Screenshot" src="images/dsltestinui.png" /></p>
 <h2 id="creating-a-test-with-custom-logic-in-javascript">Creating a Test with Custom Logic in Javascript<a class="headerlink" href="#creating-a-test-with-custom-logic-in-javascript" title="Permanent link">#</a></h2>
 <p>Tests can use custom Javascript functions. To use custom Javascript functions in your tests, first create a text file holding your Javascript code 
-and upload it to public repository (such as S3, Dropbox, Google Docs etc.). Then create the test, passing the <code>processor_file_url</code> field in the request body to inform Predator of the URL path to your Javascript file. Predator will download and save this file (any changes done to your Javascript code after creating the test will not be reflected).</p>
+and upload it to a public repository (such as S3, Dropbox, Google Docs etc.). Then create the test, passing the <code>processor_file_url</code> field in the request body to inform Predator of the URL path to your Javascript file. Predator will download and save this file (any changes done to your Javascript code after creating the test will not be reflected).</p>
 <div class="admonition note">
 <p class="admonition-title">Artillery guidelines</p>
 <p>To include Javascript functions in your scenarios, make sure to follow the <a href="https://artillery.io/docs/http-reference/#loading-custom-js-code">Artillery guidelines</a>.</p>
