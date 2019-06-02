@@ -1,8 +1,10 @@
 
-<img src="https://repository-images.githubusercontent.com/168341860/0fda9b80-857a-11e9-9a9a-eac3291b1d14" data-canonical-src="https://repository-images.githubusercontent.com/168341860/0fda9b80-857a-11e9-9a9a-eac3291b1d14." width="600" img align="center" />
-
 [![Known Vulnerabilities](https://snyk.io/test/github/zooz/predator/badge.svg)](https://snyk.io/test/github/zooz/predator) [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786) 
+
+<p align="center">
+<img src="https://repository-images.githubusercontent.com/168341860/0fda9b80-857a-11e9-9a9a-eac3291b1d14" data-canonical-src="https://repository-images.githubusercontent.com/168341860/0fda9b80-857a-11e9-9a9a-eac3291b1d14." width="600" img align="center" />
+</p>
 
 Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
 
