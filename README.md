@@ -2,9 +2,7 @@
 ## Distributed performance testing platform for APIs.
 [![Known Vulnerabilities](https://snyk.io/test/github/zooz/predator/badge.svg)](https://snyk.io/test/github/zooz/predator) [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786)
-![](https://zooz.github.io/predator/images/predator-screens.gif)
-
-
+<img src="https://repository-images.githubusercontent.com/168341860/0fda9b80-857a-11e9-9a9a-eac3291b1d14" data-canonical-src="https://repository-images.githubusercontent.com/168341860/0fda9b80-857a-11e9-9a9a-eac3291b1d14." width="600" img align="center" />
 
 <p align="center">
   <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/images/mickeythepredator-logo.png">
