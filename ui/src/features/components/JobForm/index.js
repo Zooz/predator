@@ -1,6 +1,5 @@
 import React, {Fragment} from 'react';
 import style from './style.scss';
-import Checkbox from 'material-ui/Checkbox';
 import {connect} from 'react-redux';
 import {processingCreateJob, createJobSuccess, createJobFailure} from '../../redux/selectors/jobsSelector';
 import * as Actions from '../../redux/action';
@@ -246,7 +245,6 @@ class Form extends React.Component {
                         { serverError &&
                         <ErrorDialog closeDialog={() => {clearErrorOnCreateJob()}} showMessage={serverError}/>
                         }
-
                     </div>
                 </FormWrapper>
             </Modal>
@@ -316,7 +314,7 @@ class Form extends React.Component {
 
                 );
         }
-    }
+    };
 
     whenSubmit = () => {
         const convertedArgs = {
