@@ -246,7 +246,6 @@ class Form extends React.Component {
                         { serverError &&
                         <ErrorDialog closeDialog={() => {clearErrorOnCreateJob()}} showMessage={serverError}/>
                         }
-
                     </div>
                 </FormWrapper>
             </Modal>
@@ -316,7 +315,7 @@ class Form extends React.Component {
 
                 );
         }
-    }
+    };
 
     whenSubmit = () => {
         const convertedArgs = {

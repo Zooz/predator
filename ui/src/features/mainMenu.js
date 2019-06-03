@@ -28,6 +28,11 @@ module.exports = [
     },
     {
         key: 3,
+        primaryText: 'Configuration',
+        navigateTo: 'configuration'
+    },
+    {
+        key: 4,
         primaryText: 'Docs',
         icon: faFileAlt,
         nestedItems: [

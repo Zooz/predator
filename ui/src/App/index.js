@@ -3,6 +3,7 @@ import GetTests from '../features/get-tests';
 import GetJobs from '../features/get-jobs';
 import GetReports from '../features/get-last-reports';
 import GetTestReports from '../features/get-test-reports';
+import ConfigurationForm from '../features/components/ConfigurationForm';
 import { Route, Redirect } from 'react-router';
 import { connect } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
@@ -42,6 +43,9 @@ class App extends React.Component {
               <Route exact path='/last_reports' render={props => (
                 <GetReports key={props.match.params.instance} {...props} />
               )} />
+            <Route exact path='/configuration' render={props => (
+                <ConfigurationForm key={props.match.params.instance} {...props} />
+             )} />
             </DrawerE>
           </ConnectedRouter>
 

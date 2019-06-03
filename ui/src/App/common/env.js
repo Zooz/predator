@@ -10,7 +10,7 @@ function generatePredatorUrl() {
     if (process.env.BUCKET_PATH) {
         return `${process.env.BUCKET_PATH}/v1`;
     }
-    return '/v1';
+    return 'http://localhost:3000/v1';
 }
 
 function generateBucketPath() {

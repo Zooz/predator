@@ -1,0 +1,21 @@
+.buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+
+  > :first-child {
+    margin-right: 5px;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  padding-left: 100px;
+  .TextFieldAndCheckBoxToolTip{
+    margin-right: 110px;
+  }
+}
+
+
