@@ -13,6 +13,7 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 &nbsp; [**Site**](https://predator.dev) &nbsp; |
 &nbsp; [**Documentation**](https://zooz.github.io/predator/about.html) &nbsp; |
 &nbsp; [**API Reference**](https://zooz.github.io/predator//indexapiref.html)
+&nbsp; [**Advanced tests examples**](https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest)
 
 ## Features
 - **Distributed load**:  Predator supports unlimited number of load generators that produce load concurrently.
