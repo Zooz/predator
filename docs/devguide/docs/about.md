@@ -26,7 +26,7 @@ Predator is a performance platform that can be configured to automatically load 
 
 - **Rich UI**: Predator offers a rich UI along with a powerful REST API.
 
-- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as its 
+- **Based on [artillery.io](https://artillery.io/docs/http-reference)**: Predator uses artillery as its 
 load engine to fire the requests. The schema for creating tests via the Predator REST API is based on the artillery schema.
 
 ## UI
