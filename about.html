@@ -480,15 +480,34 @@
 <p>Predator is a performance platform that can be configured to automatically load your API with scheduled tests that provide in-depth performance metrics. While sipping on your (morning) coffee, you can simply check the test summaries to make sure your system is performing as expected. By comparing test results to results from previous test runs, you can easily identify system-wide regressions. Predator’s integration with custom dashboards, test metrics, and service logs make pinpointing performance bugs painless,especially when you check up on the system on a daily basis.</p>
 <h2 id="main-features">Main Features<a class="headerlink" href="#main-features" title="Permanent link">#</a></h2>
 <ul>
-<li><strong>Distributed load</strong>:  Predator supports unlimited number of load generators that produce load concurrently.</li>
-<li><strong>Real time reports</strong>: Predator aggregate all concurrent runs into one beautiful report in real time (latency, rps, status codes and more)</li>
-<li><strong>Built for the cloud</strong>:  Predator is built to take advantage of Kubernetes and DC/OS. it's integrated with those platform and is able to manage the load generators life cycles by it self.</li>
-<li><strong>One click installation</strong>:  Installed via one click in Kubernetes, DC/OS, or any other machine that has Docker.</li>
-<li><strong>Supports 5 Different databases</strong>: Predator can adjust it self to persist data in Cassandra, Postgres, MySQL, MSSQL and SQLITE out of the box.</li>
-<li><strong>Scheduled jobs</strong>: Run any tests in recurring mode by cron expression.</li>
-<li><strong>3rd partry metrics</strong>:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.</li>
-<li><strong>Rich UI</strong>: Predator offers rich UI side by side powerful REST API.</li>
-<li><strong>Based on <a href="https://github.com/artilleryio/artillery">artilliery.io</a></strong>: Predator uses artillery as its load engine to fire the requests. The schema of creating tests via api is based on artillery schema.</li>
+<li>
+<p><strong>Distributed load</strong>:  Predator supports an unlimited number of load generators that produce multiple load runners concurrently.</p>
+</li>
+<li>
+<p><strong>Real time reports</strong>: Predator aggregates all concurrent runs into a single beautiful report in real time (latency, rps, status codes and more).</p>
+</li>
+<li>
+<p><strong>Built for the cloud</strong>:  Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.</p>
+</li>
+<li>
+<p><strong>One click installation</strong>:  Predator can be installed with just one click in Kubernetes and DC/OS, or on any other machine running Docker.</p>
+</li>
+<li>
+<p><strong>Supports 5 Different databases</strong>: Predator provides out-of-the box functionality for persisting data in Cassandra, Postgres, MySQL, MSSQL and SQLITE.</p>
+</li>
+<li>
+<p><strong>Scheduled jobs</strong>: Predator can run recurring tests using cron expressions.</p>
+</li>
+<li>
+<p><strong>3rd partry metrics</strong>: Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.</p>
+</li>
+<li>
+<p><strong>Rich UI</strong>: Predator offers a rich UI along with a powerful REST API.</p>
+</li>
+<li>
+<p><strong>Based on <a href="https://artillery.io/docs/http-reference">artillery.io</a></strong>: Predator uses artillery as its 
+load engine to fire the requests. The schema for creating tests via the Predator REST API is based on the artillery schema.</p>
+</li>
 </ul>
 <h2 id="ui">UI<a class="headerlink" href="#ui" title="Permanent link">#</a></h2>
 <p><img src="images/predator-screens.gif"/></p>
