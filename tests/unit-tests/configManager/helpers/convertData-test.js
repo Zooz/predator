@@ -3,7 +3,9 @@
 const should = require('should');
 let manager = require('../../../../src/configManager/helpers/convertData');
 
-const valuesSuccess = [{ value: '2', type: 'int', result: 2 },
+const valuesSuccess = [
+    { value: '0.25', type: 'float', result: 0.25 },
+    { value: '2', type: 'int', result: 2 },
     { value: JSON.stringify({ test: 'json' }), type: 'json', result: { test: 'json' } },
     { value: 'test', type: undefined, result: 'test' }, { value: undefined, type: undefined, result: undefined }];
 const valuesError = [{ value: 'not int', type: 'int' }, { value: 'not json', type: 'json' }];

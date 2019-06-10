@@ -1,0 +1,35 @@
+
+
+.box-wrapper {
+  padding: 10px 20px;
+  border-radius: 3px;
+  background-color: #fafbfc;
+  border: 1px solid #e9e9e9;
+  margin-left: 6px;
+}
+
+.box-title {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.box-label{
+  font-weight: 500;
+  color: #778195;
+}
+
+.details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 14px;
+  text-align: left;
+}
+.details-text {
+  font-size: 21px;
+  font-weight: 300;
+  color: #778195;
+}

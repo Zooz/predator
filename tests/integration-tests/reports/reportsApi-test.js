@@ -251,6 +251,43 @@ describe('Integration tests for the reports api', function() {
                     });
                 });
             });
+            it('Get last reports in right order', async function () {
+                let lastReportsIdtestId = uuid();
+                const lastReportId = uuid();
+                reportBody.report_id = lastReportId;
+                reportBody.runner_id = uuid();
+                const lastDate = new Date();
+                reportBody.start_time = lastDate.setMinutes(lastDate.getMinutes()).toString();
+                let createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
+
+                const secondReportId = uuid();
+                reportBody.report_id = secondReportId;
+                reportBody.runner_id = uuid();
+                const secondDate = new Date();
+                reportBody.start_time = secondDate.setMinutes(secondDate.getMinutes() + 1).toString();
+                createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
+
+                const firstReportId = uuid();
+                reportBody.report_id = firstReportId;
+                reportBody.runner_id = uuid();
+                const firstDate = new Date();
+                reportBody.start_time = firstDate.setMinutes(firstDate.getMinutes() + 2).toString();
+                createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
+
+                let getLastReportsResponse = await reportsRequestCreator.getLastReports(10);
+                const lastReports = getLastReportsResponse.body;
+                const sortReports = Object.assign([], lastReports);
+                sortReports.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+
+                should(lastReports).eql(sortReports);
+                const allRelvntResults = lastReports.filter(x => [lastReportId, secondReportId, firstReportId].includes(x.report_id));
+                should(allRelvntResults[0].report_id).eql(firstReportId);
+                should(allRelvntResults[1].report_id).eql(secondReportId);
+                should(allRelvntResults[2].report_id).eql(lastReportId);
+            });
         });
 
         describe('Post stats', function () {
@@ -684,7 +721,6 @@ describe('Integration tests for the reports api', function() {
         });
     });
 });
-
 
 function validateFinishedReport(report, expectedValues = {}) {
     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',

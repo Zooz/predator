@@ -1,24 +1,19 @@
-# Predator
-## Distributed performance testing platform for APIs.
+
 [![Known Vulnerabilities](https://snyk.io/test/github/zooz/predator/badge.svg)](https://snyk.io/test/github/zooz/predator) [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786)
-![](https://zooz.github.io/predator/images/predator-screens.gif)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786) 
 
-
-
-<p align="center">
-  <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/images/mickeythepredator-logo.png">
-</p>
-
+<h1 align="center">
+<img src="https://repository-images.githubusercontent.com/168341860/0fda9b80-857a-11e9-9a9a-eac3291b1d14" data-canonical-src="https://repository-images.githubusercontent.com/168341860/0fda9b80-857a-11e9-9a9a-eac3291b1d14." width="500" img align="center" />
+</h1>
 Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
 
 It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
 
 ## Documentation
 
-[Starting Guide](http://predator-ng.com)
+[Starting Guide](https://zooz.github.io/predator/about.html)
 <br>
-[API Reference](http://predator-ng.com/#indexapiref.html)
+[API Reference](https://zooz.github.io/predator//indexapiref.html)
 
 ## Features
 - **Distributed load**:  Predator supports unlimited number of load generators that produce load concurrently.
@@ -42,7 +37,7 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 Predator is designed to seamlessly deploy into your Kubernetes cluster. Install Predator from the [Helm Hub](https://hub.helm.sh/charts/zooz/predator)
 
 ### DC/OS
-Predator is included in Mesosphere Universe. Please refer to https://github.com/dcos/examples/tree/master/predator for a quick start guide and examples for installing the package.
+Predator is included in Mesosphere Universe. Please refer to https://universe.dcos.io/#/package/predator/version/latest for a quick start guide and examples for installing the package.
 
 ### Docker
 `docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator`

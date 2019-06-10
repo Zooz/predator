@@ -43,8 +43,6 @@ module.exports.getLastReports = async (limit) => {
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
-
-    reports = reports.sort((a, b) => b.start_time - a.start_time);
     return reports;
 };
 

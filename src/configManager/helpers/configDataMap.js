@@ -6,7 +6,7 @@ let configDataMap = {
     [constConfig.INTERNAL_ADDRESS]: { value: process.env.INTERNAL_ADDRESS },
     [constConfig.RUNNER_DOCKER_IMAGE]: { value: process.env.RUNNER_DOCKER_IMAGE || 'zooz/predator-runner:latest' },
     [constConfig.JOB_PLATFORM]: { value: process.env.JOB_PLATFORM },
-    [constConfig.RUNNER_CPU]: { value: process.env.RUNNER_CPU || 1, type: 'int' },
+    [constConfig.RUNNER_CPU]: { value: process.env.RUNNER_CPU || 1, type: 'float' },
     [constConfig.RUNNER_MEMORY]: { value: process.env.RUNNER_MEMORY || 256, type: 'int' },
     [constConfig.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS]: {
         value: process.env.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS || 30000,

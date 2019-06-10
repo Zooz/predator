@@ -1075,6 +1075,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/scenario'
+    processor_file_url:
+      type: string
+      format: uri
+      example: http://www.example.com/file.txt
+      description: The URL path to a text file holding custom Javascript code.
     artillery_request_schema:
       description: |
         The request schema used in test scenarios. The property name must be one of the following HTTP methods: `GET`, `HEAD`, `POST`, `PUT`, `DELETE`.

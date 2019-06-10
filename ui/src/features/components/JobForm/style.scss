@@ -1,0 +1,26 @@
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+
+  > :first-child {
+    margin-right: 5px;
+  }
+}
+.input-wrapper {
+  margin-bottom: 15px;
+}
+
+.run-immediately {
+  font-size: 13px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #555555;
+  margin-bottom: 5px;
+  margin-left: 10px;
+}

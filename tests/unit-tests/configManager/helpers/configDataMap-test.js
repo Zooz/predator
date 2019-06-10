@@ -13,7 +13,7 @@ const expectedTypes = {
     runner_docker_image: undefined,
     job_platform: undefined,
     runner_memory: 'int',
-    runner_cpu: 'int',
+    runner_cpu: 'float',
     minimum_wait_for_delayed_report_status_update_in_ms: 'int',
     metrics_plugin_name: 'string',
     default_email_address: undefined,
