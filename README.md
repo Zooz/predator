@@ -1,10 +1,15 @@
-
+# Predator
+## Distributed performance testing platform for APIs.
 [![Known Vulnerabilities](https://snyk.io/test/github/zooz/predator/badge.svg)](https://snyk.io/test/github/zooz/predator) [![Join the chat at https://gitter.im/predator-pf/community](https://badges.gitter.im/predator-pf/community.svg)](https://gitter.im/predator-pf/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786) 
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786)
+![](https://zooz.github.io/predator/images/predator-screens.gif)
 
-<h1 align="center">
-<img src="https://zooz.github.io/predator/images/predator-1764x640.png" data-canonical-src="https://zooz.github.io/predator/images/predator-1764x640.png"/>
-</h1>
+
+
+<p align="center">
+  <img align="right" width="25%" height="25%" src="https://zooz.github.io/predator/images/mickeythepredator-logo.png">
+</p>
+
 Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
 
 It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
@@ -16,15 +21,24 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 &nbsp; [**Advanced Tests Examples**](https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest)
 
 ## Features
-- **Distributed load**:  Predator supports unlimited number of load generators that produce load concurrently.
-- **Real time reports**: Predator aggregate all concurrent runs into one beautiful report in real time (latency, rps, status codes and more)
-- **Built for the cloud**:  Predator is built to take advantage of Kubernetes and DC/OS. it's integrated with those platform and is able to manage the load generators life cycles by it self.
-- **One click installation**:  Installed via one click in Kubernetes, DC/OS, or any other machine that has Docker.
-- **Supports 5 Different databases**: Predator can adjust it self to persist data in Cassandra, Postgres, MySQL, MSSQL and SQLITE out of the box.
-- **Scheduled jobs**: Run any tests in recurring mode by cron expression.
-- **3rd partry metrics**:  Predator integrated with Prometheus and Influx, just configure it via the config endpoint or the ui.
-- **Rich UI**: Predator offers rich UI side by side powerful REST API.
-- **Based on [artilliery.io](https://github.com/artilleryio/artillery)**: Predator uses artillery as its load engine to fire the requests. The schema of creating tests via api is based on artillery schema.
+- **Distributed load**:  Predator supports an unlimited number of load generators that produce multiple load runners concurrently.
+
+- **Real time reports**: Predator aggregates all concurrent runs into a single beautiful report in real time (latency, rps, status codes and more).
+
+- **Built for the cloud**:  Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
+
+- **One click installation**:  Predator can be installed with just one click in Kubernetes and DC/OS, or on any other machine running Docker.
+
+- **Supports 5 Different databases**: Predator provides out-of-the box functionality for persisting data in Cassandra, Postgres, MySQL, MSSQL and SQLITE.
+
+- **Scheduled jobs**: Predator can run recurring tests using cron expressions.
+
+- **3rd partry metrics**: Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
+
+- **Rich UI**: Predator offers a rich UI along with a powerful REST API.
+
+- **Based on [artillery.io](https://artillery.io/docs/http-reference)**: Predator uses artillery as its 
+load engine to fire the requests. The schema for creating tests via the Predator REST API is based on the artillery schema.
 
 
 ## System Overview
