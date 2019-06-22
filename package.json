@@ -63,7 +63,7 @@
     "replace-in-file": "^3.4.4",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
-    "sequelize": "^5.8.7",
+    "sequelize": "^5.8.11",
     "sqlite3": "^4.0.8",
     "tedious": "^4.2.0",
     "umzug": "^2.2.0",
