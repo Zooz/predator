@@ -5,9 +5,10 @@ const convertData = require('../helpers/convertData');
 
 module.exports.getConfigValue = async (configPath) => {
     const dbConfigValue = await dbConnector.getConfigValue(configPath);
-    const type = configDataMap.getConstType(configPath);
     const value = dbConfigValue || configDataMap.getConstDefaultValue(configPath);
-    return convertData.convertByType(value, type);
+    const type = configDataMap.getConstType(configPath);
+    const convertedValue = convertData.convertByType(value, type);
+    return convertedValue;
 };
 
 module.exports.getConfig = async () => {
