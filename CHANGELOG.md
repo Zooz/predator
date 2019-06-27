@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.5"></a>
+## [1.1.5](https://github.com/Zooz/predator/compare/v1.1.4...v1.1.5) (2019-06-27)
+
+
+### Bug Fixes
+
+* package.json & package-lock.json to reduce vulnerabilities ([#151](https://github.com/Zooz/predator/issues/151)) ([2202b45](https://github.com/Zooz/predator/commit/2202b45))
+
+
+### Features
+
+* **kubernetes:** allow specifiy how much cpu to resrve ([#146](https://github.com/Zooz/predator/issues/146)) ([10a6f3c](https://github.com/Zooz/predator/commit/10a6f3c))
+* **kubernetes:** allow specifiy how much cpu to resrve ([#146](https://github.com/Zooz/predator/issues/146)) ([0fc8713](https://github.com/Zooz/predator/commit/0fc8713))
+
+
+
 <a name="1.1.4"></a>
 ## [1.1.4](https://github.com/Zooz/predator/compare/v1.1.3...v1.1.4) (2019-06-01)
 

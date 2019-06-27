@@ -1,6 +1,6 @@
 {
   "name": "predator",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Framework that manages the entire lifecycle of load testing a server, from creating test files, running scheduled and on-demand tests, and viewing test results.",
   "main": "server.js",
   "directories": {
