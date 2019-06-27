@@ -29,11 +29,6 @@ const defaultConfigNotEscaped = {
     runner_cpu: 1,
     runner_memory: 256,
     smtp_server: {
-        from: undefined,
-        host: undefined,
-        port: undefined,
-        username: undefined,
-        password: undefined,
         timeout: 200
     },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
@@ -41,13 +36,13 @@ const defaultConfigNotEscaped = {
 
 const configResponseParseObject = {
     runner_cpu: 5,
-    smtp_server: {
+    smtp_server: JSON.stringify({
         host: 'test',
         port: 'test',
         username: 'test',
         password: 'test',
         timeout: 'test'
-    },
+    }),
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
