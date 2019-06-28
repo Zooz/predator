@@ -210,7 +210,7 @@ class getTests extends React.Component {
                     this.setState({
                         createTest: true
                     });
-                }}>CREATE TEST</Button>
+                }}>Create Test</Button>
                 <ReactTableComponent
                     onSearch={this.onSearch}
                     rowHeight={'46px'}
