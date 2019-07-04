@@ -1,0 +1,28 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.13.5
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-450202:
+    - express-requests-logger > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - graceful-shutdown-express > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - artillery > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - cassandra-migration > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - sequelize > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - express-easy-zip > zip-stream > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - artillery > artillery-plugin-statsd > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - artillery > cheerio > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - request-promise-native > request-promise-core > lodash:
+        patched: '2019-07-04T02:30:18.545Z'
+    - express-easy-zip > zip-stream > archiver-utils > lodash:
+        patched: '2019-07-04T02:30:18.545Z'

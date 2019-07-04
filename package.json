@@ -14,7 +14,9 @@
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh",
     "lint": "eslint src/**",
     "release": "standard-version",
-    "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
+    "test": "npm run lint && npm run unit-tests && npm run local-integration-tests",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -65,7 +67,8 @@
     "sqlite3": "^4.0.8",
     "tedious": "^4.2.0",
     "umzug": "^2.2.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.6.1",
@@ -103,5 +106,6 @@
   "nyc": {
     "exclude": "**/databaseConnector.js",
     "include": "src"
-  }
+  },
+  "snyk": true
 }
