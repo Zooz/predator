@@ -34,7 +34,7 @@ class getConfiguration extends React.Component {
         return (
             <div>
                 {config
-                    ? <ConfigurationForm history={history} config={config} /> : this.loader()}
+                    ? <ConfigurationForm history={this.props.history} config={config} /> : this.loader()}
 
                 { serverError &&
                     <ErrorDialog closeDialog={() => {clearErrorOnUpdateConfig()}} showMessage={serverError}/>

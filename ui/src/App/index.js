@@ -11,6 +11,7 @@ import history from '../store/history';
 import { hot } from 'react-hot-loader';
 import DrawerE from '../features/components/DrawerE';
 import menuList from '../features/mainMenu';
+import get from 'lodash/get'
 
 class App extends React.Component {
     state = {
@@ -25,7 +26,6 @@ class App extends React.Component {
 
     render () {
       return (
-        <Fragment>
           <ConnectedRouter history={history}>
             <DrawerE history={history} open={true} listItemData={menuList}>
               <Route exact path='/' render={() => (
@@ -48,16 +48,13 @@ class App extends React.Component {
              )} />
             </DrawerE>
           </ConnectedRouter>
-
-        </Fragment>
-
       )
     }
 }
 
 function mapStateToProps (state) {
   return {
-
+      location: get(state, 'router.location.pathname')
   }
 }
 

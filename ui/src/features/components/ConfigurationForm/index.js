@@ -14,7 +14,6 @@ import Button from "../../../components/Button";
 import TitleInput from "../../../components/TitleInput";
 import ErrorWrapper from "../../../components/ErrorWrapper";
 import Input from "../../../components/Input";
-import history from '../../../store/history'
 import Loader from '../Loader'
 import {validate} from './validator';
 
@@ -92,7 +91,6 @@ class Form extends React.Component {
     }
 
     componentDidMount () {
-
     }
 
 
@@ -192,7 +190,7 @@ class Form extends React.Component {
     }
 
     closeDialog = () => {
-        history.push('/last_reports');
+        this.props.history.push('/last_reports');
     };
 
     generateInput = (oneItem) => {
