@@ -51,7 +51,7 @@
     "fs-extra": "^5.0.0",
     "graceful-shutdown-express": "^2.0.1",
     "jsck": "^0.3.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "mathjs": "^5.10.3",
     "mysql2": "^1.6.5",
     "node-cmd": "^3.0.0",
