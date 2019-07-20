@@ -91,3 +91,4 @@ Additional parameters for the following chosen databases:
 | SMTP_USERNAME        	| smtp_server.username 	| SMTP username                                             	| ✓                        	|               	|
 | SMTP_PASSWORD        	| smtp_server.password 	| SMTP password                                             	| ✓                        	|               	|
 | SMTP_TIMEOUT         	| smtp_server.timeout  	| timeout to SMTP server in milliseconds                    	| ✓                        	|               	|
+| SMTP_REJECT_UNAUTH_CERTS         	| smtp_server.rejectUnauthCerts  	| should fail or succeed on unauthorized certificate                 	| ✓                        	|               	|

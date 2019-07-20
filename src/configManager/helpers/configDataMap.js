@@ -22,7 +22,9 @@ let configDataMap = {
             port: process.env.SMTP_PORT,
             username: process.env.SMTP_USERNAME,
             password: process.env.SMTP_PASSWORD,
-            timeout: process.env.SMTP_TIMEOUT || 200
+            timeout: process.env.SMTP_TIMEOUT || 200,
+            secure: process.env.SMTP_SECURE || false,
+            rejectUnauthCerts: process.env.SMTP_REJECT_UNAUTH_CERTS || false
         }),
         type: 'json'
     }
