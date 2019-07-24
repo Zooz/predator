@@ -63,14 +63,7 @@ class Form extends React.Component {
                     name: 'delay_runner_ms',
                     key: 'delay_runner_ms',
                     floatingLabelText: 'delay runner ms',
-                    info: 'ELI TODO',
-                },
-                {
-                    name: 'strict_ssl',
-                    key: 'strict_ssl',
-                    floatingLabelText: 'strict ssl',
-                    info: 'ELI TODO',
-                    type: INPUT_TYPES.SWITCHER
+                    info: 'Delay the predator runner from sending http requests (ms)',
                 },
                 {
                     name: 'default_webhook_url',
@@ -88,8 +81,7 @@ class Form extends React.Component {
                 runner_memory: config.runner_memory,
                 minimum_wait_for_delayed_report_status_update_in_ms: config.minimum_wait_for_delayed_report_status_update_in_ms,
                 default_webhook_url: config.default_webhook_url,
-                delay_runner_ms: config.delay_runner_ms,
-                strict_ssl: config.strict_ssl || false,
+                delay_runner_ms: config.delay_runner_ms
             },
             errors: {
                 name: undefined,
