@@ -27,6 +27,9 @@ export const updateConfigFailure = (error) => (
 export const updateConfigSuccess = () => (
     { type: Types.UPDATE_CONFIG_SUCCESS }
 );
+export const cleanUpdateConfigSuccess = () => (
+    { type: Types.CLEAN_UPDATE_CONFIG_SUCCESS }
+);
 
 export const processGetConfig = (state) => (
     { type: Types.PROCESSING_GET_CONFIG, state }
@@ -48,8 +51,8 @@ export const clearUpdateConfigError = (state) => (
     { type: Types.CLEAR_ERROR_ON_UPDATE_CONFIG, state }
 );
 
-export const deleteConfigKey = (body) => (
-    { type: Types.DELETE_CONFIG_KEY, body }
+export const deleteConfigKey = (key) => (
+    { type: Types.DELETE_CONFIG_KEY, key }
 );
 
 export const processDeleteConfigKey = (state) => (

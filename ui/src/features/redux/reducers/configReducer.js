@@ -14,8 +14,6 @@ export default function reduce (state = initialState, action = {}) {
     switch (action.type) {
         case Types.GET_CONFIG_SUCCESS:
             return state.set('config', action.config);
-        case Types.UPDATE_CONFIG:
-            return state.set('config', action.config);
         case Types.PROCESSING_GET_CONFIG:
             return state.set('processing_get_config', action.state);
         case Types.PROCESSING_UPDATE_CONFIG:
@@ -28,6 +26,10 @@ export default function reduce (state = initialState, action = {}) {
             return state.set('error_update_config', action.error);
         case Types.CLEAR_ERROR_ON_UPDATE_CONFIG:
             return state.set('error_update_config', undefined);
+        case Types.UPDATE_CONFIG_SUCCESS:
+            return state.set('update_config_success', true);
+        case Types.CLEAN_UPDATE_CONFIG_SUCCESS:
+            return state.set('update_config_success', undefined);
         default:
             return state;
     }

@@ -32,19 +32,19 @@ class App extends React.Component {
                 <Redirect to='/last_reports' />
               )} />
               <Route exact path='/tests' render={props => (
-                <GetTests key={props.match.params.instance} {...props} />
+                <GetTests {...props} />
               )} />
               <Route exact path='/jobs' render={props => (
-                <GetJobs key={props.match.params.instance} {...props} />
+                <GetJobs {...props} />
               )} />
               <Route exact path='/tests/:testId/reports' render={props => (
-                <GetTestReports key={props.match.params.instance} {...props} />
+                <GetTestReports {...props} />
               )} />
               <Route exact path='/last_reports' render={props => (
-                <GetReports key={props.match.params.instance} {...props} />
+                <GetReports {...props} />
               )} />
             <Route exact path='/configuration' render={props => (
-                <Configuration key={props.match.params.instance} {...props} />
+                <Configuration {...props} />
              )} />
             </DrawerE>
           </ConnectedRouter>

@@ -1,55 +1,54 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { config, errorOnGetConfig, errorOnUpdateConfig, processingGetConfig, processingUpdateConfig } from './redux/selectors/configSelector';
+import {connect} from 'react-redux';
+import {
+    config,
+    errorOnGetConfig,
+    processingGetConfig,
+    processingUpdateConfig
+} from './redux/selectors/configSelector';
 import * as Actions from './redux/action';
 import Loader from '../features/components/Loader';
 import ConfigurationForm from './components/ConfigurationForm';
-import history from "../store/history";
-import ErrorDialog from "./components/ErrorDialog";
+import Page from '../components/Page';
+import Card from '../components/Card';
+import style from './get-configuration.scss'
 const errorMsgGetConfig = 'Error occurred while trying to get Predator configuration.';
-
 class getConfiguration extends React.Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
     }
 
-    componentDidMount () {
-        this.loadPageData();
-    }
-
-    loadPageData = () => {
+    componentDidMount() {
         this.props.getConfig();
-    };
-
-    componentWillUnmount () {
-
     }
 
-    loader () {
-        return (this.props.processingGetConfig) ? <Loader /> : errorMsgGetConfig;
+    componentWillUnmount() {
+        this.props.getConfigFailure(undefined);
     }
 
-    render () {
-        const {serverError, clearErrorOnUpdateConfig, config} = this.props;
+    render() {
+        const {config, errorOnGetConfig, processingGetConfig} = this.props;
         return (
-            <div>
-                {config
-                    ? <ConfigurationForm history={this.props.history} config={config} /> : this.loader()}
+            <Page title={'Configuration'} description={'ELI TODO'}>
+                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+                    {errorOnGetConfig ? errorMsgGetConfig : null}
+                    {processingGetConfig && <Loader/>}
+                    {(config && !errorOnGetConfig && !processingGetConfig) &&
+                    <Card className={style['card-wrapper']}>
+                        <ConfigurationForm history={this.props.history} config={config}/>
+                    </Card>}
+                </div>
+            </Page>
 
-                { serverError &&
-                <ErrorDialog closeDialog={() => {clearErrorOnUpdateConfig()}} showMessage={serverError}/>
-                }
-            </div>
         )
     }
 }
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
     return {
         config: config(state),
         processingGetConfig: processingGetConfig(state),
         processingUpdateConfig: processingUpdateConfig(state),
-        serverError: errorOnUpdateConfig(state),
         errorOnGetConfig: errorOnGetConfig(state)
     }
 }
@@ -57,10 +56,9 @@ function mapStateToProps (state) {
 const mapDispatchToProps = {
     getConfig: Actions.getConfig,
     getConfigSuccess: Actions.getConfigSuccess,
-    getConfigFailure: Actions.getConfigFailure,
     updateConfigFailure: Actions.updateConfigFailure,
     updateConfigSuccess: Actions.updateConfigSuccess,
-    clearErrorOnUpdateConfig: Actions.clearUpdateConfigError
+    getConfigFailure: Actions.getConfigFailure,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getConfiguration);
