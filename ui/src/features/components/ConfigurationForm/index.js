@@ -233,7 +233,8 @@ class Form extends React.Component {
         const keyTypes = {
             runner_memory: 'int',
             runner_cpu: 'float',
-            minimum_wait_for_delayed_report_status_update_in_ms: 'int'
+            minimum_wait_for_delayed_report_status_update_in_ms: 'int',
+            delay_runner_ms: 'int'
         };
         const body = {};
         Object.keys(this.state.config).forEach((configKey) => {
