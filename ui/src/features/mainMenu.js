@@ -41,7 +41,7 @@ module.exports = [
             {
                 key: 0,
                 primaryText: 'Documentation',
-                linkUrl: 'https://predator-ng.com/about.html',
+                linkUrl: 'https://zooz.github.io/predator/about.html',
                 icon: faBook
             }, {
                 key: 1,

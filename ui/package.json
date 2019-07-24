@@ -64,7 +64,7 @@
     "font-awesome": "^4.7.0",
     "history": "^4.7.2",
     "immutable": "^3.8.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "material-ui": "^0.20.0",
     "moment": "^2.22.1",
     "pretty-seconds": "^0.2.1",
