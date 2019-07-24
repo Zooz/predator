@@ -29,7 +29,7 @@ class getConfiguration extends React.Component {
     render() {
         const {config, errorOnGetConfig, processingGetConfig} = this.props;
         return (
-            <Page title={'Configuration'} description={'ELI TODO'}>
+            <Page title={'Configuration'} description={'Customize Predator behavior'}>
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                     {errorOnGetConfig ? errorMsgGetConfig : null}
                     {processingGetConfig && <Loader/>}
