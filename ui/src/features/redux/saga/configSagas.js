@@ -46,7 +46,7 @@ export function* deleteConfigKey(action) {
 function cleanEmptyValues(object) {
     const result = {};
     for (let key in object) {
-        if (_.isUndefined(object[key])) {
+        if (!_.isUndefined(object[key])) {
             result[key] = object[key];
         }
     }
