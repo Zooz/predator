@@ -239,9 +239,11 @@ class Form extends React.Component {
         const body = {};
         Object.keys(this.state.config).forEach((configKey) => {
             if (keyTypes[configKey] === 'int') {
-                body[configKey] = parseInt(this.state.config[configKey]);
+                const value = parseInt(this.state.config[configKey]);
+                body[configKey] = _.isNaN(value) ? undefined : value;
             } else if (keyTypes[configKey] === 'float') {
-                body[configKey] = parseFloat(this.state.config[configKey]);
+                const value = parseFloat(this.state.config[configKey]);
+                body[configKey] = _.isNaN(value) ? undefined : value;
             } else {
                 body[configKey] = this.state.config[configKey];
             }

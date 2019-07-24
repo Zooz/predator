@@ -23,7 +23,7 @@ export function* editConfig(action) {
                 yield call(deleteConfigKey, {key})
             }
         }
-        const updateBody = cleanEmptyValues(action.body);
+        const updateBody = cleanEmptyOrNullValues(action.body);
         yield call(updateFrameworkConfig, updateBody);
         yield put(Actions.updateConfigSuccess());
     } catch (err) {
@@ -43,10 +43,10 @@ export function* deleteConfigKey(action) {
 }
 
 
-function cleanEmptyValues(object) {
+function cleanEmptyOrNullValues(object) {
     const result = {};
     for (let key in object) {
-        if (!_.isUndefined(object[key])) {
+        if (!_.isUndefined(object[key]) && !_.isNaN(object[key])) {
             result[key] = object[key];
         }
     }
