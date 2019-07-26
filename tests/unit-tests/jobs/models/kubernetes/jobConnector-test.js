@@ -86,9 +86,9 @@ describe('Kubernetes job connector tests', function () {
             requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods?labelSelector=controller-uid=uid' })).resolves({
                 items: [{ metadata: { name: 'podA' } }, { metadata: { name: 'podB' } }]
             });
-            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podA/log' })).resolves('aLog');
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podA/log?container=predator-runner' })).resolves('aLog');
 
-            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podB/log' })).resolves('bLog');
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podB/log?container=predator-runner' })).resolves('bLog');
 
             let logs = await jobConnector.getLogs('jobPlatformName', 'runId');
 

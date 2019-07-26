@@ -1,6 +1,6 @@
-import createHistory from 'history/createBrowserHistory'
+import {createBrowserHistory} from 'history'
 import * as env from '../App/common/env';
 
-const history = createHistory({ basename: `${env.BUCKET_PATH ? env.BUCKET_PATH : '/'}` });
+const history = createBrowserHistory({ basename: `${env.BUCKET_PATH ? env.BUCKET_PATH : '/'}` });
 
 export default history;
