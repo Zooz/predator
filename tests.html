@@ -322,6 +322,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#built-in-functions" title="Built-in Functions" class="md-nav__link">
+    Built-in Functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#request-reuse-with-dsl-definitions" title="Request Reuse with DSL Definitions" class="md-nav__link">
     Request Reuse with DSL Definitions
   </a>
@@ -351,6 +358,13 @@
         <li class="md-nav__item">
   <a href="#creating-a-test-with-custom-logic-in-javascript" title="Creating a Test with Custom Logic in Javascript" class="md-nav__link">
     Creating a Test with Custom Logic in Javascript
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-requestsresponses" title="Debugging Requests/Responses" class="md-nav__link">
+    Debugging Requests/Responses
   </a>
   
 </li>
@@ -440,6 +454,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#built-in-functions" title="Built-in Functions" class="md-nav__link">
+    Built-in Functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#request-reuse-with-dsl-definitions" title="Request Reuse with DSL Definitions" class="md-nav__link">
     Request Reuse with DSL Definitions
   </a>
@@ -469,6 +490,13 @@
         <li class="md-nav__item">
   <a href="#creating-a-test-with-custom-logic-in-javascript" title="Creating a Test with Custom Logic in Javascript" class="md-nav__link">
     Creating a Test with Custom Logic in Javascript
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-requestsresponses" title="Debugging Requests/Responses" class="md-nav__link">
+    Debugging Requests/Responses
   </a>
   
 </li>
@@ -506,6 +534,23 @@
 <p><code>{{petId}}</code></p>
 <p>Here's an example of using <code>{{petId}}</code> in the request path:</p>
 <p><img alt="Screenshot" src="images/variable_in_path.png" /></p>
+<h2 id="built-in-functions">Built-in Functions<a class="headerlink" href="#built-in-functions" title="Permanent link">#</a></h2>
+<p>Predator supports some generic functions out of the box and they can be used to generate random data</p>
+<ul>
+<li><code>randomNumber(min, max)</code> will generate random number within the provided range.</li>
+<li><code>$randomString(length)</code> will generate random string with the specified length.</li>
+<li><code>$uuid()</code> will generate v4 UUID.</li>
+<li><code>dateNow()</code> will generate Number of ms since epoch.</li>
+</ul>
+<p>Usage example:</p>
+<div class="codehilite"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $uuid() }}&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $randomString(6) }}&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;age&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $randomNumber(0,15) }}&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;created&quot;</span><span class="p">:</span> <span class="s2">&quot;{{$dateNow()}}&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
 <h2 id="request-reuse-with-dsl-definitions">Request Reuse with DSL Definitions<a class="headerlink" href="#request-reuse-with-dsl-definitions" title="Permanent link">#</a></h2>
 <p>This is the moment where Predator shows its teeth and unleashes its true power. </p>
 <p>Writing a performance test that checks specific parts of your API end-to-end can be a huge hassle, but now it is effortless. By creating DSL definitions using Predator's Domain Specific Language (DSL), request templates are generated which you can then reuse in the same test and in other tests under the same DSL type, reducing replication.</p>
@@ -661,6 +706,10 @@ and upload it to a public repository (such as S3, Dropbox, Google Docs etc.). Th
 <p><code>generateRandomDataGlobal()</code> is a global function that creates global variables. Those variables can be used in the scope of the test by using the <code>{{ }}</code> syntax.</p>
 </li>
 </ul>
+<h2 id="debugging-requestsresponses">Debugging Requests/Responses<a class="headerlink" href="#debugging-requestsresponses" title="Permanent link">#</a></h2>
+<p>For viewing all the requests and responses (Very useful when your test not behaves like you expected)
+It's possible to run tests with the Debug flag (can be send via jobs api or toggled in the run test form)
+The predator-runner will log this data to the log files which can be downloaded and investigated.</p>
                     
                     
                     
