@@ -17,6 +17,28 @@ Here's an example of using `{{petId}}` in the request path:
 
 ![Screenshot](images/variable_in_path.png)
 
+## Built-in Functions
+
+Predator supports some generic functions out of the box and they can be used to generate random data
+
+* `randomNumber(min, max)` will generate random number within the provided range.
+* `$randomString(length)` will generate random string with the specified length.
+* `$uuid()` will generate v4 UUID.
+* `dateNow()` will generate Number of ms since epoch.
+
+Usage example:
+
+```json
+{
+	"id": "{{ $uuid() }}",
+	"name": "{{ $randomString(6) }}",
+	"age": "{{ $randomNumber(0,15) }}",
+	"created": "{{$dateNow()}}",
+}
+
+```
+
+
 ## Request Reuse with DSL Definitions
 
 This is the moment where Predator shows its teeth and unleashes its true power. 
@@ -190,3 +212,9 @@ In the example above, we created a test with 2 Javascript functions:
 * `logResponse()` will log the result received, if the `statusCode` is different from 200. The function will be called after each response using the `afterResponse` command.
 
 * `generateRandomDataGlobal()` is a global function that creates global variables. Those variables can be used in the scope of the test by using the `{{ }}` syntax.
+
+## Debugging Requests/Responses
+
+For viewing all the requests and responses (Very useful when your test not behaves like you expected)
+It's possible to run tests with the Debug flag (can be send via jobs api or toggled in the run test form)
+The predator-runner will log this data to the log files which can be downloaded and investigated.

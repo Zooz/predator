@@ -16,16 +16,33 @@ For examples and more info check [Universe Catalog](https://universe.dcos.io/#/p
 
 ## Docker
 
-Predator runs using Docker. In order to run Predator locally, clone the [repository](https://github.com/Zooz/predator) and run the following command:
+Predator runs in a docker and it triggers other dockers which actually create the load (predator-runner).
+In order to avoid dind side affects, Predator will start its runners as siblings.
 
-`runPredatorLocal.sh`
+So this means two things
 
-Or, you can run Predator without cloning the repository with the following command :
+1. When starting Predator in a docker we will mount the docker socket to the container. This will allow Predator start the siblings dockers (predator-runner) 
+<br>
+```-v /var/run/docker.sock:/var/run/docker.sock``` 
+2. Predator runners will have to reach the main Predator to report test results. Predator has to know it's own accessible address and pass it to the predator-runners.
+<br> 
+ ```-e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1```
+   where `$MACHINE_IP` is the local ip address of your machine (not localhost, but actual ip address).
+   In unix or mac this command should give you the ip address:
+   </br>
+   ```export MACHINE_IP=$(ipconfig getifaddr en0 || ifconfig eth0|grep 'inet addr:'|cut -d':' -f2|awk '{ print $1}')```
 
 ```docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator```
 
-where `$MACHINE_IP` is the local ip address of your machine.
 
-After successfully mounting the Predator docker image, access Predator by typing the following URL in your browser:
+After successfully starting the Predator docker image, access Predator by typing the following URL in your browser:
 
 ```http://{$MACHINE_IP}/ui```
+
+!!! note "If you don't see test reports"
+   
+    This usually means that the predator-runner couldn't reach the main Predator and report about test progress;
+    <br>
+    ```docker logs $(docker ps -a -f name=predator -n 1 --format='{{ .ID }}')```
+    <br>
+    Will help to understand what went wrong.
