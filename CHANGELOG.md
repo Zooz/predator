@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.6"></a>
+## [1.1.6](https://github.com/Zooz/predator/compare/v1.1.5...v1.1.6) (2019-07-30)
+
+
+### Bug Fixes
+
+* **dsl:** fixing bug where json had to be object ([#173](https://github.com/Zooz/predator/issues/173)) ([7bf0c80](https://github.com/Zooz/predator/commit/7bf0c80))
+* **kubernetes:** fix bug where logs wasn't downloaded from kubernetes ([#169](https://github.com/Zooz/predator/issues/169)) ([b62a677](https://github.com/Zooz/predator/commit/b62a677))
+* **package:** removing fs and path as they are internal node js modules ([#157](https://github.com/Zooz/predator/issues/157)) ([c246032](https://github.com/Zooz/predator/commit/c246032))
+
+
+### Features
+
+* **ui:** add configuration page ([#150](https://github.com/Zooz/predator/issues/150)) ([2d0a35d](https://github.com/Zooz/predator/commit/2d0a35d))
+
+
+
 <a name="1.1.5"></a>
 ## [1.1.5](https://github.com/Zooz/predator/compare/v1.1.4...v1.1.5) (2019-06-27)
 
