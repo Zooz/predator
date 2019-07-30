@@ -1152,7 +1152,6 @@ components:
             type: string
         json:
           description: The JSON body to use in the request.
-          type: object
     key_value_string_object:
       type: object
       additionalProperties:
