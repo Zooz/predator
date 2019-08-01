@@ -17,6 +17,30 @@ Here's an example of using `{{petId}}` in the request path:
 
 ![Screenshot](images/variable_in_path.png)
 
+
+### Pick a random element from an array
+
+When capturing responses data, you may want to randomly select an item from your dataset to continue with your scenario.  
+This is achieved by using the `*` operator, which selects all the matching items. The engine will then randomly pick a single item for you and store it in the defined variable.  
+
+Usage example :
+
+![Screenshot](images/random_pick.png)
+on
+```json
+[
+	{
+		"id": "45697038-37ae-4149-9f5e-ed7a4a20e014",
+		"data": "132456789"
+	}, {
+		"id": "f02392e8-1b11-401f-a902-8a9a1ae5c47a",
+		"data": "abcdefghi"
+	}
+]
+```
+will randomly store `45697038-...-ed7a4a20e014` or `f02392e8-...-8a9a1ae5c47a` in `{{dataId}}` for further usage in the scenario.
+
+
 ## Built-in Functions
 
 Predator supports some generic functions out of the box and they can be used to generate random data
