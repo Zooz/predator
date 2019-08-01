@@ -23,8 +23,21 @@ and `$MACHINE_IP` needs to be your local network address (an IP address). You ca
 ifconfig en0 | grep 'inet ' | cut -d' ' -f2
 ```
 
+For more information regarding correct installation of Predator using Docker visit the [Installation](installation.md#docker) section.
+
 It is important to note this is an issue and solution only in Docker installations. 
 In Kubernetes and DC/OS installations the `INTERNAL_ADDRESS` is built in.
+
+### <b>What is the http engine Predator uses to run the load?</b>
+
+Predator uses [Artillery](https://github.com/artilleryio/artillery) as its HTTP load engine. 
+Therefore, all `basic` type tests are written in Artillery syntax and all of the features Artillery supports, Predator supports.
+
+To read more about Artillery and its features visit their well written documentary: 
+- [Artillery Documentation](https://artillery.io/docs/)
+- [Artillery Basic Concepts Documentation](https://artillery.io/docs/basic-concepts/)
+- [Artillery Test Structure Documentation](https://artillery.io/docs/script-reference/)
+- [Artillery HTTP Engine Documentation](https://artillery.io/docs/http-reference/)
 
 ## Configuration
 

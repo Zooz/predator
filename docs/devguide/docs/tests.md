@@ -50,6 +50,8 @@ Predator supports some generic functions out of the box and they can be used to 
 * `$uuid()` will generate v4 UUID.
 * `$dateNow()` will generate a number of ms since epoch.
 
+<b>Currently these functions all return values as a `string`. An issue is open regarding this: [#178](https://github.com/Zooz/predator/issues/178)</b>
+
 Usage example:
 
 ```json
