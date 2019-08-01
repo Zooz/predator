@@ -155,9 +155,16 @@ workflows:
     - build:
         requires:
         - integration-tests
+        filters:
+          branches:
+            # Forked pull requests have CIRCLE_BRANCH set to pull/XXX
+            ignore: /pull\/[0-9]+/
     - end-to-end-tests:
         requires:
         - build
+        filters:
+          branches:
+            ignore: /pull\/[0-9]+/
     - release-patch-approval:
         type: approval
         requires:
