@@ -319,6 +319,19 @@
     Data Reuse with Variables
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pick-a-random-element-from-an-array" title="Pick a random element from an array" class="md-nav__link">
+    Pick a random element from an array
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -363,9 +376,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#debugging-requestsresponses" title="Debugging Requests/Responses" class="md-nav__link">
-    Debugging Requests/Responses
+  <a href="#debugging-test-requestsresponses" title="Debugging Test Requests/Responses" class="md-nav__link">
+    Debugging Test Requests/Responses
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-ui" title="1. UI" class="md-nav__link">
+    1. UI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-api" title="2. API" class="md-nav__link">
+    2. API
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -400,6 +433,18 @@
   <li class="md-nav__item">
     <a href="configuration.html" title="Configuration" class="md-nav__link">
       Configuration
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="faq.html" title="FAQ" class="md-nav__link">
+      FAQ
     </a>
   </li>
 
@@ -451,6 +496,19 @@
     Data Reuse with Variables
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pick-a-random-element-from-an-array" title="Pick a random element from an array" class="md-nav__link">
+    Pick a random element from an array
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -495,9 +553,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#debugging-requestsresponses" title="Debugging Requests/Responses" class="md-nav__link">
-    Debugging Requests/Responses
+  <a href="#debugging-test-requestsresponses" title="Debugging Test Requests/Responses" class="md-nav__link">
+    Debugging Test Requests/Responses
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-ui" title="1. UI" class="md-nav__link">
+    1. UI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-api" title="2. API" class="md-nav__link">
+    2. API
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -534,20 +612,38 @@
 <p><code>{{petId}}</code></p>
 <p>Here's an example of using <code>{{petId}}</code> in the request path:</p>
 <p><img alt="Screenshot" src="images/variable_in_path.png" /></p>
+<h3 id="pick-a-random-element-from-an-array">Pick a random element from an array<a class="headerlink" href="#pick-a-random-element-from-an-array" title="Permanent link">#</a></h3>
+<p>When capturing responses data, you may want to randomly select an item from your dataset to continue with your scenario.<br />
+This is achieved by using the <code>*</code> operator, which selects all the matching items. The engine will then randomly pick a single item for you and store it in the defined variable.  </p>
+<p>Usage example :</p>
+<p><img alt="Screenshot" src="images/random_pick.png" />
+on
+<div class="codehilite"><pre><span></span><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;45697038-37ae-4149-9f5e-ed7a4a20e014&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;132456789&quot;</span>
+    <span class="p">},</span> <span class="p">{</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;f02392e8-1b11-401f-a902-8a9a1ae5c47a&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;abcdefghi&quot;</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...-8a9a1ae5c47a</code> in <code>{{dataId}}</code> for further usage in the scenario.</p>
 <h2 id="built-in-functions">Built-in Functions<a class="headerlink" href="#built-in-functions" title="Permanent link">#</a></h2>
-<p>Predator supports some generic functions out of the box and they can be used to generate random data</p>
+<p>Predator supports some generic functions out of the box and they can be used to generate random data.</p>
 <ul>
-<li><code>randomNumber(min, max)</code> will generate random number within the provided range.</li>
-<li><code>$randomString(length)</code> will generate random string with the specified length.</li>
+<li><code>$randomNumber(min, max)</code> will generate a random number within the provided range.</li>
+<li><code>$randomString(length)</code> will generate a random string with the specified length.</li>
 <li><code>$uuid()</code> will generate v4 UUID.</li>
-<li><code>dateNow()</code> will generate Number of ms since epoch.</li>
+<li><code>$dateNow()</code> will generate a number of ms since epoch.</li>
 </ul>
+<p><b>Currently these functions all return values as a <code>string</code>. An issue is open regarding this: <a href="https://github.com/Zooz/predator/issues/178">#178</a></b></p>
 <p>Usage example:</p>
 <div class="codehilite"><pre><span></span><span class="p">{</span>
     <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $uuid() }}&quot;</span><span class="p">,</span>
     <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $randomString(6) }}&quot;</span><span class="p">,</span>
     <span class="nt">&quot;age&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $randomNumber(0,15) }}&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;created&quot;</span><span class="p">:</span> <span class="s2">&quot;{{$dateNow()}}&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;created&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $dateNow() }}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -706,10 +802,19 @@ and upload it to a public repository (such as S3, Dropbox, Google Docs etc.). Th
 <p><code>generateRandomDataGlobal()</code> is a global function that creates global variables. Those variables can be used in the scope of the test by using the <code>{{ }}</code> syntax.</p>
 </li>
 </ul>
-<h2 id="debugging-requestsresponses">Debugging Requests/Responses<a class="headerlink" href="#debugging-requestsresponses" title="Permanent link">#</a></h2>
-<p>For viewing all the requests and responses (Very useful when your test not behaves like you expected)
-It's possible to run tests with the Debug flag (can be send via jobs api or toggled in the run test form)
-The predator-runner will log this data to the log files which can be downloaded and investigated.</p>
+<h2 id="debugging-test-requestsresponses">Debugging Test Requests/Responses<a class="headerlink" href="#debugging-test-requestsresponses" title="Permanent link">#</a></h2>
+<p>It is possible to view all of the requests and responses that the predator-runner sends and receives while running load on the API. 
+This is very useful when your test does not behave the way you expected it to and need the request/response to further investigate.
+The predator-runner will log this data to the log files which can be downloaded.</p>
+<p>For the test to run in <code>debug</code> mode:</p>
+<h5 id="1-ui">1. UI<a class="headerlink" href="#1-ui" title="Permanent link">#</a></h5>
+<ul>
+<li>Turn on the <b>Debug</b> flag when running a test</li>
+</ul>
+<h5 id="2-api">2. API<a class="headerlink" href="#2-api" title="Permanent link">#</a></h5>
+<ul>
+<li>Add <code>"debug": "*"</code> to the body of the <code>POST /jobs</code> request</li>
+</ul>
                     
                     
                     

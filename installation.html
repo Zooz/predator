@@ -380,6 +380,18 @@
 
 
   <li class="md-nav__item">
+    <a href="faq.html" title="FAQ" class="md-nav__link">
+      FAQ
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="contributing.html" title="Contributing" class="md-nav__link">
       Contributing
     </a>
@@ -469,27 +481,34 @@
 <br>
 For examples and more info check <a href="https://universe.dcos.io/#/package/predator/version/latest">Universe Catalog</a></p>
 <h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">#</a></h2>
-<p>Predator runs in a docker and it triggers other dockers which actually create the load (predator-runner).
-In order to avoid dind side affects, Predator will start its runners as siblings.</p>
-<p>So this means two things</p>
+<p>Predator runs in a docker and when installing it using <code>Docker</code>, Predator creates and runs other dockers which actually create the load (predator-runner).
+In order to avoid DIND, Predator will start its runners as siblings using the docker daemon socket.</p>
+<p><b>Command:</b></p>
+<p><code>docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator</code></p>
+<p>Explanations:</p>
 <ol>
-<li>When starting Predator in a docker we will mount the docker socket to the container. This will allow Predator start the siblings dockers (predator-runner) 
+<li>
+<p>When starting Predator in a docker we will mount the docker socket to the container. This will allow Predator to start the siblings dockers (Predator-Runner). This is done as so:
 <br>
-<code>-v /var/run/docker.sock:/var/run/docker.sock</code> </li>
-<li>Predator runners will have to reach the main Predator to report test results. Predator has to know it's own accessible address and pass it to the predator-runners.
+<code>-v /var/run/docker.sock:/var/run/docker.sock</code> </p>
+</li>
+<li>
+<p>When running tests, the Predator-Runners will have to reach the main Predator to report test results through their internal API. Therefore, Predator has to know it's own accessible address and pass it to the Predator-Runners for them to access Predator's API. This is done by setting the enviornment variable <code>INTERNAL_ADDRESS</code> as so:
 <br> 
  <code>-e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1</code>
-   where <code>$MACHINE_IP</code> is the local ip address of your machine (not localhost, but actual ip address).
-   In unix or mac this command should give you the ip address:
-   </br>
-   <code>export MACHINE_IP=$(ipconfig getifaddr en0 || ifconfig eth0|grep 'inet addr:'|cut -d':' -f2|awk '{ print $1}')</code></li>
+   where <code>$MACHINE_IP</code> is the local ip address of your machine (not localhost, but actual ip address - it is your local network address).
+   <br>In unix or mac this command should give you the ip address and set it to the MACHINE_IP variable:
+   <code>export MACHINE_IP=$(ipconfig getifaddr en0 || ifconfig eth0|grep 'inet addr:'|cut -d':' -f2|awk '{ print $1}')</code></p>
+</li>
+<li>
+<p>The environment variable <code>JOB_PLATFORM</code> is set to <code>DOCKER</code> so that Predator deploys the Predator-Runners as dockers on the machine it is running.</p>
+</li>
 </ol>
-<p><code>docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator</code></p>
 <p>After successfully starting the Predator docker image, access Predator by typing the following URL in your browser:</p>
 <p><code>http://{$MACHINE_IP}/ui</code></p>
 <div class="admonition note">
 <p class="admonition-title">If you don't see test reports</p>
-<p>This usually means that the predator-runner couldn't reach the main Predator and report about test progress;
+<p>This usually means that the predator-runner couldn't reach the main Predator's API and update it about test progress;
 <br>
 <code>docker logs $(docker ps -a -f name=predator -n 1 --format='{{ .ID }}')</code>
 <br>
