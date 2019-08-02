@@ -10,15 +10,19 @@ const configConstants = require('../../../src/common/consts').CONFIG;
 
 let manager;
 
+const defaultSmtpServerConfig = {
+    timeout: 200,
+    rejectUnauthCerts: false,
+    secure: false
+};
+
 const defaultConfig = {
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
     runner_docker_image: 'zooz/predator-runner:latest',
     runner_cpu: 1,
     runner_memory: 256,
-    smtp_server: {
-        timeout: 200
-    },
+    smtp_server: Object.assign({}, defaultSmtpServerConfig),
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
@@ -28,9 +32,7 @@ const defaultConfigNotEscaped = {
     runner_docker_image: 'zooz/predator-runner:latest',
     runner_cpu: 1,
     runner_memory: 256,
-    smtp_server: {
-        timeout: 200
-    },
+    smtp_server: Object.assign({}, defaultSmtpServerConfig),
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
@@ -74,9 +76,7 @@ const resultAfterConvert = {
     grafana_url: 'test_grafana_url',
     runner_cpu: 2,
     runner_memory: 256,
-    smtp_server: {
-        timeout: 200
-    },
+    smtp_server: Object.assign({}, defaultSmtpServerConfig),
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 
