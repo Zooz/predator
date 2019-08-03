@@ -1,5 +1,6 @@
 module.exports = {
     PREDATOR_URL: generatePredatorUrl(),
+    PREDATOR_DOCS_URL: generatePredatorDocsUrl(),
     BUCKET_PATH: generateBucketPath()
 };
 
@@ -22,4 +23,8 @@ function generateBucketPath() {
         path = `${process.env.BUCKET_PATH}/ui/`;
     }
     return path;
+}
+
+function generatePredatorDocsUrl() {
+    return process.env.PREDATOR_DOCS_URL || 'https://zooz.github.io/predator';
 }
