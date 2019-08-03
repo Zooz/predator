@@ -29,6 +29,6 @@ module.exports = {
       BUCKET_PATH: env.BUCKET_PATH || '/',
     }),
     new webpack.NamedModulesPlugin(),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'BUCKET_PATH', 'PREDATOR_URL'])
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'BUCKET_PATH', 'PREDATOR_URL', 'PREDATOR_DOCS_URL'])
   ]
 };
