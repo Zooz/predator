@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 134,
-  "iteration": 1564931723040,
+  "iteration": 1564932341379,
   "links": [],
   "panels": [
     {
@@ -689,29 +689,25 @@
   "templating": {
     "list": [
       {
-        "current": {
-          "text": "mars-fra-apps-marathon",
-          "value": "mars-fra-apps-marathon"
-        },
         "hide": 2,
         "label": "Cluster",
         "name": "Cluster",
         "options": [
           {
             "selected": true,
-            "text": "mars-fra-apps-marathon",
-            "value": "mars-fra-apps-marathon"
+            "text": "some-cluster",
+            "value": "some-cluster"
           }
         ],
-        "query": "mars-fra-apps-marathon",
+        "query": "some-cluster",
         "skipUrlSync": false,
         "type": "constant"
       },
       {
         "allValue": null,
         "current": {
-          "text": "Task Scheduler API",
-          "value": "Task Scheduler API"
+          "text": "Some service",
+          "value": "Some service"
         },
         "datasource": "Prometheus",
         "definition": "label_values(runnerStats, testName)",
@@ -765,6 +761,5 @@
   },
   "timezone": "",
   "title": "Predator",
-  "uid": "Dfvzpkrik",
-  "version": 14
+  "version": 15
 }
