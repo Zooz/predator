@@ -168,15 +168,13 @@ describe('Testing sequelize connector', function () {
                     }
                 ]
             ]);
-            should(result).eql({
+            should(result).match({
                 'artillery_json': {
                     'art': '1'
                 },
                 'id': 'test_id1',
-                'file_id': 'test_file_id',
-                'raw_data': {
-                    'raw': '1'
-                }
+                'file_id': 'test_file_id'
+
             });
         });
         it('when getTest not found - should return undefined', async function () {
@@ -293,24 +291,18 @@ describe('Testing sequelize connector', function () {
                 ]
             ]);
             result.forEach(value => delete value.file_id);
-            should(result).eql([
+            should(result).match([
                 {
                     'artillery_json': {
                         'art': '1'
                     },
-                    'id': 'test_id1',
-                    'raw_data': {
-                        'raw': '1'
-                    }
+                    'id': 'test_id1'
                 },
                 {
                     'artillery_json': {
                         'art': '2'
                     },
-                    'id': 'test_id1',
-                    'raw_data': {
-                        'raw': '2'
-                    }
+                    'id': 'test_id1'
                 }
             ]);
         });
@@ -425,24 +417,18 @@ describe('Testing sequelize connector', function () {
                 ]
             ]);
             result.forEach(value => delete value.file_id);
-            should(result).eql([
+            should(result).match([
                 {
                     'artillery_json': {
                         'art': '1'
                     },
-                    'id': 'test_id1',
-                    'raw_data': {
-                        'raw': '1'
-                    }
+                    'id': 'test_id1'
                 },
                 {
                     'artillery_json': {
                         'art': '2'
                     },
-                    'id': 'test_id2',
-                    'raw_data': {
-                        'raw': '2'
-                    }
+                    'id': 'test_id2'
                 }
             ]);
         });
@@ -478,7 +464,7 @@ describe('Testing sequelize connector', function () {
             const error = new Error('test');
             findAllStub.rejects(error);
             try {
-                const result = await sequelizeConnector.getTests();
+                await sequelizeConnector.getTests();
                 throw new Error('should not get here');
             } catch (err) {
                 const client = sequelizeConnector.__get__('client');

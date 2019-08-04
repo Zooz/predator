@@ -1,6 +1,7 @@
 
 const Sequelize = require('sequelize'),
     uuid = require('uuid');
+const sanitizeHelper = require('../../../helpers/sanitizeHelper');
 
 module.exports = {
     init,
@@ -240,12 +241,13 @@ async function getFile(id) {
 function sanitizeTestResult(data) {
     const result = data.map(function (test) {
         const dataValues = test.dataValues;
+        const dslDataObject = sanitizeHelper.extractDslRootData(dataValues.raw_data);
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
-        dataValues.raw_data = JSON.parse(dataValues.raw_data);
         dataValues.id = dataValues.test_id;
         dataValues.file_id = dataValues.file_id || undefined;
+        delete dataValues.raw_data;
         delete dataValues.test_id;
-        return dataValues;
+        return Object.assign(dataValues, dslDataObject);
     });
     return result;
 }

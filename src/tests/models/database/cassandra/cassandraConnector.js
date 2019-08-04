@@ -2,6 +2,7 @@ let logger = require('../../../../common/logger');
 let cassandra = require('cassandra-driver');
 let client = {};
 let uuid = require('cassandra-driver').types.Uuid;
+const sanitizeHelper = require('../../../helpers/sanitizeHelper');
 
 const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id,file_id) values(?,?,?,?,?,?,?,?,?)';
 const GET_TEST = 'SELECT * FROM tests WHERE id = ? ORDER BY updated_at DESC limit 1';
@@ -122,13 +123,15 @@ async function executeQuery(query, params, queryOptions) {
 
 function sanitizeTestResult(data) {
     const result = data.map(function (row) {
+        const dslDataObject = sanitizeHelper.extractDslRootData(row.raw_data);
         row.artillery_json = JSON.parse(row.artillery_json);
-        row.raw_data = JSON.parse(row.raw_data);
         row.file_id = row.file_id || undefined;
-        return row;
+        delete row.raw_data;
+        return Object.assign(row, dslDataObject);
     });
     return result;
 }
+
 function sanitizeDslResult(data) {
     const result = data.map(function (row) {
         row.artillery_json = JSON.parse(row.artillery_json);
