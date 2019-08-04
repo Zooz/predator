@@ -51,9 +51,13 @@ async function createSMTPClient(configSmtp) {
         port: configSmtp.port,
         host: configSmtp.host,
         connectionTimeout: configSmtp.timeout,
+        secure: configSmtp.secure,
         auth: {
             user: configSmtp.username,
             pass: configSmtp.password
+        },
+        tls: {
+            rejectUnauthorized: configSmtp.rejectUnauthCerts
         }
     };
 

@@ -90,4 +90,6 @@ Additional parameters for the following chosen databases:
 | SMTP_PORT            	| smtp_server.port     	| SMTP port number                                          	| ✓                        	|               	|
 | SMTP_USERNAME        	| smtp_server.username 	| SMTP username                                             	| ✓                        	|               	|
 | SMTP_PASSWORD        	| smtp_server.password 	| SMTP password                                             	| ✓                        	|               	|
-| SMTP_TIMEOUT         	| smtp_server.timeout  	| timeout to SMTP server in milliseconds                    	| ✓                        	|               	|
+| SMTP_TIMEOUT         	| smtp_server.timeout  	| timeout to SMTP server in milliseconds                    	| ✓                        	| 200              	|
+| SMTP_SECURE         	| smtp_server.secure  	|  if true the connection will use TLS when connecting to server. [Nodemailer SMTP options](https://nodemailer.com/smtp/)                   	| ✓                        	| false           	|
+| SMTP_REJECT_UNAUTH_CERTS         	| smtp_server.rejectUnauthCerts  	| should fail or succeed on unauthorized certificate                 	| ✓                        	| false              	|

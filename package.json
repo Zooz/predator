@@ -1,6 +1,6 @@
 {
   "name": "predator",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "description": "Framework that manages the entire lifecycle of load testing a server, from creating test files, running scheduled and on-demand tests, and viewing test results.",
   "main": "server.js",
   "directories": {
@@ -48,16 +48,14 @@
     "express-ajv-swagger-validation": "^0.9.0",
     "express-easy-zip": "^1.1.4",
     "express-requests-logger": "^1.0.18",
-    "fs": "0.0.1-security",
     "fs-extra": "^5.0.0",
     "graceful-shutdown-express": "^2.0.1",
     "jsck": "^0.3.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "mathjs": "^5.10.3",
     "mysql2": "^1.6.5",
     "node-cmd": "^3.0.0",
     "nodemailer": "^5.1.1",
-    "path": "^0.12.7",
     "pg": "^7.11.0",
     "pg-hstore": "^2.3.2",
     "replace-in-file": "^3.4.4",
@@ -70,10 +68,10 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "@commitlint/cli": "^7.6.1",
+    "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^7.6.0",
     "chai": "^4.2.0",
-    "commitlint": "^7.6.1",
+    "commitlint": "^8.1.0",
     "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0-alpha.0",

@@ -16,14 +16,16 @@ let configDataMap = {
     [constConfig.PROMETHEUS_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
     [constConfig.INFLUX_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
     [constConfig.SMTP_SERVER]: {
-        value: {
+        value: JSON.stringify({
             from: process.env.SMTP_FROM,
             host: process.env.SMTP_HOST,
             port: process.env.SMTP_PORT,
             username: process.env.SMTP_USERNAME,
             password: process.env.SMTP_PASSWORD,
-            timeout: process.env.SMTP_TIMEOUT || 200
-        },
+            timeout: process.env.SMTP_TIMEOUT || 200,
+            secure: process.env.SMTP_SECURE || false,
+            rejectUnauthCerts: process.env.SMTP_REJECT_UNAUTH_CERTS || false
+        }),
         type: 'json'
     }
 };

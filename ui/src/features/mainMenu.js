@@ -4,7 +4,8 @@ import {
     faFlagCheckered,
     faFileAlt,
     faBook,
-    faPassport
+    faPassport,
+    faWrench
 } from '@fortawesome/free-solid-svg-icons'
 
 module.exports = [
@@ -28,13 +29,19 @@ module.exports = [
     },
     {
         key: 3,
+        primaryText: 'Configuration',
+        navigateTo: 'configuration',
+        icon: faWrench
+    },
+    {
+        key: 4,
         primaryText: 'Docs',
         icon: faFileAlt,
         nestedItems: [
             {
                 key: 0,
                 primaryText: 'Documentation',
-                linkUrl: 'https://predator-ng.com/about.html',
+                linkUrl: 'https://zooz.github.io/predator/about.html',
                 icon: faBook
             }, {
                 key: 1,

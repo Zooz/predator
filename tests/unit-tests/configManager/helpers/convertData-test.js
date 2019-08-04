@@ -20,7 +20,6 @@ describe('convert data  helper tests', function () {
     });
 
     describe('validate convert data of all types ', function () {
-        const errorText = 'Value is corrupted can cause to errors.';
         valuesError.forEach(object => {
             it('convert value with error type: ' + object.type, () => {
                 let result = manager.convertByType(object.value, object.type);

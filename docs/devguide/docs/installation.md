@@ -16,16 +16,37 @@ For examples and more info check [Universe Catalog](https://universe.dcos.io/#/p
 
 ## Docker
 
-Predator runs using Docker. In order to run Predator locally, clone the [repository](https://github.com/Zooz/predator) and run the following command:
+Predator runs in a docker and when installing it using ```Docker```, Predator creates and runs other dockers which actually create the load (predator-runner).
+In order to avoid DIND, Predator will start its runners as siblings using the docker daemon socket.
 
-`runPredatorLocal.sh`
-
-Or, you can run Predator without cloning the repository with the following command :
+<b>Command:</b>
 
 ```docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator```
 
-where `$MACHINE_IP` is the local ip address of your machine.
 
-After successfully mounting the Predator docker image, access Predator by typing the following URL in your browser:
+Explanations:
+
+1. When starting Predator in a docker we will mount the docker socket to the container. This will allow Predator to start the siblings dockers (Predator-Runner). This is done as so:
+<br>
+```-v /var/run/docker.sock:/var/run/docker.sock``` 
+
+2. When running tests, the Predator-Runners will have to reach the main Predator to report test results through their internal API. Therefore, Predator has to know it's own accessible address and pass it to the Predator-Runners for them to access Predator's API. This is done by setting the enviornment variable ```INTERNAL_ADDRESS``` as so:
+<br> 
+ ```-e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1```
+   where `$MACHINE_IP` is the local ip address of your machine (not localhost, but actual ip address - it is your local network address).
+   <br>In unix or mac this command should give you the ip address and set it to the MACHINE_IP variable:
+   ```export MACHINE_IP=$(ipconfig getifaddr en0 || ifconfig eth0|grep 'inet addr:'|cut -d':' -f2|awk '{ print $1}')```
+
+3. The environment variable ```JOB_PLATFORM``` is set to ```DOCKER``` so that Predator deploys the Predator-Runners as dockers on the machine it is running.
+
+After successfully starting the Predator docker image, access Predator by typing the following URL in your browser:
 
 ```http://{$MACHINE_IP}/ui```
+
+!!! note "If you don't see test reports"
+   
+    This usually means that the predator-runner couldn't reach the main Predator's API and update it about test progress;
+    <br>
+    ```docker logs $(docker ps -a -f name=predator -n 1 --format='{{ .ID }}')```
+    <br>
+    Will help to understand what went wrong.
