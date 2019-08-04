@@ -21,6 +21,8 @@ describe('Manager config with env variables', function () {
         process.env.SMTP_PORT = 'smtp_port_test';
         process.env.SMTP_USERNAME = 'smtp_username_test';
         process.env.SMTP_PASSWORD = 'smtp_password_test';
+        process.env.SMTP_REJECT_UNAUTH_CERTS = true;
+        process.env.SMTP_SECURE = true;
         process.env.SMTP_TIMEOUT = '500';
         process.env.RUNNER_MEMORY = '20';
         process.env.RUNNER_CPU = '0.35';
@@ -54,7 +56,10 @@ describe('Manager config with env variables', function () {
             'port': 'smtp_port_test',
             'username': 'smtp_username_test',
             'password': 'smtp_password_test',
-            'timeout': '500'
+            'timeout': '500',
+            'rejectUnauthCerts': 'true',
+            'secure': 'true'
+
         });
     });
 });

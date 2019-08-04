@@ -17,14 +17,40 @@ Here's an example of using `{{petId}}` in the request path:
 
 ![Screenshot](images/variable_in_path.png)
 
+
+### Pick a random element from an array
+
+When capturing responses data, you may want to randomly select an item from your dataset to continue with your scenario.  
+This is achieved by using the `*` operator, which selects all the matching items. The engine will then randomly pick a single item for you and store it in the defined variable.  
+
+Usage example :
+
+![Screenshot](images/random_pick.png)
+on
+```json
+[
+	{
+		"id": "45697038-37ae-4149-9f5e-ed7a4a20e014",
+		"data": "132456789"
+	}, {
+		"id": "f02392e8-1b11-401f-a902-8a9a1ae5c47a",
+		"data": "abcdefghi"
+	}
+]
+```
+will randomly store `45697038-...-ed7a4a20e014` or `f02392e8-...-8a9a1ae5c47a` in `{{dataId}}` for further usage in the scenario.
+
+
 ## Built-in Functions
 
-Predator supports some generic functions out of the box and they can be used to generate random data
+Predator supports some generic functions out of the box and they can be used to generate random data.
 
-* `randomNumber(min, max)` will generate random number within the provided range.
-* `$randomString(length)` will generate random string with the specified length.
+* `$randomNumber(min, max)` will generate a random number within the provided range.
+* `$randomString(length)` will generate a random string with the specified length.
 * `$uuid()` will generate v4 UUID.
-* `dateNow()` will generate Number of ms since epoch.
+* `$dateNow()` will generate a number of ms since epoch.
+
+<b>Currently these functions all return values as a `string`. An issue is open regarding this: [#178](https://github.com/Zooz/predator/issues/178)</b>
 
 Usage example:
 
@@ -33,7 +59,7 @@ Usage example:
 	"id": "{{ $uuid() }}",
 	"name": "{{ $randomString(6) }}",
 	"age": "{{ $randomNumber(0,15) }}",
-	"created": "{{$dateNow()}}",
+	"created": "{{ $dateNow() }}"
 }
 
 ```
@@ -213,8 +239,16 @@ In the example above, we created a test with 2 Javascript functions:
 
 * `generateRandomDataGlobal()` is a global function that creates global variables. Those variables can be used in the scope of the test by using the `{{ }}` syntax.
 
-## Debugging Requests/Responses
+## Debugging Test Requests/Responses
 
-For viewing all the requests and responses (Very useful when your test not behaves like you expected)
-It's possible to run tests with the Debug flag (can be send via jobs api or toggled in the run test form)
-The predator-runner will log this data to the log files which can be downloaded and investigated.
+It is possible to view all of the requests and responses that the predator-runner sends and receives while running load on the API. 
+This is very useful when your test does not behave the way you expected it to and need the request/response to further investigate.
+The predator-runner will log this data to the log files which can be downloaded.
+
+For the test to run in `debug` mode:
+
+##### 1. UI
+-  Turn on the <b>Debug</b> flag when running a test
+
+##### 2. API
+- Add `"debug": "*"` to the body of the `POST /jobs` request
