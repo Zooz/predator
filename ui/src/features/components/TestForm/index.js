@@ -223,9 +223,10 @@ export class TestForm extends React.Component {
       }, 100);
     };
     generateScenarioDashBoard =() => {
-      const { isAddStepOpen, isAddScenarioOpen, scenarios, before, currentScenarioIndex, currentStepIndex, isBeforeSelected, editMode } = this.state;
+      const { isAddStepOpen, isAddScenarioOpen, scenarios, before, currentScenarioIndex, currentStepIndex, isBeforeSelected, editMode, method } = this.state;
       const scenario = scenarios[currentScenarioIndex];
-
+      console.log('method',method)
+      const disableSampleBody= method ==='GET';
       let step;
       if (isBeforeSelected) {
         step = before.steps[currentStepIndex];
@@ -253,7 +254,8 @@ export class TestForm extends React.Component {
             />
           </div>
           <div style={{ paddingLeft: '10px', width: '100%' }}>
-            {isAddStepOpen && step && <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step} onChangeValue={this.onChangeValueOfStep} editMode={editMode} />}
+            {isAddStepOpen && step &&
+            <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step} onChangeValue={this.onChangeValueOfStep} editMode={editMode} />}
             {isAddScenarioOpen && scenario && <AddScenarioForm allowedWeight={this.calcMaxAllowedWeight()} key={currentScenarioIndex} scenario={scenario} onChangeValue={this.onChangeValueOfScenario} />}
           </div>
         </div>

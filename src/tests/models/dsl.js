@@ -1,6 +1,7 @@
 
 const database = require('./database'),
     logger = require('../../common/logger'),
+    utils= require("../helpers/utils"),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
@@ -34,6 +35,7 @@ async function getDefinition(dslName, definitionName) {
 }
 
 async function createDefinition(dslName, body) {
+    utils.addDefaultsToStep(body.request);
     const result = await database.insertDslDefinition(dslName, body.name, body.request);
     if (result){
         logger.info(body, 'Definition created successfully and saved to Cassandra');
@@ -49,6 +51,7 @@ async function createDefinition(dslName, body) {
 }
 
 async function updateDefinition(dslName, definitionName, body) {
+    utils.addDefaultsToStep(body.request);
     const result = await database.updateDslDefinition(dslName, definitionName, body.request);
     if (result){
         logger.info(body, 'Definition updated successfully and saved to Cassandra');

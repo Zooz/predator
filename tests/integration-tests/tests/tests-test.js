@@ -2,6 +2,7 @@ let should = require('should');
 let validHeaders = { 'x-zooz-request-id': 'value', 'Content-Type': 'application/json' };
 let uuid = require('uuid');
 let JSCK = require('jsck');
+const {cloneDeep}  = require('lodash');
 JSCK.Draft4 = JSCK.draft4;
 let artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const requestSender = require('./helpers/requestCreator');
@@ -137,6 +138,40 @@ describe('the tests api', function() {
 
             getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
             getTestResponse.statusCode.should.eql(404);
+        });
+        it('Create basic test without step url - should add default /', async () => {
+            let requestBody = cloneDeep(require('../../testExamples/Basic_test.json'));
+            requestBody.artillery_test.scenarios[0].flow[0].post.url=undefined;
+
+            let createTestResponse = await requestSender.createTest(requestBody, validHeaders);
+            createTestResponse.statusCode.should.eql(201);
+            createTestResponse.body.should.have.only.keys('id', 'revision_id');
+
+            let getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
+            let expectedResult = cloneDeep(require('../../testResults/Basic_test.json'));
+            expectedResult.scenarios[0].flow[0].post.url='/';
+            should(getTestResponse.statusCode).eql(200, JSON.stringify(getTestResponse.body));
+            getTestResponse.body.artillery_test.should.eql(expectedResult);
+
+        });
+        it('update basic test without step url - should add default /', async () => {
+            let requestBody =cloneDeep(require('../../testExamples/Basic_test.json'));
+
+            let createTestResponse = await requestSender.createTest(requestBody, validHeaders);
+            createTestResponse.statusCode.should.eql(201);
+            createTestResponse.body.should.have.only.keys('id', 'revision_id');
+
+            requestBody.artillery_test.scenarios[0].flow[0].post.url=undefined;
+
+            let updatedTestResponse = await requestSender.updateTest(requestBody, validHeaders, createTestResponse.body.id);
+            updatedTestResponse.statusCode.should.eql(201);
+
+            let getTestResponse = await requestSender.getTest(createTestResponse.body.id, validHeaders);
+            let expectedResult = cloneDeep(require('../../testResults/Basic_test.json'));
+            expectedResult.scenarios[0].flow[0].post.url='/';
+            should(getTestResponse.statusCode).eql(200, JSON.stringify(getTestResponse.body));
+            getTestResponse.body.artillery_test.should.eql(expectedResult);
+
         });
 
         it('creates two simple tests, get a specific test, and than get list of all tests', async function(){

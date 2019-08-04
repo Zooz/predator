@@ -2,11 +2,12 @@
 let _ = require('lodash');
 let consts = require('./../../common/consts');
 const database = require('./database');
+const utils = require("../helpers/utils");
 const { get, cloneDeep } = require('lodash');
 
 module.exports.createTest = async function(testDetails) {
     if (testDetails.type === consts.TEST_TYPE_BASIC) {
-        let artillery = testDetails.artillery_test;
+        let artillery = utils.addDefaultsToTest(testDetails.artillery_test);
         delete testDetails.artillery_test;
         return artillery;
     } else {
