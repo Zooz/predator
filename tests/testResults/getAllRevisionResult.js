@@ -240,12 +240,28 @@ module.exports = (dslName) => {
             },
             'description': 'test',
             'name': 'test',
-            'steps': [
+            'scenarios': [
                 {
-                    'action': `${dslName}.createToken`
+                    'scenario_name': 'Scenario',
+                    'steps': [
+                        {
+                            'action': `${dslName}.createToken`
+                        },
+                        {
+                            'action': `${dslName}.createCustomer`
+                        }
+                    ]
                 },
                 {
-                    'action': `${dslName}.createCustomer`
+                    'scenario_name': 'Scenario',
+                    'steps': [
+                        {
+                            'action': `${dslName}.createToken`
+                        },
+                        {
+                            'action': `${dslName}.createCustomer`
+                        }
+                    ]
                 }
             ],
             'type': 'dsl'
