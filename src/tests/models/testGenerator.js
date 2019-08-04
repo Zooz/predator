@@ -2,7 +2,7 @@
 let _ = require('lodash');
 let consts = require('./../../common/consts');
 const database = require('./database');
-const utils = require("../helpers/utils");
+const utils = require('../helpers/utils');
 const { get, cloneDeep } = require('lodash');
 
 module.exports.createTest = async function(testDetails) {

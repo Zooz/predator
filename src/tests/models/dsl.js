@@ -1,7 +1,7 @@
 
 const database = require('./database'),
     logger = require('../../common/logger'),
-    utils= require("../helpers/utils"),
+    utils = require('../helpers/utils'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
