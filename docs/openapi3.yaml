@@ -1223,9 +1223,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/scenario'
+          example:
+            {
+              "scenarios": [
+              {
+                "scenario_name": "Only get pet",
+                "steps": [
+                {
+                  "action": "petstore.get-pet"
+                }
+                ]
+              }
+              ]
+            }
         before:
           type: object
-          description: The entire specification of the DSL that was used to create the test.
+          example:
+            {
+              "before": {
+                "steps": [
+                {
+                  "action": "petstore.create-pet",
+                  "properties": {
+                    "name": [
+                      "kushkush",
+                      "daisy"
+                    ]
+                  }
+                }
+                ]
+              }
+            }
         artillery_test:
           type: object
           description: |
