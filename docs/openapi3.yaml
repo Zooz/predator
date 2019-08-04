@@ -1229,7 +1229,7 @@ components:
         artillery_test:
           type: object
           description: |
-            The request JSON created from the DSL specification (as returned in the `raw_data` array).
+            The request JSON created from the DSL specification.
           example:  {
             "config": {
               "target": "",
