@@ -1217,40 +1217,15 @@ components:
       description: A test that is made of scenarios base on domain specific language
       allOf:
         - $ref: '#/components/schemas/create_test_response'
-          required:
-            - raw_data
       properties:
-        raw_data:
+        scenarios:
+          description: A scenario is a sequence of HTTP requests aimed to test the performance of specific functionality.
+          type: array
+          items:
+            $ref: '#/components/schemas/scenario'
+        before:
           type: object
           description: The entire specification of the DSL that was used to create the test.
-          example: {
-            "name": "Pet store",
-            "description": "DSL",
-            "type": "dsl",
-            "before": {
-              "steps": [
-              {
-                "action": "petstore.create-pet",
-                "properties": {
-                  "name": [
-                    "kushkush",
-                    "daisy"
-                  ]
-                }
-              }
-              ]
-            },
-            "scenarios": [
-            {
-              "scenario_name": "Only get pet",
-              "steps": [
-              {
-                "action": "petstore.get-pet"
-              }
-              ]
-            }
-            ]
-          }
         artillery_test:
           type: object
           description: |
