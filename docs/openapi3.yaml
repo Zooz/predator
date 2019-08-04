@@ -1217,44 +1217,47 @@ components:
       description: A test that is made of scenarios base on domain specific language
       allOf:
         - $ref: '#/components/schemas/create_test_response'
-          required:
-            - raw_data
       properties:
-        raw_data:
-          type: object
-          description: The entire specification of the DSL that was used to create the test.
-          example: {
-            "name": "Pet store",
-            "description": "DSL",
-            "type": "dsl",
-            "before": {
-              "steps": [
-              {
-                "action": "petstore.create-pet",
-                "properties": {
-                  "name": [
-                    "kushkush",
-                    "daisy"
-                  ]
-                }
-              }
-              ]
-            },
-            "scenarios": [
+        scenarios:
+          description: A scenario is a sequence of HTTP requests aimed to test the performance of specific functionality.
+          type: array
+          items:
+            $ref: '#/components/schemas/scenario'
+          example:
             {
-              "scenario_name": "Only get pet",
-              "steps": [
+              "scenarios": [
               {
-                "action": "petstore.get-pet"
+                "scenario_name": "Only get pet",
+                "steps": [
+                {
+                  "action": "petstore.get-pet"
+                }
+                ]
               }
               ]
             }
-            ]
-          }
+        before:
+          type: object
+          example:
+            {
+              "before": {
+                "steps": [
+                {
+                  "action": "petstore.create-pet",
+                  "properties": {
+                    "name": [
+                      "kushkush",
+                      "daisy"
+                    ]
+                  }
+                }
+                ]
+              }
+            }
         artillery_test:
           type: object
           description: |
-            The request JSON created from the DSL specification (as returned in the `raw_data` array).
+            The request JSON created from the DSL specification.
           example:  {
             "config": {
               "target": "",

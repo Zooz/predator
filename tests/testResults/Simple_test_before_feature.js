@@ -116,37 +116,32 @@ module.exports = function (dslName, id, revision_id) {
         'id': id,
         revision_id,
         'name': 'test',
-        'raw_data': {
-            'before': {
+        'before': {
+            'steps': [
+                {
+                    'action': `${dslName}.createAuthorize`,
+                    'properties': {
+                        'credit_card_cvv': [
+                            '123',
+                            '568'
+                        ]
+                    }
+                }
+            ]
+        },
+        'scenarios': [
+            {
+                'scenario_name': 'Scenario',
                 'steps': [
                     {
-                        'action': `${dslName}.createAuthorize`,
-                        'properties': {
-                            'credit_card_cvv': [
-                                '123',
-                                '568'
-                            ]
-                        }
+                        'action': `${dslName}.createToken`
+                    },
+                    {
+                        'action': `${dslName}.createCustomer`
                     }
                 ]
-            },
-            'description': 'test',
-            'name': 'test',
-            'scenarios': [
-                {
-                    'scenario_name': 'Scenario',
-                    'steps': [
-                        {
-                            'action': `${dslName}.createToken`
-                        },
-                        {
-                            'action': `${dslName}.createCustomer`
-                        }
-                    ]
-                }
-            ],
-            'type': 'dsl'
-        },
+            }
+        ],
         'type': 'dsl'
     };
 };

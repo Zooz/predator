@@ -81,7 +81,7 @@ describe('the tests api', function() {
                 let expectedResult = require('../../testResults/Test_with_variables')(dslName);
                 should(getTestResponse.statusCode).eql(200);
                 getTestResponse.body.artillery_test.should.eql(expectedResult);
-                getTestResponse.body.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'raw_data', 'type', 'updated_at');
+                getTestResponse.body.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at');
 
                 let validatedResponse = validate(getTestResponse.body.artillery_test);
                 validatedResponse.errors.length.should.eql(0);
@@ -183,7 +183,7 @@ describe('the tests api', function() {
             let getTestsResponse = await requestSender.getTests(validHeaders);
             let testsIds = [];
             getTestsResponse.body.forEach(test => {
-                test.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'raw_data', 'type', 'updated_at');
+                test.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at');
             });
             testsIds = getTestsResponse.body.map(function(test){
                 return test.id;
