@@ -59,7 +59,10 @@ export default (props) => {
     onChangeValue(step);
   };
 
-  const { step, editMode } = props;
+  const { step } = props;
+  const disableSampleBody = step.method === 'GET';
+  const jsonObjectKey = step.method === 'GET' ? 'get' : 'not-get';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       <div className={style['http-methods-request-options-wrapper']}>
@@ -85,8 +88,9 @@ export default (props) => {
       <DynamicKeyValueInput value={step.captures} onAdd={onAddCapture} onChange={onCaptureChange} keyHintText={'$.id'} valueHintText={'id'} />
               Body:
         <JSONInput
+            key={jsonObjectKey}
             id='a_unique_id'
-            placeholder={step.body || (editMode ? {} : sampleObject)}
+            placeholder={step.body || (disableSampleBody ? undefined : sampleObject)}
             colors={{
                 default: 'black',
                 background: 'white',

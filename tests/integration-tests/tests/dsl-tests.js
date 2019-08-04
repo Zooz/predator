@@ -20,6 +20,17 @@ describe('Testing dsl tests api', function () {
             should(getResponse.statusCode).eql(200, JSON.stringify(getResponse.body));
             should(getResponse.body).eql(expectedCreatePaymentBody);
         });
+        it('succeed post dsl definition without step url - should add default /', async function () {
+            const request = generateCreatePaymentRequest();
+            delete request.post.url;
+            const createDslResponse = await requestSender.createDsl(dslName, 'create_payment', request);
+            should(createDslResponse.statusCode).eql(201, JSON.stringify(request.body));
+            const expected = {...expectedCreatePaymentBody,request:{post:{...expectedCreatePaymentBody.request.post,url:'/'}}};
+            should(createDslResponse.body).eql(expected);
+            const getResponse = await requestSender.getDsl(dslName, 'create_payment');
+            should(getResponse.statusCode).eql(200, JSON.stringify(getResponse.body));
+            should(getResponse.body).eql(expected);
+        });
 
         it('create dsl which already exist - should return 400', async function () {
             let createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
@@ -59,6 +70,20 @@ describe('Testing dsl tests api', function () {
             const getResponse = await requestSender.getDsl(dslName, 'create_payment');
             should(getResponse.statusCode).eql(200, JSON.stringify(getResponse.body));
             should(getResponse.body.request).eql(registerRequest);
+        });
+
+        it('succeed update definition - without step url - should add default /', async function () {
+            const createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
+            should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
+            const request = {post:{...registerRequest.post,url: undefined}};
+
+            const updateResponse = await requestSender.updateDsl(dslName, 'create_payment', request);
+            should(updateResponse.statusCode).eql(200, JSON.stringify(updateResponse.body));
+
+            const getResponse = await requestSender.getDsl(dslName, 'create_payment');
+            should(getResponse.statusCode).eql(200, JSON.stringify(getResponse.body));
+            const expected = {post:{...registerRequest.post,url: '/'}};
+            should(getResponse.body.request).eql(expected);
         });
 
         it('succeed delete existing definition', async function () {
