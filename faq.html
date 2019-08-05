@@ -396,6 +396,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#i-want-to-use-predators-api-where-can-i-find-examples-for-creating-advanceddsl-tests" title="I want to use Predator's API, where can I find examples for creating advanced/dsl tests?" class="md-nav__link">
+    I want to use Predator's API, where can I find examples for creating advanced/dsl tests?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-content-type-does-predator-support-in-its-http-requests" title="What content-type does Predator support in its HTTP requests?" class="md-nav__link">
+    What content-type does Predator support in its HTTP requests?
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -412,6 +426,40 @@
           <li class="md-nav__item">
   <a href="#i-ran-predator-with-sqlite-and-would-like-to-migrate-now-to-a-different-database-how-do-i-do-this" title="I ran Predator with SQLITE and would like to migrate now to a different database. How do I do this?" class="md-nav__link">
     I ran Predator with SQLITE and would like to migrate now to a different database. How do I do this?
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics" title="Metrics" class="md-nav__link">
+    Metrics
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#does-predator-support-exporting-metrics-to-external-time-series-databases" title="Does Predator support exporting metrics to external time series databases?" class="md-nav__link">
+    Does Predator support exporting metrics to external time series databases?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-can-i-export-metrics-to-prometheus" title="How can I export metrics to Prometheus?" class="md-nav__link">
+    How can I export metrics to Prometheus?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#is-there-any-dashboard-for-grafana-i-can-use" title="Is there any dashboard for Grafana I can use?" class="md-nav__link">
+    Is there any dashboard for Grafana I can use?
   </a>
   
 </li>
@@ -518,6 +566,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#i-want-to-use-predators-api-where-can-i-find-examples-for-creating-advanceddsl-tests" title="I want to use Predator's API, where can I find examples for creating advanced/dsl tests?" class="md-nav__link">
+    I want to use Predator's API, where can I find examples for creating advanced/dsl tests?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-content-type-does-predator-support-in-its-http-requests" title="What content-type does Predator support in its HTTP requests?" class="md-nav__link">
+    What content-type does Predator support in its HTTP requests?
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -534,6 +596,40 @@
           <li class="md-nav__item">
   <a href="#i-ran-predator-with-sqlite-and-would-like-to-migrate-now-to-a-different-database-how-do-i-do-this" title="I ran Predator with SQLITE and would like to migrate now to a different database. How do I do this?" class="md-nav__link">
     I ran Predator with SQLITE and would like to migrate now to a different database. How do I do this?
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics" title="Metrics" class="md-nav__link">
+    Metrics
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#does-predator-support-exporting-metrics-to-external-time-series-databases" title="Does Predator support exporting metrics to external time series databases?" class="md-nav__link">
+    Does Predator support exporting metrics to external time series databases?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-can-i-export-metrics-to-prometheus" title="How can I export metrics to Prometheus?" class="md-nav__link">
+    How can I export metrics to Prometheus?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#is-there-any-dashboard-for-grafana-i-can-use" title="Is there any dashboard for Grafana I can use?" class="md-nav__link">
+    Is there any dashboard for Grafana I can use?
   </a>
   
 </li>
@@ -571,29 +667,67 @@
 <h3 id="i-run-a-test-successfully-but-no-report-is-created-for-the-test"><b>I run a test successfully but no report is created for the test</b><a class="headerlink" href="#i-run-a-test-successfully-but-no-report-is-created-for-the-test" title="Permanent link">#</a></h3>
 <p>The Predator-Runner docker that is reporting the test results back to Predator isn't able to connect to it, 
 which is why the test runs but no report is generated. When installing Predator in Docker, the following command is used:
-<div class="codehilite"><pre><span></span>docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 \
--p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator
+<div class="codehilite"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">e</span> <span class="n">JOB_PLATFORM</span><span class="o">=</span><span class="n">DOCKER</span> <span class="o">-</span><span class="n">e</span> <span class="n">INTERNAL_ADDRESS</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="err">$</span><span class="n">MACHINE_IP</span><span class="p">:</span><span class="mi">80</span><span class="o">/</span><span class="n">v1</span> <span class="err">\</span>
+<span class="o">-</span><span class="n">p</span> <span class="mi">80</span><span class="p">:</span><span class="mi">80</span> <span class="c1">--name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator</span>
 </pre></div></p>
 <p>The <code>INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1</code> is what the Predator-Runner uses to communicate with Predator, 
 and <code>$MACHINE_IP</code> needs to be your local network address (an IP address). You can get it by running the command: 
-<div class="codehilite"><pre><span></span>ifconfig en0 | grep &#39;inet &#39; | cut -d&#39; &#39; -f2
+<div class="codehilite"><pre><span></span><span class="n">ifconfig</span> <span class="n">en0</span> <span class="o">|</span> <span class="n">grep</span> <span class="s1">&#39;inet &#39;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="s1">&#39; &#39;</span> <span class="o">-</span><span class="n">f2</span>
 </pre></div></p>
-<p>For more information regarding correct installation of Predator using Docker visit the <a href="installation.html#docker">Installation</a> section.</p>
+<p>For more information regarding correct installation of Predator using Docker visit the <u><a href="installation.html#docker">Installation</a></u> section.</p>
 <p>It is important to note this is an issue and solution only in Docker installations. 
 In Kubernetes and DC/OS installations the <code>INTERNAL_ADDRESS</code> is built in.</p>
 <h3 id="what-is-the-http-engine-predator-uses-to-run-the-load"><b>What is the http engine Predator uses to run the load?</b><a class="headerlink" href="#what-is-the-http-engine-predator-uses-to-run-the-load" title="Permanent link">#</a></h3>
-<p>Predator uses <a href="https://github.com/artilleryio/artillery">Artillery</a> as its HTTP load engine. 
+<p>Predator uses <u><a href="https://github.com/artilleryio/artillery">Artillery</a></u> as its HTTP load engine. 
 Therefore, all <code>basic</code> type tests are written in Artillery syntax and all of the features Artillery supports, Predator supports.</p>
 <p>To read more about Artillery and its features visit their well written documentary: 
-- <a href="https://artillery.io/docs/">Artillery Documentation</a>
-- <a href="https://artillery.io/docs/basic-concepts/">Artillery Basic Concepts Documentation</a>
-- <a href="https://artillery.io/docs/script-reference/">Artillery Test Structure Documentation</a>
-- <a href="https://artillery.io/docs/http-reference/">Artillery HTTP Engine Documentation</a></p>
+<br>
+- <u><a href="https://artillery.io/docs/">Artillery Documentation</a></u>
+<br>
+- <u><a href="https://artillery.io/docs/basic-concepts/">Artillery Basic Concepts Documentation</a></u>
+<br>
+- <u><a href="https://artillery.io/docs/script-reference/">Artillery Test Structure Documentation</a></u>
+<br>
+- <u><a href="https://artillery.io/docs/http-reference/">Artillery HTTP Engine Documentation</a></u>
+<br></p>
+<h3 id="i-want-to-use-predators-api-where-can-i-find-examples-for-creating-advanceddsl-tests"><b>I want to use Predator's API, where can I find examples for creating advanced/dsl tests?</b><a class="headerlink" href="#i-want-to-use-predators-api-where-can-i-find-examples-for-creating-advanceddsl-tests" title="Permanent link">#</a></h3>
+<p>Here is a <u><a href="https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest">postman collection</a></u> which contains examples
+for creating tests with custom javascript and dsl definitions.</p>
+<h3 id="what-content-type-does-predator-support-in-its-http-requests"><b>What content-type does Predator support in its HTTP requests?</b><a class="headerlink" href="#what-content-type-does-predator-support-in-its-http-requests" title="Permanent link">#</a></h3>
+<p>While the Predator UI currently supports creating tests only with <code>content-type: application/json</code> body, the actual Predator API has no such limit.
+When creating a test through the API, instead of specifying in the <code>post</code> request a <code>json</code> key, specify <code>body</code> key and change the <code>content-type</code> header to the appropriate content-type being used.<br>
+For example:<br></p>
+<p><div class="codehilite"><pre><span></span>  <span class="p">{</span>
+    <span class="nt">&quot;post&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;/orders&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;text/html&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot;Not Json :)&quot;</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+</pre></div>
+In this example, the content-type used in the request is <code>text/html</code> and the body sent: "Not JSON :)" will be in that format.</p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <h3 id="i-ran-predator-with-sqlite-and-would-like-to-migrate-now-to-a-different-database-how-do-i-do-this"><b>I ran Predator with SQLITE and would like to migrate now to a different database. How do I do this?</b><a class="headerlink" href="#i-ran-predator-with-sqlite-and-would-like-to-migrate-now-to-a-different-database-how-do-i-do-this" title="Permanent link">#</a></h3>
 <p>Migration between different databases is not possible. 
 In order to run Predator with a different supported database, 
-you must restart Predator with the new configuration.</p>
+you must restart Predator with the new <u><a href="configuration.html#database">configuration</a></u>.</p>
+<h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">#</a></h2>
+<h3 id="does-predator-support-exporting-metrics-to-external-time-series-databases"><b>Does Predator support exporting metrics to external time series databases?</b><a class="headerlink" href="#does-predator-support-exporting-metrics-to-external-time-series-databases" title="Permanent link">#</a></h3>
+<p>Yes, Predator has integration with both <u><a href="https://prometheus.io">Prometheus</a></u> and <u><a href="https://www.influxdata.com/">InfluxDB</a></u>, and can export metrics by test endpoints and status codes, something that is currently is not available to configure in the Predator UI, but is supported through the API.</p>
+<h3 id="how-can-i-export-metrics-to-prometheus"><b>How can I export metrics to Prometheus?</b><a class="headerlink" href="#how-can-i-export-metrics-to-prometheus" title="Permanent link">#</a></h3>
+<p><u><a href="https://prometheus.io">Prometheus</a></u> by its nature is a scraper, while the Predator-Runner is a job without a specific API and finite time life.
+To overcome this:
+<br>
+1. Deploy <u><a href="https://github.com/prometheus/pushgateway">Prometheus push gateway</a></u>
+<br>
+2. <u><a href="configuration.html#prometheus">Configure</a></u> Predator to push metrics to the push gateway.
+<br>
+3. Configure Prometheus to scrape from the push gateway.</p>
+<h3 id="is-there-any-dashboard-for-grafana-i-can-use"><b>Is there any dashboard for Grafana I can use?</b><a class="headerlink" href="#is-there-any-dashboard-for-grafana-i-can-use" title="Permanent link">#</a></h3>
+<p><u><a href="https://github.com/Zooz/predator/blob/master/resources/grafana_prometheus_dashboard.json">This</a></u> dashboard for example configured to read from Prometheus.</p>
+<p><img alt="Screenshot" src="images/grafana_dashboard.png" /></p>
                     
                     
                     

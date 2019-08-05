@@ -1031,7 +1031,21 @@ during runtime with the /config endpoint, please check the API reference for mor
 <td>smtp_server.timeout</td>
 <td>timeout to SMTP server in milliseconds</td>
 <td>✓</td>
-<td></td>
+<td>200</td>
+</tr>
+<tr>
+<td>SMTP_SECURE</td>
+<td>smtp_server.secure</td>
+<td>if true the connection will use TLS when connecting to server. <a href="https://nodemailer.com/smtp/">Nodemailer SMTP options</a></td>
+<td>✓</td>
+<td>false</td>
+</tr>
+<tr>
+<td>SMTP_REJECT_UNAUTH_CERTS</td>
+<td>smtp_server.rejectUnauthCerts</td>
+<td>should fail or succeed on unauthorized certificate</td>
+<td>✓</td>
+<td>false</td>
 </tr>
 </tbody>
 </table>
