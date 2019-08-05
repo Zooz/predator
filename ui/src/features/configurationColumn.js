@@ -77,7 +77,20 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             ),
             accessor: data => data.type ==='basic' ? <ViewButton icon={faPen} onClick={(e) => {
                 e.stopPropagation();
-                onEdit(data)}}/> : 'N/A',
+                onEdit(data)}}/> :
+                <TooltipWrapper
+                    content={
+                    <div>
+                        DSL not supported
+                    </div>}
+                dataId={`tooltipKey`}
+                place='top'
+                offset={{top: 1}}
+            >
+                <div data-tip data-for={`tooltipKey_na`} style={{cursor: 'pointer', width:'18px'}}>
+                    N/A
+                </div>
+            </TooltipWrapper> ,
             className: css['small-header'],
             headerClassName: css['small-header']
         },
