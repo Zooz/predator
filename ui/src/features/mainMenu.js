@@ -6,7 +6,9 @@ import {
     faBook,
     faPassport,
     faWrench
-} from '@fortawesome/free-solid-svg-icons'
+} from '@fortawesome/free-solid-svg-icons';
+
+import { PREDATOR_DOCS_URL } from '../App/common/env';
 
 module.exports = [
     {
@@ -41,12 +43,12 @@ module.exports = [
             {
                 key: 0,
                 primaryText: 'Documentation',
-                linkUrl: 'https://zooz.github.io/predator/about.html',
+                linkUrl: `${PREDATOR_DOCS_URL}/about.html`,
                 icon: faBook
             }, {
                 key: 1,
                 primaryText: 'API Reference',
-                linkUrl: 'https://zooz.github.io/predator/indexapiref.html',
+                linkUrl: `${PREDATOR_DOCS_URL}/indexapiref.html`,
                 icon: faPassport
             }]
     }

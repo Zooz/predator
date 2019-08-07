@@ -79,6 +79,13 @@ In case Predator is not running under the root domain, (for example, running und
 2. Deploy the tagged docker image to your preferred platform
 3. Access the Predator UI at http://your.domain.com/example-path/ui
 
+In case you host Predator's docs website on a different URL ( for example, Predator runs in a closed network without access to the internet ) you can configure the docs link in the UI using the PREDATOR_DOCS_URL build-arg.
+if PREDATOR_DOCS_URL was not specified, the default value is `https://zooz.github.io/predator`.
+
+1. `docker build --build-arg PREDATOR_DOCS_URL=http://your.predator.docs.com/example-path . -t predator`
+2. Deploy the tagged docker image to your preferred platform
+3. One should be redirected to `http://your.predator.docs.com/example-path` when clicking the on the docs link in the UI side menu.
+
 ![](https://zooz.github.io/predator/images/predator-screens.gif)
 
 ## Contributing
