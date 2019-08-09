@@ -877,10 +877,9 @@ paths:
         name: limit
         description: The number of most recent reports to retrieve.
         required: true
-        schema:
-          minimum: 1
-          maximum: 250
-          type: integer
+        minimum: 1
+        maximum: 250
+        type: integer
       responses:
         '200':
           description: Success
