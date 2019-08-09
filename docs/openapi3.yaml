@@ -1715,12 +1715,12 @@ components:
           readOnly: true
         updated_at:
           type: string
-          format: date_time
+          format: date-time
           description: The date and time that the procesor file was updated.
           readOnly: true
         created_at:
           type: string
-          format: date_time
+          format: date-time
           description: The date and time that the procesor file was created.
           readOnly: true
         javascript:
