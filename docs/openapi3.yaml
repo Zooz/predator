@@ -27,7 +27,7 @@ tags:
     Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.
 - name: Processors
   description: |
-    Processor file allows Preadtor execute custom javascript code.
+    Processor files allow Predator to execute custom javascript code during test flows.
 - name: Jobs
   description: |
     Predator executes tests through so-called **jobs**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
@@ -1059,11 +1059,12 @@ paths:
       parameters:
       - in: query
         name: from
-        description: From which result to start retrieve data ( default is zero )
+        description: From which result to start retrieve data
         required: false
         schema:
           type: integer
           minimum: 0
+          default: 0
       - in: query
         name: limit
         description: Max results to return from this query ( Limit to 100 )
@@ -1071,6 +1072,7 @@ paths:
         schema:
           type: integer
           maximum: 100
+          default: 100
       responses:
         '200':
           description: Success
@@ -1293,7 +1295,6 @@ components:
           format: uri
           example: http://www.example.com/file.txt
           description: Url to text file location , will be used by the processor
-
         description:
           type: string
           description: A description of the test.
@@ -1671,6 +1672,10 @@ components:
           type: string
           description: set to * in order to print all requests and responeses of the runner
           example: test
+        force_download:
+          type: boolean
+          description:  If job has a processor file of type file_download, then user has the ability to force download it or not upon each job start.
+          default: false
     job_response:
       allOf:
       - $ref: '#/components/schemas/job'
@@ -1691,8 +1696,8 @@ components:
       discriminator:
         propertyName: type
       oneOf:
-      - $ref: '#/components/schemas/download'
-      - $ref: '#/components/schemas/raw'
+      - $ref: '#/components/schemas/file_download'
+      - $ref: '#/components/schemas/raw_javascript'
       required:
       - name
       - description
@@ -1724,7 +1729,7 @@ components:
           readOnly: true
         javascript:
           type: string
-          description: Javascript raw that will be used by the processor resource.
+          description: Raw javascript that will be used by the processor resource.
           readOnly: true
     post_report:
       required:
@@ -1956,7 +1961,7 @@ components:
             timeout:
               description: timout to smtp server in milliseconds
               type: number
-    download:
+    file_download:
       description: Download processor file from the file_url and store it.
       required:
       - file_url
@@ -1964,10 +1969,7 @@ components:
         file_url:
           type: string
           description: url that the file can be downloaded from, should be direct download link.
-        force_download:
-          type: boolean
-          description: wether to try download the file_url on every invoke by a test.
-    raw:
+    raw_javascript:
       description: Javascript file that will be used by the processor resource.
       required:
       - javascript
@@ -1979,9 +1981,5 @@ components:
       type: string
       description: |
         The type of the processor resource. Can be one of the following:
-        * `raw`: Raw javascript string that will be stored and persisted as it is.
-        * `download`: Predator will download the custom javascript by file_url and persist it.
-        enum:
-        - dsl
-        - basic
-        example: dsl
+        * `raw_javascript`: Raw javascript string that will be stored and persisted as it is.
+        * `file_download`: Predator will download the custom javascript by file_url and persist it.
