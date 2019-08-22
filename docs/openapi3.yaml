@@ -1205,6 +1205,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  '/v1/processors/{processor_id}/download':
+    post:
+      operationId: update-processor-file-content
+      tags:
+        - Processors
+      summary: Download the file and update its javascript content.
+      description: Download the file from the 'file_url' configured for the processor and update its javascript content. If download fails, keep the original javascript content without overriding it.
+      parameters:
+        - in: path
+          name: processor_id
+          description: The id of the processor file to download.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
 
 components:
   parameters:
@@ -1672,10 +1707,6 @@ components:
           type: string
           description: set to * in order to print all requests and responeses of the runner
           example: test
-        force_download:
-          type: boolean
-          description:  If job has a processor file of type file_download, then user has the ability to force download it or not upon each job start.
-          default: false
     job_response:
       allOf:
       - $ref: '#/components/schemas/job'
