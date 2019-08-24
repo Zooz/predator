@@ -17,6 +17,7 @@ const defaultSmtpServerConfig = {
 };
 
 const defaultConfig = {
+    allow_unsecure_ssl: false,
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
     runner_docker_image: 'zooz/predator-runner:latest',
@@ -27,6 +28,7 @@ const defaultConfig = {
 };
 
 const defaultConfigNotEscaped = {
+    allow_unsecure_ssl: false,
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
     runner_docker_image: 'zooz/predator-runner:latest',
@@ -49,6 +51,7 @@ const configResponseParseObject = {
 };
 
 const configParseExpected = {
+    allow_unsecure_ssl: false,
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
     runner_docker_image: 'zooz/predator-runner:latest',
@@ -70,6 +73,7 @@ const convertObjectDBData = {
     minimum_wait_for_delayed_report_status_update_in_ms: 30000
 };
 const resultAfterConvert = {
+    allow_unsecure_ssl: false,
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
     runner_docker_image: 'zooz/predator-runner:latest',
