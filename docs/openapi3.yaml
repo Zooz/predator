@@ -1635,7 +1635,9 @@ components:
         runner_memory:
           type: number
           minimum: 128
-          description: Max memory to use by each runner.
+        allow_unsecure_ssl:
+          type: boolean
+          description: Whether to allow unsecure ssl or not.
         metrics_plugin_name:
           type: string
           enum:
