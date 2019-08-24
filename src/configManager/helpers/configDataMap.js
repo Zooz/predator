@@ -8,6 +8,7 @@ let configDataMap = {
     [constConfig.JOB_PLATFORM]: { value: process.env.JOB_PLATFORM },
     [constConfig.RUNNER_CPU]: { value: process.env.RUNNER_CPU || 1, type: 'float' },
     [constConfig.RUNNER_MEMORY]: { value: process.env.RUNNER_MEMORY || 256, type: 'int' },
+    [constConfig.ALLOW_UNSECURE_SS]: { value: process.env.ALLOW_UNSECURE_SS || false, type: 'boolean' },
     [constConfig.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS]: {
         value: process.env.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS || 30000,
         type: 'int'
