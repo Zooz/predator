@@ -74,11 +74,10 @@ class Form extends React.Component {
                 {
                     name: 'allow_unsecure_ssl',
                     key: 'allow_unsecure_ssl',
-                    floatingLabelText: 'allow unsecure ssl',
-                    info: 'allow_unsecure_ssl.....',
+                    floatingLabelText: 'Allow unsecure SSL',
+                    info: 'Whether to allow unsecure SSL or not',
                     type: INPUT_TYPES.SWITCHER
-                },
-
+                }
             ]
         };
         this.state = {
