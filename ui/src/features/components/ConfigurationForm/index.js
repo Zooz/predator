@@ -21,7 +21,7 @@ import {validate} from './validator';
 import Snackbar from 'material-ui/Snackbar';
 import UiSwitcher from '../../../components/UiSwitcher';
 
-const INPUT_TYPES = {SWITCHER:'switcher'};
+const INPUT_TYPES = {SWITCHER: 'switcher'};
 
 class Form extends React.Component {
     constructor(props) {
@@ -70,7 +70,15 @@ class Form extends React.Component {
                     key: 'default_webhook_url',
                     floatingLabelText: 'Default webhook url',
                     info: 'Default webhook url to send live report statistics to'
-                }
+                },
+                {
+                    name: 'allow_unsecure_ssl',
+                    key: 'allow_unsecure_ssl',
+                    floatingLabelText: 'allow unsecure ssl',
+                    info: 'allow_unsecure_ssl.....',
+                    type: INPUT_TYPES.SWITCHER
+                },
+
             ]
         };
         this.state = {
@@ -81,7 +89,8 @@ class Form extends React.Component {
                 runner_memory: config.runner_memory,
                 minimum_wait_for_delayed_report_status_update_in_ms: config.minimum_wait_for_delayed_report_status_update_in_ms,
                 default_webhook_url: config.default_webhook_url,
-                delay_runner_ms: config.delay_runner_ms
+                delay_runner_ms: config.delay_runner_ms,
+                allow_unsecure_ssl: config.allow_unsecure_ssl
             },
             errors: {
                 name: undefined,
@@ -163,17 +172,17 @@ class Form extends React.Component {
         const {processingAction, serverError, clearErrorOnUpdateConfig, updateSuccess} = this.props;
         return (
             <div style={{width: '100%'}}>
-                {this.GeneralList.data.map((oneItem, index) => {
-                    return (
-                        <div key={index}>
+                    {this.GeneralList.data.map((oneItem, index) => {
+                        return (
+                            <div key={index}>
                                 {!oneItem.hidden &&
                                 <RactangleAlignChildrenLeft className={style['input-wrapper']}>
                                     <div style={{flex: '1'}}>
                                         {this.generateInput(oneItem)}
                                     </div>
                                 </RactangleAlignChildrenLeft>}
-                        </div>);
-                }, this)}
+                            </div>);
+                    }, this)}
 
                 <div className={style.buttons}>
                     <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm() || processingAction}
@@ -200,9 +209,9 @@ class Form extends React.Component {
     };
 
     generateInput = (oneItem) => {
-        if(oneItem.type===INPUT_TYPES.SWITCHER){
+        if (oneItem.type === INPUT_TYPES.SWITCHER) {
             return (
-                <TitleInput style={{flex:'1'}} key={oneItem.key} title={oneItem.floatingLabelText}
+                <TitleInput style={{flex: '1'}} key={oneItem.key} title={oneItem.floatingLabelText}
                             rightComponent={this.showInfo(oneItem)}>
                     <RactangleAlignChildrenLeft>
                         <UiSwitcher
