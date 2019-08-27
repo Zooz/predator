@@ -1635,9 +1635,9 @@ components:
         runner_memory:
           type: number
           minimum: 128
-        allow_unsecure_ssl:
+        allow_insecure_tls:
           type: boolean
-          description: Whether to allow unsecure ssl or not.
+          description: If true, don't fail requests on unverified server certificate errors.
         metrics_plugin_name:
           type: string
           enum:

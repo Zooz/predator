@@ -204,7 +204,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(metricsExport).toString('base64');
     }
 
-    if (configData.allow_unsecure_ssl) {
+    if (configData.allow_insecure_tls) {
         environmentVariables.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     }
 

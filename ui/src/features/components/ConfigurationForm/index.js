@@ -72,10 +72,10 @@ class Form extends React.Component {
                     info: 'Default webhook url to send live report statistics to'
                 },
                 {
-                    name: 'allow_unsecure_ssl',
-                    key: 'allow_unsecure_ssl',
-                    floatingLabelText: 'Allow unsecure SSL',
-                    info: 'Whether to allow unsecure SSL or not',
+                    name: 'allow_insecure_tls',
+                    key: 'allow_insecure_tls',
+                    floatingLabelText: 'Allow insecure TLS',
+                    info: 'If true, don\'t fail requests on unverified server certificate errors',
                     type: INPUT_TYPES.SWITCHER
                 }
             ]
@@ -89,7 +89,7 @@ class Form extends React.Component {
                 minimum_wait_for_delayed_report_status_update_in_ms: config.minimum_wait_for_delayed_report_status_update_in_ms,
                 default_webhook_url: config.default_webhook_url,
                 delay_runner_ms: config.delay_runner_ms,
-                allow_unsecure_ssl: config.allow_unsecure_ssl
+                allow_insecure_tls: config.allow_insecure_tls
             },
             errors: {
                 name: undefined,

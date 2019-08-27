@@ -14,7 +14,7 @@ Below are variables Predator can be configured with.
 | RUNNER_MEMORY               | runner_memory       	| Max memory to use by each runner                                                        	| ✓                        	| 256                      	    |
 | DEFAULT_EMAIL_ADDRESS       | default_email_address   | Default email to send final report to, address can be configured                        	| ✓                        	|                             	|
 | DEFAULT_WEBHOOK_URL         | default_webhook_url    	| Default webhook url to send live report statistics to                                   	| ✓                        	|                             	|
-| ALLOW_UNSECURE_SSL          | allow_unsecure_ssl    	| Whether to allow unsecure SSL or not                                   	                | ✓                        	| false                         |
+| ALLOW_INSECURE_TLS          | allow_insecure_tls    	| If true, don't fail requests on unverified server certificate errors                      | ✓                        	| false                         |
 
 ## Database
 | Environment Variable 	| Description                                                                     	| Configurable from UI/API 	| Default value 	|
