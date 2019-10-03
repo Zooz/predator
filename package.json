@@ -39,7 +39,7 @@
     "bluebird": "^3.5.5",
     "body-parser": "^1.19.0",
     "bunyan": "^1.8.12",
-    "cassandra-driver": "^3.5.0",
+    "cassandra-driver": "^4.1.0",
     "cassandra-migration": "^2.7.0",
     "copy-dir": "^0.3.0",
     "cron": "^1.7.1",

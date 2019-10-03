@@ -58,7 +58,8 @@ async function createClient() {
     const config = {
         contactPoints: String(databaseConfig.address).split(','),
         keyspace: databaseConfig.name,
-        authProvider
+        authProvider,
+        localDataCenter: databaseConfig.cassandraLocalDataCenter
     };
 
     let cassandraClient = new cassandra.Client(config);
