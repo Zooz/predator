@@ -6,6 +6,7 @@ const schedulerSequlizeConnector = require('../../jobs/models/database/sequelize
 const reportsSequlizeConnector = require('../../reports/models/database/sequelize/sequelizeConnector');
 const testsSequlizeConnector = require('../../tests/models/database/sequelize/sequelizeConnector');
 const configSequlizeConnector = require('../../configManager/models/database/sequelize/sequelizeConnector');
+const processorsConnector = require('../../processors/models/database/sequelize/sequelizeConnector');
 const logger = require('../../../src/common/logger');
 const databaseConfig = require('../../config/databaseConfig');
 const Sequelize = require('sequelize');
@@ -17,6 +18,7 @@ module.exports.init = async () => {
     await reportsSequlizeConnector.init(sequlizeClient);
     await testsSequlizeConnector.init(sequlizeClient);
     await configSequlizeConnector.init(sequlizeClient);
+    await processorsConnector.init(sequlizeClient);
     await runSequlizeMigrations();
 };
 
