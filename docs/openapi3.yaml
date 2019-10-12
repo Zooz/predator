@@ -1904,7 +1904,9 @@ components:
         runner_memory:
           type: number
           minimum: 128
-          description: Max memory to use by each runner.
+        allow_insecure_tls:
+          type: boolean
+          description: If true, don't fail requests on unverified server certificate errors.
         metrics_plugin_name:
           type: string
           enum:

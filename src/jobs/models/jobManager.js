@@ -204,6 +204,10 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         environmentVariables.METRICS_EXPORT_CONFIG = Buffer.from(metricsExport).toString('base64');
     }
 
+    if (configData.allow_insecure_tls) {
+        environmentVariables.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
+
     if (jobBody.proxy_url) {
         environmentVariables.PROXY_URL = jobBody.proxy_url;
     }

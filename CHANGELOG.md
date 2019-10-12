@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.7"></a>
+## [1.1.7](https://github.com/Zooz/predator/compare/v1.1.6...v1.1.7) (2019-08-27)
+
+
+### Bug Fixes
+
+* **issues 79 82:** issues 79 82 ([#181](https://github.com/Zooz/predator/issues/181)) ([e53c76f](https://github.com/Zooz/predator/commit/e53c76f)), closes [#79](https://github.com/Zooz/predator/issues/79) [#82](https://github.com/Zooz/predator/issues/82)
+* **not supported tool tip:** not supported tool tip ([#184](https://github.com/Zooz/predator/issues/184)) ([d19cbd8](https://github.com/Zooz/predator/commit/d19cbd8))
+* package.json & package-lock.json to reduce vulnerabilities ([#203](https://github.com/Zooz/predator/issues/203)) ([872cf23](https://github.com/Zooz/predator/commit/872cf23))
+
+
+### Features
+
+* **smtp:** support for unauthorized connections ([#170](https://github.com/Zooz/predator/issues/170)) ([7005be5](https://github.com/Zooz/predator/commit/7005be5))
+
+
+
 <a name="1.1.6"></a>
 ## [1.1.6](https://github.com/Zooz/predator/compare/v1.1.5...v1.1.6) (2019-07-30)
 
