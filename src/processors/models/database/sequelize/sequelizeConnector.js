@@ -27,7 +27,7 @@ async function insertProcessor(processorId, processorInfo) {
 }
 
 async function initSchemas() {
-    const processorsFiles = client.define('processors', {
+    const processorsFiles = client.define('processor', {
         processor_id: {
             type: Sequelize.DataTypes.UUID,
             primaryKey: true
