@@ -6,6 +6,7 @@ const database = require('./database'),
 
 module.exports = {
     createFileFromUrl,
+    downloadFile,
     getFile
 };
 async function createFileFromUrl(testRawData) {
@@ -21,8 +22,7 @@ async function downloadFile(fileUrl) {
     };
     try {
         const response = await request.get(options);
-        const base64Value = Buffer.from(response).toString('base64');
-        return base64Value;
+        return response;
     } catch (err) {
         const errMsg = 'Error to read file, throw exception: ' + err;
         const error = new Error(errMsg);
@@ -45,6 +45,7 @@ async function getFile(fileId) {
 async function saveFile(fileUrl) {
     const id = uuid();
     const fileToSave = await downloadFile(fileUrl);
-    await database.saveFile(id, fileToSave);
+    const fileBase64Value = Buffer.from(fileToSave).toString('base64');
+    await database.saveFile(id, fileBase64Value);
     return id;
 }
