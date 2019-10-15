@@ -1,5 +1,5 @@
 'use strict';
-let processorManager = require('../models/processorManager');
+let processorManager = require('../models/processorsManager');
 
 module.exports.createProcessor = function (req, res, next) {
     return processorManager.createProcessor(req.body)
