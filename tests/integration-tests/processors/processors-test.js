@@ -104,5 +104,31 @@ describe('Processors api', function() {
             let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
             createProcessorResponse.statusCode.should.eql(422);
         });
+
+        it('Create processor with type file_download and invalid js syntax', async () => {
+            nock('https://authentication.predator.dev').get('/?dl=1').reply(200,
+                `{ 
+                     const uuid = require('uuid/v4');
+                     module.exports = {
+                       createAuthToken
+                     };
+                     
+                     function createAuthToken(userContext, events, done) {
+                       userContext.vars.token = uuid();
+                       return done();
+                     }
+                     
+                     this is not valid javascript
+                 }`
+            );
+            const requestBody = {
+                name: 'authentication',
+                description: 'Creates authorization token and saves it in the context',
+                type: 'file_download',
+                file_url: 'https://authentication.predator.dev/?dl=1'
+            };
+            let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+            createProcessorResponse.statusCode.should.eql(422);
+        });
     });
 });

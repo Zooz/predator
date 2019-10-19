@@ -1,13 +1,16 @@
 'use strict';
-const database = require('./database'),
-    uuid = require('uuid'),
+const uuid = require('uuid'),
     request = require('request-promise-native'),
+    esprima = require('esprima');
+
+const database = require('./database'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
     createFileFromUrl,
     downloadFile,
-    getFile
+    getFile,
+    validateJavascriptContent
 };
 async function createFileFromUrl(testRawData) {
     if (testRawData['processor_file_url']) {
@@ -16,6 +19,7 @@ async function createFileFromUrl(testRawData) {
     }
     return undefined;
 }
+
 async function downloadFile(fileUrl) {
     const options = {
         url: fileUrl
@@ -24,7 +28,7 @@ async function downloadFile(fileUrl) {
         const response = await request.get(options);
         return response;
     } catch (err) {
-        const errMsg = 'Error to read file, throw exception: ' + err;
+        const errMsg = 'Error to download file: ' + err;
         const error = new Error(errMsg);
         error.statusCode = 422;
         throw error;
@@ -48,4 +52,31 @@ async function saveFile(fileUrl) {
     const fileBase64Value = Buffer.from(fileToSave).toString('base64');
     await database.saveFile(id, fileBase64Value);
     return id;
+}
+
+function validateJavascriptContent (javascriptFileContent) {
+    let error, errorMessage;
+    try {
+        const syntax = esprima.parseScript(javascriptFileContent, { tolerant: true });
+        const errors = syntax.errors;
+        if (errors.length > 0) {
+            let errorsString = '';
+            for (let i = 0; i < errors.length; i++) {
+                errorsString += errors[i].description + ', ';
+            }
+            errorsString = errorsString.substring(0, errorsString.length - 2);
+
+            errorMessage = 'js syntax validation failed with error: ' + errorsString;
+            error = new Error(errorMessage);
+            error.statusCode = 422;
+        }
+    } catch (err) {
+        errorMessage = err.description;
+        error = new Error(errorMessage);
+        error.statusCode = 422;
+    }
+
+    if (error) {
+        throw error;
+    }
 }

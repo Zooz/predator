@@ -11,9 +11,9 @@ module.exports.createProcessor = async function (processor) {
     let processorId = uuid.v4();
     try {
         if (processor.type === common.PROCESSOR_TYPE_FILE_DOWNLOAD) {
-            const file = await fileManager.downloadFile(processor.file_url);
-            processor.javascript = file;
+            processor.javascript = await fileManager.downloadFile(processor.file_url);
         }
+        fileManager.validateJavascriptContent(processor.javascript);
         await databaseConnector.insertProcessor(processorId, processor);
         logger.info('Processor saved successfully to database');
         return processor;
