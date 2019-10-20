@@ -6,5 +6,7 @@ CREATE TABLE IF NOT EXISTS processors
     type               text,
     file_url           text,
     javascript         text,
+    created_at timestamp,
+    updated_at timestamp,
     PRIMARY KEY (processor_id)
 );

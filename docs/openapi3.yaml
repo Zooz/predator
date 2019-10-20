@@ -2012,6 +2012,9 @@ components:
           description: Javascript as a string.
     processor_type:
       type: string
+      enum:
+        - raw_javascript
+        - file_download
       description: |
         The type of the processor resource. Can be one of the following:
         * `raw_javascript`: Raw javascript string that will be stored and persisted as it is.

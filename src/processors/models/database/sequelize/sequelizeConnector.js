@@ -21,7 +21,9 @@ async function insertProcessor(processorId, processorInfo) {
         description: processorInfo.description,
         type: processorInfo.type,
         file_url: processorInfo.file_url,
-        javascript: processorInfo.javascript
+        javascript: processorInfo.javascript,
+        created_at: Date.now(),
+        updated_at: Date.now()
     };
     return processor.create(params);
 }
@@ -46,6 +48,12 @@ async function initSchemas() {
         },
         javascript: {
             type: Sequelize.DataTypes.TEXT('long')
+        },
+        created_at: {
+            type: Sequelize.DataTypes.DATE
+        },
+        updated_at: {
+            type: Sequelize.DataTypes.DATE
         }
     });
     await processorsFiles.sync();
