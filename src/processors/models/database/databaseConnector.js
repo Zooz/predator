@@ -1,23 +1,22 @@
-'use strict';
-
 let databaseConfig = require('../../../config/databaseConfig');
-// let cassandraConnector = require('./cassandra/cassandraConnector');
+let cassandraConnector = require('./cassandra/cassandraConnector');
 let sequelizeConnector = require('./sequelize/sequelizeConnector');
-let databaseConnector;
-
-if (databaseConfig.type.toLowerCase() === 'cassandra') {
-    throw new Error('Processors is not implemented yet over Cassandra');
-} else {
-    databaseConnector = sequelizeConnector;
-}
-
+let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
 module.exports = {
     init,
     getAllProcessors
+    insertProcessor
+    closeConnection,
 };
-
+async function insertProcessor(jobId, jobInfo) {
+    return databaseConnector.insertProcessor(jobId, jobInfo);
+}
 async function init() {
     return databaseConnector.init();
+}
+
+function closeConnection() {
+    return databaseConnector.closeConnection();
 }
 
 async function getAllProcessors(from, limit) {

@@ -1,6 +1,9 @@
 module.exports = {
     TEST_TYPE_BASIC: 'basic',
     TEST_TYPE_DSL: 'dsl',
+    PROCESSOR_TYPE_FILE_DOWNLOAD: 'file_download',
+    PROCESSOR_TYPE_RAW_JAVASCRIPT: 'raw_javascript',
+
     ERROR_MESSAGES: {
         NOT_FOUND: 'Not found',
         DSL_DEF_ALREADY_EXIST: 'Definition already exists'

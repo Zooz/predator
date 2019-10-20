@@ -1,11 +1,12 @@
 'use strict';
 
-let Sequelize = require('sequelize');
+const Sequelize = require('sequelize');
 let client;
 
 module.exports = {
     init,
     getAllProcessors
+    insertProcessor
 };
 
 async function init(sequelizeClient) {
@@ -13,13 +14,23 @@ async function init(sequelizeClient) {
     await initSchemas();
 }
 
-async function getAllProcessors(from, limit) {
-    const processorsModel = client.model('processors');
-    return processorsModel.findAll({ offset: from, limit });
+async function insertProcessor(processorId, processorInfo) {
+    const processor = client.model('processor');
+    let params = {
+        processor_id: processorId,
+        name: processorInfo.name,
+        description: processorInfo.description,
+        type: processorInfo.type,
+        file_url: processorInfo.file_url,
+        javascript: processorInfo.javascript,
+        created_at: Date.now(),
+        updated_at: Date.now()
+    };
+    return processor.create(params);
 }
 
 async function initSchemas() {
-    const processors = client.define('processors', {
+    const processorsFiles = client.define('processor', {
         processor_id: {
             type: Sequelize.DataTypes.UUID,
             primaryKey: true
@@ -38,7 +49,18 @@ async function initSchemas() {
         },
         javascript: {
             type: Sequelize.DataTypes.TEXT('long')
+        },
+        created_at: {
+            type: Sequelize.DataTypes.DATE
+        },
+        updated_at: {
+            type: Sequelize.DataTypes.DATE
         }
     });
-    await processors.sync();
+    await processorsFiles.sync();
+}
+
+async function getAllProcessors(from, limit) {
+    const processorsModel = client.model('processors');
+    return processorsModel.findAll({ offset: from, limit });
 }

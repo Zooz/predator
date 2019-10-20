@@ -39,7 +39,7 @@ describe('the tests api', function() {
             let requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
             const res = await requestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(422);
-            res.body.message.should.eql('Error to read file, throw exception: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com www.notrealurl.com:443');
+            res.body.message.should.eql('Error to download file: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com www.notrealurl.com:443');
         });
         let badBodyScenarios = ['Body_with_illegal_artillery', 'Body_with_no_artillery_schema', 'Body_with_no_test_type', 'Body_with_no_description', 'Body_with_no_name', 'Body_with_no_scenarios', 'Body_with_no_step_action',
             'Body_with_no_steps'];
