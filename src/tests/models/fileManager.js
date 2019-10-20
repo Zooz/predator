@@ -57,26 +57,11 @@ async function saveFile(fileUrl) {
 function validateJavascriptContent (javascriptFileContent) {
     let error, errorMessage;
     try {
-        const syntax = esprima.parseScript(javascriptFileContent, { tolerant: true });
-        const errors = syntax.errors;
-        if (errors.length > 0) {
-            let errorsString = '';
-            for (let i = 0; i < errors.length; i++) {
-                errorsString += errors[i].description + ', ';
-            }
-            errorsString = errorsString.substring(0, errorsString.length - 2);
-
-            errorMessage = 'js syntax validation failed with error: ' + errorsString;
-            error = new Error(errorMessage);
-            error.statusCode = 422;
-        }
+        esprima.parseScript(javascriptFileContent);
     } catch (err) {
         errorMessage = err.description;
-        error = new Error(errorMessage);
+        error = new Error('javascript syntax validation failed with error: ' + errorMessage);
         error.statusCode = 422;
-    }
-
-    if (error) {
         throw error;
     }
 }
