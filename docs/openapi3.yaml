@@ -1638,6 +1638,10 @@ components:
         allow_insecure_tls:
           type: boolean
           description: If true, don't fail requests on unverified server certificate errors.
+        ttl_to_delete_finished_tests_resources:
+          type: number
+          minimum: 0
+          description: TTL (in hours) to delete finished tests resources. Value of 0 means no TTL configured.
         metrics_plugin_name:
           type: string
           enum:

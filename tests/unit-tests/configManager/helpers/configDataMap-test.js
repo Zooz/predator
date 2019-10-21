@@ -15,6 +15,7 @@ const expectedTypes = {
     runner_memory: 'int',
     runner_cpu: 'float',
     allow_insecure_tls: 'boolean',
+    ttl_to_delete_finished_tests_resources: 'int',
     minimum_wait_for_delayed_report_status_update_in_ms: 'int',
     metrics_plugin_name: 'string',
     default_email_address: undefined,
@@ -33,6 +34,7 @@ function changeAllEnvData() {
     process.env.RUNNER_CPU = 'runner_cpu_test';
     process.env.RUNNER_MEMORY = 'runner_memory_test';
     process.env.ALLOW_INSECURE_TLS = 'allow_insecure_tls';
+    process.env.TTL_TO_DELETE_FINISHED_TESTS_RESOURCES = 'ttl_to_delete_finished_tests_resources';
     process.env.METRICS_PLUGIN_NAME = 'metrics_plugin_name_test';
     process.env.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS = 'minimum_wait_for_delayed_report_status_update_in_ms_test';
 }

@@ -77,6 +77,12 @@ class Form extends React.Component {
                     floatingLabelText: 'Allow insecure TLS',
                     info: 'If true, don\'t fail requests on unverified server certificate errors',
                     type: INPUT_TYPES.SWITCHER
+                },
+                {
+                    name: 'ttl_to_delete_finished_tests_resources',
+                    key: 'ttl_to_delete_finished_tests_resources',
+                    floatingLabelText: 'TTL to delete finished tests resources',
+                    info: 'TTL (in hours) to delete finished tests resources. Value of 0 means no TTL configured.'
                 }
             ]
         };
@@ -89,7 +95,8 @@ class Form extends React.Component {
                 minimum_wait_for_delayed_report_status_update_in_ms: config.minimum_wait_for_delayed_report_status_update_in_ms,
                 default_webhook_url: config.default_webhook_url,
                 delay_runner_ms: config.delay_runner_ms,
-                allow_insecure_tls: config.allow_insecure_tls
+                allow_insecure_tls: config.allow_insecure_tls,
+                ttl_to_delete_finished_tests_resources:  config.ttl_to_delete_finished_tests_resources
             },
             errors: {
                 name: undefined,
