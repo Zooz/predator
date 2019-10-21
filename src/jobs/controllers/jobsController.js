@@ -70,3 +70,13 @@ module.exports.getLogs = function (req, res, next) {
             return next(err);
         });
 };
+
+module.exports.deleteAllContainers = function (req, res, next) {
+    return jobManager.deleteAllContainers()
+        .then(function (result) {
+            return res.status(204).json(result);
+        })
+        .catch(function (err) {
+            return next(err);
+        });
+};

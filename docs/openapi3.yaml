@@ -703,6 +703,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+
   /v1/jobs/{job_id}/runs/{run_id}/logs:
     get:
       tags:
@@ -743,6 +744,22 @@ paths:
               schema:
                 $ref: "#/components/schemas/error_response"
 
+  '/v1/jobs/containers/':
+    delete:
+      operationId: delete-all-job-containers
+      tags:
+      - Jobs
+      description: delete all containers/pods of predator-runner
+      parameters:
+      responses:
+        '204':
+          description: Success
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   # Reports
   '/v1/tests/{test_id}/reports':
     get:
