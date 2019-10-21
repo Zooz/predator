@@ -77,6 +77,18 @@ module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) 
     );
 };
 
+module.exports.deleteAllContainers = async (dockerName) => {
+    let containers = await docker.listContainers({ all: true, filters: JSON.stringify({ name: ['predator.'] }) });
+    containers.forEach(async container => {
+        let containerToRemove = await docker.getContainer(container.Id);
+        await containerToRemove.remove();
+    });
+
+    return {
+        deleted: containers.length
+    };
+};
+
 module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId) => {
     let containers = await docker.listContainers({ all: true });
 

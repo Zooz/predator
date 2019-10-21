@@ -63,6 +63,15 @@ module.exports.stopRun = async function (jobId, runId) {
     await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), runId);
 };
 
+module.exports.deleteAllContainers = async function () {
+    const configData = await configHandler.getConfig();
+    let runnerImage = configData.runner_docker_image;
+    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
+    let runnerImageWithoutTag = runnerImage.substring(0, runnerImage.indexOf(':'));
+    let result = await jobConnector.deleteAllContainers(runnerImageWithoutTag);
+    return result;
+};
+
 module.exports.getLogs = async function (jobId, runId) {
     const configData = await configHandler.getConfig();
     const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);

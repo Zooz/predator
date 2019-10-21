@@ -14,5 +14,6 @@ router.put('/:job_id', swaggerValidator.validate, jobVerifier.verifyTestExists, 
 router.delete('/:job_id', swaggerValidator.validate, jobs.deleteJob);
 router.post('/:job_id/runs/:run_id/stop', swaggerValidator.validate, jobs.stopRun);
 router.get('/:job_id/runs/:run_id/logs', swaggerValidator.validate, jobs.getLogs);
+router.delete('/runs/containers', jobs.deleteAllContainers);
 
 module.exports = router;
