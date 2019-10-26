@@ -10,3 +10,14 @@ module.exports.createProcessor = function (req, res, next) {
             return next(err);
         });
 };
+
+module.exports.getAllProcessors = async function (req, res, next) {
+    const { query: { from = 0, limit = 100 } } = req;
+    let processors;
+    try {
+        processors = await processorManager.getAllProcessors(from, limit);
+    } catch (err) {
+        return next(err);
+    }
+    return res.status(200).send(processors);
+};

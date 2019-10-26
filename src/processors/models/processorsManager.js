@@ -22,3 +22,7 @@ module.exports.createProcessor = async function (processor) {
         return Promise.reject(error);
     }
 };
+
+module.exports.getAllProcessors = async function(from, limit) {
+    return databaseConnector.getAllProcessors(from, limit);
+};

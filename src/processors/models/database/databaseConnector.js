@@ -4,9 +4,9 @@ let sequelizeConnector = require('./sequelize/sequelizeConnector');
 let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
 module.exports = {
     init,
-    getAllProcessors
-    insertProcessor
-    closeConnection,
+    getAllProcessors,
+    insertProcessor,
+    closeConnection
 };
 async function insertProcessor(jobId, jobInfo) {
     return databaseConnector.insertProcessor(jobId, jobInfo);

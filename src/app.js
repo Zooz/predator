@@ -8,7 +8,7 @@ let reportsRouter = require('./reports/routes/reportsRoute.js');
 let configRouter = require('./configManager/routes/configRoute.js');
 let dslRouter = require('./tests/routes/dslRoute.js');
 let testsRouter = require('./tests/routes/testsRoute.js');
-let processorssRouter = require('./processors/routes/processorsRoute.js');
+let processorsRouter = require('./processors/routes/processorsRoute.js');
 
 let swaggerValidator = require('express-ajv-swagger-validation');
 let audit = require('express-requests-logger');
@@ -57,6 +57,7 @@ module.exports = () => {
             app.use('/v1/dsl', dslRouter);
             app.use('/v1/tests', reportsRouter);
             app.use('/v1/tests', testsRouter);
+            app.use('/v1/processors', processorsRouter);
 
             app.use('/', function (req, res, next) {
                 res.redirect('/ui');

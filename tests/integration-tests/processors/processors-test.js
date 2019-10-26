@@ -9,20 +9,60 @@ describe('Processors api', function() {
         await requestSender.init();
     });
 
-    describe('Good requests', function() {
+    describe('Good requests', async function() {
+        describe('GET /v1/processors', async function () {
+            let jsProcessorsArr;
+            let processorsInserted;
+            before(async function() {
+                jsProcessorsArr = [...(new Array(101).keys())].map(i => generateRawJSProcessor(i.toString()));
+                processorsInserted = await Promise.all(jsProcessorsArr.map(processor => requestSender.createProcessor(processor, validHeaders)));
+            });
+            it('Check default paging values (from = 0, limit = 100)', async function() {
+                let getProcessorsResponse = await requestSender.getProcessors();
+
+                should(getProcessorsResponse.statusCode).equal(200);
+
+                const processors = getProcessorsResponse.body;
+                should(processors.length).equal(100);
+            });
+
+            it('Get a page', async function() {
+                const from = 25, limit = 50;
+                let getProcessorsResponse = await requestSender.getProcessors(from, limit);
+
+                should(getProcessorsResponse.statusCode).equal(200);
+
+                const processors = getProcessorsResponse.body;
+                should(processors.length).equal(limit);
+                should(processors[0].name).equal('25');
+                should(processors[49].name).equal('76');
+            });
+            it('Get a page with limit > # of processors', async function() {
+                const from = 0, limit = 1000;
+                let getProcessorsResponse = await requestSender.getProcessors(from, limit);
+
+                should(getProcessorsResponse.statusCode).equal(200);
+
+                const processors = getProcessorsResponse.body;
+                should(processors.length).equal(101);
+            });
+            after(async function() {
+                // TODO: when DELETE /processors is implemented, use processorsInserted to empty the table.
+            });
+        });
         it('Create processor with type file_download', async () => {
             nock('https://authentication.predator.dev').get('/?dl=1').reply(200,
-                `{ 
-                     const uuid = require('uuid/v4');
-                     module.exports = {
-                       createAuthToken
-                     };
+                `{
+                        const uuid = require('uuid/v4');
+                        module.exports = {
+                        createAuthToken
+                        };
 
-                     function createAuthToken(userContext, events, done) {
-                       userContext.vars.token = uuid();
-                       return done();
-                     }
-                 }`
+                        function createAuthToken(userContext, events, done) {
+                        userContext.vars.token = uuid();
+                        return done();
+                        }
+                    }`
             );
 
             const requestBody = {
@@ -42,16 +82,16 @@ describe('Processors api', function() {
                 type: 'raw_javascript',
                 javascript:
                     `{ 
-                     const uuid = require('uuid/v4');
-                     module.exports = {
-                       createAuthToken
-                     };
+                        const uuid = require('uuid/v4');
+                        module.exports = {
+                        createAuthToken
+                        };
 
-                     function createAuthToken(userContext, events, done) {
-                       userContext.vars.token = uuid();
-                       return done();
-                     }
-                 }`
+                        function createAuthToken(userContext, events, done) {
+                        userContext.vars.token = uuid();
+                        return done();
+                        }
+                    }`
             };
             let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
             createProcessorResponse.statusCode.should.eql(201);
@@ -107,7 +147,7 @@ describe('Processors api', function() {
 
         it('Create processor with type file_download and invalid js syntax', async () => {
             nock('https://authentication.predator.dev').get('/?dl=1').reply(200,
-                `{ 
+                `{
                      const uuid = require('uuid/v4');
                      module.exports = {
                        createAuthToken
@@ -132,3 +172,12 @@ describe('Processors api', function() {
         });
     });
 });
+
+function generateRawJSProcessor(name) {
+    return {
+        name,
+        description: 'exports a number',
+        type: 'raw_javascript',
+        javascript: 'module.exports = 5;'
+    };
+}

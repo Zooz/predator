@@ -5,7 +5,7 @@ let client;
 
 module.exports = {
     init,
-    getAllProcessors
+    getAllProcessors,
     insertProcessor
 };
 
@@ -61,6 +61,6 @@ async function initSchemas() {
 }
 
 async function getAllProcessors(from, limit) {
-    const processorsModel = client.model('processors');
+    const processorsModel = client.model('processor');
     return processorsModel.findAll({ offset: from, limit });
 }
