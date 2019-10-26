@@ -11,7 +11,8 @@ describe('Sequelize client tests', function () {
         sequelizeDeleteStub,
         sequelizeDefineStub,
         sequelizeGeValueetStub,
-        sequelizeGetStub;
+        sequelizeGetStub,
+        sequelizeCreateStub;
 
     before(async () => {
         sandbox = sinon.sandbox.create();
@@ -29,6 +30,7 @@ describe('Sequelize client tests', function () {
         sequelizeGetStub = sandbox.stub();
         sequelizeDeleteStub = sandbox.stub();
         sequelizeGeValueetStub = sandbox.stub();
+        sequelizeCreateStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
             hasMany: () => {
@@ -43,7 +45,8 @@ describe('Sequelize client tests', function () {
             findAll: sequelizeGetStub,
             findOne: sequelizeGeValueetStub,
             destroy: sequelizeDeleteStub,
-            upsert: sequelizeUpsertStub
+            upsert: sequelizeUpsertStub,
+            create: sequelizeCreateStub
         });
 
         await sequelizeConnector.init({
@@ -61,12 +64,29 @@ describe('Sequelize client tests', function () {
     });
 
     describe('Get Processors Files', () => {
-        it('Validate sequelize passed arguements', async () => {
+        it('Validate sequelize passed arguments', async () => {
             const limit = 25;
             const offset = 10;
             await sequelizeConnector.getAllProcessors(offset, limit);
             should(sequelizeGetStub.calledOnce).eql(true);
             should(sequelizeGetStub.args[0][0]).eql({ offset, limit });
+        });
+    });
+
+    describe('Insert a processor', () => {
+        it('Happy flow', async () => {
+            const processor = {
+                processor_id: '6063ae04-f832-11e9-aad5-362b9e155667',
+                name: 'processor name',
+                description: 'bla bla bla',
+                type: 'raw_javascript',
+                javascript: 'module.exports = 5;'
+            };
+            await sequelizeConnector.insertProcessor(processor.processor_id, processor);
+            const paramsArg = sequelizeCreateStub.args[0][0];
+            should(sequelizeCreateStub.calledOnce).eql(true);
+            should(paramsArg).containDeep(processor);
+            should(paramsArg).has.properties(['created_at', 'updated_at']);
         });
     });
 });
