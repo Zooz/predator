@@ -11,11 +11,16 @@ describe('Processors api', function() {
 
     describe('Good requests', async function() {
         describe('GET /v1/processors', async function () {
-            let jsProcessorsArr;
-            let processorsInserted;
+            let numberOfProcessorsToInsert = 101;
+            let jsProcessorsArr = [];
+            let processorsInserted = [];
             before(async function() {
-                jsProcessorsArr = [...(new Array(101).keys())].map(i => generateRawJSProcessor(i.toString()));
-                processorsInserted = await Promise.all(jsProcessorsArr.map(processor => requestSender.createProcessor(processor, validHeaders)));
+                for (let i = 0; i < numberOfProcessorsToInsert; i++) {
+                    const processor = generateRawJSProcessor(i.toString());
+                    jsProcessorsArr.push(processor);
+                    const processorRes = await requestSender.createProcessor(processor, validHeaders);
+                    processorsInserted.push(processorRes);
+                }
             });
             it('Check default paging values (from = 0, limit = 100)', async function() {
                 let getProcessorsResponse = await requestSender.getProcessors();
@@ -35,6 +40,20 @@ describe('Processors api', function() {
                 const processors = getProcessorsResponse.body;
                 should(processors.length).equal(limit);
             });
+
+            it('Validate from parameter starts from the correct index', async function() {
+                const from = 0, limit = 50;
+                let page1Response = await requestSender.getProcessors(from, limit);
+                let page2Response = await requestSender.getProcessors(from + 1, limit);
+
+                should(page1Response.statusCode).equal(200);
+                should(page2Response.statusCode).equal(200);
+
+                const page1Processors = page1Response.body;
+                const page2Processors = page2Response.body;
+                should(page1Processors[1]).deepEqual(page2Processors[0]);
+            });
+
             it('Get a page with limit > # of processors', async function() {
                 const from = 0, limit = 1000;
                 let getProcessorsResponse = await requestSender.getProcessors(from, limit);

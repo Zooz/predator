@@ -7,10 +7,9 @@ const sinon = require('sinon'),
 describe('Sequelize client tests', function () {
     let sandbox,
         sequelizeModelStub,
-        sequelizeUpsertStub,
         sequelizeDeleteStub,
         sequelizeDefineStub,
-        sequelizeGeValueetStub,
+        sequelizeGeValueStub,
         sequelizeGetStub,
         sequelizeCreateStub;
 
@@ -25,11 +24,10 @@ describe('Sequelize client tests', function () {
         databaseConfig.password = 'password';
 
         sequelizeModelStub = sandbox.stub();
-        sequelizeUpsertStub = sandbox.stub();
         sequelizeDefineStub = sandbox.stub();
         sequelizeGetStub = sandbox.stub();
         sequelizeDeleteStub = sandbox.stub();
-        sequelizeGeValueetStub = sandbox.stub();
+        sequelizeGeValueStub = sandbox.stub();
         sequelizeCreateStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
@@ -43,9 +41,8 @@ describe('Sequelize client tests', function () {
             key: {},
             value: {},
             findAll: sequelizeGetStub,
-            findOne: sequelizeGeValueetStub,
+            findOne: sequelizeGeValueStub,
             destroy: sequelizeDeleteStub,
-            upsert: sequelizeUpsertStub,
             create: sequelizeCreateStub
         });
 

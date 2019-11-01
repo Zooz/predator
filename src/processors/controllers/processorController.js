@@ -12,12 +12,14 @@ module.exports.createProcessor = function (req, res, next) {
 };
 
 module.exports.getAllProcessors = async function (req, res, next) {
-    const { query: { from = 0, limit = 100 } } = req;
+    let { query: { from = 0, limit = 100 } } = req;
     let processors;
     try {
+        from = parseInt(from);
+        limit = parseInt(limit);
         processors = await processorManager.getAllProcessors(from, limit);
+        return res.status(200).json(processors);
     } catch (err) {
         return next(err);
     }
-    return res.status(200).send(processors);
 };

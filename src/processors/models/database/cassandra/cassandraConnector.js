@@ -21,7 +21,7 @@ async function init(cassandraClient) {
 }
 
 async function getAllProcessors(from, limit) {
-    const resultRows = await executeQuery(GET_ALL_PROCESSORS, {}, {});
+    const resultRows = await executeQuery(GET_ALL_PROCESSORS, [], {});
     return _(resultRows).slice(from).take(limit).value();
 }
 
