@@ -29,14 +29,8 @@ function createProcessor(body, headers) {
 }
 
 function getProcessors(from, limit) {
-    let queryString = '?';
-    if (from) {
-        queryString = `from=${from}&`;
-    }
-    if (limit) {
-        queryString = `${queryString}limit=${limit}`;
-    }
-    return request(app).get(`/v1/processors${queryString}`)
+    return request(app).get('/v1/processors')
+        .query({ from, limit })
         .set({ 'Content-Type': 'application/json' })
         .expect(function (res) {
             return res;

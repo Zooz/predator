@@ -69,7 +69,7 @@ describe('Sequelize client tests', function () {
             const offset = 10;
             await sequelizeConnector.getAllProcessors(offset, limit);
             should(sequelizeGetStub.calledOnce).eql(true);
-            should(sequelizeGetStub.args[0][0]).eql({ offset, limit });
+            should(sequelizeGetStub.args[0][0]).containDeep({ offset, limit });
         });
     });
 
