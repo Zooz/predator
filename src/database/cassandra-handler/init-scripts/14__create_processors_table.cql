@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS processors
     javascript         text,
     created_at timestamp,
     updated_at timestamp,
-    PRIMARY KEY (processor_id)
-);
+    PRIMARY KEY (processor_id, created_at))
+    WITH CLUSTERING ORDER BY (created_at ASC);

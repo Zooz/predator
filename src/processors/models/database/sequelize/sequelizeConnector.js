@@ -29,6 +29,11 @@ async function insertProcessor(processorId, processorInfo) {
     return processor.create(params);
 }
 
+async function getAllProcessors(from, limit) {
+    const processorsModel = client.model('processor');
+    return processorsModel.findAll({ offset: from, limit, order: [['created_at', 'DESC']] });
+}
+
 async function initSchemas() {
     const processorsFiles = client.define('processor', {
         processor_id: {
@@ -58,9 +63,4 @@ async function initSchemas() {
         }
     });
     await processorsFiles.sync();
-}
-
-async function getAllProcessors(from, limit) {
-    const processorsModel = client.model('processor');
-    return processorsModel.findAll({ offset: from, limit });
 }
