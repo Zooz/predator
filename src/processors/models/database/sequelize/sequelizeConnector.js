@@ -5,6 +5,7 @@ let client;
 
 module.exports = {
     init,
+    getAllProcessors,
     insertProcessor
 };
 
@@ -26,6 +27,11 @@ async function insertProcessor(processorId, processorInfo) {
         updated_at: Date.now()
     };
     return processor.create(params);
+}
+
+async function getAllProcessors(from, limit) {
+    const processorsModel = client.model('processor');
+    return processorsModel.findAll({ offset: from, limit, order: [['created_at', 'DESC']] });
 }
 
 async function initSchemas() {
