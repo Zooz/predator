@@ -1,12 +1,14 @@
 let logger = require('../../../../common/logger');
 let databaseConfig = require('../../../../config/databaseConfig');
+let _ = require('lodash');
 let client;
 
 const INSERT_PROCESSOR = 'INSERT INTO processors(processor_id, name, description, type, file_url, javascript, created_at, updated_at) values(?,?,?,?,?,?,?,?)';
-
+const GET_ALL_PROCESSORS = 'SELECT * FROM processors';
 module.exports = {
     init,
-    insertProcessor
+    insertProcessor,
+    getAllProcessors
 };
 
 let queryOptions = {
@@ -16,6 +18,11 @@ let queryOptions = {
 
 async function init(cassandraClient) {
     client = cassandraClient;
+}
+
+async function getAllProcessors(from, limit) {
+    const resultRows = await executeQuery(GET_ALL_PROCESSORS, [], {});
+    return _(resultRows).slice(from).take(limit).value();
 }
 
 function insertProcessor(processorId, processorInfo) {

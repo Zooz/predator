@@ -1,11 +1,15 @@
 
 const request = require('supertest'),
     expressApp = require('../../../../src/app');
+
 let app;
+
 module.exports = {
     init,
-    createProcessor
+    createProcessor,
+    getProcessors
 };
+
 async function init() {
     try {
         app = await expressApp();
@@ -20,6 +24,15 @@ function createProcessor(body, headers) {
         .send(body)
         .set(headers)
         .expect(function(res){
+            return res;
+        });
+}
+
+function getProcessors(from, limit) {
+    return request(app).get('/v1/processors')
+        .query({ from, limit })
+        .set({ 'Content-Type': 'application/json' })
+        .expect(function (res) {
             return res;
         });
 }
