@@ -5,7 +5,8 @@ const uuid = require('uuid');
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     common = require('../../common/consts.js'),
-    fileManager = require('../../tests/models/fileManager.js');
+    fileManager = require('../../tests/models/fileManager.js'),
+    { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports.createProcessor = async function (processor) {
     let processorId = uuid.v4();
@@ -29,5 +30,12 @@ module.exports.getAllProcessors = async function(from, limit) {
 };
 
 module.exports.getProcessor = async function(processorId) {
-    return databaseConnector.getProcessor(processorId);
+    const processor = await databaseConnector.getProcessor(processorId);
+    if (processor) {
+        return processor;
+    } else {
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
 };

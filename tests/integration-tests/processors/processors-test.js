@@ -1,4 +1,5 @@
 const should = require('should'),
+    uuid = require('uuid/v4'),
     nock = require('nock');
 
 let validHeaders = { 'Content-Type': 'application/json' };
@@ -79,6 +80,10 @@ describe('Processors api', function() {
                 getProcessorResponse.statusCode.should.eql(200);
                 should(getProcessorResponse.body).containDeep(processorData);
             });
+            it('Get non-existent processor by id', async () => {
+                let getProcessorResponse = await requestSender.getProcessor(uuid(), validHeaders);
+                getProcessorResponse.statusCode.should.eql(404);
+            });
         });
         describe('POST /v1/processors', function () {
             it('Create processor with type file_download', async () => {
@@ -130,55 +135,55 @@ describe('Processors api', function() {
     });
 
     describe('Bad requests', function () {
-        it('Create processor with unknown type', async () => {
-            const requestBody = {
-                name: 'bad-processor',
-                description: 'Processor with unknown type',
-                type: 'unknown'
-            };
-            let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
-            createProcessorResponse.statusCode.should.eql(400);
-        });
-
-        it('Create processor with type file_download and no url', async () => {
-            const requestBody = {
-                name: 'download-me',
-                description: 'Processor with no file url',
-                type: 'file_download'
-            };
-            let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
-            createProcessorResponse.statusCode.should.eql(400);
-        });
-
-        it('Create processor with type raw_javascript and no js', async () => {
-            const requestBody = {
-                name: 'javascript-me',
-                description: 'Processor with no js',
-                type: 'raw_javascript',
-                file_url: 'bad'
-            };
-            let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
-            createProcessorResponse.statusCode.should.eql(400);
+        describe('POST /v1/processors', function () {
+            it('Create processor with unknown type', async () => {
+                const requestBody = {
+                    name: 'bad-processor',
+                    description: 'Processor with unknown type',
+                    type: 'unknown'
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(400);
+            });
+            it('Create processor with type file_download and no url', async () => {
+                const requestBody = {
+                    name: 'download-me',
+                    description: 'Processor with no file url',
+                    type: 'file_download'
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(400);
+            });
+            it('Create processor with type raw_javascript and no js', async () => {
+                const requestBody = {
+                    name: 'javascript-me',
+                    description: 'Processor with no js',
+                    type: 'raw_javascript',
+                    file_url: 'bad'
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(400);
+            });
         });
     });
 
     describe('Sad requests', function () {
-        it('Create processor with type file_download and invalid file_url', async () => {
-            nock('https://authentication.predator.dev').get('/?dl=1').replyWithError('error downloading file');
+        describe('POST /v1/processors', function () {
+            it('Create processor with type file_download and invalid file_url', async () => {
+                nock('https://authentication.predator.dev').get('/?dl=1').replyWithError('error downloading file');
 
-            const requestBody = {
-                name: 'authentication',
-                description: 'Creates authorization token and saves it in the context',
-                type: 'file_download',
-                file_url: 'https://authentication.predator.dev/?dl=1'
-            };
-            let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
-            createProcessorResponse.statusCode.should.eql(422);
-        });
-
-        it('Create processor with type file_download and invalid js syntax', async () => {
-            nock('https://authentication.predator.dev').get('/?dl=1').reply(200,
-                `{
+                const requestBody = {
+                    name: 'authentication',
+                    description: 'Creates authorization token and saves it in the context',
+                    type: 'file_download',
+                    file_url: 'https://authentication.predator.dev/?dl=1'
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(422);
+            });
+            it('Create processor with type file_download and invalid js syntax', async () => {
+                nock('https://authentication.predator.dev').get('/?dl=1').reply(200,
+                    `{
                      const uuid = require('uuid/v4');
                      module.exports = {
                        createAuthToken
@@ -191,15 +196,16 @@ describe('Processors api', function() {
 
                      this is not valid javascript
                  }`
-            );
-            const requestBody = {
-                name: 'authentication',
-                description: 'Creates authorization token and saves it in the context',
-                type: 'file_download',
-                file_url: 'https://authentication.predator.dev/?dl=1'
-            };
-            let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
-            createProcessorResponse.statusCode.should.eql(422);
+                );
+                const requestBody = {
+                    name: 'authentication',
+                    description: 'Creates authorization token and saves it in the context',
+                    type: 'file_download',
+                    file_url: 'https://authentication.predator.dev/?dl=1'
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(422);
+            });
         });
     });
 });
