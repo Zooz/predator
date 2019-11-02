@@ -15,6 +15,7 @@ module.exports.createProcessor = async function (processor) {
         }
         fileManager.validateJavascriptContent(processor.javascript);
         await databaseConnector.insertProcessor(processorId, processor);
+        processor.id = processorId;
         logger.info('Processor saved successfully to database');
         return processor;
     } catch (error) {
@@ -25,4 +26,8 @@ module.exports.createProcessor = async function (processor) {
 
 module.exports.getAllProcessors = async function(from, limit) {
     return databaseConnector.getAllProcessors(from, limit);
+};
+
+module.exports.getProcessor = async function(processorId) {
+    return databaseConnector.getProcessor(processorId);
 };

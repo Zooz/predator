@@ -6,7 +6,8 @@ let client;
 module.exports = {
     init,
     getAllProcessors,
-    insertProcessor
+    insertProcessor,
+    getProcessor
 };
 
 async function init(sequelizeClient) {
@@ -17,7 +18,7 @@ async function init(sequelizeClient) {
 async function insertProcessor(processorId, processorInfo) {
     const processor = client.model('processor');
     let params = {
-        processor_id: processorId,
+        id: processorId,
         name: processorInfo.name,
         description: processorInfo.description,
         type: processorInfo.type,
@@ -34,9 +35,18 @@ async function getAllProcessors(from, limit) {
     return processorsModel.findAll({ offset: from, limit, order: [['created_at', 'DESC']] });
 }
 
+async function getProcessor(processorId) {
+    const processorsModel = client.model('processor');
+    const options = {
+        where: { id: processorId }
+    };
+    let processors = await processorsModel.findAll(options);
+    return processors[0];
+}
+
 async function initSchemas() {
     const processorsFiles = client.define('processor', {
-        processor_id: {
+        id: {
             type: Sequelize.DataTypes.UUID,
             primaryKey: true
         },

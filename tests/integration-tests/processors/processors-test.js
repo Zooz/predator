@@ -10,7 +10,7 @@ describe('Processors api', function() {
     });
 
     describe('Good requests', async function() {
-        describe('GET /v1/processors', async function () {
+        describe('GET /v1/processors', function () {
             let numberOfProcessorsToInsert = 101;
             let jsProcessorsArr = [];
             let processorsInserted = [];
@@ -67,37 +67,22 @@ describe('Processors api', function() {
                 // TODO: when DELETE /processors is implemented, use processorsInserted to empty the table.
             });
         });
-        it('Create processor with type file_download', async () => {
-            nock('https://authentication.predator.dev').get('/?dl=1').reply(200,
-                `{
-                        const uuid = require('uuid/v4');
-                        module.exports = {
-                        createAuthToken
-                        };
-
-                        function createAuthToken(userContext, events, done) {
-                        userContext.vars.token = uuid();
-                        return done();
-                        }
-                    }`
-            );
-
-            const requestBody = {
-                name: 'authentication',
-                description: 'Creates authorization token and saves it in the context',
-                type: 'file_download',
-                file_url: 'https://authentication.predator.dev/?dl=1'
-            };
-            let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
-            createProcessorResponse.statusCode.should.eql(201);
+        describe('GET /v1/processors/{processor_id}', function () {
+            let processorData, processor;
+            before(async function() {
+                processorData = generateRawJSProcessor('mickeys-processor');
+                const processorResponse = await requestSender.createProcessor(processorData, validHeaders);
+                processor = processorResponse.body;
+            });
+            it('Get processor by id', async () => {
+                let getProcessorResponse = await requestSender.getProcessor(processor.id, validHeaders);
+                getProcessorResponse.statusCode.should.eql(200);
+                should(getProcessorResponse.body).containDeep(processorData);
+            });
         });
-
-        it('Create processor with type raw_javascript', async () => {
-            const requestBody = {
-                name: 'authentication',
-                description: 'Creates authorization token and saves it in the context',
-                type: 'raw_javascript',
-                javascript:
+        describe('POST /v1/processors', function () {
+            it('Create processor with type file_download', async () => {
+                nock('https://authentication.predator.dev').get('/?dl=1').reply(200,
                     `{
                         const uuid = require('uuid/v4');
                         module.exports = {
@@ -109,9 +94,38 @@ describe('Processors api', function() {
                         return done();
                         }
                     }`
-            };
-            let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
-            createProcessorResponse.statusCode.should.eql(201);
+                );
+
+                const requestBody = {
+                    name: 'authentication',
+                    description: 'Creates authorization token and saves it in the context',
+                    type: 'file_download',
+                    file_url: 'https://authentication.predator.dev/?dl=1'
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(201);
+            });
+            it('Create processor with type raw_javascript', async () => {
+                const requestBody = {
+                    name: 'authentication',
+                    description: 'Creates authorization token and saves it in the context',
+                    type: 'raw_javascript',
+                    javascript:
+                        `{
+                        const uuid = require('uuid/v4');
+                        module.exports = {
+                        createAuthToken
+                        };
+
+                        function createAuthToken(userContext, events, done) {
+                        userContext.vars.token = uuid();
+                        return done();
+                        }
+                    }`
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(201);
+            });
         });
     });
 

@@ -7,7 +7,8 @@ let app;
 module.exports = {
     init,
     createProcessor,
-    getProcessors
+    getProcessors,
+    getProcessor
 };
 
 async function init() {
@@ -31,6 +32,14 @@ function createProcessor(body, headers) {
 function getProcessors(from, limit) {
     return request(app).get('/v1/processors')
         .query({ from, limit })
+        .set({ 'Content-Type': 'application/json' })
+        .expect(function (res) {
+            return res;
+        });
+}
+
+function getProcessor(processorId) {
+    return request(app).get(`/v1/processors/${processorId}`)
         .set({ 'Content-Type': 'application/json' })
         .expect(function (res) {
             return res;

@@ -1734,20 +1734,21 @@ components:
       - description
       - type
       properties:
+        id:
+          description: Unique processor identifier
+          type: string
+          format: uuid
+          readOnly: true
         name:
           type: string
-          description: The name of the processor file.
+          description: The name of the processor.
           example: Custom javascript for logging
         description:
           type: string
-          description: A description of the processor file.
+          description: A description of the processor.
           example: logs every error (5xx).
         type:
           $ref: '#/components/schemas/processor_type'
-        processor_id:
-          description: Unique processor identifier
-          type: string
-          readOnly: true
         updated_at:
           type: string
           format: date-time
