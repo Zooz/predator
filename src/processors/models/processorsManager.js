@@ -26,3 +26,7 @@ module.exports.createProcessor = async function (processor) {
 module.exports.getAllProcessors = async function(from, limit) {
     return databaseConnector.getAllProcessors(from, limit);
 };
+
+module.exports.deleteProcessor = async function(processorId) {
+    return databaseConnector.deleteProcessor(processorId);
+};

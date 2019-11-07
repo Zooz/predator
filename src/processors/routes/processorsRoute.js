@@ -8,5 +8,6 @@ let processors = require('../controllers/processorController');
 
 router.get('/', swaggerValidator.validate, processors.getAllProcessors);
 router.post('/', swaggerValidator.validate, processors.createProcessor);
+router.delete('/:processor_id', swaggerValidator.validate, processors.deleteProcessor);
 
 module.exports = router;
