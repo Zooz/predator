@@ -6,12 +6,14 @@ let client;
 const INSERT_PROCESSOR = 'INSERT INTO processors(id, name, description, type, file_url, javascript, created_at, updated_at) values(?,?,?,?,?,?,?,?)';
 const GET_ALL_PROCESSORS = 'SELECT * FROM processors';
 const GET_PROCESSOR = 'SELECT * FROM processors where id=?';
+const DELETE_PROCESSOR = 'DELETE FROM processors WHERE id=?';
 
 module.exports = {
     init,
     insertProcessor,
     getAllProcessors,
-    getProcessor
+    getProcessor,
+    deleteProcessor
 };
 
 let queryOptions = {
@@ -31,6 +33,11 @@ async function getAllProcessors(from, limit) {
 async function getProcessor(processorId) {
     const processor = await executeQuery(GET_PROCESSOR, [processorId], queryOptions);
     return processor[0];
+}
+
+function deleteProcessor(processorId) {
+    let params = [processorId];
+    return executeQuery(DELETE_PROCESSOR, params, queryOptions);
 }
 
 async function insertProcessor(processorId, processorInfo) {
