@@ -23,11 +23,13 @@ module.exports.getAllProcessors = async function (req, res, next) {
         return next(err);
     }
 };
-module.exports.deleteProcessor = async function (req, res, next) {
-    let { params: { processor_id: processorId } } = req;
+
+module.exports.getProcessor = async function (req, res, next) {
+    let processor, processorId;
+    processorId = req.params.processor_id;
     try {
-        await processorManager.deleteProcessor(processorId);
-        return res.status(204).json();
+        processor = await processorManager.getProcessor(processorId);
+        return res.status(200).json(processor);
     } catch (err) {
         return next(err);
     }

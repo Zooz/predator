@@ -6,12 +6,10 @@ module.exports = {
     init,
     getAllProcessors,
     insertProcessor,
-    closeConnection,
-    deleteProcessor
+    getProcessor,
+    closeConnection
 };
-async function insertProcessor(jobId, jobInfo) {
-    return databaseConnector.insertProcessor(jobId, jobInfo);
-}
+
 async function init() {
     return databaseConnector.init();
 }
@@ -20,10 +18,14 @@ function closeConnection() {
     return databaseConnector.closeConnection();
 }
 
+async function insertProcessor(processorId, processorInfo) {
+    return databaseConnector.insertProcessor(processorId, processorInfo);
+}
+
 async function getAllProcessors(from, limit) {
     return databaseConnector.getAllProcessors(from, limit);
 }
 
-async function deleteProcessor(processorId) {
-    return databaseConnector.deleteProcessor(processorId);
+async function getProcessor(processorId) {
+    return databaseConnector.getProcessor(processorId);
 }
