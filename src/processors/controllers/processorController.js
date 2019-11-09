@@ -23,3 +23,14 @@ module.exports.getAllProcessors = async function (req, res, next) {
         return next(err);
     }
 };
+
+module.exports.getProcessor = async function (req, res, next) {
+    let processor, processorId;
+    processorId = req.params.processor_id;
+    try {
+        processor = await processorManager.getProcessor(processorId);
+        return res.status(200).json(processor);
+    } catch (err) {
+        return next(err);
+    }
+};

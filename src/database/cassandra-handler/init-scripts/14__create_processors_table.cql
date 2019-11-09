@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS processors
 (
-    processor_id       uuid,
+    id       uuid,
     name               text,
     description        text,
     type               text,
@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS processors
     javascript         text,
     created_at timestamp,
     updated_at timestamp,
-    PRIMARY KEY (processor_id, created_at))
+    PRIMARY KEY (id, created_at))
     WITH CLUSTERING ORDER BY (created_at DESC);

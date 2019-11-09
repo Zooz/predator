@@ -1,10 +1,19 @@
 'use strict';
 const sinon = require('sinon'),
     should = require('should'),
+    uuid = require('uuid/v4'),
     databaseConfig = require('../../../../../src/config/databaseConfig'),
     sequelizeConnector = require('../../../../../src/processors/models/database/sequelize/sequelizeConnector');
 
 describe('Sequelize client tests', function () {
+    const processor = {
+        id: '6063ae04-f832-11e9-aad5-362b9e155667',
+        name: 'processor name',
+        description: 'bla bla bla',
+        type: 'raw_javascript',
+        javascript: 'module.exports = 5;'
+    };
+
     let sandbox,
         sequelizeModelStub,
         sequelizeDeleteStub,
@@ -60,7 +69,7 @@ describe('Sequelize client tests', function () {
         sandbox.restore();
     });
 
-    describe('Get Processors Files', () => {
+    describe('Get Processors', () => {
         it('Validate sequelize passed arguments', async () => {
             const limit = 25;
             const offset = 10;
@@ -70,16 +79,20 @@ describe('Sequelize client tests', function () {
         });
     });
 
+    describe('Get specific Processors', () => {
+        it('Validate sequelize passed arguments', async () => {
+            sequelizeGetStub.returns([processor]);
+
+            const processorId = processor.id;
+            await sequelizeConnector.getProcessor(processorId);
+            should(sequelizeGetStub.calledOnce).eql(true);
+            should(sequelizeGetStub.args[0][0]).containDeep({ where: { id: processorId }});
+        });
+    });
+
     describe('Insert a processor', () => {
         it('Happy flow', async () => {
-            const processor = {
-                processor_id: '6063ae04-f832-11e9-aad5-362b9e155667',
-                name: 'processor name',
-                description: 'bla bla bla',
-                type: 'raw_javascript',
-                javascript: 'module.exports = 5;'
-            };
-            await sequelizeConnector.insertProcessor(processor.processor_id, processor);
+            await sequelizeConnector.insertProcessor(processor.id, processor);
             const paramsArg = sequelizeCreateStub.args[0][0];
             should(sequelizeCreateStub.calledOnce).eql(true);
             should(paramsArg).containDeep(processor);
