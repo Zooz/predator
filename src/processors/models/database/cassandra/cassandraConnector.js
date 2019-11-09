@@ -3,12 +3,15 @@ let databaseConfig = require('../../../../config/databaseConfig');
 let _ = require('lodash');
 let client;
 
-const INSERT_PROCESSOR = 'INSERT INTO processors(processor_id, name, description, type, file_url, javascript, created_at, updated_at) values(?,?,?,?,?,?,?,?)';
+const INSERT_PROCESSOR = 'INSERT INTO processors(id, name, description, type, file_url, javascript, created_at, updated_at) values(?,?,?,?,?,?,?,?)';
 const GET_ALL_PROCESSORS = 'SELECT * FROM processors';
+const GET_PROCESSOR = 'SELECT * FROM processors where id=?';
+
 module.exports = {
     init,
     insertProcessor,
-    getAllProcessors
+    getAllProcessors,
+    getProcessor
 };
 
 let queryOptions = {
@@ -21,13 +24,19 @@ async function init(cassandraClient) {
 }
 
 async function getAllProcessors(from, limit) {
-    const resultRows = await executeQuery(GET_ALL_PROCESSORS, [], {});
+    const resultRows = await executeQuery(GET_ALL_PROCESSORS, [], queryOptions);
     return _(resultRows).slice(from).take(limit).value();
 }
 
-function insertProcessor(processorId, processorInfo) {
+async function getProcessor(processorId) {
+    const processor = await executeQuery(GET_PROCESSOR, [processorId], queryOptions);
+    return processor[0];
+}
+
+async function insertProcessor(processorId, processorInfo) {
     let params = [processorId, processorInfo.name, processorInfo.description, processorInfo.type, processorInfo.file_url, processorInfo.javascript, Date.now(), Date.now()];
-    return executeQuery(INSERT_PROCESSOR, params, queryOptions);
+    const processor = await executeQuery(INSERT_PROCESSOR, params, queryOptions);
+    return processor;
 }
 
 function executeQuery(query, params, queryOptions) {

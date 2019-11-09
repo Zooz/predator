@@ -5,7 +5,8 @@ const uuid = require('uuid');
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     common = require('../../common/consts.js'),
-    fileManager = require('../../tests/models/fileManager.js');
+    fileManager = require('../../tests/models/fileManager.js'),
+    { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports.createProcessor = async function (processor) {
     let processorId = uuid.v4();
@@ -15,6 +16,7 @@ module.exports.createProcessor = async function (processor) {
         }
         fileManager.validateJavascriptContent(processor.javascript);
         await databaseConnector.insertProcessor(processorId, processor);
+        processor.id = processorId;
         logger.info('Processor saved successfully to database');
         return processor;
     } catch (error) {
@@ -25,4 +27,15 @@ module.exports.createProcessor = async function (processor) {
 
 module.exports.getAllProcessors = async function(from, limit) {
     return databaseConnector.getAllProcessors(from, limit);
+};
+
+module.exports.getProcessor = async function(processorId) {
+    const processor = await databaseConnector.getProcessor(processorId);
+    if (processor) {
+        return processor;
+    } else {
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
 };
