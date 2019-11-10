@@ -65,7 +65,33 @@ describe('Processors api', function() {
                 should(processors.length).greaterThanOrEqual(101);
             });
             after(async function() {
-                // TODO: when DELETE /processors is implemented, use processorsInserted to empty the table.
+                const processorIds = processorsInserted.map(processor => processor.body.id);
+                processorIds.forEach(async (processorId) => {
+                    await requestSender.deleteProcessor(processorId);
+                });
+            });
+        });
+        describe('DELETE /v1/processors/{processor_id}', () => {
+            it('insert a processor and then delete it', async () => {
+                const processor = generateRawJSProcessor('some_id');
+                const insertResponse = await requestSender.createProcessor(processor, validHeaders);
+
+                should(insertResponse.statusCode).equal(201);
+                const processorId = insertResponse.body.id;
+
+                const deleteResponse = await requestSender.deleteProcessor(processorId);
+                should(deleteResponse.statusCode).equal(204);
+
+                const getProcessorResponse = await requestSender.getProcessor(processorId);
+                should(getProcessorResponse.statusCode).equal(404);
+            });
+
+            it('delete a processor that doesn\'t exist - expect status code 204', async () => {
+                const processorId = uuid();
+                // making sure that there is no processor with the generated uuid (not taking any chances :) )
+                await requestSender.deleteProcessor(processorId);
+                const deleteResponse = await requestSender.deleteProcessor(processorId);
+                should(deleteResponse.statusCode).equal(204);
             });
         });
         describe('GET /v1/processors/{processor_id}', function () {

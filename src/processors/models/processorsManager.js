@@ -39,3 +39,7 @@ module.exports.getProcessor = async function(processorId) {
         throw error;
     }
 };
+
+module.exports.deleteProcessor = async function (processorId) {
+    return databaseConnector.deleteProcessor(processorId);
+};

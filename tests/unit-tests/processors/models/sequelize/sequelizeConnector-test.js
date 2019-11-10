@@ -86,7 +86,7 @@ describe('Sequelize client tests', function () {
             const processorId = processor.id;
             await sequelizeConnector.getProcessor(processorId);
             should(sequelizeGetStub.calledOnce).eql(true);
-            should(sequelizeGetStub.args[0][0]).containDeep({ where: { id: processorId }});
+            should(sequelizeGetStub.args[0][0]).containDeep({ where: { id: processorId } });
         });
     });
 
@@ -97,6 +97,14 @@ describe('Sequelize client tests', function () {
             should(sequelizeCreateStub.calledOnce).eql(true);
             should(paramsArg).containDeep(processor);
             should(paramsArg).has.properties(['created_at', 'updated_at']);
+        });
+    });
+
+    describe('Delete processor', () => {
+        it('validate query', async () => {
+            const processorId = 'A-B-C';
+            await sequelizeConnector.deleteProcessor(processorId);
+            should(sequelizeDeleteStub.args[0][0]).deepEqual({ where: { id: processorId } });
         });
     });
 });
