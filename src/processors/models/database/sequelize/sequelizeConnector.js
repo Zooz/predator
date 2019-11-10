@@ -7,7 +7,8 @@ module.exports = {
     init,
     getAllProcessors,
     insertProcessor,
-    getProcessor
+    getProcessor,
+    deleteProcessor
 };
 
 async function init(sequelizeClient) {
@@ -42,6 +43,15 @@ async function getProcessor(processorId) {
     };
     let processors = await processorsModel.findAll(options);
     return processors[0];
+}
+
+async function deleteProcessor(processorId) {
+    const processorsModel = client.model('processor');
+    return processorsModel.destroy({
+        where: {
+            id: processorId
+        }
+    });
 }
 
 async function initSchemas() {

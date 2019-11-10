@@ -8,7 +8,8 @@ module.exports = {
     init,
     createProcessor,
     getProcessors,
-    getProcessor
+    getProcessor,
+    deleteProcessor
 };
 
 async function init() {
@@ -32,6 +33,13 @@ function createProcessor(body, headers) {
 function getProcessors(from, limit) {
     return request(app).get('/v1/processors')
         .query({ from, limit })
+        .set({ 'Content-Type': 'application/json' })
+        .expect(function (res) {
+            return res;
+        });
+}
+function deleteProcessor(processorId) {
+    return request(app).delete(`/v1/processors/${processorId}`)
         .set({ 'Content-Type': 'application/json' })
         .expect(function (res) {
             return res;
