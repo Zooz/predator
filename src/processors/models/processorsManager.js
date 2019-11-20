@@ -63,7 +63,7 @@ module.exports.updateDownloadJSProcessor = async function(processorId) {
         logger.error(error, 'Error occurred trying to re-download processor file');
         return Promise.reject(error);
     }
-}
+};
 
 function generateProcessorNotFoundError() {
     const error = new Error(ERROR_MESSAGES.NOT_FOUND);

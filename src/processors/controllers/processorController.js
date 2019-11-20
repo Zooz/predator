@@ -50,7 +50,7 @@ module.exports.updateDownloadJSProcessor = async function (req, res, next) {
     try {
         await processorManager.updateDownloadJSProcessor(processorId);
         res.status(200).json();
-    } catch(e) {
+    } catch (e) {
         next(e);
     }
-}
+};

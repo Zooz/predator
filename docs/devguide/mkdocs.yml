@@ -4,7 +4,7 @@ repo_url: https://github.com/Zooz/predator
 edit_uri: https://github.com/Zooz/predator/blob/master/docs/devguide/docs/
 site_description: Distributed open source performance testing platform for APIs
 site_author: ZOOZ
-google_analytics: ['UA-40865650-3', 'predator.dev']
+google_analytics: ['UA-40865650-4', 'auto']
 
 nav:
   - About: about.md
