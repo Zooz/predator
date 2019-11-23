@@ -43,21 +43,24 @@ module.exports.deleteProcessor = async function (processorId) {
     return databaseConnector.deleteProcessor(processorId);
 };
 
-module.exports.updateDownloadJSProcessor = async function(processorId) {
+module.exports.redownloadJSProcessor = async function(processorId) {
     const processor = await databaseConnector.getProcessor(processorId);
+    let error;
+    if (!processor) {
+        error = generateProcessorNotFoundError();
+        throw error;
+    }
+    if (!processor.file_url) {
+        error = new Error('option not available for processor with type: raw_javascript');
+        error.statusCode = 400;
+        throw error;
+    }
     try {
-        if (!processor) {
-            const error = generateProcessorNotFoundError();
-            throw error;
-        }
-        if (!processor.file_url) {
-            throw new Error('option not available for static js content processor');
-        }
         let newJavascriptProcessorContent = await fileManager.downloadFile(processor.file_url);
         fileManager.validateJavascriptContent(newJavascriptProcessorContent);
         processor.javascript = newJavascriptProcessorContent;
-        await databaseConnector.insertProcessor(processorId, processor);
-        logger.info('Processor javascript update successfully to database');
+        await databaseConnector.updateProcessor(processorId, processor);
+        logger.info('Processor javascript updated successfully to database');
         return processor;
     } catch (error) {
         logger.error(error, 'Error occurred trying to re-download processor file');

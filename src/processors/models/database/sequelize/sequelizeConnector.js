@@ -8,7 +8,8 @@ module.exports = {
     getAllProcessors,
     insertProcessor,
     getProcessor,
-    deleteProcessor
+    deleteProcessor,
+    updateProcessor
 };
 
 async function init(sequelizeClient) {
@@ -52,6 +53,12 @@ async function deleteProcessor(processorId) {
             id: processorId
         }
     });
+}
+
+async function updateProcessor(processorId, updatedProcessor) {
+    const processorsModel = client.model('processor');
+    const { name, type, description, file_url: fileUrl, javascript } = updatedProcessor;
+    return processorsModel.update({ name, type, description, file_url: fileUrl, javascript, updated_at: Date.now() }, { where: { id: processorId } });
 }
 
 async function initSchemas() {
