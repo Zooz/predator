@@ -1037,6 +1037,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:
@@ -1230,6 +1236,12 @@ paths:
                 $ref: '#/components/schemas/error_response'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
           content:
             application/json:
               schema:
