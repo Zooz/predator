@@ -6,7 +6,7 @@ const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     common = require('../../common/consts.js'),
     fileManager = require('../../tests/models/fileManager.js'),
-    { ERROR_MESSAGES } = require('../../common/consts');
+    { ERROR_MESSAGES, PROCESSOR_TYPE_FILE_DOWNLOAD, PROCESSOR_TYPE_RAW_JAVASCRIPT } = require('../../common/consts');
 
 module.exports.createProcessor = async function (processor) {
     let processorId = uuid.v4();
@@ -25,11 +25,11 @@ module.exports.createProcessor = async function (processor) {
     }
 };
 
-module.exports.getAllProcessors = async function(from, limit) {
+module.exports.getAllProcessors = async function (from, limit) {
     return databaseConnector.getAllProcessors(from, limit);
 };
 
-module.exports.getProcessor = async function(processorId) {
+module.exports.getProcessor = async function (processorId) {
     const processor = await databaseConnector.getProcessor(processorId);
     if (processor) {
         return processor;
@@ -43,7 +43,7 @@ module.exports.deleteProcessor = async function (processorId) {
     return databaseConnector.deleteProcessor(processorId);
 };
 
-module.exports.redownloadJSProcessor = async function(processorId) {
+module.exports.redownloadJSProcessor = async function (processorId) {
     const processor = await databaseConnector.getProcessor(processorId);
     let error;
     if (!processor) {
@@ -51,7 +51,7 @@ module.exports.redownloadJSProcessor = async function(processorId) {
         throw error;
     }
     if (!processor.file_url) {
-        error = new Error('option not available for processor with type: raw_javascript');
+        error = new Error(`option not available for processor with type: ${PROCESSOR_TYPE_RAW_JAVASCRIPT}`);
         error.statusCode = 400;
         throw error;
     }
@@ -66,6 +66,25 @@ module.exports.redownloadJSProcessor = async function(processorId) {
         logger.error(error, 'Error occurred trying to re-download processor file');
         return Promise.reject(error);
     }
+};
+
+module.exports.updateProcessor = async function (processorId, processor, shouldDownloadFile) {
+    const oldProcessor = await databaseConnector.getProcessor(processorId);
+    if (!oldProcessor) {
+        throw generateProcessorNotFoundError();
+    }
+    processor.created_at = oldProcessor.created_at;
+    if (processor.type === PROCESSOR_TYPE_FILE_DOWNLOAD) {
+        if (shouldDownloadFile) {
+            let newJavascript = await fileManager.downloadFile(processor.file_url);
+            fileManager.validateJavascriptContent(newJavascript);
+            processor.javascript = newJavascript;
+        } else {
+            processor.javascript = oldProcessor.javascript;
+        }
+    }
+    await databaseConnector.updateProcessor(processorId, processor);
+    return processor;
 };
 
 function generateProcessorNotFoundError() {

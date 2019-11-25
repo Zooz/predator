@@ -54,3 +54,13 @@ module.exports.redownloadJSProcessor = async function (req, res, next) {
         next(e);
     }
 };
+
+module.exports.updateProcessor = async function (req, res, next) {
+    let { body: updatedProcessor, params: { processor_id: processorId }, query: { dl = false } } = req;
+    try {
+        const processor = await processorManager.updateProcessor(processorId, updatedProcessor, dl);
+        res.status(200).json(processor);
+    } catch (e) {
+        next(e);
+    }
+};

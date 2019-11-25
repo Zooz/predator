@@ -10,6 +10,7 @@ module.exports = {
     getProcessors,
     getProcessor,
     deleteProcessor,
+    updateProcessor,
     redownloadJSProcessor
 };
 
@@ -58,6 +59,16 @@ function getProcessor(processorId) {
 function redownloadJSProcessor(processorId) {
     return request(app).post(`/v1/processors/${processorId}/download`)
         .send({})
+        .set({ 'Content-Type': 'application/json' })
+        .expect(function(res) {
+            return res;
+        });
+}
+
+function updateProcessor(processorId, processor, dl) {
+    return request(app).put(`/v1/processors/${processorId}`)
+        .send(processor)
+        .query({ dl })
         .set({ 'Content-Type': 'application/json' })
         .expect(function(res) {
             return res;

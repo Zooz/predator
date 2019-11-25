@@ -50,7 +50,7 @@ async function insertProcessor(processorId, processorInfo) {
 
 async function updateProcessor(processorId, updatedProcessor) {
     const { name, description, type, file_url: fileUrl, javascript, created_at: createdAt } = updatedProcessor;
-    const params = [ name, description, type, fileUrl, javascript, Date.now(), processorId, createdAt ];
+    const params = [ name, description, type, fileUrl, javascript, Date.now(), processorId, createdAt.getTime() ];
     return executeQuery(UPDATE_PROCESSOR, params, {});
 }
 
