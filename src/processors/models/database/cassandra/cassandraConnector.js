@@ -7,13 +7,15 @@ const INSERT_PROCESSOR = 'INSERT INTO processors(id, name, description, type, fi
 const GET_ALL_PROCESSORS = 'SELECT * FROM processors';
 const GET_PROCESSOR = 'SELECT * FROM processors where id=?';
 const DELETE_PROCESSOR = 'DELETE FROM processors WHERE id=?';
+const UPDATE_PROCESSOR = 'UPDATE processors SET name=?, description=?, type=?, file_url=?, javascript=?, updated_at=?  WHERE id=? AND created_at=? IF EXISTS';
 
 module.exports = {
     init,
     insertProcessor,
     getAllProcessors,
     getProcessor,
-    deleteProcessor
+    deleteProcessor,
+    updateProcessor
 };
 
 let queryOptions = {
@@ -44,6 +46,12 @@ async function insertProcessor(processorId, processorInfo) {
     let params = [processorId, processorInfo.name, processorInfo.description, processorInfo.type, processorInfo.file_url, processorInfo.javascript, Date.now(), Date.now()];
     const processor = await executeQuery(INSERT_PROCESSOR, params, queryOptions);
     return processor;
+}
+
+async function updateProcessor(processorId, updatedProcessor) {
+    const { name, description, type, file_url: fileUrl, javascript, created_at: createdAt } = updatedProcessor;
+    const params = [ name, description, type, fileUrl, javascript, Date.now(), processorId, createdAt ];
+    return executeQuery(UPDATE_PROCESSOR, params, {});
 }
 
 function executeQuery(query, params, queryOptions) {

@@ -44,3 +44,13 @@ module.exports.deleteProcessor = async function (req, res, next) {
         return next(err);
     }
 };
+
+module.exports.redownloadJSProcessor = async function (req, res, next) {
+    let { params: { processor_id: processorId } } = req;
+    try {
+        await processorManager.redownloadJSProcessor(processorId);
+        res.status(204).json();
+    } catch (e) {
+        next(e);
+    }
+};

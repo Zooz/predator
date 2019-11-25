@@ -8,6 +8,7 @@ let processors = require('../controllers/processorController');
 
 router.get('/', swaggerValidator.validate, processors.getAllProcessors);
 router.post('/', swaggerValidator.validate, processors.createProcessor);
+router.post('/:processor_id/download', swaggerValidator.validate, processors.redownloadJSProcessor);
 router.get('/:processor_id', swaggerValidator.validate, processors.getProcessor);
 router.delete('/:processor_id', swaggerValidator.validate, processors.deleteProcessor);
 

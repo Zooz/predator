@@ -71,6 +71,34 @@ describe('Processors api', function() {
                 });
             });
         });
+        describe('POST /v1/processors/{processor_id}/download', () => {
+            it('Update successfully processor content', async function() {
+                let processorId;
+                const uri = '/some-processor-name';
+                const url = 'https://fakesite.com';
+                const processor = {
+                    name: 'some-user-processor',
+                    description: 'This is a description',
+                    type: 'file_download',
+                    file_url: url + uri
+                };
+                const oldContent = 'module.exports=5;';
+                nock(url).get(uri).reply(200, oldContent);
+                const insertProcessorResponse = await requestSender.createProcessor(processor, validHeaders);
+                should(insertProcessorResponse.statusCode).equal(201);
+                should(insertProcessorResponse.body.javascript).equal(oldContent);
+                processorId = insertProcessorResponse.body.id;
+
+                const newContent = 'module.exports = 9;';
+                nock(url).get(uri).reply(200, newContent);
+                const updatedProcessorResponse = await requestSender.redownloadJSProcessor(processorId);
+                should(updatedProcessorResponse.statusCode).equal(204);
+
+                const getProcessorResponse = await requestSender.getProcessor(processorId);
+                should(getProcessorResponse.statusCode).equal(200);
+                should(getProcessorResponse.body.javascript).equal(newContent);
+            });
+        });
         describe('DELETE /v1/processors/{processor_id}', () => {
             it('insert a processor and then delete it', async () => {
                 const processor = generateRawJSProcessor('some_id');
@@ -231,6 +259,43 @@ describe('Processors api', function() {
                 };
                 let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
+            });
+        });
+        describe('POST /processors/{processor_id}/download', () => {
+            it('try for a raw_javascript processor', async function() {
+                const rawJSProcessor = generateRawJSProcessor('name');
+                const createProcessorResponse = await requestSender.createProcessor(rawJSProcessor, validHeaders);
+                should(createProcessorResponse.statusCode).equal(201);
+                const processorId = createProcessorResponse.body.id;
+                const response = await requestSender.redownloadJSProcessor(processorId);
+                should(response.statusCode).equal(400);
+            });
+
+            it('processor doesn\'t exist', async function() {
+                const processorId = uuid();
+                const requestResponse = await requestSender.redownloadJSProcessor(processorId);
+                should(requestResponse.statusCode).equal(404);
+            });
+
+            it('failed download', async function() {
+                let processorId;
+                const uri = '/some-processor-name';
+                const url = 'https://fakesite.com';
+                const processor = {
+                    name: 'some-user-processor',
+                    description: 'This is a description',
+                    type: 'file_download',
+                    file_url: url + uri
+                };
+
+                nock(url).get(uri).reply(200, 'module.exports = 5;');
+                const insertProcessorResponse = await requestSender.createProcessor(processor, validHeaders);
+                should(insertProcessorResponse.statusCode).equal(201);
+                processorId = insertProcessorResponse.body.id;
+
+                nock(url).get(uri).reply(500, {});
+                const updatedProcessorResponse = await requestSender.redownloadJSProcessor(processorId);
+                should(updatedProcessorResponse.statusCode).equal(422);
             });
         });
     });

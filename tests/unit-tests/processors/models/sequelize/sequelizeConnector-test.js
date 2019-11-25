@@ -20,7 +20,8 @@ describe('Sequelize client tests', function () {
         sequelizeDefineStub,
         sequelizeGeValueStub,
         sequelizeGetStub,
-        sequelizeCreateStub;
+        sequelizeCreateStub,
+        sequelizeUpdateStub;
 
     before(async () => {
         sandbox = sinon.sandbox.create();
@@ -38,6 +39,7 @@ describe('Sequelize client tests', function () {
         sequelizeDeleteStub = sandbox.stub();
         sequelizeGeValueStub = sandbox.stub();
         sequelizeCreateStub = sandbox.stub();
+        sequelizeUpdateStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
             hasMany: () => {
@@ -105,6 +107,27 @@ describe('Sequelize client tests', function () {
             const processorId = 'A-B-C';
             await sequelizeConnector.deleteProcessor(processorId);
             should(sequelizeDeleteStub.args[0][0]).deepEqual({ where: { id: processorId } });
+        });
+    });
+
+    describe('Updating processor', () => {
+        it('updating javascript content', async () => {
+            const processorId = 'A-C-B';
+            const updatedProcessor = {
+                name: 'name',
+                type: 'file_download',
+                description: 'bla-bla',
+                file_url: 'https://fakeurl.com',
+                javascript: 'module.exports=9;',
+                updated_at: Date.now(),
+                created_at: Date.now()
+            };
+            sequelizeModelStub.returns({ update: sequelizeUpdateStub });
+            await sequelizeConnector.updateProcessor(processorId, updatedProcessor);
+            should(sequelizeUpdateStub.calledOnce).equal(true);
+            should(sequelizeUpdateStub.args[0][0].updated_at).greaterThanOrEqual(updatedProcessor.updated_at);
+            should(sequelizeUpdateStub.args[0][0].javascript).equal(updatedProcessor.javascript);
+            should(sequelizeUpdateStub.args[0][1].where.id).equal(processorId);
         });
     });
 });

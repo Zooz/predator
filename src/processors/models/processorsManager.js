@@ -34,8 +34,7 @@ module.exports.getProcessor = async function(processorId) {
     if (processor) {
         return processor;
     } else {
-        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
-        error.statusCode = 404;
+        const error = generateProcessorNotFoundError();
         throw error;
     }
 };
@@ -43,3 +42,34 @@ module.exports.getProcessor = async function(processorId) {
 module.exports.deleteProcessor = async function (processorId) {
     return databaseConnector.deleteProcessor(processorId);
 };
+
+module.exports.redownloadJSProcessor = async function(processorId) {
+    const processor = await databaseConnector.getProcessor(processorId);
+    let error;
+    if (!processor) {
+        error = generateProcessorNotFoundError();
+        throw error;
+    }
+    if (!processor.file_url) {
+        error = new Error('option not available for processor with type: raw_javascript');
+        error.statusCode = 400;
+        throw error;
+    }
+    try {
+        let newJavascriptProcessorContent = await fileManager.downloadFile(processor.file_url);
+        fileManager.validateJavascriptContent(newJavascriptProcessorContent);
+        processor.javascript = newJavascriptProcessorContent;
+        await databaseConnector.updateProcessor(processorId, processor);
+        logger.info('Processor javascript updated successfully to database');
+        return processor;
+    } catch (error) {
+        logger.error(error, 'Error occurred trying to re-download processor file');
+        return Promise.reject(error);
+    }
+};
+
+function generateProcessorNotFoundError() {
+    const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+    error.statusCode = 404;
+    return error;
+}

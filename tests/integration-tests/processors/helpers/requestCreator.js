@@ -9,7 +9,8 @@ module.exports = {
     createProcessor,
     getProcessors,
     getProcessor,
-    deleteProcessor
+    deleteProcessor,
+    redownloadJSProcessor
 };
 
 async function init() {
@@ -50,6 +51,15 @@ function getProcessor(processorId) {
     return request(app).get(`/v1/processors/${processorId}`)
         .set({ 'Content-Type': 'application/json' })
         .expect(function (res) {
+            return res;
+        });
+}
+
+function redownloadJSProcessor(processorId) {
+    return request(app).post(`/v1/processors/${processorId}/download`)
+        .send({})
+        .set({ 'Content-Type': 'application/json' })
+        .expect(function(res) {
             return res;
         });
 }
