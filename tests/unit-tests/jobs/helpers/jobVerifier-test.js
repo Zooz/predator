@@ -74,8 +74,14 @@ describe('Jobs verifier tests', function () {
             should(nextStub.args[0][0]).eql(undefined);
         });
 
-        it('Run immediately is true and cron expression exist, should pass', async () => {
-            req = { body: { run_immediately: true, cron_expression: '* * *' } };
+        it('Run immediately is true and cron expression exist and enabled is false, should pass', async () => {
+            req = { body: { run_immediately: true, cron_expression: '* * *', enabled: false } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('Run immediately is true and cron expression exist and enabled is true, should pass', async () => {
+            req = { body: { run_immediately: true, cron_expression: '* * *', enabled: true } };
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
@@ -98,11 +104,25 @@ describe('Jobs verifier tests', function () {
             should(nextStub.args[0][0]).eql(undefined);
         });
 
-        it('Run immediately does not exits and cron expression does not exist, should pass', async () => {
+        it('Run immediately does not exits and cron expression does not exist, should fail', async () => {
             req = { body: {} };
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0].message).eql('Please provide run_immediately or cron_expression in order to schedule a job');
             should(nextStub.args[0][0].statusCode).eql(400);
+        });
+
+        it('Run immediately exists with enabled false, should fail', async () => {
+            req = { body: { run_immediately: true, enabled: false } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0].message).eql('It is impossible to disable job without cron_expression');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+
+        it('Run immediately exists with enabled true, should pass', async () => {
+            req = { body: { run_immediately: true, enabled: true } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
         });
     });
 });

@@ -8,6 +8,10 @@ module.exports.verifyJobBody = (req, res, next) => {
         errorToThrow = new Error('Please provide run_immediately or cron_expression in order to schedule a job');
         errorToThrow.statusCode = 400;
     }
+    if (jobBody.enabled === false && !jobBody.cron_expression) {
+        errorToThrow = new Error('It is impossible to disable job without cron_expression');
+        errorToThrow.statusCode = 400;
+    }
     next(errorToThrow);
 };
 

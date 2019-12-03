@@ -193,7 +193,8 @@ describe('Update scheduled job', function () {
                     arrival_rate: 10,
                     ramp_to: 20,
                     duration: 30,
-                    environment: 'updated env'
+                    environment: 'updated env',
+                    enabled: false
                 },
                 {
                     'Content-Type': 'application/json'
@@ -215,7 +216,8 @@ describe('Update scheduled job', function () {
                 ramp_to: 20,
                 arrival_rate: 10,
                 duration: 30,
-                environment: 'updated env'
+                environment: 'updated env',
+                enabled: false
             });
         });
 
@@ -273,6 +275,15 @@ describe('Update scheduled job', function () {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(200);
+        });
+
+        it('Try to update enabled to not boolean', async () => {
+            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { enabled: 'NOT_BOOLEAN' }, {
+                'Content-Type': 'application/json'
+            });
+            updateJobResponse.statusCode.should.eql(400);
+            updateJobResponse.body.should.eql({ message: 'Input validation error',
+                validation_errors: [ 'body/enabled should be boolean' ] });
         });
 
         it('Delete job', async () => {

@@ -119,6 +119,72 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                 });
 
+                describe('Create cron job which is disabled, should not run, enable the job, should run', () => {
+                    let createJobResponse;
+                    let getJobsFromService;
+                    let numberOfCallsToRunTest = 0;
+                    beforeEach(() => {
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
+                            .reply(200, () => {
+                                numberOfCallsToRunTest++;
+                                return {
+                                    metadata: { name: 'jobName', uid: 'uid' },
+                                    namespace: kubernetesConfig.kubernetesNamespace
+                                };
+                            });
+                    });
+
+                    it('Create job which is disabled', async () => {
+                        let jobBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: false,
+                            cron_expression: '* * * * * *',
+                            enabled: false
+                        };
+
+                        createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                    });
+
+                    it('Get the job', async () => {
+                        jobId = createJobResponse.body.id;
+                        getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(200);
+                        should(getJobsFromService.body.enabled).eql(false);
+                    });
+
+                    it('Wait 4 seconds to let scheduler run the job', (done) => {
+                        setTimeout(done, 4000);
+                    });
+
+                    it('Verify job did not run', () => {
+                        should(numberOfCallsToRunTest).eql(0);
+                    });
+
+                    it('Enable job', () => {
+                        schedulerRequestCreator.updateJob(jobId, { enabled: true }, {
+                            'Content-Type': 'application/json'
+                        });
+                    });
+
+                    it('Wait 4 seconds to let scheduler run the job', (done) => {
+                        setTimeout(done, 4000);
+                    });
+
+                    it('Verify job did run', () => {
+                        should(numberOfCallsToRunTest).greaterThanOrEqual(1);
+                    });
+                });
+
                 describe('Create one time job with max virtual users, should create job with the right parameters and run it, finally stop and delete it', () => {
                     let createJobResponse;
                     let getJobsFromService;

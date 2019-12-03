@@ -104,7 +104,8 @@ describe('Sequelize client tests', function () {
                 max_virtual_users: 100,
                 notes: 'some nice notes',
                 proxy_url: 'http://proxy.com',
-                debug: '*'
+                debug: '*',
+                enabled: true
             });
 
             should(sequelizeCreateStub.args[0][0]).eql({
@@ -120,6 +121,7 @@ describe('Sequelize client tests', function () {
                 'max_virtual_users': 100,
                 'proxy_url': 'http://proxy.com',
                 'debug': '*',
+                'enabled': true,
                 'webhooks': [{
                     'id': 'UUIDSTUB',
                     'url': 'http://zooz.com'
@@ -171,7 +173,8 @@ describe('Sequelize client tests', function () {
                 'parallelism': 4,
                 'max_virtual_users': 100,
                 'proxy_url': 'http://proxy.com',
-                'debug': '*'
+                'debug': '*',
+                'enabled': undefined
             });
         });
 
@@ -470,7 +473,8 @@ describe('Sequelize client tests', function () {
                 max_virtual_users: 500,
                 parallelism: 3,
                 proxy_url: 'http://proxy.com',
-                debug: '*'
+                debug: '*',
+                enabled: false
             });
 
             should(sequelizeUpdateStub.args[0][0]).eql({
@@ -483,7 +487,8 @@ describe('Sequelize client tests', function () {
                 'max_virtual_users': 500,
                 'parallelism': 3,
                 'proxy_url': 'http://proxy.com',
-                'debug': '*'
+                'debug': '*',
+                'enabled': false
             });
 
             should(sequelizeUpdateStub.args[0][1]).eql({

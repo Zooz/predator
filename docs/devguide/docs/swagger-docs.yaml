@@ -1473,6 +1473,11 @@ components:
           type: string
           description: set to * in order to print all requests and responeses of the runner
           example: test
+        enabled:
+          type: boolean
+          description: Relevant for schculed jobs, wether this job is enabled or disabled.
+          example: true
+          default: true
     job_response:
       allOf:
       - $ref: '#/components/schemas/job'

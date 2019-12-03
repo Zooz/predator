@@ -30,6 +30,24 @@ describe('Create job global tests', function () {
                 });
         });
 
+        it('Create a job without cron_expression with enable=false parameters, should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_rate: 1,
+                duration: 1,
+                environment: 'test',
+                run_immediately: true,
+                enabled: false
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({ message: 'It is impossible to disable job without cron_expression' });
+                });
+        });
+
         it('Create a job with 0 duration, arrival_rate, max_virtual_users, ramp_to and parallelism should return error', () => {
             let illegalBody = {
                 test_id: uuid.v4(),
