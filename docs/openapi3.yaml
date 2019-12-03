@@ -1479,7 +1479,7 @@ components:
           example: test
         enabled:
           type: boolean
-          description: Relevant for schculed jobs, wether this job is enabled or disabled.
+          description: Ability to enable/disable scheduled jobs.
           example: true
           default: true
     job_response:
