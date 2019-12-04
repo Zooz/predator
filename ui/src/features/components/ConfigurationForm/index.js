@@ -62,7 +62,7 @@ class Form extends React.Component {
                 {
                     name: 'delay_runner_ms',
                     key: 'delay_runner_ms',
-                    floatingLabelText: 'delay runner ms',
+                    floatingLabelText: 'Delay runner ms',
                     info: 'Delay the predator runner from sending http requests (ms)',
                 },
                 {

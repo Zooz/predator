@@ -15,6 +15,7 @@ Below are variables Predator can be configured with.
 | DEFAULT_EMAIL_ADDRESS       | default_email_address   | Default email to send final report to, address can be configured                        	| ✓                        	|                             	|
 | DEFAULT_WEBHOOK_URL         | default_webhook_url    	| Default webhook url to send live report statistics to                                   	| ✓                        	|                             	|
 | ALLOW_INSECURE_TLS          | allow_insecure_tls    	| If true, don't fail requests on unverified server certificate errors                      | ✓                        	| false                         |
+| DELAY_RUNNER_MS             | delay_runner_ms    	    | Delay the predator runner from sending http requests (ms)                                 | ✓                        	|                               |
 
 ## Database
 | Environment Variable 	| Description                                                                     	| Configurable from UI/API 	| Default value 	|
