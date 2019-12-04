@@ -157,7 +157,8 @@ function createResponse(jobId, jobBody, runId) {
         environment: jobBody.environment,
         notes: jobBody.notes,
         proxy_url: jobBody.proxy_url,
-        debug: jobBody.debug
+        debug: jobBody.debug,
+        enabled: jobBody.enabled !== undefined ? jobBody.enabled : true
     };
 
     Object.keys(response).forEach(key => {
@@ -247,10 +248,14 @@ function addCron(jobId, job, cronExpression, configData) {
     const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     let scheduledJob = new CronJob(cronExpression, async function () {
         try {
-            let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
-            let runId = Date.now();
-            let jobSpecificPlatformConfig = createJobRequest(jobId, runId, job, latestDockerImage, configData);
-            await jobConnector.runJob(jobSpecificPlatformConfig);
+            if (job.enabled === false) {
+                logger.info(`Skipping job with id: ${jobId} as it's currently disabled`);
+            } else {
+                let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
+                let runId = Date.now();
+                let jobSpecificPlatformConfig = createJobRequest(jobId, runId, job, latestDockerImage, configData);
+                await jobConnector.runJob(jobSpecificPlatformConfig);
+            }
         } catch (error) {
             logger.error({ id: jobId, error: error }, 'Unable to run scheduled job.');
         }

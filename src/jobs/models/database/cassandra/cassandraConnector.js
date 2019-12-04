@@ -2,7 +2,7 @@ let logger = require('../../../../common/logger');
 let databaseConfig = require('../../../../config/databaseConfig');
 let client;
 
-const INSERT_JOB = 'INSERT INTO jobs(id, test_id, arrival_rate, cron_expression, duration, emails, environment, ramp_to, webhooks, parallelism, max_virtual_users, notes, proxy_url, debug) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+const INSERT_JOB = 'INSERT INTO jobs(id, test_id, arrival_rate, cron_expression, duration, emails, environment, ramp_to, webhooks, parallelism, max_virtual_users, notes, proxy_url, debug, enabled) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 const GET_JOBS = 'SELECT * FROM jobs';
 const DELETE_JOB = 'DELETE FROM jobs WHERE id=?';
 const GET_JOB = 'SELECT * FROM jobs WHERE id=?';
@@ -41,7 +41,7 @@ function getJob(jobId) {
 }
 
 function insertJob(jobId, jobInfo) {
-    let params = [jobId, jobInfo.test_id, jobInfo.arrival_rate, jobInfo.cron_expression, jobInfo.duration, jobInfo.emails, jobInfo.environment, jobInfo.ramp_to, jobInfo.webhooks, jobInfo.parallelism, jobInfo.max_virtual_users, jobInfo.notes, jobInfo.proxy_url, jobInfo.debug];
+    let params = [jobId, jobInfo.test_id, jobInfo.arrival_rate, jobInfo.cron_expression, jobInfo.duration, jobInfo.emails, jobInfo.environment, jobInfo.ramp_to, jobInfo.webhooks, jobInfo.parallelism, jobInfo.max_virtual_users, jobInfo.notes, jobInfo.proxy_url, jobInfo.debug, jobInfo.enabled];
     return executeQuery(INSERT_JOB, params, queryOptions);
 }
 

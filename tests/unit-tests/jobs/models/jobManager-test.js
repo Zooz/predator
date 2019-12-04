@@ -84,6 +84,17 @@ const jobBodyWithoutRampTo = {
     webhooks: ['dina', 'niv', 'eli']
 };
 
+const jobBodyWithEnabledFalse = {
+    test_id: TEST_ID,
+    arrival_rate: 1,
+    duration: 1,
+    run_immediately: true,
+    emails: ['dina@niv.eli'],
+    environment: 'test',
+    webhooks: ['dina', 'niv', 'eli'],
+    enabled: false
+};
+
 const jobBodyWithCustomEnvVars = {
     test_id: TEST_ID,
     arrival_rate: 1,
@@ -216,6 +227,7 @@ describe('Manager tests', function () {
                 arrival_rate: 1,
                 duration: 1,
                 max_virtual_users: 100,
+                enabled: true,
                 'custom_env_vars':
                     {
                         'KEY1': 'A',
@@ -356,6 +368,26 @@ describe('Manager tests', function () {
             jobConnectorRunJobStub.callCount.should.eql(1);
         });
 
+        it('Simple request with enabled as false', async () => {
+            jobConnectorRunJobStub.resolves({ id: 'run_id' });
+            cassandraInsertStub.resolves({ success: 'success' });
+            let expectedResult = {
+                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                environment: 'test',
+                emails: ['dina@niv.eli'],
+                webhooks: ['dina', 'niv', 'eli'],
+                arrival_rate: 1,
+                duration: 1,
+                enabled: false
+            };
+
+            let jobResponse = await manager.createJob(jobBodyWithEnabledFalse);
+            jobResponse.should.containEql(expectedResult);
+            cassandraInsertStub.callCount.should.eql(1);
+            jobConnectorRunJobStub.callCount.should.eql(1);
+        });
+
         it('Fail to save job to cassandra', function () {
             cassandraInsertStub.rejects({ error: 'cassandra error' });
 
@@ -413,6 +445,49 @@ describe('Manager tests', function () {
                 setTimeout(async () => {
                     try {
                         await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+                        loggerErrorStub.callCount.should.eql(0);
+                        done();
+                    } catch (error) {
+                        done(new Error(error));
+                    }
+                }, 3000);
+            });
+        });
+
+        describe('Request with cron expression and enabled=false should save new job to cassandra, deploy the job and return the job id and the job configuration and not run the job', function () {
+            before(() => {
+                jobConnectorRunJobStub.resolves({});
+            });
+
+            it('Validate response', function () {
+                cassandraInsertStub.resolves({ success: 'success' });
+                cassandraDeleteStub.resolves({});
+                let expectedResult = {
+                    'cron_expression': '* * * * * *',
+                    ramp_to: '1',
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                    test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    environment: 'test',
+                    emails: ['dina@niv.eli'],
+                    webhooks: ['dina', 'niv', 'eli'],
+                    arrival_rate: 1,
+                    duration: 1
+                };
+
+                let jobBodyWithCronDisabled = {...jobBodyWithCron, enabled: false};
+                return manager.createJob(jobBodyWithCronDisabled)
+                    .then(function (result) {
+                        result.should.containEql(expectedResult);
+                        loggerInfoStub.callCount.should.eql(2);
+                    });
+            });
+
+            it('Verify cron was invoked more than once', function (done) {
+                this.timeout(5000);
+                setTimeout(async () => {
+                    try {
+                        await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+                        loggerInfoStub.args[0][0].should.eql('Skipping job with id: 5a9eee73-cf56-47aa-ac77-fad59e961aaf as it\'s currently disabled');
                         loggerErrorStub.callCount.should.eql(0);
                         done();
                     } catch (error) {
@@ -618,7 +693,8 @@ describe('Manager tests', function () {
                 ramp_to: '1',
                 notes: 'some notes',
                 proxy_url: 'http://proxyUrl.com',
-                debug: '*'
+                debug: '*',
+                enabled: false
             },
             {
                 id: 'id2',
@@ -651,7 +727,8 @@ describe('Manager tests', function () {
                 run_id: undefined,
                 notes: 'some notes',
                 proxy_url: 'http://proxyUrl.com',
-                debug: '*'
+                debug: '*',
+                enabled: false
             }, {
                 id: 'id2',
                 test_id: 'test_id2',
@@ -666,7 +743,8 @@ describe('Manager tests', function () {
                 run_id: undefined,
                 notes: 'some other notes',
                 proxy_url: 'http://proxyUrl.com',
-                debug: '*'
+                debug: '*',
+                enabled: true
             }];
             let jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
@@ -683,7 +761,8 @@ describe('Manager tests', function () {
                 cron_expression: '* * * * *',
                 emails: null,
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1'
+                ramp_to: '1',
+                enabled: false
             },
             {
                 id: 'id2',
@@ -694,7 +773,7 @@ describe('Manager tests', function () {
                 cron_expression: null,
                 emails: ['eli@eli.eli'],
                 webhooks: null,
-                ramp_to: '1'
+                ramp_to: '1',
             }]
             );
 
@@ -713,7 +792,8 @@ describe('Manager tests', function () {
                 run_id: undefined,
                 notes: undefined,
                 proxy_url: undefined,
-                debug: undefined
+                debug: undefined,
+                enabled: false
             }];
             let jobs = await manager.getJobs();
             jobs.should.eql(expectedResult);
@@ -774,7 +854,8 @@ describe('Manager tests', function () {
                 run_id: undefined,
                 notes: 'some nice notes',
                 proxy_url: 'http://proxyUrl.com',
-                debug: '*'
+                debug: '*',
+                enabled: true
             };
 
             let job = await manager.getJob('id');
