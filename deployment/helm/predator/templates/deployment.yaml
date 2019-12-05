@@ -61,6 +61,8 @@ spec:
             value: {{ .Release.Namespace }}
           - name: INTERNAL_ADDRESS
             value: http://{{ include "predator.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}/{{ .Values.apiVersion }}
+          - name: DELAY_RUNNER_MS
+            value: {{ .Values.DELAY_RUNNER_MS | quote }}
           ports:
             - name: http
               containerPort: 80
