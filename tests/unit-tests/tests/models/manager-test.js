@@ -71,7 +71,7 @@ describe('Scenario generator tests', function () {
 
             insertStub.calledOnce.should.eql(true);
             saveFileStub.calledOnce.should.eql(true);
-            should.notEqual(insertStub.getCall(0).args[0].fileId, undefined);
+            should.notEqual(insertStub.getCall(0).args[4], undefined);
             should(getRequestStub.getCall(0).args[0].url).eql('path to dropbox');
             result.should.have.keys('id', 'revision_id');
             Object.keys(result).length.should.eql(2);

@@ -4,7 +4,7 @@ let client = {};
 let uuid = require('cassandra-driver').types.Uuid;
 const sanitizeHelper = require('../../../helpers/sanitizeHelper');
 
-const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id,file_id) values(?,?,?,?,?,?,?,?,?)';
+const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id, file_id, processor_id) values(?,?,?,?,?,?,?,?,?,?)';
 const GET_TEST = 'SELECT * FROM tests WHERE id = ? ORDER BY updated_at DESC limit 1';
 const GET_TEST_REVISIONS = 'SELECT * FROM tests WHERE id = ?';
 const GET_TESTS = 'SELECT * FROM tests';
@@ -69,9 +69,9 @@ async function getAllTestRevisions(id) {
     return sanitizedResult;
 }
 
-async function insertTest(testInfo, testJson, id, revisionId) {
+async function insertTest(testInfo, testJson, id, revisionId, testId) {
     let params;
-    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, testInfo.fileId];
+    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, testId, testInfo.processor_id];
     const result = await executeQuery(INSERT_TEST_DETAILS, params, queryOptions);
     return result;
 }
@@ -126,6 +126,7 @@ function sanitizeTestResult(data) {
         const dslDataObject = sanitizeHelper.extractDslRootData(row.raw_data);
         row.artillery_json = JSON.parse(row.artillery_json);
         row.file_id = row.file_id || undefined;
+        row.processor_id = row.processor_id || undefined;
         delete row.raw_data;
         return Object.assign(row, dslDataObject);
     });
