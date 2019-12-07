@@ -1152,6 +1152,11 @@ paths:
         required: true
         schema:
           type: string
+      - in: query
+        name: dl
+        description: should redownload the file (relevant for file_download typed processors)
+        type: boolean
+        default: false
       responses:
         '200':
           description: Success
@@ -1161,6 +1166,12 @@ paths:
                 $ref: '#/components/schemas/processor'
         '400':
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
           content:
             application/json:
               schema:

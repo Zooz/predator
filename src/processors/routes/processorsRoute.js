@@ -11,5 +11,6 @@ router.post('/', swaggerValidator.validate, processors.createProcessor);
 router.post('/:processor_id/download', swaggerValidator.validate, processors.redownloadJSProcessor);
 router.get('/:processor_id', swaggerValidator.validate, processors.getProcessor);
 router.delete('/:processor_id', swaggerValidator.validate, processors.deleteProcessor);
+router.put('/:processor_id', swaggerValidator.validate, processors.updateProcessor);
 
 module.exports = router;
