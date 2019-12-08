@@ -158,7 +158,7 @@ function createResponse(jobId, jobBody, runId) {
         notes: jobBody.notes,
         proxy_url: jobBody.proxy_url,
         debug: jobBody.debug,
-        enabled: jobBody.enabled !== undefined ? jobBody.enabled : true
+        enabled: jobBody.enabled !== false
     };
 
     Object.keys(response).forEach(key => {
