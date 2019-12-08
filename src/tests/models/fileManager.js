@@ -7,18 +7,11 @@ const database = require('./database'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
-    createFileFromUrl,
+    saveFile,
     downloadFile,
     getFile,
     validateJavascriptContent
 };
-async function createFileFromUrl(testRawData) {
-    if (testRawData['processor_file_url']) {
-        const fileId = await saveFile(testRawData['processor_file_url']);
-        return fileId;
-    }
-    return undefined;
-}
 
 async function downloadFile(fileUrl) {
     const options = {

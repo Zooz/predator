@@ -69,7 +69,7 @@ async function getAllTestRevisions(id) {
     return sanitizedResult;
 }
 
-async function insertTest(testInfo, testJson, id, revisionId, testId) {
+async function insertTest(testInfo, testJson, id, revisionId, fileId) {
     let params;
     params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, fileId, testInfo.processor_id];
     const result = await executeQuery(INSERT_TEST_DETAILS, params, queryOptions);
