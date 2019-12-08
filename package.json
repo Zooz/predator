@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "unit-tests": "nyc --check-coverage --lines 95 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
+    "unit-tests": "nyc --check-coverage --lines 90 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "end-to-end-tests": "bash ./tests/end-to-end-tests/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh",

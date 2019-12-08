@@ -288,7 +288,7 @@ paths:
       tags:
       - Tests
       summary: Retrieve a file encoding to base 64
-      description: Retrieve a specific f.
+      description: Retrieve a specific file.
       parameters:
       - in: path
         name: file_id
@@ -1226,16 +1226,16 @@ paths:
     post:
       operationId: update-processor-file-content
       tags:
-        - Processors
+      - Processors
       summary: Download the file and update its javascript content.
       description: Download the file from the 'file_url' configured for the processor and update its javascript content. If download fails, keep the original javascript content without overriding it.
       parameters:
-        - in: path
-          name: processor_id
-          description: The id of the processor file to download.
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: processor_id
+        description: The id of the processor file to download.
+        required: true
+        schema:
+          type: string
       responses:
         '204':
           description: Success
@@ -1357,6 +1357,10 @@ components:
           type: string
           description: A description of the test.
           example: Performance test for placing orders from the pet store.
+        processor_id:
+          description: Unique processor identifier
+          type: string
+          format: uuid
         type:
           $ref: '#/components/schemas/test_type'
     test_type:
@@ -1465,6 +1469,10 @@ components:
         file_id:
           type: string
           description: File id.
+        processor_id:
+          description: Unique processor identifier
+          type: string
+          format: uuid
     dsl_test_response:
       type: object
       description: A test that is made of scenarios base on domain specific language
@@ -2037,8 +2045,8 @@ components:
     processor_type:
       type: string
       enum:
-        - raw_javascript
-        - file_download
+      - raw_javascript
+      - file_download
       description: |
         The type of the processor resource. Can be one of the following:
         * `raw_javascript`: Raw javascript string that will be stored and persisted as it is.

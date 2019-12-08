@@ -10,7 +10,7 @@ let database = require('../../../../src/tests/models/database');
 const functions = [
     {
         functionName: 'insertTest',
-        args: ['testInfo', 'testJson', 'id', 'revisionId']
+        args: ['testInfo', 'testJson', 'id', 'revisionId', 'fileId']
     },
     {
         functionName: 'getTest',

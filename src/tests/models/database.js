@@ -18,8 +18,8 @@ module.exports = {
     deleteDefinition
 };
 
-function insertTest(testInfo, testJson, id, revisionId) {
-    return databaseConnector.insertTest(testInfo, testJson, id, revisionId);
+function insertTest(testInfo, testJson, id, revisionId, fileId) {
+    return databaseConnector.insertTest(testInfo, testJson, id, revisionId, fileId);
 }
 
 async function getTest(id) {

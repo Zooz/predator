@@ -45,6 +45,9 @@ async function initSchemas() {
         file_id: {
             type: Sequelize.DataTypes.UUID
         },
+        processor_id: {
+            type: Sequelize.DataTypes.UUID
+        },
         name: {
             type: Sequelize.DataTypes.STRING
         },
@@ -91,13 +94,14 @@ async function initSchemas() {
     await file.sync();
 }
 
-async function insertTest(testInfo, testJson, id, revisionId){
+async function insertTest(testInfo, testJson, id, revisionId, fileId){
     const test = client.model('test');
     let params = {
         test_id: id,
         name: testInfo.name,
         type: testInfo.type,
-        file_id: testInfo.fileId,
+        file_id: fileId,
+        processor_id: testInfo.processor_id,
         description: testInfo.description,
         updated_at: Date.now(),
         raw_data: JSON.stringify(testInfo),
@@ -245,6 +249,7 @@ function sanitizeTestResult(data) {
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
         dataValues.id = dataValues.test_id;
         dataValues.file_id = dataValues.file_id || undefined;
+        dataValues.processor_id = dataValues.processor_id || undefined;
         delete dataValues.raw_data;
         delete dataValues.test_id;
         return Object.assign(dataValues, dslDataObject);
