@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 module.exports.up = async (query, DataTypes) => {
     let testsTable = await query.describeTable('tests');
 
-    if (!testsTable.file_id) {
+    if (!testsTable.processor_id) {
         await query.addColumn(
             'tests', 'processor_id',
             Sequelize.DataTypes.UUID);
