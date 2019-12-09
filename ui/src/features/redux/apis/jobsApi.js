@@ -22,6 +22,12 @@ export const createJobInFramework = (body) => {
   });
 };
 
+export const editJobInFramework = (jobId,body) => {
+  return axios.put(`${env.PREDATOR_URL}/jobs/${jobId}`, body, {
+    headers: getAuthorizationHeader()
+  });
+};
+
 export const stopRunningJobInFramework = (jobId, runId) => {
   return axios.post(`${env.PREDATOR_URL}/jobs/${jobId}/runs/${runId}/stop`, undefined, {
     headers: getAuthorizationHeader()

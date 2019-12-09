@@ -1,8 +1,7 @@
 import { put, takeEvery, takeLatest, select, call } from 'redux-saga/effects'
 import * as Actions from '../actions/jobsActions'
 import * as Types from '../types/jobsTypes'
-import { getJobsFromFramework, getJobFromFramework, createJobInFramework, stopRunningJobInFramework, deleteJobInFramework } from '../apis/jobsApi';
-import { stopTest } from './testsSagas';
+import { getJobsFromFramework, getJobFromFramework, createJobInFramework, stopRunningJobInFramework, deleteJobInFramework, editJobInFramework } from '../apis/jobsApi';
 
 export function * getJobs () {
   try {
@@ -46,6 +45,18 @@ export function * createJob ({ body }) {
   }
   yield put(Actions.processingCreateJob(false));
 }
+export function * editJob ({id, body }) {
+  try {
+    yield put(Actions.setLoading(true));
+    let job = yield call(editJobInFramework, id, body);
+    yield put(Actions.editJobSuccess(true));
+    yield call(getJobs);
+  } catch (e) {
+    yield put(Actions.errorOnJobAction(e))
+  }
+  yield put(Actions.setLoading(false));
+
+}
 
 export function * stopRunningJob ({ jobId, runId }) {
   try {
@@ -72,6 +83,7 @@ export function * jobsRegister () {
   yield takeLatest(Types.GET_JOBS, getJobs);
   yield takeLatest(Types.GET_JOB, getJob);
   yield takeEvery(Types.CREATE_JOB, createJob);
+  yield takeEvery(Types.EDIT_JOB, editJob);
   yield takeLatest(Types.STOP_RUNNING_JOB, stopRunningJob);
   yield takeLatest(Types.DELETE_JOB, deleteJob);
 }

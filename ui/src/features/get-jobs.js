@@ -8,7 +8,9 @@ import {
     processingDeleteJob,
     deleteJobSuccess,
     getJobsWithTestNameAndLastRun,
-    createJobSuccess
+    createJobSuccess,
+    editJobSuccess,
+    errorOnJobAction
 } from './redux/selectors/jobsSelector';
 import { tests } from './redux/selectors/testsSelector';
 import { reports } from './redux/selectors/reportsSelector';
@@ -26,7 +28,7 @@ import {createJobRequest} from './requestBuilder';
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
 const REFRESH_DATA_INTERVAL = 30000;
-const columnsNames = ['test_name', 'environment', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'raw', 'delete'];
+const columnsNames = ['test_name', 'environment', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'raw', 'delete', 'enabled_disabled'];
 const DESCRIPTION = 'Scheduled jobs configured with a cron expression.';
 
 class getJobs extends React.Component {
@@ -39,7 +41,8 @@ class getJobs extends React.Component {
             openViewJob: false,
             jobToDelete: undefined,
             sortedJobs: [],
-            rerunJob: null
+            rerunJob: null,
+            editJob: null,
         };
     }
 
@@ -76,7 +79,13 @@ class getJobs extends React.Component {
         delete request.cron_expression;
         request.run_immediately = true;
         this.props.createJob(request);
-        this.setState({rerunJob:job});
+        this.setState({rerunJob: job});
+    };
+
+    onEnableDisable = (data, value) => {
+        const request = {enabled: value};
+        this.setState({editJob:data});
+        this.props.editJob(data.id, request);
     };
 
     submitDelete = () => {
@@ -138,7 +147,8 @@ class getJobs extends React.Component {
             onSort: this.onSort,
             onRawView: this.onRawView,
             onRunTest: this.onRunTest,
-            onDelete: this.onDelete
+            onDelete: this.onDelete,
+            onEnableDisable: this.onEnableDisable,
         });
         const feedbackMessage = this.generateFeedbackMessage();
         return (
@@ -167,7 +177,7 @@ class getJobs extends React.Component {
                       onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
                       onCancel={this.cancelDelete} /> : null}
                 {feedbackMessage && <Snackbar
-                    open={!!(this.props.deleteJobSuccess || this.props.jobSuccess)}
+                    open={!!(this.props.deleteJobSuccess || this.props.jobSuccess || this.props.editJobSuccess)}
                     bodyStyle={{ backgroundColor: '#2fbb67' }}
                     message={feedbackMessage}
                     autoHideDuration={4000}
@@ -175,9 +185,11 @@ class getJobs extends React.Component {
                         this.props.getAllJobs();
                         this.props.clearDeleteJobSuccess();
                         this.props.createJobSuccess(undefined);
+                        this.props.setEditJobSuccess(undefined);
                         this.setState({
                             jobToDelete: undefined,
-                            rerunJob: null
+                            rerunJob: null,
+                            editJob: null,
                         });
                     }}
                 />}
@@ -191,6 +203,9 @@ class getJobs extends React.Component {
         }
         if(this.props.jobSuccess && this.state.rerunJob){
             return `Job created successfully: ${this.props.jobSuccess.id}`;
+        }
+        if(this.props.editJobSuccess  && this.state.editJob){
+            return `Job edited successfully: ${this.state.editJob.id}`;
         }
 
     }
@@ -206,8 +221,9 @@ function mapStateToProps(state) {
         deleteJobSuccess: deleteJobSuccess(state),
         tests: tests(state),
         reports: reports(state),
-        jobSuccess: createJobSuccess(state)
-
+        jobSuccess: createJobSuccess(state),
+        editJobSuccess:  editJobSuccess(state),
+        errorOnJobAction:errorOnJobAction(state)
     };
 }
 
@@ -217,12 +233,14 @@ const mapDispatchToProps = {
     getAllJobs: Actions.getJobs,
     getJob: Actions.getJob,
     createJob: Actions.createJob,
+    editJob: Actions.editJob,
     deleteJob: Actions.deleteJob,
     clearDeleteJobSuccess: Actions.clearDeleteJobSuccess,
     clearErrorOnDeleteJob: Actions.clearErrorOnDeleteJob,
     getTests: Actions.getTests,
     getAllReports: Actions.getLastReports,
     createJobSuccess: Actions.createJobSuccess,
+    setEditJobSuccess: Actions.editJobSuccess,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getJobs);
