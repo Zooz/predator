@@ -2,7 +2,7 @@
 export const createJobRequest = (opts) => {
     let body = {
         test_id: opts.test_id,
-        debug: opts.debug,
+        debug: opts.debug ? opts.debug : undefined,
         arrival_rate: parseInt(opts.arrival_rate),
         duration: parseInt(opts.duration),
         ramp_to: opts.ramp_to ? parseInt(opts.ramp_to) : undefined,

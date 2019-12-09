@@ -40,8 +40,19 @@ export const createJob = (body) => (
   { type: Types.CREATE_JOB, body }
 );
 
+export const editJob = (id,body) => (
+  { type: Types.EDIT_JOB, id, body }
+);
+
 export const createJobSuccess = (job) => (
   { type: Types.CREATE_JOB_SUCCESS, job }
+);
+
+export const editJobSuccess = (value) => (
+  { type: Types.EDIT_JOB_SUCCESS, value }
+);
+export const errorOnJobAction = (error) => (
+  { type: Types.ERROR_ON_JOB_ACTION, error }
 );
 
 export const processingCreateJob = (state) => (
@@ -98,4 +109,8 @@ export const clearDeleteJobSuccess = () => (
 
 export const processingDeleteJob = () => (
   { type: Types.PROCESSING_DELETE_JOB }
+);
+
+export const setLoading = (isLoading) => (
+    { type: Types.IS_LOADING, isLoading }
 );
