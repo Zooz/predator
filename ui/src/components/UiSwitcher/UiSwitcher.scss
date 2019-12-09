@@ -29,11 +29,11 @@ input[type="checkbox"].switch + div {
 }
 
 .onColor {
-  background-color: #3b89ec;
+  background-color: #a3a8a5;
 }
 
 .offColor {
-  background-color: #d66969;
+  background-color: #a3a8a5;
 }
 
 input[type="checkbox"].switch:checked + div {
@@ -41,7 +41,7 @@ input[type="checkbox"].switch:checked + div {
 }
 
 input[type="checkbox"].switch:checked + div {
-  background-color: #57BB00;
+  background-color: #557EFF;
 }
 
 input[type="checkbox"].switch + div > div {
