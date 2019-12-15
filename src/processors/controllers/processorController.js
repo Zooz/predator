@@ -45,20 +45,10 @@ module.exports.deleteProcessor = async function (req, res, next) {
     }
 };
 
-module.exports.redownloadJSProcessor = async function (req, res, next) {
-    let { params: { processor_id: processorId } } = req;
-    try {
-        await processorManager.redownloadJSProcessor(processorId);
-        res.status(204).json();
-    } catch (e) {
-        next(e);
-    }
-};
-
 module.exports.updateProcessor = async function (req, res, next) {
-    let { body: updatedProcessor, params: { processor_id: processorId }, query: { dl = false } } = req;
+    let { body: updatedProcessor, params: { processor_id: processorId } } = req;
     try {
-        const processor = await processorManager.updateProcessor(processorId, updatedProcessor, dl);
+        const processor = await processorManager.updateProcessor(processorId, updatedProcessor);
         res.status(200).json(processor);
     } catch (e) {
         next(e);

@@ -10,7 +10,6 @@ describe('Sequelize client tests', function () {
         id: '6063ae04-f832-11e9-aad5-362b9e155667',
         name: 'processor name',
         description: 'bla bla bla',
-        type: 'raw_javascript',
         javascript: 'module.exports = 5;'
     };
 

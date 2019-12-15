@@ -1152,11 +1152,6 @@ paths:
         required: true
         schema:
           type: string
-      - in: query
-        name: dl
-        description: should redownload the file (relevant for file_download typed processors)
-        type: boolean
-        default: false
       responses:
         '200':
           description: Success
@@ -1212,47 +1207,6 @@ paths:
           description: Success
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-  '/v1/processors/{processor_id}/download':
-    post:
-      operationId: update-processor-file-content
-      tags:
-      - Processors
-      summary: Download the file and update its javascript content.
-      description: Download the file from the 'file_url' configured for the processor and update its javascript content. If download fails, keep the original javascript content without overriding it.
-      parameters:
-      - in: path
-        name: processor_id
-        description: The id of the processor file to download.
-        required: true
-        schema:
-          type: string
-      responses:
-        '204':
-          description: Success
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '422':
-          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -1755,15 +1709,10 @@ components:
             type: string
             description: The run id. Only shown if the job is ran immediately.
     processor:
-      discriminator:
-        propertyName: type
-      oneOf:
-      - $ref: '#/components/schemas/file_download'
-      - $ref: '#/components/schemas/raw_javascript'
       required:
       - name
       - description
-      - type
+      - javascript
       properties:
         id:
           description: Unique processor identifier
@@ -1778,8 +1727,6 @@ components:
           type: string
           description: A description of the processor.
           example: logs every error (5xx).
-        type:
-          $ref: '#/components/schemas/processor_type'
         updated_at:
           type: string
           format: date-time
@@ -2026,28 +1973,3 @@ components:
             timeout:
               description: timout to smtp server in milliseconds
               type: number
-    file_download:
-      description: Download processor file from the file_url and store it.
-      required:
-      - file_url
-      properties:
-        file_url:
-          type: string
-          description: url that the file can be downloaded from, should be direct download link.
-    raw_javascript:
-      description: Javascript file that will be used by the processor resource.
-      required:
-      - javascript
-      properties:
-        javascript:
-          type: string
-          description: Javascript as a string.
-    processor_type:
-      type: string
-      enum:
-      - raw_javascript
-      - file_download
-      description: |
-        The type of the processor resource. Can be one of the following:
-        * `raw_javascript`: Raw javascript string that will be stored and persisted as it is.
-        * `file_download`: Predator will download the custom javascript by file_url and persist it.

@@ -23,8 +23,6 @@ async function insertProcessor(processorId, processorInfo) {
         id: processorId,
         name: processorInfo.name,
         description: processorInfo.description,
-        type: processorInfo.type,
-        file_url: processorInfo.file_url,
         javascript: processorInfo.javascript,
         created_at: Date.now(),
         updated_at: Date.now()
@@ -57,8 +55,8 @@ async function deleteProcessor(processorId) {
 
 async function updateProcessor(processorId, updatedProcessor) {
     const processorsModel = client.model('processor');
-    const { name, type, description, file_url: fileUrl, javascript } = updatedProcessor;
-    return processorsModel.update({ name, type, description, file_url: fileUrl, javascript, updated_at: Date.now() }, { where: { id: processorId } });
+    const { name, description, javascript } = updatedProcessor;
+    return processorsModel.update({ name, description, javascript, updated_at: Date.now() }, { where: { id: processorId } });
 }
 
 async function initSchemas() {
@@ -71,12 +69,6 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('medium')
         },
         description: {
-            type: Sequelize.DataTypes.TEXT('long')
-        },
-        type: {
-            type: Sequelize.DataTypes.TEXT('medium')
-        },
-        file_url: {
             type: Sequelize.DataTypes.TEXT('long')
         },
         javascript: {
