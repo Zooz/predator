@@ -10,8 +10,7 @@ module.exports = {
     getProcessors,
     getProcessor,
     deleteProcessor,
-    updateProcessor,
-    redownloadJSProcessor
+    updateProcessor
 };
 
 async function init() {
@@ -40,6 +39,7 @@ function getProcessors(from, limit) {
             return res;
         });
 }
+
 function deleteProcessor(processorId) {
     return request(app).delete(`/v1/processors/${processorId}`)
         .set({ 'Content-Type': 'application/json' })
@@ -56,19 +56,9 @@ function getProcessor(processorId) {
         });
 }
 
-function redownloadJSProcessor(processorId) {
-    return request(app).post(`/v1/processors/${processorId}/download`)
-        .send({})
-        .set({ 'Content-Type': 'application/json' })
-        .expect(function(res) {
-            return res;
-        });
-}
-
-function updateProcessor(processorId, processor, dl) {
+function updateProcessor(processorId, processor) {
     return request(app).put(`/v1/processors/${processorId}`)
         .send(processor)
-        .query({ dl })
         .set({ 'Content-Type': 'application/json' })
         .expect(function(res) {
             return res;

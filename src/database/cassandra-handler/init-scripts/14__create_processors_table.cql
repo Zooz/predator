@@ -1,10 +1,8 @@
 CREATE TABLE IF NOT EXISTS processors
 (
-    id       uuid,
+    id                 uuid,
     name               text,
     description        text,
-    type               text,
-    file_url           text,
     javascript         text,
     created_at timestamp,
     updated_at timestamp,

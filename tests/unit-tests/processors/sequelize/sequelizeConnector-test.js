@@ -2,15 +2,14 @@
 const sinon = require('sinon'),
     should = require('should'),
     uuid = require('uuid/v4'),
-    databaseConfig = require('../../../../../src/config/databaseConfig'),
-    sequelizeConnector = require('../../../../../src/processors/models/database/sequelize/sequelizeConnector');
+    databaseConfig = require('../../../../src/config/databaseConfig'),
+    sequelizeConnector = require('../../../../src/processors/models/database/sequelize/sequelizeConnector');
 
 describe('Sequelize client tests', function () {
     const processor = {
         id: '6063ae04-f832-11e9-aad5-362b9e155667',
         name: 'processor name',
         description: 'bla bla bla',
-        type: 'raw_javascript',
         javascript: 'module.exports = 5;'
     };
 
