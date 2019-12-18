@@ -1,30 +1,26 @@
 'use strict';
-const database = require('./database'),
-    uuid = require('uuid'),
+const uuid = require('uuid'),
     request = require('request-promise-native'),
+    esprima = require('esprima');
+
+const database = require('./database'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
-    createFileFromUrl,
-    getFile
+    saveFile,
+    getFile,
+    validateJavascriptContent
 };
-async function createFileFromUrl(testRawData) {
-    if (testRawData['processor_file_url']) {
-        const fileId = await saveFile(testRawData['processor_file_url']);
-        return fileId;
-    }
-    return undefined;
-}
+
 async function downloadFile(fileUrl) {
     const options = {
         url: fileUrl
     };
     try {
         const response = await request.get(options);
-        const base64Value = Buffer.from(response).toString('base64');
-        return base64Value;
+        return response;
     } catch (err) {
-        const errMsg = 'Error to read file, throw exception: ' + err;
+        const errMsg = 'Error to download file: ' + err;
         const error = new Error(errMsg);
         error.statusCode = 422;
         throw error;
@@ -45,6 +41,19 @@ async function getFile(fileId) {
 async function saveFile(fileUrl) {
     const id = uuid();
     const fileToSave = await downloadFile(fileUrl);
-    await database.saveFile(id, fileToSave);
+    const fileBase64Value = Buffer.from(fileToSave).toString('base64');
+    await database.saveFile(id, fileBase64Value);
     return id;
+}
+
+function validateJavascriptContent (javascriptFileContent) {
+    let error, errorMessage;
+    try {
+        esprima.parseScript(javascriptFileContent);
+    } catch (err) {
+        errorMessage = err.description;
+        error = new Error('javascript syntax validation failed with error: ' + errorMessage);
+        error.statusCode = 422;
+        throw error;
+    }
 }

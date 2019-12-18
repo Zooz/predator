@@ -4,6 +4,7 @@ const schedulerCassandraConnector = require('../../jobs/models/database/cassandr
 const reportsCassandraConnector = require('../../reports/models/database/cassandra/cassandraConnector');
 const testsCassandraConnector = require('../../tests/models/database/cassandra/cassandraConnector');
 const configCassandraConnector = require('../../configManager/models/database/cassandra/cassandraConnector');
+const processorsCassandraConnector = require('../../processors/models/database/cassandra/cassandraConnector');
 const databaseConfig = require('../../config/databaseConfig');
 const cassandraMigration = require('./cassandraMigration');
 const logger = require('../../common/logger');
@@ -17,6 +18,7 @@ module.exports.init = async () => {
     await schedulerCassandraConnector.init(cassandraClient);
     await testsCassandraConnector.init(cassandraClient);
     await configCassandraConnector.init(cassandraClient);
+    await processorsCassandraConnector.init(cassandraClient);
     logger.info('cassandra client initialized');
 };
 
@@ -58,7 +60,8 @@ async function createClient() {
     const config = {
         contactPoints: String(databaseConfig.address).split(','),
         keyspace: databaseConfig.name,
-        authProvider
+        authProvider,
+        localDataCenter: databaseConfig.cassandraLocalDataCenter
     };
 
     let cassandraClient = new cassandra.Client(config);

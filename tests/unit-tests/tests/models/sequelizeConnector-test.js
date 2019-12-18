@@ -92,7 +92,7 @@ describe('Testing sequelize connector', function () {
 
     describe('insertTest', function () {
         it('when succeed insert test', async function () {
-            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId');
+            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', processor_id: '1234', scenarios: { s: '1' } }, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId');
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['test']]);
             should(createStub.args).eql([
@@ -102,7 +102,8 @@ describe('Testing sequelize connector', function () {
                         'name': 'name',
                         'description': 'desc',
                         'file_id': undefined,
-                        'raw_data': '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"}}',
+                        'processor_id': '1234',
+                        'raw_data': '{"name":"name","description":"desc","type":"type","processor_id":"1234","scenarios":{"s":"1"}}',
                         'revision_id': 'revisionId',
                         'test_id': 'id',
                         'type': 'type',

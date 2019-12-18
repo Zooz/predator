@@ -213,7 +213,8 @@ function buildClient(keyspace) {
     let authProvider = new cassandra.auth.PlainTextAuthProvider(args.cassandra_username, args.cassandra_password);
     let cassandraClient = {
         contactPoints: args.cassandra_url.split(','),
-        authProvider: authProvider
+        authProvider: authProvider,
+        localDataCenter: args.cassandra_local_data_center
     };
 
     if (keyspace) {

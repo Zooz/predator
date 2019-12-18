@@ -8,7 +8,7 @@ const config = {
     cassandraReplicationFactor: process.env.CASSANDRA_REPLICATION_FACTOR || 1,
     cassandraConsistency: getCassandraConsistencyByName(process.env.CASSANDRA_CONSISTENCY),
     cassandraKeyspaceStrategy: process.env.CASSANDRA_KEY_SPACE_STRATEGY || 'SimpleStrategy',
-    cassandraLocalDataCenter: process.env.CASSANDRA_LOCAL_DATA_CENTER,
+    cassandraLocalDataCenter: process.env.CASSANDRA_LOCAL_DATA_CENTER || 'datacenter1',
     sqliteStorage: process.env.SQLITE_STORAGE || 'predator'
 };
 

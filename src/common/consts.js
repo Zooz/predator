@@ -8,7 +8,6 @@ module.exports = {
     KUBERNETES: 'KUBERNETES',
     METRONOME: 'METRONOME',
     DOCKER: 'DOCKER',
-
     CONFIG: {
         GRFANA_URL: 'grafana_url',
         DELAY_RUNNER_MS: 'delay_runner_ms',
