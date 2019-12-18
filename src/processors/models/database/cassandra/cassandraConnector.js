@@ -5,7 +5,7 @@ let client;
 
 const INSERT_PROCESSOR = 'INSERT INTO processors(id, name, description, javascript, created_at, updated_at) values(?,?,?,?,?,?)';
 const GET_ALL_PROCESSORS = 'SELECT * FROM processors';
-const GET_PROCESSOR = 'SELECT * FROM processors where id=?';
+const GET_PROCESSOR = 'SELECT * FROM processors WHERE id=?';
 const DELETE_PROCESSOR = 'DELETE FROM processors WHERE id=?';
 const UPDATE_PROCESSOR = 'UPDATE processors SET name=?, description=?, javascript=?, updated_at=? WHERE id=? AND created_at=? IF EXISTS';
 

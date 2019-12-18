@@ -1,17 +1,12 @@
 const should = require('should'),
-    uuid = require('uuid/v4'),
-    nock = require('nock');
+    uuid = require('uuid/v4');
 
 let validHeaders = { 'Content-Type': 'application/json' };
 const requestSender = require('./helpers/requestCreator');
-const { PROCESSOR_TYPE_FILE_DOWNLOAD, PROCESSOR_TYPE_RAW_JAVASCRIPT } = require('../../../src/common/consts');
 describe('Processors api', function() {
     this.timeout(5000000);
     before(async function () {
         await requestSender.init();
-    });
-    beforeEach(function() {
-        nock.cleanAll();
     });
 
     describe('Good requests', async function() {
@@ -138,10 +133,6 @@ describe('Processors api', function() {
             });
         });
         describe('PUT /v1/processors/{processor_id}', function() {
-            const fileDownloadProcessor = {
-                name: 'predator-file',
-                description: 'some desc'
-            };
             it('update a processor', async function() {
                 const processor = generateRawJSProcessor('predator');
                 const createResponse = await requestSender.createProcessor(processor, validHeaders);
@@ -162,8 +153,24 @@ describe('Processors api', function() {
         describe('POST /v1/processors', function () {
             it('Create processor with no js', async () => {
                 const requestBody = {
-                    name: 'javascript-me',
+                    name: 'mickey',
                     description: 'Processor with no js',
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(400);
+            });
+            it('Create processor with no name', async () => {
+                const requestBody = {
+                    description: 'Processor with no name',
+                    javascript: 'module.exports = 5;'
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(400);
+            });
+            it('Create processor with no description', async () => {
+                const requestBody = {
+                    name: 'mickey',
+                    javascript: 'module.exports = 5;'
                 };
                 let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(400);
@@ -174,9 +181,6 @@ describe('Processors api', function() {
     describe('Sad requests', function () {
         describe('POST /v1/processors', function () {
             it('Create processor with type with invalid js syntax', async () => {
-                nock('https://authentication.predator.dev').get('/?dl=1').reply(200,
-
-                );
                 const requestBody = {
                     name: 'authentication',
                     description: 'Creates authorization token and saves it in the context',

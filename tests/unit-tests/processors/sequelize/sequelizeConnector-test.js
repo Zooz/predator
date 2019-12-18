@@ -2,8 +2,8 @@
 const sinon = require('sinon'),
     should = require('should'),
     uuid = require('uuid/v4'),
-    databaseConfig = require('../../../../../src/config/databaseConfig'),
-    sequelizeConnector = require('../../../../../src/processors/models/database/sequelize/sequelizeConnector');
+    databaseConfig = require('../../../../src/config/databaseConfig'),
+    sequelizeConnector = require('../../../../src/processors/models/database/sequelize/sequelizeConnector');
 
 describe('Sequelize client tests', function () {
     const processor = {

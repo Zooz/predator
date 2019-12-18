@@ -8,7 +8,6 @@ const database = require('./database'),
 
 module.exports = {
     saveFile,
-    downloadFile,
     getFile,
     validateJavascriptContent
 };
