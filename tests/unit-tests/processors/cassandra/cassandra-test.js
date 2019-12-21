@@ -35,8 +35,8 @@ describe('Cassandra processors tests', function() {
             clientExecuteStub.resolves({ result: { rowLength: 0 } });
             let id = uuid.v4();
 
-            let query = 'INSERT INTO processors(id, name, description, javascript, created_at, updated_at) values(?,?,?,?,?,?)';
-            return cassandraClient.insertProcessor(id, {  name: 'mick', description: 'some processor', javascript: `module.exports.mick = 'ey'` })
+            let query = cassandraClient._queries.INSERT_PROCESSOR;
+            return cassandraClient.insertProcessor(id, { name: 'mick', description: 'some processor', javascript: 'module.exports.mick = \'ey\'' })
                 .then(function(){
                     loggerErrorStub.callCount.should.eql(0);
                     clientExecuteStub.getCall(0).args[0].should.eql(query);
@@ -46,16 +46,16 @@ describe('Cassandra processors tests', function() {
 
         it('should log error for failing inserting new processor', function(){
             clientExecuteStub.rejects();
-            return cassandraClient.insertProcessor('id', {  name: 'mick', description: 'some processor', javascript: `module.exports.mick = 'ey'` })
+            return cassandraClient.insertProcessor('id', { name: 'mick', description: 'some processor', javascript: 'module.exports.mick = \'ey\'' })
                 .catch(function(){
-                    loggerErrorStub.callCount.should.eql(1);
+                    loggerErrorStub.callCount.should.eql(2);
                 });
         });
     });
 
     describe('Get processors', function(){
         it('should get multiple processors', function(){
-            let cassandraResponse = { rows: [{ id: 'id', name: 'mick', description: 'some processor', javascript: `module.exports.mick = 'ey'`, created_at: Date.now(), updated_at: Date.now() }] };
+            let cassandraResponse = { rows: [{ id: 'id', name: 'mick', description: 'some processor', javascript: 'module.exports.mick = \'ey\'', created_at: Date.now(), updated_at: Date.now() }] };
             clientExecuteStub.resolves(cassandraResponse);
 
             let query = 'SELECT * FROM processors';
@@ -70,7 +70,7 @@ describe('Cassandra processors tests', function() {
         it('should get failure from cassandra', function(){
             clientExecuteStub.rejects(new Error('error'));
 
-            let query = 'SELECT * FROM processors';
+            let query = cassandraClient._queries.GET_ALL_PROCESSORS;
             return cassandraClient.getAllProcessors()
                 .then(function(result){
                     return Promise.reject(new Error('should not get here'));
@@ -83,42 +83,94 @@ describe('Cassandra processors tests', function() {
         });
     });
 
-    describe('Get processor', function(){
-        it('should get single processor', function(){
-            clientExecuteStub.resolves({ rows: [{ id: 'id', name: 'mick', description: 'some processor', javascript: `module.exports.mick = 'ey'`, created_at: Date.now(), updated_at: Date.now() }] });
-            let proccesorId = uuid.v4();
-            let query = 'SELECT * FROM processors WHERE id=?';
-            return cassandraClient.getProcessor(proccesorId)
-                .then(function(result){
-                    clientExecuteStub.getCall(0).args[0].should.eql(query);
-                    clientExecuteStub.getCall(0).args[1][0].should.eql(proccesorId);
-                    should(result).containDeep({ id: 'id', name: 'mick', description: 'some processor', javascript: `module.exports.mick = 'ey'` });
-                });
+    describe('Get processor', function() {
+        describe('getProcessorById', function() {
+            it('should get a single processor', function(){
+                clientExecuteStub.resolves({ rows: [{ id: 'id', name: 'mick', description: 'some processor', javascript: 'module.exports.mick = \'ey\'', created_at: Date.now(), updated_at: Date.now() }] });
+                let proccesorId = uuid.v4();
+                let query = cassandraClient._queries.GET_PROCESSOR_BY_ID;
+                return cassandraClient.getProcessorById(proccesorId)
+                    .then(function(result){
+                        clientExecuteStub.getCall(0).args[0].should.eql(query);
+                        clientExecuteStub.getCall(0).args[1][0].should.eql(proccesorId);
+                        should(result).containDeep({ id: 'id', name: 'mick', description: 'some processor', javascript: 'module.exports.mick = \'ey\'' });
+                    });
+            });
+        });
+        describe('getProcessorByName', function() {
+            it('should get a single processor', function() {
+                let processorId = uuid.v4();
+                let processorName = 'Generate Random Kitty Name';
+                const processor = {
+                    id: processorId,
+                    name: processorName,
+                    description: 'some processor',
+                    javascript: 'module.exports.mick = \'ey\'',
+                    created_at: Date.now(),
+                    updated_at: Date.now()
+                };
+                const processorMapping = {
+                    name: processorName,
+                    id: processorId
+                };
+                let query = cassandraClient._queries.GET_PROCESSOR_BY_ID;
+                let mappingQuery = cassandraClient._queries.GET_PROCESSOR_MAPPING;
+                clientExecuteStub.withArgs(mappingQuery).resolves({ rows: [processorMapping] });
+                clientExecuteStub.withArgs(query).resolves({ rows: [processor] });
+                return cassandraClient.getProcessorByName(processorName)
+                    .then(function(result) {
+                        clientExecuteStub.getCall(0).args[0].should.eql(mappingQuery);
+                        clientExecuteStub.getCall(0).args[1][0].should.eql(processorName);
+                        clientExecuteStub.getCall(1).args[0].should.eql(query);
+                        clientExecuteStub.getCall(1).args[1][0].should.eql(processorId);
+                        should(result).containDeep(processor);
+                    });
+            });
         });
     });
 
     describe('Delete processor', function(){
         it('should delete single processor', function(){
-            clientExecuteStub.resolves({ rows: [] });
-            let processorId = uuid.v4();
-            let query = 'DELETE FROM processors WHERE id=?';
+            const processorId = uuid.v4();
+            const processorMapping = {
+                name: 'mick',
+                id: processorId
+            };
+            const getProcessorQuery = cassandraClient._queries.GET_PROCESSOR_BY_ID;
+            const deleteProcessorQuery = cassandraClient._queries.DELETE_PROCESSOR;
+            const deleteMappingQuery = cassandraClient._queries.DELETE_PROCESSOR_MAPPING;
+            clientExecuteStub.withArgs(getProcessorQuery).resolves({ rows: [processorMapping] });
+            clientExecuteStub.withArgs(deleteProcessorQuery).resolves({ rows: [] });
+            clientExecuteStub.withArgs(deleteMappingQuery).resolves({ rows: [] });
+
             return cassandraClient.deleteProcessor(processorId)
                 .then(function(result){
-                    clientExecuteStub.getCall(0).args[0].should.eql(query);
-                    clientExecuteStub.getCall(0).args[1][0].should.eql(processorId);
-                    result.should.eql([]);
+                    clientExecuteStub.callCount.should.eql(3);
+                    clientExecuteStub.getCall(0).args[0].should.eql(getProcessorQuery);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql(processorMapping.id);
+                    clientExecuteStub.getCall(1).args[0].should.eql(deleteProcessorQuery);
+                    clientExecuteStub.getCall(1).args[1][0].should.eql(processorId);
+                    clientExecuteStub.getCall(2).args[0].should.eql(deleteMappingQuery);
+                    clientExecuteStub.getCall(2).args[1][0].should.eql(processorMapping.name);
+                    result.should.eql([[], []]);
                 });
         });
 
         it('should get failure from cassandra', function(){
-            clientExecuteStub.rejects(new Error('error'));
             let processorId = uuid.v4();
-            let query = 'DELETE FROM processors WHERE id=?';
+            const processorMapping = {
+                id: processorId,
+                name: 'mick'
+            };
+            let getProcessorMapping = cassandraClient._queries.GET_PROCESSOR_BY_ID;
+            let deleteProcessorQuery = cassandraClient._queries.DELETE_PROCESSOR;
+            clientExecuteStub.withArgs(getProcessorMapping).resolves({ rows: [processorMapping] });
+            clientExecuteStub.withArgs(deleteProcessorQuery).rejects(new Error('error'));
             return cassandraClient.deleteProcessor(processorId)
                 .then(function(){
                     return Promise.reject(new Error('should not get here'));
                 }).catch(function(err) {
-                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    clientExecuteStub.getCall(0).args[0].should.eql(getProcessorMapping);
                     loggerErrorStub.callCount.should.eql(1);
                     loggerErrorStub.args[0][1].message.should.eql('error');
                     err.message.should.eql('Error occurred in communication with cassandra');

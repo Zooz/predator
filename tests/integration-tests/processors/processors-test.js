@@ -130,6 +130,9 @@ describe('Processors api', function() {
                 };
                 let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(201);
+
+                let deleteResponse = await requestSender.deleteProcessor(createProcessorResponse.body.id);
+                should(deleteResponse.statusCode).equal(204);
             });
         });
         describe('PUT /v1/processors/{processor_id}', function() {
@@ -154,7 +157,7 @@ describe('Processors api', function() {
             it('Create processor with no js', async () => {
                 const requestBody = {
                     name: 'mickey',
-                    description: 'Processor with no js',
+                    description: 'Processor with no js'
                 };
                 let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(400);
@@ -184,7 +187,7 @@ describe('Processors api', function() {
                 const requestBody = {
                     name: 'authentication',
                     description: 'Creates authorization token and saves it in the context',
-                    javascript: `{ this is not valid javascript }`
+                    javascript: '{ this is not valid javascript }'
                 };
                 let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);

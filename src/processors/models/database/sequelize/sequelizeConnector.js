@@ -7,7 +7,8 @@ module.exports = {
     init,
     getAllProcessors,
     insertProcessor,
-    getProcessor,
+    getProcessorById,
+    getProcessorByName,
     deleteProcessor,
     updateProcessor
 };
@@ -35,13 +36,24 @@ async function getAllProcessors(from, limit) {
     return processorsModel.findAll({ offset: from, limit, order: [['created_at', 'DESC']] });
 }
 
-async function getProcessor(processorId) {
+async function _getProcessor(options) {
     const processorsModel = client.model('processor');
+    let processors = await processorsModel.findAll(options);
+    return processors[0];
+}
+
+async function getProcessorById(processorId) {
     const options = {
         where: { id: processorId }
     };
-    let processors = await processorsModel.findAll(options);
-    return processors[0];
+    return _getProcessor(options);
+}
+
+async function getProcessorByName(processorName) {
+    const options = {
+        where: { name: processorName }
+    };
+    return _getProcessor(options);
 }
 
 async function deleteProcessor(processorId) {
@@ -66,7 +78,9 @@ async function initSchemas() {
             primaryKey: true
         },
         name: {
-            type: Sequelize.DataTypes.TEXT('medium')
+            type: Sequelize.DataTypes.TEXT('medium'),
+            primaryKey: true,
+            unique: true
         },
         description: {
             type: Sequelize.DataTypes.TEXT('long')
