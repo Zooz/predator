@@ -78,9 +78,7 @@ async function initSchemas() {
             primaryKey: true
         },
         name: {
-            type: Sequelize.DataTypes.TEXT('medium'),
-            primaryKey: true,
-            unique: true
+            type: Sequelize.DataTypes.TEXT('medium')
         },
         description: {
             type: Sequelize.DataTypes.TEXT('long')

@@ -9,14 +9,16 @@ describe('Processor manager tests', function () {
     let sandbox;
     let insertStub;
     let deleteStub;
-    let getProcessorStub;
+    let getProcessorByIdStub;
+    let getProcessorByNameStub;
     let getProcessorsStub;
     let updatedProcessorStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         insertStub = sandbox.stub(database, 'insertProcessor');
-        getProcessorStub = sandbox.stub(database, 'getProcessor');
+        getProcessorByIdStub = sandbox.stub(database, 'getProcessorById');
+        getProcessorByNameStub = sandbox.stub(database, 'getProcessorByName');
         getProcessorsStub = sandbox.stub(database, 'getAllProcessors');
         deleteStub = sandbox.stub(database, 'deleteProcessor');
         updatedProcessorStub = sandbox.stub(database, 'updateProcessor');
@@ -36,7 +38,7 @@ describe('Processor manager tests', function () {
                 name: 'mickey',
                 javascript: `module.exports.mickey = 'king'`
             };
-
+            getProcessorByNameStub.resolves(null);
             const processor = await manager.createProcessor(firstProcessor);
             should(processor.id).not.be.empty();
             should(processor).containDeep(firstProcessor);
@@ -74,14 +76,14 @@ describe('Processor manager tests', function () {
                 name: 'mickey1'
             };
 
-            getProcessorStub.resolves(firstProcessor);
+            getProcessorByIdStub.resolves(firstProcessor);
 
             const processors = await manager.getProcessor(firstProcessor.id);
             processors.should.eql(firstProcessor);
         });
         it('Database returns undefined, should throw 404', async function () {
             let exception;
-            getProcessorStub.resolves();
+            getProcessorByIdStub.resolves();
             try {
                 await manager.getProcessor(uuid());
             } catch (e) {
@@ -136,7 +138,7 @@ describe('Processor manager tests', function () {
                 name: 'mickey2',
                 javascript: 'module.exports.update = true'
             };
-            getProcessorStub.resolves(oldProcessor);
+            getProcessorByIdStub.resolves(oldProcessor);
             updatedProcessorStub.resolves();
 
             const processor = await manager.updateProcessor(oldProcessor.id, updatedProcessor);
@@ -149,7 +151,7 @@ describe('Processor manager tests', function () {
                 name: 'mickey2',
                 javascript: 'invalid js'
             };
-            getProcessorStub.resolves();
+            getProcessorByIdStub.resolves();
             try {
                 await manager.updateProcessor(oldProcessor.id, updatedProcessor);
             } catch (e) {
@@ -165,7 +167,7 @@ describe('Processor manager tests', function () {
                 name: 'mickey2',
                 javascript: 'invalid js'
             };
-            getProcessorStub.resolves(oldProcessor);
+            getProcessorByIdStub.resolves(oldProcessor);
             updatedProcessorStub.resolves();
             try {
                 await manager.updateProcessor(oldProcessor.id, updatedProcessor);

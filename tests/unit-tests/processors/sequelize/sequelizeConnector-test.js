@@ -81,13 +81,23 @@ describe('Sequelize client tests', function () {
     });
 
     describe('Get specific Processors', () => {
-        it('Validate sequelize passed arguments', async () => {
-            sequelizeGetStub.returns([processor]);
-
-            const processorId = processor.id;
-            await sequelizeConnector.getProcessor(processorId);
-            should(sequelizeGetStub.calledOnce).eql(true);
-            should(sequelizeGetStub.args[0][0]).containDeep({ where: { id: processorId } });
+        describe('getProcessorById', function() {
+            it('Validate sequelize passed arguments', async () => {
+                sequelizeGetStub.returns([processor]);
+                const processorId = processor.id;
+                await sequelizeConnector.getProcessorById(processorId);
+                should(sequelizeGetStub.calledOnce).eql(true);
+                should(sequelizeGetStub.args[0][0]).containDeep({ where: { id: processorId } });
+            });
+        });
+        describe('getProcessorByName', function() {
+            it('Validate sequelize passed arguments', async () => {
+                sequelizeGetStub.returns([processor]);
+                const processorName = processor.name;
+                await sequelizeConnector.getProcessorByName(processorName);
+                should(sequelizeGetStub.calledOnce).eql(true);
+                should(sequelizeGetStub.args[0][0]).containDeep({ where: { name: processorName } });
+            });
         });
     });
 
