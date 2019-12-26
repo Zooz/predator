@@ -30,6 +30,17 @@ describe('Cassandra processors tests', function() {
         revert();
     });
 
+    describe('init', function() {
+        it('should assign the cassandra client successfully', function () {
+            const prevClient = cassandraClient.__get__('client');
+            const newClient = { clientId: 'fake-client' };
+            cassandraClient.init(newClient);
+            const updatedClient = cassandraClient.__get__('client');
+            updatedClient.should.equal(newClient);
+            cassandraClient.__set__('client', prevClient);
+        });
+    });
+
     describe('Insert new processor', function(){
         it('should succeed simple insert', function(){
             clientExecuteStub.resolves({ result: { rowLength: 0 } });
@@ -97,6 +108,27 @@ describe('Cassandra processors tests', function() {
                     });
             });
         });
+
+        describe('updateProcessor', function() {
+            it('should update the execute the update query sucessfully', async function() {
+                const updateProcessorQuery = cassandraClient._queries.UPDATE_PROCESSOR;
+                const processorId = uuid.v4();
+                const processor = {
+                    id: processorId,
+                    name: 'updated processor name',
+                    description: 'some processor',
+                    javascript: 'module.exports.mick = \'ey\'',
+                    created_at: Date.now()
+                };
+                clientExecuteStub.withArgs(updateProcessorQuery).resolves({ rows: [processor] });
+                cassandraClient.updateProcessor(processorId, processor).then(result => {
+                    clientExecuteStub.getCall(0).args[0].should.eql(updateProcessorQuery);
+                    clientExecuteStub.getCall(0).args[1][0].should.eql(processorId);
+                    should(result).containDeep(processor);
+                });
+            });
+        });
+
         describe('getProcessorByName', function() {
             it('should get a single processor', function() {
                 let processorId = uuid.v4();
