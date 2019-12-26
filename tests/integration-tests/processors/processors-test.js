@@ -3,6 +3,7 @@ const should = require('should'),
 
 let validHeaders = { 'Content-Type': 'application/json' };
 const requestSender = require('./helpers/requestCreator');
+const { ERROR_MESSAGES } = require('../../../src/common/consts');
 describe('Processors api', function() {
     this.timeout(5000000);
     before(async function () {
@@ -109,6 +110,10 @@ describe('Processors api', function() {
                 let getProcessorResponse = await requestSender.getProcessor(uuid(), validHeaders);
                 getProcessorResponse.statusCode.should.eql(404);
             });
+            after(async function() {
+                const deleteResponse = await requestSender.deleteProcessor(processor.id);
+                should(deleteResponse.statusCode).equal(204);
+            });
         });
         describe('POST /v1/processors', function () {
             it('Create processor', async () => {
@@ -148,6 +153,9 @@ describe('Processors api', function() {
                 should(updateResponse.statusCode).equal(200);
                 should(updateResponse.body.javascript).equal(processor.javascript);
                 should(updateResponse.body.description).equal(processor.description);
+
+                const deleteResponse = await requestSender.deleteProcessor(processorId);
+                should(deleteResponse.statusCode).equal(204);
             });
         });
     });
@@ -177,6 +185,47 @@ describe('Processors api', function() {
                 };
                 let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(400);
+            });
+            it('Create a processor with name that already exists', async function() {
+                const name = 'test-processor';
+                const processor = generateRawJSProcessor(name);
+                const createResponse = await requestSender.createProcessor(processor, validHeaders);
+                should(createResponse.statusCode).equal(201);
+                const processorId = createResponse.body.id;
+
+                const createWithSameNameResponse = await requestSender.createProcessor(processor, validHeaders);
+                should(createWithSameNameResponse.statusCode).equal(400);
+                should(createWithSameNameResponse.body.message).equal(ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST);
+
+                const deleteResponse = await requestSender.deleteProcessor(processorId);
+                should(deleteResponse.statusCode).equal(204);
+            });
+        });
+        describe('PUT /v1/processors', function() {
+            describe('update a processor name to one that already exist', function() {
+                it('should fail and return status code 400', async function() {
+                    const name = 'WowProcessor';
+                    const processor = generateRawJSProcessor(name);
+                    const createResponse = await requestSender.createProcessor(processor, validHeaders);
+                    should(createResponse.statusCode).equal(201);
+                    const processorId = createResponse.body.id;
+
+                    const otherName = 'NotSoWowProcessor';
+                    const otherNameProcessor = generateRawJSProcessor(otherName);
+                    const otherProcessorCreateResponse = await requestSender.createProcessor(otherNameProcessor, validHeaders);
+                    should(otherProcessorCreateResponse.statusCode).equal(201);
+                    const otherNameProcessorId = otherProcessorCreateResponse.body.id;
+
+                    processor.name = otherName;
+
+                    const updateResponse = await requestSender.updateProcessor(processorId, processor);
+                    should(updateResponse.statusCode).equal(400);
+                    should(updateResponse.body.message).equal(ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST);
+
+                    const deleteResponsesArray = await Promise.all([requestSender.deleteProcessor(processorId), requestSender.deleteProcessor(otherNameProcessorId)]);
+                    should(deleteResponsesArray[0].statusCode).equal(204);
+                    should(deleteResponsesArray[1].statusCode).equal(204);
+                });
             });
         });
     });

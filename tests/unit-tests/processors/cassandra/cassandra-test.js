@@ -111,7 +111,10 @@ describe('Cassandra processors tests', function() {
 
         describe('updateProcessor', function() {
             it('should update the execute the update query sucessfully', async function() {
+                const getProcessorQuery = cassandraClient._queries.GET_PROCESSOR_BY_ID;
                 const updateProcessorQuery = cassandraClient._queries.UPDATE_PROCESSOR;
+                const deleteProcessorMapping = cassandraClient._queries.DELETE_PROCESSOR_MAPPING;
+                const insertProcessorMapping = cassandraClient._queries.INSERT_PROCESSOR_MAPPING;
                 const processorId = uuid.v4();
                 const processor = {
                     id: processorId,
@@ -120,10 +123,24 @@ describe('Cassandra processors tests', function() {
                     javascript: 'module.exports.mick = \'ey\'',
                     created_at: Date.now()
                 };
+                const processorMapping = {
+                    name: processor.name,
+                    id: processorId
+                };
+                clientExecuteStub.withArgs(getProcessorQuery).resolves({ rows: [processor] });
                 clientExecuteStub.withArgs(updateProcessorQuery).resolves({ rows: [processor] });
+                clientExecuteStub.withArgs(insertProcessorMapping).resolves({ rows: [processorMapping] });
+                clientExecuteStub.withArgs(deleteProcessorMapping).resolves({ rows: [] });
                 cassandraClient.updateProcessor(processorId, processor).then(result => {
-                    clientExecuteStub.getCall(0).args[0].should.eql(updateProcessorQuery);
+                    clientExecuteStub.getCall(0).args[0].should.eql(getProcessorQuery);
                     clientExecuteStub.getCall(0).args[1][0].should.eql(processorId);
+                    clientExecuteStub.getCall(1).args[0].should.eql(updateProcessorQuery);
+                    clientExecuteStub.getCall(1).args[1][0].should.eql(processor.name);
+                    clientExecuteStub.getCall(2).args[0].should.eql(insertProcessorMapping);
+                    clientExecuteStub.getCall(2).args[1][0].should.eql(processor.name);
+                    clientExecuteStub.getCall(2).args[1][1].should.eql(processor.id);
+                    clientExecuteStub.getCall(3).args[0].should.eql(deleteProcessorMapping);
+                    clientExecuteStub.getCall(3).args[1][0].should.eql(processor.name);
                     should(result).containDeep(processor);
                 });
             });

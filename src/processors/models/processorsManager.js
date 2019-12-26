@@ -8,11 +8,11 @@ const logger = require('../../common/logger'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports.createProcessor = async function (processor) {
-    let processorId = uuid.v4();
     const processorWithTheSameName = await databaseConnector.getProcessorByName(processor.name);
     if (processorWithTheSameName) {
         throw generateProcessorNameAlreadyExistsError();
     }
+    let processorId = uuid.v4();
     try {
         fileManager.validateJavascriptContent(processor.javascript);
         await databaseConnector.insertProcessor(processorId, processor);
