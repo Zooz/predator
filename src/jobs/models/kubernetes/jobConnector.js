@@ -115,7 +115,7 @@ async function getJobControllerUid(jobPlatformName, platformSpecificInternalRunI
 async function getLogsByPodsNames(podsNames, predatorRunnerPrefix) {
     let logs = [];
     podsNames.forEach((podName) => {
-        let url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=%s', kubernetesUrl, kubernetesNamespace, podName, predatorRunnerPrefix);
+        let url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=%s', kubernetesUrl, kubernetesNamespace, podName, 'predator-runner');
         let options = {
             url,
             method: 'GET',
