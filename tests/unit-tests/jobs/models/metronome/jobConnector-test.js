@@ -166,5 +166,16 @@ describe('Metronome job connector tests', function () {
                 }
             });
         });
+
+        describe('Delete all containers', () => {
+            it('Should return 501', async () => {
+                try {
+                    await jobConnector.deleteAllContainers('predator-runner');
+                    throw new Error('Should not get here');
+                } catch (error) {
+                    error.statusCode.should.eql(501);
+                }
+            });
+        });
     });
 });

@@ -3,6 +3,7 @@ let app = require('../../../../src/app');
 let testApp;
 module.exports = {
     init,
+    deletePredatorRunnerContainers,
     deleteJobFromScheduler,
     createJob,
     updateJob,
@@ -15,6 +16,12 @@ module.exports = {
 
 async function init() {
     testApp = await app();
+}
+
+function deletePredatorRunnerContainers() {
+    return request(testApp).delete('/v1/jobs/runs/containers')
+        .send()
+        .set({ 'Content-Type': 'application/json' });
 }
 
 function deleteJobFromScheduler(jobId) {

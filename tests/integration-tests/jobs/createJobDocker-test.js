@@ -6,7 +6,6 @@ const should = require('should'),
     nock = require('nock'),
     Docker = require('dockerode'),
     dockerConfig = require('../../../src/config/dockerConfig');
-
 let dockerConnection;
 if (dockerConfig.host) {
     const dockerUrl = new URL(dockerConfig.host);
@@ -18,7 +17,7 @@ if (dockerConfig.host) {
         key: dockerConfig.certPath ? fs.readFileSync(dockerConfig.certPath + '/key.pem') : undefined
     };
 } else {
-    dockerConnection = ({socketPath: '/var/run/docker.sock'});
+    dockerConnection = ({ socketPath: '/var/run/docker.sock' });
 }
 let docker = new Docker(dockerConnection);
 
@@ -136,6 +135,32 @@ describe('Create job specific docker tests', async function () {
                         });
 
                         should(getJobsFromService.status).eql(404);
+                    });
+
+                    it('Verify containers exists', async () => {
+                        let containers = await docker.listContainers();
+                        containers = containers.filter(container => {
+                            return container.Names && container.Names[0] &&
+                                container.Names[0].includes('predator-runner');
+                        });
+                        should(containers.length).eql(2);
+                    });
+
+                    it('Wait for 5 seconds to let predator runner finish', (done) => {
+                        setTimeout(done, 5000);
+                    });
+
+                    it('Delete containers', async () => {
+                        let deleteJobResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                        should(deleteJobResponse.status).eql(200);
+                        should(deleteJobResponse.body.deleted).eql(2);
+
+                        let containers = await docker.listContainers();
+                        containers = containers.filter(container => {
+                            return container.Names && container.Names[0] &&
+                                container.Names[0].includes('predator-runner');
+                        });
+                        should(containers.length).eql(0, 'expecting all containers to be deleted');
                     });
                 });
             });

@@ -110,3 +110,9 @@ async function getPodsByLabel(jobControllerUid) {
     });
     return podsNames;
 }
+
+module.exports.deleteAllContainers = async function () {
+    let error = new Error('Deleting containers not supported in metronome');
+    error.statusCode = 501;
+    throw error;
+};

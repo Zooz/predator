@@ -750,10 +750,13 @@ paths:
       tags:
       - Jobs
       description: delete all containers/pods of predator-runner
-      parameters:
       responses:
-        '204':
+        '200':
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete_containers_response'
         '500':
           description: Internal server error
           content:
@@ -1714,6 +1717,13 @@ components:
           description: Ability to enable/disable scheduled jobs.
           example: true
           default: true
+    delete_containers_response:
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: number
+          description: Number of deleted containers.
     job_response:
       allOf:
       - $ref: '#/components/schemas/job'
