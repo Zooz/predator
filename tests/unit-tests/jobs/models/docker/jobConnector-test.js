@@ -38,7 +38,7 @@ describe('Docker job connector tests', function () {
         containerLogsStub = sandbox.stub();
         containerLogsStub.resolves('this is the log');
 
-        getContainerStub.resolves({ stop: containerStopStub, logs: containerLogsStub });
+        getContainerStub.resolves({ stop: containerStopStub, logs: containerLogsStub, remove: () => {} });
 
         pullStub = sandbox.stub();
 
@@ -209,6 +209,36 @@ describe('Docker job connector tests', function () {
                 throw new Error('Should not get here');
             } catch (error) {
                 error.message.should.eql('Failure getting jobs');
+            }
+        });
+    });
+
+    describe('Delete all containers', () => {
+        it('Delete 3 containers', async () => {
+            listContainersStub.resolves([
+                { Names: ['predator-runner.0'] },
+                { Names: ['predator-runner.1'] },
+                { Names: ['predator-runner.2'] }]);
+
+            let result = await jobConnector.deleteAllContainers('predator-runner');
+            should(result).eql({ deleted: 3 });
+        });
+
+        it('Delete containers does not find anything to delete', async () => {
+            listContainersStub.resolves([]);
+
+            let result = await jobConnector.deleteAllContainers('predator-runner');
+
+            should(result).eql({ deleted: 0 });
+        });
+
+        it('Failure deleting containers', async () => {
+            listContainersStub.rejects(new Error('Failure deleting jobs'));
+            try {
+                await jobConnector.deleteAllContainers('predator-runner');
+                throw new Error('Should not get here');
+            } catch (error) {
+                error.message.should.eql('Failure deleting jobs');
             }
         });
     });
