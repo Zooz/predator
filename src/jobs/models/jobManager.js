@@ -67,7 +67,7 @@ module.exports.stopRun = async function (jobId, runId) {
 module.exports.deleteAllContainers = async function () {
     const configData = await configHandler.getConfig();
     const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
-    let result = await jobConnector.deleteAllContainers(util.format(PREDATOR_RUNNER, ''));
+    let result = await jobConnector.deleteAllContainers(PREDATOR_RUNNER);
     return result;
 };
 
