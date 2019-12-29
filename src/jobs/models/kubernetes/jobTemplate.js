@@ -1,4 +1,4 @@
-module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData) => {
+module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, predatorRunner) => {
     return {
         'apiVersion': 'batch/v1',
         'kind': 'Job',
@@ -11,7 +11,7 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
                 'spec': {
                     'containers': [
                         {
-                            'name': 'predator-runner',
+                            'name': predatorRunner,
                             'image': dockerImage,
                             'resources': {
                                 'requests': {

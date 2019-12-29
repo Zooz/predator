@@ -8,7 +8,8 @@ const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector');
 
 let cronJobs = {};
-const JOB_PLATFORM_NAME = 'predator-runner.%s';
+const PREDATOR_RUNNER = 'predator-runner';
+const JOB_PLATFORM_NAME = PREDATOR_RUNNER + '.%s';
 
 module.exports.reloadCronJobs = async function () {
     const configData = await configHandler.getConfig();
@@ -66,7 +67,7 @@ module.exports.stopRun = async function (jobId, runId) {
 module.exports.deleteAllContainers = async function () {
     const configData = await configHandler.getConfig();
     const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
-    let result = await jobConnector.deleteAllContainers(util.format(JOB_PLATFORM_NAME, ''));
+    let result = await jobConnector.deleteAllContainers(util.format(PREDATOR_RUNNER, ''));
     return result;
 };
 
@@ -246,7 +247,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         });
     }
 
-    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData);
+    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER);
 
     return jobRequest;
 }

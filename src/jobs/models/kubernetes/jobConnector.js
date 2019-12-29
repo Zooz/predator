@@ -111,8 +111,32 @@ async function getPodsByLabel(jobControllerUid) {
     return podsNames;
 }
 
-module.exports.deleteAllContainers = async function () {
-    let error = new Error('Deleting containers not supported in metronome');
-    error.statusCode = 501;
-    throw error;
+module.exports.deleteAllContainers = async (jobPlatformName) => {
+    let url = util.format('%s/api/v1/namespaces/%s/pods?container=%s', kubernetesUrl, kubernetesNamespace, jobPlatformName);
+    let options = {
+        url,
+        method: 'GET',
+        headers
+    };
+
+    let response = await requestSender.send(options);
+
+    let deleted = 0;
+    for (let i = 0; i < response.items.length; i++) {
+        let item = response.items[i];
+        let containers = item.status.containerStatuses;
+        if (containers && containers.state.terminated && containers.state.terminated.finishedAt) {
+            let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, item.metadata.labels['job-name']);
+
+            let options = {
+                url,
+                method: 'DELETE',
+                headers
+            };
+
+            await requestSender.send(options);
+            deleted++;
+        }
+    }
+    return { deleted };
 };

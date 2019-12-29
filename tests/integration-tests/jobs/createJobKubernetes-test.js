@@ -349,7 +349,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Stop run', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}?propagationPolicy=Foreground`)
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator-runner.${createJobResponse.body.id}-${createJobResponse.body.run_id}?propagationPolicy=Foreground`)
                             .reply(200);
 
                         let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
@@ -369,6 +369,32 @@ describe('Create job specific kubernetes tests', async function () {
                         });
 
                         should(getJobsFromService.status).eql(404);
+                    });
+
+                    it('Delete the containers', async () => {
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods?container=predator-runner`)
+                            .reply(200, {
+                                items: [
+                                    {
+                                        metadata:
+                                            { labels: { 'job-name': 'predator-runner' } },
+                                        status:
+                                            { containerStatuses: { name: 'podA',
+                                                state: { terminated: { finishedAt: '2020' } } } } },
+                                    {
+                                        status:
+                                            {
+                                                containerStatuses: { name: 'podB',
+                                                    state: { terminated: { } } } } }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator-runner?propagationPolicy=Foreground`)
+                            .reply(200);
+
+                        let deleteJobResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                        should(deleteJobResponse.status).eql(200);
+                        should(deleteJobResponse.body.deleted).eql(1);
                     });
                 });
 

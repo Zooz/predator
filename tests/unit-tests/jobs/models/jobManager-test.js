@@ -931,7 +931,7 @@ describe('Manager tests', function () {
                 deleted: 10
             });
 
-            jobDeleteContainerStub.args[0][0].should.containEql('predator-runner.');
+            jobDeleteContainerStub.args[0][0].should.containEql('predator-runner');
         });
 
         it('Get logs from job fails', async function () {
