@@ -141,7 +141,7 @@ describe('Create job specific docker tests', async function () {
                         let containers = await docker.listContainers();
                         containers = containers.filter(container => {
                             return container.Names && container.Names[0] &&
-                                container.Names[0].includes('predator-runner');
+                                container.Names[0].includes('predator.');
                         });
                         should(containers.length).eql(2);
                     });

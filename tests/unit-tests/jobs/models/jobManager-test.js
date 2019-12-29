@@ -675,7 +675,7 @@ describe('Manager tests', function () {
             await manager.stopRun('jobId', 'runId', 'internalRunId');
             jobStopRunStub.callCount.should.eql(1);
             jobStopRunStub.args[0].should.eql([
-                'predator-runner.jobId',
+                'predator.jobId',
                 'runId'
             ]);
         });
@@ -931,7 +931,7 @@ describe('Manager tests', function () {
                 deleted: 10
             });
 
-            jobDeleteContainerStub.args[0][0].should.containEql('predator-runner');
+            jobDeleteContainerStub.args[0][0].should.containEql('predator');
         });
 
         it('Get logs from job fails', async function () {

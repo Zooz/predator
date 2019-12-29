@@ -8,8 +8,8 @@ const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector');
 
 let cronJobs = {};
-const PREDATOR_RUNNER = 'predator-runner';
-const JOB_PLATFORM_NAME = PREDATOR_RUNNER + '.%s';
+const PREDATOR_RUNNER_PREFIX = 'predator';
+const JOB_PLATFORM_NAME = PREDATOR_RUNNER_PREFIX + '.%s';
 
 module.exports.reloadCronJobs = async function () {
     const configData = await configHandler.getConfig();
@@ -67,14 +67,14 @@ module.exports.stopRun = async function (jobId, runId) {
 module.exports.deleteAllContainers = async function () {
     const configData = await configHandler.getConfig();
     const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
-    let result = await jobConnector.deleteAllContainers(PREDATOR_RUNNER);
+    let result = await jobConnector.deleteAllContainers(PREDATOR_RUNNER_PREFIX);
     return result;
 };
 
 module.exports.getLogs = async function (jobId, runId) {
     const configData = await configHandler.getConfig();
     const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
-    let logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), runId);
+    let logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), runId, PREDATOR_RUNNER_PREFIX);
     let response = {
         files: logs,
         filename: `${jobId}-${runId}.zip`
@@ -247,7 +247,7 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         });
     }
 
-    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER);
+    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX);
 
     return jobRequest;
 }
