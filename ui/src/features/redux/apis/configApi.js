@@ -23,3 +23,11 @@ export const deleteFrameworkConfigKey = (configKey) => {
     });
 };
 
+
+export const cleanFinishedContainersApi = () => {
+    return axios.delete(`${env.PREDATOR_URL}/jobs/runs/containers`, {
+        headers: {},
+        responseType: 'json'
+    });
+};
+

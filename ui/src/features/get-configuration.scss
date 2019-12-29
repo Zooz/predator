@@ -1,6 +1,31 @@
 
 
 .card-wrapper {
-  width:50%;
-  margin-bottom: 80px
+  margin-bottom: 80px;
+}
+
+.action-style {
+  color:#557eff;
+  cursor: pointer;
+  height:46px;
+  display:flex;
+  align-items: center;
+}
+
+.disabled-button {
+  color: #b4c9d3;
+  cursor: not-allowed;
+}
+
+
+.icon {
+  font-size:20px;
+}
+
+.configuration-item-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1
 }

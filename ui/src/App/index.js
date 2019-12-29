@@ -43,7 +43,7 @@ class App extends React.Component {
               <Route exact path='/last_reports' render={props => (
                 <GetReports {...props} />
               )} />
-            <Route exact path='/configuration' render={props => (
+            <Route exact path='/settings' render={props => (
                 <Configuration {...props} />
              )} />
             </DrawerE>
