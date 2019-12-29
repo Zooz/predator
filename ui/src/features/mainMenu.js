@@ -31,9 +31,9 @@ module.exports = [
     },
     {
         key: 3,
-        primaryText: 'Configuration',
-        navigateTo: 'configuration',
-        icon: faWrench
+        primaryText: 'Settings',
+        navigateTo: 'settings',
+        icon: faWrench,
     },
     {
         key: 4,

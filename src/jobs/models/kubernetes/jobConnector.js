@@ -75,7 +75,7 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
         let pod = await getPodByName(allPredatorRunnersPods[i]);
 
         let containers = pod.status.containerStatuses;
-        containers = containers.find(o => o.name === jobPlatformName);
+        containers = containers.find(o => o.name === 'predator-runner');
         if (containers && containers.state.terminated && containers.state.terminated.finishedAt) {
             await deleteContainer(pod);
             deleted++;
