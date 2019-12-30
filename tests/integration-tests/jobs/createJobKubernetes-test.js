@@ -243,12 +243,12 @@ describe('Create job specific kubernetes tests', async function () {
                                 items: [{ metadata: { name: 'podA' } }, { metadata: { name: 'podB' } }]
                             });
 
-                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podA/log?container=predator`)
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podA/log?container=predator-runner`)
                             .reply(200, {
                                 items: [{ content: 'log' }]
                             });
 
-                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podB/log?container=predator`)
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podB/log?container=predator-runner`)
                             .reply(200, {
                                 items: [{ content: 'log' }]
                             });
@@ -391,7 +391,7 @@ describe('Create job specific kubernetes tests', async function () {
                         nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podA`)
                             .reply(200, {
                                 metadata: { labels: { 'job-name': 'predator.job' } },
-                                status: { containerStatuses: [{ name: 'predator',
+                                status: { containerStatuses: [{ name: 'predator-runner',
                                     state: { terminated: { finishedAt: '2020' } } }, { name: 'podB',
                                     state: {} }] }
 

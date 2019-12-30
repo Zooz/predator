@@ -75,7 +75,7 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
         let pod = await getPodByName(allPredatorRunnersPods[i]);
 
         let containers = pod.status.containerStatuses;
-        containers = containers.find(o => o.name === jobPlatformName);
+        containers = containers.find(o => o.name === 'predator-runner');
         if (containers && containers.state.terminated && containers.state.terminated.finishedAt) {
             await deleteContainer(pod);
             deleted++;
@@ -115,7 +115,7 @@ async function getJobControllerUid(jobPlatformName, platformSpecificInternalRunI
 async function getLogsByPodsNames(podsNames, predatorRunnerPrefix) {
     let logs = [];
     podsNames.forEach((podName) => {
-        let url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=%s', kubernetesUrl, kubernetesNamespace, podName, predatorRunnerPrefix);
+        let url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=%s', kubernetesUrl, kubernetesNamespace, podName, 'predator-runner');
         let options = {
             url,
             method: 'GET',
