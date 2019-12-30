@@ -51,7 +51,7 @@ class getConfiguration extends React.Component {
 
     render() {
         const {config, errorOnGetConfig, processingGetConfig, cleanFinishedContainersSuccess, cleanFinishedContainersFailure} = this.props;
-       const currentError = cleanFinishedContainersFailure || errorOnGetConfig;
+        const currentError = cleanFinishedContainersFailure || errorOnGetConfig;
         return (
             <Page title={'Settings'} description={'Customize Predator behavior'}>
                 <div>
@@ -81,10 +81,10 @@ class getConfiguration extends React.Component {
                     bodyStyle={{backgroundColor: '#2fbb67'}}
                     message={`${cleanFinishedContainersSuccess.deleted} containers were deleted`}
                     autoHideDuration={4000}
-                    // onRequestClose={this.handleSnackbarClose}
+                    onRequestClose={() => this.props.setCleanFinishedContainersSuccess(undefined)}
                 />}
 
-                {currentError&&
+                {currentError &&
                 <ErrorDialog closeDialog={() => {
                     this.props.setCleanFinishedContainersFailure(undefined);
                     this.props.getConfigFailure(undefined);
@@ -113,7 +113,8 @@ const mapDispatchToProps = {
     updateConfigSuccess: Actions.updateConfigSuccess,
     getConfigFailure: Actions.getConfigFailure,
     cleanFinishedContainers: Actions.cleanFinishedContainers,
-    setCleanFinishedContainersFailure: Actions.cleanFinishedContainersFailure
+    setCleanFinishedContainersFailure: Actions.cleanFinishedContainersFailure,
+    setCleanFinishedContainersSuccess: Actions.cleanFinishedContainersSuccess,
 
 };
 
