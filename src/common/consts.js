@@ -3,7 +3,8 @@ module.exports = {
     TEST_TYPE_DSL: 'dsl',
     ERROR_MESSAGES: {
         NOT_FOUND: 'Not found',
-        DSL_DEF_ALREADY_EXIST: 'Definition already exists'
+        DSL_DEF_ALREADY_EXIST: 'Definition already exists',
+        PROCESSOR_NAME_ALREADY_EXIST: 'Processor name already exists'
     },
     KUBERNETES: 'KUBERNETES',
     METRONOME: 'METRONOME',

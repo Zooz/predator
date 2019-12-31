@@ -6,7 +6,8 @@ module.exports = {
     init,
     getAllProcessors,
     insertProcessor,
-    getProcessor,
+    getProcessorById,
+    getProcessorByName,
     deleteProcessor,
     updateProcessor,
     closeConnection
@@ -28,8 +29,12 @@ async function getAllProcessors(from, limit) {
     return databaseConnector.getAllProcessors(from, limit);
 }
 
-async function getProcessor(processorId) {
-    return databaseConnector.getProcessor(processorId);
+async function getProcessorById(processorId) {
+    return databaseConnector.getProcessorById(processorId);
+}
+
+async function getProcessorByName(name) {
+    return databaseConnector.getProcessorByName(name);
 }
 
 async function updateProcessor(processorId, updatedProcessor) {

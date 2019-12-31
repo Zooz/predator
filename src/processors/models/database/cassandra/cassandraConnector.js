@@ -5,17 +5,32 @@ let client;
 
 const INSERT_PROCESSOR = 'INSERT INTO processors(id, name, description, javascript, created_at, updated_at) values(?,?,?,?,?,?)';
 const GET_ALL_PROCESSORS = 'SELECT * FROM processors';
-const GET_PROCESSOR = 'SELECT * FROM processors WHERE id=?';
+const GET_PROCESSOR_BY_ID = 'SELECT * FROM processors WHERE id=?';
 const DELETE_PROCESSOR = 'DELETE FROM processors WHERE id=?';
 const UPDATE_PROCESSOR = 'UPDATE processors SET name=?, description=?, javascript=?, updated_at=? WHERE id=? AND created_at=? IF EXISTS';
+
+const INSERT_PROCESSOR_MAPPING = 'INSERT INTO processors_mapping(name, id) VALUES(?, ?)';
+const DELETE_PROCESSOR_MAPPING = 'DELETE FROM processors_mapping WHERE name=?';
+const GET_PROCESSOR_MAPPING = 'SELECT * FROM processors_mapping WHERE name=?';
 
 module.exports = {
     init,
     insertProcessor,
     getAllProcessors,
-    getProcessor,
+    getProcessorById,
+    getProcessorByName,
     deleteProcessor,
-    updateProcessor
+    updateProcessor,
+    _queries: {
+        INSERT_PROCESSOR_MAPPING,
+        DELETE_PROCESSOR_MAPPING,
+        GET_PROCESSOR_MAPPING,
+        INSERT_PROCESSOR,
+        GET_ALL_PROCESSORS,
+        GET_PROCESSOR_BY_ID,
+        DELETE_PROCESSOR,
+        UPDATE_PROCESSOR
+    }
 };
 
 let queryOptions = {
@@ -32,26 +47,49 @@ async function getAllProcessors(from, limit) {
     return _(resultRows).slice(from).take(limit).value();
 }
 
-async function getProcessor(processorId) {
-    const processor = await executeQuery(GET_PROCESSOR, [processorId], queryOptions);
+async function getProcessorByName(processorName) {
+    const [processorMapping] = await executeQuery(GET_PROCESSOR_MAPPING, [processorName], queryOptions);
+    if (processorMapping) {
+        return getProcessorById(processorMapping.id);
+    }
+}
+
+async function getProcessorById(processorId) {
+    const processor = await executeQuery(GET_PROCESSOR_BY_ID, [processorId], queryOptions);
     return processor[0];
 }
 
-function deleteProcessor(processorId) {
+async function deleteProcessor(processorId) {
     let params = [processorId];
-    return executeQuery(DELETE_PROCESSOR, params, queryOptions);
+    let processor = await getProcessorById(processorId);
+    if (processor) {
+        let mappingParams = [processor.name];
+        return Promise.all([
+            executeQuery(DELETE_PROCESSOR, params, queryOptions),
+            executeQuery(DELETE_PROCESSOR_MAPPING, mappingParams, queryOptions)
+        ]);
+    }
 }
 
 async function insertProcessor(processorId, processorInfo) {
     let params = [processorId, processorInfo.name, processorInfo.description, processorInfo.javascript, Date.now(), Date.now()];
-    const processor = await executeQuery(INSERT_PROCESSOR, params, queryOptions);
+    let mappingParams = [processorInfo.name, processorId];
+    const [processor] = await Promise.all([
+        executeQuery(INSERT_PROCESSOR, params, queryOptions),
+        executeQuery(INSERT_PROCESSOR_MAPPING, mappingParams, queryOptions)
+    ]);
     return processor;
 }
 
 async function updateProcessor(processorId, updatedProcessor) {
     const { name, description, javascript, created_at: createdAt } = updatedProcessor;
+    const processor = await getProcessorById(processorId);
     const params = [ name, description, javascript, Date.now(), processorId, createdAt.getTime() ];
-    return executeQuery(UPDATE_PROCESSOR, params, {});
+    return Promise.all([
+        executeQuery(UPDATE_PROCESSOR, params, queryOptions),
+        executeQuery(INSERT_PROCESSOR_MAPPING, [updatedProcessor.name, processorId]),
+        executeQuery(DELETE_PROCESSOR_MAPPING, [processor.name])
+    ]);
 }
 
 function executeQuery(query, params, queryOptions) {
