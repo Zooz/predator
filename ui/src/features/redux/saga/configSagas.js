@@ -1,7 +1,7 @@
 import {put, takeLatest, call} from 'redux-saga/effects'
 import * as Actions from '../actions/configActions'
 import * as Types from '../types/configTypes'
-import {getFrameworkConfig, updateFrameworkConfig, deleteFrameworkConfigKey} from '../apis/configApi'
+import {getFrameworkConfig, updateFrameworkConfig, deleteFrameworkConfigKey,cleanFinishedContainersApi} from '../apis/configApi'
 import _ from 'lodash';
 
 export function* getConfig() {
@@ -13,6 +13,15 @@ export function* getConfig() {
         yield put(Actions.getConfigFailure(e))
     }
     yield put(Actions.processGetConfig(false));
+}
+
+export function* cleanFinishedContainers() {
+    try {
+        const config = yield call(cleanFinishedContainersApi);
+        yield put(Actions.cleanFinishedContainersSuccess(config.data));
+    } catch (e) {
+        yield put(Actions.cleanFinishedContainersFailure(e))
+    }
 }
 
 export function* editConfig(action) {
@@ -57,4 +66,5 @@ export function* configRegister() {
     yield takeLatest(Types.GET_CONFIG, getConfig);
     yield takeLatest(Types.UPDATE_CONFIG, editConfig);
     yield takeLatest(Types.DELETE_CONFIG_KEY, deleteConfigKey);
+    yield takeLatest(Types.CLEAN_FINISHED_CONTAINERS, cleanFinishedContainers);
 }

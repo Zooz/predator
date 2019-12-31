@@ -115,6 +115,7 @@ describe('Manager tests', function () {
     let jobConnectorRunJobStub;
     let jobStopRunStub;
     let jobGetLogsStub;
+    let jobDeleteContainerStub;
     let uuidStub;
     let cassandraDeleteStub;
     let cassandraGetStub;
@@ -132,6 +133,7 @@ describe('Manager tests', function () {
         cassandraDeleteStub = sandbox.stub(databaseConnector, 'deleteJob');
         cassandraUpdateJobStub = sandbox.stub(databaseConnector, 'updateJob');
         jobGetLogsStub = sandbox.stub(jobConnector, 'getLogs');
+        jobDeleteContainerStub = sandbox.stub(jobConnector, 'deleteAllContainers');
         jobStopRunStub = sandbox.stub(jobConnector, 'stopRun');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
@@ -917,6 +919,28 @@ describe('Manager tests', function () {
                 throw new Error('should not get here');
             } catch (error) {
                 error.message.should.eql('error getting logs');
+            }
+        });
+    });
+
+    describe('Delete containers', function () {
+        it('Success deleting jobs from connector', async function () {
+            jobDeleteContainerStub.resolves({deleted: 10});
+            let result = await manager.deleteAllContainers();
+            result.should.eql({
+                deleted: 10
+            });
+
+            jobDeleteContainerStub.args[0][0].should.containEql('predator');
+        });
+
+        it('Get logs from job fails', async function () {
+            jobDeleteContainerStub.rejects({message: 'Failed to delete containers'});
+            try {
+                await manager.deleteAllContainers();
+                throw new Error('should not get here');
+            } catch (error) {
+                error.message.should.eql('Failed to delete containers');
             }
         });
     });

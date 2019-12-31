@@ -7,7 +7,8 @@ const initialState = Immutable.Map({
     processing_update_config: false,
     processing_delete_config_key: false,
     error_get_config: undefined,
-    error_update_config: undefined
+    error_update_config: undefined,
+    clean_finished_containers_success: undefined
 });
 
 export default function reduce (state = initialState, action = {}) {
@@ -30,6 +31,10 @@ export default function reduce (state = initialState, action = {}) {
             return state.set('update_config_success', true);
         case Types.CLEAN_UPDATE_CONFIG_SUCCESS:
             return state.set('update_config_success', undefined);
+        case Types.CLEAN_FINISHED_CONTAINERS_SUCCESS:
+            return state.set('clean_finished_containers_success', action.result);
+        case Types.CLEAN_FINISHED_CONTAINERS_FAILURE:
+            return state.set('clean_finished_containers_failure', action.error);
         default:
             return state;
     }

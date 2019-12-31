@@ -100,8 +100,8 @@ describe('Create job specific kubernetes tests', async function () {
                             test_id: testId,
                             arrival_rate: 1,
                             duration: 1,
-                            environment: 'test'
-                        });
+                            environment: 'test',
+                            enabled: true });
 
                         should(relevantJobs).containEql({
                             id: cronJobId,
@@ -109,7 +109,8 @@ describe('Create job specific kubernetes tests', async function () {
                             cron_expression: '* 10 * * * *',
                             arrival_rate: 1,
                             duration: 1,
-                            environment: 'test'
+                            environment: 'test',
+                            enabled: true
                         });
                     });
 
@@ -170,8 +171,8 @@ describe('Create job specific kubernetes tests', async function () {
                         should(numberOfCallsToRunTest).eql(0);
                     });
 
-                    it('Enable job', () => {
-                        schedulerRequestCreator.updateJob(jobId, { enabled: true }, {
+                    it('Enable job', async () => {
+                        await schedulerRequestCreator.updateJob(jobId, { enabled: true }, {
                             'Content-Type': 'application/json'
                         });
                     });
@@ -369,6 +370,48 @@ describe('Create job specific kubernetes tests', async function () {
                         });
 
                         should(getJobsFromService.status).eql(404);
+                    });
+
+                    it('Delete the containers', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs?labelSelector=app=predator`)
+                            .reply(200, {
+                                items: [{ metadata: { uid: 'x' } }, { metadata: { uid: 'y' } }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods?labelSelector=controller-uid=x`)
+                            .reply(200, {
+                                items: [{ metadata: { name: 'podA' } }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods?labelSelector=controller-uid=y`)
+                            .reply(200, {
+                                items: [{ metadata: { name: 'podB' } }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podA`)
+                            .reply(200, {
+                                metadata: { labels: { 'job-name': 'predator.job' } },
+                                status: { containerStatuses: [{ name: 'predator-runner',
+                                    state: { terminated: { finishedAt: '2020' } } }, { name: 'podB',
+                                    state: {} }] }
+
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podB`)
+                            .reply(200, {
+                                metadata: { labels: { 'job-name': 'someJob.job' } },
+                                status: { containerStatuses: [{ name: 'podC',
+                                    state: { terminated: { finishedAt: '2020' } } }, { name: 'podD',
+                                    state: {} }] }
+
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job?propagationPolicy=Foreground`)
+                            .reply(200);
+
+                        let deleteJobResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                        should(deleteJobResponse.status).eql(200);
+                        should(deleteJobResponse.body.deleted).eql(1);
                     });
                 });
 

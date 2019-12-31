@@ -18,7 +18,7 @@ describe('Kubernetes job connector tests', function () {
     });
 
     beforeEach(() => {
-        sandbox.resetHistory();
+        sandbox.reset();
     });
 
     after(() => {
@@ -70,7 +70,7 @@ describe('Kubernetes job connector tests', function () {
         it('Failure Stopping a running run of specific job', async () => {
             requestSenderSendStub.rejects(new Error('timeout'));
             try {
-                await jobConnector.stopRun('jobPlatformName');
+                await jobConnector.stopRun('predator-runner');
                 throw new Error('Should not get here');
             } catch (error) {
                 error.message.should.eql('timeout');
@@ -90,7 +90,7 @@ describe('Kubernetes job connector tests', function () {
 
             requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podB/log?container=predator-runner' })).resolves('bLog');
 
-            let logs = await jobConnector.getLogs('jobPlatformName', 'runId');
+            let logs = await jobConnector.getLogs('jobPlatformName', 'runId', 'predator-runner');
 
             logs.should.eql([{ type: 'file', name: 'podA.txt', content: 'aLog' },
                 { type: 'file', name: 'podB.txt', content: 'bLog' }]);
@@ -102,6 +102,47 @@ describe('Kubernetes job connector tests', function () {
                 .rejects(new Error('Error in kubernetes'));
             try {
                 await jobConnector.getLogs('jobPlatformName', 'runId');
+                throw new Error('Should not get here');
+            } catch (error) {
+                error.message.should.eql('Error in kubernetes');
+            }
+        });
+    });
+
+    describe('Delete all containers', () => {
+        it('Should success delete job', async () => {
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs?labelSelector=app=predator-runner' })).resolves({
+                items: [ { metadata: { uid: 'x' } } ]
+            });
+
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods?labelSelector=controller-uid=x' })).resolves({
+                items: [{ metadata: { name: 'podA' } }]
+            });
+
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podA' })).resolves({
+                metadata: { labels: { 'job-name': 'predator.job' } },
+                status: { containerStatuses: [{ name: 'predator-runner',
+                    state: { terminated: { finishedAt: '2020' } } }, { name: 'podB',
+                    state: {} }] }
+
+            });
+
+            let result = await jobConnector.deleteAllContainers('predator-runner');
+
+            requestSenderSendStub.args[3][0].should.eql({
+                url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/predator.job?propagationPolicy=Foreground',
+                method: 'DELETE',
+                headers: {}
+            });
+
+            should(result.deleted).eql(1);
+        });
+
+        it('Fails due to error in kubernetes', async () => {
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs?labelSelector=app=predator-runner' })).rejects(new Error('Error in kubernetes'));
+
+            try {
+                await jobConnector.deleteAllContainers('predator-runner');
                 throw new Error('Should not get here');
             } catch (error) {
                 error.message.should.eql('Error in kubernetes');

@@ -52,15 +52,51 @@ module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) 
     await requestSender.send(options);
 };
 
-module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId) => {
+module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId, predatorRunnerPrefix) => {
     let jobControllerUid = await getJobControllerUid(jobPlatformName, platformSpecificInternalRunId);
 
     let podsNames = await getPodsByLabel(jobControllerUid);
 
-    let logs = await getLogsByPodsNames(podsNames);
+    let logs = await getLogsByPodsNames(podsNames, predatorRunnerPrefix);
 
     return logs;
 };
+
+module.exports.deleteAllContainers = async (jobPlatformName) => {
+    let jobs = await getAllPredatorRunnerJobs(jobPlatformName);
+    let allPredatorRunnersPods = [];
+    for (let i = 0; i < jobs.length; i++) {
+        const pods = await getPodsByLabel(jobs[i].metadata.uid);
+        allPredatorRunnersPods = allPredatorRunnersPods.concat(pods);
+    }
+
+    let deleted = 0;
+    for (let i = 0; i < allPredatorRunnersPods.length; i++) {
+        let pod = await getPodByName(allPredatorRunnersPods[i]);
+
+        let containers = pod.status.containerStatuses;
+        containers = containers.find(o => o.name === 'predator-runner');
+        if (containers && containers.state.terminated && containers.state.terminated.finishedAt) {
+            await deleteContainer(pod);
+            deleted++;
+        }
+    }
+    return { deleted };
+};
+
+async function getAllPredatorRunnerJobs(jobPlatformName) {
+    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs?labelSelector=app=%s', kubernetesUrl, kubernetesNamespace, jobPlatformName);
+
+    let options = {
+        url,
+        method: 'GET',
+        headers
+    };
+
+    let jobs = await requestSender.send(options);
+    jobs = jobs.items;
+    return jobs;
+}
 
 async function getJobControllerUid(jobPlatformName, platformSpecificInternalRunId) {
     let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
@@ -76,10 +112,10 @@ async function getJobControllerUid(jobPlatformName, platformSpecificInternalRunI
     return controllerUid;
 }
 
-async function getLogsByPodsNames(podsNames) {
+async function getLogsByPodsNames(podsNames, predatorRunnerPrefix) {
     let logs = [];
     podsNames.forEach((podName) => {
-        let url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=predator-runner', kubernetesUrl, kubernetesNamespace, podName);
+        let url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=%s', kubernetesUrl, kubernetesNamespace, podName, 'predator-runner');
         let options = {
             url,
             method: 'GET',
@@ -109,4 +145,27 @@ async function getPodsByLabel(jobControllerUid) {
         return pod.metadata.name;
     });
     return podsNames;
+}
+
+async function getPodByName(podName) {
+    let url = util.format('%s/api/v1/namespaces/%s/pods/%s', kubernetesUrl, kubernetesNamespace, podName);
+    let options = {
+        url,
+        method: 'GET',
+        headers
+    };
+    let pod = await requestSender.send(options);
+    return pod;
+}
+
+async function deleteContainer(pod) {
+    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, pod.metadata.labels['job-name']);
+
+    let options = {
+        url,
+        method: 'DELETE',
+        headers
+    };
+
+    await requestSender.send(options);
 }
