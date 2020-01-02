@@ -660,7 +660,7 @@ paths:
   /v1/jobs/{job_id}/runs/{run_id}/logs:
     get:
       tags:
-      - jobs
+      - Jobs
       description: get logs of specific job.
       parameters:
       - in: path
@@ -696,6 +696,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
+
+  '/v1/jobs/containers/':
+    delete:
+      operationId: delete-all-job-containers
+      tags:
+      - Jobs
+      description: delete all containers/pods of predator-runner
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete_containers_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   # Reports
   '/v1/tests/{test_id}/reports':
     get:
@@ -1066,7 +1086,7 @@ components:
     dsl:
       description: A test that is made of scenarios base on domain specific language
       allOf:
-        - $ref: '#/components/schemas/test'
+      - $ref: '#/components/schemas/test'
       required:
       - scenarios
       properties:
@@ -1113,7 +1133,7 @@ components:
     basic:
       description: A test that is made of artillery json
       allOf:
-        - $ref: '#/components/schemas/test'
+      - $ref: '#/components/schemas/test'
       required:
       - artillery_test
       properties:
@@ -1204,7 +1224,7 @@ components:
           $ref: '#/components/schemas/test_type'
         updated_at:
           type: string
-          format: date_time
+          format: date-time
           description:   The date and time that the test was created.
         name:
           type: string
@@ -1478,6 +1498,13 @@ components:
           description: Ability to enable/disable scheduled jobs.
           example: true
           default: true
+    delete_containers_response:
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: number
+          description: Number of deleted containers.
     job_response:
       allOf:
       - $ref: '#/components/schemas/job'
@@ -1637,6 +1664,9 @@ components:
           type: number
           minimum: 128
           description: Max memory to use by each runner.
+        allow_insecure_tls:
+          type: boolean
+          description: If true, don't fail requests on unverified server certificate errors.
         metrics_plugin_name:
           type: string
           enum:
