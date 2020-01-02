@@ -661,7 +661,7 @@ paths:
     get:
       tags:
       - Jobs
-      description: get logs of specific job.
+      description: Get logs of specific job.
       parameters:
       - in: path
         description: The ID of the job.
@@ -699,7 +699,7 @@ paths:
 
   '/v1/jobs/containers/':
     delete:
-      operationId: delete-all-job-containers
+      operationId: Delete all finished containers/pods
       tags:
       - Jobs
       description: delete all containers/pods of predator-runner
