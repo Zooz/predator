@@ -1432,7 +1432,7 @@ components:
           $ref: '#/components/schemas/test_type'
         updated_at:
           type: string
-          format: date_time
+          format: date-time
           description:   The date and time that the test was created.
         name:
           type: string
