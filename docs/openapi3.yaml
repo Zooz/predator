@@ -1918,10 +1918,10 @@ components:
         allow_insecure_tls:
           type: boolean
           description: If true, don't fail requests on unverified server certificate errors.
-        ttl_to_delete_finished_tests_resources:
+        interval_cleanup_finished_containers_ms:
           type: number
           minimum: 0
-          description: TTL (in hours) to delete finished tests resources. Value of 0 means no TTL configured.
+          description: Interval (in ms) to search and delete finished tests containers. Value of 0 means no atuo clearing enabled.
         metrics_plugin_name:
           type: string
           enum:

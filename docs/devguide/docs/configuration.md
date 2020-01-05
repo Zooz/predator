@@ -16,7 +16,7 @@ Below are variables Predator can be configured with.
 | DEFAULT_WEBHOOK_URL                             | default_webhook_url    	                    | Default webhook url to send live report statistics to                                   	                                                          | ✓                        	|                             	|
 | ALLOW_INSECURE_TLS                              | allow_insecure_tls    	                    | If true, don't fail requests on unverified server certificate errors                                                                                | ✓                        	| false                         |
 | DELAY_RUNNER_MS                                 | delay_runner_ms    	                        | Delay the predator runner from sending http requests (ms)                                                                                           | ✓                        	|                               |
-| TTL_TO_DELETE_FINISHED_TESTS_RESOURCES          | ttl_to_delete_finished_tests_resources    	| TTL (in hours) to delete finished tests resources (supported job platforms: Docker and Kubernetes). Value of 0 means no TTL is configured           | ✓                        	| 0                             |
+| INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS         | interval_cleanup_finished_containers_ms    	| Interval (in ms) to search and delete finished tests containers. Value of 0 means no atuo clearing enabled                                          | ✓                        	| 0                             |
 
 ## Database
 | Environment Variable 	| Description                                                                     	| Configurable from UI/API 	| Default value 	|
