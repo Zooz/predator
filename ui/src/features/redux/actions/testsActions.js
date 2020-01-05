@@ -77,9 +77,7 @@ export const cleanAllErrors = () => (
 export const setLoading = (isLoading) => (
   { type: Types.IS_LOADING, isLoading }
 );
-export const initCreateTestForm = () => (
-  { type: Types.INIT_CREATE_FORM }
-);
+
 export const editTest = (body,id) => (
   { type: Types.EDIT_TEST,body,id }
 );
