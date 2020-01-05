@@ -1921,7 +1921,7 @@ components:
         interval_cleanup_finished_containers_ms:
           type: number
           minimum: 0
-          description: Interval (in ms) to search and delete finished tests containers. Value of 0 means no atuo clearing enabled.
+          description: Interval (in ms) to search and delete finished tests containers. Value of 0 means no auto clearing enabled.
         metrics_plugin_name:
           type: string
           enum:

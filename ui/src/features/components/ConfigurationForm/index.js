@@ -75,7 +75,7 @@ class Form extends React.Component {
                     name: 'interval_cleanup_finished_containers_ms',
                     key: 'interval_cleanup_finished_containers_ms',
                     floatingLabelText: 'Interval for clearing finished containers (ms)',
-                    info: 'Interval (in ms) to search and delete finished tests containers. Value of 0 means no atuo clearing enabled'
+                    info: 'Interval (in ms) to search and delete finished tests containers. Value of 0 means no auto clearing enabled'
                 },
                 {
                     name: 'allow_insecure_tls',
