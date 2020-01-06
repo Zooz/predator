@@ -7,7 +7,7 @@ export function* getProcessors() {
     try {
         yield put(Actions.processorsLoading(true));
         const allProcessors = yield call(getProcessorsApi);
-        yield put(Actions.getProcessorsSuccess(allProcessors));
+        yield put(Actions.getProcessorsSuccess(allProcessors.data));
     } catch (err) {
       yield put(Actions.processorsFailure(err));
     }
