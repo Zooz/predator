@@ -14,10 +14,34 @@ const PREDATOR_RUNNER_PREFIX = 'predator';
 const JOB_PLATFORM_NAME = PREDATOR_RUNNER_PREFIX + '.%s';
 
 module.exports.init = async () => {
+    let jobPlatform = await configHandler.getConfigValue(configConstants.JOB_PLATFORM);
+    jobConnector = require(`./${jobPlatform.toLowerCase()}/jobConnector`);
+};
+
+module.exports.reloadCronJobs = async () => {
     const configData = await configHandler.getConfig();
-    jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
-    await reloadCronJobs();
-    await scheduleFinishedContainersCleanup();
+    try {
+        let jobs = await databaseConnector.getJobs();
+        jobs.forEach(async function (job) {
+            if (job.cron_expression !== null) {
+                addCron(job.id.toString(), job, job.cron_expression, configData);
+            }
+        });
+    } catch (error) {
+        throw new Error('Unable to reload scheduled jobs, error: ' + error);
+    }
+};
+
+module.exports.scheduleFinishedContainersCleanup = async () => {
+    let interval = await configHandler.getConfigValue(configConstants.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
+    if (interval > 0) {
+        logger.info(`Setting containers clean up with interval of ${interval}`);
+        return setInterval(async () => {
+            logger.info('starting scheduled container deletion');
+            const deleteResult = await jobConnector.deleteAllContainers(PREDATOR_RUNNER_PREFIX);
+            logger.info('finished scheduled container deletion', deleteResult);
+        }, interval);
+    }
 };
 
 module.exports.createJob = async (job) => {
@@ -60,7 +84,7 @@ module.exports.deleteAllContainers = async () => {
     return result;
 };
 
-module.exports.getLogs = async (jobId, runId) => {
+module.exports.getLogs = async function (jobId, runId) {
     let logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), runId, PREDATOR_RUNNER_PREFIX);
     let response = {
         files: logs,
@@ -257,30 +281,4 @@ function addCron(jobId, job, cronExpression, configData) {
         logger.info('Job: ' + jobId + ' completed.');
     }, true);
     cronJobs[jobId] = scheduledJob;
-}
-
-async function reloadCronJobs() {
-    const configData = await configHandler.getConfig();
-    try {
-        let jobs = await databaseConnector.getJobs();
-        jobs.forEach(async function (job) {
-            if (job.cron_expression !== null) {
-                addCron(job.id.toString(), job, job.cron_expression, configData);
-            }
-        });
-    } catch (error) {
-        throw new Error('Unable to reload scheduled jobs, error: ' + error);
-    }
-}
-
-async function scheduleFinishedContainersCleanup () {
-    let interval = await configHandler.getConfigValue(configConstants.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
-    if (interval > 0) {
-        logger.info(`Setting containers clean up with interval of ${interval}`)
-        setInterval(async () => {
-            logger.info('starting scheduled container deletion');
-            const deleteResult = await jobConnector.deleteAllContainers(PREDATOR_RUNNER_PREFIX);
-            logger.info('finished scheduled container deletion', deleteResult);
-        }, interval);
-    }
 }

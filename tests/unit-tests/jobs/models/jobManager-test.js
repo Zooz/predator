@@ -7,7 +7,9 @@ const should = require('should'),
     uuid = require('uuid'),
     jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector'),
     dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector'),
-    jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate');
+    jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate'),
+    config = require('../../../../src/common/consts').CONFIG;
+
 
 let manager;
 
@@ -123,6 +125,7 @@ describe('Manager tests', function () {
     let cassandraUpdateJobStub;
     let dockerHubConnectorGetMostRecentTagStub;
     let jobTemplateCreateJobRequestStub;
+    let getConfigValueStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -141,8 +144,9 @@ describe('Manager tests', function () {
         dockerHubConnectorGetMostRecentTagStub = sandbox.stub(dockerHubConnector, 'getMostRecentRunnerTag');
         uuidStub = sandbox.stub(uuid, 'v4');
         jobTemplateCreateJobRequestStub = sandbox.spy(jobTemplate, 'createJobRequest');
-
+        getConfigValueStub = sandbox.stub();
         manager = rewire('../../../../src/jobs/models/jobManager');
+
         manager.__set__('configHandler', {
             getConfig: () => {
                 return {
@@ -150,11 +154,14 @@ describe('Manager tests', function () {
                     concurrency_limit: 100,
                     delay_runner_ms: 0
                 };
-            }
+            },
+            getConfigValue: getConfigValueStub
         });
+        getConfigValueStub.withArgs(config.JOB_PLATFORM).returns('KUBERNETES');
     });
 
-    beforeEach(() => {
+    beforeEach(async () =>  {
+        await manager.init();
         sandbox.resetHistory();
     });
 
@@ -202,6 +209,35 @@ describe('Manager tests', function () {
         });
     });
 
+    describe('schedule Finished Containers Cleanup', function () {
+        it('Interval is set to 0, no automatic cleanup is scheduled', (done) => {
+            getConfigValueStub.withArgs(config.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS).returns(0);
+            jobDeleteContainerStub.resolves({deleted: 10});
+            manager.scheduleFinishedContainersCleanup();
+
+            setTimeout(() => {
+                jobDeleteContainerStub.callCount.should.eql(0);
+                done();
+            }, 1000);
+        });
+
+        it('Interval is set to 100, automatic cleanup is scheduled', (done) => {
+            getConfigValueStub.withArgs(config.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS).returns(100);
+            jobDeleteContainerStub.resolves({deleted: 10});
+            let intervalObject;
+            manager.scheduleFinishedContainersCleanup()
+                .then((interval) => {
+                    intervalObject = interval;
+                });
+
+            setTimeout(() => {
+                jobDeleteContainerStub.callCount.should.be.greaterThanOrEqual(5);
+                clearInterval(intervalObject);
+                done();
+            }, 1000);
+        });
+    });
+
     describe('Create new job', function () {
         before(() => {
             manager.__set__('configHandler', {
@@ -212,7 +248,9 @@ describe('Manager tests', function () {
                         internal_address: 'localhost:80',
                         delay_runner_ms: 0
                     };
-                }
+
+                },
+                getConfigValue: getConfigValueStub
             });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
@@ -602,7 +640,9 @@ describe('Manager tests', function () {
                         internal_address: 'localhost:80',
                         delay_runner_ms: 0
                     };
-                }
+                },
+                getConfigValue: getConfigValueStub
+
             });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
@@ -656,7 +696,9 @@ describe('Manager tests', function () {
                         internal_address: 'localhost:80',
                         delay_runner_ms: 0
                     };
-                }
+                },
+                getConfigValue: getConfigValueStub
+
             });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
             jobConnectorRunJobStub.resolves({});

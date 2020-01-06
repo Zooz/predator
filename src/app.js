@@ -22,6 +22,8 @@ module.exports = async () => {
     swaggerValidator.init('./docs/openapi3.yaml', { beautifyErrors: true });
     await database.init();
     await jobsManager.init();
+    await jobsManager.reloadCronJobs();
+    await jobsManager.scheduleFinishedContainersCleanup();
     let app = express();
 
     app.use((req, res, next) => {
