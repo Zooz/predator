@@ -9,6 +9,7 @@ let configDataMap = {
     [constConfig.RUNNER_CPU]: { value: process.env.RUNNER_CPU || 1, type: 'float' },
     [constConfig.RUNNER_MEMORY]: { value: process.env.RUNNER_MEMORY || 256, type: 'int' },
     [constConfig.ALLOW_INSECURE_TLS]: { value: process.env.ALLOW_INSECURE_TLS || false, type: 'boolean' },
+    [constConfig.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS]: { value: process.env.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS || 0, type: 'int' },
     [constConfig.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS]: {
         value: process.env.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS || 30000,
         type: 'int'

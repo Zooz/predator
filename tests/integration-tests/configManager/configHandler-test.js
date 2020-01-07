@@ -6,6 +6,7 @@ const validationError = 'Input validation error';
 const configValues = require('../../../src/common/consts').CONFIG;
 
 const defaultBody = {
+    interval_cleanup_finished_containers_ms: 0,
     allow_insecure_tls: false,
     internal_address: 'http://localhost:80',
     runner_docker_image: 'zooz/predator-runner:latest',
@@ -39,6 +40,7 @@ const updateBodyWithTypes = {
 
 const requestBody =
     {
+        interval_cleanup_finished_containers_ms: 0,
         allow_insecure_tls: false,
         grafana_url: 'string_value_grafana_url',
         internal_address: 'string_value_internal_address',
