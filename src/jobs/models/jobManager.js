@@ -5,13 +5,20 @@ const logger = require('../../common/logger'),
     configHandler = require('../../configManager/models/configHandler'),
     util = require('util'),
     dockerHubConnector = require('./dockerHubConnector'),
-    databaseConnector = require('./database/databaseConnector');
+    databaseConnector = require('./database/databaseConnector'),
+    configConstants = require('../../common/consts').CONFIG;
 
+let jobConnector;
 let cronJobs = {};
 const PREDATOR_RUNNER_PREFIX = 'predator';
 const JOB_PLATFORM_NAME = PREDATOR_RUNNER_PREFIX + '.%s';
 
-module.exports.reloadCronJobs = async function () {
+module.exports.init = async () => {
+    let jobPlatform = await configHandler.getConfigValue(configConstants.JOB_PLATFORM);
+    jobConnector = require(`./${jobPlatform.toLowerCase()}/jobConnector`);
+};
+
+module.exports.reloadCronJobs = async () => {
     const configData = await configHandler.getConfig();
     try {
         let jobs = await databaseConnector.getJobs();
@@ -21,15 +28,25 @@ module.exports.reloadCronJobs = async function () {
             }
         });
     } catch (error) {
-        Promise.reject(new Error('Unable to reload scheduled jobs, error: ' + error));
+        throw new Error('Unable to reload scheduled jobs, error: ' + error);
     }
 };
 
-module.exports.createJob = async function (job) {
-    const configData = await configHandler.getConfig();
-    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
-    let jobId = uuid.v4();
+module.exports.scheduleFinishedContainersCleanup = async () => {
+    let interval = await configHandler.getConfigValue(configConstants.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
+    if (interval > 0) {
+        logger.info(`Setting containers clean up with interval of ${interval}`);
+        return setInterval(async () => {
+            logger.info('starting scheduled container deletion');
+            const deleteResult = await jobConnector.deleteAllContainers(PREDATOR_RUNNER_PREFIX);
+            logger.info('finished scheduled container deletion', deleteResult);
+        }, interval);
+    }
+};
 
+module.exports.createJob = async (job) => {
+    let jobId = uuid.v4();
+    const configData = await configHandler.getConfig();
     try {
         await databaseConnector.insertJob(jobId, job);
         logger.info('Job saved successfully to database');
@@ -50,7 +67,7 @@ module.exports.createJob = async function (job) {
     }
 };
 
-module.exports.deleteJob = function (jobId) {
+module.exports.deleteJob = (jobId) => {
     if (cronJobs[jobId]) {
         cronJobs[jobId].stop();
         delete cronJobs[jobId];
@@ -58,22 +75,16 @@ module.exports.deleteJob = function (jobId) {
     return databaseConnector.deleteJob(jobId);
 };
 
-module.exports.stopRun = async function (jobId, runId) {
-    const configData = await configHandler.getConfig();
-    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
+module.exports.stopRun = async (jobId, runId) => {
     await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), runId);
 };
 
-module.exports.deleteAllContainers = async function () {
-    const configData = await configHandler.getConfig();
-    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
+module.exports.deleteAllContainers = async () => {
     let result = await jobConnector.deleteAllContainers(PREDATOR_RUNNER_PREFIX);
     return result;
 };
 
 module.exports.getLogs = async function (jobId, runId) {
-    const configData = await configHandler.getConfig();
-    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     let logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), runId, PREDATOR_RUNNER_PREFIX);
     let response = {
         files: logs,
@@ -83,7 +94,7 @@ module.exports.getLogs = async function (jobId, runId) {
     return response;
 };
 
-module.exports.getJobs = async function (getOneTimeJobs) {
+module.exports.getJobs = async (getOneTimeJobs) => {
     try {
         let jobs = await databaseConnector.getJobs();
         logger.info('Got jobs list from database successfully');
@@ -101,7 +112,7 @@ module.exports.getJobs = async function (getOneTimeJobs) {
     }
 };
 
-module.exports.getJob = async function (jobId) {
+module.exports.getJob = async (jobId) => {
     try {
         let error;
         let job = await databaseConnector.getJob(jobId);
@@ -124,7 +135,7 @@ module.exports.getJob = async function (jobId) {
     }
 };
 
-module.exports.updateJob = async function (jobId, jobConfig) {
+module.exports.updateJob = async (jobId, jobConfig) => {
     const configData = await configHandler.getConfig();
     return databaseConnector.updateJob(jobId, jobConfig)
         .then(function () {
@@ -253,7 +264,6 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
 }
 
 function addCron(jobId, job, cronExpression, configData) {
-    const jobConnector = require(`./${configData.job_platform.toLowerCase()}/jobConnector`);
     let scheduledJob = new CronJob(cronExpression, async function () {
         try {
             if (job.enabled === false) {

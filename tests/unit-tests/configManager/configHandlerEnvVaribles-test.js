@@ -59,7 +59,6 @@ describe('Manager config with env variables', function () {
             'timeout': '500',
             'rejectUnauthCerts': 'true',
             'secure': 'true'
-
         });
     });
 });
