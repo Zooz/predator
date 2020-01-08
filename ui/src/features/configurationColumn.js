@@ -34,11 +34,22 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: 'report_id'
-        }, {
+        },
+        {
             id: 'name',
             Header: () => (
                 <TableHeader sortable={false}>
                     Test Name
+                </TableHeader>
+            ),
+            accessor: 'name',
+            headerClassName: css['header-name'],
+            className: css['header-name']
+        },  {
+            id: 'processor_name',
+            Header: () => (
+                <TableHeader sortable={false}>
+                    Processor Name
                 </TableHeader>
             ),
             accessor: 'name',
@@ -101,6 +112,20 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                         N/A
                     </div>
                 </TooltipWrapper>,
+            className: css['small-header'],
+            headerClassName: css['small-header']
+        },
+        {
+            id: 'processor_edit',
+            Header: () => (
+                <TableHeader sortable={false}>
+                    Edit
+                </TableHeader>
+            ),
+            accessor: data => <ViewButton icon={faPen} onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(data)
+                }}/>,
             className: css['small-header'],
             headerClassName: css['small-header']
         },
