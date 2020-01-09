@@ -2,13 +2,9 @@ import React from 'react';
 import Snackbar from 'material-ui/Snackbar';
 import {connect} from 'react-redux';
 import * as Selectors from './redux/selectors/processorsSelector';
-import {createJobSuccess} from './redux/selectors/jobsSelector';
 import style from './style.scss';
-import Dialog from './components/Dialog';
-import JobForm from './components/JobForm';
 import * as Actions from './redux/action';
 import Loader from './components/Loader';
-import history from '../store/history'
 import DeleteDialog from './components/DeleteDialog';
 import Page from '../components/Page';
 import ProcessorForm from './components/ProcessorForm';
@@ -17,16 +13,16 @@ import {getColumns} from "./configurationColumn";
 import Button from '../components/Button';
 import _ from "lodash";
 
-
+/*
+*  TODO and error handling for delete processor
+*
+* */
 const noDataMsg = 'There is no data to display.';
-const errorMsgGetTests = 'Error occurred while trying to get all tests.';
+const errorMsgGetProcessors = 'Error occurred while trying to get all processors.';
 const columnsNames = ['processor_name', 'description', 'updated_at', 'processor_edit', 'delete'];
 const DESCRIPTION = 'Processors are the way you can...';
 
-/*
-* TODO check what is deleteError
-* */
-class getTests extends React.Component {
+class getProcessors extends React.Component {
     constructor(props) {
         super(props);
 
@@ -95,17 +91,10 @@ class getTests extends React.Component {
         });
     };
 
-    clearDeleteError = () => {
-        this.props.getAllTests();
-        this.props.clearErrorOnDelete();
-    };
-
     cancelDelete = () => {
         this.setState({
             deleteDialog: false
         });
-
-        this.props.deleteError ? this.clearDeleteError() : undefined
     };
 
 
@@ -137,13 +126,9 @@ class getTests extends React.Component {
         this.props.getProcessors();
     }
 
-    componentWillUnmount() {
-        this.props.clearErrorOnGetTests();
-    }
-
     render() {
         const {sortedProcessors, sortHeader} = this.state;
-        const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
+        const noDataText = this.props.getProcessorsFailure ? errorMsgGetProcessors : this.loader();
         const columns = getColumns({
             columnsNames,
             onReportView: this.onReportView,
@@ -181,7 +166,7 @@ class getTests extends React.Component {
                 {(this.state.deleteDialog && !this.props.deleteProcessorSuccess)
                     ? <DeleteDialog loader={this.props.processingDeleteTest}
                                     display={this.state.processorToDelete ? this.state.processorToDelete.name : ''}
-                                    onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
+                                    onSubmit={this.submitDelete}
                                     onCancel={this.cancelDelete}/> : null}
                 <Snackbar
                     open={this.props.deleteProcessorSuccess}
@@ -206,7 +191,8 @@ function mapStateToProps(state) {
 const mapDispatchToProps = {
     getProcessors: Actions.getProcessors,
     deleteProcessor: Actions.deleteProcessor,
-    setDeleteProcessorSuccess: Actions.deleteProcessorSuccess
+    setDeleteProcessorSuccess: Actions.deleteProcessorSuccess,
+    getProcessorsFailure: Actions.getProcessorsFailure
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(getTests);
+export default connect(mapStateToProps, mapDispatchToProps)(getProcessors);

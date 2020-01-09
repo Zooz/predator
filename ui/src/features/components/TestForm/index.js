@@ -331,7 +331,7 @@ function mapStateToProps(state) {
         createTestSuccess: Selectors.createTestSuccess(state),
         processorsList: ProcessorsSelector.processorsList(state),
         processorsLoading: ProcessorsSelector.processorsLoading(state),
-        processorsError: ProcessorsSelector.processor_failure(state),
+        processorsError: ProcessorsSelector.processorFailure(state),
     }
 }
 

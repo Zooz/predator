@@ -32,10 +32,9 @@ export const processorsLoading = (value) => (
 );
 
 
-export const processorsFailure = (error) => (
+export const getProcessorsFailure = (error) => (
     {type: Types.GET_PROCESSORS_FAILURE, error}
 );
-
 
 export const editProcessor = (id, body) => (
     {type: Types.EDIT_PROCESSOR, id, body}

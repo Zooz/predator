@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "NODE_ENV=production webpack --env --config ./config/webpack.config.js",
+    "build": "NODE_ENV=production node --max_old_space_size=2048 ./node_modules/webpack/bin/webpack.js --env --config ./config/webpack.config.js",
     "start": "webpack-dev-server  --open --history-api-fallback --config ./config/webpack.config.js --devtool eval --hot"
   },
   "repository": {

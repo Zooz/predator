@@ -10,7 +10,7 @@ export function* createProcessor(action) {
         yield put(Actions.createProcessorSuccess(data));
         yield put(Actions.getProcessors());
     } catch (err) {
-        yield put(Actions.processorsFailure(err));
+        yield put(Actions.getProcessorsFailure(err));
     }
     yield put(Actions.processorsLoading(false));
 
@@ -22,7 +22,7 @@ export function* getProcessors() {
         const {data} = yield call(getProcessorsApi);
         yield put(Actions.getProcessorsSuccess(data));
     } catch (err) {
-        yield put(Actions.processorsFailure(err));
+        yield put(Actions.getProcessorsFailure(err));
     }
     yield put(Actions.processorsLoading(false));
 
@@ -49,7 +49,6 @@ export function* editProcessor(action) {
         yield put(Actions.editProcessorSuccess(true));
         yield put(Actions.getProcessors());
     } catch (err) {
-        console.log('manor err', err)
         yield put(Actions.editProcessorFailure(err));
     }
     yield put(Actions.processorsLoading(false));

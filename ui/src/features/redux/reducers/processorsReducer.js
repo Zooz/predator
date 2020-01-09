@@ -8,10 +8,8 @@ const initialState = Immutable.Map({
     create_processor_success: false,
     delete_processor_success: false,
 });
-// TODO split processor error to each action
 
 export default function reduce(state = initialState, action = {}) {
-    console.log("manor action",action);
     switch (action.type) {
         case Types.PROCESSORS_LOADING:
             return state.set('processors_loading', action.value);
@@ -32,7 +30,8 @@ export default function reduce(state = initialState, action = {}) {
         case Types.EDIT_PROCESSOR_FAILURE:
             return state.set('processor_error', action.error);
         case Types.CLEAN_ALL_ERRORS:
-            return state.set('processor_error', undefined);
+             state.set('processor_error', undefined);
+            return state.set('delete_processor_failure', undefined);
 
         default:
             return state;
