@@ -41,6 +41,10 @@ const functions = [
     {
         functionName: 'deleteDefinition',
         args: ['dslName', 'definitionName']
+    },
+    {
+        functionName: 'getTestsByProcessorId',
+        args: ['processorId']
     }
 
 ];

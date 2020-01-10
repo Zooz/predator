@@ -15,7 +15,8 @@ module.exports = {
     getDslDefinitions,
     updateDslDefinition,
     getFile,
-    deleteDefinition
+    deleteDefinition,
+    getTestsByProcessorId
 };
 
 function insertTest(testInfo, testJson, id, revisionId, fileId) {
@@ -28,6 +29,11 @@ async function getTest(id) {
 async function getTests() {
     return databaseConnector.getTests();
 }
+
+async function getTestsByProcessorId(processorId) {
+    return databaseConnector.getTestsByProcessorId(processorId);
+}
+
 async function deleteTest(testId) {
     return databaseConnector.deleteTest(testId);
 }
