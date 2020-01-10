@@ -21,8 +21,13 @@ In order to avoid DIND, Predator will start its runners as siblings using the do
 
 <b>Command:</b>
 
+<b>Without persisted storage:</b>
+
 ```docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator```
 
+<b>With persisted storage:</b>
+
+```docker run -d -e SQLITE_STORAGE=db/predator -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/predator:/usr/db zooz/predator```
 
 Explanations:
 
