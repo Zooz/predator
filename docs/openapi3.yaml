@@ -1231,6 +1231,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:

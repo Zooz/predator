@@ -10,7 +10,8 @@ module.exports = {
     getTest,
     getAllTestRevisions,
     getTests,
-    deleteTest
+    deleteTest,
+    getTestsByProcessorId
 };
 
 async function upsertTest(testRawData, existingTestId) {
@@ -75,4 +76,8 @@ async function getTests() {
 
 function deleteTest(testId) {
     return database.deleteTest(testId);
+}
+
+async function getTestsByProcessorId(processorId) {
+    return database.getTestsByProcessorId(processorId);
 }

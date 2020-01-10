@@ -7,6 +7,8 @@ const logger = require('../../common/logger'),
     fileManager = require('../../tests/models/fileManager.js'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
+let testsManager = require('../../tests/models/manager');
+
 module.exports.createProcessor = async function (processor) {
     const processorWithTheSameName = await databaseConnector.getProcessorByName(processor.name);
     if (processorWithTheSameName) {
@@ -40,6 +42,10 @@ module.exports.getProcessor = async function (processorId) {
 };
 
 module.exports.deleteProcessor = async function (processorId) {
+    const tests = await testsManager.getTestsByProcessorId(processorId);
+    if (tests.length > 0) {
+        throw generateProcessorIsUsedByTestsError(tests.map(test => test.name));
+    }
     return databaseConnector.deleteProcessor(processorId);
 };
 
@@ -70,5 +76,11 @@ function generateProcessorNotFoundError() {
 function generateProcessorNameAlreadyExistsError() {
     const error = new Error(ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST);
     error.statusCode = 400;
+    return error;
+}
+
+function generateProcessorIsUsedByTestsError(testNames) {
+    const error = new Error(`${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`);
+    error.statusCode = 409;
     return error;
 }
