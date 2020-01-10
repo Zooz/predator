@@ -4,6 +4,7 @@ const uuid = require('uuid');
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
+    testsManager = require('../../tests/models/manager');
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports.createProcessor = async function (processor) {
@@ -43,6 +44,10 @@ module.exports.getProcessor = async function (processorId) {
 };
 
 module.exports.deleteProcessor = async function (processorId) {
+    const tests = await testsManager.getTestsByProcessorId(processorId);
+    if (tests.length > 0) {
+        throw generateProcessorIsUsedByTestsError(tests.map(test => test.name));
+    }
     return databaseConnector.deleteProcessor(processorId);
 };
 
@@ -101,4 +106,10 @@ function verifyJSAndGetExportedFunctions(src) {
         throw error;
     }
     return exportedFunctions;
+}
+
+function generateProcessorIsUsedByTestsError(testNames) {
+    const error = new Error(`${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`);
+    error.statusCode = 409;
+    return error;
 }
