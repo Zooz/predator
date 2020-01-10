@@ -4,7 +4,6 @@ const uuid = require('uuid');
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
-    fileManager = require('../../tests/models/fileManager.js'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports.createProcessor = async function (processor) {
