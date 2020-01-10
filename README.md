@@ -12,7 +12,7 @@ Predator manages the entire lifecycle of stress-testing servers, from creating p
 
 It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
 
-[**Installation**](https://www.predator.dev/#sectionInstallation) &nbsp; |
+[**Installation**](https://www.predator.dev/#installation) &nbsp; |
 &nbsp; [**Site**](https://predator.dev) &nbsp; |
 &nbsp; [**Documentation**](https://zooz.github.io/predator/about.html) &nbsp; |
 &nbsp; [**API Reference**](https://zooz.github.io/predator//indexapiref.html) | 
