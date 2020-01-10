@@ -105,6 +105,7 @@ describe('Processors api', function() {
                 let getProcessorResponse = await requestSender.getProcessor(processor.id, validHeaders);
                 getProcessorResponse.statusCode.should.eql(200);
                 should(getProcessorResponse.body).containDeep(processorData);
+                should(getProcessorResponse.body.exported_functions).eql(['simple']);
             });
             it('Get non-existent processor by id', async () => {
                 let getProcessorResponse = await requestSender.getProcessor(uuid(), validHeaders);
@@ -135,6 +136,7 @@ describe('Processors api', function() {
                 };
                 let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(201);
+                createProcessorResponse.body.exported_functions.should.eql(['createAuthToken']);
 
                 let deleteResponse = await requestSender.deleteProcessor(createProcessorResponse.body.id);
                 should(deleteResponse.statusCode).equal(204);
@@ -142,7 +144,7 @@ describe('Processors api', function() {
         });
         describe('PUT /v1/processors/{processor_id}', function() {
             it('update a processor', async function() {
-                const processor = generateRawJSProcessor('predator');
+                const processor = generateRawJSProcessor('predator ' + uuid());
                 const createResponse = await requestSender.createProcessor(processor, validHeaders);
                 should(createResponse.statusCode).equal(201);
                 const processorId = createResponse.body.id;
@@ -153,7 +155,7 @@ describe('Processors api', function() {
                 should(updateResponse.statusCode).equal(200);
                 should(updateResponse.body.javascript).equal(processor.javascript);
                 should(updateResponse.body.description).equal(processor.description);
-
+                should(updateResponse.body.exported_functions).eql(['add']);
                 const deleteResponse = await requestSender.deleteProcessor(processorId);
                 should(deleteResponse.statusCode).equal(204);
             });
@@ -241,6 +243,72 @@ describe('Processors api', function() {
                 let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
             });
+
+
+            it('Create processor without export functions', async () => {
+                const requestBody = {
+                    name: 'authentication',
+                    description: 'Creates authorization token and saves it in the context',
+                    javascript:
+                        `{
+                        const uuid = require('uuid/v4');
+                        module.exports = {
+                        };
+
+                        function createAuthToken(userContext, events, done) {
+                        userContext.vars.token = uuid();
+                        return done();
+                        }
+                    }`
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(422);
+                createProcessorResponse.body.message.should.eql('javascript has 0 exported function');
+            });
+
+            it('Create processor export function that not exists', async () => {
+                const requestBody = {
+                    name: 'authentication',
+                    description: 'Creates authorization token and saves it in the context',
+                    javascript:
+                        `{
+                        const uuid = require('uuid/v4');
+                        module.exports = {
+                        hello,
+                        };
+
+                        function createAuthToken(userContext, events, done) {
+                        userContext.vars.token = uuid();
+                        return done();
+                        }
+                    }`
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(422);
+                createProcessorResponse.body.message.should.eql('javascript syntax validation failed with error: hello is not defined');
+            });
+
+            it('Create processor with Unexpected token', async () => {
+                const requestBody = {
+                    name: 'authentication',
+                    description: 'Creates authorization token and saves it in the context',
+                    javascript:
+                        `{
+                        const uuid = require('uuid/v4');
+                        module.exports = {
+                        hello,
+                        };
+
+                        function createAut) {
+                        userContext.vars.token = uuid();
+                        return done();
+                        }
+                    }`
+                };
+                let createProcessorResponse = await requestSender.createProcessor(requestBody, validHeaders);
+                createProcessorResponse.statusCode.should.eql(422);
+                createProcessorResponse.body.message.should.eql('javascript syntax validation failed with error: Unexpected token )');
+            });
         });
         describe('PUT /processors/{processor_id}', () => {
             it('processor doesn\'t exist', async function() {
@@ -257,6 +325,6 @@ function generateRawJSProcessor(name) {
     return {
         name,
         description: 'exports a number',
-        javascript: 'module.exports = 5;'
+        javascript: 'module.exports.simple = 5;'
     };
 }

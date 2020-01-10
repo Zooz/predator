@@ -14,7 +14,8 @@ module.exports.createProcessor = async function (processor) {
     }
     let processorId = uuid.v4();
     try {
-        fileManager.validateJavascriptContent(processor.javascript);
+        let exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
+        processor.exported_functions = exportedFunctions;
         await databaseConnector.insertProcessor(processorId, processor);
         processor.id = processorId;
         logger.info('Processor saved successfully to database');
@@ -26,7 +27,10 @@ module.exports.createProcessor = async function (processor) {
 };
 
 module.exports.getAllProcessors = async function (from, limit) {
-    return databaseConnector.getAllProcessors(from, limit);
+    let allProcessors = await databaseConnector.getAllProcessors(from, limit);
+    allProcessors.forEach(processor => {
+    });
+    return allProcessors;
 };
 
 module.exports.getProcessor = async function (processorId) {
@@ -56,8 +60,10 @@ module.exports.updateProcessor = async function (processorId, processor) {
     }
 
     processor.created_at = oldProcessor.created_at;
-    fileManager.validateJavascriptContent(processor.javascript);
+    let exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
+    processor.exported_functions = exportedFunctions;
     await databaseConnector.updateProcessor(processorId, processor);
+    processor.exported_functions = verifyJSAndGetExportedFunctions(processor.javascript, true);
     return processor;
 };
 
@@ -71,4 +77,29 @@ function generateProcessorNameAlreadyExistsError() {
     const error = new Error(ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST);
     error.statusCode = 400;
     return error;
+}
+
+function generateUnprocessableEntityError(message) {
+    const error = new Error(message);
+    error.statusCode = 422;
+    return error;
+}
+function verifyJSAndGetExportedFunctions(src) {
+    let exportedFunctions;
+    try {
+        let m = new module.constructor();
+        m.paths = module.paths;
+        m._compile(src, 'none');
+        let exports = m.exports;
+        exportedFunctions = Object.keys(exports);
+    } catch (err) {
+        let error = generateUnprocessableEntityError('javascript syntax validation failed with error: ' + err.message);
+        throw error;
+    }
+
+    if (exportedFunctions.length === 0) {
+        let error = generateUnprocessableEntityError('javascript has 0 exported function');
+        throw error;
+    }
+    return exportedFunctions;
 }

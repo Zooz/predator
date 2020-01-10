@@ -59,6 +59,22 @@ describe('Processor manager tests', function () {
             should(exception.statusCode).eql(422);
             should(exception.message).eql('javascript syntax validation failed with error: Unexpected identifier');
         });
+
+        it('Should return error for js without public functions', async function () {
+            let exception;
+            const firstProcessor = {
+                description: 'bad processor',
+                name: 'mickey',
+                javascript: 'return 5'
+            };
+            try {
+                await manager.createProcessor(firstProcessor);
+            } catch (e) {
+                exception = e;
+            }
+            should(exception.statusCode).eql(422);
+            should(exception.message).eql('javascript has 0 exported function');
+        });
     });
     describe('Delete existing processor', function () {
         it('Should delete processor', async function () {
