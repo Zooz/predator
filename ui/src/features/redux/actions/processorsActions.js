@@ -43,6 +43,6 @@ export const editProcessorSuccess = (value) => (
     {type: Types.EDIT_PROCESSOR_SUCCESS, value}
 )
 
-export const editProcessorFailure = (value) => (
-    {type: Types.EDIT_PROCESSOR_FAILURE, value}
+export const editProcessorFailure = (error) => (
+    {type: Types.EDIT_PROCESSOR_FAILURE, error}
 );

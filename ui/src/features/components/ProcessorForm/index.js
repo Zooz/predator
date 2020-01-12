@@ -31,7 +31,7 @@ export class ProcessorForm extends React.Component {
         const {editMode} = this.state;
         const {createProcessor, editProcessor} = this.props;
         if (editMode) {
-            editProcessor(this.state.id,createProcessorRequest(this.state));
+            editProcessor(this.state.id, createProcessorRequest(this.state));
         } else {
             createProcessor(createProcessorRequest(this.state));
         }
@@ -42,13 +42,13 @@ export class ProcessorForm extends React.Component {
     };
 
     componentDidUpdate(prevProps, prevState) {
-        const {createProcessorSuccess: createProcessorSuccessBefore,editProcessorSuccess: editProcessorSuccessBefore} = prevProps;
-        const {createProcessorSuccess,editProcessorSuccess, closeDialog} = this.props;
+        const {createProcessorSuccess: createProcessorSuccessBefore, editProcessorSuccess: editProcessorSuccessBefore} = prevProps;
+        const {createProcessorSuccess, editProcessorSuccess, closeDialog} = this.props;
 
         if (createProcessorSuccess && !createProcessorSuccessBefore) {
             this.props.setCreateProcessorSuccess(false);
             closeDialog();
-        }else if(editProcessorSuccess && !editProcessorSuccessBefore){
+        } else if (editProcessorSuccess && !editProcessorSuccessBefore) {
             this.props.setEditProcessorSuccess(false);
             closeDialog();
         }

@@ -30,9 +30,8 @@ export default function reduce(state = initialState, action = {}) {
         case Types.EDIT_PROCESSOR_FAILURE:
             return state.set('processor_error', action.error);
         case Types.CLEAN_ALL_ERRORS:
-             state.set('processor_error', undefined);
-            return state.set('delete_processor_failure', undefined);
-
+             return state.set('processor_error', undefined)
+                 .set('delete_processor_failure', undefined);
         default:
             return state;
     }
