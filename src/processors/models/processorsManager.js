@@ -4,7 +4,7 @@ const uuid = require('uuid');
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
-    fileManager = require('../../tests/models/fileManager.js'),
+    testsManager = require('../../tests/models/manager'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports.createProcessor = async function (processor) {
@@ -14,8 +14,7 @@ module.exports.createProcessor = async function (processor) {
     }
     let processorId = uuid.v4();
     try {
-        fileManager.validateJavascriptContent(processor.javascript);
-        let exportedFunctions = getExportedFunctions(processor.javascript);
+        let exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
         processor.exported_functions = exportedFunctions;
         await databaseConnector.insertProcessor(processorId, processor);
         processor.id = processorId;
@@ -30,7 +29,6 @@ module.exports.createProcessor = async function (processor) {
 module.exports.getAllProcessors = async function (from, limit) {
     let allProcessors = await databaseConnector.getAllProcessors(from, limit);
     allProcessors.forEach(processor => {
-        processor.exported_functions = getExportedFunctions(processor.javascript);
     });
     return allProcessors;
 };
@@ -38,7 +36,6 @@ module.exports.getAllProcessors = async function (from, limit) {
 module.exports.getProcessor = async function (processorId) {
     const processor = await databaseConnector.getProcessorById(processorId);
     if (processor) {
-        processor.exported_functions = getExportedFunctions(processor.javascript);
         return processor;
     } else {
         const error = generateProcessorNotFoundError();
@@ -47,6 +44,10 @@ module.exports.getProcessor = async function (processorId) {
 };
 
 module.exports.deleteProcessor = async function (processorId) {
+    const tests = await testsManager.getTestsByProcessorId(processorId);
+    if (tests.length > 0) {
+        throw generateProcessorIsUsedByTestsError(tests.map(test => test.name));
+    }
     return databaseConnector.deleteProcessor(processorId);
 };
 
@@ -63,9 +64,10 @@ module.exports.updateProcessor = async function (processorId, processor) {
     }
 
     processor.created_at = oldProcessor.created_at;
-    fileManager.validateJavascriptContent(processor.javascript);
+    let exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
+    processor.exported_functions = exportedFunctions;
     await databaseConnector.updateProcessor(processorId, processor);
-    processor.exported_functions = getExportedFunctions(processor.javascript);
+    processor.exported_functions = verifyJSAndGetExportedFunctions(processor.javascript, true);
     return processor;
 };
 
@@ -81,17 +83,33 @@ function generateProcessorNameAlreadyExistsError() {
     return error;
 }
 
-function getExportedFunctions(src) {
+function generateUnprocessableEntityError(message) {
+    const error = new Error(message);
+    error.statusCode = 422;
+    return error;
+}
+function verifyJSAndGetExportedFunctions(src) {
+    let exportedFunctions;
     try {
         let m = new module.constructor();
         m.paths = module.paths;
         m._compile(src, 'none');
         let exports = m.exports;
-        let exportedFunctions = Object.keys(exports);
-        return exportedFunctions;
+        exportedFunctions = Object.keys(exports);
     } catch (err) {
-        let error = new Error('javascript syntax validation failed with error: ' + error.message);
-        error.statusCode = 422;
+        let error = generateUnprocessableEntityError('javascript syntax validation failed with error: ' + err.message);
         throw error;
     }
+
+    if (exportedFunctions.length === 0) {
+        let error = generateUnprocessableEntityError('javascript has 0 exported function');
+        throw error;
+    }
+    return exportedFunctions;
+}
+
+function generateProcessorIsUsedByTestsError(testNames) {
+    const error = new Error(`${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`);
+    error.statusCode = 409;
+    return error;
 }

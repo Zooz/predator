@@ -12,7 +12,7 @@ Predator manages the entire lifecycle of stress-testing servers, from creating p
 
 It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
 
-[**Installation**](https://www.predator.dev/#sectionInstallation) &nbsp; |
+[**Installation**](https://www.predator.dev/#installation) &nbsp; |
 &nbsp; [**Site**](https://predator.dev) &nbsp; |
 &nbsp; [**Documentation**](https://zooz.github.io/predator/about.html) &nbsp; |
 &nbsp; [**API Reference**](https://zooz.github.io/predator//indexapiref.html) | 
@@ -52,9 +52,16 @@ Predator is designed to seamlessly deploy into your Kubernetes cluster. Install 
 Predator is included in Mesosphere Universe. Please refer to https://universe.dcos.io/#/package/predator/version/latest for a quick start guide and examples for installing the package.
 
 ### Docker
-`docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator`
 
-where $MACHINE_IP=local ip address of your machine
+Without persisted storage:
+
+```docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator```
+
+With persisted storage:
+
+```docker run -d -e SQLITE_STORAGE=db/predator -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/predator:/usr/db zooz/predator```
+
+where $MACHINE_IP is the local ip address of your machine (not localhost, but actual ip address - it is your local network address).
 
 ### Developers
 Predator runs using Docker. In order to run Predator locally, clone this repository and then run the following command:

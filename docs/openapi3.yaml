@@ -1231,6 +1231,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:
@@ -1320,6 +1326,7 @@ components:
       properties:
         name:
           type: string
+          minLength: 1
           description: The name of the test.
           example: Order from Pet Store
         processor_file_url:
@@ -1752,12 +1759,19 @@ components:
           readOnly: true
         name:
           type: string
+          minLength: 1
           description: The name of the processor.
           example: Custom javascript for logging
         description:
           type: string
           description: A description of the processor.
           example: logs every error (5xx).
+        exported_functions:
+          type: array
+          readOnly: true
+          description: Names of all exported function in the javascript file
+          items:
+            type: string
         updated_at:
           type: string
           format: date-time

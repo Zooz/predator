@@ -1,9 +1,11 @@
 'use strict';
 let should = require('should');
-let manager = require('../../../../src/processors/models/processorsManager');
 let sinon = require('sinon');
-let database = require('../../../../src/processors/models/database/databaseConnector');
 let uuid = require('uuid');
+let rewire = require('rewire');
+
+let database = require('../../../../src/processors/models/database/databaseConnector');
+let manager = rewire('../../../../src/processors/models/processorsManager');
 
 describe('Processor manager tests', function () {
     let sandbox;
@@ -13,6 +15,8 @@ describe('Processor manager tests', function () {
     let getProcessorByNameStub;
     let getProcessorsStub;
     let updatedProcessorStub;
+    let testsManagerStub;
+    let originalTestManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -22,21 +26,27 @@ describe('Processor manager tests', function () {
         getProcessorsStub = sandbox.stub(database, 'getAllProcessors');
         deleteStub = sandbox.stub(database, 'deleteProcessor');
         updatedProcessorStub = sandbox.stub(database, 'updateProcessor');
+        testsManagerStub = {
+            getTestsByProcessorId: sandbox.stub()
+        };
+        originalTestManager = manager.__get__('testsManager');
+        manager.__set__('testsManager', testsManagerStub);
     });
 
     beforeEach(() => {
-        sandbox.resetHistory();
+        sandbox.reset();
     });
 
     after(() => {
         sandbox.restore();
+        manager.__set__('testsManager', originalTestManager);
     });
     describe('Create new processor', function () {
         it('Should save new test to database and return the processor id', async function () {
             const firstProcessor = {
                 description: 'first processor',
                 name: 'mickey',
-                javascript: `module.exports.mickey = 'king'`
+                javascript: "module.exports.mickey = 'king'"
             };
             getProcessorByNameStub.resolves(null);
             const processor = await manager.createProcessor(firstProcessor);
@@ -59,13 +69,55 @@ describe('Processor manager tests', function () {
             should(exception.statusCode).eql(422);
             should(exception.message).eql('javascript syntax validation failed with error: Unexpected identifier');
         });
+
+        it('should throw an error of name already exists', async function() {
+            const processor = {
+                description: 'first processor',
+                name: 'mickey',
+                javascript: "module.exports.mickey = 'king'"
+            };
+            getProcessorByNameStub.resolves(processor);
+            try {
+                await manager.createProcessor(processor);
+                throw new Error('should not get here');
+            } catch (e) {
+                should(e.statusCode).equal(400);
+            }
+        });
+
+        it('Should return error for js without public functions', async function () {
+            let exception;
+            const firstProcessor = {
+                description: 'bad processor',
+                name: 'mickey',
+                javascript: 'return 5'
+            };
+            try {
+                await manager.createProcessor(firstProcessor);
+            } catch (e) {
+                exception = e;
+            }
+            should(exception.statusCode).eql(422);
+            should(exception.message).eql('javascript has 0 exported function');
+        });
     });
     describe('Delete existing processor', function () {
         it('Should delete processor', async function () {
+            testsManagerStub.getTestsByProcessorId.resolves([]);
             deleteStub.resolves();
             const existingProcessorId = uuid();
             await manager.deleteProcessor(existingProcessorId);
             deleteStub.calledOnce.should.eql(true);
+        });
+        it('Should throw an error for a processor that is used by a test', async function() {
+            testsManagerStub.getTestsByProcessorId.resolves([{ name: 'predator' }]);
+            deleteStub.resolves();
+            try {
+                await manager.deleteProcessor(uuid());
+                throw Error('Should have thrown an error');
+            } catch (e) {
+                should(e.statusCode).equal(409);
+            }
         });
     });
     describe('Get single processor', function () {
@@ -176,6 +228,22 @@ describe('Processor manager tests', function () {
             }
             should(exception.statusCode).eql(422);
             should(exception.message).eql('javascript syntax validation failed with error: Unexpected identifier');
+        });
+
+        it('should fail - updating a processor name to another existing processor name', async function() {
+            const updatedProcessor = {
+                description: 'update processor',
+                name: 'mickey2',
+                javascript: 'module.exports.update = true'
+            };
+            getProcessorByIdStub.resolves(oldProcessor);
+            getProcessorByNameStub.resolves(updatedProcessor);
+            try {
+                await manager.updateProcessor(oldProcessor.id, updatedProcessor);
+                throw new Error('should not get here');
+            } catch (err) {
+                should(err.statusCode).equal(400);
+            }
         });
     });
 });
