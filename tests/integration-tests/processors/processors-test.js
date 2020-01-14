@@ -67,6 +67,17 @@ describe('Processors api', function() {
                 const processors = getProcessorsResponse.body;
                 should(processors.length).greaterThanOrEqual(101);
             });
+
+            it('Get tests without javascript field', async function() {
+                const from = 0, limit = 10, exclude = 'javascript';
+                let getProcessorsResponse = await processorRequestSender.getProcessors(from, limit, exclude);
+
+                should(getProcessorsResponse.statusCode).equal(200);
+
+                const processors = getProcessorsResponse.body;
+                const processorsWithJavascript = processors.filter(processor => processor.javascript);
+                should(processorsWithJavascript.length).equal(0);
+            });
             after(async function() {
                 const processorIds = processorsInserted.map(processor => processor.body.id);
                 processorIds.forEach(async (processorId) => {
@@ -247,7 +258,6 @@ describe('Processors api', function() {
                 let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
             });
-
 
             it('Create processor without export functions', async () => {
                 const requestBody = {
