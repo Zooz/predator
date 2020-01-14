@@ -31,8 +31,8 @@ function createProcessor(body, headers) {
         });
 }
 
-function getProcessors(from, limit) {
-    return request(app).get('/v1/processors')
+function getProcessors(from, limit, excludeField) {
+    return request(app).get('/v1/processors' + excludeField ? `?exclude=${excludeField}` : '')
         .query({ from, limit })
         .set({ 'Content-Type': 'application/json' })
         .expect(function (res) {

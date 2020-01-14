@@ -1099,6 +1099,16 @@ paths:
           type: integer
           maximum: 100
           default: 100
+      - in: query
+        name: exclude
+        description: fields to exclude from response
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - javascript
       responses:
         '200':
           description: Success

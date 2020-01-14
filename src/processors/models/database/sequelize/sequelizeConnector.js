@@ -34,7 +34,7 @@ async function insertProcessor(processorId, processorInfo) {
 
 async function getAllProcessors(from, limit) {
     const processorsModel = client.model('processor');
-    return processorsModel.findAll({ offset: from, limit, order: [['created_at', 'DESC']] });
+    return processorsModel.findAll({ offset: from, limit, order: [['created_at', 'DESC']] }, { raw: true });
 }
 
 async function _getProcessor(options) {
