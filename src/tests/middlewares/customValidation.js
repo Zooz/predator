@@ -20,5 +20,7 @@ function createDslValidator(req, res, next) {
 
 function buildSwaggerError(req, message) {
     const error = [{ message, dataPath: '' }];
-    return new swaggerValidator.InputValidationError(error, req.path, req.method, { beautifyErrors: true });
+    const swaggerValidatorError = new swaggerValidator.InputValidationError(error, req.path, req.method, { beautifyErrors: true });
+    let errors = swaggerValidatorError.errors.map(o => o.message);
+    return { errors, message: swaggerValidatorError.message };
 }
