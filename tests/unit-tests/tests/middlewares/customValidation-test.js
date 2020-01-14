@@ -38,13 +38,13 @@ describe('Testing customValidation', function () {
         reqStub.body.request['zoozMethod'] = {};
         customValidation.createDslValidator(reqStub, undefined, nextStub);
         should(nextStub.args[0][0].message).eql('Input validation error');
-        should(nextStub.args[0][0].errors).eql(['request should have only one of properties: get,head,post,put,delete,connect,options,trace']);
+        should(nextStub.args[0][0].errors[0]).eql('body request should have only one of properties: get,head,post,put,delete,connect,options,trace');
     });
     it('when request has more then one key - should call next with an error', function () {
         reqStub.body.request['post'] = {};
         reqStub.body.request['get'] = {};
         customValidation.createDslValidator(reqStub, undefined, nextStub);
         should(nextStub.args[0][0].message).eql('Input validation error');
-        should(nextStub.args[0][0].errors).eql(['request should have only one of properties: get,head,post,put,delete,connect,options,trace']);
+        should(nextStub.args[0][0].errors[0]).eql('body request should have only one of properties: get,head,post,put,delete,connect,options,trace');
     });
 });
