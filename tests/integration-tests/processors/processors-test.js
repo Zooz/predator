@@ -267,7 +267,7 @@ describe('Processors api', function() {
                 };
                 let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
-                createProcessorResponse.body.message.should.eql('javascript has 0 exported function');
+                createProcessorResponse.body.message.should.eql('javascript has 0 exported functions');
             });
 
             it('Create processor export function that not exists', async () => {

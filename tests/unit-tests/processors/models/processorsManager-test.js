@@ -98,7 +98,7 @@ describe('Processor manager tests', function () {
                 exception = e;
             }
             should(exception.statusCode).eql(422);
-            should(exception.message).eql('javascript has 0 exported function');
+            should(exception.message).eql('javascript has 0 exported functions');
         });
     });
     describe('Delete existing processor', function () {
