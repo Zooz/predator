@@ -75,7 +75,7 @@ function verifyJSAndGetExportedFunctions(src) {
     try {
         let m = new module.constructor();
         m.paths = module.paths;
-        m._compile(src, 'none');
+        m._compile(src);
         let exports = m.exports;
         exportedFunctions = Object.keys(exports);
     } catch (err) {
