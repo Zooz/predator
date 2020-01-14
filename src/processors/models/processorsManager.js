@@ -4,19 +4,18 @@ const uuid = require('uuid');
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
-    fileManager = require('../../tests/models/fileManager.js'),
+    testsManager = require('../../tests/models/manager'),
     { ERROR_MESSAGES } = require('../../common/consts');
-
-let testsManager = require('../../tests/models/manager');
 
 module.exports.createProcessor = async function (processor) {
     const processorWithTheSameName = await databaseConnector.getProcessorByName(processor.name);
     if (processorWithTheSameName) {
-        throw generateProcessorNameAlreadyExistsError();
+        throw generateError(ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST, 400);
     }
     let processorId = uuid.v4();
     try {
-        fileManager.validateJavascriptContent(processor.javascript);
+        let exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
+        processor.exported_functions = exportedFunctions;
         await databaseConnector.insertProcessor(processorId, processor);
         processor.id = processorId;
         logger.info('Processor saved successfully to database');
@@ -28,7 +27,8 @@ module.exports.createProcessor = async function (processor) {
 };
 
 module.exports.getAllProcessors = async function (from, limit) {
-    return databaseConnector.getAllProcessors(from, limit);
+    let allProcessors = await databaseConnector.getAllProcessors(from, limit);
+    return allProcessors;
 };
 
 module.exports.getProcessor = async function (processorId) {
@@ -36,7 +36,7 @@ module.exports.getProcessor = async function (processorId) {
     if (processor) {
         return processor;
     } else {
-        const error = generateProcessorNotFoundError();
+        const error = generateError(ERROR_MESSAGES.NOT_FOUND, 404);
         throw error;
     }
 };
@@ -44,7 +44,9 @@ module.exports.getProcessor = async function (processorId) {
 module.exports.deleteProcessor = async function (processorId) {
     const tests = await testsManager.getTestsByProcessorId(processorId);
     if (tests.length > 0) {
-        throw generateProcessorIsUsedByTestsError(tests.map(test => test.name));
+        let testNames = tests.map(test => test.name);
+        let message = `${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`;
+        throw generateError(message, 409);
     }
     return databaseConnector.deleteProcessor(processorId);
 };
@@ -52,35 +54,44 @@ module.exports.deleteProcessor = async function (processorId) {
 module.exports.updateProcessor = async function (processorId, processor) {
     const oldProcessor = await databaseConnector.getProcessorById(processorId);
     if (!oldProcessor) {
-        throw generateProcessorNotFoundError();
+        throw generateError(ERROR_MESSAGES.NOT_FOUND, 404);
     }
     if (oldProcessor.name !== processor.name) {
         const processorWithUpdatedName = await databaseConnector.getProcessorByName(processor.name);
         if (processorWithUpdatedName) {
-            throw generateProcessorNameAlreadyExistsError();
+            throw generateError(ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST, 400);
         }
     }
 
     processor.created_at = oldProcessor.created_at;
-    fileManager.validateJavascriptContent(processor.javascript);
+    let exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
+    processor.exported_functions = exportedFunctions;
     await databaseConnector.updateProcessor(processorId, processor);
     return processor;
 };
 
-function generateProcessorNotFoundError() {
-    const error = new Error(ERROR_MESSAGES.NOT_FOUND);
-    error.statusCode = 404;
-    return error;
+function verifyJSAndGetExportedFunctions(src) {
+    let exportedFunctions;
+    try {
+        let m = new module.constructor();
+        m.paths = module.paths;
+        m._compile(src, 'none');
+        let exports = m.exports;
+        exportedFunctions = Object.keys(exports);
+    } catch (err) {
+        let error = generateError('javascript syntax validation failed with error: ' + err.message, 422);
+        throw error;
+    }
+
+    if (exportedFunctions.length === 0) {
+        let error = generateError('javascript has 0 exported functions', 422);
+        throw error;
+    }
+    return exportedFunctions;
 }
 
-function generateProcessorNameAlreadyExistsError() {
-    const error = new Error(ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST);
-    error.statusCode = 400;
-    return error;
-}
-
-function generateProcessorIsUsedByTestsError(testNames) {
-    const error = new Error(`${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`);
-    error.statusCode = 409;
+function generateError(message, statusCode) {
+    const error = new Error(message);
+    error.statusCode = statusCode;
     return error;
 }

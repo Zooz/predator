@@ -1,15 +1,13 @@
 'use strict';
 const uuid = require('uuid'),
-    request = require('request-promise-native'),
-    esprima = require('esprima');
+    request = require('request-promise-native');
 
 const database = require('./database'),
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
     saveFile,
-    getFile,
-    validateJavascriptContent
+    getFile
 };
 
 async function downloadFile(fileUrl) {
@@ -44,16 +42,4 @@ async function saveFile(fileUrl) {
     const fileBase64Value = Buffer.from(fileToSave).toString('base64');
     await database.saveFile(id, fileBase64Value);
     return id;
-}
-
-function validateJavascriptContent (javascriptFileContent) {
-    let error, errorMessage;
-    try {
-        esprima.parseScript(javascriptFileContent);
-    } catch (err) {
-        errorMessage = err.description;
-        error = new Error('javascript syntax validation failed with error: ' + errorMessage);
-        error.statusCode = 422;
-        throw error;
-    }
 }

@@ -34,7 +34,6 @@ describe('Processor manager tests', function () {
     });
 
     beforeEach(() => {
-        sandbox.resetHistory();
         sandbox.reset();
     });
 
@@ -84,6 +83,22 @@ describe('Processor manager tests', function () {
             } catch (e) {
                 should(e.statusCode).equal(400);
             }
+        });
+
+        it('Should return error for js without public functions', async function () {
+            let exception;
+            const firstProcessor = {
+                description: 'bad processor',
+                name: 'mickey',
+                javascript: 'return 5'
+            };
+            try {
+                await manager.createProcessor(firstProcessor);
+            } catch (e) {
+                exception = e;
+            }
+            should(exception.statusCode).eql(422);
+            should(exception.message).eql('javascript has 0 exported functions');
         });
     });
     describe('Delete existing processor', function () {

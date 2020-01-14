@@ -3,11 +3,11 @@ let databaseConfig = require('../../../../config/databaseConfig');
 let _ = require('lodash');
 let client;
 
-const INSERT_PROCESSOR = 'INSERT INTO processors(id, name, description, javascript, created_at, updated_at) values(?,?,?,?,?,?)';
+const INSERT_PROCESSOR = 'INSERT INTO processors(id, name, description, javascript, exported_functions, created_at, updated_at) values(?,?,?,?,?,?,?)';
 const GET_ALL_PROCESSORS = 'SELECT * FROM processors';
 const GET_PROCESSOR_BY_ID = 'SELECT * FROM processors WHERE id=?';
 const DELETE_PROCESSOR = 'DELETE FROM processors WHERE id=?';
-const UPDATE_PROCESSOR = 'UPDATE processors SET name=?, description=?, javascript=?, updated_at=? WHERE id=? AND created_at=? IF EXISTS';
+const UPDATE_PROCESSOR = 'UPDATE processors SET name=?, description=?, javascript=?, exported_functions=?, updated_at=? WHERE id=? AND created_at=? IF EXISTS';
 
 const INSERT_PROCESSOR_MAPPING = 'INSERT INTO processors_mapping(name, id) VALUES(?, ?)';
 const DELETE_PROCESSOR_MAPPING = 'DELETE FROM processors_mapping WHERE name=?';
@@ -72,7 +72,7 @@ async function deleteProcessor(processorId) {
 }
 
 async function insertProcessor(processorId, processorInfo) {
-    let params = [processorId, processorInfo.name, processorInfo.description, processorInfo.javascript, Date.now(), Date.now()];
+    let params = [processorId, processorInfo.name, processorInfo.description, processorInfo.javascript, processorInfo.exported_functions, Date.now(), Date.now()];
     let mappingParams = [processorInfo.name, processorId];
     const [processor] = await Promise.all([
         executeQuery(INSERT_PROCESSOR, params, queryOptions),
@@ -82,9 +82,9 @@ async function insertProcessor(processorId, processorInfo) {
 }
 
 async function updateProcessor(processorId, updatedProcessor) {
-    const { name, description, javascript, created_at: createdAt } = updatedProcessor;
+    const { name, description, javascript, exported_functions, created_at: createdAt } = updatedProcessor;
     const processor = await getProcessorById(processorId);
-    const params = [ name, description, javascript, Date.now(), processorId, createdAt.getTime() ];
+    const params = [ name, description, javascript, exported_functions, Date.now(), processorId, createdAt.getTime() ];
     return Promise.all([
         executeQuery(UPDATE_PROCESSOR, params, queryOptions),
         executeQuery(INSERT_PROCESSOR_MAPPING, [updatedProcessor.name, processorId]),

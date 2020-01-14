@@ -146,8 +146,8 @@ describe('Create job specific docker tests', async function () {
                         should(containers.length).eql(2);
                     });
 
-                    it('Wait for 5 seconds to let predator runner finish', (done) => {
-                        setTimeout(done, 5000);
+                    it('Wait for 10 seconds to let predator runner finish', (done) => {
+                        setTimeout(done, 10000);
                     });
 
                     it('Delete containers', async () => {
