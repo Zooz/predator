@@ -59,7 +59,7 @@ describe('Processors api', function() {
             });
 
             it('Get a page with limit > # of processors', async function() {
-                const from = 0, limit = 1000;
+                const from = 0, limit = 200;
                 let getProcessorsResponse = await processorRequestSender.getProcessors(from, limit);
 
                 should(getProcessorsResponse.statusCode).equal(200);

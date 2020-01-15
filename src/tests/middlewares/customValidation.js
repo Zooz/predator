@@ -7,7 +7,7 @@ module.exports = {
 function createDslValidator(req, res, next) {
     const request = req.body.request;
     const keys = Object.keys(request);
-    const swaggerError = buildSwaggerError(req, 'request should have only one of properties: get,head,post,put,delete,connect,options,trace');
+    const swaggerError = buildSwaggerError(req, 'body request should have only one of properties: get,head,post,put,delete,connect,options,trace');
     if (keys.length === 0 || keys.length !== 1){
         return next(swaggerError);
     }
@@ -19,6 +19,7 @@ function createDslValidator(req, res, next) {
 }
 
 function buildSwaggerError(req, message) {
-    const error = [{ message, dataPath: '' }];
-    return new swaggerValidator.InputValidationError(error, req.path, req.method, { beautifyErrors: true });
+    const error = [message];
+    const swaggerValidatorError = new swaggerValidator.InputValidationError(error, req.path, req.method, { beautifyErrors: true });
+    return swaggerValidatorError;
 }
