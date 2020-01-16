@@ -38,7 +38,8 @@ export class TestForm extends React.Component {
                 description: '',
                 currentScenarioIndex: 0,
                 currentStepIndex: null,
-                processorId: undefined
+                processorId: undefined,
+                processorsExportedFunctions: []
             }
         }
     }
@@ -58,16 +59,21 @@ export class TestForm extends React.Component {
     };
 
     componentDidUpdate(prevProps, prevState) {
-        const {createTestSuccess: createTestSuccessBefore} = prevProps;
-        const {createTestSuccess, closeDialog} = this.props;
+        const {createTestSuccess: createTestSuccessBefore, processorsList: processorsListBefore} = prevProps;
+        const {createTestSuccess, closeDialog, processorsList} = this.props;
 
         if (createTestSuccess === true && createTestSuccessBefore === false) {
             closeDialog();
+        }
+        if (processorsList.length > 0 && processorsListBefore.length === 0 && this.state.processorId) {
+            const processorsExportedFunctions = this.extractPExportedFunctions(processorsList, this.state.processorId);
+            this.setState({processorsExportedFunctions})
         }
     }
 
     componentDidMount() {
         this.props.getProcessors();
+        this.props.initForm();
     }
 
     render() {
@@ -80,24 +86,29 @@ export class TestForm extends React.Component {
                 <div className={style['top']}>
                     <div className={style['top-inputs']}>
                         {/* left */}
-                        <div className={style['input-container']}>
-                            Name:<TextField value={name} onChange={(event, value) => {
-                            this.setState({name: value})
-                        }} hintText={'Test name'}/>
+                        <div>
+                            <div className={style['input-container']}>
+                                Name:<TextField value={name} onChange={(event, value) => {
+                                this.setState({name: value})
+                            }} hintText={'Test name'}/>
+                            </div>
+                            <div className={style['input-container']}>
+                                Description:<TextField value={description} onChange={(event, value) => {
+                                this.setState({description: value})
+                            }} hintText={'Description'}/>
+                            </div>
                         </div>
-                        <div className={style['input-container']}>
-                            Description:<TextField value={description} onChange={(event, value) => {
-                            this.setState({description: value})
-                        }} hintText={'Description'}/>
-                        </div>
-                        <div className={style['input-container']}>
-                            Base url:<TextField value={baseUrl} onChange={(event, value) => {
-                            this.setState({baseUrl: value})
-                        }} hintText={'http://my.api.com/'}/>
-                        </div>
-                        <div className={style['input-container']} style={{width: '376px'}}>Processor:<ProcessorsDropDown
-                            onChange={this.onProcessorChosen} options={processorsList} value={processorId}
-                            loading={processorsLoading}/>
+                        <div>
+                            <div className={style['input-container']}>
+                                Base url:<TextField value={baseUrl} onChange={(event, value) => {
+                                this.setState({baseUrl: value})
+                            }} hintText={'http://my.api.com/'}/>
+                            </div>
+                            <div className={style['input-container']}
+                                 style={{width: '376px'}}>Processor:<ProcessorsDropDown
+                                onChange={this.onProcessorChosen} options={processorsList} value={processorId}
+                                loading={processorsLoading}/>
+                            </div>
                         </div>
                     </div>
                     {this.generateAddsButtons()}
@@ -110,8 +121,40 @@ export class TestForm extends React.Component {
         )
     }
 
+    extractPExportedFunctions = (processorsList, processorId) => {
+        const chosenProcessor = processorsList.find((processor) => processor.id === processorId);
+        const processorsExportedFunctions = chosenProcessor ? chosenProcessor.exported_functions.map((funcName) => ({
+            id: funcName,
+            name: funcName
+        })) : [];
+        return processorsExportedFunctions;
+    };
     onProcessorChosen = (id) => {
-        this.setState({processorId: id})
+        const processorsExportedFunctions = this.extractPExportedFunctions(this.props.processorsList, id);
+        //cleaning all steps and before
+        const scenarios = cloneDeep(this.state.scenarios);
+        const before = cloneDeep(this.state.before);
+
+        if (before) {
+            for (const step of before.steps) {
+                delete step.beforeRequest;
+                delete step.afterResponse;
+            }
+        }
+
+
+        for (const scenario of scenarios) {
+            delete scenario.beforeScenario;
+            delete scenario.afterScenario;
+            for (const step of scenario.steps) {
+                delete step.beforeRequest;
+                delete step.afterResponse;
+            }
+        }
+        this.setState({
+            processorId: id, processorsExportedFunctions, scenarios, before
+        })
+
     }
     generateBottomBar = () => {
         const {isLoading, closeDialog} = this.props;
@@ -267,7 +310,11 @@ export class TestForm extends React.Component {
         }, 100);
     };
     generateScenarioDashBoard = () => {
-        const {isAddStepOpen, isAddScenarioOpen, scenarios, before, currentScenarioIndex, currentStepIndex, isBeforeSelected, editMode} = this.state;
+        const {
+            isAddStepOpen, isAddScenarioOpen, scenarios, before, currentScenarioIndex, currentStepIndex, isBeforeSelected, editMode,
+            afterStepProcessorValue, beforeStepProcessorValue,
+            processorsExportedFunctions
+        } = this.state;
         const scenario = scenarios[currentScenarioIndex];
 
         let step;
@@ -298,13 +345,29 @@ export class TestForm extends React.Component {
                 </div>
                 <div style={{paddingLeft: '10px', width: '100%'}}>
                     {isAddStepOpen && step && <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step}
-                                                        onChangeValue={this.onChangeValueOfStep} editMode={editMode}/>}
+                                                        onChangeValue={this.onChangeValueOfStep} editMode={editMode}
+                                                        processorsExportedFunctions={processorsExportedFunctions}
+                                                        onAfterStepProcessorChange={this.onAfterStepProcessorChange}
+                                                        onBeforeStepProcessorChange={this.onBeforeStepProcessorChange}
+                                                        beforeStepProcessorValue={beforeStepProcessorValue}
+                                                        afterStepProcessorValue={afterStepProcessorValue}
+                    />}
                     {isAddScenarioOpen && scenario &&
                     <AddScenarioForm allowedWeight={this.calcMaxAllowedWeight()} key={currentScenarioIndex}
-                                     scenario={scenario} onChangeValue={this.onChangeValueOfScenario}/>}
+                                     scenario={scenario} onChangeValue={this.onChangeValueOfScenario}
+                                     processorsExportedFunctions={processorsExportedFunctions}/>
+                    }
                 </div>
             </div>
         )
+    };
+
+    onBeforeStepProcessorChange = (value) => {
+        this.setState({beforeStepProcessorValue: value})
+    };
+
+    onAfterStepProcessorChange = (value) => {
+        this.setState({afterStepProcessorValue: value})
     };
 
     onChangeValueOfScenario = (key, value) => {
@@ -340,5 +403,6 @@ const mapDispatchToProps = {
     editTest: Actions.editTest,
     cleanAllErrors: Actions.cleanAllErrors,
     getProcessors: Actions.getProcessors,
+    initForm: Actions.initCreateTestForm
 };
 export default connect(mapStateToProps, mapDispatchToProps)(TestForm);

@@ -5,7 +5,7 @@
   padding: 10px 20px;
   display:flex;
   justify-content: space-between;
-
+  flex-wrap: wrap;
 }
 .bottom {
   padding: 10px 20px 10px 0px;
@@ -16,7 +16,10 @@
 }
 .top-inputs {
   display:flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 58%;
 }
 .input-container{
   display:flex;

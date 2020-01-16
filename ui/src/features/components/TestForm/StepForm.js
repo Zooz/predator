@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 import JSONInput from 'react-json-editor-ajrm';
@@ -9,143 +8,177 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
-import { cloneDeep } from 'lodash'
+import {cloneDeep} from 'lodash'
 import RequestOptions from './requestOptions';
+import ProcessorsDropDown from './ProcessorsDropDown';
 
 import style from './stepform.scss';
+
 export default (props) => {
-  const sampleObject = {};
+    const sampleObject = {};
 
-  const onHeaderChange = (key, value, index) => {
-    const { onChangeValue } = props;
-    const step = cloneDeep(props.step);
-    step.headers[index][key] = value;
-    onChangeValue(step)
-  };
+    const onHeaderChange = (key, value, index) => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.headers[index][key] = value;
+        onChangeValue(step)
+    };
 
-  const onAddHeader = () => {
-    const { onChangeValue } = props;
-    const step = cloneDeep(props.step);
-    step.headers.push({});
-    onChangeValue(step)
-  };
-  const onAddCapture = () => {
-    const { onChangeValue } = props;
-    const step = cloneDeep(props.step);
-    step.captures.push({});
-    onChangeValue(step)
-  };
-  const onCaptureChange = (key, value, index) => {
-    const { onChangeValue } = props;
-    const step = cloneDeep(props.step);
-    step.captures[index][key] = value;
-    onChangeValue(step)
-  };
+    const onAddHeader = () => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.headers.push({});
+        onChangeValue(step)
+    };
+    const onAddCapture = () => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.captures.push({});
+        onChangeValue(step)
+    };
+    const onCaptureChange = (key, value, index) => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.captures[index][key] = value;
+        onChangeValue(step)
+    };
 
-  const onBodyChange = (value) => {
-    if (!value.error) {
-      const { onChangeValue } = props;
-      const step = cloneDeep(props.step);
-      step.body = value.jsObject;
-      onChangeValue(step)
-    }
-  };
+    const onBodyChange = (value) => {
+        if (!value.error) {
+            const {onChangeValue} = props;
+            const step = cloneDeep(props.step);
+            step.body = value.jsObject;
+            onChangeValue(step)
+        }
+    };
 
-  const onInputChange = (key, value) => {
-    const { onChangeValue } = props;
-    const step = cloneDeep(props.step);
+    const onInputChange = (key, value) => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
 
-    step[key] = value;
-    onChangeValue(step);
-  };
+        step[key] = value;
+        onChangeValue(step);
+    };
 
-  const { step } = props;
-  const disableSampleBody = step.method === 'GET';
-  const jsonObjectKey = step.method === 'GET' ? 'get' : 'not-get';
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      <div className={style['http-methods-request-options-wrapper']}>
-        <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
-          <HttpMethodDropdown
-            value={step.method}
-            onChange={(value) => onInputChange('method', value)}
-          />
-          <TextField value={step.url} style={{ marginBottom: '-19px', width: '100%' }} hintText={'Enter url'} onChange={(event, value) => { onInputChange('url', value) }} />
-        </RectangleAlignChildrenLeft>
-        <RequestOptions
-          onGzipToggleChanged={(value) => onInputChange('gzip', value)}
-          onForeverToggleChanged={(value) => onInputChange('forever', value)}
-          gzipValue={step.gzip}
-          foreverValue={step.forever}
-        />
-      </div>
-      <RectangleAlignChildrenLeft />
+    const {
+        step, processorsExportedFunctions
+    } = props;
+    const disableSampleBody = step.method === 'GET';
+    const jsonObjectKey = step.method === 'GET' ? 'get' : 'not-get';
+
+    return (
+        <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
+            <div className={style['http-methods-request-options-wrapper']}>
+                <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
+                    <HttpMethodDropdown
+                        value={step.method}
+                        onChange={(value) => onInputChange('method', value)}
+                    />
+                    <TextField value={step.url} style={{marginBottom: '-19px', width: '100%'}} hintText={'Enter url'}
+                               onChange={(event, value) => {
+                                   onInputChange('url', value)
+                               }}/>
+                </RectangleAlignChildrenLeft>
+
+                <RequestOptions
+                    onGzipToggleChanged={(value) => onInputChange('gzip', value)}
+                    onForeverToggleChanged={(value) => onInputChange('forever', value)}
+                    gzipValue={step.gzip}
+                    foreverValue={step.forever}
+                />
+            </div>
+            <RectangleAlignChildrenLeft/>
 
             Headers:
-      <DynamicKeyValueInput value={step.headers} onAdd={onAddHeader} onChange={onHeaderChange} />
+            <DynamicKeyValueInput value={step.headers} onAdd={onAddHeader} onChange={onHeaderChange}/>
             Captures:
-      <DynamicKeyValueInput value={step.captures} onAdd={onAddCapture} onChange={onCaptureChange} keyHintText={'$.id'} valueHintText={'id'} />
-              Body:
-        <JSONInput
-            key={jsonObjectKey}
-            id='a_unique_id'
-            placeholder={step.body || (disableSampleBody ? undefined : sampleObject)}
-            colors={{
-                default: 'black',
-                background: 'white',
-                string: 'red',
-                keys: 'blue'
-            }}
-            locale={locale}
-            height={'200px'}
-            width={'100%'}
-            onChange={onBodyChange}
-        />
-    </div>
+            <DynamicKeyValueInput value={step.captures} onAdd={onAddCapture} onChange={onCaptureChange}
+                                  keyHintText={'$.id'} valueHintText={'id'}/>
 
-  )
+            Processors:
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '100%',
+                paddingLeft: '90px',
+                alignItems: 'center'
+            }}>
+                <div style={{whiteSpace: 'nowrap'}}>Before Request</div>
+                <ProcessorsDropDown options={processorsExportedFunctions}
+                                    onChange={(value) => onInputChange('beforeRequest', value)}
+                                    value={step.beforeRequest}/>
+                <div style={{whiteSpace: 'nowrap'}}>After Response</div>
+                <ProcessorsDropDown options={processorsExportedFunctions}
+                                    onChange={(value) => onInputChange('afterResponse', value)}
+                                    value={step.afterResponse}/>
+            </div>
+            Body:
+            <JSONInput
+                key={jsonObjectKey}
+                id='a_unique_id'
+                placeholder={step.body || (disableSampleBody ? undefined : sampleObject)}
+                colors={{
+                    default: 'black',
+                    background: 'white',
+                    string: 'red',
+                    keys: 'blue'
+                }}
+                locale={locale}
+                height={'200px'}
+                width={'100%'}
+                onChange={onBodyChange}
+            />
+        </div>
+
+    )
 }
 
-const DynamicKeyValueInput = ({ value, onChange, onAdd, keyHintText, valueHintText }) => {
-  const headersList = value
-    .map((header, index) => {
-      return (
-        <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }} key={index}>
-          <TextField onChange={(event, value) => { onChange('key', value, index) }} value={header.key} style={{ width: '100%' }} hintText={keyHintText || 'key'} />
-          <TextField onChange={(event, value) => { onChange('value', value, index) }} value={header.value} style={{ width: '100%' }} hintText={valueHintText || 'value'} />
-        </div>
-      )
-    });
+const DynamicKeyValueInput = ({value, onChange, onAdd, keyHintText, valueHintText}) => {
+    const headersList = value
+        .map((header, index) => {
+            return (
+                <div style={{display: 'flex', flexDirection: 'row', width: '100%'}} key={index}>
+                    <TextField onChange={(event, value) => {
+                        onChange('key', value, index)
+                    }} value={header.key} style={{width: '100%'}} hintText={keyHintText || 'key'}/>
+                    <TextField onChange={(event, value) => {
+                        onChange('value', value, index)
+                    }} value={header.value} style={{width: '100%'}} hintText={valueHintText || 'value'}/>
+                </div>
+            )
+        });
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        {headersList}
-      </div>
-      <div>
-        <FloatingActionButton onClick={onAdd} mini>
-          <ContentAdd />
-        </FloatingActionButton>
-      </div>
-    </div>
-  )
+    return (
+        <div style={{display: 'flex', flexDirection: 'row', width: '100%'}}>
+            <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
+                {headersList}
+            </div>
+            <div>
+                <FloatingActionButton onClick={onAdd} mini>
+                    <ContentAdd/>
+                </FloatingActionButton>
+            </div>
+        </div>
+    )
 }
 
 const HttpMethodDropdown = (props) => {
-  const httpMethods = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE'];
-  const { onChange, value } = props;
-  return (<DropDownMenu
-    autoWidth={false}
-    style={{ width: '150px', marginLeft: '-25px', height: '50px' }}
-    value={value}
-    onChange={(event, keyNumber, value) => { onChange(value) }}
-  >
-    {
-      httpMethods.map((method, index) => {
-        return (<MenuItem key={index} value={method} primaryText={method} />
-        )
-      })
-    }
-  </DropDownMenu>);
+    const httpMethods = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE'];
+    const {onChange, value} = props;
+    return (<DropDownMenu
+        autoWidth={false}
+        style={{width: '150px', marginLeft: '-25px', height: '50px'}}
+        value={value}
+        onChange={(event, keyNumber, value) => {
+            onChange(value)
+        }}
+    >
+        {
+            httpMethods.map((method, index) => {
+                return (<MenuItem key={index} value={method} primaryText={method}/>
+                )
+            })
+        }
+    </DropDownMenu>);
 }

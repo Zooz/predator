@@ -1,5 +1,6 @@
 import {
     getTest,
+    initCreateTestForm,
     editTest,
     cleanAllErrors,
     clearDeleteTestSuccess,
@@ -82,6 +83,7 @@ import {
 export {
     // tests//
     getTest,
+    initCreateTestForm,
     editTest,
     cleanAllErrors,
     getTests,

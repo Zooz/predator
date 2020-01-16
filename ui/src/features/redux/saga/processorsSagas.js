@@ -35,7 +35,6 @@ export function* deleteProcessor(action) {
         yield put(Actions.deleteProcessorSuccess(true));
         yield put(Actions.getProcessors());
     } catch (err) {
-        console.log('manor err', err)
         yield put(Actions.deleteProcessorFailure(err));
     }
     yield put(Actions.processorsLoading(false));

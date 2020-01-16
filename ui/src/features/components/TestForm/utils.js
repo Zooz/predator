@@ -7,6 +7,8 @@ export const createTestRequest = (data) => {
         return {
             name: scenario.scenario_name,
             weight: scenario.weight,
+            beforeScenario: scenario.beforeScenario,
+            afterScenario: scenario.afterScenario,
             flow: prepareFlow(scenario.steps)
         }
     });
@@ -57,6 +59,8 @@ function testScenarioToTestScenario(testScenarios) {
         return {
             id: uuid(),
             scenario_name: scenario.name,
+            beforeScenario: scenario.beforeScenario,
+            afterScenario: scenario.afterScenario,
             weight: scenario.weight,
             steps: buildStepsFromFlow(scenario.flow)
         }
@@ -76,6 +80,8 @@ function buildStepsFromFlow(flow) {
             gzip: request[method].gzip,
             forever: request[method].forever,
             url: request[method].url,
+            beforeRequest: request[method].beforeRequest,
+            afterResponse: request[method].afterResponse,
             captures: buildCaptureState(request[method].capture),
             headers: buildHeadersState(request[method].headers)
         }
@@ -117,7 +123,9 @@ function prepareFlow(steps) {
                 json: step.body,
                 capture: prepareCapture(step.captures),
                 gzip: step.gzip,
-                forever: step.forever
+                forever: step.forever,
+                beforeRequest: step.beforeRequest,
+                afterResponse: step.afterResponse
             }
         }
     });

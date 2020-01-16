@@ -2,7 +2,7 @@ import DropDownMenu from "material-ui/DropDownMenu";
 import MenuItem from "material-ui/MenuItem";
 import React from "react";
 
-const ProcessorsDropdown = ({onChange, options, value, loading}) => {
+const ProcessorsDropdown = ({onChange, options=[], value, loading}) => {
     const dropDownOptions = [...options, {name: loading ? 'Loading...' : 'NONE', id: undefined}];
     return (
         <DropDownMenu
