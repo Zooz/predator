@@ -24,7 +24,6 @@ export class TestForm extends React.Component {
 
         if (props.data) {
             this.state = createStateForEditTest(props.data);
-            this.state.editMode = true;
         } else {
             this.state = {
                 isAddScenarioOpen: false,
@@ -65,7 +64,8 @@ export class TestForm extends React.Component {
         if (createTestSuccess === true && createTestSuccessBefore === false) {
             closeDialog();
         }
-        if (processorsList.length > 0 && processorsListBefore.length === 0 && this.state.processorId) {
+        console.log('manor this.state.processorsExportedFunctions',this.state.processorsExportedFunctions)
+        if (processorsList && processorsList.length > 0 && this.state.processorsExportedFunctions.length === 0 && this.state.processorId) {
             const processorsExportedFunctions = this.extractPExportedFunctions(processorsList, this.state.processorId);
             this.setState({processorsExportedFunctions})
         }

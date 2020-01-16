@@ -38,7 +38,9 @@ export const createStateForEditTest = (test) => {
         before: testBeforeToStateBefore(artillery_test.before),
         scenarios: testScenarioToTestScenario(artillery_test.scenarios),
         type: test.type,
-        processorId: test.processor_id
+        processorId: test.processor_id,
+        editMode: true,
+        processorsExportedFunctions: []
     }
 };
 
