@@ -128,7 +128,7 @@ async function getTest(id) {
 async function getTests() {
     const test = client.model('test');
     const options = {
-        attributes: { include: [Sequelize.fn('max', Sequelize.col('id'))], exclude: ['created_at'] },
+        attributes: { include: [Sequelize.fn('max', Sequelize.col('updated_at'))], exclude: ['created_at'] },
         order: [['updated_at', 'DESC'], ['id', 'DESC']],
         group: ['test_id']
     };
