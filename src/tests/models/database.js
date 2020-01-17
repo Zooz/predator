@@ -15,7 +15,7 @@ module.exports = {
     getDslDefinitions,
     updateDslDefinition,
     getFile,
-    deleteDefinition,
+    deleteDefinition
 };
 
 function insertTest(testInfo, testJson, id, revisionId, fileId) {

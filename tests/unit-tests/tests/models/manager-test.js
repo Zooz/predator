@@ -310,4 +310,16 @@ describe('Scenario generator tests', function () {
                 });
         });
     });
+
+    describe('getTestsByProcessorId', function() {
+        it('should return the rows from the database', async function() {
+            let processorId = uuid();
+            const rows = [{ name: 'firewall', processor_id: processorId }, { name: 'Generic', id: uuid() }];
+            getTestsStub.resolves(rows);
+            const result = await manager.getTestsByProcessorId(processorId);
+
+            should(result.length).eql(1);
+            should(result[0].name).eql('firewall');
+        });
+    });
 });
