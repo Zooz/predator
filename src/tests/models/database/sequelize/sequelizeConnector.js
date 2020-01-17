@@ -128,8 +128,9 @@ async function getTest(id) {
 async function getTests() {
     const test = client.model('test');
     const options = {
-        attributes: { exclude: ['created_at'] },
-        order: [['updated_at', 'DESC'], ['id', 'DESC']]
+        attributes: { include: [Sequelize.fn('max', Sequelize.col('id'))], exclude: ['created_at'] },
+        order: [['updated_at', 'DESC'], ['id', 'DESC']],
+        group: ['test_id']
     };
     let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
@@ -157,10 +158,13 @@ async function deleteTest(testId){
 }
 
 async function getTestsByProcessorId(processorId) {
+    const activeTests = await getTests();
+    let activeTestRevisionIds = activeTests.map(test => test.revision_id);
     const testModel = client.model('test');
     const options = {
         where: {
-            processor_id: processorId
+            processor_id: processorId,
+            revision_id: { [Sequelize.Op.in]: activeTestRevisionIds }
         },
         attributes: ['name']
     };
