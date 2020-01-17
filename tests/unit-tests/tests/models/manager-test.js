@@ -32,7 +32,6 @@ describe('Scenario generator tests', function () {
         getFileStub = sandbox.stub(database, 'getFile');
         saveFileStub = sandbox.stub(database, 'saveFile');
         testGeneratorStub = sandbox.stub(testGenerator, 'createTest');
-        getTestsByProcessorIdStub = sandbox.stub(database, 'getTestsByProcessorId');
     });
 
     beforeEach(() => {
@@ -309,15 +308,6 @@ describe('Scenario generator tests', function () {
                 .then(function (res) {
                     res.should.eql(expectedResult);
                 });
-        });
-    });
-
-    describe('getTestsByProcessorId', function() {
-        it('should return the rows from the database', async function() {
-            const rows = [{ name: 'firewall' }, { name: 'Generic' }];
-            getTestsByProcessorIdStub.resolves(rows);
-            const result = await manager.getTestsByProcessorId(uuid());
-            should(result).deepEqual(rows);
         });
     });
 });

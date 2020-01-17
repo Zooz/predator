@@ -27,7 +27,6 @@ module.exports = {
     getAllTestRevisions,
     getTest,
     getTests,
-    getTestsByProcessorId,
     deleteTest,
     insertDslDefinition,
     getDslDefinition,
@@ -153,10 +152,4 @@ async function saveFile(id, file) {
 async function getFile(id) {
     const result = await executeQuery(GET_FILE, [id], queryOptions);
     return result.rows[0] ? result.rows[0].file : undefined;
-}
-
-async function getTestsByProcessorId(processorId) {
-    const params = [processorId];
-    const result = await executeQuery(GET_TESTS_ID_THAT_USE_THE_PROCESSOR, params, queryOptions);
-    return result.rows;
 }
