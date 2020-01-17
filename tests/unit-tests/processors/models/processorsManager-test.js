@@ -181,24 +181,6 @@ describe('Processor manager tests', function () {
                     secondProcessor
                 ]);
             });
-
-            it('Database returns two rows array, should return two processors with javascript when excluding by unknown exclude key', async function () {
-                const processors = await manager.getAllProcessors(undefined, undefined, 'unknown');
-                processors[0].should.have.key('javascript');
-                processors[1].should.have.key('javascript');
-            });
-
-            it('Database returns two rows array, should return two processors without javascript when excluding this field in query param by array', async function () {
-                const processors = await manager.getAllProcessors(undefined, undefined, ['javascript']);
-                processors[0].should.not.have.key('javascript');
-                processors[1].should.not.have.key('javascript');
-            });
-
-            it('Database returns two rows array, should return two processors without javascript when excluding this field in query param by single query item', async function () {
-                const processors = await manager.getAllProcessors(undefined, undefined, 'javascript');
-                processors[0].should.not.have.key('javascript');
-                processors[1].should.not.have.key('javascript');
-            });
         });
     });
     describe('Update processor', function () {

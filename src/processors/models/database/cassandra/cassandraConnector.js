@@ -3,8 +3,11 @@ let databaseConfig = require('../../../../config/databaseConfig');
 let _ = require('lodash');
 let client;
 
+const JAVASCRIPT = 'javascript';
 const INSERT_PROCESSOR = 'INSERT INTO processors(id, name, description, javascript, exported_functions, created_at, updated_at) values(?,?,?,?,?,?,?)';
 const GET_ALL_PROCESSORS = 'SELECT * FROM processors';
+const GET_ALL_PROCESSORS_NO_JAVASCRIPT = 'SELECT id, name, description, created_at, updated_at, exported_functions FROM processors';
+
 const GET_PROCESSOR_BY_ID = 'SELECT * FROM processors WHERE id=?';
 const DELETE_PROCESSOR = 'DELETE FROM processors WHERE id=?';
 const UPDATE_PROCESSOR = 'UPDATE processors SET name=?, description=?, javascript=?, exported_functions=?, updated_at=? WHERE id=? AND created_at=? IF EXISTS';
@@ -42,8 +45,12 @@ async function init(cassandraClient) {
     client = cassandraClient;
 }
 
-async function getAllProcessors(from, limit) {
-    const resultRows = await executeQuery(GET_ALL_PROCESSORS, [], queryOptions);
+async function getAllProcessors(from, limit, exclude) {
+    let query = GET_ALL_PROCESSORS;
+    if (exclude && (exclude === JAVASCRIPT || exclude.includes(JAVASCRIPT))) {
+        query = GET_ALL_PROCESSORS_NO_JAVASCRIPT;
+    }
+    const resultRows = await executeQuery(query, [], queryOptions);
     return _(resultRows).slice(from).take(limit).value();
 }
 

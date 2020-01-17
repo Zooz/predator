@@ -22,7 +22,24 @@ export class ProcessorForm extends React.Component {
             this.state = {
                 name: '',
                 description: '',
-                javascript: 'const x=100;'
+                javascript: 'module.exports = {\n' +
+                    '    beforeRequest,\n' +
+                    '    afterResponse,\n' +
+                    '    afterScenario,\n' +
+                    '    beforeScenario\n' +
+                    '};\n' +
+                    'function beforeRequest(requestParams, context, ee, next) {\n' +
+                    '    return next(); // MUST be called for the scenario to continue\n' +
+                    '}\n' +
+                    'function afterResponse(requestParams, response, context, ee, next) {\n' +
+                    '    return next(); // MUST be called for the scenario to continue\n' +
+                    '}\n' +
+                    'function afterScenario(context, ee, next) {\n' +
+                    '    return next(); // MUST be called for the scenario to continue\n' +
+                    '}\n' +
+                    'function beforeScenario(context, ee, next) {\n' +
+                    '    return next(); // MUST be called for the scenario to continue\n' +
+                    '}'
             }
         }
     }
