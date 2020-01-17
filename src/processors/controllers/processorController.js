@@ -17,7 +17,7 @@ module.exports.getAllProcessors = async function (req, res, next) {
     try {
         from = parseInt(from);
         limit = parseInt(limit);
-        processors = await processorManager.getAllProcessors(from, limit);
+        processors = await processorManager.getAllProcessors(from, limit, req.query.exclude);
         return res.status(200).json(processors);
     } catch (err) {
         return next(err);

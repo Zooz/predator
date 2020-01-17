@@ -1097,8 +1097,18 @@ paths:
         required: false
         schema:
           type: integer
-          maximum: 100
+          maximum: 200
           default: 100
+      - in: query
+        name: exclude
+        description: fields to exclude from response
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - javascript
       responses:
         '200':
           description: Success
@@ -1785,7 +1795,6 @@ components:
         javascript:
           type: string
           description: Raw javascript that will be used by the processor resource.
-          readOnly: true
     post_report:
       required:
       - report_id

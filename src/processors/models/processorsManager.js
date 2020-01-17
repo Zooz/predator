@@ -5,6 +5,7 @@ const uuid = require('uuid');
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     testsManager = require('../../tests/models/manager'),
+    JAVASCRIPT = 'javascript',
     { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports.createProcessor = async function (processor) {
@@ -26,8 +27,11 @@ module.exports.createProcessor = async function (processor) {
     }
 };
 
-module.exports.getAllProcessors = async function (from, limit) {
+module.exports.getAllProcessors = async function (from, limit, exclude) {
     let allProcessors = await databaseConnector.getAllProcessors(from, limit);
+    if (exclude && (exclude === JAVASCRIPT || exclude.includes(JAVASCRIPT))) {
+        allProcessors.forEach(processor => delete processor.javascript);
+    }
     return allProcessors;
 };
 
