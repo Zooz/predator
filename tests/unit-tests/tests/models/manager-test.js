@@ -19,7 +19,6 @@ describe('Scenario generator tests', function () {
     let saveFileStub;
     let getFileStub;
     let getRequestStub;
-    let getTestsByProcessorIdStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
