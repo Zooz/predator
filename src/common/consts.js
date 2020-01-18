@@ -1,6 +1,7 @@
 module.exports = {
     TEST_TYPE_BASIC: 'basic',
     TEST_TYPE_DSL: 'dsl',
+    PROCESSOR_FUNCTIONS_KEYS: ['beforeScenario', 'afterScenario', 'beforeRequest', 'afterResponse'],
     ERROR_MESSAGES: {
         NOT_FOUND: 'Not found',
         DSL_DEF_ALREADY_EXIST: 'Definition already exists',

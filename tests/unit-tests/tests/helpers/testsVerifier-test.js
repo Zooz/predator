@@ -35,13 +35,42 @@ describe('tests verifier tests', function () {
     });
 
     describe('verifyProcessorExists tests', () => {
-        it('Should pass processor id validation', async () => {
-            req = { body: { processor_id: 'id' } };
+        it('Should pass processor validation', async () => {
+            req = { body: { processor_id: 'id', artillery_test: { before: { afterScenario: 'logResponse' } } } };
 
-            processorsManagerStub.resolves();
-            await testsVerifier.verifyProcessorExists(req, res, nextStub);
+            processorsManagerStub.resolves({ exported_functions: ['logResponse'] });
+            await testsVerifier.verifyProcessorIsValid(req, res, nextStub);
             should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0]).eql(undefined);
             should(processorsManagerStub.calledOnce).eql(true);
+        });
+
+        it('Should pass processor validation when using functions without specifying processor for dsl type', async () => {
+            req = { body: { type: 'dsl', artillery_test: { before: { afterScenario: 'logResponse', beforeScenario: 'xyz' } } } };
+            await testsVerifier.verifyProcessorIsValid(req, res, nextStub);
+            should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0]).eql(undefined);
+
+        });
+
+        it('Should fail on test that using function with processor', async () => {
+            req = { body: { type: 'basic', artillery_test: { before: { afterScenario: 'logResponse', beforeScenario: 'xyz' } } } };
+
+            processorsManagerStub.resolves({ exported_functions: ['logResponse'] });
+            await testsVerifier.verifyProcessorIsValid(req, res, nextStub);
+            should(nextStub.called).eql(true);
+            should(nextStub.args[0][0].statusCode).eql(400);
+            should(nextStub.args[0][0].message).eql('Functions: logResponse, xyz are used without specifying processor');
+        });
+
+        it('Should fail on processor validation due to using functions which are not part of the processor', async () => {
+            req = { body: { processor_id: 'id', artillery_test: { before: { afterScenario: 'logResponse', beforeScenario: 'xyz' } } } };
+
+            processorsManagerStub.resolves({ exported_functions: ['logResponse'] });
+            await testsVerifier.verifyProcessorIsValid(req, res, nextStub);
+            should(nextStub.called).eql(true);
+            should(nextStub.args[0][0].statusCode).eql(400);
+            should(nextStub.args[0][0].message).eql('Functions: xyz does not exist in the processor file');
         });
 
         it('Should fail on processor id validation when test not found', async () => {
@@ -49,10 +78,10 @@ describe('tests verifier tests', function () {
 
             processorsManagerStub.rejects({ statusCode: 404 });
 
-            await testsVerifier.verifyProcessorExists(req, res, nextStub);
+            await testsVerifier.verifyProcessorIsValid(req, res, nextStub);
             should(nextStub.called).eql(true);
-            should(nextStub.args[0][0].message).eql('processor with id: id does not exist');
             should(nextStub.args[0][0].statusCode).eql(400);
+            should(nextStub.args[0][0].message).eql('processor with id: id does not exist');
         });
 
         it('Should fail on processor id validation when error from performance framework api', async () => {
@@ -60,10 +89,10 @@ describe('tests verifier tests', function () {
 
             processorsManagerStub.rejects({ statusCode: 500, message: 'failure' });
 
-            await testsVerifier.verifyProcessorExists(req, res, nextStub);
+            await testsVerifier.verifyProcessorIsValid(req, res, nextStub);
             should(nextStub.called).eql(true);
-            should(nextStub.args[0][0].message).eql('failure');
             should(nextStub.args[0][0].statusCode).eql(500);
+            should(nextStub.args[0][0].message).eql('failure');
         });
     });
 });

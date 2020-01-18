@@ -1,17 +1,25 @@
 'use strict';
 const sinon = require('sinon'),
     should = require('should'),
-    uuid = require('uuid/v4'),
     databaseConfig = require('../../../../src/config/databaseConfig'),
     sequelizeConnector = require('../../../../src/processors/models/database/sequelize/sequelizeConnector');
 
 describe('Sequelize client tests', function () {
-    const processor = {
+    const processorRaw = {
         id: '6063ae04-f832-11e9-aad5-362b9e155667',
         name: 'processor name',
         description: 'bla bla bla',
         javascript: 'module.exports = 5;'
     };
+    const processor = {
+        get: () => {
+            return {
+                processorRaw
+            };
+        }
+    };
+
+    Object.assign(processor, processorRaw);
 
     let sandbox,
         sequelizeModelStub,
@@ -106,7 +114,7 @@ describe('Sequelize client tests', function () {
             await sequelizeConnector.insertProcessor(processor.id, processor);
             const paramsArg = sequelizeCreateStub.args[0][0];
             should(sequelizeCreateStub.calledOnce).eql(true);
-            should(paramsArg).containDeep(processor);
+            should(paramsArg).containDeep(processorRaw);
             should(paramsArg).has.properties(['created_at', 'updated_at']);
         });
     });
