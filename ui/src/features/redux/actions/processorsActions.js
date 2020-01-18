@@ -18,8 +18,8 @@ export const deleteProcessorSuccess = (value) => (
 export const deleteProcessorFailure = (value) => (
     {type: Types.DELETE_PROCESSOR_FAILURE, value}
 );
-export const getProcessors = () => (
-    {type: Types.GET_PROCESSORS}
+export const getProcessors = (params) => (
+    {type: Types.GET_PROCESSORS, params}
 );
 
 export const getProcessorsSuccess = (processors) => (

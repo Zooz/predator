@@ -16,10 +16,10 @@ export function* createProcessor(action) {
 
 }
 
-export function* getProcessors() {
+export function* getProcessors(action) {
     try {
         yield put(Actions.processorsLoading(true));
-        const {data} = yield call(getProcessorsApi);
+        const {data} = yield call(getProcessorsApi, action.params);
         yield put(Actions.getProcessorsSuccess(data));
     } catch (err) {
         yield put(Actions.getProcessorsFailure(err));
@@ -44,7 +44,7 @@ export function* deleteProcessor(action) {
 export function* editProcessor(action) {
     try {
         yield put(Actions.processorsLoading(true));
-        yield call(editProcessorApi, action.id,action.body);
+        yield call(editProcessorApi, action.id, action.body);
         yield put(Actions.editProcessorSuccess(true));
         yield put(Actions.getProcessors());
     } catch (err) {

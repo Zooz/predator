@@ -40,6 +40,7 @@ export class TestForm extends React.Component {
                 processorId: undefined,
                 processorsExportedFunctions: []
             }
+
         }
     }
 
@@ -64,7 +65,6 @@ export class TestForm extends React.Component {
         if (createTestSuccess === true && createTestSuccessBefore === false) {
             closeDialog();
         }
-        console.log('manor this.state.processorsExportedFunctions',this.state.processorsExportedFunctions)
         if (processorsList && processorsList.length > 0 && this.state.processorsExportedFunctions.length === 0 && this.state.processorId) {
             const processorsExportedFunctions = this.extractPExportedFunctions(processorsList, this.state.processorId);
             this.setState({processorsExportedFunctions})
@@ -72,8 +72,18 @@ export class TestForm extends React.Component {
     }
 
     componentDidMount() {
-        this.props.getProcessors();
+        this.props.getProcessors({exclude: 'javascript'});
         this.props.initForm();
+        if (this.state.editMode) {
+            if (this.state.before) {
+                this.onChooseBefore()
+            } else if (this.state.scenarios.length > 0) {
+                this.onChooseScenario(0);
+            }
+        } else {
+            this.addScenarioHandler();
+
+        }
     }
 
     render() {
@@ -122,6 +132,8 @@ export class TestForm extends React.Component {
     }
 
     extractPExportedFunctions = (processorsList, processorId) => {
+        console.log("manor",processorsList);
+        console.log("manor processorId",processorId);
         const chosenProcessor = processorsList.find((processor) => processor.id === processorId);
         const processorsExportedFunctions = chosenProcessor ? chosenProcessor.exported_functions.map((funcName) => ({
             id: funcName,
@@ -162,7 +174,7 @@ export class TestForm extends React.Component {
         return (<div style={{display: 'flex', justifyContent: 'flex-end'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', width: '340px'}}>
                 <Button label={'CANCEL'} onClick={closeDialog}/>
-                <Button isLoading={isLoading} onClick={this.postTest} label={'SAVE'}/>
+                <Button isLoading={isLoading} disabled={!this.state.name} onClick={this.postTest} label={'SAVE'}/>
             </div>
         </div>)
     }
