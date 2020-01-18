@@ -8,7 +8,6 @@ module.exports = {
     insertTest,
     getTest,
     getTests,
-    getTestsByProcessorId,
     deleteTest,
     getAllTestRevisions,
     saveFile,
@@ -154,18 +153,6 @@ async function deleteTest(testId){
             where: { test_id: testId }
         });
     return result;
-}
-
-async function getTestsByProcessorId(processorId) {
-    const testModel = client.model('test');
-    const options = {
-        where: {
-            processor_id: processorId
-        },
-        attributes: ['name']
-    };
-    const tests = await testModel.findAll(options);
-    return tests;
 }
 
 async function insertDslDefinition(dslName, definitionName, data){

@@ -151,30 +151,54 @@ describe('Processor manager tests', function () {
             const processors = await manager.getAllProcessors();
             processors.should.eql([]);
         });
+        describe('Get multiple processors with results', function () {
+            let firstProcessor, secondProcessor;
+            beforeEach(() => {
+                firstProcessor = {
+                    id: uuid(),
+                    description: 'first processor',
+                    javascript: 'aaaa',
+                    name: 'mickey1'
+                };
 
-        it('Database returns two rows array, should return two processors', async function () {
-            const firstProcessor = {
-                id: uuid(),
-                description: 'first processor',
-                name: 'mickey1'
-            };
+                secondProcessor = {
+                    id: uuid(),
+                    description: 'first processor',
+                    javascript: 'bbbb',
+                    name: 'mickey1'
+                };
+                getProcessorsStub.resolves([
+                    firstProcessor,
+                    secondProcessor
+                ]);
+            });
+            it('Database returns two rows array, should return two processors', async function () {
+                const processors = await manager.getAllProcessors();
+                processors[0].should.have.key('javascript');
+                processors[1].should.have.key('javascript');
+                processors.should.eql([
+                    firstProcessor,
+                    secondProcessor
+                ]);
+            });
 
-            const secondProcessor = {
-                id: uuid(),
-                description: 'first processor',
-                name: 'mickey1'
-            };
+            it('Database returns two rows array, should return two processors with javascript when excluding by unknown exclude key', async function () {
+                const processors = await manager.getAllProcessors(undefined, undefined, 'unknown');
+                processors[0].should.have.key('javascript');
+                processors[1].should.have.key('javascript');
+            });
 
-            getProcessorsStub.resolves([
-                firstProcessor,
-                secondProcessor
-            ]);
+            it('Database returns two rows array, should return two processors without javascript when excluding this field in query param by array', async function () {
+                const processors = await manager.getAllProcessors(undefined, undefined, ['javascript']);
+                processors[0].should.not.have.key('javascript');
+                processors[1].should.not.have.key('javascript');
+            });
 
-            const processors = await manager.getAllProcessors();
-            processors.should.eql([
-                firstProcessor,
-                secondProcessor
-            ]);
+            it('Database returns two rows array, should return two processors without javascript when excluding this field in query param by single query item', async function () {
+                const processors = await manager.getAllProcessors(undefined, undefined, 'javascript');
+                processors[0].should.not.have.key('javascript');
+                processors[1].should.not.have.key('javascript');
+            });
         });
     });
     describe('Update processor', function () {

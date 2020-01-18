@@ -6,19 +6,19 @@ const processorRequestSender = require('./helpers/requestCreator');
 const testsRequestSender = require('../tests/helpers/requestCreator');
 const { ERROR_MESSAGES } = require('../../../src/common/consts');
 const basicTest = require('../../testExamples/Basic_test.json');
-describe('Processors api', function() {
+describe('Processors api', function () {
     this.timeout(5000000);
     before(async function () {
         await processorRequestSender.init();
         await testsRequestSender.init();
     });
 
-    describe('Good requests', async function() {
+    describe('Good requests', async function () {
         describe('GET /v1/processors', function () {
             let numberOfProcessorsToInsert = 101;
             let jsProcessorsArr = [];
             let processorsInserted = [];
-            before(async function() {
+            before(async function () {
                 for (let i = 0; i < numberOfProcessorsToInsert; i++) {
                     const processor = generateRawJSProcessor(i.toString());
                     jsProcessorsArr.push(processor);
@@ -26,7 +26,7 @@ describe('Processors api', function() {
                     processorsInserted.push(processorRes);
                 }
             });
-            it('Check default paging values (from = 0, limit = 100)', async function() {
+            it('Check default paging values (from = 0, limit = 100)', async function () {
                 let getProcessorsResponse = await processorRequestSender.getProcessors();
 
                 should(getProcessorsResponse.statusCode).equal(200);
@@ -35,7 +35,7 @@ describe('Processors api', function() {
                 should(processors.length).equal(100);
             });
 
-            it('Get a page', async function() {
+            it('Get a page', async function () {
                 const from = 25, limit = 50;
                 let getProcessorsResponse = await processorRequestSender.getProcessors(from, limit);
 
@@ -45,7 +45,7 @@ describe('Processors api', function() {
                 should(processors.length).equal(limit);
             });
 
-            it('Validate from parameter starts from the correct index', async function() {
+            it('Validate from parameter starts from the correct index', async function () {
                 const from = 0, limit = 50;
                 let page1Response = await processorRequestSender.getProcessors(from, limit);
                 let page2Response = await processorRequestSender.getProcessors(from + 1, limit);
@@ -58,8 +58,8 @@ describe('Processors api', function() {
                 should(page1Processors[1]).deepEqual(page2Processors[0]);
             });
 
-            it('Get a page with limit > # of processors', async function() {
-                const from = 0, limit = 1000;
+            it('Get a page with limit > # of processors', async function () {
+                const from = 0, limit = 200;
                 let getProcessorsResponse = await processorRequestSender.getProcessors(from, limit);
 
                 should(getProcessorsResponse.statusCode).equal(200);
@@ -67,7 +67,18 @@ describe('Processors api', function() {
                 const processors = getProcessorsResponse.body;
                 should(processors.length).greaterThanOrEqual(101);
             });
-            after(async function() {
+
+            it('Get tests without javascript field', async function () {
+                const from = 0, limit = 10, exclude = 'javascript';
+                let getProcessorsResponse = await processorRequestSender.getProcessors(from, limit, exclude);
+
+                should(getProcessorsResponse.statusCode).equal(200);
+
+                const processors = getProcessorsResponse.body;
+                const processorsWithJavascript = processors.filter(processor => processor.javascript);
+                should(processorsWithJavascript.length).equal(0);
+            });
+            after(async function () {
                 const processorIds = processorsInserted.map(processor => processor.body.id);
                 processorIds.forEach(async (processorId) => {
                     await processorRequestSender.deleteProcessor(processorId);
@@ -99,7 +110,7 @@ describe('Processors api', function() {
         });
         describe('GET /v1/processors/{processor_id}', function () {
             let processorData, processor;
-            before(async function() {
+            before(async function () {
                 processorData = generateRawJSProcessor('mickeys-processor');
                 const processorResponse = await processorRequestSender.createProcessor(processorData, validHeaders);
                 processor = processorResponse.body;
@@ -114,7 +125,7 @@ describe('Processors api', function() {
                 let getProcessorResponse = await processorRequestSender.getProcessor(uuid(), validHeaders);
                 getProcessorResponse.statusCode.should.eql(404);
             });
-            after(async function() {
+            after(async function () {
                 const deleteResponse = await processorRequestSender.deleteProcessor(processor.id);
                 should(deleteResponse.statusCode).equal(204);
             });
@@ -145,8 +156,8 @@ describe('Processors api', function() {
                 should(deleteResponse.statusCode).equal(204);
             });
         });
-        describe('PUT /v1/processors/{processor_id}', function() {
-            it('update a processor', async function() {
+        describe('PUT /v1/processors/{processor_id}', function () {
+            it('update a processor', async function () {
                 const processor = generateRawJSProcessor('predator ' + uuid());
                 const createResponse = await processorRequestSender.createProcessor(processor, validHeaders);
                 should(createResponse.statusCode).equal(201);
@@ -192,7 +203,7 @@ describe('Processors api', function() {
                 let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(400);
             });
-            it('Create a processor with name that already exists', async function() {
+            it('Create a processor with name that already exists', async function () {
                 const name = 'test-processor';
                 const processor = generateRawJSProcessor(name);
                 const createResponse = await processorRequestSender.createProcessor(processor, validHeaders);
@@ -207,9 +218,9 @@ describe('Processors api', function() {
                 should(deleteResponse.statusCode).equal(204);
             });
         });
-        describe('PUT /v1/processors', function() {
-            describe('update a processor name to one that already exist', function() {
-                it('should fail and return status code 400', async function() {
+        describe('PUT /v1/processors', function () {
+            describe('update a processor name to one that already exist', function () {
+                it('should fail and return status code 400', async function () {
                     const name = 'WowProcessor';
                     const processor = generateRawJSProcessor(name);
                     const createResponse = await processorRequestSender.createProcessor(processor, validHeaders);
@@ -247,7 +258,6 @@ describe('Processors api', function() {
                 let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
             });
-
 
             it('Create processor without export functions', async () => {
                 const requestBody = {
@@ -315,31 +325,48 @@ describe('Processors api', function() {
             });
         });
         describe('PUT /processors/{processor_id}', () => {
-            it('processor doesn\'t exist', async function() {
+            it('processor doesn\'t exist', async function () {
                 const processorId = uuid();
                 const processor = generateRawJSProcessor('not stored in db processor');
                 const updateResponse = await processorRequestSender.updateProcessor(processorId, processor);
                 should(updateResponse.statusCode).equal(404);
             });
         });
-        describe('DELETE /processors/{processor_id}', function() {
-            it('should return 409 for deleting a processor which is used by other tests', async function() {
-                const processor = generateRawJSProcessor('simple-processor');
+        describe('DELETE /processors/{processor_id}', function () {
+            let test;
+            let testId;
+            let processorId;
+            before(async () => {
+                const processor = generateRawJSProcessor('simple-processor:' + uuid());
                 const processorInsertResponse = await processorRequestSender.createProcessor(processor, validHeaders);
                 should(processorInsertResponse.statusCode).equal(201);
 
-                const processorId = processorInsertResponse.body.id;
-                const test = Object.assign({}, basicTest);
+                processorId = processorInsertResponse.body.id;
+                test = Object.assign({}, basicTest);
                 test.processor_id = processorId;
                 const testsInsertResponse = await testsRequestSender.createTest(test, validHeaders);
                 should(testsInsertResponse.statusCode).equal(201);
+                testId = testsInsertResponse.body.id;
+            });
 
-                const deleteProcessorResponse = await processorRequestSender.deleteProcessor(processorId);
+            it('Should return 409 when trying to delete processor which is in use', async () => {
+                let deleteProcessorResponse = await processorRequestSender.deleteProcessor(processorId);
                 should(deleteProcessorResponse.statusCode).equal(409);
                 should(deleteProcessorResponse.body.message).startWith(`${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${test.name}`);
+            });
 
-                const cleanUpTestResponse = await testsRequestSender.deleteTest(validHeaders, testsInsertResponse.body.id);
-                should(cleanUpTestResponse.statusCode).equal(200);
+            it('Should return 409 and name of the correct test name which is using the processor', async function () {
+                test.name = 'new test name';
+                await testsRequestSender.updateTest(test, validHeaders, testId);
+                const deleteProcessorResponse = await processorRequestSender.deleteProcessor(processorId);
+                should(deleteProcessorResponse.statusCode).equal(409);
+                should(deleteProcessorResponse.body.message).startWith(`${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: new test name`);
+            });
+
+            it('Should success deleting the processor after test is deleted', async function () {
+                delete test.processor_id;
+                await testsRequestSender.updateTest(test, validHeaders, testId);
+
                 const cleanUpProcessorResponse = await processorRequestSender.deleteProcessor(processorId);
                 should(cleanUpProcessorResponse.statusCode).equal(204);
             });
