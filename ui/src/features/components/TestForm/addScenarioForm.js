@@ -31,13 +31,13 @@ const AddScenarioForm = (props) => {
             &&
             <React.Fragment>
 
-            <TextSideWrapper title={'Before Request:'} textStyle={{marginRight: -13}}>
+            <TextSideWrapper title={'Before Scenario:'} textStyle={{marginRight: -13}}>
                 <ProcessorsDropDown options={processorsExportedFunctions}
                                     onChange={(value) => onChangeValue('beforeScenario', value)}
                                     value={scenario.beforeScenario}/>
             </TextSideWrapper>
 
-            <TextSideWrapper title={'After Request:'} textStyle={{marginRight: -13}}>
+            <TextSideWrapper title={'After Scenario:'} textStyle={{marginRight: -13}}>
                 <ProcessorsDropDown options={processorsExportedFunctions}
                 onChange={(value) => onChangeValue('afterScenario', value)}
                 value={scenario.afterScenario}/>

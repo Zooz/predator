@@ -124,11 +124,8 @@ describe('the tests api', function() {
                 const processor = {
                     name: 'some-user-processor',
                     description: 'This is a description',
-                    type: 'file_download',
-                    file_url: url + uri
+                    javascript: 'module.exports.simple = 5'
                 };
-                const content = 'module.exports=5;';
-                nock(url).get(uri).reply(200, content);
                 const processorResponse = await processorsRequestSender.createProcessor(processor, validHeaders);
                 const processorId = processorResponse.body.id;
                 let requestBody = Object.assign({ processor_id: processorId }, simpleTest.test);
