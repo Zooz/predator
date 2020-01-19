@@ -76,7 +76,7 @@ describe('the tests api', function() {
             let requestBody = testWithFunctions;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             createTestResponse.statusCode.should.eql(400);
-            createTestResponse.body.message.should.eql('Functions: beforeScenario, afterScenario, afterResponse, beforeRequest, afterResponse are used without specifying processor');
+            createTestResponse.body.message.should.eql('Functions: beforeScenario, afterScenario, afterResponse, beforeRequest are used without specifying processor');
         });
         let badBodyScenarios = ['Body_with_illegal_artillery', 'Body_with_no_artillery_schema', 'Body_with_no_test_type', 'Body_with_no_description', 'Body_with_no_name', 'Body_with_no_scenarios', 'Body_with_no_step_action',
             'Body_with_no_steps'];

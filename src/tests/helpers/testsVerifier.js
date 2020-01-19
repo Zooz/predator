@@ -25,7 +25,6 @@ module.exports.verifyProcessorIsValid = async (req, res, next) => {
 
         if (!errorToThrow) {
             let usedFunctionsWhichNotExists = usedFunctions.filter(uf => !processor.exported_functions.includes(uf));
-            usedFunctionsWhichNotExists = _.uniq(usedFunctionsWhichNotExists);
             if (usedFunctionsWhichNotExists.length > 0) {
                 errorToThrow = new Error(`Functions: ${usedFunctionsWhichNotExists.join(', ')} does not exist in the processor file`);
                 errorToThrow.statusCode = 400;
@@ -42,7 +41,7 @@ function getUsedFunctions(obj, functions) {
     for (let key in obj) {
         if (typeof obj[key] === 'object' && obj[key] !== null) {
             getUsedFunctions(obj[key], functions);
-        } else if (consts.PROCESSOR_FUNCTIONS_KEYS.includes(key)) {
+        } else if (consts.PROCESSOR_FUNCTIONS_KEYS.includes(key) && !functions.includes(obj[key])) {
             functions.push(obj[key]);
         }
     }
