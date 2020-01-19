@@ -66,7 +66,7 @@ export class TestForm extends React.Component {
             closeDialog();
         }
         if (processorsList && processorsList.length > 0 && this.state.processorsExportedFunctions.length === 0 && this.state.processorId) {
-            const processorsExportedFunctions = this.extractPExportedFunctions(processorsList, this.state.processorId);
+            const processorsExportedFunctions = this.extractExportedFunctions(processorsList, this.state.processorId);
             this.setState({processorsExportedFunctions})
         }
     }
@@ -131,7 +131,7 @@ export class TestForm extends React.Component {
         )
     }
 
-    extractPExportedFunctions = (processorsList, processorId) => {
+    extractExportedFunctions = (processorsList, processorId) => {
         const chosenProcessor = processorsList.find((processor) => processor.id === processorId);
         const processorsExportedFunctions = chosenProcessor ? chosenProcessor.exported_functions.map((funcName) => ({
             id: funcName,
@@ -143,7 +143,7 @@ export class TestForm extends React.Component {
         return array.includes(value) ? value : undefined;
     };
     onProcessorChosen = (id) => {
-        const processorsExportedFunctions = this.extractPExportedFunctions(this.props.processorsList, id);
+        const processorsExportedFunctions = this.extractExportedFunctions(this.props.processorsList, id);
         const functionsNames = processorsExportedFunctions.map((object)=>object.name);
         //cleaning all steps and before
         const scenarios = cloneDeep(this.state.scenarios);

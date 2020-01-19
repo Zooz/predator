@@ -12,11 +12,8 @@ import { ReactTableComponent } from '../components/ReactTable';
 import { getColumns } from './configurationColumn';
 import Button from '../components/Button';
 import _ from 'lodash';
+import ErrorDialog from "./components/ErrorDialog";
 
-/*
-*  TODO and error handling for delete processor
-*
-* */
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetProcessors = 'Error occurred while trying to get all processors.';
 const columnsNames = ['processor_name', 'description', 'updated_at', 'processor_edit', 'delete'];
@@ -120,7 +117,9 @@ class getProcessors extends React.Component {
     componentDidMount() {
         this.props.getProcessors();
     }
-
+    onCloseErrorDialog=()=>{
+        this.props.setDeleteProcessorFailure(undefined);
+    };
     render() {
         const { sortedProcessors, sortHeader } = this.state;
         const noDataText = this.props.processorFailure ? errorMsgGetProcessors : this.loader();
@@ -134,6 +133,7 @@ class getProcessors extends React.Component {
             onSort: this.onSort,
             sortHeader: sortHeader
         });
+        const error = this.props.processorFailure || this.props.deleteProcessorFailure;
         return (
             <Page title={'Processors'} description={DESCRIPTION}>
             <Button className={style['create-button']} onClick={() => {
@@ -170,7 +170,9 @@ class getProcessors extends React.Component {
                     autoHideDuration={4000}
                     onRequestClose={this.handleSnackbarClose}
                 />
-          </Page>
+                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
+
+            </Page>
         );
     }
 }
@@ -181,6 +183,7 @@ function mapStateToProps(state) {
         deleteProcessorSuccess: Selectors.deleteProcessorSuccess(state),
         processorLoading: Selectors.processorsLoading(state),
         processorFailure: Selectors.processorFailure(state),
+        deleteProcessorFailure: Selectors.deleteProcessorFailure(state),
     };
 }
 
@@ -188,7 +191,8 @@ const mapDispatchToProps = {
     getProcessors: Actions.getProcessors,
     deleteProcessor: Actions.deleteProcessor,
     setDeleteProcessorSuccess: Actions.deleteProcessorSuccess,
-    getProcessorsFailure: Actions.getProcessorsFailure
+    getProcessorsFailure: Actions.getProcessorsFailure,
+    setDeleteProcessorFailure: Actions.deleteProcessorFailure,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getProcessors);
