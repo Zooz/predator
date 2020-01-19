@@ -79,5 +79,7 @@ function deleteTest(testId) {
 }
 
 async function getTestsByProcessorId(processorId) {
-    return database.getTestsByProcessorId(processorId);
+    const allCurrentTests = await getTests();
+    const inUseTestsByProcessor = allCurrentTests.filter(test => test.processor_id && test.processor_id.toString() === processorId);
+    return inUseTestsByProcessor;
 }
