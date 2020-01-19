@@ -1,7 +1,6 @@
 'use strict';
 const processorsManager = require('../../processors/models/processorsManager');
 const consts = require('../../common/consts');
-const _ = require('lodash');
 module.exports.verifyProcessorIsValid = async (req, res, next) => {
     let errorToThrow;
     let processor;
