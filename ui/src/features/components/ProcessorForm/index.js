@@ -8,7 +8,6 @@ import {connect} from 'react-redux';
 import Modal from '../Modal';
 import {createProcessorRequest, createStateForEditTest} from './utils';
 import Button from '../Button';
-import ErrorDialog from '../ErrorDialog';
 import MonacoEditor from '@uiw/react-monacoeditor';
 
 export class ProcessorForm extends React.Component {
@@ -53,10 +52,6 @@ export class ProcessorForm extends React.Component {
             createProcessor(createProcessorRequest(this.state));
         }
     };
-    onCloseErrorDialog = () => {
-        const {cleanAllErrors} = this.props;
-        cleanAllErrors();
-    };
 
     componentDidUpdate(prevProps, prevState) {
         const {createProcessorSuccess: createProcessorSuccessBefore, editProcessorSuccess: editProcessorSuccessBefore} = prevProps;
@@ -96,7 +91,6 @@ export class ProcessorForm extends React.Component {
                 {/* bottom */}
                 {this.generateJavascriptEditor()}
                 {this.generateBottomBar()}
-                {processorsError && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={processorsError}/>}
             </Modal>
         )
     }
@@ -178,7 +172,6 @@ function mapStateToProps(state) {
 const mapDispatchToProps = {
     createProcessor: Actions.createProcessor,
     editProcessor: Actions.editProcessor,
-    cleanAllErrors: Actions.cleanAllErrors,
     setCreateProcessorSuccess: Actions.createProcessorSuccess,
     setEditProcessorSuccess: Actions.editProcessorSuccess
 };

@@ -118,7 +118,7 @@ class getProcessors extends React.Component {
         this.props.getProcessors();
     }
     onCloseErrorDialog=()=>{
-        this.props.setDeleteProcessorFailure(undefined);
+        this.props.cleanAllErrors();
     };
     render() {
         const { sortedProcessors, sortHeader } = this.state;
@@ -192,7 +192,7 @@ const mapDispatchToProps = {
     deleteProcessor: Actions.deleteProcessor,
     setDeleteProcessorSuccess: Actions.deleteProcessorSuccess,
     getProcessorsFailure: Actions.getProcessorsFailure,
-    setDeleteProcessorFailure: Actions.deleteProcessorFailure,
+    cleanAllErrors: Actions.cleanAllErrors
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getProcessors);
