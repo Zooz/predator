@@ -27,9 +27,7 @@ const AddScenarioForm = (props) => {
                     onChangeValue('scenario_name', value);
                 }}/>
             </TextSideWrapper>
-            {processorsExportedFunctions && processorsExportedFunctions.length>0
-            &&
-            <React.Fragment>
+
 
             <TextSideWrapper title={'Before Scenario:'} textStyle={{marginRight: -13}}>
                 <ProcessorsDropDown options={processorsExportedFunctions}
@@ -42,9 +40,8 @@ const AddScenarioForm = (props) => {
                 onChange={(value) => onChangeValue('afterScenario', value)}
                 value={scenario.afterScenario}/>
                 </TextSideWrapper>
-                </React.Fragment>
 
-                }
+
 
 
             <div style={{

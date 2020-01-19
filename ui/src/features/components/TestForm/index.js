@@ -132,8 +132,6 @@ export class TestForm extends React.Component {
     }
 
     extractPExportedFunctions = (processorsList, processorId) => {
-        console.log("manor",processorsList);
-        console.log("manor processorId",processorId);
         const chosenProcessor = processorsList.find((processor) => processor.id === processorId);
         const processorsExportedFunctions = chosenProcessor ? chosenProcessor.exported_functions.map((funcName) => ({
             id: funcName,
@@ -141,26 +139,29 @@ export class TestForm extends React.Component {
         })) : [];
         return processorsExportedFunctions;
     };
+    getTheValueIfIncludeInArray = (value, array) => {
+        return array.includes(value) ? value : undefined;
+    };
     onProcessorChosen = (id) => {
         const processorsExportedFunctions = this.extractPExportedFunctions(this.props.processorsList, id);
+        const functionsNames = processorsExportedFunctions.map((object)=>object.name);
         //cleaning all steps and before
         const scenarios = cloneDeep(this.state.scenarios);
         const before = cloneDeep(this.state.before);
 
         if (before) {
             for (const step of before.steps) {
-                delete step.beforeRequest;
-                delete step.afterResponse;
+                step.beforeRequest = this.getTheValueIfIncludeInArray(step.beforeRequest, functionsNames);
+                step.afterResponse = this.getTheValueIfIncludeInArray(step.afterResponse, functionsNames);
             }
         }
 
-
         for (const scenario of scenarios) {
-            delete scenario.beforeScenario;
-            delete scenario.afterScenario;
+            scenario.beforeScenario = this.getTheValueIfIncludeInArray(scenario.beforeScenario, functionsNames);
+            scenario.afterScenario = this.getTheValueIfIncludeInArray(scenario.afterScenario, functionsNames);
             for (const step of scenario.steps) {
-                delete step.beforeRequest;
-                delete step.afterResponse;
+                step.beforeRequest = this.getTheValueIfIncludeInArray(step.beforeRequest, functionsNames);
+                step.afterResponse = this.getTheValueIfIncludeInArray(step.afterResponse, functionsNames);
             }
         }
         this.setState({

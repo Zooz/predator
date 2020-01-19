@@ -123,7 +123,7 @@ class getProcessors extends React.Component {
 
     render() {
         const { sortedProcessors, sortHeader } = this.state;
-        const noDataText = this.props.getProcessorsFailure ? errorMsgGetProcessors : this.loader();
+        const noDataText = this.props.processorFailure ? errorMsgGetProcessors : this.loader();
         const columns = getColumns({
             columnsNames,
             onReportView: this.onReportView,
@@ -179,7 +179,8 @@ function mapStateToProps(state) {
     return {
         processorsList: Selectors.processorsList(state),
         deleteProcessorSuccess: Selectors.deleteProcessorSuccess(state),
-        processorLoading: Selectors.processorsLoading(state)
+        processorLoading: Selectors.processorsLoading(state),
+        processorFailure: Selectors.processorFailure(state),
     };
 }
 
