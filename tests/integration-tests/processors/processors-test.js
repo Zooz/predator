@@ -363,7 +363,7 @@ describe('Processors api', function () {
                 should(deleteProcessorResponse.body.message).startWith(`${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: new test name`);
             });
 
-            it('Should success deleting the processor after test is deleted', async function () {
+            it('Should succeed deleting the processor after processor is removed from test', async function () {
                 delete test.processor_id;
                 await testsRequestSender.updateTest(test, validHeaders, testId);
 

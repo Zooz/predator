@@ -53,7 +53,11 @@ async function getProcessorById(processorId) {
     const options = {
         where: { id: processorId }
     };
-    return _getProcessor(options);
+    let processor = await _getProcessor(options);
+    if (processor) {
+        processor = processor.get();
+    }
+    return processor;
 }
 
 async function getProcessorByName(processorName) {

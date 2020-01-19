@@ -14,6 +14,7 @@ const fileUrl = 'https://raw.githubusercontent.com/Zooz/predator/master/README.m
 describe('the tests api', function() {
     this.timeout(5000000);
     let simpleTest;
+    let testWithFunctions;
     let dslName;
     before(async function () {
         await testsRequestSender.init();
@@ -21,6 +22,7 @@ describe('the tests api', function() {
 
         dslName = testsRequestSender.generateUniqueDslName('paymentsos');
         simpleTest = require('../../testExamples/Simple_test')(dslName);
+        testWithFunctions = require('../../testExamples/Test_with_functions');
         await testsRequestSender.createDslRequests(dslName, paymentsOsDsl.dsl_list);
     });
     beforeEach(function() {
@@ -54,6 +56,27 @@ describe('the tests api', function() {
             const res = await testsRequestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(400);
             res.body.message.should.eql('processor with id: 123e4567-e89b-12d3-a456-426655440000 does not exist');
+        });
+        it('Should return error when using functions not from processor', async () => {
+            const processor = {
+                name: 'some-user-processor: ' + uuid(),
+                description: 'This is a description',
+                javascript: 'module.exports.func = 5'
+            };
+            const processorResponse = await processorsRequestSender.createProcessor(processor, validHeaders);
+            processorResponse.statusCode.should.eql(201);
+            const processorId = processorResponse.body.id;
+            let requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            createTestResponse.statusCode.should.eql(400);
+            createTestResponse.body.message.should.eql('Functions: beforeScenario, afterScenario, afterResponse, beforeRequest does not exist in the processor file');
+        });
+
+        it('Should return error when using functions without specifying processor id', async () => {
+            let requestBody = testWithFunctions;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            createTestResponse.statusCode.should.eql(400);
+            createTestResponse.body.message.should.eql('Functions: beforeScenario, afterScenario, afterResponse, beforeRequest are used without specifying processor');
         });
         let badBodyScenarios = ['Body_with_illegal_artillery', 'Body_with_no_artillery_schema', 'Body_with_no_test_type', 'Body_with_no_description', 'Body_with_no_name', 'Body_with_no_scenarios', 'Body_with_no_step_action',
             'Body_with_no_steps'];
@@ -119,16 +142,31 @@ describe('the tests api', function() {
                 resGetFile.statusCode.should.eql(200);
             });
             it('Create test, with a processor id', async () => {
-                const uri = '/some-processor-name';
-                const url = 'https://fakesite.com';
                 const processor = {
-                    name: 'some-user-processor',
+                    name: 'some-user-processor: ' + uuid(),
                     description: 'This is a description',
-                    javascript: 'module.exports.simple = 5'
+                    javascript: 'module.exports = {\n' +
+                        '    beforeRequest,\n' +
+                        '    afterResponse,\n' +
+                        '    afterScenario,\n' +
+                        '    beforeScenario\n' +
+                        '};\n' +
+                        'function beforeRequest(requestParams, context, ee, next) {\n' +
+                        '    return next(); // MUST be called for the scenario to continue\n' +
+                        '}\n' +
+                        'function afterResponse(requestParams, response, context, ee, next) {\n' +
+                        '    return next(); // MUST be called for the scenario to continue\n' +
+                        '}\n' +
+                        'function afterScenario(context, ee, next) {\n' +
+                        '    return next(); // MUST be called for the scenario to continue\n' +
+                        '}\n' +
+                        'function beforeScenario(context, ee, next) {\n' +
+                        '    return next(); // MUST be called for the scenario to continue\n' +
+                        '}'
                 };
                 const processorResponse = await processorsRequestSender.createProcessor(processor, validHeaders);
                 const processorId = processorResponse.body.id;
-                let requestBody = Object.assign({ processor_id: processorId }, simpleTest.test);
+                let requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
                 const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
                 createTestResponse.statusCode.should.eql(201);

@@ -1,21 +1,47 @@
 'use strict';
 const processorsManager = require('../../processors/models/processorsManager');
-
-module.exports.verifyProcessorExists = async (req, res, next) => {
+const consts = require('../../common/consts');
+module.exports.verifyProcessorIsValid = async (req, res, next) => {
     let errorToThrow;
-    let jobBody = req.body;
-    if (jobBody.processor_id) {
+    let processor;
+    let usedFunctions = [];
+
+    getUsedFunctions(req.body.artillery_test, usedFunctions);
+
+    let testBody = req.body;
+    if (testBody.processor_id) {
         try {
-            await processorsManager.getProcessor(jobBody.processor_id);
+            processor = await processorsManager.getProcessor(testBody.processor_id);
         } catch (error) {
             if (error.statusCode === 404) {
-                errorToThrow = new Error(`processor with id: ${jobBody.processor_id} does not exist`);
+                errorToThrow = new Error(`processor with id: ${testBody.processor_id} does not exist`);
                 errorToThrow.statusCode = 400;
             } else {
                 errorToThrow = new Error(error.message);
                 errorToThrow.statusCode = 500;
             }
         }
+
+        if (!errorToThrow) {
+            let usedFunctionsWhichNotExists = usedFunctions.filter(uf => !processor.exported_functions.includes(uf));
+            if (usedFunctionsWhichNotExists.length > 0) {
+                errorToThrow = new Error(`Functions: ${usedFunctionsWhichNotExists.join(', ')} does not exist in the processor file`);
+                errorToThrow.statusCode = 400;
+            }
+        }
+    } else if (usedFunctions.length > 0) {
+        errorToThrow = new Error(`Functions: ${usedFunctions.join(', ')} are used without specifying processor`);
+        errorToThrow.statusCode = 400;
     }
     next(errorToThrow);
 };
+
+function getUsedFunctions(obj, functions) {
+    for (let key in obj) {
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+            getUsedFunctions(obj[key], functions);
+        } else if (consts.PROCESSOR_FUNCTIONS_KEYS.includes(key) && !functions.includes(obj[key])) {
+            functions.push(obj[key]);
+        }
+    }
+}
