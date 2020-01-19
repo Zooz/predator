@@ -44,7 +44,7 @@
           {
             "get": {
               "afterResponse": "afterResponse",
-              "beforeRequest": ["beforeRequest", "abc"],
+              "beforeRequest": "beforeRequest",
               "url": "/payments/{{id}}",
               "headers": {
                 "Content-Type": "application/json"
