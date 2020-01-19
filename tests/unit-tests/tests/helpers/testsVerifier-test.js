@@ -45,14 +45,6 @@ describe('tests verifier tests', function () {
             should(processorsManagerStub.calledOnce).eql(true);
         });
 
-        it('Should pass processor validation when using functions without specifying processor for dsl type', async () => {
-            req = { body: { type: 'dsl', artillery_test: { before: { afterScenario: 'logResponse', beforeScenario: 'xyz' } } } };
-            await testsVerifier.verifyProcessorIsValid(req, res, nextStub);
-            should(nextStub.calledOnce).eql(true);
-            should(nextStub.args[0][0]).eql(undefined);
-
-        });
-
         it('Should fail on test that using function with processor', async () => {
             req = { body: { type: 'basic', artillery_test: { before: { afterScenario: 'logResponse', beforeScenario: 'xyz' } } } };
 

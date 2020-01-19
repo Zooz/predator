@@ -31,7 +31,7 @@ module.exports.verifyProcessorIsValid = async (req, res, next) => {
                 errorToThrow.statusCode = 400;
             }
         }
-    } else if (usedFunctions.length > 0 && testBody.type === consts.TEST_TYPE_BASIC) {
+    } else if (usedFunctions.length > 0) {
         errorToThrow = new Error(`Functions: ${usedFunctions.join(', ')} are used without specifying processor`);
         errorToThrow.statusCode = 400;
     }
