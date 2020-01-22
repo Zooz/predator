@@ -68,7 +68,7 @@ export class ProcessorForm extends React.Component {
 
 
     render() {
-        const {processorsError, closeDialog} = this.props;
+        const {closeDialog} = this.props;
         const {name, description} = this.state;
         return (
             <Modal onExit={closeDialog}>
@@ -101,7 +101,7 @@ export class ProcessorForm extends React.Component {
         return (<div style={{display: 'flex', justifyContent: 'flex-end'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', width: '340px'}}>
                 <Button label={'CANCEL'} onClick={closeDialog}/>
-                <Button isLoading={isLoading} onClick={this.postProcessor} label={'SAVE'}/>
+                <Button isLoading={isLoading} disabled={!this.state.name} onClick={this.postProcessor} label={'SAVE'}/>
             </div>
         </div>)
     };
@@ -116,7 +116,7 @@ export class ProcessorForm extends React.Component {
                 readOnly: false,
                 cursorStyle: 'line',
                 automaticLayout: false,
-                theme: 'vs-dark'
+                theme: 'vs',
             }
         ;
         const {javascript} = this.state;

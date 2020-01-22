@@ -69,6 +69,7 @@ export class TestForm extends React.Component {
             const processorsExportedFunctions = this.extractExportedFunctions(processorsList, this.state.processorId);
             this.setState({processorsExportedFunctions})
         }
+
     }
 
     componentDidMount() {
@@ -139,35 +140,13 @@ export class TestForm extends React.Component {
         })) : [];
         return processorsExportedFunctions;
     };
-    getTheValueIfIncludeInArray = (value, array) => {
-        return array.includes(value) ? value : undefined;
-    };
+
     onProcessorChosen = (id) => {
         const processorsExportedFunctions = this.extractExportedFunctions(this.props.processorsList, id);
-        const functionsNames = processorsExportedFunctions.map((object)=>object.name);
-        //cleaning all steps and before
-        const scenarios = cloneDeep(this.state.scenarios);
-        const before = cloneDeep(this.state.before);
 
-        if (before) {
-            for (const step of before.steps) {
-                step.beforeRequest = this.getTheValueIfIncludeInArray(step.beforeRequest, functionsNames);
-                step.afterResponse = this.getTheValueIfIncludeInArray(step.afterResponse, functionsNames);
-            }
-        }
-
-        for (const scenario of scenarios) {
-            scenario.beforeScenario = this.getTheValueIfIncludeInArray(scenario.beforeScenario, functionsNames);
-            scenario.afterScenario = this.getTheValueIfIncludeInArray(scenario.afterScenario, functionsNames);
-            for (const step of scenario.steps) {
-                step.beforeRequest = this.getTheValueIfIncludeInArray(step.beforeRequest, functionsNames);
-                step.afterResponse = this.getTheValueIfIncludeInArray(step.afterResponse, functionsNames);
-            }
-        }
         this.setState({
-            processorId: id, processorsExportedFunctions, scenarios, before
+            processorId: id, processorsExportedFunctions
         })
-
     }
     generateBottomBar = () => {
         const {isLoading, closeDialog} = this.props;
