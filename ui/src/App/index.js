@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import GetTests from '../features/get-tests';
+import GetProcessors from '../features/get-processors';
 import GetJobs from '../features/get-jobs';
 import GetReports from '../features/get-last-reports';
 import GetTestReports from '../features/get-test-reports';
@@ -42,6 +43,9 @@ class App extends React.Component {
               )} />
               <Route exact path='/last_reports' render={props => (
                 <GetReports {...props} />
+              )} />
+              <Route exact path='/processors' render={props => (
+                <GetProcessors {...props} />
               )} />
             <Route exact path='/settings' render={props => (
                 <Configuration {...props} />

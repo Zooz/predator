@@ -1,6 +1,7 @@
 'use strict';
 
 const Sequelize = require('sequelize');
+const JAVASCRIPT = 'javascript';
 let client;
 
 module.exports = {
@@ -32,9 +33,14 @@ async function insertProcessor(processorId, processorInfo) {
     return processor.create(params);
 }
 
-async function getAllProcessors(from, limit) {
+async function getAllProcessors(from, limit, exclude) {
     const processorsModel = client.model('processor');
-    return processorsModel.findAll({ raw: true, offset: from, limit, order: [['created_at', 'DESC']] });
+    const attributes = {};
+    if (exclude && (exclude === JAVASCRIPT || exclude.includes(JAVASCRIPT))) {
+        attributes.exclude = ['javascript'];
+    }
+    let allProcessors = processorsModel.findAll({ attributes, offset: from, limit, order: [['created_at', 'DESC']] });
+    return allProcessors;
 }
 
 async function _getProcessor(options) {

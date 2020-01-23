@@ -160,4 +160,9 @@ export {
     cleanFinishedContainers,
     cleanFinishedContainersSuccess,
     cleanFinishedContainersFailure
+
 };
+//processors
+
+export * from './actions/processorsActions';
+

@@ -4,6 +4,8 @@ const rules = require('./rules');
 const entries = require('./entries');
 const ip = require('ip');
 const env = require('../src/App/common/env');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 module.exports = {
   // Tell webpack to start bundling our app at app/get-apis.js
   entry: entries,
@@ -29,6 +31,7 @@ module.exports = {
       BUCKET_PATH: env.BUCKET_PATH || '/',
     }),
     new webpack.NamedModulesPlugin(),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'BUCKET_PATH', 'PREDATOR_URL', 'PREDATOR_DOCS_URL'])
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'BUCKET_PATH', 'PREDATOR_URL', 'PREDATOR_DOCS_URL']),
+    new MonacoWebpackPlugin()
   ]
 };

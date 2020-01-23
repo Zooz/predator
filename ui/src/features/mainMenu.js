@@ -5,7 +5,8 @@ import {
     faFileAlt,
     faBook,
     faPassport,
-    faWrench
+    faWrench,
+    faMicrochip
 } from '@fortawesome/free-solid-svg-icons';
 
 import { PREDATOR_DOCS_URL } from '../App/common/env';
@@ -31,12 +32,18 @@ module.exports = [
     },
     {
         key: 3,
+        primaryText: 'Processors',
+        navigateTo: 'processors',
+        icon: faMicrochip
+    },
+    {
+        key: 4,
         primaryText: 'Settings',
         navigateTo: 'settings',
         icon: faWrench,
     },
     {
-        key: 4,
+        key: 5,
         primaryText: 'Docs',
         icon: faFileAlt,
         nestedItems: [

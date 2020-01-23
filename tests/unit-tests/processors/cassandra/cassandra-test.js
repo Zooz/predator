@@ -78,6 +78,19 @@ describe('Cassandra processors tests', function() {
                 });
         });
 
+        it('should get multiple processors while excluding javascript', function(){
+            let cassandraResponse = { rows: [{ id: 'id', name: 'mick', description: 'some processor', javascript: 'module.exports.mick = \'ey\'', created_at: Date.now(), updated_at: Date.now() }] };
+            clientExecuteStub.resolves(cassandraResponse);
+
+            let query = 'SELECT id, name, description, created_at, updated_at, exported_functions FROM processors';
+            return cassandraClient.getAllProcessors(undefined, undefined, 'javascript')
+                .then(function(result){
+                    loggerErrorStub.callCount.should.eql(0);
+                    clientExecuteStub.getCall(0).args[0].should.eql(query);
+                    result.should.eql(cassandraResponse.rows);
+                });
+        });
+
         it('should get failure from cassandra', function(){
             clientExecuteStub.rejects(new Error('error'));
 

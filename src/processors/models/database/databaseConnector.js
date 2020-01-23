@@ -25,8 +25,8 @@ async function insertProcessor(processorId, processorInfo) {
     return databaseConnector.insertProcessor(processorId, processorInfo);
 }
 
-async function getAllProcessors(from, limit) {
-    return databaseConnector.getAllProcessors(from, limit);
+async function getAllProcessors(from, limit, exclude) {
+    return databaseConnector.getAllProcessors(from, limit, exclude);
 }
 
 async function getProcessorById(processorId) {
