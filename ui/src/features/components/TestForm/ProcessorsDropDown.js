@@ -4,11 +4,13 @@ import React from "react";
 
 const ProcessorsDropdown = ({onChange, options = [], value, loading}) => {
     let dropDownOptions = [...options, {name: loading ? 'Loading...' : 'NONE', id: undefined}];
-    const isValueExistInOptions = options.find(option => option.id === value);
-
-    if (!isValueExistInOptions) {
-        dropDownOptions=[{id: value, name: value}].concat(dropDownOptions);
+    if (value) {
+        const isValueExistInOptions = options.find(option => option.id === value);
+        if (!isValueExistInOptions) {
+            dropDownOptions = [{id: value, name: value}].concat(dropDownOptions);
+        }
     }
+
     return (
         <DropDownMenu
             autoWidth={false}
