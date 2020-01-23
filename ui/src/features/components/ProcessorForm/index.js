@@ -4,9 +4,9 @@ import style from './style.scss';
 import * as Actions from '../../redux/action';
 import * as Selectors from '../../redux/selectors/processorsSelector';
 import * as ProcessorsSelector from '../../redux/selectors/processorsSelector';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import Modal from '../Modal';
-import {createProcessorRequest, createStateForEditTest} from './utils';
+import { createProcessorRequest, createStateForEditTest } from './utils';
 import Button from '../Button';
 import MonacoEditor from '@uiw/react-monacoeditor';
 
@@ -22,30 +22,30 @@ export class ProcessorForm extends React.Component {
                 name: '',
                 description: '',
                 javascript: 'module.exports = {\n' +
-                    '    beforeRequest,\n' +
-                    '    afterResponse,\n' +
+                    '    beforeScenario,\n' +
                     '    afterScenario,\n' +
-                    '    beforeScenario\n' +
+                    '    beforeRequest,\n' +
+                    '    afterResponse\n' +
                     '};\n' +
-                    'function beforeRequest(requestParams, context, ee, next) {\n' +
-                    '    return next(); // MUST be called for the scenario to continue\n' +
-                    '}\n' +
-                    'function afterResponse(requestParams, response, context, ee, next) {\n' +
+                    'function beforeScenario(context, ee, next) {\n' +
                     '    return next(); // MUST be called for the scenario to continue\n' +
                     '}\n' +
                     'function afterScenario(context, ee, next) {\n' +
                     '    return next(); // MUST be called for the scenario to continue\n' +
                     '}\n' +
-                    'function beforeScenario(context, ee, next) {\n' +
+                    'function beforeRequest(requestParams, context, ee, next) {\n' +
+                    '    return next(); // MUST be called for the scenario to continue\n' +
+                    '}\n' +
+                    'function afterResponse(requestParams, response, context, ee, next) {\n' +
                     '    return next(); // MUST be called for the scenario to continue\n' +
                     '}'
-            }
+            };
         }
     }
 
     postProcessor = () => {
-        const {editMode} = this.state;
-        const {createProcessor, editProcessor} = this.props;
+        const { editMode } = this.state;
+        const { createProcessor, editProcessor } = this.props;
         if (editMode) {
             editProcessor(this.state.id, createProcessorRequest(this.state));
         } else {
@@ -54,8 +54,8 @@ export class ProcessorForm extends React.Component {
     };
 
     componentDidUpdate(prevProps, prevState) {
-        const {createProcessorSuccess: createProcessorSuccessBefore, editProcessorSuccess: editProcessorSuccessBefore} = prevProps;
-        const {createProcessorSuccess, editProcessorSuccess, closeDialog} = this.props;
+        const { createProcessorSuccess: createProcessorSuccessBefore, editProcessorSuccess: editProcessorSuccessBefore } = prevProps;
+        const { createProcessorSuccess, editProcessorSuccess, closeDialog } = this.props;
 
         if (createProcessorSuccess && !createProcessorSuccessBefore) {
             this.props.setCreateProcessorSuccess(false);
@@ -66,70 +66,69 @@ export class ProcessorForm extends React.Component {
         }
     }
 
-
     render() {
-        const {closeDialog} = this.props;
-        const {name, description} = this.state;
+        const { closeDialog } = this.props;
+        const { name, description } = this.state;
         return (
             <Modal onExit={closeDialog}>
                 <h1>Create Processor</h1>
-                <div className={style['top']}>
-                    <div className={style['top-inputs']}>
-                        {/* left */}
-                        <div className={style['input-container']}>
+            <div className={style['top']}>
+                <div className={style['top-inputs']}>
+                {/* left */}
+                <div className={style['input-container']}>
                             Name:<TextField value={name} onChange={(event, value) => {
-                            this.setState({name: value})
-                        }} hintText={'Processor name'}/>
+                                this.setState({ name: value });
+                            }} hintText={'Processor name'} />
                         </div>
                         <div className={style['input-container']}>
                             Description:<TextField value={description} onChange={(event, value) => {
-                            this.setState({description: value})
-                        }} hintText={'Description'}/>
-                        </div>
-                    </div>
-                </div>
-                {/* bottom */}
-                {this.generateJavascriptEditor()}
+                                this.setState({ description: value });
+                            }} hintText={'Description'} />
+                  </div>
+              </div>
+              </div>
+            {/* bottom */}
+            {this.generateJavascriptEditor()}
                 {this.generateBottomBar()}
-            </Modal>
-        )
+          </Modal>
+        );
     }
 
     generateBottomBar = () => {
-        const {isLoading, closeDialog} = this.props;
+        const { isLoading, closeDialog } = this.props;
 
-        return (<div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            <div style={{display: 'flex', justifyContent: 'space-between', width: '340px'}}>
-                <Button label={'CANCEL'} onClick={closeDialog}/>
-                <Button isLoading={isLoading} disabled={!this.state.name} onClick={this.postProcessor} label={'SAVE'}/>
-            </div>
-        </div>)
+        return (<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '340px' }}>
+                <Button label={'CANCEL'} onClick={closeDialog} />
+                <Button isLoading={isLoading} disabled={!this.state.name} onClick={this.postProcessor} label={'SAVE'} />
+          </div>
+        </div>);
     };
 
     onInputCodeChange = (code) => {
-        this.setState({javascript: code});
+        this.setState({ javascript: code });
     };
     generateJavascriptEditor = () => {
         const options = {
-                selectOnLineNumbers: true,
-                roundedSelection: false,
-                readOnly: false,
-                cursorStyle: 'line',
-                automaticLayout: false,
-                theme: 'vs',
-            }
+            selectOnLineNumbers: true,
+            roundedSelection: false,
+            readOnly: false,
+            cursorStyle: 'line',
+            automaticLayout: false,
+            theme: 'vs'
+        }
         ;
-        const {javascript} = this.state;
+        const { javascript } = this.state;
         return (
             <div className={style['bottom']}>
-                {/* bottom */}
-                <div style={{display: 'flex', flexDirection: 'column', flex: 1}}>
+            {/* bottom */}
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                     <MonacoEditor
-                        language="javascript"
+                        language='javascript'
                         value={javascript}
                         options={options}
-                        height="500px"
-                        width="100%"
+                        height='500px'
+                        width='100%'
                         onChange={this.onInputCodeChange}
                         scrollbar={{
                             // Subtle shadows to the left & top. Defaults to true.
@@ -148,13 +147,13 @@ export class ProcessorForm extends React.Component {
                             horizontal: 'visible',
                             verticalScrollbarSize: 17,
                             horizontalScrollbarSize: 17,
-                            arrowSize: 30,
+                            arrowSize: 30
                         }}
                     />
 
-                </div>
-            </div>
-        )
+              </div>
+          </div>
+        );
     };
 }
 
@@ -165,8 +164,8 @@ function mapStateToProps(state) {
         processorsList: ProcessorsSelector.processorsList(state),
         processorsLoading: ProcessorsSelector.processorsLoading(state),
         processorsError: ProcessorsSelector.processorFailure(state),
-        editProcessorSuccess: ProcessorsSelector.editProcessorSuccess(state),
-    }
+        editProcessorSuccess: ProcessorsSelector.editProcessorSuccess(state)
+    };
 }
 
 const mapDispatchToProps = {
