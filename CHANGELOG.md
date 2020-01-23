@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/Zooz/predator/compare/v1.1.7...v1.2.0) (2020-01-23)
+
+
+### Bug Fixes
+
+* **custom-js:** remove file_download type from processors ([#242](https://github.com/Zooz/predator/issues/242)) ([db4b783](https://github.com/Zooz/predator/commit/db4b783))
+* **fix index html style:** fix index html style ([65f7069](https://github.com/Zooz/predator/commit/65f7069))
+* **jobs:** fixing bug where enabled wasn't returned with cassandra ([df7fbc1](https://github.com/Zooz/predator/commit/df7fbc1))
+* **processors:** fixing deleting of used processor ([#262](https://github.com/Zooz/predator/issues/262)) ([60e4972](https://github.com/Zooz/predator/commit/60e4972))
+* **processors:** prevent user from deleting a processor that a test use ([#254](https://github.com/Zooz/predator/issues/254)) ([d1d358d](https://github.com/Zooz/predator/commit/d1d358d))
+* **processors:** processor name is unique alongside processor id ([#243](https://github.com/Zooz/predator/issues/243)) ([125ea2c](https://github.com/Zooz/predator/commit/125ea2c))
+* **typo:** typo date_time to date-time ([07278cd](https://github.com/Zooz/predator/commit/07278cd))
+* **typo:** typo date_time to date-time ([6a94a99](https://github.com/Zooz/predator/commit/6a94a99))
+* **vulnerabilities:** update npm packages ([#215](https://github.com/Zooz/predator/issues/215)) ([50f0e67](https://github.com/Zooz/predator/commit/50f0e67))
+
+
+### Features
+
+* **api:** add api spec for processors resource ([300f5a1](https://github.com/Zooz/predator/commit/300f5a1)), closes [#185](https://github.com/Zooz/predator/issues/185) [#185](https://github.com/Zooz/predator/issues/185)
+* **api:** add api spec for processors resource ([#200](https://github.com/Zooz/predator/issues/200)) ([0d22c92](https://github.com/Zooz/predator/commit/0d22c92))
+* **clean containers  ui:** clean containers  ui ([b653474](https://github.com/Zooz/predator/commit/b653474))
+* **custom-js:** implement DELETE /processors/{processor_id} ([#231](https://github.com/Zooz/predator/issues/231)) ([8b2d9d0](https://github.com/Zooz/predator/commit/8b2d9d0)), closes [#185](https://github.com/Zooz/predator/issues/185) [#185](https://github.com/Zooz/predator/issues/185) [#200](https://github.com/Zooz/predator/issues/200) [#210](https://github.com/Zooz/predator/issues/210) [#213](https://github.com/Zooz/predator/issues/213) [#214](https://github.com/Zooz/predator/issues/214) [#218](https://github.com/Zooz/predator/issues/218) [#200](https://github.com/Zooz/predator/issues/200) [#185](https://github.com/Zooz/predator/issues/185) [#185](https://github.com/Zooz/predator/issues/185) [#210](https://github.com/Zooz/predator/issues/210) [#217](https://github.com/Zooz/predator/issues/217) [#212](https://github.com/Zooz/predator/issues/212) [#210](https://github.com/Zooz/predator/issues/210) [#186](https://github.com/Zooz/predator/issues/186)
+* **custom-js:** implement GET /processors ([#212](https://github.com/Zooz/predator/issues/212)) ([6a00cd7](https://github.com/Zooz/predator/commit/6a00cd7)), closes [#210](https://github.com/Zooz/predator/issues/210) [#186](https://github.com/Zooz/predator/issues/186)
+* **custom-js:** implement GET /processors/{processor_id} ([#230](https://github.com/Zooz/predator/issues/230)) ([0394723](https://github.com/Zooz/predator/commit/0394723)), closes [#213](https://github.com/Zooz/predator/issues/213) [#214](https://github.com/Zooz/predator/issues/214) [#218](https://github.com/Zooz/predator/issues/218) [#200](https://github.com/Zooz/predator/issues/200) [#185](https://github.com/Zooz/predator/issues/185) [#185](https://github.com/Zooz/predator/issues/185) [#210](https://github.com/Zooz/predator/issues/210) [#217](https://github.com/Zooz/predator/issues/217)
+* **custom-js:** implement PUT /processors/{processor_id} ([#237](https://github.com/Zooz/predator/issues/237)) ([f19a17e](https://github.com/Zooz/predator/commit/f19a17e))
+* **jobs:** Add disable/enable scheduled jobs to UI ([#241](https://github.com/Zooz/predator/issues/241)) ([2adf634](https://github.com/Zooz/predator/commit/2adf634))
+* **jobs:** add enabled param to jobs ([#238](https://github.com/Zooz/predator/issues/238)) ([fac8887](https://github.com/Zooz/predator/commit/fac8887))
+* **jobs:** adding new api for deleting containers for dockers ([8a84536](https://github.com/Zooz/predator/commit/8a84536))
+* **jobs:** api and first implenation for cleaning containers) ([046d55d](https://github.com/Zooz/predator/commit/046d55d))
+* **jobs:** delete containers api support for k8s ([a17024c](https://github.com/Zooz/predator/commit/a17024c))
+* **jobs:** delete containers api support for k8s ([0088108](https://github.com/Zooz/predator/commit/0088108))
+* **jobs:** delete containers api support for k8s ([37312ee](https://github.com/Zooz/predator/commit/37312ee))
+* **jobs:** delete containers api support for k8s ([0d71e58](https://github.com/Zooz/predator/commit/0d71e58))
+* **jobs:** delete containers api support for k8s ([6deba18](https://github.com/Zooz/predator/commit/6deba18))
+* **jobs:** delete containers api support for k8s ([40eff6e](https://github.com/Zooz/predator/commit/40eff6e))
+* **kill containers:** kill containers ([9d4226c](https://github.com/Zooz/predator/commit/9d4226c))
+* **processors:** adding exported functions to processors ([#255](https://github.com/Zooz/predator/issues/255)) ([76f0344](https://github.com/Zooz/predator/commit/76f0344))
+* **processors:** verify tests using functions from the processor ([#264](https://github.com/Zooz/predator/issues/264)) ([2ba2d17](https://github.com/Zooz/predator/commit/2ba2d17))
+* **tests:** adding processor_id to tests resource ([#240](https://github.com/Zooz/predator/issues/240)) ([8325c58](https://github.com/Zooz/predator/commit/8325c58))
+
+
+
 <a name="1.1.7"></a>
 ## [1.1.7](https://github.com/Zooz/predator/compare/v1.1.6...v1.1.7) (2019-08-27)
 
