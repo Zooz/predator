@@ -369,8 +369,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-a-test-with-custom-logic-in-javascript" title="Creating a Test with Custom Logic in Javascript" class="md-nav__link">
-    Creating a Test with Custom Logic in Javascript
+  <a href="#creating-a-test-with-custom-logic-in-javascript-released-in-version-120" title="Creating a Test with Custom Logic in Javascript (Released in version 1.2.0)" class="md-nav__link">
+    Creating a Test with Custom Logic in Javascript (Released in version 1.2.0)
   </a>
   
 </li>
@@ -410,6 +410,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="processors.html" title="Processor Creation" class="md-nav__link">
+      Processor Creation
+    </a>
   </li>
 
     
@@ -546,8 +558,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-a-test-with-custom-logic-in-javascript" title="Creating a Test with Custom Logic in Javascript" class="md-nav__link">
-    Creating a Test with Custom Logic in Javascript
+  <a href="#creating-a-test-with-custom-logic-in-javascript-released-in-version-120" title="Creating a Test with Custom Logic in Javascript (Released in version 1.2.0)" class="md-nav__link">
+    Creating a Test with Custom Logic in Javascript (Released in version 1.2.0)
   </a>
   
 </li>
@@ -727,81 +739,8 @@ will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...
 <p>If you login to the Predator UI after creating the test, you will notice that the test has been added with a type of <strong>dsl</strong>. </p>
 <p>You can now run the test as you would any other. </p>
 <p><img alt="Screenshot" src="images/dsltestinui.png" /></p>
-<h2 id="creating-a-test-with-custom-logic-in-javascript">Creating a Test with Custom Logic in Javascript<a class="headerlink" href="#creating-a-test-with-custom-logic-in-javascript" title="Permanent link">#</a></h2>
-<p>Tests can use custom Javascript functions. To use custom Javascript functions in your tests, first create a text file holding your Javascript code 
-and upload it to a public repository (such as S3, Dropbox, Google Docs etc.). Then create the test, passing the <code>processor_file_url</code> field in the request body to inform Predator of the URL path to your Javascript file. Predator will download and save this file (any changes done to your Javascript code after creating the test will not be reflected).</p>
-<div class="admonition note">
-<p class="admonition-title">Artillery guidelines</p>
-<p>To include Javascript functions in your scenarios, make sure to follow the <a href="https://artillery.io/docs/http-reference/#loading-custom-js-code">Artillery guidelines</a>.</p>
-</div>
-<p>Here's an example of a test using custom Javascript code:</p>
-<div class="codehilite"><pre><span></span><span class="p">{</span>
-  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;custom logic in Javascript example&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;custom logic in Javascript&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;processor_file_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.dropbox.com/s/yourFilePath/fileName.txt?dl=1&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;basic&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;scenarios&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span>
-      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Processor exmaple&quot;</span><span class="p">,</span>
-      <span class="nt">&quot;flow&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-          <span class="nt">&quot;function&quot;</span><span class="p">:</span> <span class="s2">&quot;generateRandomDataGlobal&quot;</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-          <span class="nt">&quot;get&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.google.com/{{ randomPath }}&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;afterResponse&quot;</span><span class="p">:</span> <span class="s2">&quot;logResponse&quot;</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-          <span class="nt">&quot;log&quot;</span><span class="p">:</span> <span class="s2">&quot;********************* Sent a request to /users with {{ name }}, {{ email }}, {{ password }}&quot;</span>
-        <span class="p">}</span>
-      <span class="p">]</span>
-    <span class="p">}</span>
-  <span class="p">]</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>Here's some sample Javascript code:</p>
-<div class="codehilite"><pre><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
-<span class="kr">const</span> <span class="nx">uuid</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;uuid/v4&#39;</span><span class="p">);</span>
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="nx">logResponse</span><span class="p">,</span>
-  <span class="nx">generateRandomDataGlobal</span>
-<span class="p">};</span>
-
-
-  <span class="kd">function</span> <span class="nx">logResponse</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">){</span>
-       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** fail with status code: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">));</span>
-       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** host is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">host</span><span class="p">));</span>
-       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** path is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">pathname</span><span class="p">));</span>
-       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** response headers is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">));</span>
-
-    <span class="p">}</span>
-     <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
-  <span class="p">}</span>
-
-
-<span class="kd">function</span> <span class="nx">generateRandomDataGlobal</span><span class="p">(</span><span class="nx">userContext</span><span class="p">,</span> <span class="nx">events</span><span class="p">,</span> <span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;userContext is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">userContext</span><span class="p">));</span>
-  <span class="nx">userContext</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">randomPath</span> <span class="o">=</span> <span class="s1">&#39;random_path_&#39;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">();</span>
-  <span class="nx">userContext</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;name_random_&#39;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">();</span>
-  <span class="nx">userContext</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">email</span> <span class="o">=</span> <span class="s1">&#39;email_random_&#39;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">();</span>
-  <span class="nx">userContext</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="s1">&#39;password_random_&#39;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">();</span>
-  <span class="k">return</span> <span class="nx">done</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>In the example above, we created a test with 2 Javascript functions:</p>
-<ul>
-<li>
-<p><code>logResponse()</code> will log the result received, if the <code>statusCode</code> is different from 200. The function will be called after each response using the <code>afterResponse</code> command.</p>
-</li>
-<li>
-<p><code>generateRandomDataGlobal()</code> is a global function that creates global variables. Those variables can be used in the scope of the test by using the <code>{{ }}</code> syntax.</p>
-</li>
-</ul>
+<h2 id="creating-a-test-with-custom-logic-in-javascript-released-in-version-120">Creating a Test with Custom Logic in Javascript (Released in version 1.2.0)<a class="headerlink" href="#creating-a-test-with-custom-logic-in-javascript-released-in-version-120" title="Permanent link">#</a></h2>
+<p>Tests can use custom Javascript functions. To use custom Javascript functions in your tests please refer to the <u><a href="processors.html">processors documentation</a></u>.</p>
 <h2 id="debugging-test-requestsresponses">Debugging Test Requests/Responses<a class="headerlink" href="#debugging-test-requestsresponses" title="Permanent link">#</a></h2>
 <p>It is possible to view all of the requests and responses that the predator-runner sends and receives while running load on the API. 
 This is very useful when your test does not behave the way you expected it to and need the request/response to further investigate.
@@ -850,13 +789,13 @@ The predator-runner will log this data to the log files which can be downloaded.
           </a>
         
         
-          <a href="schedulesandreports.html" title="Schedules and Reports" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="processors.html" title="Processor Creation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Schedules and Reports
+                Processor Creation
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
