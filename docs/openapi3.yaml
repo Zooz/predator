@@ -1782,6 +1782,7 @@ components:
           description: Names of all exported function in the javascript file
           items:
             type: string
+          example: generateNameBeforeScenario
         updated_at:
           type: string
           format: date-time
@@ -1795,6 +1796,7 @@ components:
         javascript:
           type: string
           description: Raw javascript that will be used by the processor resource.
+          example: module.exports.generateNameBeforeScenario = (context, ee, next) => { context.name = Date.now() + '_mick' }
     post_report:
       required:
       - report_id

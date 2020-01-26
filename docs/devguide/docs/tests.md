@@ -160,84 +160,9 @@ You can now run the test as you would any other.
 
 ![Screenshot](images/dsltestinui.png)
 
-## Creating a Test with Custom Logic in Javascript
+## Creating a Test with Custom Logic in Javascript (Released in version 1.2.0)
 
-Tests can use custom Javascript functions. To use custom Javascript functions in your tests, first create a text file holding your Javascript code 
-and upload it to a public repository (such as S3, Dropbox, Google Docs etc.). Then create the test, passing the `processor_file_url` field in the request body to inform Predator of the URL path to your Javascript file. Predator will download and save this file (any changes done to your Javascript code after creating the test will not be reflected).
-
-!!! note "Artillery guidelines"
-   
-    To include Javascript functions in your scenarios, make sure to follow the [Artillery guidelines](https://artillery.io/docs/http-reference/#loading-custom-js-code).
-
-
-Here's an example of a test using custom Javascript code:
-
-```JSON
-{
-  "name": "custom logic in Javascript example",
-  "description": "custom logic in Javascript",
-  "processor_file_url": "https://www.dropbox.com/s/yourFilePath/fileName.txt?dl=1",
-  "type": "basic",
-  "scenarios": [
-    {
-      "name": "Processor exmaple",
-      "flow": [
-        {
-          "function": "generateRandomDataGlobal"
-        },
-        {
-          "get": {
-            "url": "http://www.google.com/{{ randomPath }}",
-            "afterResponse": "logResponse"
-          }
-        },
-        {
-          "log": "********************* Sent a request to /users with {{ name }}, {{ email }}, {{ password }}"
-        }
-      ]
-    }
-  ]
-}
-```
-
-Here's some sample Javascript code:
-
-```javascript
-'use strict';
-const uuid = require('uuid/v4');
-module.exports = {
-  logResponse,
-  generateRandomDataGlobal
-};
-
-
-  function logResponse(requestParams, response, context, ee, next) {
-  if(response.statusCode !== 200){
-       console.log('**************** fail with status code: ' + JSON.stringify(response.statusCode));
-       console.log('**************** host is: ' + JSON.stringify(response.request.uri.host));
-       console.log('**************** path is: ' + JSON.stringify(response.request.uri.pathname));
-       console.log('**************** response headers is: ' + JSON.stringify(response.headers));
-
-    }
-     return next(); // MUST be called for the scenario to continue
-  }
-
-
-function generateRandomDataGlobal(userContext, events, done) {
-console.log('userContext is: ' + JSON.stringify(userContext));
-  userContext.vars.randomPath = 'random_path_' + uuid();
-  userContext.vars.name = 'name_random_' + uuid();
-  userContext.vars.email = 'email_random_' + uuid();
-  userContext.vars.password = 'password_random_' + uuid();
-  return done();
-}
-```
-
-In the example above, we created a test with 2 Javascript functions:
-
-* `logResponse()` will log the result received, if the `statusCode` is different from 200. The function will be called after each response using the `afterResponse` command.
-
-* `generateRandomDataGlobal()` is a global function that creates global variables. Those variables can be used in the scope of the test by using the `{{ }}` syntax.
+Tests can use custom Javascript functions. To use custom Javascript functions in your tests please refer to the <u>[processors documentation](processors.md)</u>.
 
 ## Debugging Test Requests/Responses
 
