@@ -57,7 +57,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.9, sum(rate(request_duration_seconds_bucket{testName=\"$Name\", job=\"$Cluster\"}[60s])) by (le, status_code, path))",
+          "expr": "histogram_quantile(0.9, sum(rate(request_duration_seconds_bucket{testName=\"$Name\"}[60s])) by (le, status_code, path))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{path}} - {{status_code}}",
@@ -143,7 +143,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "topk(10, sum(rate(request_duration_seconds_count{testName=\"$Name\", job=\"$Cluster\"}[5m])) by (status_code, path))",
+          "expr": "topk(10, sum(rate(request_duration_seconds_count{testName=\"$Name\"}[5m])) by (status_code, path))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -252,7 +252,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "avg(runnerStats{testName=\"$Name\", job=\"$Cluster\", field=\"memory\"})",
+          "expr": "avg(runnerStats{testName=\"$Name\", field=\"memory\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "B"
@@ -331,7 +331,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "avg(runnerStats{testName=\"Gett Scenario - correct before definitions\", field=\"cpu\"})",
+          "expr": "avg(runnerStats{testName=\"$Name\", field=\"cpu\"})",
           "format": "time_series",
           "instant": false,
           "intervalFactor": 1,
@@ -412,7 +412,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{testName=\"$Name\", job=\"$Cluster\"}[60s])) by (le))",
+          "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{testName=\"$Name\"}[60s])) by (le))",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 1,
@@ -493,7 +493,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(increase(request_duration_seconds_count{testName=\"$Name\", job=\"$Cluster\"}[30s])) / 30",
+          "expr": "sum(increase(request_duration_seconds_count{testName=\"$Name\"}[30s])) / 30",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 1,
@@ -549,7 +549,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg(runnerStats{testName=\"$Name\", job=\"$Cluster\", field=\"avoidedScenarios\"})",
+          "expr": "avg(runnerStats{testName=\"$Name\", field=\"avoidedScenarios\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Avoided Scenarios",
@@ -633,7 +633,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg(runnerStats{testName=\"$Name\", job=\"$Cluster\", field=\"pendingRequests\"})",
+          "expr": "avg(runnerStats{testName=\"$Name\", field=\"pendingRequests\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "pendingRequests",
