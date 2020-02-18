@@ -16,6 +16,7 @@ import {cloneDeep, reduce, isNumber} from 'lodash';
 import Button from '../Button';
 import ErrorDialog from '../ErrorDialog';
 import ProcessorsDropDown from './ProcessorsDropDown';
+import Tabs from '../../../components/Tabs/Tabs'
 
 
 export class TestForm extends React.Component {
@@ -94,6 +95,17 @@ export class TestForm extends React.Component {
         return (
             <Modal onExit={closeDialog}>
                 <h1>Create Test</h1>
+                <Tabs defaultActiveKey={'2'}>
+                    <Tabs.TabPane lazy={false} tab="Tab 1" key="1">
+                        Content of Tab Pane 1
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="Tab 2" key="2">
+                        Content of Tab Pane 2
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="Tab 3" key="3">
+                        Content of Tab Pane 3
+                    </Tabs.TabPane>
+                </Tabs>
                 <div className={style['top']}>
                     <div className={style['top-inputs']}>
                         {/* left */}

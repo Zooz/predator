@@ -15,6 +15,9 @@ module.exports = {
     path: __dirname + '/../dist', // or path: path.join(__dirname, "dist/js"),
     filename: process.env.NODE_ENV === 'production' ? 'bundle.[chunkhash:8].js' : 'bundle.js'
   },
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx']
+  },
   // Emit source maps so we can debug our code in the browser
   devtool: 'source-map',
   // Tell webpack to run our source code through Babel

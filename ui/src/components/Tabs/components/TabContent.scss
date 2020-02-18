@@ -1,0 +1,13 @@
+.tab-pane-content {
+  width: 100%;
+  flex: none;
+  transition: opacity 0.45s;
+
+  &--inactive {
+    opacity: 0;
+  }
+
+  &--active {
+    opacity: 1;
+  }
+}

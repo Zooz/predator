@@ -1,0 +1,17 @@
+@import "../styles/colors";
+
+.Label {
+  font-weight: 600;
+  font-size: 2rem;
+  color: $default-blue;
+  line-height: normal;
+
+  &--pre, &--post {
+    font-weight: 400;
+    text-transform: lowercase;
+  }
+
+  &--post {
+    color: $text-grey;
+  }
+}

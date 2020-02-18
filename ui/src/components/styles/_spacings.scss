@@ -1,0 +1,34 @@
+$spacing_0: 0;
+$spacing_4: 4px;
+$spacing_8: 8px;
+$spacing_12: 12px;
+$spacing_20: 20px;
+$spacing_32: 32px;
+$spacing_52: 52px;
+$spacing_84: 84px;
+$spacing_136: 136px;
+$spacing_220: 220px;
+$spacing_356: 356px;
+$spacing_576: 576px;
+$spacing_932: 932px;
+$spacing_1508: 1508px;
+$spacing_2440: 2440px;
+
+
+:export {
+  spacing_0: $spacing_0;
+  spacing_4: $spacing_4;
+  spacing_8: $spacing_8;
+  spacing_12: $spacing_12;
+  spacing_20: $spacing_20;
+  spacing_32: $spacing_32;
+  spacing_52: $spacing_52;
+  spacing_84: $spacing_84;
+  spacing_136: $spacing_136;
+  spacing_220: $spacing_220;
+  spacing_356: $spacing_356;
+  spacing_576: $spacing_576;
+  spacing_932: $spacing_932;
+  spacing_1508: $spacing_1508;
+  spacing_2440: $spacing_2440;
+}

@@ -1,0 +1,25 @@
+@import '../../styles/_colors';
+@import '../_defaults';
+
+.scrolling-wrapper {
+  width: 100%;
+  margin-bottom: 16px;
+  position: relative;
+
+  &--no-scroll {
+    padding-left: #{$no-scroll-padding}px;
+  }
+
+  &__bottom-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-bottom: 1px solid $border-grey;
+    z-index: 100;
+  }
+}

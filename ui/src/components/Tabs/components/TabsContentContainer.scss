@@ -1,0 +1,8 @@
+@import '../_defaults';
+
+.tabs-content {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  transition: transform 0.3s $animation-cubic-bezier;
+}

@@ -1,0 +1,171 @@
+import * as actions from './actions'
+import styleDefs from '../../_defaults.scss'
+
+const buttonWidth = parseInt(styleDefs['button-width-size'])
+const noScrollExtraPadding = parseInt(styleDefs['no-scroll-padding'])
+
+export const initialState = {
+  shouldScroll: false,
+  enableScrollLeft: false,
+  enableScrollRight: false,
+  innerScrollWidth: 0,
+  scrollWrapperWidth: 0,
+  scrollXValue: 0
+}
+
+export default function reducer (state, action) {
+  switch (action.type) {
+    case actions.ON_MOUNT:
+      return onMount(state, action)
+    case actions.ON_RESIZE:
+      return onResize(state, action)
+    case actions.ON_SCROLL_LEFT:
+      return onScrollLeft(state)
+    case actions.ON_SCROLL_RIGHT:
+      return onScrollRight(state)
+    case actions.ON_TAB_SELECTION:
+      return onTabSelection(state, action)
+    default:
+      return state
+  }
+}
+
+function onMount (state, { innerScrollWidth, scrollWrapperWidth }) {
+  const shouldScroll = innerScrollWidth > scrollWrapperWidth - noScrollExtraPadding
+  return {
+    ...state,
+    shouldScroll,
+    innerScrollWidth,
+    scrollWrapperWidth,
+    enableScrollRight: shouldScroll,
+    scrollXValue: shouldScroll ? buttonWidth : 0
+  }
+}
+
+function onResize (state, {
+  scrollWrapperWidth,
+  tabOffsetLeft,
+  tabWidth,
+  innerScrollWidth
+}) {
+  if (state.scrollWrapperWidth !== scrollWrapperWidth || state.innerScrollWidth !== innerScrollWidth) {
+    const shouldScroll = innerScrollWidth > scrollWrapperWidth - noScrollExtraPadding
+    if (!shouldScroll) {
+      return {
+        ...state,
+        shouldScroll,
+        scrollWrapperWidth,
+        innerScrollWidth,
+        enableScrollLeft: false,
+        enableScrollRight: false,
+        scrollXValue: 0
+      }
+    }
+
+    const nextState = onTabSelection({
+      ...state,
+      shouldScroll,
+      scrollWrapperWidth,
+      innerScrollWidth
+    }, {
+      tabOffsetLeft,
+      tabWidth
+    })
+
+    // stick inner scroll to the right when resize more than th scrollXValue
+    if (scrollWrapperWidth - buttonWidth > nextState.innerScrollWidth + nextState.scrollXValue) {
+      return {
+        ...nextState,
+        enableScrollRight: false,
+        enableScrollLeft: true,
+        scrollXValue: scrollWrapperWidth - buttonWidth - nextState.innerScrollWidth
+      }
+    }
+
+    // otherwise update scroll enabling
+    return {
+      ...nextState,
+      enableScrollLeft: nextState.scrollXValue < buttonWidth,
+      enableScrollRight: innerScrollWidth + nextState.scrollXValue > scrollWrapperWidth - buttonWidth
+    }
+  }
+  return state
+}
+
+function onScrollLeft (state) {
+  const { enableScrollLeft, scrollXValue, scrollWrapperWidth } = state
+  if (!enableScrollLeft) {
+    return state
+  }
+  // actual width is the total width, without the buttons width
+  const actualContentWidth = scrollWrapperWidth - 2 * buttonWidth
+  // the content to the left is larger than the scrolling container width
+  if (Math.abs(scrollXValue - buttonWidth) > actualContentWidth) {
+    return {
+      ...state,
+      scrollXValue: scrollXValue + actualContentWidth,
+      enableScrollLeft: true,
+      enableScrollRight: true
+    }
+  }
+  // the content width to the left is smaller than the container width
+  // scrolling all of it into the container
+  return {
+    ...state,
+    scrollXValue: buttonWidth,
+    enableScrollLeft: false,
+    enableScrollRight: true
+  }
+}
+
+function onScrollRight (state) {
+  const { enableScrollRight, scrollXValue, innerScrollWidth, scrollWrapperWidth } = state
+  if (!enableScrollRight) {
+    return state
+  }
+  // actual width
+  const actualContentWidth = scrollWrapperWidth - 2 * buttonWidth
+  // the inner scroll remain to the right is larger than the scrolling wrapper
+  if (innerScrollWidth - Math.abs(scrollXValue - buttonWidth) - actualContentWidth > actualContentWidth) {
+    return {
+      ...state,
+      scrollXValue: scrollXValue - actualContentWidth,
+      enableScrollRight: true,
+      enableScrollLeft: true
+    }
+  }
+  // the inner scroll remaining width is smaller than the wrapper
+  // scroll all of it from the right
+  return {
+    ...state,
+    scrollXValue: actualContentWidth + buttonWidth - innerScrollWidth,
+    enableScrollRight: false,
+    enableScrollLeft: true
+  }
+}
+
+function onTabSelection (state, { tabOffsetLeft, tabWidth }) {
+  if (state.shouldScroll) {
+    const { scrollXValue, scrollWrapperWidth, innerScrollWidth } = state
+    // scrolling in the tab from the left
+    if (scrollXValue + tabOffsetLeft < buttonWidth) {
+      const nextScrollXValue = buttonWidth - tabOffsetLeft
+      return {
+        ...state,
+        scrollXValue: nextScrollXValue,
+        enableScrollRight: true,
+        enableScrollLeft: nextScrollXValue < buttonWidth
+      }
+    } else if (scrollXValue + tabOffsetLeft + tabWidth > scrollWrapperWidth - buttonWidth) {
+      // scrolling in the tab from the right
+      const nextScrollXValue = scrollWrapperWidth - buttonWidth - (tabOffsetLeft + tabWidth)
+      return {
+        ...state,
+        scrollXValue: nextScrollXValue,
+        enableScrollRight: tabOffsetLeft + tabWidth < innerScrollWidth,
+        enableScrollLeft: true
+      }
+    }
+  }
+  return state
+}
