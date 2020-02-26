@@ -1,0 +1,22 @@
+@import "../../../../styles/colors";
+@import "../../../shared/style";
+
+.list__item {
+  cursor: pointer;
+  display: flex;
+  padding: 0 $list-side-padding;
+  height: 24px;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover:not(&--disabled) {
+    background: $default-blue;
+    color: $white;
+  }
+
+  &--disabled {
+    cursor: default;
+  }
+}

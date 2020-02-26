@@ -100,9 +100,6 @@ const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey }) => {
       <InkedTabsBar
         activeKey={activeKey}
         onTabClick={handleTabClick}
-        style={{
-          transform: `translateX(${scrollXValue}px)`
-        }}
         tabs={tabs}
         setContainerWidth={setInnerContainerWidth}
         setActiveTabSizes={setActiveTabSizes}

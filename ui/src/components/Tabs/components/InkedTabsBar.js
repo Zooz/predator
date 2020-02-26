@@ -23,8 +23,8 @@ const InkedTabsBar = (
     if (activeTabRef) {
       const { clientWidth, offsetLeft } = activeTabRef
       setInkStyle({
-        width: `${clientWidth}px`,
-        transform: `translateX(${offsetLeft}px)`
+          // borderBottom: '3px solid #557eff'
+
       })
       setActiveTabSizes(clientWidth, offsetLeft)
     }
@@ -42,7 +42,7 @@ const InkedTabsBar = (
       style={style}
       className={styles['tabs-container']}
     >
-      <div style={inkStyle} className={styles['active-tab-ink']} />
+      <div style={inkStyle} />
       {
         tabs.map(({ key, tab }) => {
           const tabClickHandler = () => {

@@ -2,6 +2,7 @@
   width: 100%;
   flex: none;
   transition: opacity 0.45s;
+  overflow: scroll;
 
   &--inactive {
     opacity: 0;

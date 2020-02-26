@@ -1,0 +1,36 @@
+@import "../../styles/colors";
+
+@mixin SideNote {
+  font-weight: 500;
+  color: $text-grey;
+  line-height: 1.564rem;
+  font-size: 0.9666rem;
+}
+
+@mixin SideNote--bold {
+  font-weight: 700;
+}
+
+@mixin SideNote--obscure {
+  color: $disabled-grey-text;
+}
+
+@mixin SideNote--disabled {
+  color: $disabled-light-grey-button;
+}
+
+.SideNote {
+  @include SideNote;
+
+  &--bold {
+    @include SideNote--bold;
+  }
+
+  &--obscure {
+    @include SideNote--obscure;
+  }
+
+  &--disabled {
+    @include SideNote--disabled;
+  }
+}

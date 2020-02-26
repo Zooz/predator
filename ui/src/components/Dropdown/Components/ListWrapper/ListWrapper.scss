@@ -1,0 +1,22 @@
+@import "../../../../styles/colors";
+
+.wrapper {
+  transform: translateY(1px);
+  width: 100%;
+  background-color: $white;
+  box-shadow: 0 7px 40px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding-top: 20px;
+  padding-bottom: 9px;
+  text-align: left;
+  animation: fadein 0.1s;
+
+  @keyframes fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

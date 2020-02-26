@@ -13,12 +13,17 @@ import {createTestRequest, createStateForEditTest} from './utils';
 import ScenarioList from './scenarioList';
 import {v4 as uuid} from 'uuid';
 import {cloneDeep, reduce, isNumber} from 'lodash';
-import Button from '../Button';
+import Button from '../../../components/Button';
 import ErrorDialog from '../ErrorDialog';
 import ProcessorsDropDown from './ProcessorsDropDown';
 import Tabs from '../../../components/Tabs/Tabs'
+import TitleInput from "../../../components/TitleInput";
+import TextArea from "../../../components/TextArea";
+import ErrorWrapper from "../../../components/ErrorWrapper";
+import StepsList from './stepsList';
+import FormWrapper from "../../../components/FormWrapper";
 
-
+const DESCRIPTION = 'dsfdsfdsf adjksfhk sdjfhdjksf adjksfdjksafsf sakfhdksjfhdjksfhdks sfjkdsfjds jf sjfjksd'
 export class TestForm extends React.Component {
     constructor(props) {
         super(props);
@@ -90,66 +95,65 @@ export class TestForm extends React.Component {
 
     render() {
         const {createTestError, processorsError, closeDialog, processorsLoading, processorsList} = this.props;
-        const {name, description, baseUrl, processorId} = this.state;
+        const {name, description, baseUrl, processorId,editMode} = this.state;
         const error = createTestError || processorsError;
         return (
             <Modal onExit={closeDialog}>
-                <h1>Create Test</h1>
-                <Tabs defaultActiveKey={'2'}>
-                    <Tabs.TabPane lazy={false} tab="Tab 1" key="1">
-                        Content of Tab Pane 1
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab="Tab 2" key="2">
-                        Content of Tab Pane 2
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab="Tab 3" key="3">
-                        Content of Tab Pane 3
-                    </Tabs.TabPane>
-                </Tabs>
+                <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`} description={DESCRIPTION}>
                 <div className={style['top']}>
                     <div className={style['top-inputs']}>
                         {/* left */}
-                        <div>
-                            <div className={style['input-container']}>
-                                Name:<TextField value={name} onChange={(event, value) => {
-                                this.setState({name: value})
-                            }} hintText={'Test name'}/>
-                            </div>
-                            <div className={style['input-container']}>
-                                Description:<TextField value={description} onChange={(event, value) => {
-                                this.setState({description: value})
-                            }} hintText={'Description'}/>
-                            </div>
+
+                        <div className={style['input-container']}>
+                            <TitleInput style={{flex: '1'}} title={'Name'}>
+                                <TextArea value={name} onChange={(evt, value) => {
+                                    this.setState({name: evt.target.value})
+                                }}/>
+                            </TitleInput>
                         </div>
-                        <div>
-                            <div className={style['input-container']}>
-                                Base url:<TextField value={baseUrl} onChange={(event, value) => {
-                                this.setState({baseUrl: value})
-                            }} hintText={'http://my.api.com/'}/>
-                            </div>
-                            <div className={style['input-container']}
-                                 style={{width: '376px'}}>Processor:<ProcessorsDropDown
-                                onChange={this.onProcessorChosen} options={processorsList} value={processorId}
-                                loading={processorsLoading}/>
-                            </div>
+                        <div className={style['input-container']}>
+                            <TitleInput style={{flex: '1'}} title={'Description'}>
+                                <TextArea maxRows={1} value={description} onChange={(evt, value) => {
+                                    this.setState({description: evt.target.value})
+                                }}/>
+                            </TitleInput>
                         </div>
+                        <div className={style['input-container']}>
+                            <TitleInput style={{flex: '1'}} title={'Base url'}>
+                                <TextArea value={baseUrl} placeholder={'http://my.api.com/'}
+                                          onChange={(evt, value) => {
+                                              this.setState({baseUrl: evt.target.value})
+                                          }}/>
+                            </TitleInput>
+                        </div>
+
+                            <div className={style['input-container']} style={{width: '376px'}}>
+                                <TitleInput style={{flex: '1'}} title={'Processor'}>
+                                   <ProcessorsDropDown
+                                    onChange={this.onProcessorChosen} options={processorsList} value={processorId}
+                                    loading={processorsLoading}/>
+                                </TitleInput>
+
+                            </div>
+                        {/*{this.generateAddsButtons()}*/}
                     </div>
-                    {this.generateAddsButtons()}
                 </div>
                 {/* bottom */}
-                {this.generateScenarioDashBoard()}
-                {this.generateBottomBar()}
-                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
+
+                    {this.generateScenarioDashBoard()}
+                    {this.generateBottomBar()}
+                    {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
+                </FormWrapper>
             </Modal>
-        )
+    )
     }
 
     extractExportedFunctions = (processorsList, processorId) => {
         const chosenProcessor = processorsList.find((processor) => processor.id === processorId);
         const processorsExportedFunctions = chosenProcessor ? chosenProcessor.exported_functions.map((funcName) => ({
-            id: funcName,
-            name: funcName
-        })) : [];
+        id: funcName,
+        name: funcName
+    })) : [];
         return processorsExportedFunctions;
     };
 
@@ -157,17 +161,18 @@ export class TestForm extends React.Component {
         const processorsExportedFunctions = this.extractExportedFunctions(this.props.processorsList, id);
 
         this.setState({
-            processorId: id, processorsExportedFunctions
-        })
+        processorId: id, processorsExportedFunctions
+    })
     }
     generateBottomBar = () => {
         const {isLoading, closeDialog} = this.props;
 
         return (<div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            <div style={{display: 'flex', justifyContent: 'space-between', width: '340px'}}>
-                <Button label={'CANCEL'} onClick={closeDialog}/>
-                <Button isLoading={isLoading} disabled={!this.state.name} onClick={this.postTest} label={'SAVE'}/>
-            </div>
+        <div style={{display: 'flex', justifyContent: 'space-between', width: '230px'}}>
+            <Button inverted onClick={closeDialog}>Cancel</Button>
+            <Button spinner={isLoading} hover disabled={!this.state.name}
+                    onClick={this.postTest}>Submit</Button>
+        </div>
         </div>)
     }
     addScenarioHandler = () => {
@@ -175,12 +180,12 @@ export class TestForm extends React.Component {
         const maxWeight = this.calcMaxAllowedWeight(scenarios.length);
         scenarios.push({id: uuid(), steps: [], weight: maxWeight, scenario_name: 'Scenario ' + (scenarios.length + 1)});
         this.setState({
-            scenarios,
-            isAddStepOpen: false,
-            isAddScenarioOpen: true,
-            currentScenarioIndex: scenarios.length - 1,
-            isBeforeSelected: false
-        })
+        scenarios,
+        isAddStepOpen: false,
+        isAddScenarioOpen: true,
+        currentScenarioIndex: scenarios.length - 1,
+        isBeforeSelected: false
+    })
     };
 
     addBeforeHandler = () => {
@@ -192,18 +197,18 @@ export class TestForm extends React.Component {
         const {scenarios, currentScenarioIndex, isBeforeSelected, before} = this.state;
         let steps;
         if (isBeforeSelected) {
-            steps = before.steps;
-        } else {
-            steps = scenarios[currentScenarioIndex].steps;
-        }
+        steps = before.steps;
+    } else {
+        steps = scenarios[currentScenarioIndex].steps;
+    }
         steps.push(this.initStep());
         this.setState({
-            scenarios,
-            before,
-            isAddStepOpen: true,
-            isAddScenarioOpen: false,
-            currentStepIndex: steps.length - 1
-        })
+        scenarios,
+        before,
+        isAddStepOpen: true,
+        isAddScenarioOpen: false,
+        currentStepIndex: steps.length - 1
+    })
     };
 
     initStep() {
@@ -213,11 +218,11 @@ export class TestForm extends React.Component {
     generateAddsButtons = () => {
         const {before, scenarios} = this.state;
         return (
-            <div className={style['add-buttons-container']}>
-                <AddButton disabled={!!before} title={'before'} onClick={this.addBeforeHandler}/>
-                <AddButton title={'scenario'} onClick={this.addScenarioHandler}/>
-                <AddButton disabled={scenarios.length === 0 && !before} title={'steps'} onClick={this.addStepHandler}/>
-            </div>
+        <div className={style['add-buttons-container']}>
+        <AddButton disabled={!!before} title={'before'} onClick={this.addBeforeHandler}/>
+        <AddButton title={'scenario'} onClick={this.addScenarioHandler}/>
+        <AddButton disabled={scenarios.length === 0 && !before} title={'steps'} onClick={this.addStepHandler}/>
+        </div>
         )
     };
 
@@ -249,10 +254,10 @@ export class TestForm extends React.Component {
         let steps = this.getStepsByCurrentState();
         steps.splice(currentStepIndex, 1);
         if (isBeforeSelected && steps.length === 0) {
-            this.setState({scenarios, before: undefined, currentStepIndex, isBeforeSelected: false});
-        } else {
-            this.setState({scenarios, before, currentStepIndex});
-        }
+        this.setState({scenarios, before: undefined, currentStepIndex, isBeforeSelected: false});
+    } else {
+        this.setState({scenarios, before, currentStepIndex});
+    }
     };
     onDuplicateStep = () => {
         const {scenarios, currentStepIndex} = this.state;
@@ -280,10 +285,10 @@ export class TestForm extends React.Component {
         const {scenarios, currentScenarioIndex, before, isBeforeSelected} = this.state;
         let steps;
         if (isBeforeSelected) {
-            steps = before.steps
-        } else {
-            steps = scenarios[currentScenarioIndex].steps;
-        }
+        steps = before.steps
+    } else {
+        steps = scenarios[currentScenarioIndex].steps;
+    }
         return steps;
     };
 
@@ -291,10 +296,10 @@ export class TestForm extends React.Component {
         const {scenarios, currentScenarioIndex, before, isBeforeSelected} = this.state;
         let steps;
         if (isBeforeSelected) {
-            steps = before.steps
-        } else {
-            steps = scenarios[currentScenarioIndex].steps;
-        }
+        steps = before.steps
+    } else {
+        steps = scenarios[currentScenarioIndex].steps;
+    }
         const step = steps[dragIndex];
         steps.splice(dragIndex, 1);
         steps.splice(hoverIndex, 0, step);
@@ -305,64 +310,83 @@ export class TestForm extends React.Component {
         const {scenarios, currentScenarioIndex} = this.state;
         const exceptIndex = index || currentScenarioIndex;
         return reduce(scenarios, (result, value, key) => {
-            if (exceptIndex !== key && isNumber(value.weight)) {
-                result = result - value.weight;
-                return result;
-            } else {
-                return result;
-            }
-        }, 100);
+        if (exceptIndex !== key && isNumber(value.weight)) {
+        result = result - value.weight;
+        return result;
+    } else {
+        return result;
+    }
+    }, 100);
     };
     generateScenarioDashBoard = () => {
         const {
-            isAddStepOpen, isAddScenarioOpen, scenarios, before, currentScenarioIndex, currentStepIndex, isBeforeSelected, editMode,
-            afterStepProcessorValue, beforeStepProcessorValue,
-            processorsExportedFunctions
-        } = this.state;
+        isAddStepOpen, isAddScenarioOpen, scenarios, before, currentScenarioIndex, currentStepIndex, isBeforeSelected, editMode,
+        afterStepProcessorValue, beforeStepProcessorValue,
+        processorsExportedFunctions
+    } = this.state;
         const scenario = scenarios[currentScenarioIndex];
 
         let step;
         if (isBeforeSelected) {
-            step = before.steps[currentStepIndex];
-        } else {
-            step = scenario ? scenario.steps[currentStepIndex] : undefined;
-        }
+        step = before.steps[currentStepIndex];
+    } else {
+        step = scenario ? scenario.steps[currentStepIndex] : undefined;
+    }
+        console.log('scenarios',scenarios)
         return (
-            <div className={style['bottom']}>
-                {/* bottom */}
-                <div style={{display: 'flex', flexDirection: 'column', width: '200px'}}>
-                    <ScenarioList
-                        scenarios={scenarios}
-                        before={before}
-                        currentScenarioIndex={currentScenarioIndex}
-                        currentStepIndex={currentStepIndex}
-                        updateStepOrder={this.updateStepOrder}
-                        onChooseScenario={this.onChooseScenario}
-                        onChooseStep={this.onChooseStep}
-                        onChooseBefore={this.onChooseBefore}
-                        isBeforeSelected={isBeforeSelected}
-                        onDuplicateStep={this.onDuplicateStep}
-                        onDeleteStep={this.onDeleteStep}
-                        onDeleteScenario={this.onDeleteScenario}
-                        onDuplicateScenario={this.onDuplicateScenario}
-                    />
-                </div>
-                <div style={{paddingLeft: '10px', width: '100%'}}>
-                    {isAddStepOpen && step && <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step}
-                                                        onChangeValue={this.onChangeValueOfStep} editMode={editMode}
-                                                        processorsExportedFunctions={processorsExportedFunctions}
-                                                        onAfterStepProcessorChange={this.onAfterStepProcessorChange}
-                                                        onBeforeStepProcessorChange={this.onBeforeStepProcessorChange}
-                                                        beforeStepProcessorValue={beforeStepProcessorValue}
-                                                        afterStepProcessorValue={afterStepProcessorValue}
-                    />}
-                    {isAddScenarioOpen && scenario &&
+        <div className={style['bottom']}>
+        {/* bottom */}
+
+        <Tabs className={style.tabs}>
+        {
+            scenarios.map((scenario, index) => {
+                console.log('scenario', scenario)
+                return (
+                <Tabs.TabPane onClick={() => this.onChooseScenario(index)} lazy={false} tab={scenario.scenario_name}
+                              key={scenario.id}>
                     <AddScenarioForm allowedWeight={this.calcMaxAllowedWeight()} key={currentScenarioIndex}
                                      scenario={scenario} onChangeValue={this.onChangeValueOfScenario}
                                      processorsExportedFunctions={processorsExportedFunctions}/>
-                    }
-                </div>
+                    <StepsList steps={scenario.steps}/>
+
+                </Tabs.TabPane>
+                )
+            })
+        }
+        </Tabs>
+            <div style={{position:'absolute',zIndex:10, marginLeft:'50%', marginTop:'14px', display:'flex',justifyContent:'space-between',width:'172px'}}>
+                <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
+                <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
             </div>
+
+        {/*<div style={{display: 'flex', flexDirection: 'column', width: '200px'}}>*/}
+        {/*    /!*<ScenarioList*!/*/}
+        {/*    /!*    scenarios={scenarios}*!/*/}
+        {/*    /!*    before={before}*!/*/}
+        {/*    /!*    currentScenarioIndex={currentScenarioIndex}*!/*/}
+        {/*    /!*    currentStepIndex={currentStepIndex}*!/*/}
+        {/*    /!*    updateStepOrder={this.updateStepOrder}*!/*/}
+        {/*    /!*    onChooseScenario={this.onChooseScenario}*!/*/}
+        {/*    /!*    onChooseStep={this.onChooseStep}*!/*/}
+        {/*    /!*    onChooseBefore={this.onChooseBefore}*!/*/}
+        {/*    /!*    isBeforeSelected={isBeforeSelected}*!/*/}
+        {/*    /!*    onDuplicateStep={this.onDuplicateStep}*!/*/}
+        {/*    /!*    onDeleteStep={this.onDeleteStep}*!/*/}
+        {/*    /!*    onDeleteScenario={this.onDeleteScenario}*!/*/}
+        {/*    /!*    onDuplicateScenario={this.onDuplicateScenario}*!/*/}
+        {/*/>*/}
+        {/*</div>*/}
+        {/*<div style={{paddingLeft: '10px', width: '100%'}}>*/}
+        {/*    /!*{isAddStepOpen && step && <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step}*!/*/}
+        {/*    /!*                                    onChangeValue={this.onChangeValueOfStep} editMode={editMode}*!/*/}
+        {/*    /!*                                    processorsExportedFunctions={processorsExportedFunctions}*!/*/}
+        {/*    /!*                                    onAfterStepProcessorChange={this.onAfterStepProcessorChange}*!/*/}
+        {/*    /!*                                    onBeforeStepProcessorChange={this.onBeforeStepProcessorChange}*!/*/}
+        {/*    /!*                                    beforeStepProcessorValue={beforeStepProcessorValue}*!/*/}
+        {/*    /!*                                    afterStepProcessorValue={afterStepProcessorValue}*!/*/}
+        {/*</div>*/}
+
+        </div>
         )
     };
 
@@ -383,16 +407,16 @@ export class TestForm extends React.Component {
     onChangeValueOfStep = (newStep) => {
         const {scenarios, currentScenarioIndex, currentStepIndex, before, isBeforeSelected} = this.state;
         if (isBeforeSelected) {
-            before.steps[currentStepIndex] = newStep;
-        } else {
-            scenarios[currentScenarioIndex].steps[currentStepIndex] = newStep;
-        }
+        before.steps[currentStepIndex] = newStep;
+    } else {
+        scenarios[currentScenarioIndex].steps[currentStepIndex] = newStep;
+    }
         this.setState({scenarios: scenarios, before});
     };
-}
+    }
 
-function mapStateToProps(state) {
-    return {
+    function mapStateToProps(state) {
+        return {
         isLoading: Selectors.isLoading(state),
         createTestError: Selectors.errorOnCreateTest(state),
         createTestSuccess: Selectors.createTestSuccess(state),
@@ -400,13 +424,13 @@ function mapStateToProps(state) {
         processorsLoading: ProcessorsSelector.processorsLoading(state),
         processorsError: ProcessorsSelector.processorFailure(state),
     }
-}
+    }
 
-const mapDispatchToProps = {
-    createTest: Actions.createTest,
-    editTest: Actions.editTest,
-    cleanAllErrors: Actions.cleanAllErrors,
-    getProcessors: Actions.getProcessors,
-    initForm: Actions.initCreateTestForm
-};
-export default connect(mapStateToProps, mapDispatchToProps)(TestForm);
+    const mapDispatchToProps = {
+        createTest: Actions.createTest,
+        editTest: Actions.editTest,
+        cleanAllErrors: Actions.cleanAllErrors,
+        getProcessors: Actions.getProcessors,
+        initForm: Actions.initCreateTestForm
+    };
+    export default connect(mapStateToProps, mapDispatchToProps)(TestForm);

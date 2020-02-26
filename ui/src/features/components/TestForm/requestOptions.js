@@ -1,29 +1,48 @@
 
 import React from 'react';
 
-import Toggle from 'material-ui/Toggle';
+import UiSwitcher from '../../../components/UiSwitcher'
 
+const SideLabel = ({label,children})=>{
+
+
+    return (
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            {children}
+            <div style={{fontSize:'13px',color: '#555555',marginLeft:'10px'}}>{label}</div>
+        </div>
+        )
+}
 export default (props) => {
   const { gzipValue, foreverValue, onGzipToggleChanged, onForeverToggleChanged } = props;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div>
-        <Toggle
-          label='gzip'
-          labelPosition='left'
-          toggled={!!gzipValue}
-          onToggle={(event, value) => onGzipToggleChanged(value)}
-        />
+    <div style={{ display: 'flex', flexDirection: 'column',justifyContent:'sapce-between',height:'61px',marginLeft:'17px'}}>
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            <SideLabel label={'gzip'}>
+                <UiSwitcher
+                    onChange={(value) => {
+                        onGzipToggleChanged(value)
+                    }}
+                    disabledInp={false}
+                    activeState={!!gzipValue}
+                    height={12}
+                    width={22}
+                />
+            </SideLabel>
       </div>
-      <div>
-        <Toggle
-          label='forever'
-          labelPosition='left'
-          toggled={!!foreverValue}
-          onToggle={(event, value) => onForeverToggleChanged(value)}
-        />
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            <SideLabel label={'forever'}>
+                <UiSwitcher
+                    onChange={(value) => {
+                        onForeverToggleChanged(value)
+                    }}
+                    disabledInp={false}
+                    activeState={!!foreverValue}
+                    height={12}
+                    width={22}
+                />
+            </SideLabel>
       </div>
-
     </div>
 
   )

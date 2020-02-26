@@ -10,12 +10,6 @@
 }
 
 .active-tab-ink {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  border: none;
-  background-color: $default-blue;
+  border-bottom: 3px solid #557eff;
   transition: transform 0.3s $animation-cubic-bezier, width 0.3s $animation-cubic-bezier;
 }

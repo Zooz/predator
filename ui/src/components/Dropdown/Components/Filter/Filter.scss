@@ -1,0 +1,24 @@
+@import "../../../../styles/colors";
+
+.filter-wrapper {
+  padding: 0 20px;
+  margin-bottom: 15px;
+
+  .filter-input {
+    width: calc(100% - 2px);
+    border: 0;
+    border-radius: 0;
+    padding: 0 0 15px;
+    border-bottom: 1px solid $default-blue;
+    font-size: 13px;
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(68, 130, 255, 0);
+      outline: none;
+    }
+
+    &::placeholder {
+      color: #c2c2c2;
+    }
+  }
+}

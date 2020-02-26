@@ -11,6 +11,7 @@ const TabBarNode = React.forwardRef(({ tabName, onTabClick, isActive }, ref) => 
     onClick={onTabClick}
     className={styles['tab-bar-node']}
     data-test={isActive ? 'active' : 'inactive'}
+    style={isActive ? {borderBottom: '3px solid #557eff'} : undefined}
   >
     {tabName}
   </Label>

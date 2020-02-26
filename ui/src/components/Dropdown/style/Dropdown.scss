@@ -1,0 +1,18 @@
+@import "../../../styles/colors";
+
+.wrapper {
+  width: 100%;
+  position: relative;
+  line-height: 18px;
+
+  &[data-disabled="true"] {
+    pointer-events: none;
+  }
+}
+
+.selection-input {
+  width: 53px;
+  font-size: 12px;
+  padding: 3px 5px 0px;
+  height: 27px;
+}

@@ -13,6 +13,10 @@ import RequestOptions from './requestOptions';
 import ProcessorsDropDown from './ProcessorsDropDown';
 
 import style from './stepform.scss';
+import TextArea from "../../../components/TextArea";
+import Input from "../../../components/Input";
+import TitleInput from "../../../components/TitleInput";
+import Button from "../../../components/Button";
 
 export default (props) => {
     const sampleObject = {};
@@ -71,14 +75,18 @@ export default (props) => {
         <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
             <div className={style['http-methods-request-options-wrapper']}>
                 <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
+                    <TitleInput title={'Select'}>
+
                     <HttpMethodDropdown
                         value={step.method}
                         onChange={(value) => onInputChange('method', value)}
                     />
-                    <TextField value={step.url} style={{marginBottom: '-19px', width: '100%'}} hintText={'Enter url'}
-                               onChange={(event, value) => {
-                                   onInputChange('url', value)
-                               }}/>
+                    </TitleInput>
+                    <TitleInput style={{width:'100%'}} title={'Enter Url'}>
+                        <Input value={step.url} onChange={(evt, value) => {
+                            onInputChange('url', value)
+                        }}/>
+                    </TitleInput>
                 </RectangleAlignChildrenLeft>
 
                 <RequestOptions
@@ -89,20 +97,21 @@ export default (props) => {
                 />
             </div>
             <RectangleAlignChildrenLeft/>
-
-            Headers:
-            <DynamicKeyValueInput value={step.headers} onAdd={onAddHeader} onChange={onHeaderChange}/>
-            Captures:
+            <Header text={'Headers'}/>
+            <DynamicKeyValueInput value={step.headers} onAdd={onAddHeader}/>
+            <Button style={{width:'100px',minWidth:'0',marginBottom:'40px'}} inverted onClick={onHeaderChange}>+Add</Button>
+            <Header text={'Captures'}/>
             <DynamicKeyValueInput value={step.captures} onAdd={onAddCapture} onChange={onCaptureChange}
                                   keyHintText={'$.id'} valueHintText={'id'}/>
-
-            Processors:
+            <Button style={{width:'100px',minWidth:'0',marginBottom:'40px'}}  inverted onClick={onCaptureChange}>+Add</Button>
+            <Header text={'Processors'}/>
             <div style={{
                 display: 'flex',
                 flexDirection: 'row',
                 width: '100%',
                 paddingLeft: '90px',
-                alignItems: 'center'
+                alignItems: 'center',
+                marginBottom:'40px'
             }}>
                 <div style={{whiteSpace: 'nowrap'}}>Before Request</div>
                 <ProcessorsDropDown options={processorsExportedFunctions}
@@ -113,7 +122,7 @@ export default (props) => {
                                     onChange={(value) => onInputChange('afterResponse', value)}
                                     value={step.afterResponse}/>
             </div>
-            Body:
+            <Header text={'Body'}/>
             <JSONInput
                 key={jsonObjectKey}
                 id='a_unique_id'
@@ -134,31 +143,26 @@ export default (props) => {
     )
 }
 
-const DynamicKeyValueInput = ({value, onChange, onAdd, keyHintText, valueHintText}) => {
+const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => {
     const headersList = value
         .map((header, index) => {
             return (
                 <div style={{display: 'flex', flexDirection: 'row', width: '100%'}} key={index}>
-                    <TextField onChange={(event, value) => {
+                    <Input value={header.key} onChange={(evt, value) => {
                         onChange('key', value, index)
-                    }} value={header.key} style={{width: '100%'}} hintText={keyHintText || 'key'}/>
-                    <TextField onChange={(event, value) => {
+                    }} placeholder={keyHintText || 'key'}/>
+
+                    <Input value={header.value} onChange={(evt, value) => {
                         onChange('value', value, index)
-                    }} value={header.value} style={{width: '100%'}} hintText={valueHintText || 'value'}/>
+                    }} placeholder={valueHintText || 'value'}/>
+
                 </div>
             )
         });
 
     return (
-        <div style={{display: 'flex', flexDirection: 'row', width: '100%'}}>
-            <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
-                {headersList}
-            </div>
-            <div>
-                <FloatingActionButton onClick={onAdd} mini>
-                    <ContentAdd/>
-                </FloatingActionButton>
-            </div>
+        <div style={{display: 'flex', flexDirection: 'row', width: '100%',marginBottom:'22px'}}>
+            {headersList}
         </div>
     )
 }
@@ -181,4 +185,32 @@ const HttpMethodDropdown = (props) => {
             })
         }
     </DropDownMenu>);
+}
+
+
+const Header = ({text})=>{
+    return (
+        <div style={{
+            fontFamily: 'Roboto',
+            fontSize: '20px',
+            fontWeight: '300',
+            fontStretch: 'normal',
+            fontStyle: 'italic',
+            color: '#778195',
+            lineHeight: 'normal',
+            letterSpacing: 'normal',
+            // width: 72px;
+            // height: 24px;
+            // font-family: Roboto;
+            // font-size: 20px;
+            // font-weight: 300;
+            // font-stretch: normal;
+            // font-style: italic;
+            // line-height: normal;
+            // letter-spacing: normal;
+            // color: #778195;
+            marginBottom:'11px'
+
+        }}>{text}</div>
+    )
 }

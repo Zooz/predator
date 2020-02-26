@@ -41,7 +41,7 @@ class getTests extends React.Component {
             openNewTestDialog: false,
             deleteDialog: false,
             testToDelete: undefined,
-            createTest: true,
+            createTest: false,
             testForEdit: null,
             sortedTests: [],
             sortHeader:''
