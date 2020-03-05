@@ -1,10 +1,9 @@
-@import "../../../../styles/colors";
-@import "../../../shared/style";
+@import "../../../styles/_colors.scss";
 
 .list__item {
   cursor: pointer;
   display: flex;
-  padding: 0 $list-side-padding;
+  padding: 0 20px;
   height: 24px;
   align-items: center;
   overflow: hidden;

@@ -25,26 +25,26 @@ export default (props) => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.headers[index][key] = value;
-        onChangeValue(step)
+        onChangeValue(step, props.index);
     };
 
     const onAddHeader = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.headers.push({});
-        onChangeValue(step)
+        onChangeValue(step, props.index);
     };
     const onAddCapture = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.captures.push({});
-        onChangeValue(step)
+        onChangeValue(step, props.index);
     };
     const onCaptureChange = (key, value, index) => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.captures[index][key] = value;
-        onChangeValue(step)
+        onChangeValue(step, props.index);
     };
 
     const onBodyChange = (value) => {
@@ -52,7 +52,7 @@ export default (props) => {
             const {onChangeValue} = props;
             const step = cloneDeep(props.step);
             step.body = value.jsObject;
-            onChangeValue(step)
+            onChangeValue(step, props.index);
         }
     };
 
@@ -61,7 +61,7 @@ export default (props) => {
         const step = cloneDeep(props.step);
 
         step[key] = value;
-        onChangeValue(step);
+        onChangeValue(step, props.index);
     };
 
 
@@ -77,14 +77,15 @@ export default (props) => {
                 <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
                     <TitleInput title={'Select'}>
 
-                    <HttpMethodDropdown
-                        value={step.method}
-                        onChange={(value) => onInputChange('method', value)}
-                    />
+                        <HttpMethodDropdown
+                            value={step.method}
+                            onChange={(value) => onInputChange('method', value)}
+                        />
                     </TitleInput>
-                    <TitleInput style={{width:'100%'}} title={'Enter Url'}>
-                        <Input value={step.url} onChange={(evt, value) => {
-                            onInputChange('url', value)
+                    <TitleInput style={{width: '100%'}} title={'Enter Url'}>
+                        <Input value={step.url} onChange={(evt) => {
+
+                            onInputChange('url', evt.target.value)
                         }}/>
                     </TitleInput>
                 </RectangleAlignChildrenLeft>
@@ -98,12 +99,14 @@ export default (props) => {
             </div>
             <RectangleAlignChildrenLeft/>
             <Header text={'Headers'}/>
-            <DynamicKeyValueInput value={step.headers} onAdd={onAddHeader}/>
-            <Button style={{width:'100px',minWidth:'0',marginBottom:'40px'}} inverted onClick={onHeaderChange}>+Add</Button>
+            <DynamicKeyValueInput value={step.headers} onChange={onHeaderChange}/>
+            <Button style={{width: '100px', minWidth: '0', marginBottom: '40px'}} inverted
+                    onClick={onAddHeader}>+Add</Button>
             <Header text={'Captures'}/>
-            <DynamicKeyValueInput value={step.captures} onAdd={onAddCapture} onChange={onCaptureChange}
+            <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange}
                                   keyHintText={'$.id'} valueHintText={'id'}/>
-            <Button style={{width:'100px',minWidth:'0',marginBottom:'40px'}}  inverted onClick={onCaptureChange}>+Add</Button>
+            <Button style={{width: '100px', minWidth: '0', marginBottom: '40px'}} inverted
+                    onClick={onAddCapture}>+Add</Button>
             <Header text={'Processors'}/>
             <div style={{
                 display: 'flex',
@@ -111,7 +114,7 @@ export default (props) => {
                 width: '100%',
                 paddingLeft: '90px',
                 alignItems: 'center',
-                marginBottom:'40px'
+                marginBottom: '40px'
             }}>
                 <div style={{whiteSpace: 'nowrap'}}>Before Request</div>
                 <ProcessorsDropDown options={processorsExportedFunctions}
@@ -147,21 +150,20 @@ const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => 
     const headersList = value
         .map((header, index) => {
             return (
-                <div style={{display: 'flex', flexDirection: 'row', width: '100%'}} key={index}>
-                    <Input value={header.key} onChange={(evt, value) => {
-                        onChange('key', value, index)
+                <div style={{display: 'flex', flexDirection: 'row', width: '100%',marginBottom: index!==headersList-1 ? '5px': undefined}} key={index}>
+                    <Input style={{marginRight:'10px'}} value={header.key} onChange={(evt) => {
+                        onChange('key', evt.target.value, index)
                     }} placeholder={keyHintText || 'key'}/>
 
-                    <Input value={header.value} onChange={(evt, value) => {
-                        onChange('value', value, index)
+                    <Input value={header.value} onChange={(evt) => {
+                        onChange('value', evt.target.value, index)
                     }} placeholder={valueHintText || 'value'}/>
-
                 </div>
             )
         });
 
     return (
-        <div style={{display: 'flex', flexDirection: 'row', width: '100%',marginBottom:'22px'}}>
+        <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '22px'}}>
             {headersList}
         </div>
     )
@@ -188,7 +190,7 @@ const HttpMethodDropdown = (props) => {
 }
 
 
-const Header = ({text})=>{
+const Header = ({text}) => {
     return (
         <div style={{
             fontFamily: 'Roboto',
@@ -209,7 +211,7 @@ const Header = ({text})=>{
             // line-height: normal;
             // letter-spacing: normal;
             // color: #778195;
-            marginBottom:'11px'
+            marginBottom: '11px'
 
         }}>{text}</div>
     )

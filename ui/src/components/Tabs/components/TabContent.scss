@@ -1,9 +1,10 @@
 .tab-pane-content {
   width: 100%;
+  height:100%;
   flex: none;
   transition: opacity 0.45s;
   overflow: scroll;
-
+  overflow-x: hidden;
   &--inactive {
     opacity: 0;
   }

@@ -8,7 +8,7 @@
 }
 .bottom {
   display:flex;
-  justify-content: flex-start;
+  flex-direction: column;
   overflow: auto;
   height:400px;
 }

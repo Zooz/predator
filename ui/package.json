@@ -94,6 +94,7 @@
     "react-json-editor-ajrm": "^2.5.9",
     "react-json-pretty": "^2.0.1",
     "react-number-format": "^4.0.7",
+    "react-onclickout": "^2.0.8",
     "react-popper": "^1.3.7",
     "react-redux": "^5.0.7",
     "react-resize-detector": "^4.2.1",

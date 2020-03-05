@@ -4,6 +4,8 @@ import Slider from 'material-ui/Slider';
 
 import React from 'react';
 import ProcessorsDropDown from "./ProcessorsDropDown";
+import Input from "../../../components/Input";
+import TitleInput from "../../../components/TitleInput";
 
 const TextSideWrapper = ({title, children, textStyle = {}}) => {
     return (
@@ -23,19 +25,21 @@ const AddScenarioForm = (props) => {
     return (
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'left', width: '100%'}}>
             <TextSideWrapper title={'Scenario Name:'}>
-                <TextField id={'name'} value={scenario.scenario_name} onChange={(event, value) => {
-                    onChangeValue('scenario_name', value);
+                <Input value={scenario.scenario_name} onChange={(evt) => {
+                    onChangeValue('scenario_name', evt.target.value);
                 }}/>
             </TextSideWrapper>
 
 
-            <TextSideWrapper title={'Before Scenario:'} textStyle={{marginRight: -13}}>
+
+
+            <TextSideWrapper title={'Before Scenario:'}>
                 <ProcessorsDropDown options={processorsExportedFunctions}
                                     onChange={(value) => onChangeValue('beforeScenario', value)}
                                     value={scenario.beforeScenario}/>
             </TextSideWrapper>
 
-            <TextSideWrapper title={'After Scenario:'} textStyle={{marginRight: -13}}>
+            <TextSideWrapper title={'After Scenario:'}>
                 <ProcessorsDropDown options={processorsExportedFunctions}
                 onChange={(value) => onChangeValue('afterScenario', value)}
                 value={scenario.afterScenario}/>

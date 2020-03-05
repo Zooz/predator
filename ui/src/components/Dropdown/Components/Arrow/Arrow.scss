@@ -1,0 +1,17 @@
+@import "../../../styles/_colors.scss";
+
+.arrow {
+  margin: auto 10px auto auto;
+  font-size: 12px;
+  color: $default-blue;
+  display: inline-block;
+  float: right;
+
+  .arrow__icon {
+
+  }
+
+  &.arrow--disabled {
+    color: #dbdbdb;
+  }
+}

@@ -9,10 +9,9 @@ import TabContent from './components/TabContent'
 
 import styles from './Tabs.scss'
 
-const Tabs = ({ children, defaultActiveKey,className }) => {
+const Tabs = ({ children, defaultActiveKey,className, onTabChosen, activeTabKey }) => {
   const validChildren = []
   const validTabs = []
-
   React.Children.forEach(children, (child) => {
     const key = child.key
     const { tab } = child.props
@@ -28,30 +27,30 @@ const Tabs = ({ children, defaultActiveKey,className }) => {
     return (key === defaultActiveKey && key) || reduction || key
   }, null)
 
-  const [currentKey, setCurrentKey] = useState(validDefaultKey)
+  // const [currentKey, setCurrentKey] = useState(validDefaultKey)
 
-  const currentKeyIdx = _.findIndex(validTabs, ({ key }) => key === currentKey)
+  const currentKeyIdx = _.findIndex(validTabs, ({ key }) => key === activeTabKey)
 
   // update key on children change
   useEffect(() => {
     if (currentKeyIdx !== -1) {
       return
     }
-    setCurrentKey(_.get(validTabs, '[0].key'))
+    // setCurrentKey(_.get(validTabs, '[0].key'))
     // TODO: fix
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [children])
   const child = validChildren.find((child) => {
     const key = child.key
-    return key===currentKey;
+    return key===activeTabKey;
   })
 
 
-  return (validTabs.length === 0
+  return (validTabs.length === 0 || !child
     ? null
     : (
       <div className={classnames(className,styles.tabs)}>
-        <ScrollableTabsNavBar onTabClick={setCurrentKey} activeKey={currentKey} tabs={validTabs} />
+        <ScrollableTabsNavBar onTabClick={onTabChosen} activeKey={activeTabKey} tabs={validTabs} />
         <TabsContentContainer>
           {
             <TabContent key={child.key} {...child.props}>

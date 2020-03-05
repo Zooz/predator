@@ -4,14 +4,16 @@
   display: inline-block;
   height: 100%;
   line-height: normal;
-  padding: 14px 0;
+  padding: 10px 0;
   margin: 0 18px 0 0;
   white-space: nowrap;
   cursor: pointer;
   transition: color 0.3s $animation-cubic-bezier;
   flex: none; // prevents tab resizing in flexbox container
-
-
+  font-family: 'Bai Jamjuree', sans-serif;
+  max-width:75px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
   &:last-child {
     margin-right: 0;
   }

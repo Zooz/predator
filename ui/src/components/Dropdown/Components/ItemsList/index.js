@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import ItemsWrapper from '../../../shared/Components/ItemsWrapper'
+import ItemsWrapper from '../ItemsWrapper'
 import style from './ItemsList.scss'
-import InputText from '../../../../Typography/InputText/InputText.export'
+import InputText from '../InputText/InputText.export'
 
 const ItemsList = ({ items, onClick }) => {
   const [hoveredKey, setHoveredKey] = useState(undefined)

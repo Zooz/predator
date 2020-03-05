@@ -32,12 +32,20 @@ export default class CollapsibleStep extends React.Component {
     render() {
 
         // this.props.step;
-        const {step} = this.props;
-        console.log('step', JSON.stringify(step))
+        const {
+            step, onDuplicateStep,
+            onDeleteStep, index
+        } = this.props;
         const sections = [
-            <Section key={1} icon='fa-warning' tooltip='I am a tooltip'/>,
+            <Section key={1} onClick={(evt) => {
+                evt.stopPropagation();
+                onDuplicateStep(index)
+            }} icon='fa-copy' tooltip='Duplicate step'/>,
+            <Section key={2} onClick={(evt) => {
+                evt.stopPropagation();
+                onDeleteStep(index)
+            }} icon='fa-trash' tooltip='Delete step' borderLeft/>,
         ]
-        console.log('step', step);
         const {expanded} = this.state;
         return (<CollapsibleItem
             onClick={() => {
@@ -57,9 +65,13 @@ export default class CollapsibleStep extends React.Component {
     }
 
     generateBody = () => {
+        const {index, onChangeValueOfStep, processorsExportedFunctions} = this.props;
         return (
             <div style={{padding: '10px'}}>
-                <StepForm step={this.props.step}/>
+                <StepForm step={this.props.step}
+                          index={index}
+                          onChangeValue={onChangeValueOfStep}
+                          processorsExportedFunctions={processorsExportedFunctions}/>
             </div>
 
 

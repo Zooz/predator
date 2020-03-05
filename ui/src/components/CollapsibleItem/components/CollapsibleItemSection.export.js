@@ -26,7 +26,7 @@ export default class Section extends Component {
   }
 
   render () {
-    const { icon, children, className, borderRight, borderLeft, tooltip } = this.props
+    const { icon, children, className, borderRight, borderLeft, tooltip,onClick } = this.props
     const classes = `${css.section} ${className}`
     return icon || children !== undefined
       ? (
@@ -34,6 +34,7 @@ export default class Section extends Component {
           className={css.sectionWrapper}
           data-border-right={String(borderRight)}
           data-border-left={String(borderLeft)}
+          onClick={onClick}
         >
           <div className={css.sectionWrapper__content}>
             <Tooltip content={tooltip} placement={PopoverPlacements.TopCenter} disabled={!tooltip}>
