@@ -38,7 +38,7 @@ export const createStateForEditTest = (test) => {
         baseUrl: artillery_test.config.target,
         before: testBeforeToStateBefore(artillery_test.before),
         scenarios: scenarios,
-        activeTabKey:scenarios[0].id,
+        activeTabKey:scenarios[0] && scenarios[0].id,
         type: test.type,
         processorId: test.processor_id,
         editMode: true,

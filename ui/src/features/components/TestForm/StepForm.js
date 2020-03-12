@@ -3,20 +3,15 @@ import React from 'react';
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
 import RectangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft'
-import TextField from 'material-ui/TextField';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import DropDownMenu from 'material-ui/DropDownMenu';
-import MenuItem from 'material-ui/MenuItem';
 import {cloneDeep} from 'lodash'
 import RequestOptions from './requestOptions';
 import ProcessorsDropDown from './ProcessorsDropDown';
 
 import style from './stepform.scss';
-import TextArea from "../../../components/TextArea";
 import Input from "../../../components/Input";
 import TitleInput from "../../../components/TitleInput";
 import Button from "../../../components/Button";
+import Dropdown from "../../../components/Dropdown/Dropdown.export";
 
 export default (props) => {
     const sampleObject = {};
@@ -75,8 +70,7 @@ export default (props) => {
         <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
             <div className={style['http-methods-request-options-wrapper']}>
                 <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
-                    <TitleInput title={'Select'}>
-
+                    <TitleInput title={'Method'}>
                         <HttpMethodDropdown
                             value={step.method}
                             onChange={(value) => onInputChange('method', value)}
@@ -84,7 +78,6 @@ export default (props) => {
                     </TitleInput>
                     <TitleInput style={{width: '100%'}} title={'Enter Url'}>
                         <Input value={step.url} onChange={(evt) => {
-
                             onInputChange('url', evt.target.value)
                         }}/>
                     </TitleInput>
@@ -112,18 +105,19 @@ export default (props) => {
                 display: 'flex',
                 flexDirection: 'row',
                 width: '100%',
-                paddingLeft: '90px',
                 alignItems: 'center',
                 marginBottom: '40px'
             }}>
-                <div style={{whiteSpace: 'nowrap'}}>Before Request</div>
-                <ProcessorsDropDown options={processorsExportedFunctions}
-                                    onChange={(value) => onInputChange('beforeRequest', value)}
-                                    value={step.beforeRequest}/>
-                <div style={{whiteSpace: 'nowrap'}}>After Response</div>
-                <ProcessorsDropDown options={processorsExportedFunctions}
-                                    onChange={(value) => onInputChange('afterResponse', value)}
-                                    value={step.afterResponse}/>
+                <TitleInput title={'Before Request'}>
+                    <ProcessorsDropDown options={processorsExportedFunctions}
+                                        onChange={(value) => onInputChange('beforeRequest', value)}
+                                        value={step.beforeRequest}/>
+                </TitleInput>
+                <TitleInput title={'After Response'}>
+                    <ProcessorsDropDown options={processorsExportedFunctions}
+                                        onChange={(value) => onInputChange('afterResponse', value)}
+                                        value={step.afterResponse}/>
+                </TitleInput>
             </div>
             <Header text={'Body'}/>
             <JSONInput
@@ -172,28 +166,27 @@ const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => 
 const HttpMethodDropdown = (props) => {
     const httpMethods = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE'];
     const {onChange, value} = props;
-    return (<DropDownMenu
-        autoWidth={false}
-        style={{width: '150px', marginLeft: '-25px', height: '50px'}}
-        value={value}
-        onChange={(event, keyNumber, value) => {
-            onChange(value)
-        }}
-    >
-        {
-            httpMethods.map((method, index) => {
-                return (<MenuItem key={index} value={method} primaryText={method}/>
-                )
-            })
-        }
-    </DropDownMenu>);
+    return (
+        <Dropdown
+            options={httpMethods.map((option) => ({key: option, value: option}))}
+            selectedOption={{key: value, value: value}}
+            onChange={(selected)=>{
+                onChange(selected.value)
+            }}
+            placeholder={"Method"}
+            height={'35px'}
+            disabled={false}
+            validationErrorText=''
+            enableFilter={false}
+        />
+    )
 }
 
 
 const Header = ({text}) => {
     return (
         <div style={{
-            fontFamily: 'Roboto',
+            // fontFamily: 'Roboto',
             fontSize: '20px',
             fontWeight: '300',
             fontStretch: 'normal',
@@ -201,16 +194,6 @@ const Header = ({text}) => {
             color: '#778195',
             lineHeight: 'normal',
             letterSpacing: 'normal',
-            // width: 72px;
-            // height: 24px;
-            // font-family: Roboto;
-            // font-size: 20px;
-            // font-weight: 300;
-            // font-stretch: normal;
-            // font-style: italic;
-            // line-height: normal;
-            // letter-spacing: normal;
-            // color: #778195;
             marginBottom: '11px'
 
         }}>{text}</div>

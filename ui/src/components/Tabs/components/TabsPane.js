@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const TabPane = ({ children }) => (<>{children}</>)
+const TabPane = ({ children,style }) => (<div style={style}>{children}</div>)
 
 TabPane.propTypes = {
   children: PropTypes.any,

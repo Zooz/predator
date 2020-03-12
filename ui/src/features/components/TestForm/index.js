@@ -1,29 +1,22 @@
 import React from 'react';
-import TextField from 'material-ui/TextField';
-import StepForm from './StepForm';
 import style from './style.scss';
 import * as Actions from '../../redux/action';
 import * as Selectors from '../../redux/selectors/testsSelector';
 import * as ProcessorsSelector from '../../redux/selectors/processorsSelector';
 import {connect} from 'react-redux';
-import AddButton from './addButton';
-import AddScenarioForm from './addScenarioForm';
 import Modal from '../Modal';
 import {createTestRequest, createStateForEditTest} from './utils';
-import ScenarioList from './scenarioList';
 import {v4 as uuid} from 'uuid';
-import {cloneDeep, reduce, isNumber, get} from 'lodash';
+import {cloneDeep, reduce, isNumber} from 'lodash';
 import Button from '../../../components/Button';
 import ErrorDialog from '../ErrorDialog';
 import ProcessorsDropDown from './ProcessorsDropDown';
 import Tabs from '../../../components/Tabs/Tabs'
 import TitleInput from "../../../components/TitleInput";
 import TextArea from "../../../components/TextArea";
-import ErrorWrapper from "../../../components/ErrorWrapper";
 import StepsList from './stepsList';
 import FormWrapper from "../../../components/FormWrapper";
-
-const DESCRIPTION = 'dsfdsfdsf adjksfhk sdjfhdjksf adjksfdjksafsf sakfhdksjfhdjksfhdks sfjkdsfjds jf sjfjksd'
+import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 
 export class TestForm extends React.Component {
     constructor(props) {
@@ -62,10 +55,6 @@ export class TestForm extends React.Component {
     };
 
     componentDidUpdate(prevProps, prevState) {
-        console.log('prevProps', prevProps);
-        console.log('cur props', this.props);
-        console.log('prevState', prevState);
-        console.log('cur state', this.state);
         const {createTestSuccess: createTestSuccessBefore, processorsList: processorsListBefore} = prevProps;
         const {createTestSuccess, closeDialog, processorsList} = this.props;
 
@@ -99,28 +88,28 @@ export class TestForm extends React.Component {
         const {name, description, baseUrl, processorId, editMode} = this.state;
         const error = createTestError || processorsError;
         return (
-            <Modal onExit={closeDialog}>
-                <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`} description={DESCRIPTION}>
+            <Modal style={{paddingTop:'65px'}} height={'93%'} onExit={closeDialog}>
+                <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
                     <div className={style['top']}>
                         <div className={style['top-inputs']}>
                             {/* left */}
 
                             <div className={style['input-container']}>
-                                <TitleInput style={{flex: '1'}} title={'Name'}>
+                                <TitleInput style={{flex: '1',marginTop:'2px'}} title={'Name'}>
                                     <TextArea value={name} onChange={(evt, value) => {
                                         this.setState({name: evt.target.value})
                                     }}/>
                                 </TitleInput>
                             </div>
                             <div className={style['input-container']}>
-                                <TitleInput style={{flex: '1'}} title={'Description'}>
+                                <TitleInput style={{flex: '1',marginTop:'2px'}} title={'Description'}>
                                     <TextArea maxRows={1} value={description} onChange={(evt, value) => {
                                         this.setState({description: evt.target.value})
                                     }}/>
                                 </TitleInput>
                             </div>
                             <div className={style['input-container']}>
-                                <TitleInput style={{flex: '1'}} title={'Base url'}>
+                                <TitleInput style={{flex: '1',marginTop:'2px'}} title={'Base url'}>
                                     <TextArea value={baseUrl} placeholder={'http://my.api.com/'}
                                               onChange={(evt, value) => {
                                                   this.setState({baseUrl: evt.target.value})
@@ -129,14 +118,13 @@ export class TestForm extends React.Component {
                             </div>
 
                             <div className={style['input-container']}>
-                                <TitleInput style={{flex: '1'}} title={'Processor'}>
+                                <TitleInput style={{flex: '1',marginTop:'2px'}} title={'Processor'}>
                                     <ProcessorsDropDown
                                         onChange={this.onProcessorChosen} options={processorsList} value={processorId}
                                         loading={processorsLoading}/>
                                 </TitleInput>
 
                             </div>
-                            {/*{this.generateAddsButtons()}*/}
                         </div>
                     </div>
                     {/* bottom */}
@@ -168,7 +156,7 @@ export class TestForm extends React.Component {
     generateBottomBar = () => {
         const {isLoading, closeDialog} = this.props;
 
-        return (<div style={{display: 'flex', justifyContent: 'flex-end'}}>
+        return (<div style={{display: 'flex', justifyContent: 'flex-end', marginBottom:'10px'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', width: '230px'}}>
                 <Button inverted onClick={closeDialog}>Cancel</Button>
                 <Button spinner={isLoading} hover disabled={!this.state.name}
@@ -223,36 +211,18 @@ export class TestForm extends React.Component {
         return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: ''}
     }
 
-    generateAddsButtons = () => {
-        const {before, scenarios} = this.state;
-        return (
-            <div className={style['add-buttons-container']}>
-                <AddButton disabled={!!before} title={'before'} onClick={this.addBeforeHandler}/>
-                <AddButton title={'scenario'} onClick={this.addScenarioHandler}/>
-                <AddButton disabled={scenarios.length === 0 && !before} title={'steps'} onClick={this.addStepHandler}/>
-            </div>
-        )
-    };
-
     onChooseScenario = (key) => {
-        console.log('manor this.state.scenarios', this.state.scenarios);
-        console.log('manor this.state.scenarios', key);
         const scenarioResult = this.state.scenarios.findIndex((scenario) => scenario.id === key);
         let currentScenarioIndex = null;
-        console.log("manor scenarioResult", scenarioResult)
         if (scenarioResult !== -1) {
             currentScenarioIndex = scenarioResult
         }
-        console.log("manor currentScenarioIndex",currentScenarioIndex)
         this.setState({
             currentStepIndex: null,
             currentScenarioIndex
         })
     };
 
-    onChooseStep = (index) => {
-        this.setState({ currentStepIndex: index})
-    };
     onChooseBefore = () => {
         this.setState({
             currentScenarioIndex: null
@@ -263,8 +233,6 @@ export class TestForm extends React.Component {
 
         let steps = this.getStepsByCurrentState();
         steps.splice(stepIndex, 1);
-        console.log("manor currentScenarioIndex", currentScenarioIndex);
-        console.log("manor steps", steps);
         if (currentScenarioIndex === null && steps.length === 0) {
             this.setState({scenarios, before: undefined, currentScenarioIndex: 0});
         } else {
@@ -282,7 +250,7 @@ export class TestForm extends React.Component {
     onDeleteScenario = () => {
         const {scenarios, currentScenarioIndex} = this.state;
         scenarios.splice(currentScenarioIndex, 1);
-        this.setState({scenarios});
+        this.setState({scenarios,currentScenarioIndex:currentScenarioIndex-1});
     };
 
     onDuplicateScenario = () => {
@@ -305,20 +273,6 @@ export class TestForm extends React.Component {
         return steps;
     };
 
-    updateStepOrder = (dragIndex, hoverIndex) => {
-        const {scenarios, currentScenarioIndex, before, isBeforeSelected} = this.state;
-        let steps;
-        if (isBeforeSelected) {
-            steps = before.steps
-        } else {
-            steps = scenarios[currentScenarioIndex].steps;
-        }
-        const step = steps[dragIndex];
-        steps.splice(dragIndex, 1);
-        steps.splice(hoverIndex, 0, step);
-
-        this.setState({scenarios, before, currentStepIndex: hoverIndex});
-    };
     calcMaxAllowedWeight = (index) => {
         const {scenarios, currentScenarioIndex} = this.state;
         const exceptIndex = index || currentScenarioIndex;
@@ -333,10 +287,8 @@ export class TestForm extends React.Component {
     };
     generateScenarioDashBoard = () => {
         const {
-            scenarios, before, currentScenarioIndex, editMode,
-            afterStepProcessorValue, beforeStepProcessorValue,
+            scenarios, before, currentScenarioIndex,
             processorsExportedFunctions
-
         } = this.state;
         let tabsData;
         if (before) {
@@ -351,7 +303,7 @@ export class TestForm extends React.Component {
                 {/* bottom */}
                 <div style={{
                     marginLeft: 'auto',
-                    marginRight:'12px',
+                    marginRight: '12px',
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '250px'
@@ -365,66 +317,45 @@ export class TestForm extends React.Component {
                     {
                         tabsData.map((tabData, index) => {
                             return (
-                                <Tabs.TabPane tab={tabData.scenario_name || 'Scenario'}
+                                <Tabs.TabPane style={{
+                                    padding: '10px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    flexDirection: 'column',
+                                    flex:1
+                                }} tab={tabData.scenario_name || 'Scenario'}
                                               key={tabData.id}>
                                     {
                                         !tabData.isBefore &&
-                                        <AddScenarioForm allowedWeight={this.calcMaxAllowedWeight()}
-                                                         key={currentScenarioIndex}
-                                                         scenario={tabData} onChangeValue={this.onChangeValueOfScenario}
-                                                         processorsExportedFunctions={processorsExportedFunctions}/>
+                                        <div style={{width: "80%"}}>
+
+                                            <CollapsibleScenarioConfig
+                                                allowedWeight={this.calcMaxAllowedWeight()}
+                                                scenario={tabData}
+                                                onChangeValueOfScenario={this.onChangeValueOfScenario}
+                                                processorsExportedFunctions={processorsExportedFunctions}
+                                                onDeleteScenario={this.onDeleteScenario}
+                                                onDuplicateScenario={this.onDuplicateScenario}
+                                            />
+                                        </div>
+
                                     }
-                                    <StepsList steps={tabData.steps}
-                                               onChangeValueOfStep={this.onChangeValueOfStep}
-                                               processorsExportedFunctions={processorsExportedFunctions}
-                                               onDeleteStep={this.onDeleteStep}
-                                               onDuplicateStep={this.onDuplicateStep}
-                                    />
+                                    <div style={{width: "70%"}}>
+                                        <StepsList steps={tabData.steps}
+                                                   onChangeValueOfStep={this.onChangeValueOfStep}
+                                                   processorsExportedFunctions={processorsExportedFunctions}
+                                                   onDeleteStep={this.onDeleteStep}
+                                                   onDuplicateStep={this.onDuplicateStep}
+                                        />
+                                    </div>
 
                                 </Tabs.TabPane>
                             )
                         })
                     }
                 </Tabs>
-
-
-                {/*<div style={{display: 'flex', flexDirection: 'column', width: '200px'}}>*/}
-                {/*    /!*<ScenarioList*!/*/}
-                {/*    /!*    scenarios={scenarios}*!/*/}
-                {/*    /!*    before={before}*!/*/}
-                {/*    /!*    currentScenarioIndex={currentScenarioIndex}*!/*/}
-                {/*    /!*    currentStepIndex={currentStepIndex}*!/*/}
-                {/*    /!*    updateStepOrder={this.updateStepOrder}*!/*/}
-                {/*    /!*    onChooseScenario={this.onChooseScenario}*!/*/}
-                {/*    /!*    onChooseStep={this.onChooseStep}*!/*/}
-                {/*    /!*    onChooseBefore={this.onChooseBefore}*!/*/}
-                {/*    /!*    isBeforeSelected={isBeforeSelected}*!/*/}
-                {/*    /!*    onDuplicateStep={this.onDuplicateStep}*!/*/}
-                {/*    /!*    onDeleteStep={this.onDeleteStep}*!/*/}
-                {/*    /!*    onDeleteScenario={this.onDeleteScenario}*!/*/}
-                {/*    /!*    onDuplicateScenario={this.onDuplicateScenario}*!/*/}
-                {/*/>*/}
-                {/*</div>*/}
-                {/*<div style={{paddingLeft: '10px', width: '100%'}}>*/}
-                {/*    /!*{isAddStepOpen && step && <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step}*!/*/}
-                {/*    /!*                                    onChangeValue={this.onChangeValueOfStep} editMode={editMode}*!/*/}
-                {/*    /!*                                    processorsExportedFunctions={processorsExportedFunctions}*!/*/}
-                {/*    /!*                                    onAfterStepProcessorChange={this.onAfterStepProcessorChange}*!/*/}
-                {/*    /!*                                    onBeforeStepProcessorChange={this.onBeforeStepProcessorChange}*!/*/}
-                {/*    /!*                                    beforeStepProcessorValue={beforeStepProcessorValue}*!/*/}
-                {/*    /!*                                    afterStepProcessorValue={afterStepProcessorValue}*!/*/}
-                {/*</div>*/}
-
             </div>
         )
-    };
-
-    onBeforeStepProcessorChange = (value) => {
-        this.setState({beforeStepProcessorValue: value})
-    };
-
-    onAfterStepProcessorChange = (value) => {
-        this.setState({afterStepProcessorValue: value})
     };
 
     onChangeValueOfScenario = (key, value) => {

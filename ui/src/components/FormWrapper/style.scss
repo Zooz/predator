@@ -27,4 +27,8 @@
   margin-top:17px;
   padding-top:11px;
   width: 100%;
+  flex:1;
+  display:flex;
+  flex-direction: column;
+  overflow:hidden;
 }
