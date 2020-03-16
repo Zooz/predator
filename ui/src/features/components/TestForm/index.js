@@ -88,29 +88,29 @@ export class TestForm extends React.Component {
         const {name, description, baseUrl, processorId, editMode} = this.state;
         const error = createTestError || processorsError;
         return (
-            <Modal style={{paddingTop:'65px'}} height={'93%'} onExit={closeDialog}>
+            <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
                 <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
                     <div className={style['top']}>
                         <div className={style['top-inputs']}>
                             {/* left */}
 
                             <div className={style['input-container']}>
-                                <TitleInput style={{flex: '1',marginTop:'2px'}} title={'Name'}>
-                                    <TextArea value={name} onChange={(evt, value) => {
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Name'}>
+                                    <TextArea maxRows={5} value={name} onChange={(evt, value) => {
                                         this.setState({name: evt.target.value})
                                     }}/>
                                 </TitleInput>
                             </div>
                             <div className={style['input-container']}>
-                                <TitleInput style={{flex: '1',marginTop:'2px'}} title={'Description'}>
-                                    <TextArea maxRows={1} value={description} onChange={(evt, value) => {
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Description'}>
+                                    <TextArea maxRows={5} value={description} onChange={(evt, value) => {
                                         this.setState({description: evt.target.value})
                                     }}/>
                                 </TitleInput>
                             </div>
                             <div className={style['input-container']}>
-                                <TitleInput style={{flex: '1',marginTop:'2px'}} title={'Base url'}>
-                                    <TextArea value={baseUrl} placeholder={'http://my.api.com/'}
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Base url'}>
+                                    <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
                                               onChange={(evt, value) => {
                                                   this.setState({baseUrl: evt.target.value})
                                               }}/>
@@ -118,7 +118,7 @@ export class TestForm extends React.Component {
                             </div>
 
                             <div className={style['input-container']}>
-                                <TitleInput style={{flex: '1',marginTop:'2px'}} title={'Processor'}>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Processor'}>
                                     <ProcessorsDropDown
                                         onChange={this.onProcessorChosen} options={processorsList} value={processorId}
                                         loading={processorsLoading}/>
@@ -156,7 +156,7 @@ export class TestForm extends React.Component {
     generateBottomBar = () => {
         const {isLoading, closeDialog} = this.props;
 
-        return (<div style={{display: 'flex', justifyContent: 'flex-end', marginBottom:'10px'}}>
+        return (<div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '10px'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', width: '230px'}}>
                 <Button inverted onClick={closeDialog}>Cancel</Button>
                 <Button spinner={isLoading} hover disabled={!this.state.name}
@@ -250,7 +250,7 @@ export class TestForm extends React.Component {
     onDeleteScenario = () => {
         const {scenarios, currentScenarioIndex} = this.state;
         scenarios.splice(currentScenarioIndex, 1);
-        this.setState({scenarios,currentScenarioIndex:currentScenarioIndex-1});
+        this.setState({scenarios, currentScenarioIndex: currentScenarioIndex - 1});
     };
 
     onDuplicateScenario = () => {
@@ -322,7 +322,7 @@ export class TestForm extends React.Component {
                                     display: 'flex',
                                     alignItems: 'center',
                                     flexDirection: 'column',
-                                    flex:1
+                                    flex: 1
                                 }} tab={tabData.scenario_name || 'Scenario'}
                                               key={tabData.id}>
                                     {
