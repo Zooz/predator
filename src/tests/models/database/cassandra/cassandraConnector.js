@@ -9,6 +9,7 @@ const GET_TEST = 'SELECT * FROM tests WHERE id = ? ORDER BY updated_at DESC limi
 const GET_TEST_REVISIONS = 'SELECT * FROM tests WHERE id = ?';
 const GET_TESTS = 'SELECT * FROM tests';
 const DELETE_TEST = 'DELETE FROM tests WHERE id=?';
+const INSERT_BENCH_MARK_DATA_TEST = 'INSERT INTO benchmarks(test_id,data) values(?,?)';
 
 const INSERT_DSL_DEFINITION_IF_NOT_EXIST = 'INSERT INTO dsl(dsl_name, definition_name, artillery_json) values(?,?,?) IF NOT EXISTS';
 const UPDATE_DSL_DEFINITION = 'UPDATE dsl SET artillery_json= ? WHERE dsl_name = ? AND definition_name = ? IF EXISTS;';
@@ -32,7 +33,8 @@ module.exports = {
     updateDslDefinition,
     saveFile,
     getFile,
-    deleteDefinition
+    deleteDefinition,
+    insertTestBenchMark
 };
 
 let queryOptions = {
@@ -59,6 +61,12 @@ async function getTests() {
 
 async function deleteTest(testId){
     const result = await executeQuery(DELETE_TEST, [testId]);
+    return result;
+}
+
+async function insertTestBenchMark(testId, benchMarkData) {
+    testId = uuid.fromString(testId);
+    const result = await executeQuery(INSERT_BENCH_MARK_DATA_TEST, [testId, benchMarkData]);
     return result;
 }
 
