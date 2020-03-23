@@ -18,6 +18,8 @@ import StepsList from './stepsList';
 import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 
+const MAX_SUPPORTED_SCENARIOS_MESSAGE = 'Max supported number of scenarios by the UI is 10';
+
 export class TestForm extends React.Component {
     constructor(props) {
         super(props);
@@ -50,8 +52,13 @@ export class TestForm extends React.Component {
         }
     };
     onCloseErrorDialog = () => {
+        const {maxSupportedScenariosUi} = this.state;
         const {cleanAllErrors} = this.props;
         cleanAllErrors();
+        if(maxSupportedScenariosUi){
+            this.setState({maxSupportedScenariosUi: null})
+        }
+
     };
 
     componentDidUpdate(prevProps, prevState) {
@@ -85,8 +92,8 @@ export class TestForm extends React.Component {
 
     render() {
         const {createTestError, processorsError, closeDialog, processorsLoading, processorsList} = this.props;
-        const {name, description, baseUrl, processorId, editMode} = this.state;
-        const error = createTestError || processorsError;
+        const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi} = this.state;
+        const error = createTestError || processorsError || maxSupportedScenariosUi;
         return (
             <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
                 <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
@@ -163,9 +170,14 @@ export class TestForm extends React.Component {
                         onClick={this.postTest}>Submit</Button>
             </div>
         </div>)
-    }
+    };
     addScenarioHandler = () => {
         const {scenarios} = this.state;
+        if(scenarios && scenarios.length > 10 ){
+            this.setState({maxSupportedScenariosUi: MAX_SUPPORTED_SCENARIOS_MESSAGE});
+            return;
+        }
+
         const maxWeight = this.calcMaxAllowedWeight(scenarios.length);
         const scenarioId = uuid();
         scenarios.push({
