@@ -1,0 +1,64 @@
+@import 'defaults';
+
+.sectionWrapper {
+  display: flex;
+
+  &[data-border-right=true] {
+    border-right: $border;
+  }
+
+  &[data-border-left=true] {
+    border-left: $border;
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.section {
+  position: relative;
+  display: flex;
+  color: $sectionsTextColor;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  user-select: none;
+  padding: 0px 20px;
+  width: auto;
+  animation-name: section-appear;
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+
+  @keyframes section-appear {
+    0% {
+      visibility: hidden;
+      opacity: 0;
+    }
+    100% {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
+
+.section:hover {
+  z-index: 1;
+}
+
+.icon {
+  height: 100%;
+  font-family: FontAwesome;
+  font-size: 14px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+
+  &:not(:last-child) {
+    margin-right: 9px;
+  }
+}
+.text {
+  display: inline-flex;
+}

@@ -1,0 +1,10 @@
+@import '../styles/_colors';
+
+.tabs {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex:1;
+}

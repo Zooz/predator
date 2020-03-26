@@ -3,16 +3,15 @@ import React from 'react';
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
 import RectangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft'
-import TextField from 'material-ui/TextField';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import DropDownMenu from 'material-ui/DropDownMenu';
-import MenuItem from 'material-ui/MenuItem';
 import {cloneDeep} from 'lodash'
 import RequestOptions from './requestOptions';
 import ProcessorsDropDown from './ProcessorsDropDown';
 
 import style from './stepform.scss';
+import Input from "../../../components/Input";
+import TitleInput from "../../../components/TitleInput";
+import Button from "../../../components/Button";
+import Dropdown from "../../../components/Dropdown/Dropdown.export";
 
 export default (props) => {
     const sampleObject = {};
@@ -21,26 +20,26 @@ export default (props) => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.headers[index][key] = value;
-        onChangeValue(step)
+        onChangeValue(step, props.index);
     };
 
     const onAddHeader = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.headers.push({});
-        onChangeValue(step)
+        onChangeValue(step, props.index);
     };
     const onAddCapture = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.captures.push({});
-        onChangeValue(step)
+        onChangeValue(step, props.index);
     };
     const onCaptureChange = (key, value, index) => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.captures[index][key] = value;
-        onChangeValue(step)
+        onChangeValue(step, props.index);
     };
 
     const onBodyChange = (value) => {
@@ -48,7 +47,7 @@ export default (props) => {
             const {onChangeValue} = props;
             const step = cloneDeep(props.step);
             step.body = value.jsObject;
-            onChangeValue(step)
+            onChangeValue(step, props.index);
         }
     };
 
@@ -57,7 +56,7 @@ export default (props) => {
         const step = cloneDeep(props.step);
 
         step[key] = value;
-        onChangeValue(step);
+        onChangeValue(step, props.index);
     };
 
 
@@ -71,14 +70,17 @@ export default (props) => {
         <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
             <div className={style['http-methods-request-options-wrapper']}>
                 <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
-                    <HttpMethodDropdown
-                        value={step.method}
-                        onChange={(value) => onInputChange('method', value)}
-                    />
-                    <TextField value={step.url} style={{marginBottom: '-19px', width: '100%'}} hintText={'Enter url'}
-                               onChange={(event, value) => {
-                                   onInputChange('url', value)
-                               }}/>
+                    <TitleInput title={'Method'}>
+                        <HttpMethodDropdown
+                            value={step.method}
+                            onChange={(value) => onInputChange('method', value)}
+                        />
+                    </TitleInput>
+                    <TitleInput style={{width: '100%'}} title={'Enter Url'}>
+                        <Input value={step.url} onChange={(evt) => {
+                            onInputChange('url', evt.target.value)
+                        }}/>
+                    </TitleInput>
                 </RectangleAlignChildrenLeft>
 
                 <RequestOptions
@@ -89,31 +91,35 @@ export default (props) => {
                 />
             </div>
             <RectangleAlignChildrenLeft/>
-
-            Headers:
-            <DynamicKeyValueInput value={step.headers} onAdd={onAddHeader} onChange={onHeaderChange}/>
-            Captures:
-            <DynamicKeyValueInput value={step.captures} onAdd={onAddCapture} onChange={onCaptureChange}
+            <Header text={'Headers'}/>
+            <DynamicKeyValueInput value={step.headers} onChange={onHeaderChange}/>
+            <Button style={{width: '100px', minWidth: '0', marginBottom: '40px'}} inverted
+                    onClick={onAddHeader}>+Add</Button>
+            <Header text={'Captures'}/>
+            <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange}
                                   keyHintText={'$.id'} valueHintText={'id'}/>
-
-            Processors:
+            <Button style={{width: '100px', minWidth: '0', marginBottom: '40px'}} inverted
+                    onClick={onAddCapture}>+Add</Button>
+            <Header text={'Processors'}/>
             <div style={{
                 display: 'flex',
                 flexDirection: 'row',
                 width: '100%',
-                paddingLeft: '90px',
-                alignItems: 'center'
+                alignItems: 'center',
+                marginBottom: '40px'
             }}>
-                <div style={{whiteSpace: 'nowrap'}}>Before Request</div>
-                <ProcessorsDropDown options={processorsExportedFunctions}
-                                    onChange={(value) => onInputChange('beforeRequest', value)}
-                                    value={step.beforeRequest}/>
-                <div style={{whiteSpace: 'nowrap'}}>After Response</div>
-                <ProcessorsDropDown options={processorsExportedFunctions}
-                                    onChange={(value) => onInputChange('afterResponse', value)}
-                                    value={step.afterResponse}/>
+                <TitleInput title={'Before Request'}>
+                    <ProcessorsDropDown options={processorsExportedFunctions}
+                                        onChange={(value) => onInputChange('beforeRequest', value)}
+                                        value={step.beforeRequest}/>
+                </TitleInput>
+                <TitleInput title={'After Response'}>
+                    <ProcessorsDropDown options={processorsExportedFunctions}
+                                        onChange={(value) => onInputChange('afterResponse', value)}
+                                        value={step.afterResponse}/>
+                </TitleInput>
             </div>
-            Body:
+            <Header text={'Body'}/>
             <JSONInput
                 key={jsonObjectKey}
                 id='a_unique_id'
@@ -134,31 +140,25 @@ export default (props) => {
     )
 }
 
-const DynamicKeyValueInput = ({value, onChange, onAdd, keyHintText, valueHintText}) => {
+const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => {
     const headersList = value
         .map((header, index) => {
             return (
-                <div style={{display: 'flex', flexDirection: 'row', width: '100%'}} key={index}>
-                    <TextField onChange={(event, value) => {
-                        onChange('key', value, index)
-                    }} value={header.key} style={{width: '100%'}} hintText={keyHintText || 'key'}/>
-                    <TextField onChange={(event, value) => {
-                        onChange('value', value, index)
-                    }} value={header.value} style={{width: '100%'}} hintText={valueHintText || 'value'}/>
+                <div style={{display: 'flex', flexDirection: 'row', width: '100%',marginBottom: index!==headersList-1 ? '5px': undefined}} key={index}>
+                    <Input style={{marginRight:'10px'}} value={header.key} onChange={(evt) => {
+                        onChange('key', evt.target.value, index)
+                    }} placeholder={keyHintText || 'key'}/>
+
+                    <Input value={header.value} onChange={(evt) => {
+                        onChange('value', evt.target.value, index)
+                    }} placeholder={valueHintText || 'value'}/>
                 </div>
             )
         });
 
     return (
-        <div style={{display: 'flex', flexDirection: 'row', width: '100%'}}>
-            <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
-                {headersList}
-            </div>
-            <div>
-                <FloatingActionButton onClick={onAdd} mini>
-                    <ContentAdd/>
-                </FloatingActionButton>
-            </div>
+        <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '22px'}}>
+            {headersList}
         </div>
     )
 }
@@ -166,19 +166,36 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, keyHintText, valueHintTex
 const HttpMethodDropdown = (props) => {
     const httpMethods = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE'];
     const {onChange, value} = props;
-    return (<DropDownMenu
-        autoWidth={false}
-        style={{width: '150px', marginLeft: '-25px', height: '50px'}}
-        value={value}
-        onChange={(event, keyNumber, value) => {
-            onChange(value)
-        }}
-    >
-        {
-            httpMethods.map((method, index) => {
-                return (<MenuItem key={index} value={method} primaryText={method}/>
-                )
-            })
-        }
-    </DropDownMenu>);
+    return (
+        <Dropdown
+            options={httpMethods.map((option) => ({key: option, value: option}))}
+            selectedOption={{key: value, value: value}}
+            onChange={(selected)=>{
+                onChange(selected.value)
+            }}
+            placeholder={"Method"}
+            height={'35px'}
+            disabled={false}
+            validationErrorText=''
+            enableFilter={false}
+        />
+    )
+}
+
+
+const Header = ({text}) => {
+    return (
+        <div style={{
+            // fontFamily: 'Roboto',
+            fontSize: '20px',
+            fontWeight: '300',
+            fontStretch: 'normal',
+            fontStyle: 'italic',
+            color: '#778195',
+            lineHeight: 'normal',
+            letterSpacing: 'normal',
+            marginBottom: '11px'
+
+        }}>{text}</div>
+    )
 }

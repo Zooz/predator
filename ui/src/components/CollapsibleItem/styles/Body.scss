@@ -1,0 +1,16 @@
+@import 'defaults';
+
+.collapsibleBody {
+  border-top: $border;
+  overflow: visible;
+  max-height: var(--content-height);
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
+}
+
+.collapsibleBody--hidden {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
+}

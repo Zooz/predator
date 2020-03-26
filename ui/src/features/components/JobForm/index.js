@@ -224,8 +224,8 @@ class Form extends React.Component {
     render() {
         const {closeDialog, processingAction, serverError,clearErrorOnCreateJob} = this.props;
         return (
-            <Modal width={'50%'} onExit={closeDialog}>
-                <FormWrapper title={'Create a new job'} description={DESCRIPTION}>
+            <Modal style={{paddingTop:'64px'}} width={'50%'} onExit={closeDialog}>
+                <FormWrapper style={{height:null}} title={'Create a new job'} description={DESCRIPTION}>
                     <div style={{width: '100%'}}>
                         {this.FormList.map((oneItem, index) => {
                             return (<Fragment key={index}>

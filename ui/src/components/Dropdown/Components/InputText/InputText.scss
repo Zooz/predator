@@ -1,0 +1,32 @@
+@import "../../../../components/styles/_colors.scss";
+
+
+@mixin inputDefault {
+  font-weight: 400;
+  font-size: 1rem;
+  color: $text-black;
+  letter-spacing: normal;
+}
+
+@mixin inputPlaceholder {
+  @include inputDefault;
+  color: $disabled-grey-text;
+}
+
+@mixin inputView {
+  @include inputDefault;
+  color: $text-grey;
+}
+
+.InputText {
+  @include inputDefault;
+  line-height: 1.6183rem;
+
+  &--placeholder {
+    @include inputPlaceholder;
+  }
+
+  &--view {
+    @include inputView;
+  }
+}

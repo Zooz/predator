@@ -1,0 +1,12 @@
+@import "_colors";
+
+$border: solid 1px $borderColor;
+$transitionDuration: 0.4s;
+
+.disabled {
+  pointer-events: none;
+}
+
+.hidden {
+  visibility: hidden;
+}

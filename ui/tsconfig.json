@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base",
+  "compilerOptions": {
+    "noEmit": false
+  },
+  "include": [
+    ".storybook",
+    "config",
+    "regression",
+    "src/**/*",
+    "*.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

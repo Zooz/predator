@@ -1,18 +1,11 @@
 import RectangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft'
-import TextField from 'material-ui/TextField';
 import Slider from 'material-ui/Slider';
 
 import React from 'react';
 import ProcessorsDropDown from "./ProcessorsDropDown";
+import Input from "../../../components/Input";
+import TitleInput from "../../../components/TitleInput";
 
-const TextSideWrapper = ({title, children, textStyle = {}}) => {
-    return (
-        <RectangleAlignChildrenLeft>
-            <div style={{marginRight: '10px', width: '110px', ...textStyle}}>{title}</div>
-            <div style={{flex: 1}}>{children}</div>
-        </RectangleAlignChildrenLeft>
-    )
-};
 const AddScenarioForm = (props) => {
     const onChangeValue = (key, value) => {
         const {onChangeValue} = props;
@@ -22,26 +15,24 @@ const AddScenarioForm = (props) => {
     const {scenario, allowedWeight, processorsExportedFunctions} = props;
     return (
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'left', width: '100%'}}>
-            <TextSideWrapper title={'Scenario Name:'}>
-                <TextField id={'name'} value={scenario.scenario_name} onChange={(event, value) => {
-                    onChangeValue('scenario_name', value);
+
+            <TitleInput title={'Scenario Name'}>
+                <Input value={scenario.scenario_name} onChange={(evt) => {
+                    onChangeValue('scenario_name', evt.target.value);
+
                 }}/>
-            </TextSideWrapper>
+            </TitleInput>
 
-
-            <TextSideWrapper title={'Before Scenario:'} textStyle={{marginRight: -13}}>
+            <TitleInput style={{marginTop:'10px'}} title={'Before Scenario'}>
                 <ProcessorsDropDown options={processorsExportedFunctions}
                                     onChange={(value) => onChangeValue('beforeScenario', value)}
                                     value={scenario.beforeScenario}/>
-            </TextSideWrapper>
-
-            <TextSideWrapper title={'After Scenario:'} textStyle={{marginRight: -13}}>
+            </TitleInput>
+            <TitleInput style={{marginTop:'10px'}}  title={'After Scenario'}>
                 <ProcessorsDropDown options={processorsExportedFunctions}
-                onChange={(value) => onChangeValue('afterScenario', value)}
-                value={scenario.afterScenario}/>
-                </TextSideWrapper>
-
-
+                                    onChange={(value) => onChangeValue('afterScenario', value)}
+                                    value={scenario.afterScenario}/>
+            </TitleInput>
 
 
             <div style={{

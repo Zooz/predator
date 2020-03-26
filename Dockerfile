@@ -15,6 +15,9 @@ COPY /docs /usr/docs
 COPY /ui/src /usr/ui/src
 COPY /ui/config /usr/ui/config
 COPY /ui/package*.json /usr/ui/
+COPY /ui/tsconfig.base.json /usr/ui/
+COPY /ui/tsconfig.json /usr/ui/
+COPY /ui/tsconfig.declarations.json /usr/ui/
 COPY /ui/.babelrc /usr/ui
 ARG BUCKET_PATH
 ARG PREDATOR_DOCS_URL
