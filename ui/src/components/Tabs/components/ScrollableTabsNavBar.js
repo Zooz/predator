@@ -12,20 +12,24 @@ import reducer, { initialState } from './TabsScrollingReducer/reducer'
 
 import styles from './ScrollableTabsNavBar.scss'
 
-const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey }) => {
-  const [state, dispatch] = useReducer(reducer, { ...initialState })
-  const { shouldScroll, enableScrollLeft, enableScrollRight, scrollXValue } = state
-  const scrollWrapperRef = useRef(null)
-  const innerContainerWidthRef = useRef(0)
-  const activeTabSizesRef = useRef({ width: 0, offsetLeft: 0 })
+const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey}) => {
+  console.log("width init",width);
+  // width is all the scroll bar  but not init on strart
+  const [state, dispatch] = useReducer(reducer, {...initialState});
+  const {shouldScroll, enableScrollLeft, enableScrollRight, scrollXValue, currentTabs} = state;
+  const scrollWrapperRef = useRef(null);
+  const innerContainerWidthRef = useRef(0);
+  const activeTabSizesRef = useRef({width: 89, offsetLeft: 0});
 
   useEffect(() => {
     dispatch({
       type: actions.ON_MOUNT,
       innerScrollWidth: innerContainerWidthRef.current,
-      scrollWrapperWidth: scrollWrapperRef.current.clientWidth
+      scrollWrapperWidth: scrollWrapperRef.current.clientWidth,
+      currentTabs: tabs,
+      tabs
     })
-  }, [])
+  }, [tabs]);
 
   useEffect(() => {
     dispatch({
@@ -33,17 +37,18 @@ const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey }) => {
       tabOffsetLeft: activeTabSizesRef.current.offsetLeft,
       tabWidth: activeTabSizesRef.current.width
     })
-  }, [activeKey])
+  }, [activeKey]);
 
   useEffect(() => {
+    console.log("new width", width);
     dispatch({
       type: actions.ON_RESIZE,
       scrollWrapperWidth: scrollWrapperRef.current.clientWidth,
       tabOffsetLeft: activeTabSizesRef.current.offsetLeft,
       tabWidth: activeTabSizesRef.current.width,
       innerScrollWidth: innerContainerWidthRef.current
-    })
-  }, [width])
+    });
+  }, [width]);
 
   function handleScrollLeft () {
     if (enableScrollLeft) {
@@ -62,6 +67,8 @@ const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey }) => {
   }
 
   function setInnerContainerWidth (width) {
+    console.log("inner container", width);
+/// update  here the inneer container of inks .
     if (innerContainerWidthRef.current && innerContainerWidthRef.current !== width) {
       dispatch({
         type: actions.ON_RESIZE,
@@ -75,10 +82,10 @@ const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey }) => {
   }
 
   function setActiveTabSizes (width = 0, offsetLeft = 0) {
-    activeTabSizesRef.current = {
-      width,
-      offsetLeft
-    }
+    // activeTabSizesRef.current = {
+    //   width,
+    //   offsetLeft
+    // }
   }
 
   return (
@@ -100,7 +107,7 @@ const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey }) => {
       <InkedTabsBar
         activeKey={activeKey}
         onTabClick={handleTabClick}
-        tabs={tabs}
+        tabs={currentTabs}
         setContainerWidth={setInnerContainerWidth}
         setActiveTabSizes={setActiveTabSizes}
       />

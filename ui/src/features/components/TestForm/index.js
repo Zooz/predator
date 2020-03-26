@@ -18,8 +18,6 @@ import StepsList from './stepsList';
 import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 
-const MAX_SUPPORTED_SCENARIOS_MESSAGE = 'Max supported number of scenarios by the UI is 10';
-
 export class TestForm extends React.Component {
     constructor(props) {
         super(props);
@@ -173,10 +171,6 @@ export class TestForm extends React.Component {
     };
     addScenarioHandler = () => {
         const {scenarios} = this.state;
-        if(scenarios && scenarios.length > 10 ){
-            this.setState({maxSupportedScenariosUi: MAX_SUPPORTED_SCENARIOS_MESSAGE});
-            return;
-        }
 
         const maxWeight = this.calcMaxAllowedWeight(scenarios.length);
         const scenarioId = uuid();
@@ -324,8 +318,7 @@ export class TestForm extends React.Component {
                     <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
                     <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
                 </div>
-                <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey}
-                      className={style.tabs}>
+                <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey} className={style.tabs}>
                     {
                         tabsData.map((tabData, index) => {
                             return (

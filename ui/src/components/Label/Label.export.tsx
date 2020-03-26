@@ -17,6 +17,7 @@ export interface LabelComponent<T, P> extends React.RefForwardingComponent<T, P>
 }
 
 const Label: LabelComponent<HTMLLabelElement, LabelProps> = React.forwardRef(({
+
   className,
   type,
   ...rest
