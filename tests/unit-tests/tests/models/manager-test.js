@@ -49,8 +49,8 @@ describe('Scenario generator tests', function () {
             });
             insertStub.resolves();
 
-            return manager.insertTestBenchMark({
-                bench_mark: 'some bench_mark data' })
+            return manager.upsertTest({
+                testInfo: 'info' })
                 .then(function (result) {
                     insertStub.calledOnce.should.eql(true);
                     result.should.have.keys('id', 'revision_id');
