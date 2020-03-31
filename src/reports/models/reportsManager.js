@@ -4,7 +4,10 @@ const _ = require('lodash'),
     uuid = require('uuid/v4');
 
 const databaseConnector = require('./databaseConnector'),
+    testDbConnector = require('../../tests/models/database'),
     jobConnector = require('../../jobs/models/jobManager'),
+    aggregateReportGenerator = require('./aggregateReportGenerator'),
+    benchMarkCalculator = require('./benchMarkCalculator'),
     configHandler = require('../../configManager/models/configHandler'),
     notifier = require('./notifier'),
     constants = require('../utils/constants');
@@ -26,6 +29,7 @@ module.exports.getReport = async (testId, reportId) => {
     let report = await getReportResponse(reportSummary[0], config);
     return report;
 };
+
 
 module.exports.getReports = async (testId) => {
     let reportSummaries = await databaseConnector.getReports(testId);
@@ -73,6 +77,7 @@ module.exports.postStats = async (report, stats) => {
 
     if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE) {
         await databaseConnector.updateSubscriber(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
+        await updateReportBenchMark(report);
     } else {
         await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
     }
@@ -86,6 +91,20 @@ module.exports.postStats = async (report, stats) => {
 
     return stats;
 };
+
+async function updateReportBenchMark(report) {
+    const testBenchMarkData = await extractBenchMarkData(report.test_id);
+    if (!testBenchMarkData) {
+        const reportAggregate = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
+        const reportBenchMark = benchMarkCalculator.calculate(testBenchMarkData, reportAggregate.aggregate);
+        await databaseConnector.updateReportBenchMark(report.test_id, report.report_id, JSON.stringify(reportBenchMark));
+    }
+}
+
+async function extractBenchMarkData(testId) {
+    const res = await testDbConnector.getTestBenchMark(testId);
+    return res ? JSON.parse(res.data) : undefined;
+}
 
 function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();

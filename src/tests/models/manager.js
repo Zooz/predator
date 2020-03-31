@@ -12,7 +12,8 @@ module.exports = {
     getTests,
     deleteTest,
     getTestsByProcessorId,
-    insertTestBenchMark
+    insertTestBenchMark,
+    getBench
 };
 
 async function upsertTest(testRawData, existingTestId) {
@@ -32,6 +33,11 @@ async function insertTestBenchMark(benchMarkRawData, testId) {
     await database.insertTestBenchMark(testId, dataParse);
     return { test_id: testId, bench_mark_data: benchMarkRawData };
 }
+async function getBench(testId) {
+    const res = await database.getTestBenchMark(testId);
+    return res;
+}
+
 
 async function getTest(testId) {
     const result = await database.getTest(testId);

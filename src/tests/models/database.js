@@ -16,7 +16,8 @@ module.exports = {
     updateDslDefinition,
     getFile,
     deleteDefinition,
-    insertTestBenchMark
+    insertTestBenchMark,
+    getTestBenchMark
 };
 
 function insertTest(testInfo, testJson, id, revisionId, fileId) {
@@ -36,6 +37,10 @@ async function deleteTest(testId) {
 
 async function insertTestBenchMark(testId, benchMarkData) {
     return databaseConnector.insertTestBenchMark(testId, benchMarkData);
+}
+
+async function getTestBenchMark(id) {
+    return databaseConnector.getTestBenchMark(id);
 }
 
 async function getAllTestRevisions(testId) {
