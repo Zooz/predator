@@ -90,6 +90,19 @@ describe('Cassandra client tests', function () {
                 });
         });
     });
+    describe('Insert new bench mark', () => {
+        it('should succeed bench mark insert', async () => {
+            clientExecuteStub.resolves({ result: { rowLength: 0 } });
+            let id = uuid.v4();
+
+            let query = 'INSERT INTO benchmarks(test_id,data) values(?,?)';
+            await cassandraClient.insertTestBenchMark(id, JSON.stringify({ data: 'some data' }));
+            loggerErrorStub.callCount.should.eql(0);
+            clientExecuteStub.getCall(0).args[0].should.eql(query);
+            clientExecuteStub.getCall(0).args[1][0].should.eql(uuidCassandraDriver.fromString(id));
+            clientExecuteStub.getCall(0).args[1][1].should.eql(JSON.stringify({ data: 'some data' }));
+        });
+    });
 
     describe('Delete test', function () {
         it('Should delete single test successfully', () => {
@@ -103,7 +116,6 @@ describe('Cassandra client tests', function () {
                     res.should.eql(cassandraResponse);
                 });
         });
-
         it('Should get error because of cassandra error', function () {
             let query = 'DELETE FROM tests WHERE id=?';
             clientExecuteStub.rejects();

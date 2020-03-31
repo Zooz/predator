@@ -19,10 +19,12 @@ describe('Scenario generator tests', function () {
     let saveFileStub;
     let getFileStub;
     let getRequestStub;
+    let insertBenchMarkStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         insertStub = sandbox.stub(database, 'insertTest');
+        insertBenchMarkStub = sandbox.stub(database, 'insertTestBenchMark');
         getTestStub = sandbox.stub(database, 'getTest');
         getTestsStub = sandbox.stub(database, 'getTests');
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
@@ -47,13 +49,40 @@ describe('Scenario generator tests', function () {
             });
             insertStub.resolves();
 
-            return manager.upsertTest({
-                testInfo: 'info' })
+            return manager.insertTestBenchMark({
+                bench_mark: 'some bench_mark data' })
                 .then(function (result) {
                     insertStub.calledOnce.should.eql(true);
                     result.should.have.keys('id', 'revision_id');
                     Object.keys(result).length.should.eql(2);
                 });
+        });
+    });
+    describe('Create new bench mark for test', async () => {
+        it('Should save new bench mark for test', async () => {
+            insertBenchMarkStub.resolves();
+            getTestStub.resolves({ result: 'someTest' });
+            const result = manager.insertTestBenchMark({ bench_mark: 'some bench_mark data' }, 1234);
+            getTestStub.calledOnce.should.eql(true);
+            should(getTestStub.args).eql([[1234]]);
+            insertBenchMarkStub.calledOnce.should.eql(true);
+            result.should.have.keys('testId', 'bench_mark');
+            Object.keys(result).length.should.eql(2);
+            should(result).eql({
+                'testId': 1234,
+                'bench_mark': 'some bench_mark data'
+            });
+        });
+        it('Should  fail when test not exist', async () => {
+            insertBenchMarkStub.resolves();
+            getTestStub.resolves();
+            try {
+                await manager.insertTestBenchMark({ bench_mark: 'some bench_mark data' }, 1234);
+                should.fail('Expected to get error');
+            } catch (err) {
+                should(err.message).eql('Not found');
+                should(err.statusCode).eql(404);
+            }
         });
     });
     describe('Create new file for test', function () {
