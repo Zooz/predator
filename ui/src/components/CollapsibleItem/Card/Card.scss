@@ -1,0 +1,205 @@
+@import "./_defaults";
+
+@mixin upper-line {
+  &:after {
+    content: " ";
+    position: absolute;
+    display: inline-block;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+    border-bottom: 2px solid var(--upper-line-color, transparent);
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+@mixin active {
+  &[data-clickable="true"] {
+    &:active {
+      @content;
+    }
+  }
+}
+
+@mixin notActive {
+  &[data-clickable="true"] {
+    &:not(:active) {
+      @content;
+    }
+  }
+  &[data-clickable="false"] {
+    @content;
+  }
+}
+
+@mixin selectedIndication($isPlaceholder: false) {
+  &:after {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    pointer-events: none;
+    border-radius: $border-radius;
+    border: solid 2px transparent;
+    transition: border 0.2s;
+  }
+
+  @if ($isPlaceholder == true) {
+  } @else {
+    &:after {
+      border-color: $active-color;
+    }
+
+    &:before {
+      transition: all 0.3s;
+      text-align: center;
+      font-family: FontAwesome;
+      content: "\f00c";
+      font-size: 10px;
+      color: $white;
+      position: absolute;
+      padding-right: 1px;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 19px;
+      line-height: 19px;
+      background: $active-color;
+      border-bottom-right-radius: 13px;
+      border-top-left-radius: $border-radius;
+    }
+  }
+}
+
+@mixin selected {
+  @include selectedIndication(true);
+
+  &[data-selected="true"] {
+    @include selectedIndication(false);
+  }
+}
+
+@mixin hovering {
+  $box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08), 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+
+  &:not([data-selected="true"]) {
+    &[data-hoverable="true"] {
+      &:hover {
+        z-index: 4;
+        @content;
+        box-shadow: $box-shadow;
+      }
+    }
+
+    &[data-hovering="true"] {
+      z-index: 4;
+      @content;
+      box-shadow: $box-shadow;
+    }
+  }
+}
+
+.card {
+  transition: all 0.2s;
+  cursor: default;
+  border-radius: $border-radius;
+  box-shadow: 0 1px 9px 0 rgba(0, 0, 0, 0.05);
+  background: $background;
+  position: relative;
+  @include upper-line;
+
+  &__disabled {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: $disabled-grey-background;
+    opacity: 0.66;
+    border-radius: $border-radius;
+  }
+
+  &.card--default {
+    @include selected();
+    @include hovering();
+  }
+
+  &.card--clicker {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.19);
+
+    @include selected();
+    @include notActive {
+      @include hovering {
+        cursor: pointer;
+      }
+    }
+    @include active {
+      box-shadow: 0 1px 9px 0 rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  &.card--active {
+    background: $active-color;
+    box-shadow: 0 1px 9px 0 rgba(85, 126, 255, 0.25);
+
+    @include selectedIndication(true);
+  }
+
+  &.card--placeholder {
+    $placeholder-border-color: #abbfff;
+    box-shadow: none;
+    border: 1px dashed $placeholder-border-color;
+  }
+
+  &.card--disabled {
+    $disabled-border-color: $border-grey;
+    $disabled-background: $disabled-grey-background;
+
+    box-shadow: none;
+    background: $disabled-background;
+  }
+
+  &.card--negative {
+    --upper-line-color: #{$negative-color};
+    box-shadow: none;
+  }
+
+  &.card--positive {
+    --upper-line-color: #{$positive-color};
+    box-shadow: none;
+  }
+
+  &.card--success {
+    box-shadow: 0 2px 14px 0 rgba(3, 181, 113, 0.08), 0 2px 10px 0 rgba(3, 181, 113, 0.36);
+  }
+
+  &.card--failed {
+    box-shadow: 0 2px 14px 0 rgba(249, 69, 62, 0.08), 0 2px 10px 0 rgba(249, 69, 62, 0.36);
+  }
+
+  &.card--intermediate {
+    box-shadow: 0 2px 14px 0 rgba(235, 162, 5, 0.08), 0 2px 10px 0 rgba(235, 162, 5, 0.36);
+  }
+
+  &.card--error {
+    box-shadow: none;
+    border: 1px solid $negative-color;
+  }
+
+  &.card--message {
+    $message-background: #f1f3f6;
+
+    box-shadow: 0 19px 44px 0 rgba(0, 0, 0, 0.06);
+    background: $message-background;
+  }
+
+  &.card--dropdown {
+    box-shadow: 0 7px 40px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.card--indicator {
+    --upper-line-color: #{$default-blue};
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,15 @@
+@import '../../styles/_colors';
+@import '../_defaults';
+
+.tabs-container {
+  display: inline-block;
+  white-space: nowrap;
+  position: relative;
+  //height: 100%;
+  transition: transform 0.3s $animation-cubic-bezier;
+}
+
+.active-tab-ink {
+  border-bottom: 3px solid #557eff;
+  transition: transform 0.3s $animation-cubic-bezier, width 0.3s $animation-cubic-bezier;
+}

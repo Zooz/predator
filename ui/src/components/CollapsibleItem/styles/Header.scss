@@ -1,0 +1,70 @@
+@import 'defaults';
+
+.leftHeader {
+  display: flex;
+  flex: 1;
+  justify-content: left;
+  align-items: center;
+  font-size: 16px;
+  text-align: left;
+  overflow: hidden;
+}
+
+.rightHeader {
+  display: flex;
+  justify-content: right;
+  overflow: hidden;
+}
+
+.collapsibleHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 8px 21px;
+  color: $textColor;
+  letter-spacing: -0.2px;
+}
+
+.collapsibleHeader:not([editable=true]):hover {
+  cursor: pointer;
+}
+
+.collapsibleHeader[toggleable=false]:not([data-title-only="true"]) {
+  padding-right: 0;
+}
+
+.headerIcon {
+  font-family: FontAwesome;
+  font-size: 20px;
+  text-align: left;
+  color: $headerIconColor;
+  margin-right: 15px;
+}
+
+.headerTitle {
+  height: 100%;
+  font-size: 16px;
+  text-align: left;
+}
+
+.headerToggle {
+  padding-left: 20px;
+  font-family: FontAwesome;
+  border: none;
+  color: $iconColor;
+  transform: rotateX(0);
+  transition: 0.5s transform;
+}
+
+.toggleWrapper {
+  border-left: $border;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
+.headerToggle[rotate=true] {
+  transform: rotateX(180deg);
+}

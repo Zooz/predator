@@ -1,0 +1,43 @@
+.popper__arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  position: absolute;
+
+
+  &[data-placement^="top"] {
+    border-width: 5px 5px 0 5px;
+    border-color: white transparent transparent transparent;
+    bottom: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  &[data-placement^="bottom"] {
+    border-width: 0 5px 5px 5px;
+    border-color: transparent transparent white transparent;
+    top: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  &[data-placement^="right"] {
+    border-width: 5px 5px 5px 0;
+    border-color: transparent white transparent transparent;
+    left: -5px;
+    top: calc(50% - 5px);
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  &[data-placement^="left"] {
+    border-width: 5px 0 5px 5px;
+    border-color: transparent transparent transparent white;
+    right: -5px;
+    top: calc(50% - 5px);
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.base",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "types",
+    "skipLibCheck": true,
+    "emitDeclarationOnly": true,
+    "rootDir": "./src"
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/**/*.js",
+    "node_modules",
+    ".storybook",
+    "src/**/__stories__/**.*",
+    "src/**/__tests__/**.*",
+    "config",
+    "integration",
+    "pipeline-scripts"
+  ]
+}

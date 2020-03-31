@@ -1,25 +1,27 @@
 {
-  "presets": [
-    "es2015",
-    "stage-0",
-    "react"
-  ],
+  "comments": false,
   "plugins": [
-    "react-hot-loader/babel",
     [
-      "transform-runtime",
+      "@babel/plugin-proposal-decorators",
       {
-        "polyfill": false,
-        "regenerator": true
+        "legacy": true
       }
-    ]
+    ],
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-proposal-export-default-from",
+    "@babel/plugin-proposal-export-namespace-from"
   ],
-  "env": {
-    "build": {
-      "optional": [
-        "optimisation",
-        "minification"
-      ]
-    }
-  }
+  "presets": [
+    [
+      "@babel/preset-typescript",
+      {
+        "isTSX": true,
+        "allExtensions": true
+      }
+    ],
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ]
 }

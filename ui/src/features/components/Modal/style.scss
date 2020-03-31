@@ -6,6 +6,7 @@
   padding: 20px;
   border: 1px solid #888;
   width: 80%;
+  flex:1
 }
 
 .modal {
@@ -33,6 +34,8 @@
   flex-direction: row;
   justify-content: flex-end;
     svg {
+      position: absolute;
+      z-index: 2;
       font-size: 22px;
       color: #545454;
     }

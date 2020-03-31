@@ -11,7 +11,7 @@ import {
 
 import { PREDATOR_DOCS_URL } from '../App/common/env';
 
-module.exports = [
+export default [
     {
         key: 0,
         primaryText: 'Tests',

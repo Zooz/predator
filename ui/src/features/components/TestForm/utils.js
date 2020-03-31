@@ -30,18 +30,21 @@ export const createTestRequest = (data) => {
 export const createStateForEditTest = (test) => {
     test = cloneDeep(test);
     const {artillery_test} = test;
+    const scenarios = testScenarioToTestScenario(artillery_test.scenarios);
     return {
         name: test.name,
         description: test.description,
         id: test.id,
         baseUrl: artillery_test.config.target,
         before: testBeforeToStateBefore(artillery_test.before),
-        scenarios: testScenarioToTestScenario(artillery_test.scenarios),
+        scenarios: scenarios,
+        activeTabKey:scenarios[0] && scenarios[0].id,
         type: test.type,
         processorId: test.processor_id,
         editMode: true,
         processorsExportedFunctions: []
     }
+
 };
 
 function testBeforeToStateBefore(before) {
@@ -49,6 +52,9 @@ function testBeforeToStateBefore(before) {
         return;
     }
     return {
+        scenario_name: 'Before',
+        isBefore: true,
+        id: uuid(),
         steps: buildStepsFromFlow(before.flow)
     }
 }

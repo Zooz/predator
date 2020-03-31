@@ -1,0 +1,13 @@
+@import "../styles/colors";
+
+.tooltip {
+  position: relative;
+
+  &__content {
+    padding: 17px 20px;
+    line-height: 1.62;
+    white-space: pre;
+    max-height: 90vh;
+    overflow: auto;
+  }
+}

@@ -13,7 +13,7 @@ const UiSwitcher = (props) => {
       '--switch-space': `${switcherSpace}px`,
       '--ball-size': `${ballSize}px`
     }}>
-      <label>
+      <label style={{marginBottom: 0}}>
         <input
           checked={activeState}
           onChange={() => onChange(!activeState)}

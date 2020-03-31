@@ -1,36 +1,32 @@
 import React from 'react';
-import TextField from 'material-ui/TextField';
-import StepForm from './StepForm';
 import style from './style.scss';
 import * as Actions from '../../redux/action';
 import * as Selectors from '../../redux/selectors/testsSelector';
 import * as ProcessorsSelector from '../../redux/selectors/processorsSelector';
 import {connect} from 'react-redux';
-import AddButton from './addButton';
-import AddScenarioForm from './addScenarioForm';
 import Modal from '../Modal';
 import {createTestRequest, createStateForEditTest} from './utils';
-import ScenarioList from './scenarioList';
 import {v4 as uuid} from 'uuid';
 import {cloneDeep, reduce, isNumber} from 'lodash';
-import Button from '../Button';
+import Button from '../../../components/Button';
 import ErrorDialog from '../ErrorDialog';
 import ProcessorsDropDown from './ProcessorsDropDown';
-
+import Tabs from '../../../components/Tabs/Tabs'
+import TitleInput from "../../../components/TitleInput";
+import TextArea from "../../../components/TextArea";
+import StepsList from './stepsList';
+import FormWrapper from "../../../components/FormWrapper";
+import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 
 export class TestForm extends React.Component {
     constructor(props) {
         super(props);
-
         if (props.data) {
             this.state = createStateForEditTest(props.data);
         } else {
             this.state = {
-                isAddScenarioOpen: false,
-                isAddStepOpen: false,
                 scenarios: [],
                 before: null,
-                isBeforeSelected: false,
                 type: 'basic',
                 name: '',
                 baseUrl: '',
@@ -54,8 +50,13 @@ export class TestForm extends React.Component {
         }
     };
     onCloseErrorDialog = () => {
+        const {maxSupportedScenariosUi} = this.state;
         const {cleanAllErrors} = this.props;
         cleanAllErrors();
+        if(maxSupportedScenariosUi){
+            this.setState({maxSupportedScenariosUi: null})
+        }
+
     };
 
     componentDidUpdate(prevProps, prevState) {
@@ -79,7 +80,7 @@ export class TestForm extends React.Component {
             if (this.state.before) {
                 this.onChooseBefore()
             } else if (this.state.scenarios.length > 0) {
-                this.onChooseScenario(0);
+                this.onChooseScenario(this.state.scenarios[0].id);
             }
         } else {
             this.addScenarioHandler();
@@ -89,45 +90,54 @@ export class TestForm extends React.Component {
 
     render() {
         const {createTestError, processorsError, closeDialog, processorsLoading, processorsList} = this.props;
-        const {name, description, baseUrl, processorId} = this.state;
-        const error = createTestError || processorsError;
+        const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi} = this.state;
+        const error = createTestError || processorsError || maxSupportedScenariosUi;
         return (
-            <Modal onExit={closeDialog}>
-                <h1>Create Test</h1>
-                <div className={style['top']}>
-                    <div className={style['top-inputs']}>
-                        {/* left */}
-                        <div>
+            <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
+                <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
+                    <div className={style['top']}>
+                        <div className={style['top-inputs']}>
+                            {/* left */}
+
                             <div className={style['input-container']}>
-                                Name:<TextField value={name} onChange={(event, value) => {
-                                this.setState({name: value})
-                            }} hintText={'Test name'}/>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Name'}>
+                                    <TextArea maxRows={5} value={name} onChange={(evt, value) => {
+                                        this.setState({name: evt.target.value})
+                                    }}/>
+                                </TitleInput>
                             </div>
                             <div className={style['input-container']}>
-                                Description:<TextField value={description} onChange={(event, value) => {
-                                this.setState({description: value})
-                            }} hintText={'Description'}/>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Description'}>
+                                    <TextArea maxRows={5} value={description} onChange={(evt, value) => {
+                                        this.setState({description: evt.target.value})
+                                    }}/>
+                                </TitleInput>
                             </div>
-                        </div>
-                        <div>
                             <div className={style['input-container']}>
-                                Base url:<TextField value={baseUrl} onChange={(event, value) => {
-                                this.setState({baseUrl: value})
-                            }} hintText={'http://my.api.com/'}/>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Base url'}>
+                                    <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
+                                              onChange={(evt, value) => {
+                                                  this.setState({baseUrl: evt.target.value})
+                                              }}/>
+                                </TitleInput>
                             </div>
-                            <div className={style['input-container']}
-                                 style={{width: '376px'}}>Processor:<ProcessorsDropDown
-                                onChange={this.onProcessorChosen} options={processorsList} value={processorId}
-                                loading={processorsLoading}/>
+
+                            <div className={style['input-container']}>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Processor'}>
+                                    <ProcessorsDropDown
+                                        onChange={this.onProcessorChosen} options={processorsList} value={processorId}
+                                        loading={processorsLoading}/>
+                                </TitleInput>
+
                             </div>
                         </div>
                     </div>
-                    {this.generateAddsButtons()}
-                </div>
-                {/* bottom */}
-                {this.generateScenarioDashBoard()}
-                {this.generateBottomBar()}
-                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
+                    {/* bottom */}
+
+                    {this.generateScenarioDashBoard()}
+                    {this.generateBottomBar()}
+                    {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
+                </FormWrapper>
             </Modal>
         )
     }
@@ -151,35 +161,47 @@ export class TestForm extends React.Component {
     generateBottomBar = () => {
         const {isLoading, closeDialog} = this.props;
 
-        return (<div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            <div style={{display: 'flex', justifyContent: 'space-between', width: '340px'}}>
-                <Button label={'CANCEL'} onClick={closeDialog}/>
-                <Button isLoading={isLoading} disabled={!this.state.name} onClick={this.postTest} label={'SAVE'}/>
+        return (<div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '10px'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '230px'}}>
+                <Button inverted onClick={closeDialog}>Cancel</Button>
+                <Button spinner={isLoading} hover disabled={!this.state.name}
+                        onClick={this.postTest}>Submit</Button>
             </div>
         </div>)
-    }
+    };
     addScenarioHandler = () => {
         const {scenarios} = this.state;
+
         const maxWeight = this.calcMaxAllowedWeight(scenarios.length);
-        scenarios.push({id: uuid(), steps: [], weight: maxWeight, scenario_name: 'Scenario ' + (scenarios.length + 1)});
+        const scenarioId = uuid();
+        scenarios.push({
+            id: scenarioId,
+            steps: [],
+            weight: maxWeight,
+            scenario_name: 'Scenario ' + (scenarios.length + 1)
+        });
         this.setState({
             scenarios,
-            isAddStepOpen: false,
-            isAddScenarioOpen: true,
             currentScenarioIndex: scenarios.length - 1,
             isBeforeSelected: false
         })
     };
 
     addBeforeHandler = () => {
-        const before = {id: uuid(), steps: [this.initStep()]};
+        const before = {
+            id: uuid(), scenario_name: 'Before',
+            isBefore: true,
+            steps: [this.initStep()]
+        };
         this.setState({before});
-        this.setState({isAddStepOpen: true, currentStepIndex: 0, currentScenarioIndex: null, isBeforeSelected: true})
+        this.setState({currentScenarioIndex: null})
     };
     addStepHandler = () => {
-        const {scenarios, currentScenarioIndex, isBeforeSelected, before} = this.state;
+        const {scenarios, currentScenarioIndex, before} = this.state;
+
         let steps;
-        if (isBeforeSelected) {
+        if (currentScenarioIndex === null) {
+            //should be before selected
             steps = before.steps;
         } else {
             steps = scenarios[currentScenarioIndex].steps;
@@ -188,72 +210,53 @@ export class TestForm extends React.Component {
         this.setState({
             scenarios,
             before,
-            isAddStepOpen: true,
-            isAddScenarioOpen: false,
-            currentStepIndex: steps.length - 1
         })
     };
 
     initStep() {
-        return {id: uuid(), method: 'POST', headers: [{}], captures: [{}]}
+        return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: ''}
     }
 
-    generateAddsButtons = () => {
-        const {before, scenarios} = this.state;
-        return (
-            <div className={style['add-buttons-container']}>
-                <AddButton disabled={!!before} title={'before'} onClick={this.addBeforeHandler}/>
-                <AddButton title={'scenario'} onClick={this.addScenarioHandler}/>
-                <AddButton disabled={scenarios.length === 0 && !before} title={'steps'} onClick={this.addStepHandler}/>
-            </div>
-        )
-    };
-
-    onChooseScenario = (index) => {
+    onChooseScenario = (key) => {
+        const scenarioResult = this.state.scenarios.findIndex((scenario) => scenario.id === key);
+        let currentScenarioIndex = null;
+        if (scenarioResult !== -1) {
+            currentScenarioIndex = scenarioResult
+        }
         this.setState({
-            isAddStepOpen: false,
-            isAddScenarioOpen: true,
             currentStepIndex: null,
-            currentScenarioIndex: index,
-            isBeforeSelected: false
+            currentScenarioIndex
         })
     };
 
-    onChooseStep = (index) => {
-        this.setState({isAddStepOpen: true, isAddScenarioOpen: false, currentStepIndex: index})
-    };
     onChooseBefore = () => {
         this.setState({
-            isAddStepOpen: true,
-            isAddScenarioOpen: false,
-            isBeforeSelected: true,
-            currentStepIndex: 0,
             currentScenarioIndex: null
         })
     };
-    onDeleteStep = () => {
-        const {scenarios, currentStepIndex, before, isBeforeSelected} = this.state;
+    onDeleteStep = (stepIndex) => {
+        const {scenarios, before, currentScenarioIndex} = this.state;
 
         let steps = this.getStepsByCurrentState();
-        steps.splice(currentStepIndex, 1);
-        if (isBeforeSelected && steps.length === 0) {
-            this.setState({scenarios, before: undefined, currentStepIndex, isBeforeSelected: false});
+        steps.splice(stepIndex, 1);
+        if (currentScenarioIndex === null && steps.length === 0) {
+            this.setState({scenarios, before: undefined, currentScenarioIndex: 0});
         } else {
-            this.setState({scenarios, before, currentStepIndex});
+            this.setState({scenarios, before});
         }
     };
-    onDuplicateStep = () => {
-        const {scenarios, currentStepIndex} = this.state;
+    onDuplicateStep = (stepIndex) => {
+        const {scenarios} = this.state;
         let steps = this.getStepsByCurrentState();
-        const duplicatedStep = cloneDeep(steps[currentStepIndex]);
+        const duplicatedStep = cloneDeep(steps[stepIndex]);
         duplicatedStep.id = uuid();
-        steps.splice(currentStepIndex, 0, duplicatedStep);
+        steps.splice(stepIndex, 0, duplicatedStep);
         this.setState({scenarios});
     };
     onDeleteScenario = () => {
         const {scenarios, currentScenarioIndex} = this.state;
         scenarios.splice(currentScenarioIndex, 1);
-        this.setState({scenarios});
+        this.setState({scenarios, currentScenarioIndex: currentScenarioIndex - 1});
     };
 
     onDuplicateScenario = () => {
@@ -265,30 +268,17 @@ export class TestForm extends React.Component {
     };
 
     getStepsByCurrentState = () => {
-        const {scenarios, currentScenarioIndex, before, isBeforeSelected} = this.state;
+        const {scenarios, currentScenarioIndex, before} = this.state;
         let steps;
-        if (isBeforeSelected) {
-            steps = before.steps
-        } else {
+        if (currentScenarioIndex !== null) {
             steps = scenarios[currentScenarioIndex].steps;
+        } else {
+            steps = before.steps
+
         }
         return steps;
     };
 
-    updateStepOrder = (dragIndex, hoverIndex) => {
-        const {scenarios, currentScenarioIndex, before, isBeforeSelected} = this.state;
-        let steps;
-        if (isBeforeSelected) {
-            steps = before.steps
-        } else {
-            steps = scenarios[currentScenarioIndex].steps;
-        }
-        const step = steps[dragIndex];
-        steps.splice(dragIndex, 1);
-        steps.splice(hoverIndex, 0, step);
-
-        this.setState({scenarios, before, currentStepIndex: hoverIndex});
-    };
     calcMaxAllowedWeight = (index) => {
         const {scenarios, currentScenarioIndex} = this.state;
         const exceptIndex = index || currentScenarioIndex;
@@ -303,63 +293,74 @@ export class TestForm extends React.Component {
     };
     generateScenarioDashBoard = () => {
         const {
-            isAddStepOpen, isAddScenarioOpen, scenarios, before, currentScenarioIndex, currentStepIndex, isBeforeSelected, editMode,
-            afterStepProcessorValue, beforeStepProcessorValue,
+            scenarios, before, currentScenarioIndex,
             processorsExportedFunctions
         } = this.state;
-        const scenario = scenarios[currentScenarioIndex];
-
-        let step;
-        if (isBeforeSelected) {
-            step = before.steps[currentStepIndex];
+        let tabsData;
+        if (before) {
+            tabsData = [before, ...scenarios];
         } else {
-            step = scenario ? scenario.steps[currentStepIndex] : undefined;
+            tabsData = [...scenarios];
         }
+
+        const activeTabKey = currentScenarioIndex === null ? before.id : scenarios[currentScenarioIndex] && scenarios[currentScenarioIndex].id;
         return (
             <div className={style['bottom']}>
                 {/* bottom */}
-                <div style={{display: 'flex', flexDirection: 'column', width: '200px'}}>
-                    <ScenarioList
-                        scenarios={scenarios}
-                        before={before}
-                        currentScenarioIndex={currentScenarioIndex}
-                        currentStepIndex={currentStepIndex}
-                        updateStepOrder={this.updateStepOrder}
-                        onChooseScenario={this.onChooseScenario}
-                        onChooseStep={this.onChooseStep}
-                        onChooseBefore={this.onChooseBefore}
-                        isBeforeSelected={isBeforeSelected}
-                        onDuplicateStep={this.onDuplicateStep}
-                        onDeleteStep={this.onDeleteStep}
-                        onDeleteScenario={this.onDeleteScenario}
-                        onDuplicateScenario={this.onDuplicateScenario}
-                    />
+                <div style={{
+                    marginLeft: 'auto',
+                    marginRight: '12px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '250px'
+                }}>
+                    <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
+                    <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
+                    <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
                 </div>
-                <div style={{paddingLeft: '10px', width: '100%'}}>
-                    {isAddStepOpen && step && <StepForm key={`${currentScenarioIndex}_${currentStepIndex}`} step={step}
-                                                        onChangeValue={this.onChangeValueOfStep} editMode={editMode}
-                                                        processorsExportedFunctions={processorsExportedFunctions}
-                                                        onAfterStepProcessorChange={this.onAfterStepProcessorChange}
-                                                        onBeforeStepProcessorChange={this.onBeforeStepProcessorChange}
-                                                        beforeStepProcessorValue={beforeStepProcessorValue}
-                                                        afterStepProcessorValue={afterStepProcessorValue}
-                    />}
-                    {isAddScenarioOpen && scenario &&
-                    <AddScenarioForm allowedWeight={this.calcMaxAllowedWeight()} key={currentScenarioIndex}
-                                     scenario={scenario} onChangeValue={this.onChangeValueOfScenario}
-                                     processorsExportedFunctions={processorsExportedFunctions}/>
+                <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey} className={style.tabs}>
+                    {
+                        tabsData.map((tabData, index) => {
+                            return (
+                                <Tabs.TabPane style={{
+                                    padding: '10px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    flexDirection: 'column',
+                                    flex: 1
+                                }} tab={tabData.scenario_name || 'Scenario'}
+                                              key={tabData.id}>
+                                    {
+                                        !tabData.isBefore &&
+                                        <div style={{width: "80%"}}>
+
+                                            <CollapsibleScenarioConfig
+                                                allowedWeight={this.calcMaxAllowedWeight()}
+                                                scenario={tabData}
+                                                onChangeValueOfScenario={this.onChangeValueOfScenario}
+                                                processorsExportedFunctions={processorsExportedFunctions}
+                                                onDeleteScenario={this.onDeleteScenario}
+                                                onDuplicateScenario={this.onDuplicateScenario}
+                                            />
+                                        </div>
+
+                                    }
+                                    <div style={{width: "70%"}}>
+                                        <StepsList steps={tabData.steps}
+                                                   onChangeValueOfStep={this.onChangeValueOfStep}
+                                                   processorsExportedFunctions={processorsExportedFunctions}
+                                                   onDeleteStep={this.onDeleteStep}
+                                                   onDuplicateStep={this.onDuplicateStep}
+                                        />
+                                    </div>
+
+                                </Tabs.TabPane>
+                            )
+                        })
                     }
-                </div>
+                </Tabs>
             </div>
         )
-    };
-
-    onBeforeStepProcessorChange = (value) => {
-        this.setState({beforeStepProcessorValue: value})
-    };
-
-    onAfterStepProcessorChange = (value) => {
-        this.setState({afterStepProcessorValue: value})
     };
 
     onChangeValueOfScenario = (key, value) => {
@@ -368,12 +369,12 @@ export class TestForm extends React.Component {
 
         this.setState({scenarios: scenarios});
     };
-    onChangeValueOfStep = (newStep) => {
-        const {scenarios, currentScenarioIndex, currentStepIndex, before, isBeforeSelected} = this.state;
-        if (isBeforeSelected) {
-            before.steps[currentStepIndex] = newStep;
+    onChangeValueOfStep = (newStep, index) => {
+        const {scenarios, currentScenarioIndex, before} = this.state;
+        if (currentScenarioIndex === null) {
+            before.steps[index] = newStep;
         } else {
-            scenarios[currentScenarioIndex].steps[currentStepIndex] = newStep;
+            scenarios[currentScenarioIndex].steps[index] = newStep;
         }
         this.setState({scenarios: scenarios, before});
     };

@@ -1,0 +1,21 @@
+@import "../../../styles/_colors.scss";
+
+.list__item {
+  cursor: pointer;
+  display: flex;
+  padding: 0 20px;
+  height: 24px;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover:not(&--disabled) {
+    background: $default-blue;
+    color: $white;
+  }
+
+  &--disabled {
+    cursor: default;
+  }
+}

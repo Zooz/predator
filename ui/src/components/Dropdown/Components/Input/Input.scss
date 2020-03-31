@@ -1,0 +1,47 @@
+@import "../../../styles/_colors.scss";
+
+.input {
+  width: 100%;
+  height: var(--height);
+  position: relative;
+  color: $text-black;
+  font-size: 13px;
+  background-color: $white;
+  border: 1px solid $border-grey;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  overflow: hidden;
+  padding: calc((var(--height) - 27px) / 2) 4px;
+
+  &.input--open, &:focus {
+    outline: none;
+    border: 1px solid $default-blue;
+    box-shadow: inset 0 0 5px 0 rgba(13, 145, 189, 0.25);
+    z-index: 1000;
+    min-height: var(--height);
+    display: flex;
+  }
+
+  &.input--closed {
+    height: var(--height);
+    display: flex;
+  }
+
+  &.input--error {
+    border-color: $error-red;
+  }
+
+  &.input--disabled {
+    background: #f7f7f7;
+    color: #c2c2c2;
+    pointer-events: none;
+  }
+
+  &.input--overflowed {
+    overflow: auto;
+    height: auto;
+    min-height: var(--height);
+    padding-bottom: 0;
+  }
+}

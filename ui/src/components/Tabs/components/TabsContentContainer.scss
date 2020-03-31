@@ -1,0 +1,11 @@
+@import '../_defaults';
+
+.tabs-content {
+  flex:1;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  transition: transform 0.3s $animation-cubic-bezier;
+  overflow: hidden;
+}
+//TODO  //

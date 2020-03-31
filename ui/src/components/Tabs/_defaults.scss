@@ -1,0 +1,9 @@
+$animation-cubic-bezier: cubic-bezier(0.645, 0.045, 0.355, 1);
+$button-width-size: 32;
+$button-width: #{$button-width-size}px;
+$no-scroll-padding: 12;
+
+:export {
+  button-width-size: $button-width-size;
+  no-scroll-padding: $no-scroll-padding;
+}
