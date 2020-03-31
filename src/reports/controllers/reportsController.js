@@ -25,6 +25,16 @@ module.exports.getReport = async (req, res, next) => {
     return res.send(reportSummary);
 };
 
+module.exports.editReport = async (req, res, next) => {
+    try {
+        await reports.editReport(req.params.test_id, req.params.report_id, req.body);
+    } catch (err) {
+        return next(err);
+    }
+
+    return res.status(204).send();
+};
+
 module.exports.getReports = async (req, res, next) => {
     let reportSummaries;
     try {

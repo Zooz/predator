@@ -9,6 +9,7 @@ const isRowAppliedField = '[applied]';
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const INSERT_LAST_REPORT_SUMMARY = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary SET phase=?, last_updated_at=? WHERE test_id=? AND report_id=?';
+const UPDATE_REPORT_NOTES_SUMMARY = 'UPDATE reports_summary SET notes=?, last_updated_at=? WHERE test_id=? AND report_id=?';
 const UPDATE_LAST_REPORT_SUMMARY = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time=? AND test_id=? AND report_id=?';
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
@@ -24,6 +25,7 @@ module.exports = {
     init,
     insertReport,
     updateReport,
+    updateReportNotes,
     getReport,
     getReports,
     getLastReports,
@@ -74,6 +76,12 @@ async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
     params = [phaseIndex, lastUpdatedAt, testId, reportId];
     updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt);
     return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
+}
+
+async function updateReportNotes(testId, reportId, notes, lastUpdatedAt) {
+    let params;
+    params = [notes, lastUpdatedAt, testId, reportId];
+    return executeQuery(UPDATE_REPORT_NOTES_SUMMARY, params, queryOptions);
 }
 
 async function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt) {

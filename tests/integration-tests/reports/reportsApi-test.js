@@ -48,7 +48,7 @@ describe('Integration tests for the reports api', function() {
     });
 
     afterEach(async function () {
-        await mailhogHelper.clearAllOldMails();
+        // await mailhogHelper.clearAllOldMails();
     });
 
     describe('Happy flow - no parallelism', function () {
@@ -125,7 +125,41 @@ describe('Integration tests for the reports api', function() {
                 });
             });
         });
+        describe('edit report', function () {
+            it('should successfully edit report notes', async function () {
+                const reportBody = minimalReportBody;
+                const jobResponse = await createJob(testId);
+                jobBody = jobResponse.body;
+                jobId = jobResponse.body.id;
+                reportBody.job_id = jobId;
+                reportBody.runner_id = uuid();
 
+                const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
+                should(reportResponse.statusCode).be.eql(201);
+
+                const editBody = {
+                    notes: 'edited notes'
+                };
+                let editReportResponse = await reportsRequestCreator.editReport(testId, reportId, editBody);
+                should(editReportResponse.statusCode).eql(204);
+
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                let report = getReportResponse.body;
+                should(report.status).eql('initializing');
+                should(report.notes).eql(editBody.notes);
+                should(report.max_virtual_users).eql(jobBody.max_virtual_users);
+                should(report.arrival_rate).eql(jobBody.arrival_rate);
+                should(report.duration).eql(jobBody.duration);
+                should(report.ramp_to).eql(jobBody.ramp_to);
+            });
+            it('when report id does not exist - should return 404', async function () {
+                let editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { notes: 'dfdsf' });
+                should(editReportResponse.statusCode).eql(404);
+                should(editReportResponse.body).eql({
+                    "message": "Not found"
+                });
+            });
+        });
         describe('Create report, post stats, and get final report', function () {
             describe('Create report with all fields, and post full cycle stats', async function () {
                 before(async function () {

@@ -7,7 +7,8 @@ const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
     notifier = require('./notifier'),
-    constants = require('../utils/constants');
+    constants = require('../utils/constants'),
+    { ERROR_MESSAGES } = require('../../common/consts');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
 
@@ -44,6 +45,22 @@ module.exports.getLastReports = async (limit) => {
         return getReportResponse(summaryRow, config);
     });
     return reports;
+};
+
+module.exports.editReport = async (testId, reportId, reportBody) => {
+    // currently we support only edit for notes
+    const { notes } = reportBody;
+    const editTime = new Date();
+    const report = await databaseConnector.getReport(testId, reportId);
+    console.log('result', report);
+    if (report.length === 0){
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
+
+    await databaseConnector.updateReportNotes(testId, reportId, notes, editTime);
+    return reportBody;
 };
 
 module.exports.postReport = async (testId, reportBody) => {

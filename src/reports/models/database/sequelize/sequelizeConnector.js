@@ -11,6 +11,7 @@ module.exports = {
     insertReport,
     insertStats,
     updateReport,
+    updateReportNotes,
     getReport,
     getReports,
     getLastReports,
@@ -72,6 +73,21 @@ async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
 
     return report.update({
         phase: phaseIndex,
+        last_updated_at: lastUpdatedAt
+    }, options);
+}
+
+async function updateReportNotes(testId, reportId, notes, lastUpdatedAt) {
+    const report = client.model('report');
+    const options = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+
+    return report.update({
+        notes: notes,
         last_updated_at: lastUpdatedAt
     }, options);
 }
