@@ -93,7 +93,79 @@ describe('the tests api', function() {
             });
         });
     });
+    describe('create bench mark for test', () => {
+        it('Create bench mark with partial body for existing test', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const benchMarkRequest = {
+                'rps': {
+                    'count': 1270,
+                    'mean': 46.74
+                }
+            };
+            const testId = createTestResponse.body.id;
+            const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
+            const { body } = benchMarkResult;
+            should(benchMarkResult.statusCode).eql(201);
+            should(body.test_id).eql(testId);
+            should(body.bench_mark_data).eql(benchMarkRequest);
 
+        });
+        it('Create bench mark with full body for existing test', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const benchMarkRequest = {
+                "rps": {
+                    "count": 1270,
+                    "mean": 46.74
+                },
+                "latency": {
+                    "min": 419.1,
+                    "max": 1295.4,
+                    "median": 553.9,
+                    "p95": 763.8,
+                    "p99": 929.5
+                },
+                "errors": {
+                    "500":12
+                },
+                "codes": {
+                    "200": 161,
+                    "201": 1061,
+                    "409": 53
+                }
+            };
+            const testId = createTestResponse.body.id;
+            const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
+            const { body } = benchMarkResult;
+            should(benchMarkResult.statusCode).eql(201);
+            should(body.test_id).eql(testId);
+            should(body.bench_mark_data).eql(benchMarkRequest);
+
+        });
+        it('try to create bench mark for not existing test', async () => {
+            const benchMarkRequest = {
+                'rps': {
+                    'count': 1270,
+                    'mean': 46.74
+                }
+            };
+            const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
+            should(benchMarkResult.body.message).eql('Not found');
+            should(benchMarkResult.statusCode).eql(404);
+        });
+        it('try to create bench mark with not valid body and fail', async () => {
+            const benchMarkRequest = {
+                'not_valid': {
+                    'count': 1270,
+                    'mean': 46.74
+                }
+            };
+            const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
+            should(benchMarkResult.body.message).eql('Input validation error');
+            should(benchMarkResult.statusCode).eql(400);
+        });
+    });
     describe('Good request tests', function() {
         it('Should get 404 for for not existing test', function(){
             return testsRequestSender.getTest(uuid.v4(), validHeaders)
@@ -101,36 +173,6 @@ describe('the tests api', function() {
                     res.statusCode.should.eql(404);
                     res.body.should.eql({ message: 'Not found' });
                 });
-        });
-        describe('create bench mark for test',  ()=> {
-            it('Create bench mark for existing test', async () => {
-                const requestBody = simpleTest.test;
-                const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
-                const benchMarkRequest = {
-                    'rps': {
-                        'count': 1270,
-                        'mean': 46.74
-                    }
-                };
-                const testId = createTestResponse.body.id;
-                const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
-                const { body } = benchMarkResult;
-                should(benchMarkResult.statusCode).eql(201);
-                should(body.test_id).eql(testId);
-                should(body.bench_mark_data).eql(benchMarkRequest);
-
-            });
-            it('try to create bench mark for not existing test', async () => {
-                const benchMarkRequest = {
-                    'rps': {
-                        'count': 1270,
-                        'mean': 46.74
-                    }
-                };
-                const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
-                should(benchMarkResult.body.message).eql('Not found');
-                should(benchMarkResult.statusCode).eql(404);
-            });
         });
         describe('simple test with dsl', function () {
             it('Create test, update test, delete test, get test', async () => {

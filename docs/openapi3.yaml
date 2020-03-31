@@ -281,7 +281,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  '/v1/test/{test_id}/bench_mark':
+  /v1/tests/{test_id}/bench_mark:
     post:
       tags:
         - Tests
@@ -1425,6 +1425,7 @@ components:
 
     bench_mark_request:
       type: object
+      additionalProperties: false
       properties:
         errors:
           type: object

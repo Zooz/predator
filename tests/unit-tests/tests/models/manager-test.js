@@ -61,10 +61,7 @@ describe('Scenario generator tests', function () {
     describe('Create new bench mark for test', async () => {
         it('Should save new bench mark for test', async () => {
             insertBenchMarkStub.resolves();
-            getTestStub.resolves({ result: 'someTest' });
             const result = await manager.insertTestBenchMark({ rps: 'some bench_mark data' }, 1234);
-            getTestStub.calledOnce.should.eql(true);
-            should(getTestStub.args).eql([[1234]]);
             insertBenchMarkStub.calledOnce.should.eql(true);
             result.should.have.keys('test_id', 'bench_mark_data');
             Object.keys(result).length.should.eql(2);
@@ -72,17 +69,6 @@ describe('Scenario generator tests', function () {
                 'test_id': 1234,
                 'bench_mark_data': { rps: 'some bench_mark data' }
             });
-        });
-        it('Should  fail when test not exist', async () => {
-            insertBenchMarkStub.resolves();
-            getTestStub.resolves();
-            try {
-                await manager.insertTestBenchMark({ bench_mark: 'some bench_mark data' }, 1234);
-                should.fail('Expected to get error');
-            } catch (err) {
-                should(err.message).eql('Not found');
-                should(err.statusCode).eql(404);
-            }
         });
     });
     describe('Create new file for test', function () {
