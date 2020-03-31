@@ -102,6 +102,36 @@ describe('the tests api', function() {
                     res.body.should.eql({ message: 'Not found' });
                 });
         });
+        describe('create bench mark for test',  ()=> {
+            it('Create bench mark for existing test', async () => {
+                const requestBody = simpleTest.test;
+                const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+                const benchMarkRequest = {
+                    'rps': {
+                        'count': 1270,
+                        'mean': 46.74
+                    }
+                };
+                const testId = createTestResponse.body.id;
+                const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
+                const { body } = benchMarkResult;
+                should(benchMarkResult.statusCode).eql(201);
+                should(body.test_id).eql(testId);
+                should(body.bench_mark_data).eql(benchMarkRequest);
+
+            });
+            it('try to create bench mark for not existing test', async () => {
+                const benchMarkRequest = {
+                    'rps': {
+                        'count': 1270,
+                        'mean': 46.74
+                    }
+                };
+                const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
+                should(benchMarkResult.body.message).eql('Not found');
+                should(benchMarkResult.statusCode).eql(404);
+            });
+        });
         describe('simple test with dsl', function () {
             it('Create test, update test, delete test, get test', async () => {
                 let requestBody = simpleTest.test;

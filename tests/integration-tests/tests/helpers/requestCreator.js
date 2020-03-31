@@ -18,7 +18,8 @@ module.exports = {
     getTests,
     getFile,
     getTest,
-    getAllRevisions
+    getAllRevisions,
+    createBenchMark
 };
 async function init() {
     try {
@@ -80,6 +81,15 @@ function createTest(body, headers) {
         .send(body)
         .set(headers)
         .expect(function(res){
+            return res;
+        });
+}
+
+function createBenchMark(testId, body, headers) {
+    return request(app).post('/v1/tests/' + testId + '/bench_mark')
+        .send(body)
+        .set(headers)
+        .expect(function (res) {
             return res;
         });
 }

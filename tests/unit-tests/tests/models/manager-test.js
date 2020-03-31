@@ -62,15 +62,15 @@ describe('Scenario generator tests', function () {
         it('Should save new bench mark for test', async () => {
             insertBenchMarkStub.resolves();
             getTestStub.resolves({ result: 'someTest' });
-            const result = manager.insertTestBenchMark({ bench_mark: 'some bench_mark data' }, 1234);
+            const result = await manager.insertTestBenchMark({ rps: 'some bench_mark data' }, 1234);
             getTestStub.calledOnce.should.eql(true);
             should(getTestStub.args).eql([[1234]]);
             insertBenchMarkStub.calledOnce.should.eql(true);
-            result.should.have.keys('testId', 'bench_mark');
+            result.should.have.keys('test_id', 'bench_mark_data');
             Object.keys(result).length.should.eql(2);
             should(result).eql({
-                'testId': 1234,
-                'bench_mark': 'some bench_mark data'
+                'test_id': 1234,
+                'bench_mark_data': { rps: 'some bench_mark data' }
             });
         });
         it('Should  fail when test not exist', async () => {
