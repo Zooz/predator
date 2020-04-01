@@ -215,6 +215,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Tests
   /v1/tests:
     post:
       operationId: create-a-test

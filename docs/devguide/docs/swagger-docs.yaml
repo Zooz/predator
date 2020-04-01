@@ -312,6 +312,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/benchmark_request'
+        description: The bench mark to add
+        required: true
   '/v1/tests/{test_id}':
     get:
       operationId: retrieve-a-test
