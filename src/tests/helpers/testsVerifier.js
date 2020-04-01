@@ -1,5 +1,6 @@
 'use strict';
 const processorsManager = require('../../processors/models/processorsManager');
+const testMannager = require('../../tests/models/manager');
 const consts = require('../../common/consts');
 module.exports.verifyProcessorIsValid = async (req, res, next) => {
     let errorToThrow;
@@ -32,6 +33,21 @@ module.exports.verifyProcessorIsValid = async (req, res, next) => {
     } else if (usedFunctions.length > 0) {
         errorToThrow = new Error(`Functions: ${usedFunctions.join(', ')} are used without specifying processor`);
         errorToThrow.statusCode = 400;
+    }
+    next(errorToThrow);
+};
+module.exports.verifyTestExist = async (req, res, next) => {
+    let errorToThrow;
+    let testId = req.params.test_id;
+    try {
+        await testMannager.getTest(testId);
+    } catch (error) {
+        if (error.statusCode === 404) {
+            errorToThrow = error;
+        } else {
+            errorToThrow = new Error(error.message);
+            errorToThrow.statusCode = 500;
+        }
     }
     next(errorToThrow);
 };

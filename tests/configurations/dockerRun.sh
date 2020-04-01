@@ -29,11 +29,11 @@ function mysql() {
     stop $APP
     COMMAND="docker run \
                     -d \
-                    --name $APP \
+                    --name mysql \
                     -p 3306:3306 \
                     -e MYSQL_ROOT_PASSWORD=password \
                     -e MYSQL_DATABASE=predator \
-                    $IMAGE_NAME"
+                    mysql:5.7"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
 
