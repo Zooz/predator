@@ -86,7 +86,7 @@ function createTest(body, headers) {
 }
 
 function createBenchMark(testId, body, headers) {
-    return request(app).post('/v1/tests/' + testId + '/bench_mark')
+    return request(app).post('/v1/tests/' + testId + '/benchmark')
         .send(body)
         .set(headers)
         .expect(function (res) {

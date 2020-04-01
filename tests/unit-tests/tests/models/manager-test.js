@@ -61,13 +61,13 @@ describe('Scenario generator tests', function () {
     describe('Create new bench mark for test', async () => {
         it('Should save new bench mark for test', async () => {
             insertBenchMarkStub.resolves();
-            const result = await manager.insertTestBenchMark({ rps: 'some bench_mark data' }, 1234);
+            const result = await manager.insertTestBenchMark({ rps: 'some benchmark data' }, 1234);
             insertBenchMarkStub.calledOnce.should.eql(true);
-            result.should.have.keys('test_id', 'bench_mark_data');
+            result.should.have.keys('test_id', 'benchmark_data');
             Object.keys(result).length.should.eql(2);
             should(result).eql({
                 'test_id': 1234,
-                'bench_mark_data': { rps: 'some bench_mark data' }
+                'benchmark_data': { rps: 'some benchmark data' }
             });
         });
     });

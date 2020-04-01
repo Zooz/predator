@@ -31,7 +31,7 @@ async function upsertTest(testRawData, existingTestId) {
 async function insertTestBenchMark(benchMarkRawData, testId) {
     const dataParse = JSON.stringify(benchMarkRawData);
     await database.insertTestBenchMark(testId, dataParse);
-    return { test_id: testId, bench_mark_data: benchMarkRawData };
+    return { test_id: testId, benchmark_data: benchMarkRawData };
 }
 async function getBench(testId) {
     const res = await database.getTestBenchMark(testId);
