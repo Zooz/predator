@@ -11,6 +11,7 @@ module.exports = {
     insertReport,
     insertStats,
     updateReport,
+    updateReportNotes,
     getReport,
     getReports,
     getLastReports,
@@ -71,6 +72,21 @@ async function updateReport(testId, reportId, reportData) {
     };
 
     return report.update(reportData, options);
+}
+
+async function updateReportNotes(testId, reportId, notes, lastUpdatedAt) {
+    const report = client.model('report');
+    const options = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+
+    return report.update({
+        notes: notes,
+        last_updated_at: lastUpdatedAt
+    }, options);
 }
 
 async function subscribeRunner(testId, reportId, runnerId) {

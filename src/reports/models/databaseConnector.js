@@ -9,6 +9,7 @@ module.exports = {
     insertReport,
     insertStats,
     updateReport,
+    updateReportNotes,
     getReport,
     getReports,
     getLastReports,
@@ -29,6 +30,10 @@ function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, 
 
 function updateReport(testId, reportId, reportData) {
     return databaseConnector.updateReport(testId, reportId, reportData);
+}
+
+function updateReportNotes(testId, reportId, notes, lastUpdatedAt) {
+    return databaseConnector.updateReportNotes(testId, reportId, notes, lastUpdatedAt);
 }
 
 function getLastReports(limit) {
