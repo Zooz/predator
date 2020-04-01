@@ -2,7 +2,7 @@
 let swaggerValidator = require('express-ajv-swagger-validation');
 let express = require('express');
 let router = express.Router();
-let { verifyReportIDInRoute } = require('../utils/middlewares')
+let { verifyReportIDInRoute } = require('../utils/middlewares');
 let reports = require('../controllers/reportsController');
 
 router.get('/:test_id/reports/:report_id/aggregate', swaggerValidator.validate, reports.getAggregateReport);

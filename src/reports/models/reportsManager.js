@@ -7,8 +7,7 @@ const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
     notifier = require('./notifier'),
-    constants = require('../utils/constants'),
-    { ERROR_MESSAGES } = require('../../common/consts');
+    constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
 
