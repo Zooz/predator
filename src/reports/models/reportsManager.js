@@ -7,7 +7,8 @@ const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
     notifier = require('./notifier'),
-    constants = require('../utils/constants');
+    constants = require('../utils/constants'),
+    { ERROR_MESSAGES } = require('../../common/consts');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
 
@@ -46,6 +47,20 @@ module.exports.getLastReports = async (limit) => {
     return reports;
 };
 
+module.exports.editReport = async (testId, reportId, reportBody) => {
+    // currently we support only edit for notes
+    const { notes } = reportBody;
+    const report = await databaseConnector.getReport(testId, reportId);
+    if (report.length === 0){
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
+
+    await databaseConnector.updateReport(testId, reportId, { notes, last_updated_at: new Date() });
+    return reportBody;
+};
+
 module.exports.postReport = async (testId, reportBody) => {
     const startTime = new Date(Number(reportBody.start_time));
     const job = await jobConnector.getJob(reportBody.job_id);
@@ -80,7 +95,7 @@ module.exports.postStats = async (report, stats) => {
     if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
         await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
     }
-    await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime);
+    await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
     report = await module.exports.getReport(report.test_id, report.report_id);
     notifier.notifyIfNeeded(report, stats);
 

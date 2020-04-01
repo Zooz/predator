@@ -61,7 +61,7 @@ async function insertStats(runnerId, testId, reportId, statsId, statsTime, phase
     return stats.create(params);
 }
 
-async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
+async function updateReport(testId, reportId, reportData) {
     const report = client.model('report');
     const options = {
         where: {
@@ -70,10 +70,7 @@ async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
         }
     };
 
-    return report.update({
-        phase: phaseIndex,
-        last_updated_at: lastUpdatedAt
-    }, options);
+    return report.update(reportData, options);
 }
 
 async function subscribeRunner(testId, reportId, runnerId) {
