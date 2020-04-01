@@ -281,7 +281,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  /v1/tests/{test_id}/bench_mark:
+  /v1/tests/{test_id}/benchmark:
     post:
       tags:
         - Tests
@@ -302,7 +302,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/bench_mark_response'
+                $ref: '#/components/schemas/benchmark_response'
         '400':
           description: Bad request
           content:
@@ -325,7 +325,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/bench_mark_request'
+              $ref: '#/components/schemas/benchmark_request'
         description: The bench mark to add
         required: true
   '/v1/tests/file/{file_id}':
@@ -1411,7 +1411,7 @@ components:
         - dsl
         - basic
         example: dsl
-    bench_mark_response:
+    benchmark_response:
       type: object
 
       properties:
@@ -1419,11 +1419,11 @@ components:
           type: string
           format: uuid
           example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-        bench_mark_data:
+        benchmark_data:
           allOf:
-            - $ref: '#/components/schemas/bench_mark_request'
+            - $ref: '#/components/schemas/benchmark_request'
 
-    bench_mark_request:
+    benchmark_request:
       type: object
       additionalProperties: false
       properties:
