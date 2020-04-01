@@ -47,9 +47,9 @@ describe('Integration tests for the reports api', function() {
         };
     });
 
-    // afterEach(async function () {
-    //     await mailhogHelper.clearAllOldMails();
-    // });
+    afterEach(async function () {
+        await mailhogHelper.clearAllOldMails();
+    });
 
     describe('Happy flow - no parallelism', function () {
         describe('Create report', function () {
