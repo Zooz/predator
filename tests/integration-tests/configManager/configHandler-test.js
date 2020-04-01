@@ -210,7 +210,7 @@ describe('update and get config', () => {
                     }
                 }
             });
-            should(response.statusCode).eql(400);
+            should(response.statusCode).eql(422);
             should(response.body.message).eql('Benchmark weights needs to sum up to 100%');
         });
     });
