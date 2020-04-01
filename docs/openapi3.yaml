@@ -947,12 +947,9 @@ paths:
         schema:
           type: string
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/report_response'
+
         '400':
           description: Bad request
           content:
