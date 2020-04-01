@@ -75,7 +75,7 @@ describe('Cassandra client tests', function() {
         reportId = uuid();
         jobId = uuid();
         testType = 'testType';
-        startTime = new Date('1/10/2017')
+        startTime = new Date('1/10/2017');
         testName = 'testName';
         testDescription = 'testDescription';
         testConfiguration = 'testConfiguration';
@@ -159,7 +159,7 @@ describe('Cassandra client tests', function() {
             clientExecuteStub.onCall(0).resolves({ rowLength: 1, rows: [{ 'start_time': '01/22/2017' }] });
             clientExecuteStub.onCall(1).resolves({ rowLength: 1 });
             let queryLastReport = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time=? AND test_id=? AND report_id=?';
-            await cassandraClientLastReport(testId, reportId, phase, lastUpdatedAt);
+            await cassandraClientLastReport(testId, reportId, { phase, last_updated_at: lastUpdatedAt });
 
             loggerErrorStub.callCount.should.eql(0);
             clientExecuteStub.getCall(1).args[0].should.eql(queryLastReport);

@@ -78,8 +78,8 @@ async function updateReport(testId, reportId, reportData) {
 
 function buildUpdateQuery(baseQuery, values, where, whereDataArray) {
     const entriesValues = Object.entries(values);
-    const params = entriesValues.map((entry) => entry[0]).concat(whereDataArray);
-    const setStatement = `SET ${entriesValues.map((entry) => `${entry} = ?`.join(', '))}`;
+    const params = entriesValues.map((entry) => entry[1]).concat(whereDataArray);
+    const setStatement = `SET ${entriesValues.map((entry) => `${entry[0]}=?`).join(', ')}`;
     const query = `${baseQuery} ${setStatement} ${where}`;
 
     return {
