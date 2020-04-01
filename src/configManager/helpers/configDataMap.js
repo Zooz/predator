@@ -29,7 +29,11 @@ let configDataMap = {
             rejectUnauthCerts: process.env.SMTP_REJECT_UNAUTH_CERTS || false
         }),
         type: 'json'
-    }
+    },
+    [constConfig.THRESHOLD]: { value: process.env.THRESHOLD, type: 'int' },
+    [constConfig.THRESHOLD_WEBHOOK_URL]: { value: process.env.THRESHOLD_WEBHOOK_URL, type: 'string' },
+    [constConfig.BENCHMARK_WEIGHTS]: { value: process.env.BENCHMARK_WEIGHTS, type: 'json' },
+    [constConfig.BENCHMARK_CONFIG]: { value: process.env.BENCHMARK_CONFIG, type: 'json' }
 };
 
 module.exports.getConstType = (configValue) => {

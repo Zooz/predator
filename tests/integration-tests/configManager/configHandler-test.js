@@ -35,7 +35,17 @@ const updateBodyWithTypes = {
         password: 'string_value',
         timeout: 2
     },
-    runner_memory: 256
+    runner_memory: 256,
+    benchmark_config: {
+        threshold: 20,
+        threshold_webhook_url: 'http://slack.com',
+        benchmark_weights: {
+            percentile_ninety: { factor: 10, percentage: 20 },
+            percentile_fifty: { factor: 10, percentage: 30 },
+            server_errors: { factor: 10, percentage: 20 },
+            client_errors: { factor: 10, percentage: 30 }
+        }
+    }
 };
 
 const requestBody =
@@ -70,7 +80,17 @@ const requestBody =
             password: 'string_value',
             timeout: 2
         },
-        minimum_wait_for_delayed_report_status_update_in_ms: 30000
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        benchmark_config: {
+            threshold: 20,
+            threshold_webhook_url: 'http://slack.com',
+            benchmark_weights: {
+                percentile_ninety: { factor: 10, percentage: 20 },
+                percentile_fifty: { factor: 10, percentage: 30 },
+                server_errors: { factor: 10, percentage: 20 },
+                client_errors: { factor: 10, percentage: 30 }
+            }
+        }
     };
 const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
 const requestBodyNotValidType = { runner_cpu: 'not_int' };
@@ -121,6 +141,7 @@ describe('update and get config', () => {
             should(response.body['prometheus_metrics'] instanceof Object);
             should(response.body['smtp_server'] instanceof Object);
             should(response.body['smtp_server'] instanceof Number);
+            should(response.body['benchmark_config'] instanceof Object);
         });
     });
     describe('Update config and get config ', () => {

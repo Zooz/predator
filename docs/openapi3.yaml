@@ -2034,3 +2034,59 @@ components:
             timeout:
               description: timout to smtp server in milliseconds
               type: number
+        benchmark_config:
+          additionalProperties: false
+          type: object
+          description: Simple mail transfer protocol.
+          required:
+          - threshold
+          - threshold_webhook_url
+          - benchmark_weights
+          properties:
+            threshold:
+              type: number
+              description: benchmark threshold
+              minimum: 0
+              maximum: 100
+            threshold_webhook_url:
+              type: string
+              format: uri
+              description: webhook url to alert when coverage less than threshold
+            benchmark_weights:
+              additionalProperties: false
+              type: object
+              description: benchmark_weights
+              required:
+              - percentile_ninety
+              - percentile_fifty
+              - server_errors
+              - client_errors
+              properties:
+                percentile_ninety:
+                  description: P90 benchmark weight
+                  allOf:
+                    - $ref: '#/components/schemas/benchmark_weights'
+                percentile_fifty:
+                  description: P50 benchmark weight
+                  allOf:
+                    - $ref: '#/components/schemas/benchmark_weights'
+                server_errors:
+                  description: 5xx server errors benchmark weight
+                  allOf: 
+                   - $ref: '#/components/schemas/benchmark_weights'
+                client_errors:
+                  description: 4xx server errors benchmark weight
+                  allOf: 
+                   - $ref: '#/components/schemas/benchmark_weights'
+    benchmark_weights:
+      type: object
+      required:
+        - factor
+        - percentage
+      properties:
+        factor:
+          type: number
+          description: benchmark factor weight
+        percentage:
+            type: number
+            description: benchmark percentage weight

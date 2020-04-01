@@ -27,6 +27,10 @@ module.exports = {
         DEFAULT_WEBHOOK_URL: 'default_webhook_url',
         INFLUX_METRICS: 'influx_metrics',
         PROMETHEUS_METRICS: 'prometheus_metrics',
-        SMTP_SERVER: 'smtp_server'
+        SMTP_SERVER: 'smtp_server',
+        THRESHOLD: 'threshold',
+        THRESHOLD_WEBHOOK_URL: 'threshold_webhook_url',
+        BENCHMARK_WEIGHTS: 'benchmark_weights',
+        BENCHMARK_CONFIG: 'benchmark_config'
     }
 };
