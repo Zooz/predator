@@ -494,8 +494,9 @@ const Notes = ({data, onEditNote}) => {
         place='top'
         offset={{top: 1}}
     >
-        <div className={css.notes} data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer'}}>
-            {editMode && <TextArea value={editValue} onKeyDown={onKeyDown} onChange={(evt, value) => {
+        <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer'}}>
+            {editMode &&
+            <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown} onChange={(evt, value) => {
                 setEditValue(evt.target.value)
             }}/>}
             {!editMode &&
