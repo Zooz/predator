@@ -58,7 +58,6 @@ module.exports.editReport = async (testId, reportId, reportBody) => {
     }
 
     await databaseConnector.updateReport(testId, reportId, { notes, last_updated_at: new Date() });
-    return reportBody;
 };
 
 module.exports.postReport = async (testId, reportBody) => {

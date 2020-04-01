@@ -352,6 +352,20 @@ describe('Reports manager tests', function () {
             }
         });
     });
+    describe('edit report', function () {
+        it('Successfully edit report', async () => {
+            databaseGetReportStub.resolves(['report']);
+            databaseUpdateReportStub.resolves();
+            await manager.editReport('test_id', REPORT, { notes: 'notes' });
+        });
+
+        it('Fail to retrieve report', async () => {
+            databaseGetReportStub.resolves([]);
+            databaseUpdateReportStub.resolves();
+            await should(manager.editReport('test_id', REPORT, { notes: 'notes' }))
+                .rejectedWith({ statusCode: 404, message: 'Not found' });
+        });
+    });
 
     describe('Create new stats', function () {
         it('Stats consumer handles message with status intermediate', async () => {
