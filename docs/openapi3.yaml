@@ -302,15 +302,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/benchmark_response'
+                $ref: '#/components/schemas/benchmark_request'
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '422':
-          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -1411,17 +1405,6 @@ components:
         - dsl
         - basic
         example: dsl
-    benchmark_response:
-      type: object
-
-      properties:
-        test_id:
-          type: string
-          format: uuid
-          example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-        benchmark_data:
-          allOf:
-            - $ref: '#/components/schemas/benchmark_request'
 
     benchmark_request:
       type: object
@@ -1429,8 +1412,15 @@ components:
       properties:
         errors:
           type: object
+          example:
+            ECONNREFUSED: 33
+            CLIENTERROR: 10
         codes:
           type: object
+          example:
+            200: 161
+            201: 1061
+            500: 53
         rps:
           type: object
           properties:
