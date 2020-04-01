@@ -926,6 +926,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+    put:
+      operationId: edit-a-report
+      tags:
+      - Reports
+      summary: edit a Report
+      description: edit a specific report for the specified test.
+      parameters:
+      - in: path
+        name: test_id
+        required: true
+        description: The id of the test for which to retrieve the report.
+        schema:
+          type: string
+          example: 81a27853-0db5-4e57-ad63-4b637528398a
+      - in: path
+        name: report_id
+        description: The id of the report to retrieve.
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success
+
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/edit_report'
+        description: report data
+        required: true
   /v1/tests/last_reports:
     get:
       operationId: retrieve-recent-reports
@@ -1875,6 +1924,12 @@ components:
           type: string
           description: Raw javascript that will be used by the processor resource.
           example: module.exports.generateNameBeforeScenario = (context, ee, next) => { context.name = Date.now() + '_mick' }
+    edit_report:
+      additionalProperties: false
+      properties:
+        notes:
+          type: string
+          description: notes for specific report
     post_report:
       required:
         - report_id

@@ -14,6 +14,8 @@ import {createJobRequest} from './requestBuilder';
 
 import {ReactTableComponent} from './../components/ReactTable';
 import {getColumns} from './configurationColumn'
+import ErrorDialog from "./components/ErrorDialog";
+import FormWrapper from "../components/FormWrapper";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -53,6 +55,10 @@ class getReports extends React.Component {
         this.setState({rerunJob: job});
     };
 
+    onEditNote = (testId, reportId, notes) => {
+        const {editReport} = this.props;
+        editReport(testId, reportId, {notes});
+    };
     closeViewReportDialog = () => {
         this.setState({
             openViewReport: false
@@ -79,12 +85,10 @@ class getReports extends React.Component {
     }
     loadPageData = () => {
         this.props.getTests();
-        this.props.clearErrorOnGetReports();
         this.props.getAllReports();
     };
 
     componentWillUnmount() {
-        this.props.clearErrorOnGetReports();
         this.props.clearSelectedReport();
         clearInterval(this.refreshDataInterval);
     }
@@ -114,10 +118,21 @@ class getReports extends React.Component {
         });
         this.setState({sortedReports: newSorted})
     };
+    onCloseErrorDialog = () => {
+        this.props.cleanAllReportsErrors();
+        this.props.clearErrorOnStopJob();
+
+    };
 
     render() {
-
         const {showReport, sortHeader, sortedReports} = this.state;
+        const {
+            errorOnGetReports,
+            errorOnGetReport,
+            errorOnStopRunningJob,
+            errorCreateBenchmark,
+            errorEditReport
+        } = this.props;
         const columns = getColumns({
             columnsNames,
             sortHeader,
@@ -125,9 +140,13 @@ class getReports extends React.Component {
             onReportView: this.onReportView,
             onRawView: this.onRawView,
             onStop: this.onStop,
-            onRunTest: this.onRunTest
+            onRunTest: this.onRunTest,
+            onEditNote: this.onEditNote
         });
         const feedbackMessage = this.generateFeedbackMessage();
+        const error = errorOnGetReports || errorOnGetReport || errorOnStopRunningJob || errorCreateBenchmark || errorEditReport;
+
+
         return (
             <Page title={'Last Reports'} description={DESCRIPTION}>
                 <div style={{width: '100%'}}>
@@ -151,21 +170,22 @@ class getReports extends React.Component {
                               closeDialog={this.closeViewReportDialog}/> : null}
 
                 {feedbackMessage && <Snackbar
-                    open={(!!(this.props.stopRunningJobSuccess || this.props.jobSuccess))}
+                    open={!!feedbackMessage}
                     bodyStyle={{backgroundColor: '#2fbb67'}}
                     message={feedbackMessage}
                     autoHideDuration={4000}
                     onRequestClose={() => {
                         this.props.getAllReports();
                         this.props.clearStopJobSuccess();
-                        this.props.clearStoppedJobError();
                         this.props.createJobSuccess(undefined);
+                        this.props.editNotesSuccess(false);
                         this.setState({
-                            showSnackbar: false,
                             rerunJob: null
                         });
                     }}
                 />}
+                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
+
             </Page>
         )
     }
@@ -176,6 +196,9 @@ class getReports extends React.Component {
         }
         if (this.props.jobSuccess && this.state.rerunJob) {
             return `Job created successfully: ${this.props.jobSuccess.id}`;
+        }
+        if (this.props.noteSuccess) {
+            return `report notes edited successfully`;
         }
 
     }
@@ -193,21 +216,27 @@ function mapStateToProps(state) {
         errorOnStopRunningJob: errorOnStopRunningJob(state),
         stopRunningJobSuccess: stopRunningJobSuccess(state),
         tests: tests(state),
-        jobSuccess: createJobSuccess(state)
+        jobSuccess: createJobSuccess(state),
+        noteSuccess: selectors.editNotesSuccess(state),
+        errorEditReport: selectors.editReportFailure(state),
+        errorCreateBenchmark: selectors.createBenchmarkFailure(state),
+
     }
 }
 
 const mapDispatchToProps = {
     clearSelectedReport: Actions.clearSelectedReport,
-    clearErrorOnGetReports: Actions.clearErrorOnGetReports,
     getAllReports: Actions.getLastReports,
     getReport: Actions.getReport,
     stopRunningJob: Actions.stopRunningJob,
     clearStopJobSuccess: Actions.clearStopJobSuccess,
-    clearStoppedJobError: Actions.clearErrorOnStopJob,
     createJob: Actions.createJob,
     getTests: Actions.getTests,
-    createJobSuccess: Actions.createJobSuccess
+    createJobSuccess: Actions.createJobSuccess,
+    editReport: Actions.editReport,
+    editNotesSuccess: Actions.editReportSuccess,
+    cleanAllReportsErrors: Actions.cleanAllReportsErrors,
+    clearErrorOnStopJob: Actions.clearErrorOnStopJob,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getReports);

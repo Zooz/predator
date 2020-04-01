@@ -13,6 +13,7 @@ module.exports = {
     postStats,
     getReport,
     getReports,
+    editReport,
     getLastReports
 };
 
@@ -31,6 +32,14 @@ function createReport(testId, body) {
 
 function postStats(testId, reportId, body) {
     return request(testApp).post(`/v1/tests/${testId}/reports/${reportId}/stats`)
+        .send(body)
+        .set(HEADERS)
+        .expect(function(res){
+            return res;
+        });
+}
+function editReport(testId, reportId, body) {
+    return request(testApp).put(`/v1/tests/${testId}/reports/${reportId}`)
         .send(body)
         .set(HEADERS)
         .expect(function(res){

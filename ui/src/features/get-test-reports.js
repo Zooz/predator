@@ -1,12 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {
-    reports,
-    report,
-    processingGetReports,
-    errorOnGetReports,
-    errorOnGetReport
-} from './redux/selectors/reportsSelector';
+import * as selectors from './redux/selectors/reportsSelector';
 import style from './style.scss';
 import Dialog from './components/Dialog';
 import * as Actions from './redux/action';
@@ -19,6 +13,7 @@ import {getColumns} from "./configurationColumn";
 import {createJobRequest} from "./requestBuilder";
 import {createJobSuccess} from "./redux/selectors/jobsSelector";
 import Snackbar from 'material-ui/Snackbar';
+import ErrorDialog from "./components/ErrorDialog";
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetReports = 'Error occurred while trying to get all reports for test.';
@@ -58,6 +53,10 @@ class getTests extends React.Component {
         }
     }
 
+    onEditNote = (testId, reportId, notes) => {
+        const {editReport} = this.props;
+        editReport(testId, reportId, {notes});
+    };
     onSort = (field) => {
         const {sortHeader} = this.state;
         let isAsc = false;
@@ -84,6 +83,9 @@ class getTests extends React.Component {
         this.setState({sortedReports: newSorted})
     };
 
+    onCloseErrorDialog = () => {
+        this.props.cleanAllReportsErrors();
+    };
 
     onReportView = (data) => {
         this.setState({showReport: data})
@@ -129,10 +131,16 @@ class getTests extends React.Component {
             onReportView: this.onReportView,
             onRawView: this.onRawView,
             onStop: this.onStop,
-            onRunTest: this.onRunTest
+            onRunTest: this.onRunTest,
+            onEditNote: this.onEditNote
         });
         const {showReport} = this.state;
+        const {
+            errorCreateBenchmark,
+            errorEditReport,
+        } = this.props;
         const feedbackMessage = this.generateFeedbackMessage();
+        const error = errorCreateBenchmark || errorEditReport;
         return (
             <Page
                 title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
@@ -155,7 +163,7 @@ class getTests extends React.Component {
                 {this.state.openViewReport ? <Dialog title_key={'report_id'} data={this.state.openViewReport}
                                                      closeDialog={this.closeViewReportDialog}/> : null}
                 {feedbackMessage && <Snackbar
-                    open={!!this.props.jobSuccess}
+                    open={!!feedbackMessage}
                     bodyStyle={{backgroundColor: '#2fbb67'}}
                     message={this.generateFeedbackMessage()}
                     autoHideDuration={4000}
@@ -164,8 +172,11 @@ class getTests extends React.Component {
                         this.setState({
                             rerunJob: null
                         });
+                        this.props.editNotesSuccess(false);
                     }}
                 />}
+                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
+
             </Page>
         )
     }
@@ -175,18 +186,23 @@ class getTests extends React.Component {
         if (this.props.jobSuccess && this.state.rerunJob) {
             return `Job created successfully: ${this.props.jobSuccess.id}`;
         }
-
+        if (this.props.noteSuccess) {
+            return `report notes edited successfully`;
+        }
     }
 }
 
 function mapStateToProps(state) {
     return {
-        reports: reports(state),
-        report: report(state),
-        processingGetReports: processingGetReports(state),
-        errorOnGetReports: errorOnGetReports(state),
-        errorOnGetReport: errorOnGetReport(state),
-        jobSuccess: createJobSuccess(state)
+        reports: selectors.reports(state),
+        report: selectors.report(state),
+        processingGetReports: selectors.processingGetReports(state),
+        errorOnGetReports: selectors.errorOnGetReports(state),
+        errorOnGetReport: selectors.errorOnGetReport(state),
+        jobSuccess: createJobSuccess(state),
+        noteSuccess: selectors.editNotesSuccess(state),
+        errorEditReport: selectors.editReportFailure(state),
+        errorCreateBenchmark: selectors.createBenchmarkFailure(state),
     }
 }
 
@@ -197,7 +213,11 @@ const mapDispatchToProps = {
     getReports: Actions.getReports,
     getReport: Actions.getReport,
     createJob: Actions.createJob,
-    createJobSuccess: Actions.createJobSuccess
+    createJobSuccess: Actions.createJobSuccess,
+    editReport: Actions.editReport,
+    editNotesSuccess: Actions.editReportSuccess,
+    cleanAllReportsErrors: Actions.cleanAllReportsErrors,
+    clearErrorOnStopJob: Actions.clearErrorOnStopJob,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);
