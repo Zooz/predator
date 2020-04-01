@@ -107,8 +107,7 @@ describe('the tests api', function() {
             const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
             const { body } = benchMarkResult;
             should(benchMarkResult.statusCode).eql(201);
-            should(body.test_id).eql(testId);
-            should(body.benchmark_data).eql(benchMarkRequest);
+             should(body.benchmark_data).eql(benchMarkRequest);
 
         });
         it('Create bench mark with full body for existing test', async () => {
@@ -139,8 +138,7 @@ describe('the tests api', function() {
             const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
             const { body } = benchMarkResult;
             should(benchMarkResult.statusCode).eql(201);
-            should(body.test_id).eql(testId);
-            should(body.bench_mark_data).eql(benchMarkRequest);
+            should(body.benchmark_data).eql(benchMarkRequest);
 
         });
         it('try to create bench mark for not existing test', async () => {

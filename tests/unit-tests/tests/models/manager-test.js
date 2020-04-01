@@ -63,10 +63,9 @@ describe('Scenario generator tests', function () {
             insertBenchMarkStub.resolves();
             const result = await manager.insertTestBenchMark({ rps: 'some benchmark data' }, 1234);
             insertBenchMarkStub.calledOnce.should.eql(true);
-            result.should.have.keys('test_id', 'benchmark_data');
-            Object.keys(result).length.should.eql(2);
+            result.should.have.keys('benchmark_data');
+            Object.keys(result).length.should.eql(1);
             should(result).eql({
-                'test_id': 1234,
                 'benchmark_data': { rps: 'some benchmark data' }
             });
         });
