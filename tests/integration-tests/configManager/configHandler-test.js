@@ -195,6 +195,25 @@ describe('update and get config', () => {
             ]);
         });
     });
+
+    describe('Update config with benchmark weights not sum up to 100%', () => {
+        it('params below minimum', async () => {
+            let response = await configRequestCreator.updateConfig({
+                benchmark_config: {
+                    threshold: 20,
+                    threshold_webhook_url: 'http://slack.com',
+                    benchmark_weights: {
+                        percentile_ninety: { factor: 10, percentage: 50 },
+                        percentile_fifty: { factor: 10, percentage: 30 },
+                        server_errors: { factor: 10, percentage: 20 },
+                        client_errors: { factor: 10, percentage: 30 }
+                    }
+                }
+            });
+            should(response.statusCode).eql(400);
+            should(response.body.message).eql('Benchmark weights needs to sum up to 100%');
+        });
+    });
 });
 
 async function cleanData() {

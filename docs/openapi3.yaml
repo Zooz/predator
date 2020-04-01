@@ -1004,6 +1004,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/config_body"
+        "422":
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         "500":
           description: Internal server error
           content:
