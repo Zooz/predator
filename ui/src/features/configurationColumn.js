@@ -1,5 +1,5 @@
 import {TableHeader} from "../components/ReactTable";
-import React,{ useEffect, useState }  from "react";
+import React, {useEffect, useState} from "react";
 import {filter, sortedUniqBy} from 'lodash';
 
 import Moment from 'moment';
@@ -464,7 +464,7 @@ const ViewButton = ({onClick, icon, disabled, text}) => {
 
     const element = icon ? <FontAwesomeIcon
         className={classnames(css['icon'], {[css['action-style']]: !disabled, [css['disabled-button']]: disabled})}
-        onClick={()=>!disabled && onClick} icon={icon}/> : text || 'View';
+        onClick={() => !disabled && onClick} icon={icon}/> : text || 'View';
 
 
     return (<div className={css['action-style']} onClick={onClick}>{element}</div>)
@@ -472,7 +472,7 @@ const ViewButton = ({onClick, icon, disabled, text}) => {
 
 
 const Notes = ({data, onEditNote}) => {
-    const {notes='',report_id,test_id} = data;
+    const {notes = '', report_id, test_id} = data;
     const [editMode, setEditMode] = useState(false);
     const [editValue, setEditValue] = useState(notes);
     const id = uuid();
@@ -494,13 +494,14 @@ const Notes = ({data, onEditNote}) => {
         place='top'
         offset={{top: 1}}
     >
-        <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer'}}>
+        <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
             {editMode &&
             <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown} onChange={(evt, value) => {
                 setEditValue(evt.target.value)
             }}/>}
             {!editMode &&
-            <div onClick={() => onEditNote && setEditMode(true)} style={onEditNote && {cursor:'pointer'}}>{editValue || 'empty'}</div>
+            <div onClick={() => onEditNote && setEditMode(true)}
+                 style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
 
             }
         </div>

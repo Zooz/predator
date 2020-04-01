@@ -50,13 +50,6 @@ module.exports.getLastReports = async (limit) => {
 module.exports.editReport = async (testId, reportId, reportBody) => {
     // currently we support only edit for notes
     const { notes } = reportBody;
-    const report = await databaseConnector.getReport(testId, reportId);
-    if (report.length === 0){
-        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
-        error.statusCode = 404;
-        throw error;
-    }
-
     await databaseConnector.updateReport(testId, reportId, { notes, last_updated_at: new Date() });
 };
 

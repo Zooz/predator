@@ -47,9 +47,9 @@ describe('Integration tests for the reports api', function() {
         };
     });
 
-    afterEach(async function () {
-        await mailhogHelper.clearAllOldMails();
-    });
+    // afterEach(async function () {
+    //     await mailhogHelper.clearAllOldMails();
+    // });
 
     describe('Happy flow - no parallelism', function () {
         describe('Create report', function () {
@@ -156,7 +156,7 @@ describe('Integration tests for the reports api', function() {
                 let editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { notes: 'dfdsf' });
                 should(editReportResponse.statusCode).eql(404);
                 should(editReportResponse.body).eql({
-                    'message': 'Not found'
+                    'message': 'Report not found'
                 });
             });
             it('when edit additional properties that not include in the swagger', async function () {

@@ -358,13 +358,6 @@ describe('Reports manager tests', function () {
             databaseUpdateReportStub.resolves();
             await manager.editReport('test_id', REPORT, { notes: 'notes' });
         });
-
-        it('Fail to retrieve report', async () => {
-            databaseGetReportStub.resolves([]);
-            databaseUpdateReportStub.resolves();
-            await should(manager.editReport('test_id', REPORT, { notes: 'notes' }))
-                .rejectedWith({ statusCode: 404, message: 'Not found' });
-        });
     });
 
     describe('Create new stats', function () {
