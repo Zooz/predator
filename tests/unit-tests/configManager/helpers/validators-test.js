@@ -30,13 +30,4 @@ describe('configManager validators tests', function() {
             should(nextStub.args[0][0].statusCode).eql(422);
         });
     });
-
-    describe('validate benchmark properties', function() {
-        it('should return next with an error when sendind partial benchmark properties', function() {
-            const req = { body: { benchmark_weights: {} } };
-            const res = {};
-            validators.validateBenchmarkProperties(req, res, nextStub);
-            should(nextStub.args[0][0].message).eql('Input validation error');
-        });
-    });
 });

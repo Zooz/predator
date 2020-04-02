@@ -214,21 +214,6 @@ describe('update and get config', () => {
         });
     });
 
-    describe('Update config benchmark with partial properties', () => {
-        it('update config fail with validation type', async () => {
-            const requestBody = {
-                benchmark_threshold: 20,
-                benchmark_threshold_webhook_url: 'http://slack.com'
-            };
-            let response = await configRequestCreator.updateConfig(requestBody);
-            should(response.statusCode).eql(400);
-            should(response.body.message).eql(validationError);
-            should(response.body.validation_errors).eql([
-                'body request should have all of properties: benchmark_threshold,benchmark_threshold_webhook_url,benchmark_weights'
-            ]);
-        });
-    });
-
     describe('Update config benchmark weights with invalid properties', () => {
         it('update config fail with validation type', async () => {
             let response = await configRequestCreator.updateConfig({
