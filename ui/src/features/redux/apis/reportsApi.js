@@ -24,8 +24,22 @@ export const getAggregateFromFramework = (testId,reportId) => {
 
 export const getLastReportsFromFramework = () => {
 
-  let url = `${env.PREDATOR_URL}/tests/last_reports?limit=200`;
+  const url = `${env.PREDATOR_URL}/tests/last_reports?limit=200`;
   return axios.get(url, {
+    headers: getAuthorizationHeader()
+  });
+};
+
+export const createBenchmarkFromFramework = (testId, body) => {
+  const url = `${env.PREDATOR_URL}/tests/${testId}/bench_mark`;
+  return axios.post(url, body, {
+    headers: getAuthorizationHeader()
+  });
+};
+
+export const editReportFromFramework = (testId,reportId, body) => {
+  const url = `${env.PREDATOR_URL}/tests/${testId}/reports/${reportId}`;
+  return axios.put(url, body, {
     headers: getAuthorizationHeader()
   });
 };

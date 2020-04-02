@@ -13,7 +13,6 @@ import reducer, { initialState } from './TabsScrollingReducer/reducer'
 import styles from './ScrollableTabsNavBar.scss'
 
 const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey}) => {
-  console.log("width init",width);
   // width is all the scroll bar  but not init on strart
   const [state, dispatch] = useReducer(reducer, {...initialState});
   const {shouldScroll, enableScrollLeft, enableScrollRight, scrollXValue, currentTabs} = state;
@@ -40,7 +39,6 @@ const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey}) => {
   }, [activeKey]);
 
   useEffect(() => {
-    console.log("new width", width);
     dispatch({
       type: actions.ON_RESIZE,
       scrollWrapperWidth: scrollWrapperRef.current.clientWidth,
@@ -67,7 +65,6 @@ const ScrollableTabsNavBar = ({ width, tabs, onTabClick, activeKey}) => {
   }
 
   function setInnerContainerWidth (width) {
-    console.log("inner container", width);
 /// update  here the inneer container of inks .
     if (innerContainerWidthRef.current && innerContainerWidthRef.current !== width) {
       dispatch({

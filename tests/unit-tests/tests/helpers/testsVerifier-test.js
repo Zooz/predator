@@ -1,10 +1,11 @@
 const sinon = require('sinon'),
     should = require('should'),
     testsVerifier = require('../../../../src/tests/helpers/testsVerifier'),
-    processorsManager = require('../../../../src/processors/models/processorsManager');
+    processorsManager = require('../../../../src/processors/models/processorsManager'),
+    testManager = require('../../../../src/tests/models/manager');
 
 describe('tests verifier tests', function () {
-    let req, res, sandbox, nextStub, resJsonStub, resStatusStub, processorsManagerStub;
+    let req, res, sandbox, nextStub, resJsonStub, resStatusStub, processorsManagerStub,testManagerStub;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -13,7 +14,7 @@ describe('tests verifier tests', function () {
         resStatusStub = sandbox.stub();
 
         processorsManagerStub = sandbox.stub(processorsManager, 'getProcessor');
-
+        testManagerStub = sandbox.stub(testManager, 'getTest');
         res = {
             json: (json) => {
                 resJsonStub(json);
@@ -32,6 +33,38 @@ describe('tests verifier tests', function () {
 
     after(() => {
         sandbox.restore();
+    });
+
+    describe('verifyTestExists tests', () => {
+        it('Should pass tests validation', async () => {
+            req = { params: { test_id: 1234 } };
+
+            testManagerStub.resolves({});
+            await testsVerifier.verifyTestExist(req, res, nextStub);
+            should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0]).eql(undefined);
+            should(testManagerStub.calledOnce).eql(true);
+        });
+        it('Should fail to find tests', async () => {
+            req = { params: { test_id: 1234 } };
+            const err = new Error();
+            err.statusCode = 404;
+            testManagerStub.throws(err);
+            await testsVerifier.verifyTestExist(req, res, nextStub);
+            should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0].statusCode).eql(404);
+            should(testManagerStub.calledOnce).eql(true);
+        });
+        it('Should fail on unexpected error and return 500', async () => {
+            req = { params: { test_id: 1234 } };
+            const err = new Error();
+            err.statusCode = 503;
+            testManagerStub.throws(err);
+            await testsVerifier.verifyTestExist(req, res, nextStub);
+            should(nextStub.calledOnce).eql(true);
+            should(nextStub.args[0][0].statusCode).eql(500);
+            should(testManagerStub.calledOnce).eql(true);
+        });
     });
 
     describe('verifyProcessorExists tests', () => {

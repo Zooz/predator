@@ -27,8 +27,8 @@ function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, 
     return databaseConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 }
 
-function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
-    return databaseConnector.updateReport(testId, reportId, phaseIndex, lastUpdatedAt);
+function updateReport(testId, reportId, reportData) {
+    return databaseConnector.updateReport(testId, reportId, reportData);
 }
 
 function getLastReports(limit) {

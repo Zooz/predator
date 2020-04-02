@@ -18,7 +18,6 @@ export const initialState = {
 }
 
 export default function reducer (state, action) {
-  console.log('reducer got state',action)
   switch (action.type) {
     case actions.ON_MOUNT:
       return onMount(state, action)
@@ -60,15 +59,8 @@ function onResize (state, {
 
 
   if (state.scrollWrapperWidth !== scrollWrapperWidth || state.innerScrollWidth !== innerScrollWidth) {
-    console.log('manor scrollWrapperWidth',scrollWrapperWidth);
-    console.log('manor tab width',tabWidth);
-    console.log('manor noScrollExtraPadding',noScrollExtraPadding);
-    console.log('manor innerScrollWidth',innerScrollWidth);
     const maxNumberOfTabs = Math.floor(scrollWrapperWidth / tabWidth);
-    console.log("manor maxNumberOfTabs",maxNumberOfTabs);
-    // const page  todo fix here the new calculate of page
     const numberOfPages = Math.floor(state.tabs.length / maxNumberOfTabs) + 1;
-    console.log("manor numberOfPages",numberOfPages);
 
     const pageNumber = state.pageNumber > numberOfPages ? 1 : state.pageNumber;
     const currentTabs = state.tabs.slice((pageNumber - 1) * maxNumberOfTabs, pageNumber * maxNumberOfTabs + 1);
@@ -160,7 +152,6 @@ function onScrollLeft (state) {
 function onScrollRight (state) {
   const { enableScrollRight, scrollXValue, innerScrollWidth, scrollWrapperWidth,maxNumberOfTabs } = state
 
-  console.log("manor on scroll right",enableScrollRight)
   if (!enableScrollRight) {
     return state
   }
