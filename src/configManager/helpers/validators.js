@@ -1,5 +1,3 @@
-const swaggerValidator = require('express-ajv-swagger-validation');
-
 module.exports.validateBenchmarkWeights = (req, res, next) => {
     const benchmarkWeights = req.body.benchmark_weights;
     if (benchmarkWeights){
