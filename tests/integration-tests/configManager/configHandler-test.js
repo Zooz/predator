@@ -99,7 +99,7 @@ const requestBodyNotValidRequire = {
     }
 };
 
-describe.only('update and get config', () => {
+describe('update and get config', () => {
     before(async () => {
         await configRequestCreator.init();
     });
@@ -226,6 +226,24 @@ describe.only('update and get config', () => {
             should(response.body.validation_errors).eql([
                 'body request should have all of properties: benchmark_threshold,benchmark_threshold_webhook_url,benchmark_weights'
             ]);
+        });
+    });
+    describe('Update config benchmark weights with invalid properties', () => {
+        it('update config fail with validation type', async () => {
+            let response = await configRequestCreator.updateConfig({
+                benchmark_threshold: 20,
+                benchmark_threshold_webhook_url: 'http://slack.com',
+                benchmark_weights: { 'tps': '10' }
+            });
+            should(response.statusCode).eql(400);
+            should(response.body.message).eql(validationError);
+            should(response.body.validation_errors).eql([
+                "body/benchmark_weights should NOT have additional properties 'tps'",
+                "body/benchmark_weights should have required property 'percentile_ninety'",
+                "body/benchmark_weights should have required property 'percentile_fifty'",
+                "body/benchmark_weights should have required property 'server_errors'",
+                "body/benchmark_weights should have required property 'client_errors'",
+                "body/benchmark_weights should have required property 'rps'" ]);
         });
     });
 });
