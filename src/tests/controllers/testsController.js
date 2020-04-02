@@ -11,7 +11,7 @@ module.exports = {
     getFile,
     getTestRevisions,
     insertTestBenchMark,
-    getBench
+    getBenchmark
 };
 
 async function insertTestBenchMark(req, res, next) {
@@ -22,7 +22,7 @@ async function insertTestBenchMark(req, res, next) {
         return next(err);
     }
 }
-async function getBench(req, res, next) {
+async function getBenchmark(req, res, next) {
     try {
         const result = await manager.getBench(req.params.test_id);
         return res.status(201).json(result);

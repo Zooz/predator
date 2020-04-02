@@ -6,10 +6,11 @@ const _ = require('lodash'),
 const databaseConnector = require('./databaseConnector'),
     testDbConnector = require('../../tests/models/database'),
     jobConnector = require('../../jobs/models/jobManager'),
-    aggregateReportGenerator = require('./aggregateReportGenerator'),
+    aggregateReportManager = require('./aggregateReportManager'),
     benchMarkCalculator = require('./benchMarkCalculator'),
     configHandler = require('../../configManager/models/configHandler'),
     notifier = require('./notifier'),
+    reportUtil=require('../utils/reportUtil'),
     constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
@@ -77,7 +78,7 @@ module.exports.postStats = async (report, stats) => {
 
     if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE) {
         await databaseConnector.updateSubscriber(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
-        await updateReportBenchMark(report);
+
     } else {
         await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
     }
@@ -87,17 +88,25 @@ module.exports.postStats = async (report, stats) => {
     }
     await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime);
     report = await module.exports.getReport(report.test_id, report.report_id);
+    await updateReportBenchMarkIfNeeded(report);
     notifier.notifyIfNeeded(report, stats);
 
     return stats;
 };
 
-async function updateReportBenchMark(report) {
+async function updateReportBenchMarkIfNeeded(report) {
+    if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
+        return;
+    }
     const testBenchMarkData = await extractBenchMarkData(report.test_id);
-    if (!testBenchMarkData) {
-        const reportAggregate = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
-        const reportBenchMark = benchMarkCalculator.calculate(testBenchMarkData, reportAggregate.aggregate);
-        await databaseConnector.updateReportBenchMark(report.test_id, report.report_id, JSON.stringify(reportBenchMark));
+    try {
+        if (testBenchMarkData) {
+            const reportAggregate = await aggregateReportManager.aggregateReport(report);
+            const reportBenchMark = benchMarkCalculator.calculate(testBenchMarkData, reportAggregate.aggregate);
+            await databaseConnector.updateReportBenchMark(report.test_id, report.report_id, JSON.stringify(reportBenchMark));
+        }
+    } catch (err) {
+        console.log(err);
     }
 }
 
