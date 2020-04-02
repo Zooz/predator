@@ -18,7 +18,6 @@ module.exports.getConfig = async () => {
 };
 
 module.exports.updateConfig = async (config) => {
-    validators.validateBenchmarkWeights(config);
     let response = await dbConnector.updateConfig(config);
     return response;
 };

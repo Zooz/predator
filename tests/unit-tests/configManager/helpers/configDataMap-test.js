@@ -24,10 +24,9 @@ const expectedTypes = {
     prometheus_metrics: 'json',
     smtp_server: 'json',
     delay_runner_ms: 'int',
-    threshold: 'int',
-    threshold_webhook_url: 'string',
-    benchmark_weights: 'json',
-    benchmark_config: 'json'
+    benchmark_threshold: 'int',
+    benchmark_threshold_webhook_url: 'string',
+    benchmark_weights: 'json'
 };
 
 function changeAllEnvData() {

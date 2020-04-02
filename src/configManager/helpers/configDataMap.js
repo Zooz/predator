@@ -30,10 +30,9 @@ let configDataMap = {
         }),
         type: 'json'
     },
-    [constConfig.THRESHOLD]: { value: process.env.THRESHOLD, type: 'int' },
-    [constConfig.THRESHOLD_WEBHOOK_URL]: { value: process.env.THRESHOLD_WEBHOOK_URL, type: 'string' },
-    [constConfig.BENCHMARK_WEIGHTS]: { value: process.env.BENCHMARK_WEIGHTS, type: 'json' },
-    [constConfig.BENCHMARK_CONFIG]: { value: process.env.BENCHMARK_CONFIG, type: 'json' }
+    [constConfig.BENCHMARK_THRESHOLD]: { value: process.env.BENCHMARK_THRESHOLD, type: 'int' },
+    [constConfig.BENCHMARK_THRESHOLD_WEBHOOK_URL]: { value: process.env.BENCHMARK_THRESHOLD_WEBHOOK_URL, type: 'string' },
+    [constConfig.BENCHMARK_WEIGHTS]: { value: process.env.BENCHMARK_WEIGHTS, type: 'json' }
 };
 
 module.exports.getConstType = (configValue) => {

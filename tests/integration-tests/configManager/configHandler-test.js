@@ -36,16 +36,14 @@ const updateBodyWithTypes = {
         timeout: 2
     },
     runner_memory: 256,
-    benchmark_config: {
-        threshold: 20,
-        threshold_webhook_url: 'http://slack.com',
-        benchmark_weights: {
-            percentile_ninety: { factor: 10, percentage: 20 },
-            percentile_fifty: { factor: 10, percentage: 30 },
-            server_errors: { factor: 10, percentage: 20 },
-            client_errors: { factor: 10, percentage: 20 },
-            rps: { factor: 10, percentage: 10 }
-        }
+    benchmark_threshold: 20,
+    benchmark_threshold_webhook_url: 'http://slack.com',
+    benchmark_weights: {
+        percentile_ninety: { factor: 10, percentage: 20 },
+        percentile_fifty: { factor: 10, percentage: 30 },
+        server_errors: { factor: 10, percentage: 20 },
+        client_errors: { factor: 10, percentage: 20 },
+        rps: { factor: 10, percentage: 10 }
     }
 };
 
@@ -82,16 +80,14 @@ const requestBody =
             timeout: 2
         },
         minimum_wait_for_delayed_report_status_update_in_ms: 30000,
-        benchmark_config: {
-            threshold: 20,
-            threshold_webhook_url: 'http://slack.com',
-            benchmark_weights: {
-                percentile_ninety: { factor: 10, percentage: 20 },
-                percentile_fifty: { factor: 10, percentage: 30 },
-                server_errors: { factor: 10, percentage: 20 },
-                client_errors: { factor: 10, percentage: 20 },
-                rps: { factor: 10, percentage: 10 }
-            }
+        benchmark_threshold: 20,
+        benchmark_threshold_webhook_url: 'http://slack.com',
+        benchmark_weights: {
+            percentile_ninety: { factor: 10, percentage: 20 },
+            percentile_fifty: { factor: 10, percentage: 30 },
+            server_errors: { factor: 10, percentage: 20 },
+            client_errors: { factor: 10, percentage: 20 },
+            rps: { factor: 10, percentage: 10 }
         }
     };
 const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
@@ -103,7 +99,7 @@ const requestBodyNotValidRequire = {
     }
 };
 
-describe('update and get config', () => {
+describe.only('update and get config', () => {
     before(async () => {
         await configRequestCreator.init();
     });
@@ -143,7 +139,9 @@ describe('update and get config', () => {
             should(response.body['prometheus_metrics'] instanceof Object);
             should(response.body['smtp_server'] instanceof Object);
             should(response.body['smtp_server'] instanceof Number);
-            should(response.body['benchmark_config'] instanceof Object);
+            should(response.body['benchmark_threshold'] instanceof Number);
+            should(response.body['benchmark_threshold_webhook_url'] instanceof String);
+            should(response.body['benchmark_weights'] instanceof Object);
         });
     });
     describe('Update config and get config ', () => {
@@ -201,20 +199,33 @@ describe('update and get config', () => {
     describe('Update config with benchmark weights not sum up to 100%', () => {
         it('params below minimum', async () => {
             let response = await configRequestCreator.updateConfig({
-                benchmark_config: {
-                    threshold: 20,
-                    threshold_webhook_url: 'http://slack.com',
-                    benchmark_weights: {
-                        percentile_ninety: { factor: 10, percentage: 50 },
-                        percentile_fifty: { factor: 10, percentage: 30 },
-                        server_errors: { factor: 10, percentage: 20 },
-                        client_errors: { factor: 10, percentage: 30 },
-                        rps: { factor: 10, percentage: 30 }
-                    }
+                benchmark_threshold: 20,
+                benchmark_threshold_webhook_url: 'http://slack.com',
+                benchmark_weights: {
+                    percentile_ninety: { factor: 10, percentage: 50 },
+                    percentile_fifty: { factor: 10, percentage: 30 },
+                    server_errors: { factor: 10, percentage: 20 },
+                    client_errors: { factor: 10, percentage: 30 },
+                    rps: { factor: 10, percentage: 30 }
                 }
             });
             should(response.statusCode).eql(422);
             should(response.body.message).eql('Benchmark weights needs to sum up to 100%');
+        });
+    });
+
+    describe('Update config benchmark with partial properties', () => {
+        it('update config fail with validation type', async () => {
+            const requestBody = {
+                benchmark_threshold: 20,
+                benchmark_threshold_webhook_url: 'http://slack.com'
+            };
+            let response = await configRequestCreator.updateConfig(requestBody);
+            should(response.statusCode).eql(400);
+            should(response.body.message).eql(validationError);
+            should(response.body.validation_errors).eql([
+                'body request should have all of properties: benchmark_threshold,benchmark_threshold_webhook_url,benchmark_weights'
+            ]);
         });
     });
 });

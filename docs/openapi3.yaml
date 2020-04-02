@@ -2040,25 +2040,16 @@ components:
             timeout:
               description: timout to smtp server in milliseconds
               type: number
-        benchmark_config:
-          additionalProperties: false
-          type: object
-          description: Simple mail transfer protocol.
-          required:
-          - threshold
-          - threshold_webhook_url
-          - benchmark_weights
-          properties:
-            threshold:
+        benchmark_threshold:
               type: number
               description: benchmark threshold
               minimum: 0
               maximum: 100
-            threshold_webhook_url:
+        benchmark_threshold_webhook_url:
               type: string
               format: uri
               description: webhook url to alert when coverage less than threshold
-            benchmark_weights:
+        benchmark_weights:
               additionalProperties: false
               type: object
               description: benchmark_weights

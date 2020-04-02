@@ -28,8 +28,8 @@ describe('Manager config with env variables', function () {
         process.env.RUNNER_CPU = '0.35';
         process.env.GRAFANA_URL = 'url_test';
         process.env.GRAFANA_URL = 'url_test';
-        process.env.THRESHOLD = 10;
-        process.env.THRESHOLD_WEBHOOK_URL = 'url_test';
+        process.env.BENCHMARK_THRESHOLD = 10;
+        process.env.BENCHMARK_THRESHOLD_WEBHOOK_URL = 'url_test';
         const configDataMap = rewire('../../../src/configManager/helpers/configDataMap');
         console.log('**********' + configDataMap.getConstDefaultValue('grafana_url'));
         manager = rewire('../../../src/configManager/models/configHandler');
@@ -45,8 +45,8 @@ describe('Manager config with env variables', function () {
         delete process.env.RUNNER_MEMORY;
         delete process.env.RUNNER_CPU;
         delete process.env.GRAFANA_URL;
-        delete process.env.THRESHOLD;
-        delete process.env.THRESHOLD_WEBHOOK_URL;
+        delete process.env.BENCHMARK_THRESHOLD;
+        delete process.env.BENCHMARK_THRESHOLD_WEBHOOK_URL;
         sandbox.restore();
     });
     it('get config for from env varibles in the right types (json,int,float,string)', async () => {
@@ -65,7 +65,7 @@ describe('Manager config with env variables', function () {
             'rejectUnauthCerts': 'true',
             'secure': 'true'
         });
-        should(result.threshold).eql(10);
-        should(result.threshold_webhook_url).eql('url_test');
+        should(result.benchmark_threshold).eql(10);
+        should(result.benchmark_threshold_webhook_url).eql('url_test');
     });
 });
