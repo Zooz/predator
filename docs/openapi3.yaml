@@ -2042,7 +2042,7 @@ components:
               type: number
         benchmark_threshold:
               type: number
-              description: benchmark threshold
+              description: benchmark threshold. Test below this threshold considered as failed and webhook will be sent to the threshold_webhook_url.
               minimum: 0
               maximum: 100
         benchmark_threshold_webhook_url:
