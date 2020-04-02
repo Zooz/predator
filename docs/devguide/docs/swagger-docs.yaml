@@ -1046,6 +1046,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/config_body"
+        "422":
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         "500":
           description: Internal server error
           content:
@@ -1886,3 +1892,55 @@ components:
             timeout:
               description: timout to smtp server in milliseconds
               type: number
+        benchmark_threshold:
+              type: number
+              description: benchmark threshold. Test below this threshold considered as failed and webhook will be sent to the threshold_webhook_url.
+              minimum: 0
+              maximum: 100
+        benchmark_threshold_webhook_url:
+              type: string
+              format: uri
+              description: webhook url to alert when coverage less than threshold
+        benchmark_weights:
+              additionalProperties: false
+              type: object
+              description: benchmark_weights
+              required:
+              - percentile_ninety
+              - percentile_fifty
+              - server_errors
+              - client_errors
+              - rps
+              properties:
+                percentile_ninety:
+                  description: P90 benchmark weight
+                  allOf:
+                    - $ref: '#/components/schemas/benchmark_weights'
+                percentile_fifty:
+                  description: P50 benchmark weight
+                  allOf:
+                    - $ref: '#/components/schemas/benchmark_weights'
+                server_errors:
+                  description: 5xx server errors benchmark weight
+                  allOf: 
+                   - $ref: '#/components/schemas/benchmark_weights'
+                client_errors:
+                  description: 4xx server errors benchmark weight
+                  allOf: 
+                   - $ref: '#/components/schemas/benchmark_weights'
+                rps:
+                  description: requests per second benchmark weight
+                  allOf: 
+                   - $ref: '#/components/schemas/benchmark_weights'
+    benchmark_weights:
+      type: object
+      required:
+        - factor
+        - percentage
+      properties:
+        factor:
+          type: number
+          description: benchmark factor weight
+        percentage:
+            type: number
+            description: benchmark percentage weight
