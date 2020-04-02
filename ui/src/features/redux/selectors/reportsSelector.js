@@ -7,9 +7,12 @@ export const errorOnGetReports = (state) => state.ReportsReducer.get('error_get_
 export const report = (state) => state.ReportsReducer.get('report');
 export const errorOnGetReport = (state) => state.ReportsReducer.get('error_get_report');
 export const processingGetReports = (state) => state.ReportsReducer.get('processing_get_reports');
+export const createBenchmarkSuccess = (state) => state.ReportsReducer.get('create_benchmark_success');
+export const editNotesSuccess = (state) => state.ReportsReducer.get('edit_notes_success');
+export const createBenchmarkFailure = (state) => state.ReportsReducer.get('create_benchmark_failure');
+export const editReportFailure = (state) => state.ReportsReducer.get('edit_report_failure');
 
-
-export const getAggregateReort = createSelector(aggregateReport,(report)=>{
+export const getAggregateReport = createSelector(aggregateReport,(report)=>{
     const latencyGraph = [],
         errorsCodeGraph = [],
         errorCodes = {},
@@ -17,7 +20,8 @@ export const getAggregateReort = createSelector(aggregateReport,(report)=>{
         errors = {},
         rps = [],
         errorsBar = [],
-        scenarios = [];
+        scenarios = [],
+        benchMark = {};
     if (report) {
         const startTime = new Date(report.start_time).getTime();
         report.intermediates.forEach((bucket, index) => {
@@ -53,6 +57,12 @@ export const getAggregateReort = createSelector(aggregateReport,(report)=>{
             scenarios.push({name: key, value: report.aggregate.scenarioCounts[key]})
         })
 
+        if(report.aggregate){
+            benchMark.rps=report.aggregate.rps;
+            benchMark.scenarioDuration = report.aggregate.scenarioDuration;
+            benchMark.errors = report.aggregate.errors;
+            benchMark.codes = report.aggregate.v;
+            }
     }
 
     return {
@@ -63,6 +73,7 @@ export const getAggregateReort = createSelector(aggregateReport,(report)=>{
         errors,
         rps,
         errorsBar,
-        scenarios
+        scenarios,
+        benchMark
     }
 });

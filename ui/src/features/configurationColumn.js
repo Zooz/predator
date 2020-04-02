@@ -1,6 +1,7 @@
 import {TableHeader} from "../components/ReactTable";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {filter, sortedUniqBy} from 'lodash';
+
 import Moment from 'moment';
 import prettySeconds from 'pretty-seconds';
 import 'font-awesome/css/font-awesome.min.css';
@@ -21,9 +22,11 @@ import {v4 as uuid} from "uuid";
 import TooltipWrapper from '../components/TooltipWrapper';
 import {getTimeFromCronExpr} from './utils';
 import UiSwitcher from '../components/UiSwitcher';
+import TextArea from "../components/TextArea";
+import TitleInput from "../components/TitleInput";
 
 
-export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable}) => {
+export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote}) => {
 
     const columns = [
         {
@@ -45,7 +48,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             accessor: 'name',
             headerClassName: css['header-name'],
             className: css['header-name']
-        },  {
+        }, {
             id: 'processor_name',
             Header: () => (
                 <TableHeader sortable={false}>
@@ -123,9 +126,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => <ViewButton icon={faPen} onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(data)
-                }}/>,
+                e.stopPropagation();
+                onEdit(data)
+            }}/>,
             className: css['small-header'],
             headerClassName: css['small-header']
         },
@@ -274,7 +277,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Notes
                 </TableHeader>
             ),
-            accessor: data => notes(data.notes)
+            accessor: data => <Notes data={data} onEditNote={onEditNote}/>
         }, {
             id: 'report',
             Header: () => (
@@ -419,13 +422,13 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 return (
                     <UiSwitcher
                         onChange={(value) => {
-                            onEnableDisable(data,value)
+                            onEnableDisable(data, value)
                         }}
                         disabledInp={false}
                         activeState={activated}
                         height={12}
                         width={22}
-                />)
+                    />)
             },
             className: css['small-header'],
             headerClassName: css['small-header']
@@ -461,31 +464,49 @@ const ViewButton = ({onClick, icon, disabled, text}) => {
 
     const element = icon ? <FontAwesomeIcon
         className={classnames(css['icon'], {[css['action-style']]: !disabled, [css['disabled-button']]: disabled})}
-        onClick={!disabled && onClick} icon={icon}/> : text || 'View';
+        onClick={() => !disabled && onClick} icon={icon}/> : text || 'View';
 
 
     return (<div className={css['action-style']} onClick={onClick}>{element}</div>)
 };
 
 
-const notes = (cell, row) => {
-    if (cell) {
-        const id = uuid();
-        cell = cell.split('\n').map((row) => (<p>{row}</p>));
-        return <TooltipWrapper
-            content={<div>
-                {cell}
-            </div>}
-            dataId={`tooltipKey_${id}`}
-            place='top'
-            offset={{top: 1}}
-        >
-            <div className={css.notes} data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer'}}>
-                {cell}
-            </div>
+const Notes = ({data, onEditNote}) => {
+    const {notes = '', report_id, test_id} = data;
+    const [editMode, setEditMode] = useState(false);
+    const [editValue, setEditValue] = useState(notes);
+    const id = uuid();
+    const cell = notes.split('\n').map((row) => (<p>{row}</p>));
 
-        </TooltipWrapper>;
+    function onKeyDown(e) {
+        if (e.key === 'Enter') {
+            setEditMode(false);
+            onEditNote(test_id, report_id, editValue);
+        }
     }
+
+    return <TooltipWrapper
+        disable={!notes}
+        content={<div>
+            {cell}
+        </div>}
+        dataId={`tooltipKey_${id}`}
+        place='top'
+        offset={{top: 1}}
+    >
+        <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
+            {editMode &&
+            <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown} onChange={(evt, value) => {
+                setEditValue(evt.target.value)
+            }}/>}
+            {!editMode &&
+            <div onClick={() => onEditNote && setEditMode(true)}
+                 style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
+
+            }
+        </div>
+
+    </TooltipWrapper>;
 };
 
 

@@ -49,8 +49,37 @@ export const getAggregateReport = (testId,reportId) => (
   { type: Types.GET_AGGREGATE_REPORT, testId,reportId }
 );
 
+export const createBenchmark = (testId,body) => (
+  { type: Types.CREATE_BENCHMARK, testId,body }
+);
+
+export const createBenchmarkSuccess = (value) => (
+  { type: Types.CREATE_BENCHMARK_SUCCESS, value }
+);
+
+export const createBenchmarkFailure = (error) => (
+  { type: Types.CREATE_BENCHMARK_FAILURE, error }
+);
+
 
 export const getAggregateReportSuccess = (data) => (
   { type: Types.GET_AGGREGATE_REPORT_SUCCESS, data }
 );
+
+export const editReport = (testId, reportId, body) => (
+    {type: Types.EDIT_REPORT, testId,reportId, body}
+);
+
+export const editReportSuccess = (value) => (
+    {type: Types.EDIT_REPORT_SUCCESS, value}
+);
+
+export const editReportFailure = (error) => (
+    {type: Types.EDIT_REPORT_FAILURE, error}
+);
+
+export const cleanAllReportsErrors = () => (
+    {type: Types.CLEAN_ALL_ERRORS}
+);
+
 

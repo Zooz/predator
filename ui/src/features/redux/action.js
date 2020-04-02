@@ -59,7 +59,10 @@ import {
     getReportsFaliure,
     getReportsSuccess,
     getReportSuccess,
-    processingGetReports
+    processingGetReports,
+    editReport,
+    editReportSuccess,
+    cleanAllReportsErrors
 } from './actions/reportsActions';
 import {
     updateConfig,
@@ -142,6 +145,9 @@ export {
     getReportSuccess,
     processingGetReports,
     getLastReports,
+    editReport,
+    editReportSuccess,
+    cleanAllReportsErrors,
 
     //config
     getConfigDataMapSuccess,
