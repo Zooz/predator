@@ -2,7 +2,6 @@ const dbConnector = require('./database/databaseConnector');
 const configDataMap = require('../helpers/configDataMap');
 const configTemplate = require('../../common/consts').CONFIG;
 const convertData = require('../helpers/convertData');
-const validators = require('../helpers/validators');
 
 module.exports.getConfigValue = async (configPath) => {
     const dbConfigValue = await dbConnector.getConfigValue(configPath);

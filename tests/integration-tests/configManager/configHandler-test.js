@@ -228,6 +228,7 @@ describe('update and get config', () => {
             ]);
         });
     });
+
     describe('Update config benchmark weights with invalid properties', () => {
         it('update config fail with validation type', async () => {
             let response = await configRequestCreator.updateConfig({
