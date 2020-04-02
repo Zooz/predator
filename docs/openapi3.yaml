@@ -2067,6 +2067,7 @@ components:
               - percentile_fifty
               - server_errors
               - client_errors
+              - rps
               properties:
                 percentile_ninety:
                   description: P90 benchmark weight
@@ -2082,6 +2083,10 @@ components:
                    - $ref: '#/components/schemas/benchmark_weights'
                 client_errors:
                   description: 4xx server errors benchmark weight
+                  allOf: 
+                   - $ref: '#/components/schemas/benchmark_weights'
+                rps:
+                  description: requests per second benchmark weight
                   allOf: 
                    - $ref: '#/components/schemas/benchmark_weights'
     benchmark_weights:

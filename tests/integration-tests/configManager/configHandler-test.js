@@ -43,7 +43,8 @@ const updateBodyWithTypes = {
             percentile_ninety: { factor: 10, percentage: 20 },
             percentile_fifty: { factor: 10, percentage: 30 },
             server_errors: { factor: 10, percentage: 20 },
-            client_errors: { factor: 10, percentage: 30 }
+            client_errors: { factor: 10, percentage: 20 },
+            rps: { factor: 10, percentage: 10 }
         }
     }
 };
@@ -88,7 +89,8 @@ const requestBody =
                 percentile_ninety: { factor: 10, percentage: 20 },
                 percentile_fifty: { factor: 10, percentage: 30 },
                 server_errors: { factor: 10, percentage: 20 },
-                client_errors: { factor: 10, percentage: 30 }
+                client_errors: { factor: 10, percentage: 20 },
+                rps: { factor: 10, percentage: 10 }
             }
         }
     };
@@ -206,7 +208,8 @@ describe('update and get config', () => {
                         percentile_ninety: { factor: 10, percentage: 50 },
                         percentile_fifty: { factor: 10, percentage: 30 },
                         server_errors: { factor: 10, percentage: 20 },
-                        client_errors: { factor: 10, percentage: 30 }
+                        client_errors: { factor: 10, percentage: 30 },
+                        rps: { factor: 10, percentage: 30 }
                     }
                 }
             });
