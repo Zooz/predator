@@ -100,13 +100,22 @@ async function handleDone(report, job) {
 
     let emails = await getEmailTargets(job);
     let webhooks = await getWebhookTargets(job);
+    let benchmarkWebhook;
+    /** TODO - calculate score */
+    // const score = calculateTestScore();
+    const score = 8;
+    if (configConstants.BENCHMARK_THRESHOLD && score < configConstants.BENCHMARK_THRESHOLD){
+        benchmarkWebhook = await getBenchmarkWebhook();
+    }
 
-    if (emails.length === 0 && webhooks.length === 0) {
+    if (emails.length === 0 && webhooks.length === 0 && benchmarkWebhook.length === 0) {
         return;
     }
 
     let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
     let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate)}\n`;
+    /** TODO - compleate last scores in msg */
+    let benchmarkWebhookMsg = `😔*Test ${report.test_name} got a score of ${score} this is below the threshold of ${configConstants.BENCHMARK_THRESHOLD}. last 3 scores are {y}, {y2}, y{3}'`;
 
     if (report.grafana_report) {
         webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;
@@ -118,6 +127,10 @@ async function handleDone(report, job) {
 
     if (webhooks.length > 0) {
         reportWebhookSender.send(webhooks, webhookMessage);
+    }
+
+    if (benchmarkWebhook.length > 0) {
+        reportWebhookSender.send(benchmarkWebhook, benchmarkWebhookMsg);
     }
 }
 
@@ -155,6 +168,17 @@ async function getWebhookTargets(job) {
     if (job.webhooks) {
         targets = targets.concat(job.webhooks);
     }
+    return targets;
+}
+
+async function getBenchmarkWebhook() {
+    let targets = [];
+    let benchmarkWebhookUrl = await configHandler.getConfigValue(configConstants.BENCHMARK_THRESHOLD_WEBHOOK_URL);
+
+    if (benchmarkWebhookUrl) {
+        targets.push(benchmarkWebhookUrl);
+    }
+
     return targets;
 }
 

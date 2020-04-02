@@ -12,6 +12,7 @@ let configHandler = require('../../../../src/configManager/models/configHandler'
 let statsFormatter = require('../../../../src/reports/models/statsFormatter');
 let aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
 let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
+let configConstants = require('../../../../src/common/consts').CONFIG;
 
 describe('Webhook/email notifier test ', () => {
     let sandbox, loggerInfoStub, loggerWarnStub, reportWebhookSenderSendStub,
@@ -276,6 +277,50 @@ describe('Webhook/email notifier test ', () => {
         reportEmailSenderStub.callCount.should.equal(1);
         reportEmailSenderStub.args[0][2].should.containDeep(['test@predator.com', 'test2@predator.com']);
         loggerInfoStub.callCount.should.equal(1);
+    });
+
+    it('Handing message with phase: done - score is less than threshold', async () => {
+        configConstants.BENCHMARK_THRESHOLD = 10;
+
+        getConfigStub.resolves('test@predator.com');
+        getConfigStub.withArgs(sinon.match('default_webhook_url')).resolves('http://www.webhook.com');
+        getConfigStub.withArgs(sinon.match('default_email_address')).resolves('test@predator.com');
+        getConfigStub.withArgs(sinon.match('benchmark_threshold_webhook_url')).resolves('benchmarktest@predator.com');
+
+        aggregateReportGeneratorStub.resolves({});
+        jobsManagerStub.resolves({
+            webhooks: ['http://www.zooz.com'],
+            emails: ['test2@predator.com']
+
+        });
+        let report = {
+            environment: 'test',
+            report_id: 'report_id',
+            test_id: 'test_id',
+            test_name: 'some_test_name',
+            duration: 10,
+            arrival_rate: 10,
+            parallelism: 2,
+            ramp_to: 20,
+            status: 'started',
+            phase: 0,
+            subscribers: [{ phase_status: 'done' }, { phase_status: 'done' }]
+
+        };
+        let stats = {
+            phase_status: 'done',
+            data: JSON.stringify({})
+        };
+        statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
+
+        await notifier.notifyIfNeeded(report, stats);
+
+        reportWebhookSenderSendStub.args.should.containDeep([
+            [
+                "😔*Test some_test_name got a score of 8 this is below the threshold of 10. last 3 scores are {y}, {y2}, y{3}'"
+            ]
+        ]);
+        configConstants.BENCHMARK_THRESHOLD = undefined;
     });
 
     it('Handing message with phase: aborted', async () => {
