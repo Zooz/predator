@@ -101,7 +101,7 @@ async function handleDone(report, job) {
     let emails = await getEmailTargets(job);
     let webhooks = await getWebhookTargets(job);
     let benchmarkWebhook;
-    /** TODO - calculate score */
+    /** TODO: calculate score */
     // const score = calculateTestScore();
     const score = 8;
     if (configConstants.BENCHMARK_THRESHOLD && score < configConstants.BENCHMARK_THRESHOLD){
@@ -114,7 +114,7 @@ async function handleDone(report, job) {
 
     let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
     let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate)}\n`;
-    /** TODO - compleate last scores in msg */
+    /** TODO: compleate last scores in msg */
     let benchmarkWebhookMsg = `😔*Test ${report.test_name} got a score of ${score} this is below the threshold of ${configConstants.BENCHMARK_THRESHOLD}. last 3 scores are {y}, {y2}, y{3}'`;
 
     if (report.grafana_report) {
