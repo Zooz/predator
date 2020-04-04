@@ -2146,6 +2146,11 @@ components:
             buckets_sizes:
               type: string
               description: Bucket sizes use to configure prometheus.
+            labels:
+              description: Labels which will be passed to prometheus push gateway.
+              type: object
+              additionalProperties:
+                type: string
         smtp_server:
           additionalProperties: false
           type: object
@@ -2203,15 +2208,15 @@ components:
                     - $ref: '#/components/schemas/benchmark_weights'
                 server_errors:
                   description: 5xx server errors benchmark weight
-                  allOf: 
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
                 client_errors:
                   description: 4xx server errors benchmark weight
-                  allOf: 
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
                 rps:
                   description: requests per second benchmark weight
-                  allOf: 
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
     benchmark_weights:
       type: object
