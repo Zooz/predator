@@ -67,6 +67,7 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
+    "artillery": "^1.6.0-28",
     "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^7.6.0",
     "chai": "^4.2.0",
