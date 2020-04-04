@@ -58,10 +58,10 @@ export const getAggregateReport = createSelector(aggregateReport,(report)=>{
         })
 
         if(report.aggregate){
-            benchMark.rps=report.aggregate.rps;
-            benchMark.scenarioDuration = report.aggregate.scenarioDuration;
+            benchMark.rps = report.aggregate.rps;
+            benchMark.latency = report.aggregate.latency;
             benchMark.errors = report.aggregate.errors;
-            benchMark.codes = report.aggregate.v;
+            benchMark.codes = report.aggregate.codes;
             }
     }
 
