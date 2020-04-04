@@ -35,6 +35,7 @@
   },
   "homepage": "https://github.com/Zooz/predator#readme",
   "dependencies": {
+    "artillery": "^1.6.0",
     "bluebird": "^3.5.5",
     "body-parser": "^1.19.0",
     "bunyan": "^1.8.12",
@@ -67,7 +68,6 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "artillery": "^1.6.0-28",
     "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^7.6.0",
     "chai": "^4.2.0",
