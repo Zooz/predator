@@ -35,7 +35,16 @@ const updateBodyWithTypes = {
         password: 'string_value',
         timeout: 2
     },
-    runner_memory: 256
+    runner_memory: 256,
+    benchmark_threshold: 20,
+    benchmark_threshold_webhook_url: 'http://slack.com',
+    benchmark_weights: {
+        percentile_ninety: { factor: 10, percentage: 20 },
+        percentile_fifty: { factor: 10, percentage: 30 },
+        server_errors: { factor: 10, percentage: 20 },
+        client_errors: { factor: 10, percentage: 20 },
+        rps: { factor: 10, percentage: 10 }
+    }
 };
 
 const requestBody =
@@ -70,7 +79,16 @@ const requestBody =
             password: 'string_value',
             timeout: 2
         },
-        minimum_wait_for_delayed_report_status_update_in_ms: 30000
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        benchmark_threshold: 20,
+        benchmark_threshold_webhook_url: 'http://slack.com',
+        benchmark_weights: {
+            percentile_ninety: { factor: 10, percentage: 20 },
+            percentile_fifty: { factor: 10, percentage: 30 },
+            server_errors: { factor: 10, percentage: 20 },
+            client_errors: { factor: 10, percentage: 20 },
+            rps: { factor: 10, percentage: 10 }
+        }
     };
 const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
 const requestBodyNotValidType = { runner_cpu: 'not_int' };
@@ -121,6 +139,9 @@ describe('update and get config', () => {
             should(response.body['prometheus_metrics'] instanceof Object);
             should(response.body['smtp_server'] instanceof Object);
             should(response.body['smtp_server'] instanceof Number);
+            should(response.body['benchmark_threshold'] instanceof Number);
+            should(response.body['benchmark_threshold_webhook_url'] instanceof String);
+            should(response.body['benchmark_weights'] instanceof Object);
         });
     });
     describe('Update config and get config ', () => {
@@ -172,6 +193,43 @@ describe('update and get config', () => {
                 'body/minimum_wait_for_delayed_report_status_update_in_ms should be >= 0',
                 'body/delay_runner_ms should be >= 0'
             ]);
+        });
+    });
+
+    describe('Update config with benchmark weights not sum up to 100%', () => {
+        it('params below minimum', async () => {
+            let response = await configRequestCreator.updateConfig({
+                benchmark_threshold: 20,
+                benchmark_threshold_webhook_url: 'http://slack.com',
+                benchmark_weights: {
+                    percentile_ninety: { factor: 10, percentage: 50 },
+                    percentile_fifty: { factor: 10, percentage: 30 },
+                    server_errors: { factor: 10, percentage: 20 },
+                    client_errors: { factor: 10, percentage: 30 },
+                    rps: { factor: 10, percentage: 30 }
+                }
+            });
+            should(response.statusCode).eql(422);
+            should(response.body.message).eql('Benchmark weights needs to sum up to 100%');
+        });
+    });
+
+    describe('Update config benchmark weights with invalid properties', () => {
+        it('update config fail with validation type', async () => {
+            let response = await configRequestCreator.updateConfig({
+                benchmark_threshold: 20,
+                benchmark_threshold_webhook_url: 'http://slack.com',
+                benchmark_weights: { 'tps': '10' }
+            });
+            should(response.statusCode).eql(400);
+            should(response.body.message).eql(validationError);
+            should(response.body.validation_errors).eql([
+                "body/benchmark_weights should NOT have additional properties 'tps'",
+                "body/benchmark_weights should have required property 'percentile_ninety'",
+                "body/benchmark_weights should have required property 'percentile_fifty'",
+                "body/benchmark_weights should have required property 'server_errors'",
+                "body/benchmark_weights should have required property 'client_errors'",
+                "body/benchmark_weights should have required property 'rps'" ]);
         });
     });
 });

@@ -51,6 +51,12 @@ module.exports.getLastReports = async (limit) => {
     return reports;
 };
 
+module.exports.editReport = async (testId, reportId, reportBody) => {
+    // currently we support only edit for notes
+    const { notes } = reportBody;
+    await databaseConnector.updateReport(testId, reportId, { notes, last_updated_at: new Date() });
+};
+
 module.exports.postReport = async (testId, reportBody) => {
     const startTime = new Date(Number(reportBody.start_time));
     const job = await jobConnector.getJob(reportBody.job_id);
@@ -86,7 +92,7 @@ module.exports.postStats = async (report, stats) => {
     if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
         await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
     }
-    await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime);
+    await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
     report = await module.exports.getReport(report.test_id, report.report_id);
     await updateReportBenchMarkIfNeeded(report);
     notifier.notifyIfNeeded(report, stats);
@@ -175,7 +181,7 @@ function getReportResponse(summaryRow, config) {
 
 function generateGrafanaUrl(report, grafanaUrl) {
     if (grafanaUrl) {
-        const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
+        const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '&to=now';
         const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
         return grafanaReportUrl;
     }

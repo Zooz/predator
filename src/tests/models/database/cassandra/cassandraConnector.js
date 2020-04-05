@@ -131,7 +131,7 @@ async function executeQuery(query, params, queryOptions) {
         });
         return result;
     } catch (err){
-        cassandlogger.error(`Cassandra query failed \n ${JSON.stringify({ query, params, queryOptions })}`, err);
+        logger.error(`Cassandra query failed \n ${JSON.stringify({ query, params, queryOptions })}`, err);
         throw new Error('Error occurred in communication with cassandra');
     }
 }

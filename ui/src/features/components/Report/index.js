@@ -16,7 +16,8 @@ import * as selectors from "../../redux/selectors/reportsSelector";
 import {connect} from "react-redux";
 import Box from '../Box';
 import dateFormat from 'dateformat';
-import Button from '../Button';
+import Button from '../../../components/Button';
+import Snackbar from "material-ui/Snackbar";
 
 const REFRESH_DATA_INTERVAL = 30000;
 const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
@@ -105,9 +106,13 @@ class Report extends React.Component {
             </ResponsiveContainer>
         )
     };
+    createBenchmark = ()=>{
+        const {aggregateReport, report} = this.props;
+        this.props.createBenchmark(report.test_id, aggregateReport.benchMark);
+    };
 
     render() {
-        const {report, onClose,aggregateReport} = this.props;
+        const {report, onClose, aggregateReport} = this.props;
         return (
             <Modal onExit={onClose}>
                 <div style={{
@@ -121,8 +126,17 @@ class Report extends React.Component {
                 </div>
                 <span>Started at {dateFormat(new Date(report.start_time), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</span>
                 <div>
-                    <h3>Overall Latency</h3>
-                    {this.lineChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms' )}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <h3>Overall Latency</h3>
+                        <Button hover disabled={report.status !== 'finished'}
+                                onClick={this.createBenchmark}>Set as Benchmark</Button>
+                    </div>
+                    {this.lineChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms')}
                     <h3>Status Codes</h3>
                     {this.lineChart(aggregateReport.errorsCodeGraph, Object.keys(aggregateReport.errorCodes))}
                     <h3>RPS</h3>
@@ -138,12 +152,22 @@ class Report extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div style={{display:'flex',flexDirection:'row',justifyContent:'flex-end'}}>
-                        <Button onClick={onClose} label={'CLOSE'}/>
+                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                    <Button inverted onClick={onClose}>Close</Button>
                 </div>
+                <Snackbar
+                    open={this.props.createBenchmarkSucceed}
+                    bodyStyle={{backgroundColor: '#2fbb67'}}
+                    message={'create benchmark succeeded'}
+                    autoHideDuration={4000}
+                    onRequestClose={() => {
+                        this.props.createBenchmarkSuccess(false);
+                    }}
+                />
             </Modal>
         );
     }
+
     loadData = () => {
         const {getAggregateReport, report} = this.props;
         getAggregateReport(report.test_id, report.report_id);
@@ -165,12 +189,15 @@ class Report extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        aggregateReport: selectors.getAggregateReort(state),
+        aggregateReport: selectors.getAggregateReport(state),
+        createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
     }
 }
 
 const mapDispatchToProps = {
     getAggregateReport: Actions.getAggregateReport,
+    createBenchmark: Actions.createBenchmark,
+    createBenchmarkSuccess: Actions.createBenchmarkSuccess,
 };
 
 

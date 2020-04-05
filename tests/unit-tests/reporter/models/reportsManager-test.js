@@ -109,7 +109,7 @@ describe('Reports manager tests', function () {
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
-            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&from=1527533459591');
+            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=now');
         });
 
         it('Database connector returns an array with one report without grafana url configured', async () => {
@@ -350,6 +350,13 @@ describe('Reports manager tests', function () {
             } catch (error) {
                 error.should.eql(expectedError);
             }
+        });
+    });
+    describe('edit report', function () {
+        it('Successfully edit report', async () => {
+            databaseGetReportStub.resolves(['report']);
+            databaseUpdateReportStub.resolves();
+            await manager.editReport('test_id', REPORT, { notes: 'notes' });
         });
     });
 

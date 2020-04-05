@@ -71,11 +71,25 @@ function insertLastReportAsync(testId, revisionId, reportId, jobId, testType, ph
         })}`, err));
 }
 
-async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
-    let params;
-    params = [phaseIndex, lastUpdatedAt, testId, reportId];
-    updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt);
-    return executeQuery(UPDATE_REPORT_SUMMARY, params, queryOptions);
+async function updateReport(testId, reportId, reportData) {
+    const UPDATE_REPORT_SUMMARY = 'UPDATE reports_summary';
+    const where = 'WHERE test_id=? AND report_id=?';
+    const queryData = buildUpdateQuery(UPDATE_REPORT_SUMMARY, reportData, where, [testId, reportId]);
+
+    updateLastReportAsync(testId, reportId, reportData);
+    return executeQuery(queryData.query, queryData.params, queryOptions);
+}
+
+function buildUpdateQuery(baseQuery, values, where, whereDataArray) {
+    const entriesValues = Object.entries(values);
+    const params = entriesValues.map((entry) => entry[1]).concat(whereDataArray);
+    const setStatement = `SET ${entriesValues.map((entry) => `${entry[0]}=?`).join(', ')}`;
+    const query = `${baseQuery} ${setStatement} ${where}`;
+
+    return {
+        query,
+        params
+    };
 }
 
 async function updateReportBenchMark(testId, reportId, benchMarkData) {
@@ -92,12 +106,18 @@ async function updateLastReportAsync(testId, reportId, phaseIndex, lastUpdatedAt
         const startTimeDate = new Date(startTime);
         const startTimeYear = startTimeDate.getFullYear();
         const startTimeMonth = startTimeDate.getMonth() + 1;
-        params = [phaseIndex, lastUpdatedAt, startTimeYear, startTimeMonth, startTime, testId, reportId];
-        await executeQuery(UPDATE_LAST_REPORT_SUMMARY, params, queryOptions);
+
+        const where = 'WHERE start_time_year=? AND start_time_month=? AND start_time=? AND test_id=? AND report_id=?';
+        const whereParams = [startTimeYear, startTimeMonth, startTime, testId, reportId];
+        const UPDATE_LAST_REPORT_SUMMARY = 'UPDATE last_reports';
+
+        queryData = buildUpdateQuery(UPDATE_LAST_REPORT_SUMMARY, reportData, where, whereParams);
+
+        await executeQuery(queryData.query, queryData.params, queryOptions);
     } catch (err) {
         logger.error(`Cassandra updateLastReportAsync failed \n ${JSON.stringify({
-            UPDATE_LAST_REPORT_SUMMARY,
-            params,
+            query: queryData.query,
+            params: queryData.params,
             queryOptions
         })}`, err);
     }
