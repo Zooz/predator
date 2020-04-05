@@ -36,7 +36,7 @@ module.exports = {
     getFile,
     deleteDefinition,
     insertTestBenchMark,
-    getTestBenchMark,
+    getTestBenchMark
 };
 
 let queryOptions = {
@@ -74,7 +74,7 @@ async function insertTestBenchMark(testId, benchMarkData) {
 
 async function getTestBenchMark(testId) {
     const result = await executeQuery(GET_BENCHMARK_DATA_TEST, [testId]);
-    return result.rows.length > 0 ? result.rows[0] : undefined;
+    return result.rows.length > 0 ? result.rows[0].data : undefined;
 }
 
 async function getAllTestRevisions(id) {

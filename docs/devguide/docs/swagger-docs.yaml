@@ -312,6 +312,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+    get:
+      tags:
+        - Tests
+      parameters:
+        - in: path
+          name: test_id
+          description: The test id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      summary: get a bench mark for test
+      description: Create a bench mark for test
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/benchmark_request'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}':
     get:
       operationId: retrieve-a-test
@@ -1710,6 +1743,13 @@ components:
         notes:
           type: string
           description: notes about the test
+        score:
+          type: number
+          description: The score of report comapring to test benchmark
+          example: 9.25
+        weights_data:
+          type: object
+          description: The way score calualated
     config_body:
       additionalProperties: false
       properties:

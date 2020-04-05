@@ -10,7 +10,7 @@ const databaseConnector = require('./databaseConnector'),
     benchMarkCalculator = require('./benchMarkCalculator'),
     configHandler = require('../../configManager/models/configHandler'),
     notifier = require('./notifier'),
-    reportUtil=require('../utils/reportUtil'),
+    reportUtil = require('../utils/reportUtil'),
     constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
@@ -30,7 +30,6 @@ module.exports.getReport = async (testId, reportId) => {
     let report = await getReportResponse(reportSummary[0], config);
     return report;
 };
-
 
 module.exports.getReports = async (testId) => {
     let reportSummaries = await databaseConnector.getReports(testId);
@@ -84,7 +83,6 @@ module.exports.postStats = async (report, stats) => {
 
     if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE) {
         await databaseConnector.updateSubscriber(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
-
     } else {
         await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
     }
@@ -105,20 +103,17 @@ async function updateReportBenchMarkIfNeeded(report) {
         return;
     }
     const testBenchMarkData = await extractBenchMarkData(report.test_id);
-    try {
-        if (testBenchMarkData) {
-            const reportAggregate = await aggregateReportManager.aggregateReport(report);
-            const reportBenchMark = benchMarkCalculator.calculate(testBenchMarkData, reportAggregate.aggregate);
-            await databaseConnector.updateReportBenchMark(report.test_id, report.report_id, JSON.stringify(reportBenchMark));
-        }
-    } catch (err) {
-        console.log(err);
+    if (testBenchMarkData) {
+        const reportAggregate = await aggregateReportManager.aggregateReport(report);
+        const reportBenchMark = benchMarkCalculator.calculate(testBenchMarkData, reportAggregate.aggregate);
+        const { data, score } = reportBenchMark;
+        await databaseConnector.updateReportBenchMark(report.test_id, report.report_id, score, JSON.stringify(data));
     }
 }
 
 async function extractBenchMarkData(testId) {
     const res = await testDbConnector.getTestBenchMark(testId);
-    return res ? JSON.parse(res.data) : undefined;
+    return res ? JSON.parse(res) : undefined;
 }
 
 function getReportResponse(summaryRow, config) {
@@ -165,7 +160,10 @@ function getReportResponse(summaryRow, config) {
         environment: testConfiguration.environment,
         subscribers: summaryRow.subscribers,
         last_rps: rps,
-        last_success_rate: successRate
+        last_success_rate: successRate,
+        score: summaryRow.score,
+        weights_data: summaryRow.weights_data ? JSON.parse(summaryRow.weights_data) : undefined
+
     };
 
     report.status = calculateReportStatus(report, config);

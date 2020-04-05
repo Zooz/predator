@@ -14,11 +14,11 @@ module.exports = {
 
 };
 
-async function aggregateReport (report)  {
+async function aggregateReport (report) {
     let stats = await databaseConnector.getStats(report.test_id, report.report_id);
 
     if (stats.length === 0) {
-        let errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${testId} and reportId: ${reportId}`;
+        let errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${report.test_id} and reportId: ${report.report_id}`;
         logger.error(errorMessage);
         let error = new Error(errorMessage);
         error.statusCode = 404;
@@ -34,6 +34,8 @@ async function aggregateReport (report)  {
     reportInput.test_id = report.test_id;
     reportInput.test_name = report.test_name;
     reportInput.revision_id = report.revision_id;
+    reportInput.score = report.score;
+    reportInput.weights_data = report.weights_data;
 
     reportInput.status = mapReportStatus(report.status);
 

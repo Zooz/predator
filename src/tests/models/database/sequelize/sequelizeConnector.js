@@ -17,7 +17,8 @@ module.exports = {
     getDslDefinition,
     deleteDefinition,
     updateDslDefinition,
-    insertTestBenchMark
+    insertTestBenchMark,
+    getTestBenchMark
 
 };
 
@@ -114,6 +115,15 @@ async function insertTestBenchMark(testId, benchMarkData) {
     };
     const result = benchmark.create(params);
     return result;
+}
+
+async function getTestBenchMark(test_id) {
+    const benchmark = client.model('benchmark');
+    const options = {
+        where: { test_id: test_id }
+    };
+    let benchmarkRes = await benchmark.findOne(options);
+    return benchmarkRes ? benchmarkRes.dataValues.data : undefined;
 }
 
 async function insertTest(testInfo, testJson, id, revisionId, fileId){

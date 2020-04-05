@@ -17,7 +17,8 @@ module.exports = {
     getStats,
     subscribeRunner,
     updateSubscriberWithStats,
-    updateSubscriber
+    updateSubscriber,
+    updateReportBenchMark
 };
 
 async function init(sequlizeClient) {
@@ -71,6 +72,19 @@ async function updateReport(testId, reportId, reportData) {
     };
 
     return report.update(reportData, options);
+}
+
+async function updateReportBenchMark(testId, reportId, score, benchMarkData) {
+    const benchmark = client.model('report');
+    const params = { score: score, weights_data: benchMarkData };
+    const options = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+    const res = await benchmark.update(params, options);
+    return res;
 }
 
 async function subscribeRunner(testId, reportId, runnerId) {
@@ -250,6 +264,12 @@ async function initSchemas() {
         },
         phase: {
             type: Sequelize.DataTypes.STRING
+        },
+        weights_data: {
+            type: Sequelize.DataTypes.STRING
+        },
+        score: {
+            type: Sequelize.DataTypes.FLOAT
         }
     });
 

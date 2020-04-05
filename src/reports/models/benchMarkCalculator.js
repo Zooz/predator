@@ -1,6 +1,3 @@
-
-module.exports.calculate =  (testBenchMark, reportData) => {
-    return {res: 'to implement'}
-
+module.exports.calculate = (testBenchMark, reportData) => {
+    return { data: testBenchMark, score: 9 };
 };
-
