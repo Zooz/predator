@@ -8,7 +8,7 @@ const reportEmailSender = require('./reportEmailSender'),
     logger = require('../../common/logger'),
     constants = require('../utils/constants'),
     configHandler = require('../../configManager/models/configHandler'),
-    reportUtil=require('../utils/reportUtil'),
+    reportUtil = require('../utils/reportUtil'),
     configConstants = require('../../common/consts').CONFIG;
 
 module.exports.notifyIfNeeded = async (report, stats) => {
@@ -133,7 +133,6 @@ async function handleAbort(report, job) {
     }
     reportWebhookSender.send(webhooks, webhookMessage);
 }
-
 
 async function getWebhookTargets(job) {
     let targets = [];
