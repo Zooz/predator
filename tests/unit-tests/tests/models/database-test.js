@@ -16,6 +16,10 @@ const functions = [
         args: ['testId', 'benchMarkData']
     },
     {
+        functionName: 'getTestBenchMark',
+        args: ['testId']
+    },
+    {
         functionName: 'getTest',
         args: ['id']
     },

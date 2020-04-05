@@ -7,7 +7,7 @@ const databaseConnector = require('./databaseConnector'),
     testDbConnector = require('../../tests/models/database'),
     jobConnector = require('../../jobs/models/jobManager'),
     aggregateReportManager = require('./aggregateReportManager'),
-    benchMarkCalculator = require('./benchMarkCalculator'),
+    benchmarkCalculator = require('./benchmarkCalculator'),
     configHandler = require('../../configManager/models/configHandler'),
     notifier = require('./notifier'),
     reportUtil = require('../utils/reportUtil'),
@@ -105,7 +105,7 @@ async function updateReportBenchMarkIfNeeded(report) {
     const testBenchMarkData = await extractBenchMarkData(report.test_id);
     if (testBenchMarkData) {
         const reportAggregate = await aggregateReportManager.aggregateReport(report);
-        const reportBenchMark = benchMarkCalculator.calculate(testBenchMarkData, reportAggregate.aggregate);
+        const reportBenchMark = benchmarkCalculator.calculate(testBenchMarkData, reportAggregate.aggregate);
         const { data, score } = reportBenchMark;
         await databaseConnector.updateReportBenchMark(report.test_id, report.report_id, score, JSON.stringify(data));
     }

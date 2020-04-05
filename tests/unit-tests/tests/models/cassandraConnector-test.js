@@ -90,8 +90,8 @@ describe('Cassandra client tests', function () {
                 });
         });
     });
-    describe('Insert new bench mark', () => {
-        it('should succeed bench mark insert', async () => {
+    describe('benchmark tests', () => {
+        it('should succeed insert benchmark', async () => {
             clientExecuteStub.resolves({ result: { rowLength: 0 } });
             let id = uuid.v4();
 
@@ -101,6 +101,16 @@ describe('Cassandra client tests', function () {
             clientExecuteStub.getCall(0).args[0].should.eql(query);
             clientExecuteStub.getCall(0).args[1][0].should.eql(uuidCassandraDriver.fromString(id));
             clientExecuteStub.getCall(0).args[1][1].should.eql(JSON.stringify({ data: 'some data' }));
+        });
+        it('should get benchmark', async () => {
+            clientExecuteStub.resolves({ rows: [{ data: 'some data' }] });
+            let id = uuid.v4();
+
+            let query = 'SELECT * FROM benchmarks WHERE test_id=?';
+            await cassandraClient.getTestBenchMark(id);
+            loggerErrorStub.callCount.should.eql(0);
+            clientExecuteStub.getCall(0).args[0].should.eql(query);
+            clientExecuteStub.getCall(0).args[1][0].should.eql(id);
         });
     });
 

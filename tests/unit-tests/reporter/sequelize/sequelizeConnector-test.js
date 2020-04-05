@@ -147,6 +147,24 @@ describe('Sequelize client tests', function () {
         });
     });
 
+    describe('should update report with benchmark tests ', async () => {
+        it('should update report with benchmark tests ', async () => {
+            await sequelizeConnector.updateReportBenchMark(testId, reportId, 5.3, 'some data');
+
+            sequelizeUpdateStub.callCount.should.eql(1); // query last report should not be trig
+            sequelizeUpdateStub.args[0][0].should.eql({
+                'score': 5.3,
+                'weights_data': 'some data'
+            });
+            sequelizeUpdateStub.args[0][1].should.eql({
+                'where': {
+                    'test_id': testId,
+                    'report_id': reportId
+                }
+            });
+        });
+    });
+
     describe('Get reports', () => {
         it('should get multiple reports', async () => {
             let sequelizeResponse = [{

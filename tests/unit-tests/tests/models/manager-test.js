@@ -20,11 +20,13 @@ describe('Scenario generator tests', function () {
     let getFileStub;
     let getRequestStub;
     let insertBenchMarkStub;
+    let getTestBenchMarkStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         insertStub = sandbox.stub(database, 'insertTest');
         insertBenchMarkStub = sandbox.stub(database, 'insertTestBenchMark');
+        getTestBenchMarkStub = sandbox.stub(database, 'getTestBenchMark');
         getTestStub = sandbox.stub(database, 'getTest');
         getTestsStub = sandbox.stub(database, 'getTests');
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
@@ -68,6 +70,18 @@ describe('Scenario generator tests', function () {
             should(result).eql({
                 'benchmark_data': { rps: 'some benchmark data' }
             });
+        });
+        it('Should get bench mark for test with no bench mark and get empty data', async () => {
+            getTestBenchMarkStub.resolves();
+            const result = await manager.getBenchmark(1234);
+            getTestBenchMarkStub.calledOnce.should.eql(true);
+            should(result).eql({});
+        });
+        it('Should get bench mark for test with  bench', async () => {
+            getTestBenchMarkStub.resolves(JSON.stringify({ benchmark: 'some data' }));
+            const result = await manager.getBenchmark(1234);
+            getTestBenchMarkStub.calledOnce.should.eql(true);
+            should(result).eql({ benchmark: 'some data' });
         });
     });
     describe('Create new file for test', function () {
