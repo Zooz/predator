@@ -154,9 +154,11 @@ describe('the tests api', function() {
         it('try to create benchmark for not existing test', async () => {
             const benchMarkRequest = {
                 'rps': {
-                    'count': 1270,
                     'mean': 46.74
-                }
+                },
+                'latency': { median: 1, p95: 1 },
+                'errors': {},
+                'codes': {}
             };
             const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
             should(benchMarkResult.body.message).eql('Not found');
