@@ -176,6 +176,44 @@ describe('the tests api', function() {
             should(benchMarkResult.statusCode).eql(400);
         });
     });
+    describe('get benchmark', () => {
+        it('get benchmark', async () => {
+            const benchMarkRequest = {
+                'rps': {
+                    'mean': 46.74
+                },
+                'latency': { median: 1, p95: 1 },
+                'errors': { errorTest: 1 },
+                'codes': { codeTest: 1 }
+            };
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const testId = createTestResponse.body.id;
+            const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
+            should(benchMarkResult.statusCode).eql(201);
+            const getResult = await testsRequestSender.getBenchmark(testId, validHeaders);
+            should(getResult.statusCode).eql(200);
+            should(getResult.body).eql(benchMarkRequest);
+        });
+        it('get benchmark when no bench mark create to this tests and get 404', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const testId = createTestResponse.body.id;
+            const getResult = await testsRequestSender.getBenchmark(testId, validHeaders);
+            should(getResult.statusCode).eql(404);
+            should(getResult.body.message).eql('Not found');
+        });
+        it('get benchmark when tests not created and get 404', async () => {
+            const getResult = await testsRequestSender.getBenchmark(uuid(), validHeaders);
+            should(getResult.statusCode).eql(404);
+            should(getResult.body.message).eql('Not found');
+        });
+        it('get benchmark with no uuid id and get validation error ', async () => {
+            const getResult = await testsRequestSender.getBenchmark(1, validHeaders);
+            should(getResult.statusCode).eql(400);
+            should(getResult.body.message).eql('Input validation error');
+        });
+    });
     describe('Good request tests', function() {
         it('Should get 404 for for not existing test', function(){
             return testsRequestSender.getTest(uuid.v4(), validHeaders)

@@ -76,11 +76,11 @@ function cassandra() {
     IMAGE_NAME=cassandra:3.11
     APP=cassandra
     stop $APP
-    COMMAND="docker run \
+    COMMAND="docker run -d --name cassandra -p 9042:9042 cassandra:3.11
                     -d \
-                    --name $APP \
+                    --name cassandra \
                     -p 9042:9042 \
-                    $IMAGE_NAME"
+                    cassandra:3.11"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
     COMMAND_EXIT_CODE=$?
