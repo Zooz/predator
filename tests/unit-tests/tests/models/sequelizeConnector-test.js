@@ -133,7 +133,7 @@ describe('Testing sequelize connector', function () {
             should(createStub.args[0][0].data).eql('benchmark data');
         });
         it('when succeed to get benchmark', async function () {
-            findStub.resolves({ dataValues: { data: 'some_data' } });
+            findStub.resolves({ data: 'some_data' });
             const testId = uuid();
             const res = await sequelizeConnector.getTestBenchMark(testId);
             const client = sequelizeConnector.__get__('client');

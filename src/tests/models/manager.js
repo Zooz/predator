@@ -33,9 +33,15 @@ async function insertTestBenchMark(benchMarkRawData, testId) {
     await database.insertTestBenchMark(testId, dataParse);
     return { benchmark_data: benchMarkRawData };
 }
+
 async function getBenchmark(testId) {
     const benchmark = await database.getTestBenchMark(testId);
-    return benchmark ? JSON.parse(benchmark) : {};
+    if (!benchmark) {
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
+    return JSON.parse(benchmark);
 }
 
 async function getTest(testId) {
