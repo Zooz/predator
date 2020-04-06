@@ -42,7 +42,7 @@
     "cassandra-driver": "^4.1.0",
     "cassandra-migration": "^2.7.0",
     "copy-dir": "^0.3.0",
-    "cron": "^1.7.1",
+    "cron": "1.7.2",
     "dockerode": "^2.5.8",
     "express": "^4.17.1",
     "express-ajv-swagger-validation": "^1.1.1",
