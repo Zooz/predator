@@ -73,9 +73,13 @@ describe('Scenario generator tests', function () {
         });
         it('Should get bench mark for test with no bench mark and get empty data', async () => {
             getTestBenchMarkStub.resolves();
-            const result = await manager.getBenchmark(1234);
-            getTestBenchMarkStub.calledOnce.should.eql(true);
-            should(result).eql({});
+            try {
+                await manager.getBenchmark(1234);
+                should.fail('Expected to throw error');
+            } catch (err) {
+                getTestBenchMarkStub.calledOnce.should.eql(true);
+                should(err.statusCode).eql(404);
+            }
         });
         it('Should get bench mark for test with  bench', async () => {
             getTestBenchMarkStub.resolves(JSON.stringify({ benchmark: 'some data' }));

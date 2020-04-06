@@ -103,8 +103,8 @@ async function updateReportBenchMarkIfNeeded(report) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
-    const configBenchmark = await extractBenchmark(configConsts.BENCHMARK_WEIGHTS);
-    const testBenchmarkData = await testManager.getBenchmark(report.test_id);
+    const configBenchmark = await configHandler.getConfigValue(configConsts.BENCHMARK_WEIGHTS);
+    const testBenchmarkData = await extractBenchmark(report.test_id);
     if (testBenchmarkData && configBenchmark) {
         const reportAggregate = await aggregateReportManager.aggregateReport(report);
         const reportBenchMark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark);
