@@ -1,8 +1,8 @@
 import dateFormat from "dateformat";
-import { createSelector } from 'reselect'
+import {createSelector} from 'reselect'
 
 export const reports = (state) => state.ReportsReducer.get('reports');
-export const aggregateReport = (state) => state.ReportsReducer.get('aggregate_report');
+export const aggregateReport = (state) => state.ReportsReducer.get('aggregate_reports');
 export const errorOnGetReports = (state) => state.ReportsReducer.get('error_get_reports');
 export const report = (state) => state.ReportsReducer.get('report');
 export const errorOnGetReport = (state) => state.ReportsReducer.get('error_get_report');
@@ -11,69 +11,107 @@ export const createBenchmarkSuccess = (state) => state.ReportsReducer.get('creat
 export const editNotesSuccess = (state) => state.ReportsReducer.get('edit_notes_success');
 export const createBenchmarkFailure = (state) => state.ReportsReducer.get('create_benchmark_failure');
 export const editReportFailure = (state) => state.ReportsReducer.get('edit_report_failure');
+export const selectedReports = (state) => state.ReportsReducer.get('selected_reports');
 
-export const getAggregateReport = createSelector(aggregateReport,(report)=>{
-    const latencyGraph = [],
-        errorsCodeGraph = [],
-        errorCodes = {},
-        errorsGraph = [],
-        errors = {},
-        rps = [],
-        errorsBar = [],
-        scenarios = [],
-        benchMark = {};
-    if (report) {
+export const getAggregateReport= createSelector(aggregateReport, (reports) => {
+    return buildAggregateReportData(reports)[0] || {};
+});
+
+export const getAggregateReportsForCompare = createSelector(aggregateReport, (reports) => {
+    return buildAggregateReportData(reports, true);
+});
+
+
+function buildAggregateReportData(reports, withPrefix) {
+    let prefix = withPrefix ? 'A_' : '';
+
+    return reports.map((report) => {
+        const latencyGraph = [],
+            errorsCodeGraph = [],
+            errorCodes = {},
+            errorsGraph = [],
+            errors = {},
+            rps = [],
+            errorsBar = [],
+            scenarios = [],
+            benchMark = {},
+            errorsCodeGraphKeys= [];
+
         const startTime = new Date(report.start_time).getTime();
         report.intermediates.forEach((bucket, index) => {
             const latency = bucket.latency;
             const time = new Date(startTime + (bucket.bucket * 1000));
+            const timeMills= time.getTime()
             latencyGraph.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
-                median: latency.median,
-                p95: latency.p95,
-                p99: latency.p99,
+                [`${prefix}median`]: latency.median,
+                [`${prefix}p95`]: latency.p95,
+                [`${prefix}p99`]: latency.p99,
+                timeMills
             });
-            rps.push({name: `${dateFormat(time, 'h:MM:ss')}`, mean: bucket.rps.mean});
+            rps.push({name: `${dateFormat(time, 'h:MM:ss')}`,timeMills, [`${prefix}mean`]: bucket.rps.mean});
 
             if (Object.keys(bucket.codes).length > 0) {
-                errorsCodeGraph.push({name: `${dateFormat(time, 'h:MM:ss')}`, ...bucket.codes, ...bucket.errors});
+
+                const errorsData = Object.entries({...bucket.codes,...bucket.errors}).reduce((acc,cur)=>{
+                   acc[`${prefix}${cur[0]}`]=cur[1];
+                    return acc;
+                },{});
+
+                errorsCodeGraphKeys.push(...Object.keys(errorsData));
+                errorsCodeGraph.push({name: `${dateFormat(time, 'h:MM:ss')}`,timeMills, ...errorsData});
                 Object.keys(bucket.codes).forEach((code) => {
-                    errorCodes[code] = true;
+                    errorCodes[`${prefix}${code}`] = true;
                 });
                 Object.keys(bucket.errors).forEach((error) => {
-                    errorCodes[error] = true;
+                    errorCodes[`${prefix}${error}`] = true;
                 })
             }
 
         });
 
         Object.keys(report.aggregate.codes).forEach((code) => {
-            errorsBar.push({name: code, count: report.aggregate.codes[code]})
+            errorsBar.push({name: code, [`${prefix}count`]: report.aggregate.codes[code]})
         });
         Object.keys(report.aggregate.errors).forEach((error) => {
-            errorsBar.push({name: error, count: report.aggregate.errors[error]})
+            errorsBar.push({name: error, [`${prefix}count`]: report.aggregate.errors[error]})
         });
         Object.keys(report.aggregate.scenarioCounts).forEach((key) => {
-            scenarios.push({name: key, value: report.aggregate.scenarioCounts[key]})
-        })
+            scenarios.push({name: `${prefix}${key}`, value: report.aggregate.scenarioCounts[key]})
+        });
 
-        if(report.aggregate){
-            benchMark.rps=report.aggregate.rps;
+        if (report.aggregate) {
+            benchMark.rps = report.aggregate.rps;
             benchMark.scenarioDuration = report.aggregate.scenarioDuration;
             benchMark.errors = report.aggregate.errors;
             benchMark.codes = report.aggregate.v;
-            }
-    }
+        }
+        const alias = prefix.substring(0,1);
 
-    return {
-        latencyGraph,
-        errorsCodeGraph,
-        errorCodes,
-        errorsGraph,
-        errors,
-        rps,
-        errorsBar,
-        scenarios,
-        benchMark
-    }
-});
+        const latencyGraphKeys = [`${prefix}median`,`${prefix}p95`,`${prefix}p99`];
+        const rpsKeys = [`${prefix}mean`];
+        const errorsBarKeys = [`${prefix}count`];
+        if (withPrefix) {
+            prefix = String.fromCharCode(prefix.charCodeAt(0) + 1)+'_';
+        }
+
+        return {
+            alias,
+            latencyGraph,
+            latencyGraphKeys,
+            errorsCodeGraph,
+            errorsCodeGraphKeys,
+            errorCodes,
+            errorsGraph,
+            errors,
+            rps,
+            rpsKeys,
+            errorsBar,
+            errorsBarKeys,
+            scenarios,
+            benchMark,
+            startTime: report.start_time
+        }
+
+    })
+}

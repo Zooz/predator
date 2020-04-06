@@ -10,7 +10,9 @@ const initialState = Immutable.Map({
     create_benchmark_success: false,
     edit_notes_success: false,
     edit_report_failure: undefined,
-    create_benchmark_failure: undefined
+    create_benchmark_failure: undefined,
+    selected_reports: {},
+    aggregate_reports:[]
 });
 
 export default function reduce(state = initialState, action = {}) {
@@ -31,8 +33,8 @@ export default function reduce(state = initialState, action = {}) {
             return state.set('processing_get_reports', action.state);
         case Types.CLEAR_SELECTED_REPORT:
             return state.set('report', undefined);
-        case Types.GET_AGGREGATE_REPORT_SUCCESS:
-            return state.set('aggregate_report', action.data);
+        case Types.GET_AGGREGATE_REPORTS_SUCCESS:
+            return state.set('aggregate_reports', action.data);
         case Types.CREATE_BENCHMARK_SUCCESS:
             return state.set('create_benchmark_success', action.value);
         case Types.EDIT_REPORT_SUCCESS:
@@ -41,6 +43,11 @@ export default function reduce(state = initialState, action = {}) {
             return state.set('edit_report_failure', action.error);
         case Types.CREATE_BENCHMARK_FAILURE:
             return state.set('create_benchmark_failure', action.error);
+        case Types.ADD_REPORT_FOR_COMPARE:
+            const currentSelectedReports = JSON.parse(JSON.stringify(state.get('selected_reports')));
+            currentSelectedReports[action.testId]=currentSelectedReports[action.testId] || {};
+            currentSelectedReports[action.testId][action.reportId] = action.value;
+            return state.set('selected_reports', currentSelectedReports);
         case Types.CLEAN_ALL_ERRORS:
             const newState = (state.set('error_get_reports', undefined)
                 .set('error_get_reports', undefined)

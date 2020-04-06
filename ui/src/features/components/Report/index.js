@@ -7,7 +7,8 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     LineChart,
     Legend,
-    BarChart, Bar,
+    BarChart,
+    Bar,
     Line
 } from 'recharts';
 
@@ -28,7 +29,7 @@ const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
 
 class Report extends React.Component {
 
-    generateAreaChart = (data, keys, labelY) => {
+    generateAreaChart = (data, keys=[], labelY) => {
         return (
             <ResponsiveContainer width="100%" height={300}>
                 <AreaChart
@@ -55,7 +56,7 @@ class Report extends React.Component {
             </ResponsiveContainer>
         )
     }
-    lineChart = (data, keys, labelY) => {
+    lineChart = (data, keys=[], labelY) => {
         return (
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
@@ -82,7 +83,7 @@ class Report extends React.Component {
             </ResponsiveContainer>
         )
     }
-    barChart = (data, keys) => {
+    barChart = (data, keys=[]) => {
         return (
             <ResponsiveContainer width={'100%'} height={300}>
                 <BarChart
@@ -113,6 +114,8 @@ class Report extends React.Component {
 
     render() {
         const {report, onClose, aggregateReport} = this.props;
+        console.log("manor report",report);
+        console.log("manor aggregateReport",aggregateReport);
         return (
             <Modal onExit={onClose}>
                 <div style={{
@@ -136,11 +139,11 @@ class Report extends React.Component {
                         <Button hover disabled={report.status !== 'finished'}
                                 onClick={this.createBenchmark}>Create Benchmark</Button>
                     </div>
-                    {this.lineChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms')}
+                    {this.lineChart(aggregateReport.latencyGraph, aggregateReport.latencyGraphKeys, 'ms')}
                     <h3>Status Codes</h3>
-                    {this.lineChart(aggregateReport.errorsCodeGraph, Object.keys(aggregateReport.errorCodes))}
+                    {this.lineChart(aggregateReport.errorsCodeGraph, aggregateReport.errorsCodeGraphKeys)}
                     <h3>RPS</h3>
-                    {this.generateAreaChart(aggregateReport.rps, ['mean'])}
+                    {this.generateAreaChart(aggregateReport.rps, aggregateReport.rpsKeys)}
                     <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                         <div style={{width: '50%'}}>
                             <h3>Status Codes And Errors Distribution</h3>
@@ -169,8 +172,8 @@ class Report extends React.Component {
     }
 
     loadData = () => {
-        const {getAggregateReport, report} = this.props;
-        getAggregateReport(report.test_id, report.report_id);
+        const {getAggregateReports, report} = this.props;
+        getAggregateReports([{testId:report.test_id, reportId:report.report_id}]);
 
     }
 
@@ -195,7 +198,7 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = {
-    getAggregateReport: Actions.getAggregateReport,
+    getAggregateReports: Actions.getAggregateReports,
     createBenchmark: Actions.createBenchmark,
     createBenchmarkSuccess: Actions.createBenchmarkSuccess,
 };

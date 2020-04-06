@@ -1,7 +1,7 @@
 import {TableHeader} from "../components/ReactTable";
 import React, {useEffect, useState} from "react";
 import {filter, sortedUniqBy} from 'lodash';
-
+import Checkbox from '../components/Checkbox/Checkbox';
 import Moment from 'moment';
 import prettySeconds from 'pretty-seconds';
 import 'font-awesome/css/font-awesome.min.css';
@@ -26,10 +26,20 @@ import TextArea from "../components/TextArea";
 import TitleInput from "../components/TitleInput";
 
 
-export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote}) => {
+export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote, selectedReports, onReportSelected}) => {
 
     const columns = [
         {
+            id: 'compare',
+            Header: () => (
+                <TableHeader sortable={false}>
+                    Select
+                </TableHeader>
+            ),
+            accessor: (data) => <CompareCheckbox onReportSelected={onReportSelected} selectedReports={selectedReports} data={data}/>,
+            className: css['small-header'],
+            headerClassName: css['small-header'],
+        }, {
             id: 'report_id',
             Header: () => (
                 <TableHeader sortable={false}>
@@ -470,6 +480,24 @@ const ViewButton = ({onClick, icon, disabled, text}) => {
     return (<div className={css['action-style']} onClick={onClick}>{element}</div>)
 };
 
+const CompareCheckbox = ({data, onReportSelected,selectedReports}) => {
+
+    return (
+        <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
+            <Checkbox
+                indeterminate={false}
+                checked={selectedReports && selectedReports[data.test_id] &&  selectedReports[data.test_id][data.report_id]}
+                // disabled={}
+                onChange={(value) => onReportSelected(data.test_id, data.report_id, value)}
+            />
+
+        </div>
+
+
+    )
+
+
+}
 
 const Notes = ({data, onEditNote}) => {
     const {notes = '', report_id, test_id} = data;
