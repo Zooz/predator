@@ -5,7 +5,7 @@ const rewire = require('rewire');
 const sinon = require('sinon');
 
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
-const testDbConnector = require('../../../../src/tests/models/database');
+const testManager = require('../../../../src/tests/models/manager');
 const aggregateReportManager = require('../../../../src/reports/models/aggregateReportManager');
 const benchmarkCalculator = require('../../../../src/reports/models/benchmarkCalculator');
 const jobsManager = require('../../../../src/jobs/models/jobManager');
@@ -102,7 +102,7 @@ describe('Reports manager tests', function () {
         databaseSubscribeRunnerStub = sandbox.stub(databaseConnector, 'subscribeRunner');
         databaseUpdateSubscriberStub = sandbox.stub(databaseConnector, 'updateSubscriber');
         databaseUpdateSubscriberWithStatsStub = sandbox.stub(databaseConnector, 'updateSubscriberWithStats');
-        getBenchmarkStub = sandbox.stub(testDbConnector, 'getTestBenchMark');
+        getBenchmarkStub = sandbox.stub(testManager, 'getBenchmark');
         aggregateReportManagerStub = sandbox.stub(aggregateReportManager, 'aggregateReport');
         benchmarkCalculatorStub = sandbox.stub(benchmarkCalculator, 'calculate');
         updateReportBenchMarkStub = sandbox.stub(databaseConnector, 'updateReportBenchMark');
@@ -410,6 +410,20 @@ describe('Reports manager tests', function () {
     });
 
     describe('Create new stats', function () {
+        before(() => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return {
+                        job_platform: 'KUBERNETES'
+                    };
+                },
+                getConfigValue: () => {
+                    return {
+                        config: 'some value'
+                    };
+                }
+            });
+        });
         it('Stats consumer handles message with status intermediate', async () => {
             configStub.resolves({});
             databaseGetReportStub.resolves([REPORT]);
@@ -446,7 +460,7 @@ describe('Reports manager tests', function () {
 
         it('when report done and have benchmark data ', async () => {
             databaseGetReportStub.resolves([REPORT_DONE]);
-            getBenchmarkStub.resolves(JSON.stringify({ test: 'some  benchmark data' }));
+            getBenchmarkStub.resolves({ test: 'some  benchmark data' });
             aggregateReportManagerStub.resolves({ aggregate: { test: 'some aggregate data' } });
             benchmarkCalculatorStub.returns({ score: 5.5, data: { test: 'some calculate data' } });
             updateReportBenchMarkStub.resolves();
@@ -459,7 +473,9 @@ describe('Reports manager tests', function () {
             updateReportBenchMarkStub.callCount.should.eql(1);
 
             should(getBenchmarkStub.args).eql([['test_id']]);
-            should(benchmarkCalculatorStub.args).eql([[{ 'test': 'some  benchmark data' }, { 'test': 'some aggregate data' }]]);
+            should(benchmarkCalculatorStub.args).eql([[{ 'test': 'some  benchmark data' }, { 'test': 'some aggregate data' }, {
+                config: 'some value'
+            }]]);
             should(updateReportBenchMarkStub.args[0][0]).eql('test_id');
             should(updateReportBenchMarkStub.args[0][1]).eql('report_id');
             should(updateReportBenchMarkStub.args[0][2]).eql(5.5);
