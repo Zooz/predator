@@ -25,7 +25,8 @@ const updateBodyWithTypes = {
     },
     prometheus_metrics: {
         push_gateway_url: 'string_value',
-        buckets_sizes: 'string_value'
+        buckets_sizes: 'string_value',
+        labels: { key1: 'value1', key2: 'value2' }
     },
     smtp_server: {
         from: 'test@mail.com',
@@ -69,7 +70,8 @@ const requestBody =
         },
         prometheus_metrics: {
             push_gateway_url: 'string_value_push_gateway_url',
-            buckets_sizes: 'string_value_buckets_sizes'
+            buckets_sizes: 'string_value_buckets_sizes',
+            labels: { key1: 'value1', key2: 'value2' }
         },
         smtp_server: {
             from: 'test@mail.com',
@@ -229,7 +231,23 @@ describe('update and get config', () => {
                 "body/benchmark_weights should have required property 'percentile_fifty'",
                 "body/benchmark_weights should have required property 'server_errors'",
                 "body/benchmark_weights should have required property 'client_errors'",
-                "body/benchmark_weights should have required property 'rps'" ]);
+                "body/benchmark_weights should have required property 'rps'"]);
+        });
+    });
+
+    describe('Update prometheus configuration with labels which are not key value', () => {
+        it('update config fail with validation type', async () => {
+            let response = await configRequestCreator.updateConfig({
+                prometheus_metrics: {
+                    push_gateway_url: 'string_value',
+                    buckets_sizes: 'string_value',
+                    labels: { key1: { innerKey1: 'value1' }, key2: 'value2' }
+                }
+            });
+            should(response.statusCode).eql(400);
+            should(response.body.message).eql(validationError);
+            should(response.body.validation_errors).eql([
+                "body/prometheus_metrics.labels['key1'] should be string"]);
         });
     });
 });
