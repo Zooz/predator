@@ -215,6 +215,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Tests
   /v1/tests:
     post:
       operationId: create-a-test
@@ -335,7 +336,7 @@ paths:
             format: uuid
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       summary: get a bench mark for test
-      description: Create a bench mark for test
+      description:  Get a benchmark for a test
       responses:
         '200':
           description: Success
@@ -1498,6 +1499,11 @@ components:
     benchmark_request:
       type: object
       additionalProperties: false
+      required:
+        - errors
+        - codes
+        - rps
+        - latency
       properties:
         errors:
           type: object
@@ -1512,23 +1518,20 @@ components:
             500: 53
         rps:
           type: object
+          required:
+            - mean
           properties:
-            count:
-              type: number
             mean:
               type: number
         latency:
           type: object
+          required:
+            - median
+            - p95
           properties:
-            min:
-              type: number
-            max:
-              type: number
             median:
               type: number
             p95:
-              type: number
-            p99:
               type: number
 
     dsl:
@@ -2082,9 +2085,9 @@ components:
           example: 60
         score:
           type: number
-          description: The score of report comapring to test benchmark
+          description: The score of a report, calculated based on a benchmark and benchmark weights
           example: 9.25
-        weights_data:
+        benchmark_weights_data:
           type: object
           description: The way score calualated
         arrival_rate:

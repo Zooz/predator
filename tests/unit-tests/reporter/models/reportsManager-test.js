@@ -151,14 +151,14 @@ describe('Reports manager tests', function () {
                     return { grafana_url: 'http://www.grafana.com' };
                 }
             });
-            const reportWithScore = Object.assign({ score: 6.6, weights_data: JSON.stringify({ data: 'some data' }) }, REPORT);
+            const reportWithScore = Object.assign({ score: 6.6, benchmark_weights_data: JSON.stringify({ data: 'some data' }) }, REPORT);
             databaseGetReportStub.resolves([reportWithScore]);
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
-            should.exist(report.weights_data);
+            should.exist(report.benchmark_weights_data);
             should(report.score).eql(6.6);
-            should(report.weights_data).eql({ data: 'some data' });
+            should(report.benchmark_weights_data).eql({ data: 'some data' });
         });
 
         it('Database connector returns an array with one report without grafana url configured', async () => {

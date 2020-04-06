@@ -154,7 +154,7 @@ describe('Sequelize client tests', function () {
             sequelizeUpdateStub.callCount.should.eql(1); // query last report should not be trig
             sequelizeUpdateStub.args[0][0].should.eql({
                 'score': 5.3,
-                'weights_data': 'some data'
+                'benchmark_weights_data': 'some data'
             });
             sequelizeUpdateStub.args[0][1].should.eql({
                 'where': {

@@ -123,7 +123,7 @@ async function getTestBenchMark(test_id) {
         where: { test_id: test_id }
     };
     let benchmarkRes = await benchmark.findOne(options);
-    return benchmarkRes ? benchmarkRes.dataValues.data : undefined;
+    return benchmarkRes ? benchmarkRes.data : undefined;
 }
 
 async function insertTest(testInfo, testJson, id, revisionId, fileId){

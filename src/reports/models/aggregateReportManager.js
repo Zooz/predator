@@ -35,7 +35,7 @@ async function aggregateReport (report) {
     reportInput.test_name = report.test_name;
     reportInput.revision_id = report.revision_id;
     reportInput.score = report.score;
-    reportInput.weights_data = report.weights_data;
+    reportInput.benchmark_weights_data = report.benchmark_weights_data;
 
     reportInput.status = mapReportStatus(report.status);
 

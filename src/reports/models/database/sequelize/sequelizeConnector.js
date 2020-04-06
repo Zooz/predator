@@ -76,7 +76,7 @@ async function updateReport(testId, reportId, reportData) {
 
 async function updateReportBenchMark(testId, reportId, score, benchMarkData) {
     const benchmark = client.model('report');
-    const params = { score: score, weights_data: benchMarkData };
+    const params = { score: score, benchmark_weights_data: benchMarkData };
     const options = {
         where: {
             test_id: testId,
@@ -265,7 +265,7 @@ async function initSchemas() {
         phase: {
             type: Sequelize.DataTypes.STRING
         },
-        weights_data: {
+        benchmark_weights_data: {
             type: Sequelize.DataTypes.STRING
         },
         score: {

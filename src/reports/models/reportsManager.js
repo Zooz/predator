@@ -4,11 +4,12 @@ const _ = require('lodash'),
     uuid = require('uuid/v4');
 
 const databaseConnector = require('./databaseConnector'),
-    testDbConnector = require('../../tests/models/database'),
+    testManager = require('../../tests/models/manager'),
     jobConnector = require('../../jobs/models/jobManager'),
     aggregateReportManager = require('./aggregateReportManager'),
     benchmarkCalculator = require('./benchmarkCalculator'),
     configHandler = require('../../configManager/models/configHandler'),
+    configConsts = require('../../common/consts').CONFIG,
     notifier = require('./notifier'),
     reportUtil = require('../utils/reportUtil'),
     constants = require('../utils/constants');
@@ -102,18 +103,14 @@ async function updateReportBenchMarkIfNeeded(report) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
-    const testBenchMarkData = await extractBenchMarkData(report.test_id);
-    if (testBenchMarkData) {
+    const testBenchmarkData = await testManager.getBenchmark(report.test_id);
+    const configBenchmark = await configHandler.getConfigValue(configConsts.BENCHMARK_WEIGHTS);
+    if (testBenchmarkData && configBenchmark) {
         const reportAggregate = await aggregateReportManager.aggregateReport(report);
-        const reportBenchMark = benchmarkCalculator.calculate(testBenchMarkData, reportAggregate.aggregate);
+        const reportBenchMark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark);
         const { data, score } = reportBenchMark;
         await databaseConnector.updateReportBenchMark(report.test_id, report.report_id, score, JSON.stringify(data));
     }
-}
-
-async function extractBenchMarkData(testId) {
-    const res = await testDbConnector.getTestBenchMark(testId);
-    return res ? JSON.parse(res) : undefined;
 }
 
 function getReportResponse(summaryRow, config) {
@@ -162,7 +159,7 @@ function getReportResponse(summaryRow, config) {
         last_rps: rps,
         last_success_rate: successRate,
         score: summaryRow.score,
-        weights_data: summaryRow.weights_data ? JSON.parse(summaryRow.weights_data) : undefined
+        benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined
 
     };
 

@@ -25,7 +25,7 @@ async function insertTestBenchMark(req, res, next) {
 async function getBenchmark(req, res, next) {
     try {
         const result = await manager.getBenchmark(req.params.test_id);
-        return res.status(201).json(result);
+        return res.status(200).json(result);
     } catch (err){
         return next(err);
     }

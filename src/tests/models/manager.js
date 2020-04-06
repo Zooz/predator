@@ -34,8 +34,8 @@ async function insertTestBenchMark(benchMarkRawData, testId) {
     return { benchmark_data: benchMarkRawData };
 }
 async function getBenchmark(testId) {
-    const res = await database.getTestBenchMark(testId);
-    return res ? JSON.parse(res) : {};
+    const benchmark = await database.getTestBenchMark(testId);
+    return benchmark ? JSON.parse(benchmark) : {};
 }
 
 async function getTest(testId) {
