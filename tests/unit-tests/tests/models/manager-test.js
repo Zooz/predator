@@ -181,6 +181,29 @@ describe('Scenario generator tests', function () {
                     });
                 });
         });
+        it('Database returns one row from type dsl, should return the test', async function () {
+            getTestStub.resolves({
+                artillery_json: { id: '1', name: '1' },
+                raw_data: { id: '1', name: '1' },
+                type: 'dsl'
+            });
+            await manager.getTest(uuid.v4())
+                .then(function (res) {
+                    res.should.eql({
+                        raw_data: {
+                            id: '1',
+                            name: '1'
+                        },
+                        artillery_test: {
+                            id: '1',
+                            name: '1'
+                        },
+                        type: 'dsl'
+                    });
+                });
+            insertStub.calledOnce.should.eql(true);
+            getTestStub.calledTwice.should.eql(true);
+        });
     });
 
     describe('Get multiple tests', function () {
