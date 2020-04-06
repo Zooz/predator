@@ -8,7 +8,7 @@ import Loader from './components/Loader';
 import Page from '../components/Page';
 import _ from 'lodash';
 import Report from "./components/Report";
-import CompareReports from "./components/Report/CompareReports";
+import CompareReports from "./components/Report/compareReports";
 import {ReactTableComponent} from "../components/ReactTable";
 import {getColumns} from "./configurationColumn";
 import {createJobRequest} from "./requestBuilder";

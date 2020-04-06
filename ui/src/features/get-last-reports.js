@@ -10,7 +10,7 @@ import * as Actions from './redux/action';
 import Page from '../components/Page';
 import _ from 'lodash';
 import Report from './components/Report';
-import CompareReports from "./components/Report/CompareReports";
+import CompareReports from "./components/Report/compareReports";
 import {createJobRequest} from './requestBuilder';
 
 import {ReactTableComponent} from './../components/ReactTable';
