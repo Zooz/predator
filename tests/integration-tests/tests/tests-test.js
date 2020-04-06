@@ -94,20 +94,32 @@ describe('the tests api', function() {
         });
     });
     describe('create benchmark for test', () => {
-        it('Create benchmark with partial body for existing test', async () => {
+        it('Create benchmark with empty body and get 400 response', async () => {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
-            const benchMarkRequest = {
-                'rps': {
-                    'count': 1270,
-                    'mean': 46.74
-                }
-            };
             const testId = createTestResponse.body.id;
-            const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
+            const benchMarkResult = await testsRequestSender.createBenchMark(testId, {}, validHeaders);
             const { body } = benchMarkResult;
-            should(benchMarkResult.statusCode).eql(201);
-            should(body.benchmark_data).eql(benchMarkRequest);
+            should(benchMarkResult.statusCode).eql(400);
+            should(body.message).eql('Input validation error');
+            should(body.validation_errors).eql(['body should have required property \'errors\'',
+                'body should have required property \'codes\'',
+                'body should have required property \'rps\'',
+                'body should have required property \'latency\'']);
+        });
+        it('Create benchmark with inner empty body and get 400 response', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const testId = createTestResponse.body.id;
+            const benchMarkResult = await testsRequestSender.createBenchMark(testId, { latency: {}, rps: {} }, validHeaders);
+            const { body } = benchMarkResult;
+            should(benchMarkResult.statusCode).eql(400);
+            should(body.message).eql('Input validation error');
+            should(body.validation_errors).eql(['body should have required property \'errors\'',
+                'body should have required property \'codes\'',
+                'body/rps should have required property \'mean\'',
+                'body/latency should have required property \'median\'',
+                'body/latency should have required property \'p95\'']);
         });
         it('Create benchmark with full body for existing test', async () => {
             const requestBody = simpleTest.test;
