@@ -34,8 +34,11 @@ async function insertTestBenchMark(benchMarkRawData, testId) {
 }
 
 async function getTest(testId) {
-    const result = await database.getTest(testId);
+    let result = await database.getTest(testId);
     if (result) {
+        if (result.type === 'dsl'){
+            result = await getTestWithUpdateDsl(result, testId);
+        }
         result.artillery_test = result.artillery_json;
         delete result.artillery_json;
         return result;
@@ -89,4 +92,13 @@ async function getTestsByProcessorId(processorId) {
     const allCurrentTests = await getTests();
     const inUseTestsByProcessor = allCurrentTests.filter(test => test.processor_id && test.processor_id.toString() === processorId);
     return inUseTestsByProcessor;
+}
+
+async function getTestWithUpdateDsl(test, testId){
+    const testRawData = { name: test.name, description: test.description, type: test.type, scenarios: test.scenarios, before: test.before };
+    const testArtilleryJson = await testGenerator.createTest(testRawData);
+    const revisionId = uuid.v4();
+    await database.insertTest(testRawData, testArtilleryJson, testId, revisionId, test.file_id);
+
+    return database.getTest(testId);
 }

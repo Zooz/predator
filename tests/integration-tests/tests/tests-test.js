@@ -107,31 +107,30 @@ describe('the tests api', function() {
             const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
             const { body } = benchMarkResult;
             should(benchMarkResult.statusCode).eql(201);
-             should(body.benchmark_data).eql(benchMarkRequest);
-
+            should(body.benchmark_data).eql(benchMarkRequest);
         });
         it('Create bench mark with full body for existing test', async () => {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const benchMarkRequest = {
-                "rps": {
-                    "count": 1270,
-                    "mean": 46.74
+                'rps': {
+                    'count': 1270,
+                    'mean': 46.74
                 },
-                "latency": {
-                    "min": 419.1,
-                    "max": 1295.4,
-                    "median": 553.9,
-                    "p95": 763.8,
-                    "p99": 929.5
+                'latency': {
+                    'min': 419.1,
+                    'max': 1295.4,
+                    'median': 553.9,
+                    'p95': 763.8,
+                    'p99': 929.5
                 },
-                "errors": {
-                    "500":12
+                'errors': {
+                    '500': 12
                 },
-                "codes": {
-                    "200": 161,
-                    "201": 1061,
-                    "409": 53
+                'codes': {
+                    '200': 161,
+                    '201': 1061,
+                    '409': 53
                 }
             };
             const testId = createTestResponse.body.id;
@@ -139,7 +138,6 @@ describe('the tests api', function() {
             const { body } = benchMarkResult;
             should(benchMarkResult.statusCode).eql(201);
             should(body.benchmark_data).eql(benchMarkRequest);
-
         });
         it('try to create bench mark for not existing test', async () => {
             const benchMarkRequest = {
@@ -249,12 +247,50 @@ describe('the tests api', function() {
                 let createTestResponse = await testsRequestSender.createTest(simpleTestWithBefore.test, validHeaders);
                 should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
                 createTestResponse.body.should.have.only.keys('id', 'revision_id');
-                const expected = require('../../testResults/Simple_test_before_feature')(dslName, createTestResponse.body.id, createTestResponse.body.revision_id);
+                const expected = require('../../testResults/Simple_test_before_feature')(dslName, createTestResponse.body.id);
                 const getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
                 should(getTestResponse.statusCode).eql(200, JSON.stringify(createTestResponse.body));
                 should.exists(getTestResponse.body.updated_at);
                 delete getTestResponse.body.updated_at;
+                delete getTestResponse.body.revision_id;
+                delete expected.revision_id;
                 should(getTestResponse.body).eql(expected);
+            });
+            it('Create test, update dsl, get test', async () => {
+                let requestBody = simpleTest.test;
+                let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+                createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
+                createTestResponse.body.should.have.only.keys('id', 'revision_id');
+
+                const updateTokenRequest = {
+                    'post': {
+                        'url': '/tokens',
+                        'capture': [{
+                            'json': '$.token',
+                            'as': 'tokenId'
+                        }],
+                        'headers': {
+                            'Content-Type': 'application/json'
+                        },
+                        'json': {
+                            'token_type': 'credit_card',
+                            'holder_name': 'new name',
+                            'expiration_date': '11/2020',
+                            'card_number': '1234458045804123',
+                            'identity_document': {
+                                'number': '1234668464654',
+                                'type': 'NEW_ID'
+                            }
+                        }
+                    }
+                };
+                const updateDSLResponse = await testsRequestSender.updateDsl(dslName, 'createToken', updateTokenRequest);
+                should(updateDSLResponse.statusCode).eql(200, JSON.stringify(updateDSLResponse.body));
+
+                let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+                should(getTestResponse.statusCode).eql(200);
+                const getTestResponseTokenRequest = JSON.parse(getTestResponse.text).artillery_test.scenarios[0].flow[0];
+                should(getTestResponseTokenRequest).eql(updateTokenRequest);
             });
         });
 
