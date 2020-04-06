@@ -373,7 +373,6 @@ describe('the tests api', function() {
             testsIds.should.containEql(createTestResponse.body.id);
             testsIds.should.containEql(createSecondTestResponse.body.id);
             getTestResponse.body.id.should.eql(createTestResponse.body.id);
-            getTestResponse.body.revision_id.should.eql(createTestResponse.body.revision_id);
             getTestResponse.body.artillery_test.should.eql(expectedResult);
         });
         it('create test with several revisions and get all test revisions', async function () {
