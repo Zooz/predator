@@ -181,6 +181,7 @@ describe('Scenario generator tests', function () {
                     });
                 });
         });
+        
         it('Database returns one row from type dsl, should return the test', async function () {
             getTestStub.resolves({
                 artillery_json: { id: '1', name: '1' },
