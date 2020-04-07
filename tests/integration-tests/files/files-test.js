@@ -39,12 +39,12 @@ describe('Upload and download file', () => {
     });
 
     describe('download file', () => {
-        it('Download existing file', async () => {
+        it('Download not existing file', async () => {
             const response = await requestCreator.downloadFile('10bc7982-d57b-4917-a952-7a8d8d75bf92');
             should(response.statusCode).eql(404);
         });
 
-        it('Download not exiting file id', async () => {
+        it('Download exiting file id', async () => {
             const response = await requestCreator.uploadFile('csv', SMALL_CSV_PATH);
             should(response.statusCode).eql(201);
             should(response.body.id).not.empty();
