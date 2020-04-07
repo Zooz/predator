@@ -8,6 +8,7 @@ const reportsRequestCreator = require('./helpers/requestCreator');
 const jobRequestCreator = require('../jobs/helpers/requestCreator');
 const testsRequestCreator = require('../tests/helpers/requestCreator');
 const configRequestCreator = require('../configManager/helpers/requestCreator');
+const config = require('../../../src/common/consts').CONFIG;
 const constants = require('../../../src/reports/utils/constants');
 
 const mailhogHelper = require('./mailhog/mailhogHelper');
@@ -370,6 +371,9 @@ describe('Integration tests for the reports api', function() {
 
                 const reportResponse = await reportsRequestCreator.createReport(testId, minimalReportBody);
                 should(reportResponse.statusCode).be.eql(201);
+            });
+            after(async () => {
+                await configRequestCreator.deleteConfig(config.BENCHMARK_WEIGHTS);
             });
 
             it('Post full cycle stats', async function () {
