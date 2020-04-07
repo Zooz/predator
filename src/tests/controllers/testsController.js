@@ -9,8 +9,27 @@ module.exports = {
     deleteTest,
     getTests,
     getFile,
-    getTestRevisions
+    getTestRevisions,
+    insertTestBenchmark,
+    getBenchmark
 };
+
+async function insertTestBenchmark(req, res, next) {
+    try {
+        const result = await manager.insertTestBenchmark(req.body, req.params.test_id);
+        return res.status(201).json(result);
+    } catch (err){
+        return next(err);
+    }
+}
+async function getBenchmark(req, res, next) {
+    try {
+        const result = await manager.getBenchmark(req.params.test_id);
+        return res.status(200).json(result);
+    } catch (err){
+        return next(err);
+    }
+}
 
 async function upsertTest(req, res, next) {
     try {

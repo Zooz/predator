@@ -19,10 +19,14 @@ describe('Scenario generator tests', function () {
     let saveFileStub;
     let getFileStub;
     let getRequestStub;
+    let insertBenchmarkStub;
+    let getTestBenchmarkStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         insertStub = sandbox.stub(database, 'insertTest');
+        insertBenchmarkStub = sandbox.stub(database, 'insertTestBenchmark');
+        getTestBenchmarkStub = sandbox.stub(database, 'getTestBenchmark');
         getTestStub = sandbox.stub(database, 'getTest');
         getTestsStub = sandbox.stub(database, 'getTests');
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
@@ -54,6 +58,34 @@ describe('Scenario generator tests', function () {
                     result.should.have.keys('id', 'revision_id');
                     Object.keys(result).length.should.eql(2);
                 });
+        });
+    });
+    describe('Create new bench mark for test', async () => {
+        it('Should save new bench mark for test', async () => {
+            insertBenchmarkStub.resolves();
+            const result = await manager.insertTestBenchmark({ rps: 'some benchmark data' }, 1234);
+            insertBenchmarkStub.calledOnce.should.eql(true);
+            result.should.have.keys('benchmark_data');
+            Object.keys(result).length.should.eql(1);
+            should(result).eql({
+                'benchmark_data': { rps: 'some benchmark data' }
+            });
+        });
+        it('Should get bench mark for test with no bench mark and get empty data', async () => {
+            getTestBenchmarkStub.resolves();
+            try {
+                await manager.getBenchmark(1234);
+                should.fail('Expected to throw error');
+            } catch (err) {
+                getTestBenchmarkStub.calledOnce.should.eql(true);
+                should(err.statusCode).eql(404);
+            }
+        });
+        it('Should get bench mark for test with  bench', async () => {
+            getTestBenchmarkStub.resolves(JSON.stringify({ benchmark: 'some data' }));
+            const result = await manager.getBenchmark(1234);
+            getTestBenchmarkStub.calledOnce.should.eql(true);
+            should(result).eql({ benchmark: 'some data' });
         });
     });
     describe('Create new file for test', function () {

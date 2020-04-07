@@ -1,5 +1,13 @@
 const constConfig = require('../../common/consts').CONFIG;
 
+const BENCHMARK_WEIGHTS_DEFAULT = {
+    percentile_ninety_five: { percentage: 20 },
+    percentile_fifty: { percentage: 20 },
+    server_errors: { percentage: 20 },
+    client_errors: { percentage: 20 },
+    rps: { percentage: 20 }
+};
+
 let configDataMap = {
     [constConfig.GRFANA_URL]: { value: process.env.GRAFANA_URL },
     [constConfig.DELAY_RUNNER_MS]: { value: process.env.DELAY_RUNNER_MS || 0, type: 'int' },
@@ -30,10 +38,9 @@ let configDataMap = {
         }),
         type: 'json'
     },
-    [constConfig.THRESHOLD]: { value: process.env.THRESHOLD, type: 'int' },
-    [constConfig.THRESHOLD_WEBHOOK_URL]: { value: process.env.THRESHOLD_WEBHOOK_URL, type: 'string' },
-    [constConfig.BENCHMARK_WEIGHTS]: { value: process.env.BENCHMARK_WEIGHTS, type: 'json' },
-    [constConfig.BENCHMARK_CONFIG]: { value: process.env.BENCHMARK_CONFIG, type: 'json' }
+    [constConfig.BENCHMARK_THRESHOLD]: { value: process.env.BENCHMARK_THRESHOLD, type: 'int' },
+    [constConfig.BENCHMARK_THRESHOLD_WEBHOOK_URL]: { value: process.env.BENCHMARK_THRESHOLD_WEBHOOK_URL, type: 'string' },
+    [constConfig.BENCHMARK_WEIGHTS]: { value: process.env.BENCHMARK_WEIGHTS || JSON.stringify(BENCHMARK_WEIGHTS_DEFAULT), type: 'json' }
 };
 
 module.exports.getConstType = (configValue) => {

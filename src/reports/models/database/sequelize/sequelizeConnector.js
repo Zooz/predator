@@ -17,7 +17,8 @@ module.exports = {
     getStats,
     subscribeRunner,
     updateSubscriberWithStats,
-    updateSubscriber
+    updateSubscriber,
+    updateReportBenchmark
 };
 
 async function init(sequlizeClient) {
@@ -61,7 +62,7 @@ async function insertStats(runnerId, testId, reportId, statsId, statsTime, phase
     return stats.create(params);
 }
 
-async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
+async function updateReport(testId, reportId, reportData) {
     const report = client.model('report');
     const options = {
         where: {
@@ -70,10 +71,20 @@ async function updateReport(testId, reportId, phaseIndex, lastUpdatedAt) {
         }
     };
 
-    return report.update({
-        phase: phaseIndex,
-        last_updated_at: lastUpdatedAt
-    }, options);
+    return report.update(reportData, options);
+}
+
+async function updateReportBenchmark(testId, reportId, score, benchmarkData) {
+    const benchmark = client.model('report');
+    const params = { score: score, benchmark_weights_data: benchmarkData };
+    const options = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+    const res = await benchmark.update(params, options);
+    return res;
 }
 
 async function subscribeRunner(testId, reportId, runnerId) {
@@ -253,6 +264,12 @@ async function initSchemas() {
         },
         phase: {
             type: Sequelize.DataTypes.STRING
+        },
+        benchmark_weights_data: {
+            type: Sequelize.DataTypes.TEXT('long')
+        },
+        score: {
+            type: Sequelize.DataTypes.FLOAT
         }
     });
 

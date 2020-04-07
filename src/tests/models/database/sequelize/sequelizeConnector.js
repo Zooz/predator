@@ -16,7 +16,9 @@ module.exports = {
     getDslDefinitions,
     getDslDefinition,
     deleteDefinition,
-    updateDslDefinition
+    updateDslDefinition,
+    insertTestBenchmark,
+    getTestBenchmark
 
 };
 
@@ -89,9 +91,39 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('long')
         }
     });
+
+    const benchmarkDefinition = client.define('benchmark', {
+        test_id: {
+            type: Sequelize.DataTypes.UUID,
+            primaryKey: true
+        },
+        data: {
+            type: Sequelize.DataTypes.STRING
+        }
+    });
     await test.sync();
     await dslDefinition.sync();
+    await benchmarkDefinition.sync();
     await file.sync();
+}
+
+async function insertTestBenchmark(testId, benchmarkData) {
+    const benchmark = client.model('benchmark');
+    let params = {
+        test_id: testId,
+        data: benchmarkData
+    };
+    const result = benchmark.create(params);
+    return result;
+}
+
+async function getTestBenchmark(test_id) {
+    const benchmark = client.model('benchmark');
+    const options = {
+        where: { test_id: test_id }
+    };
+    let benchmarkRes = await benchmark.findOne(options);
+    return benchmarkRes ? benchmarkRes.data : undefined;
 }
 
 async function insertTest(testInfo, testJson, id, revisionId, fileId){

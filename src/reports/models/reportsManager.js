@@ -4,9 +4,14 @@ const _ = require('lodash'),
     uuid = require('uuid/v4');
 
 const databaseConnector = require('./databaseConnector'),
+    testManager = require('../../tests/models/manager'),
     jobConnector = require('../../jobs/models/jobManager'),
+    aggregateReportManager = require('./aggregateReportManager'),
+    benchmarkCalculator = require('./benchmarkCalculator'),
     configHandler = require('../../configManager/models/configHandler'),
+    configConsts = require('../../common/consts').CONFIG,
     notifier = require('./notifier'),
+    reportUtil = require('../utils/reportUtil'),
     constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
@@ -46,6 +51,12 @@ module.exports.getLastReports = async (limit) => {
     return reports;
 };
 
+module.exports.editReport = async (testId, reportId, reportBody) => {
+    // currently we support only edit for notes
+    const { notes } = reportBody;
+    await databaseConnector.updateReport(testId, reportId, { notes, last_updated_at: new Date() });
+};
+
 module.exports.postReport = async (testId, reportBody) => {
     const startTime = new Date(Number(reportBody.start_time));
     const job = await jobConnector.getJob(reportBody.job_id);
@@ -80,12 +91,36 @@ module.exports.postStats = async (report, stats) => {
     if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
         await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
     }
-    await databaseConnector.updateReport(report.test_id, report.report_id, report.phase, statsTime);
+    await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
     report = await module.exports.getReport(report.test_id, report.report_id);
+    await updateReportBenchmarkIfNeeded(report);
     notifier.notifyIfNeeded(report, stats);
 
     return stats;
 };
+
+async function updateReportBenchmarkIfNeeded(report) {
+    if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
+        return;
+    }
+    const configBenchmark = await configHandler.getConfigValue(configConsts.BENCHMARK_WEIGHTS);
+    const testBenchmarkData = await extractBenchmark(report.test_id);
+    if (testBenchmarkData && configBenchmark) {
+        const reportAggregate = await aggregateReportManager.aggregateReport(report);
+        const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark);
+        const { data, score } = reportBenchmark;
+        await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
+    }
+}
+
+async function extractBenchmark(testId) {
+    try {
+        const testBenchmarkData = await testManager.getBenchmark(testId);
+        return testBenchmarkData;
+    } catch (e) {
+        return undefined;
+    }
+}
 
 function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
@@ -131,7 +166,9 @@ function getReportResponse(summaryRow, config) {
         environment: testConfiguration.environment,
         subscribers: summaryRow.subscribers,
         last_rps: rps,
-        last_success_rate: successRate
+        last_success_rate: successRate,
+        score: summaryRow.score ? summaryRow.score : undefined,
+        benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined
     };
 
     report.status = calculateReportStatus(report, config);
@@ -147,7 +184,7 @@ function getReportResponse(summaryRow, config) {
 
 function generateGrafanaUrl(report, grafanaUrl) {
     if (grafanaUrl) {
-        const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '';
+        const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '&to=now';
         const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
         return grafanaReportUrl;
     }

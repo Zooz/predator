@@ -101,7 +101,7 @@ describe('Sequelize client tests', function () {
         startTime = Date.now();
         testName = 'unit-test';
         testDescription = 'desc';
-        testConfiguration = JSON.stringify({environment: 'test'});
+        testConfiguration = JSON.stringify({ environment: 'test' });
         notes = 'some notes';
         await sequelizeConnector.init(sequelizeStub());
     });
@@ -141,6 +141,24 @@ describe('Sequelize client tests', function () {
                     'runners_subscribed': []
                 },
                 'where': {
+                    'report_id': reportId
+                }
+            });
+        });
+    });
+
+    describe('should update report with benchmark tests ', async () => {
+        it('should update report with benchmark tests ', async () => {
+            await sequelizeConnector.updateReportBenchmark(testId, reportId, 5.3, 'some data');
+
+            sequelizeUpdateStub.callCount.should.eql(1); // query last report should not be trig
+            sequelizeUpdateStub.args[0][0].should.eql({
+                'score': 5.3,
+                'benchmark_weights_data': 'some data'
+            });
+            sequelizeUpdateStub.args[0][1].should.eql({
+                'where': {
+                    'test_id': testId,
                     'report_id': reportId
                 }
             });
@@ -299,10 +317,9 @@ describe('Sequelize client tests', function () {
 
     describe('Update report', () => {
         it('should succeed updating report', async () => {
-            const endTime = Date.now();
             const lastUpdatedAt = Date.now();
 
-            await sequelizeConnector.updateReport(testId, reportId, '0', lastUpdatedAt, endTime);
+            await sequelizeConnector.updateReport(testId, reportId, { phase: '0', last_updated_at: lastUpdatedAt });
 
             should(sequelizeUpdateStub.args[0][0]).eql({
                 'last_updated_at': lastUpdatedAt,
@@ -325,7 +342,7 @@ describe('Sequelize client tests', function () {
             const statId = uuid();
             const phaseIndex = 0;
             const phaseStatus = 'initiliazed';
-            const data = JSON.stringify({message: 'started'});
+            const data = JSON.stringify({ message: 'started' });
 
             await sequelizeConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 
@@ -355,7 +372,7 @@ describe('Sequelize client tests', function () {
                     stats_time: statsTime,
                     phase_status: uuid(),
                     phase_index: uuid(),
-                    data: JSON.stringify({median: 5})
+                    data: JSON.stringify({ median: 5 })
                 }
             }];
 
@@ -413,7 +430,6 @@ describe('Sequelize client tests', function () {
                 }
             }]);
 
-
             let sequelizeResponse = [{
                 dataValues: {
                 },
@@ -421,7 +437,7 @@ describe('Sequelize client tests', function () {
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            await sequelizeConnector.updateSubscriberWithStats('test_id', 'report_id', 'runner_id', 'started_phase', {codes: {}, errors: {}});
+            await sequelizeConnector.updateSubscriberWithStats('test_id', 'report_id', 'runner_id', 'started_phase', { codes: {}, errors: {} });
         });
         it('Should successfully update subscriber without stats', async () => {
             sequelizeGetSubscribersStatsStub.resolves([{
@@ -435,16 +451,14 @@ describe('Sequelize client tests', function () {
                 }
             }]);
 
-
             let sequelizeResponse = [{
                 dataValues: {
                 },
-                getSubscribers: sequelizeGetSubscribersStatsStub,
+                getSubscribers: sequelizeGetSubscribersStatsStub
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
             await sequelizeConnector.updateSubscriber('test_id', 'report_id', 'runner_id', 'started_phase');
         });
-
     });
 });

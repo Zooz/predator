@@ -3,7 +3,6 @@ let sinon = require('sinon');
 let logger = require('../../../../src/common/logger');
 let driver = require('cassandra-driver');
 let rewire = require('rewire');
-let should = require('should');
 let cassandraClient = rewire('../../../../src/reports/models/database/cassandra/cassandraConnector');
 
 let uuid = require('uuid');
@@ -75,7 +74,7 @@ describe('Cassandra client tests', function() {
         reportId = uuid();
         jobId = uuid();
         testType = 'testType';
-        startTime = new Date('1/10/2017')
+        startTime = new Date('1/10/2017');
         testName = 'testName';
         testDescription = 'testDescription';
         testConfiguration = 'testConfiguration';
@@ -135,6 +134,20 @@ describe('Cassandra client tests', function() {
                 });
         });
     });
+    describe('should update report with benchmark tests ', async () => {
+        it('should update report with benchmark tests ', async () => {
+            clientExecuteStub.resolves({ rowLength: 1, rows: [{ '[applied]': false }] });
+            let queryReport = 'UPDATE reports_summary SET score=?, benchmark_weights_data=? WHERE test_id=? AND report_id=?';
+            await cassandraClient.updateReportBenchmark(testId, reportId, 5.3, 'some data');
+            loggerErrorStub.callCount.should.eql(0);
+            clientExecuteStub.callCount.should.eql(3); // query last report should be trig
+            clientExecuteStub.getCall(1).args[0].should.eql(queryReport);
+            clientExecuteStub.getCall(1).args[1][0].should.eql(5.3);
+            clientExecuteStub.getCall(1).args[1][1].should.eql('some data');
+            clientExecuteStub.getCall(1).args[1][2].should.eql(testId);
+            clientExecuteStub.getCall(1).args[1][3].should.eql(reportId);
+        });
+    });
 
     describe('Insert report that already exist', function () {
         it('should succeed simple insert', function () {
@@ -159,7 +172,7 @@ describe('Cassandra client tests', function() {
             clientExecuteStub.onCall(0).resolves({ rowLength: 1, rows: [{ 'start_time': '01/22/2017' }] });
             clientExecuteStub.onCall(1).resolves({ rowLength: 1 });
             let queryLastReport = 'UPDATE last_reports SET phase=?, last_updated_at=? WHERE start_time_year=? AND start_time_month=? AND start_time=? AND test_id=? AND report_id=?';
-            await cassandraClientLastReport(testId, reportId, phase, lastUpdatedAt);
+            await cassandraClientLastReport(testId, reportId, { phase, last_updated_at: lastUpdatedAt });
 
             loggerErrorStub.callCount.should.eql(0);
             clientExecuteStub.getCall(1).args[0].should.eql(queryLastReport);

@@ -6,11 +6,18 @@ const should = require('should'),
     rewire = require('rewire'),
     databaseConfig = require('../../../../src/config/databaseConfig');
 let database = require('../../../../src/tests/models/database');
-
 const functions = [
     {
         functionName: 'insertTest',
         args: ['testInfo', 'testJson', 'id', 'revisionId', 'fileId']
+    },
+    {
+        functionName: 'insertTestBenchmark',
+        args: ['testId', 'benchmarkData']
+    },
+    {
+        functionName: 'getTestBenchmark',
+        args: ['testId']
     },
     {
         functionName: 'getTest',
