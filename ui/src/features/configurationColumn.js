@@ -501,7 +501,6 @@ const Notes = ({data, onEditNote}) => {
             setEditMode(false);
             onEditNote(test_id, report_id, editValue);
         }
-    }
 
     return (
 
