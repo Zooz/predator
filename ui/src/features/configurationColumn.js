@@ -24,6 +24,7 @@ import {getTimeFromCronExpr} from './utils';
 import UiSwitcher from '../components/UiSwitcher';
 import TextArea from "../components/TextArea";
 import TitleInput from "../components/TitleInput";
+import ClickOutHandler from 'react-onclickout'
 
 
 export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote}) => {
@@ -480,12 +481,17 @@ const Notes = ({data, onEditNote}) => {
 
     function onKeyDown(e) {
         if (e.key === 'Enter') {
+            save();
+        }
+    }
+    function save() {
             setEditMode(false);
             onEditNote(test_id, report_id, editValue);
         }
-    }
 
-    return <TooltipWrapper
+    return (
+        <ClickOutHandler onClickOut={save}>
+            <TooltipWrapper
         disable={!notes}
         content={<div>
             {cell}
@@ -506,7 +512,9 @@ const Notes = ({data, onEditNote}) => {
             }
         </div>
 
-    </TooltipWrapper>;
+            </TooltipWrapper>
+        </ClickOutHandler>
+    )
 };
 
 
