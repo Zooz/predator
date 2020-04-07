@@ -423,7 +423,7 @@ describe('Integration tests for the reports api', function() {
                 };
                 const config = {
                     benchmark_weights: {
-                        percentile_ninety: { factor: 1, percentage: 20 },
+                        percentile_ninety_five: { factor: 1, percentage: 20 },
                         percentile_fifty: { factor: 1, percentage: 30 },
                         server_errors: { factor: 1, percentage: 20 },
                         client_errors: { factor: 1, percentage: 20 },

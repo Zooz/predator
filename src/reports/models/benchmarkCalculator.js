@@ -30,7 +30,7 @@ function calculateObjectScore(benchmarkObject, reportObject, configObject) {
 function extractCalculateObject(dataObject) {
     return {
         rps: dataObject.rps.mean,
-        percentile_ninety: dataObject.latency.p95,
+        percentile_ninety_five: dataObject.latency.p95,
         percentile_fifty: dataObject.latency.median,
         client_errors: extractNumberOfErrorsPrefix(dataObject.codes, FOUR_PREFIX),
         server_errors: calculateServerErrors(dataObject)
