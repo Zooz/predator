@@ -136,7 +136,7 @@ class Report extends React.Component {
                     }}>
                         <h3>Overall Latency</h3>
                         <Button hover disabled={report.status !== 'finished'}
-                                onClick={this.createBenchmark}>Create Benchmark</Button>
+                                onClick={this.createBenchmark}>Set as Benchmark</Button>
                     </div>
                     {this.lineChart(aggregateReport.latencyGraph, aggregateReport.latencyGraphKeys, 'ms')}
                     <h3>Status Codes</h3>

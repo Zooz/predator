@@ -8,6 +8,7 @@ const reportEmailSender = require('./reportEmailSender'),
     logger = require('../../common/logger'),
     constants = require('../utils/constants'),
     configHandler = require('../../configManager/models/configHandler'),
+    reportUtil = require('../utils/reportUtil'),
     configConstants = require('../../common/consts').CONFIG;
 
 module.exports.notifyIfNeeded = async (report, stats) => {
@@ -56,7 +57,7 @@ async function handleError(report, job, stats) {
 }
 
 async function handleStart(report, job) {
-    if (!isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_STARTED_STAGE)) {
+    if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_STARTED_STAGE)) {
         return;
     }
 
@@ -75,7 +76,7 @@ async function handleStart(report, job) {
 }
 
 async function handleFirstIntermediate(report, job) {
-    if (!isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE)) {
+    if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE)) {
         return;
     }
     let webhooks = await getWebhookTargets(job);
@@ -94,7 +95,7 @@ async function handleFirstIntermediate(report, job) {
 }
 
 async function handleDone(report, job) {
-    if (!isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
+    if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
 
@@ -131,17 +132,6 @@ async function handleAbort(report, job) {
         webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;
     }
     reportWebhookSender.send(webhooks, webhookMessage);
-}
-
-function isAllRunnersInExpectedPhase(report, phaseStatus) {
-    let postStatsUpdate = [];
-    report.subscribers.forEach(subscribers => {
-        postStatsUpdate.push(subscribers.phase_status);
-    });
-    let uniquePostStatsUpdatePhases = [...new Set(postStatsUpdate)];
-
-    let isInStage = (postStatsUpdate.length === (report.parallelism || 1) && uniquePostStatsUpdatePhases.length === 1 && uniquePostStatsUpdatePhases[0] === phaseStatus);
-    return isInStage;
 }
 
 async function getWebhookTargets(job) {

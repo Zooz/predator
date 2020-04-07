@@ -5,6 +5,9 @@ const rewire = require('rewire');
 const sinon = require('sinon');
 
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
+const testManager = require('../../../../src/tests/models/manager');
+const aggregateReportManager = require('../../../../src/reports/models/aggregateReportManager');
+const benchmarkCalculator = require('../../../../src/reports/models/benchmarkCalculator');
 const jobsManager = require('../../../../src/jobs/models/jobManager');
 const logger = require('../../../../src/common/logger');
 const notifier = require('../../../../src/reports/models/notifier');
@@ -26,6 +29,28 @@ const REPORT = {
         {
             'runner_id': '1234',
             'phase_status': constants.SUBSCRIBER_STARTED_STAGE,
+            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+        }
+    ],
+    'test_configuration': JSON.stringify({
+        duration: 10
+    }),
+    last_updated_at: Date.now()
+};
+
+const REPORT_DONE = {
+    'test_id': 'test_id',
+    'revision_id': 'revision_id',
+    'report_id': 'report_id',
+    'test_name': 'test name',
+    'report_url': 'http://www.zooz.com',
+    'status': constants.REPORT_INITIALIZING_STATUS,
+    'start_time': 1527533459591,
+    'grafana_report': 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
+    'subscribers': [
+        {
+            'runner_id': '1234',
+            'phase_status': constants.SUBSCRIBER_DONE_STAGE,
             'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
         }
     ],
@@ -61,6 +86,10 @@ describe('Reports manager tests', function () {
     let getJobStub;
     let configStub;
     let notifierStub;
+    let getBenchmarkStub;
+    let aggregateReportManagerStub;
+    let benchmarkCalculatorStub;
+    let updateReportBenchmarkStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -73,6 +102,10 @@ describe('Reports manager tests', function () {
         databaseSubscribeRunnerStub = sandbox.stub(databaseConnector, 'subscribeRunner');
         databaseUpdateSubscriberStub = sandbox.stub(databaseConnector, 'updateSubscriber');
         databaseUpdateSubscriberWithStatsStub = sandbox.stub(databaseConnector, 'updateSubscriberWithStats');
+        getBenchmarkStub = sandbox.stub(testManager, 'getBenchmark');
+        aggregateReportManagerStub = sandbox.stub(aggregateReportManager, 'aggregateReport');
+        benchmarkCalculatorStub = sandbox.stub(benchmarkCalculator, 'calculate');
+        updateReportBenchmarkStub = sandbox.stub(databaseConnector, 'updateReportBenchmark');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
@@ -109,7 +142,23 @@ describe('Reports manager tests', function () {
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
-            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&from=1527533459591');
+            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=now');
+        });
+
+        it('Database connector returns an array with one report and score ', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { grafana_url: 'http://www.grafana.com' };
+                }
+            });
+            const reportWithScore = Object.assign({ score: 6.6, benchmark_weights_data: JSON.stringify({ data: 'some data' }) }, REPORT);
+            databaseGetReportStub.resolves([reportWithScore]);
+            const report = await manager.getReport();
+            should.exist(report);
+            should.exist(report.grafana_report);
+            should.exist(report.benchmark_weights_data);
+            should(report.score).eql(6.6);
+            should(report.benchmark_weights_data).eql({ data: 'some data' });
         });
 
         it('Database connector returns an array with one report without grafana url configured', async () => {
@@ -361,6 +410,20 @@ describe('Reports manager tests', function () {
     });
 
     describe('Create new stats', function () {
+        before(() => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return {
+                        job_platform: 'KUBERNETES'
+                    };
+                },
+                getConfigValue: () => {
+                    return {
+                        config: 'some value'
+                    };
+                }
+            });
+        });
         it('Stats consumer handles message with status intermediate', async () => {
             configStub.resolves({});
             databaseGetReportStub.resolves([REPORT]);
@@ -393,6 +456,43 @@ describe('Reports manager tests', function () {
 
             should.exist(statsResponse);
             statsResponse.should.eql(stats);
+        });
+
+        it('when report done and have benchmark data ', async () => {
+            databaseGetReportStub.resolves([REPORT_DONE]);
+            getBenchmarkStub.resolves({ test: 'some  benchmark data' });
+            aggregateReportManagerStub.resolves({ aggregate: { test: 'some aggregate data' } });
+            benchmarkCalculatorStub.returns({ score: 5.5, data: { test: 'some calculate data' } });
+            updateReportBenchmarkStub.resolves();
+            const stats = { phase_status: 'done', data: JSON.stringify({ median: 1 }) };
+            await manager.postStats('test_id', stats);
+
+            getBenchmarkStub.callCount.should.eql(1);
+            aggregateReportManagerStub.callCount.should.eql(1);
+            benchmarkCalculatorStub.callCount.should.eql(1);
+            updateReportBenchmarkStub.callCount.should.eql(1);
+
+            should(getBenchmarkStub.args).eql([['test_id']]);
+            should(benchmarkCalculatorStub.args).eql([[{ 'test': 'some  benchmark data' }, { 'test': 'some aggregate data' }, {
+                config: 'some value'
+            }]]);
+            should(updateReportBenchmarkStub.args[0][0]).eql('test_id');
+            should(updateReportBenchmarkStub.args[0][1]).eql('report_id');
+            should(updateReportBenchmarkStub.args[0][2]).eql(5.5);
+            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data' }));
+        });
+        it('when report done and dont have benchmark data ', async () => {
+            databaseGetReportStub.resolves([REPORT_DONE]);
+            getBenchmarkStub.resolves();
+            const stats = { phase_status: 'done', data: JSON.stringify({ median: 1 }) };
+            await manager.postStats('test_id', stats);
+
+            getBenchmarkStub.callCount.should.eql(1);
+            aggregateReportManagerStub.callCount.should.eql(0);
+            benchmarkCalculatorStub.callCount.should.eql(0);
+            updateReportBenchmarkStub.callCount.should.eql(0);
+
+            should(getBenchmarkStub.args).eql([['test_id']]);
         });
     });
 });

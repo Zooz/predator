@@ -5,6 +5,7 @@ const sinon = require('sinon');
 const rewire = require('rewire');
 const logger = require('../../../../src/common/logger');
 const aggregateReportGenerator = rewire('../../../../src/reports/models/aggregateReportGenerator');
+const aggregateReportManager = rewire('../../../../src/reports/models/aggregateReportManager');
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
 const reportsManager = require('../../../../src/reports/models/reportsManager');
 
@@ -80,9 +81,11 @@ describe('Artillery report generator test', () => {
 
         it('create aggregate report with intermediate rows - with stats interval 15 seconds', async () => {
             const STATS_INTERVAL = 15;
-            aggregateReportGenerator.__set__('STATS_INTERVAL', STATS_INTERVAL);
+            aggregateReportManager.__set__('STATS_INTERVAL', STATS_INTERVAL);
+            aggregateReportGenerator.__set__('aggregateReportManager', aggregateReportManager);
             const firstStatsTimestamp = JSON.parse(PARALLEL_INTERMEDIATE_ROWS[0].data).timestamp;
 
+            reportsManagerGetReportStub.resolves(REPORT);
             REPORT.start_time = new Date(new Date(firstStatsTimestamp).getTime() - (STATS_INTERVAL * 1000));
             databaseConnectorGetStatsStub.resolves(PARALLEL_INTERMEDIATE_ROWS);
             let reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);

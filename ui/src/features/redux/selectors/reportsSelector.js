@@ -83,9 +83,9 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime) {
 
         if (report.aggregate) {
             benchMark.rps = report.aggregate.rps;
-            benchMark.scenarioDuration = report.aggregate.scenarioDuration;
+            benchMark.latency = report.aggregate.latency;
             benchMark.errors = report.aggregate.errors;
-            benchMark.codes = report.aggregate.v;
+            benchMark.codes = report.aggregate.codes;
         }
         const alias = prefix.substring(0, 1);
 
