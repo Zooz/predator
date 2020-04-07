@@ -4,9 +4,14 @@ const _ = require('lodash'),
     uuid = require('uuid/v4');
 
 const databaseConnector = require('./databaseConnector'),
+    testManager = require('../../tests/models/manager'),
     jobConnector = require('../../jobs/models/jobManager'),
+    aggregateReportManager = require('./aggregateReportManager'),
+    benchmarkCalculator = require('./benchmarkCalculator'),
     configHandler = require('../../configManager/models/configHandler'),
+    configConsts = require('../../common/consts').CONFIG,
     notifier = require('./notifier'),
+    reportUtil = require('../utils/reportUtil'),
     constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
@@ -88,10 +93,34 @@ module.exports.postStats = async (report, stats) => {
     }
     await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
     report = await module.exports.getReport(report.test_id, report.report_id);
+    await updateReportBenchmarkIfNeeded(report);
     notifier.notifyIfNeeded(report, stats);
 
     return stats;
 };
+
+async function updateReportBenchmarkIfNeeded(report) {
+    if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
+        return;
+    }
+    const configBenchmark = await configHandler.getConfigValue(configConsts.BENCHMARK_WEIGHTS);
+    const testBenchmarkData = await extractBenchmark(report.test_id);
+    if (testBenchmarkData && configBenchmark) {
+        const reportAggregate = await aggregateReportManager.aggregateReport(report);
+        const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark);
+        const { data, score } = reportBenchmark;
+        await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
+    }
+}
+
+async function extractBenchmark(testId) {
+    try {
+        const testBenchmarkData = await testManager.getBenchmark(testId);
+        return testBenchmarkData;
+    } catch (e) {
+        return undefined;
+    }
+}
 
 function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
@@ -137,7 +166,9 @@ function getReportResponse(summaryRow, config) {
         environment: testConfiguration.environment,
         subscribers: summaryRow.subscribers,
         last_rps: rps,
-        last_success_rate: successRate
+        last_success_rate: successRate,
+        score: summaryRow.score ? summaryRow.score : undefined,
+        benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined
     };
 
     report.status = calculateReportStatus(report, config);
