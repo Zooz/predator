@@ -1909,6 +1909,11 @@ components:
             buckets_sizes:
               type: string
               description: Bucket sizes use to configure prometheus.
+            labels:
+              description: Labels which will be passed to prometheus push gateway.
+              type: object
+              additionalProperties:
+                type: string
         smtp_server:
           additionalProperties: false
           type: object
@@ -1950,14 +1955,14 @@ components:
               type: object
               description: benchmark_weights
               required:
-              - percentile_ninety
+              - percentile_ninety_five
               - percentile_fifty
               - server_errors
               - client_errors
               - rps
               properties:
-                percentile_ninety:
-                  description: P90 benchmark weight
+                percentile_ninety_five:
+                  description: P95 benchmark weight
                   allOf:
                     - $ref: '#/components/schemas/benchmark_weights'
                 percentile_fifty:
@@ -1979,12 +1984,8 @@ components:
     benchmark_weights:
       type: object
       required:
-        - factor
         - percentage
       properties:
-        factor:
-          type: number
-          description: benchmark factor weight
         percentage:
             type: number
             description: benchmark percentage weight

@@ -72,10 +72,11 @@ Additional parameters for the following chosen databases:
 | METRICS_PLUGIN_NAME  	| metrics_plugin_name 	| Metrics integration to use [prometheus,influx] 	| ✓                        	|               	|
 
 #### Prometheus
-| Environment Variable 	| Configuration key                   	| Description                          	| Configurable from UI/API 	| Default value 	|
-|----------------------	|-------------------------------------	|--------------------------------------	|--------------------------	|---------------	|
-|                      	| prometheus_metrics.push_gateway_url 	| Url of push gateway                  	| ✓                        	|               	|
-|                      	| prometheus_metrics.buckets_sizes    	| Bucket sizes to configure prometheus 	| ✓                        	|               	|
+| Environment Variable 	| Configuration key                   	| Description                          	            | Configurable from UI/API 	| Default value 	|
+|----------------------	|-------------------------------------	|---------------------------------------------------|--------------------------	|---------------	|
+|                      	| prometheus_metrics.push_gateway_url 	| Url of push gateway                  	            | ✓                        	|               	|
+|                      	| prometheus_metrics.buckets_sizes    	| Bucket sizes to configure prometheus 	            | ✓                        	|               	|
+|                      	| prometheus_metrics.labels    	        | Labels will be passed to the push gateway       	| ✓                        	|               	|
 
 #### Influx
 | Environment Variable 	| Configuration key       	| Description        	| Configurable from UI/API 	| Default value 	|
