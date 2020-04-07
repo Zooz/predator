@@ -40,7 +40,7 @@ const configBasic =
 
 const emptyCofnig =
     {
-        'percentile_ninety': {
+        'percentile_ninety_five': {
             'percentage': 0
         },
         'percentile_fifty': {
