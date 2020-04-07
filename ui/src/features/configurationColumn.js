@@ -290,7 +290,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             accessor: 'score',
             className: css['small-header'],
             headerClassName: css['small-header']
-        },{
+        }, {
             id: 'report',
             Header: () => (
                 <TableHeader sortable={false}>
@@ -495,33 +495,37 @@ const Notes = ({data, onEditNote}) => {
             save();
         }
     }
+
     function save() {
+        if (editMode) {
             setEditMode(false);
             onEditNote(test_id, report_id, editValue);
         }
+    }
 
     return (
         <ClickOutHandler onClickOut={save}>
             <TooltipWrapper
-        disable={!notes}
-        content={<div>
-            {cell}
-        </div>}
-        dataId={`tooltipKey_${id}`}
-        place='top'
-        offset={{top: 1}}
-    >
-        <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
-            {editMode &&
-            <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown} onChange={(evt, value) => {
-                setEditValue(evt.target.value)
-            }}/>}
-            {!editMode &&
-            <div onClick={() => onEditNote && setEditMode(true)}
-                 style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
+                disable={!notes}
+                content={<div>
+                    {cell}
+                </div>}
+                dataId={`tooltipKey_${id}`}
+                place='top'
+                offset={{top: 1}}
+            >
+                <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
+                    {editMode &&
+                    <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown}
+                              onChange={(evt, value) => {
+                                  setEditValue(evt.target.value)
+                              }}/>}
+                    {!editMode &&
+                    <div onClick={() => onEditNote && setEditMode(true)}
+                         style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
 
-            }
-        </div>
+                    }
+                </div>
 
             </TooltipWrapper>
         </ClickOutHandler>
