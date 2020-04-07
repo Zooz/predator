@@ -55,9 +55,7 @@ class CompareReports extends React.Component {
         const reportsNames =  reportsList.filter(cur=>cur.show).map(cur=>cur.name);
         const {aggregateReports} =this.props;
         const filteredData = aggregateReports.filter((report)=>reportsNames.includes(report.alias));
-        console.log('manor startTime',new Date());
         const mergedReports = this.mergeGraphs(filteredData);
-        console.log('manor stop time',new Date());
         this.setState({mergedReports});
     };
 
