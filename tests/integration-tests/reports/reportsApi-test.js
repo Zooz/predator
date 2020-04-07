@@ -458,7 +458,7 @@ describe('Integration tests for the reports api', function() {
                         'percentage': 0.1,
                         'score': 10
                     },
-                    'percentile_ninety': {
+                    'percentile_ninety_five': {
                         'benchmark_value': 1042,
                         'report_value': 1042,
                         'percentage': 0.2,
