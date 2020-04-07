@@ -37,6 +37,9 @@ tags:
   - name: Configuration
     description: |
       This resource allows you to configure Predator programmatically.
+  - name: Files
+    description: |
+      This resource allows uploading files which can be used by Predator tests like csv.
 x-tagGroups:
   - name: Reference
     tags:
@@ -46,6 +49,7 @@ x-tagGroups:
       - Jobs
       - Reports
       - Configuration
+      - Files
 
 paths:
   #DSL Definitions
@@ -1384,6 +1388,73 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
 
+  # Files
+  /v1/files:
+    post:
+      operationId: upload-file
+      tags:
+        - Files
+      summary: Create file
+      description: Upload a file which can be used by Predator tests like csv.
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/upload_file_response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '413':
+          description: Payload Too Large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                csv:
+                  type: string
+                  format: binary
+        description: The file to create upload
+        required: true
+  '/v1/files/{file_id}':
+    get:
+      operationId: retrieve-file
+      tags:
+        - Files
+      summary: Download file
+      description: Retrieve a specific file.
+      parameters:
+        - in: path
+          name: file_id
+          description: The id of file to download
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/upload_file_response'
+
 components:
   parameters:
     dsl_name:
@@ -1474,6 +1545,11 @@ components:
           format: uri
           example: http://www.example.com/file.txt
           description: Url to text file location , will be used by the processor
+        csv_file_id:
+          type: string
+          format: uuid
+          example: 8e83bca3-f04f-4d16-a324-b0d2959db7d4
+          description: The id of the uploaded csv file resource
         description:
           type: string
           description: A description of the test.
@@ -2275,5 +2351,18 @@ components:
          - percentage
       properties:
         percentage:
-            type: number
-            description: benchmark percentage weight
+          type: number
+          description: benchmark percentage weight
+    upload_file_response:
+      type: object
+      required:
+        - id
+        - filename
+      properties:
+        id:
+          type: string
+          pattern: uuid
+          description: the id of the file
+        filename:
+          type: string
+          description: the name of the file
