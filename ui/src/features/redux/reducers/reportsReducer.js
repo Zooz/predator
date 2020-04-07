@@ -48,6 +48,8 @@ export default function reduce(state = initialState, action = {}) {
             currentSelectedReports[action.testId]=currentSelectedReports[action.testId] || {};
             currentSelectedReports[action.testId][action.reportId] = action.value;
             return state.set('selected_reports', currentSelectedReports);
+        case Types.CLEAR_REPORT_FOR_COMPARE:
+            return state.set('selected_reports', {});
         case Types.CLEAN_ALL_ERRORS:
             const newState = (state.set('error_get_reports', undefined)
                 .set('error_get_reports', undefined)

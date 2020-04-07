@@ -34,14 +34,15 @@ function buildAggregateReportData(reports, withPrefix) {
             rps = [],
             errorsBar = [],
             scenarios = [],
-            benchMark = {},
-            errorsCodeGraphKeys= [];
+            benchMark = {};
+        let errorsCodeGraphKeysAsObjectAcc= {};
+
 
         const startTime = new Date(report.start_time).getTime();
         report.intermediates.forEach((bucket, index) => {
             const latency = bucket.latency;
             const time = new Date(startTime + (bucket.bucket * 1000));
-            const timeMills= time.getTime()
+            const timeMills= time.getTime();
             latencyGraph.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
                 [`${prefix}median`]: latency.median,
@@ -52,13 +53,14 @@ function buildAggregateReportData(reports, withPrefix) {
             rps.push({name: `${dateFormat(time, 'h:MM:ss')}`,timeMills, [`${prefix}mean`]: bucket.rps.mean});
 
             if (Object.keys(bucket.codes).length > 0) {
+                console.log('manor bucket.codes',bucket.codes);
+                console.log('manor bucket.errors',bucket.errors);
 
                 const errorsData = Object.entries({...bucket.codes,...bucket.errors}).reduce((acc,cur)=>{
                    acc[`${prefix}${cur[0]}`]=cur[1];
                     return acc;
                 },{});
-
-                errorsCodeGraphKeys.push(...Object.keys(errorsData));
+                errorsCodeGraphKeysAsObjectAcc = Object.assign(errorsCodeGraphKeysAsObjectAcc,errorsData)
                 errorsCodeGraph.push({name: `${dateFormat(time, 'h:MM:ss')}`,timeMills, ...errorsData});
                 Object.keys(bucket.codes).forEach((code) => {
                     errorCodes[`${prefix}${code}`] = true;
@@ -91,6 +93,10 @@ function buildAggregateReportData(reports, withPrefix) {
         const latencyGraphKeys = [`${prefix}median`,`${prefix}p95`,`${prefix}p99`];
         const rpsKeys = [`${prefix}mean`];
         const errorsBarKeys = [`${prefix}count`];
+
+
+        const errorsCodeGraphKeys = Object.keys(errorsCodeGraphKeysAsObjectAcc)
+
         if (withPrefix) {
             prefix = String.fromCharCode(prefix.charCodeAt(0) + 1)+'_';
         }

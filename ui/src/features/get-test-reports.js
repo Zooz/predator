@@ -112,6 +112,7 @@ class getTests extends React.Component {
         this.props.clearErrorOnGetReports();
         this.props.clearSelectedReport();
         this.props.clearSelectedTest();
+        this.props.clearReportForCompare();
     }
 
     loader() {
@@ -239,6 +240,7 @@ const mapDispatchToProps = {
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
     addReportForCompare: Actions.addReportForCompare,
+    clearReportForCompare: Actions.clearReportForCompare,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);

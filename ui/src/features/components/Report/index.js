@@ -114,8 +114,7 @@ class Report extends React.Component {
 
     render() {
         const {report, onClose, aggregateReport} = this.props;
-        console.log("manor report",report);
-        console.log("manor aggregateReport",aggregateReport);
+
         return (
             <Modal onExit={onClose}>
                 <div style={{

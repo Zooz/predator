@@ -93,6 +93,7 @@ class getReports extends React.Component {
     componentWillUnmount() {
         this.props.clearSelectedReport();
         clearInterval(this.refreshDataInterval);
+        this.props.clearReportForCompare();
     }
 
     onSort = (field) => {
@@ -254,6 +255,8 @@ const mapDispatchToProps = {
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
     addReportForCompare: Actions.addReportForCompare,
+    clearReportForCompare: Actions.clearReportForCompare,
+
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getReports);
