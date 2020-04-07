@@ -1911,14 +1911,14 @@ components:
               type: object
               description: benchmark_weights
               required:
-              - percentile_ninety
+              - percentile_ninety_five
               - percentile_fifty
               - server_errors
               - client_errors
               - rps
               properties:
-                percentile_ninety:
-                  description: P90 benchmark weight
+                percentile_ninety_five:
+                  description: P95 benchmark weight
                   allOf:
                     - $ref: '#/components/schemas/benchmark_weights'
                 percentile_fifty:

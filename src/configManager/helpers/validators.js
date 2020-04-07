@@ -1,7 +1,7 @@
 module.exports.validateBenchmarkWeights = (req, res, next) => {
     const benchmarkWeights = req.body.benchmark_weights;
     if (benchmarkWeights){
-        const p90Percentage = benchmarkWeights.percentile_ninety.percentage;
+        const p90Percentage = benchmarkWeights.percentile_ninety_five.percentage;
         const p50Percentage = benchmarkWeights.percentile_fifty.percentage;
         const serverErrorsPercentage = benchmarkWeights.server_errors.percentage;
         const clientErrorsPercentage = benchmarkWeights.client_errors.percentage;

@@ -27,7 +27,7 @@ const defaultConfig = {
     smtp_server: Object.assign({}, defaultSmtpServerConfig),
     minimum_wait_for_delayed_report_status_update_in_ms: 30000,
     benchmark_weights: {
-        percentile_ninety: { percentage: 20 },
+        percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
         server_errors: { percentage: 20 },
         client_errors: { percentage: 20 },
@@ -46,7 +46,7 @@ const defaultConfigNotEscaped = {
     smtp_server: Object.assign({}, defaultSmtpServerConfig),
     minimum_wait_for_delayed_report_status_update_in_ms: 30000,
     benchmark_weights: {
-        percentile_ninety: { percentage: 20 },
+        percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
         server_errors: { percentage: 20 },
         client_errors: { percentage: 20 },
@@ -83,7 +83,7 @@ const configParseExpected = {
     },
     minimum_wait_for_delayed_report_status_update_in_ms: 30000,
     benchmark_weights: {
-        percentile_ninety: { percentage: 20 },
+        percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
         server_errors: { percentage: 20 },
         client_errors: { percentage: 20 },
@@ -108,7 +108,7 @@ const resultAfterConvert = {
     smtp_server: Object.assign({}, defaultSmtpServerConfig),
     minimum_wait_for_delayed_report_status_update_in_ms: 30000,
     benchmark_weights: {
-        percentile_ninety: { percentage: 20 },
+        percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
         server_errors: { percentage: 20 },
         client_errors: { percentage: 20 },

@@ -16,7 +16,7 @@ const defaultBody = {
     delay_runner_ms: 0,
     minimum_wait_for_delayed_report_status_update_in_ms: 30000,
     benchmark_weights: {
-        percentile_ninety: { percentage: 20 },
+        percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
         server_errors: { percentage: 20 },
         client_errors: { percentage: 20 },
@@ -47,7 +47,7 @@ const updateBodyWithTypes = {
     benchmark_threshold: 20,
     benchmark_threshold_webhook_url: 'http://slack.com',
     benchmark_weights: {
-        percentile_ninety: { percentage: 20 },
+        percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 30 },
         server_errors: { percentage: 20 },
         client_errors: { percentage: 20 },
@@ -92,7 +92,7 @@ const requestBody =
         benchmark_threshold: 20,
         benchmark_threshold_webhook_url: 'http://slack.com',
         benchmark_weights: {
-            percentile_ninety: { percentage: 20 },
+            percentile_ninety_five: { percentage: 20 },
             percentile_fifty: { percentage: 30 },
             server_errors: { percentage: 20 },
             client_errors: { percentage: 20 },
@@ -211,7 +211,7 @@ describe('update and get config', () => {
                 benchmark_threshold: 20,
                 benchmark_threshold_webhook_url: 'http://slack.com',
                 benchmark_weights: {
-                    percentile_ninety: { percentage: 50 },
+                    percentile_ninety_five: { percentage: 50 },
                     percentile_fifty: { percentage: 30 },
                     server_errors: { percentage: 20 },
                     client_errors: { percentage: 30 },

@@ -1,7 +1,7 @@
 const constConfig = require('../../common/consts').CONFIG;
 
 const BENCHMARK_WEIGHTS_DEFAULT = {
-    percentile_ninety: { percentage: 20 },
+    percentile_ninety_five: { percentage: 20 },
     percentile_fifty: { percentage: 20 },
     server_errors: { percentage: 20 },
     client_errors: { percentage: 20 },
