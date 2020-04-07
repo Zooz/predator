@@ -290,7 +290,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             accessor: (data) => data.score ? Math.floor(data.score) : '',
             className: css['small-header'],
             headerClassName: css['small-header']
-        }, {
+        },{
             id: 'report',
             Header: () => (
                 <TableHeader sortable={false}>
