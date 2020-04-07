@@ -268,7 +268,7 @@ function sanitizeTestResult(data) {
     const result = data.map(function (test) {
         const dataValues = test.dataValues;
         const dslDataObject = sanitizeHelper.extractDslRootData(dataValues.raw_data);
-        dataValues.artillery_json =  dataValues.artillery_json ? JSON.parse(dataValues.artillery_json) : undefined;
+        dataValues.artillery_json = dataValues.artillery_json ? JSON.parse(dataValues.artillery_json) : undefined;
         dataValues.id = dataValues.test_id;
         dataValues.file_id = dataValues.file_id || undefined;
         dataValues.processor_id = dataValues.processor_id || undefined;
