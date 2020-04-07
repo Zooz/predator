@@ -21,7 +21,7 @@ const benchmarkBasic = {
 
 const configBasic =
     {
-        'percentile_ninety': {
+        'percentile_ninety_five': {
             'percentage': 20
         },
         'percentile_fifty': {
@@ -116,7 +116,7 @@ describe('benchmark calculator', function () {
                 'percentage': 0.2,
                 'score': 20
             },
-            'percentile_ninety': {
+            'percentile_ninety_five': {
                 'benchmark_value': 200,
                 'report_value': 200,
                 'percentage': 0.2,
@@ -157,7 +157,7 @@ describe('benchmark calculator', function () {
                 'percentage': 0,
                 'score': 0
             },
-            'percentile_ninety': {
+            'percentile_ninety_five': {
                 'benchmark_value': 200,
                 'report_value': 248,
                 'percentage': 0,
@@ -204,7 +204,7 @@ describe('benchmark calculator', function () {
                 'percentage': 0,
                 'score': 0
             },
-            'percentile_ninety': {
+            'percentile_ninety_five': {
                 'benchmark_value': 200,
                 'report_value': 248,
                 'percentage': 0,
@@ -251,7 +251,7 @@ describe('benchmark calculator', function () {
                 'percentage': 1,
                 'score': 100
             },
-            'percentile_ninety': {
+            'percentile_ninety_five': {
                 'benchmark_value': 200,
                 'report_value': 248,
                 'percentage': 0,
@@ -298,7 +298,7 @@ describe('benchmark calculator', function () {
                 'percentage': 1,
                 'score': 50
             },
-            'percentile_ninety': {
+            'percentile_ninety_five': {
                 'benchmark_value': 200,
                 'report_value': 248,
                 'percentage': 0,
