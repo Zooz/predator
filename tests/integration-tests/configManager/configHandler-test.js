@@ -234,7 +234,7 @@ describe('update and get config', () => {
             should(response.body.message).eql(validationError);
             should(response.body.validation_errors).eql([
                 "body/benchmark_weights should NOT have additional properties 'tps'",
-                "body/benchmark_weights should have required property 'percentile_ninety'",
+                "body/benchmark_weights should have required property 'percentile_ninety_five'",
                 "body/benchmark_weights should have required property 'percentile_fifty'",
                 "body/benchmark_weights should have required property 'server_errors'",
                 "body/benchmark_weights should have required property 'client_errors'",
