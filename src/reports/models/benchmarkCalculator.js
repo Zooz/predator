@@ -3,8 +3,8 @@ const FIVE_PREFIX = '5';
 const FOUR_PREFIX = '4';
 const RPS = 'rps';
 
-module.exports.calculate = (testBenchMark, reportData, configObject) => {
-    const benchmarkObject = extractCalculateObject(testBenchMark);
+module.exports.calculate = (testBenchmark, reportData, configObject) => {
+    const benchmarkObject = extractCalculateObject(testBenchmark);
     const reportObject = extractCalculateObject(reportData);
     return calculateObjectScore(benchmarkObject, reportObject, configObject);
 };

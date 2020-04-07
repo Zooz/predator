@@ -16,7 +16,7 @@ module.exports = {
     subscribeRunner,
     updateSubscriberWithStats,
     updateSubscriber,
-    updateReportBenchMark
+    updateReportBenchmark
 
 };
 
@@ -32,8 +32,8 @@ function updateReport(testId, reportId, reportData) {
     return databaseConnector.updateReport(testId, reportId, reportData);
 }
 
-function updateReportBenchMark(testId, reportId, score, benchMarkData) {
-    return databaseConnector.updateReportBenchMark(testId, reportId, score, benchMarkData);
+function updateReportBenchmark(testId, reportId, score, benchmarkData) {
+    return databaseConnector.updateReportBenchmark(testId, reportId, score, benchmarkData);
 }
 
 function getLastReports(limit) {

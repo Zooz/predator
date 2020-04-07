@@ -126,7 +126,7 @@ describe('Testing sequelize connector', function () {
     describe('benchmark', function () {
         it('when succeed to insert benchmark', async function () {
             const testId = uuid();
-            await sequelizeConnector.insertTestBenchMark(testId, 'benchmark data');
+            await sequelizeConnector.insertTestBenchmark(testId, 'benchmark data');
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['benchmark']]);
             should(createStub.args[0][0].test_id).eql(testId);
@@ -135,7 +135,7 @@ describe('Testing sequelize connector', function () {
         it('when succeed to get benchmark', async function () {
             findStub.resolves({ data: 'some_data' });
             const testId = uuid();
-            const res = await sequelizeConnector.getTestBenchMark(testId);
+            const res = await sequelizeConnector.getTestBenchmark(testId);
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['benchmark']]);
             should(findStub.args[0][0].where).eql({ test_id: testId });
@@ -144,7 +144,7 @@ describe('Testing sequelize connector', function () {
         it('when no benchmark to get ', async function () {
             findStub.resolves();
             const testId = uuid();
-            const res = await sequelizeConnector.getTestBenchMark(testId);
+            const res = await sequelizeConnector.getTestBenchmark(testId);
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['benchmark']]);
             should(findStub.args[0][0].where).eql({ test_id: testId });

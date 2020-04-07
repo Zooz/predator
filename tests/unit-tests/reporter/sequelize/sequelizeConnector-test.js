@@ -149,7 +149,7 @@ describe('Sequelize client tests', function () {
 
     describe('should update report with benchmark tests ', async () => {
         it('should update report with benchmark tests ', async () => {
-            await sequelizeConnector.updateReportBenchMark(testId, reportId, 5.3, 'some data');
+            await sequelizeConnector.updateReportBenchmark(testId, reportId, 5.3, 'some data');
 
             sequelizeUpdateStub.callCount.should.eql(1); // query last report should not be trig
             sequelizeUpdateStub.args[0][0].should.eql({

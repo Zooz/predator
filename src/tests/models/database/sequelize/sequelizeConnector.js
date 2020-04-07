@@ -17,8 +17,8 @@ module.exports = {
     getDslDefinition,
     deleteDefinition,
     updateDslDefinition,
-    insertTestBenchMark,
-    getTestBenchMark
+    insertTestBenchmark,
+    getTestBenchmark
 
 };
 
@@ -107,17 +107,17 @@ async function initSchemas() {
     await file.sync();
 }
 
-async function insertTestBenchMark(testId, benchMarkData) {
+async function insertTestBenchmark(testId, benchmarkData) {
     const benchmark = client.model('benchmark');
     let params = {
         test_id: testId,
-        data: benchMarkData
+        data: benchmarkData
     };
     const result = benchmark.create(params);
     return result;
 }
 
-async function getTestBenchMark(test_id) {
+async function getTestBenchmark(test_id) {
     const benchmark = client.model('benchmark');
     const options = {
         where: { test_id: test_id }

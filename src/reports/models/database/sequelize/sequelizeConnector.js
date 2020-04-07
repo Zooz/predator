@@ -18,7 +18,7 @@ module.exports = {
     subscribeRunner,
     updateSubscriberWithStats,
     updateSubscriber,
-    updateReportBenchMark
+    updateReportBenchmark
 };
 
 async function init(sequlizeClient) {
@@ -74,9 +74,9 @@ async function updateReport(testId, reportId, reportData) {
     return report.update(reportData, options);
 }
 
-async function updateReportBenchMark(testId, reportId, score, benchMarkData) {
+async function updateReportBenchmark(testId, reportId, score, benchmarkData) {
     const benchmark = client.model('report');
-    const params = { score: score, benchmark_weights_data: benchMarkData };
+    const params = { score: score, benchmark_weights_data: benchmarkData };
     const options = {
         where: {
             test_id: testId,

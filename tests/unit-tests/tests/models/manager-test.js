@@ -19,14 +19,14 @@ describe('Scenario generator tests', function () {
     let saveFileStub;
     let getFileStub;
     let getRequestStub;
-    let insertBenchMarkStub;
-    let getTestBenchMarkStub;
+    let insertBenchmarkStub;
+    let getTestBenchmarkStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         insertStub = sandbox.stub(database, 'insertTest');
-        insertBenchMarkStub = sandbox.stub(database, 'insertTestBenchMark');
-        getTestBenchMarkStub = sandbox.stub(database, 'getTestBenchMark');
+        insertBenchmarkStub = sandbox.stub(database, 'insertTestBenchmark');
+        getTestBenchmarkStub = sandbox.stub(database, 'getTestBenchmark');
         getTestStub = sandbox.stub(database, 'getTest');
         getTestsStub = sandbox.stub(database, 'getTests');
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
@@ -62,9 +62,9 @@ describe('Scenario generator tests', function () {
     });
     describe('Create new bench mark for test', async () => {
         it('Should save new bench mark for test', async () => {
-            insertBenchMarkStub.resolves();
-            const result = await manager.insertTestBenchMark({ rps: 'some benchmark data' }, 1234);
-            insertBenchMarkStub.calledOnce.should.eql(true);
+            insertBenchmarkStub.resolves();
+            const result = await manager.insertTestBenchmark({ rps: 'some benchmark data' }, 1234);
+            insertBenchmarkStub.calledOnce.should.eql(true);
             result.should.have.keys('benchmark_data');
             Object.keys(result).length.should.eql(1);
             should(result).eql({
@@ -72,19 +72,19 @@ describe('Scenario generator tests', function () {
             });
         });
         it('Should get bench mark for test with no bench mark and get empty data', async () => {
-            getTestBenchMarkStub.resolves();
+            getTestBenchmarkStub.resolves();
             try {
                 await manager.getBenchmark(1234);
                 should.fail('Expected to throw error');
             } catch (err) {
-                getTestBenchMarkStub.calledOnce.should.eql(true);
+                getTestBenchmarkStub.calledOnce.should.eql(true);
                 should(err.statusCode).eql(404);
             }
         });
         it('Should get bench mark for test with  bench', async () => {
-            getTestBenchMarkStub.resolves(JSON.stringify({ benchmark: 'some data' }));
+            getTestBenchmarkStub.resolves(JSON.stringify({ benchmark: 'some data' }));
             const result = await manager.getBenchmark(1234);
-            getTestBenchMarkStub.calledOnce.should.eql(true);
+            getTestBenchmarkStub.calledOnce.should.eql(true);
             should(result).eql({ benchmark: 'some data' });
         });
     });

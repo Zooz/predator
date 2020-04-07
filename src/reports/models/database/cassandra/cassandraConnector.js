@@ -31,7 +31,7 @@ module.exports = {
     subscribeRunner,
     updateSubscriberWithStats,
     updateSubscriber,
-    updateReportBenchMark
+    updateReportBenchmark
 };
 
 let queryOptions = {
@@ -90,8 +90,13 @@ function buildUpdateQuery(baseQuery, values, where, whereDataArray) {
     };
 }
 
-async function updateReportBenchMark(testId, reportId, score, benchMarkData) {
-    const res = await executeQuery(UPDATE_REPORT_BENCHMARK, [score, benchMarkData, testId, reportId], { prepare: true });
+async function updateReportBenchmark(testId, reportId, score, benchmarkData) {
+    const reportData = {
+        score,
+        benchmark_weights_data: benchmarkData
+    };
+    updateLastReportAsync(testId, reportId, reportData);
+    const res = await executeQuery(UPDATE_REPORT_BENCHMARK, [score, benchmarkData, testId, reportId], { prepare: true });
     return res;
 }
 

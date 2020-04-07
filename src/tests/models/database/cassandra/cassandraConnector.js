@@ -35,8 +35,8 @@ module.exports = {
     saveFile,
     getFile,
     deleteDefinition,
-    insertTestBenchMark,
-    getTestBenchMark
+    insertTestBenchmark,
+    getTestBenchmark
 };
 
 let queryOptions = {
@@ -66,13 +66,13 @@ async function deleteTest(testId){
     return result;
 }
 
-async function insertTestBenchMark(testId, benchMarkData) {
+async function insertTestBenchmark(testId, benchmarkData) {
     testId = uuid.fromString(testId);
-    const result = await executeQuery(INSERT_BENCHMARK_DATA_TEST, [testId, benchMarkData]);
+    const result = await executeQuery(INSERT_BENCHMARK_DATA_TEST, [testId, benchmarkData]);
     return result;
 }
 
-async function getTestBenchMark(testId) {
+async function getTestBenchmark(testId) {
     const result = await executeQuery(GET_BENCHMARK_DATA_TEST, [testId]);
     return result.rows.length > 0 ? result.rows[0].data : undefined;
 }

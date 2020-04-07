@@ -98,9 +98,9 @@ describe('the tests api', function() {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
-            const benchMarkResult = await testsRequestSender.createBenchMark(testId, {}, validHeaders);
-            const { body } = benchMarkResult;
-            should(benchMarkResult.statusCode).eql(400);
+            const benchmarkResult = await testsRequestSender.createBenchmark(testId, {}, validHeaders);
+            const { body } = benchmarkResult;
+            should(benchmarkResult.statusCode).eql(400);
             should(body.message).eql('Input validation error');
             should(body.validation_errors).eql(['body should have required property \'errors\'',
                 'body should have required property \'codes\'',
@@ -111,9 +111,9 @@ describe('the tests api', function() {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
-            const benchMarkResult = await testsRequestSender.createBenchMark(testId, { latency: {}, rps: {} }, validHeaders);
-            const { body } = benchMarkResult;
-            should(benchMarkResult.statusCode).eql(400);
+            const benchmarkResult = await testsRequestSender.createBenchmark(testId, { latency: {}, rps: {} }, validHeaders);
+            const { body } = benchmarkResult;
+            should(benchmarkResult.statusCode).eql(400);
             should(body.message).eql('Input validation error');
             should(body.validation_errors).eql(['body should have required property \'errors\'',
                 'body should have required property \'codes\'',
@@ -124,7 +124,7 @@ describe('the tests api', function() {
         it('Create benchmark with full body for existing test', async () => {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
-            const benchMarkRequest = {
+            const benchmarkRequest = {
                 'rps': {
                     'count': 1270,
                     'mean': 46.74
@@ -146,13 +146,13 @@ describe('the tests api', function() {
                 }
             };
             const testId = createTestResponse.body.id;
-            const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
-            const { body } = benchMarkResult;
-            should(benchMarkResult.statusCode).eql(201);
-            should(body.benchmark_data).eql(benchMarkRequest);
+            const benchmarkResult = await testsRequestSender.createBenchmark(testId, benchmarkRequest, validHeaders);
+            const { body } = benchmarkResult;
+            should(benchmarkResult.statusCode).eql(201);
+            should(body.benchmark_data).eql(benchmarkRequest);
         });
         it('try to create benchmark for not existing test', async () => {
-            const benchMarkRequest = {
+            const benchmarkRequest = {
                 'rps': {
                     'mean': 46.74
                 },
@@ -160,25 +160,25 @@ describe('the tests api', function() {
                 'errors': {},
                 'codes': {}
             };
-            const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
-            should(benchMarkResult.body.message).eql('Not found');
-            should(benchMarkResult.statusCode).eql(404);
+            const benchmarkResult = await testsRequestSender.createBenchmark(uuid(), benchmarkRequest, validHeaders);
+            should(benchmarkResult.body.message).eql('Not found');
+            should(benchmarkResult.statusCode).eql(404);
         });
         it('try to create benchmark with not valid body and fail', async () => {
-            const benchMarkRequest = {
+            const benchmarkRequest = {
                 'not_valid': {
                     'count': 1270,
                     'mean': 46.74
                 }
             };
-            const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
-            should(benchMarkResult.body.message).eql('Input validation error');
-            should(benchMarkResult.statusCode).eql(400);
+            const benchmarkResult = await testsRequestSender.createBenchmark(uuid(), benchmarkRequest, validHeaders);
+            should(benchmarkResult.body.message).eql('Input validation error');
+            should(benchmarkResult.statusCode).eql(400);
         });
     });
     describe('get benchmark', () => {
         it('get benchmark', async () => {
-            const benchMarkRequest = {
+            const benchmarkRequest = {
                 'rps': {
                     'mean': 46.74
                 },
@@ -189,11 +189,11 @@ describe('the tests api', function() {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
-            const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
-            should(benchMarkResult.statusCode).eql(201);
+            const benchmarkResult = await testsRequestSender.createBenchmark(testId, benchmarkRequest, validHeaders);
+            should(benchmarkResult.statusCode).eql(201);
             const getResult = await testsRequestSender.getBenchmark(testId, validHeaders);
             should(getResult.statusCode).eql(200);
-            should(getResult.body).eql(benchMarkRequest);
+            should(getResult.body).eql(benchmarkRequest);
         });
         it('get benchmark when no bench mark create to this tests and get 404', async () => {
             const requestBody = simpleTest.test;

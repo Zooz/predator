@@ -89,7 +89,7 @@ describe('Reports manager tests', function () {
     let getBenchmarkStub;
     let aggregateReportManagerStub;
     let benchmarkCalculatorStub;
-    let updateReportBenchMarkStub;
+    let updateReportBenchmarkStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -105,7 +105,7 @@ describe('Reports manager tests', function () {
         getBenchmarkStub = sandbox.stub(testManager, 'getBenchmark');
         aggregateReportManagerStub = sandbox.stub(aggregateReportManager, 'aggregateReport');
         benchmarkCalculatorStub = sandbox.stub(benchmarkCalculator, 'calculate');
-        updateReportBenchMarkStub = sandbox.stub(databaseConnector, 'updateReportBenchMark');
+        updateReportBenchmarkStub = sandbox.stub(databaseConnector, 'updateReportBenchmark');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
@@ -463,23 +463,23 @@ describe('Reports manager tests', function () {
             getBenchmarkStub.resolves({ test: 'some  benchmark data' });
             aggregateReportManagerStub.resolves({ aggregate: { test: 'some aggregate data' } });
             benchmarkCalculatorStub.returns({ score: 5.5, data: { test: 'some calculate data' } });
-            updateReportBenchMarkStub.resolves();
+            updateReportBenchmarkStub.resolves();
             const stats = { phase_status: 'done', data: JSON.stringify({ median: 1 }) };
             await manager.postStats('test_id', stats);
 
             getBenchmarkStub.callCount.should.eql(1);
             aggregateReportManagerStub.callCount.should.eql(1);
             benchmarkCalculatorStub.callCount.should.eql(1);
-            updateReportBenchMarkStub.callCount.should.eql(1);
+            updateReportBenchmarkStub.callCount.should.eql(1);
 
             should(getBenchmarkStub.args).eql([['test_id']]);
             should(benchmarkCalculatorStub.args).eql([[{ 'test': 'some  benchmark data' }, { 'test': 'some aggregate data' }, {
                 config: 'some value'
             }]]);
-            should(updateReportBenchMarkStub.args[0][0]).eql('test_id');
-            should(updateReportBenchMarkStub.args[0][1]).eql('report_id');
-            should(updateReportBenchMarkStub.args[0][2]).eql(5.5);
-            should(updateReportBenchMarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data' }));
+            should(updateReportBenchmarkStub.args[0][0]).eql('test_id');
+            should(updateReportBenchmarkStub.args[0][1]).eql('report_id');
+            should(updateReportBenchmarkStub.args[0][2]).eql(5.5);
+            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data' }));
         });
         it('when report done and dont have benchmark data ', async () => {
             databaseGetReportStub.resolves([REPORT_DONE]);
@@ -490,7 +490,7 @@ describe('Reports manager tests', function () {
             getBenchmarkStub.callCount.should.eql(1);
             aggregateReportManagerStub.callCount.should.eql(0);
             benchmarkCalculatorStub.callCount.should.eql(0);
-            updateReportBenchMarkStub.callCount.should.eql(0);
+            updateReportBenchmarkStub.callCount.should.eql(0);
 
             should(getBenchmarkStub.args).eql([['test_id']]);
         });

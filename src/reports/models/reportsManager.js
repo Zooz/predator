@@ -93,13 +93,13 @@ module.exports.postStats = async (report, stats) => {
     }
     await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
     report = await module.exports.getReport(report.test_id, report.report_id);
-    await updateReportBenchMarkIfNeeded(report);
+    await updateReportBenchmarkIfNeeded(report);
     notifier.notifyIfNeeded(report, stats);
 
     return stats;
 };
 
-async function updateReportBenchMarkIfNeeded(report) {
+async function updateReportBenchmarkIfNeeded(report) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
@@ -107,9 +107,9 @@ async function updateReportBenchMarkIfNeeded(report) {
     const testBenchmarkData = await extractBenchmark(report.test_id);
     if (testBenchmarkData && configBenchmark) {
         const reportAggregate = await aggregateReportManager.aggregateReport(report);
-        const reportBenchMark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark);
-        const { data, score } = reportBenchMark;
-        await databaseConnector.updateReportBenchMark(report.test_id, report.report_id, score, JSON.stringify(data));
+        const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark);
+        const { data, score } = reportBenchmark;
+        await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
     }
 }
 
@@ -167,9 +167,8 @@ function getReportResponse(summaryRow, config) {
         subscribers: summaryRow.subscribers,
         last_rps: rps,
         last_success_rate: successRate,
-        score: summaryRow.score,
+        score: summaryRow.score ? summaryRow.score : undefined,
         benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined
-
     };
 
     report.status = calculateReportStatus(report, config);

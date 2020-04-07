@@ -138,7 +138,7 @@ describe('Cassandra client tests', function() {
         it('should update report with benchmark tests ', async () => {
             clientExecuteStub.resolves({ rowLength: 1, rows: [{ '[applied]': false }] });
             let queryReport = 'UPDATE reports_summary SET score=?, benchmark_weights_data=? WHERE test_id=? AND report_id=?';
-            await cassandraClient.updateReportBenchMark(testId, reportId, 5.3, 'some data');
+            await cassandraClient.updateReportBenchmark(testId, reportId, 5.3, 'some data');
             loggerErrorStub.callCount.should.eql(0);
             clientExecuteStub.callCount.should.eql(1); // query last report should not be trig
             clientExecuteStub.getCall(0).args[0].should.eql(queryReport);

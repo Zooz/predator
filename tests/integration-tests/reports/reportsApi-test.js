@@ -50,9 +50,9 @@ describe('Integration tests for the reports api', function() {
         };
     });
 
-    afterEach(async function () {
-        await mailhogHelper.clearAllOldMails();
-    });
+    // afterEach(async function () {
+    //     await mailhogHelper.clearAllOldMails();
+    // });
 
     describe('Happy flow - no parallelism', function () {
         describe('Create report', function () {
@@ -413,7 +413,7 @@ describe('Integration tests for the reports api', function() {
             });
 
             it('Post done phase stats with benchmark data config for test', async () => {
-                const benchMarkRequest = {
+                const benchmarkRequest = {
                     'rps': {
                         'mean': 90.99
                     },
@@ -432,17 +432,24 @@ describe('Integration tests for the reports api', function() {
                 };
                 const configRes = await configRequestCreator.updateConfig(config);
                 should(configRes.statusCode).eql(200);
-                const benchmarkRes = await testsRequestCreator.createBenchMark(testId, benchMarkRequest, {});
+                const benchmarkRes = await testsRequestCreator.createBenchmark(testId, benchmarkRequest, {});
                 should(benchmarkRes.statusCode).eql(201);
                 const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId));
                 should(intermediateStatsResponse.statusCode).be.eql(204);
                 const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', runnerId));
                 should(doneStatsResponse.statusCode).be.eql(204);
                 let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                let getLastReport = await reportsRequestCreator.getLastReports(1);
                 should(getReportResponse.statusCode).be.eql(200);
+                should(getLastReport.statusCode).be.eql(200);
+
                 let report = getReportResponse.body;
+                let lastReport = getLastReport.body[0];
+                should(lastReport.report_id).eql(reportId);
                 validateFinishedReport(report);
                 should(report.score).eql(100);
+                should(lastReport.score).eql(100);
+                should(lastReport.benchmark_weights_data).eql(report.benchmark_weights_data);
                 should(report.benchmark_weights_data).eql({
                     'rps': {
                         'benchmark_value': 90.99,

@@ -12,7 +12,7 @@ module.exports = {
     getTests,
     deleteTest,
     getTestsByProcessorId,
-    insertTestBenchMark,
+    insertTestBenchmark,
     getBenchmark
 };
 
@@ -28,14 +28,14 @@ async function upsertTest(testRawData, existingTestId) {
     return { id: id, revision_id: revisionId };
 }
 
-async function insertTestBenchMark(benchMarkRawData, testId) {
-    const dataParse = JSON.stringify(benchMarkRawData);
-    await database.insertTestBenchMark(testId, dataParse);
-    return { benchmark_data: benchMarkRawData };
+async function insertTestBenchmark(benchmarkRawData, testId) {
+    const dataParse = JSON.stringify(benchmarkRawData);
+    await database.insertTestBenchmark(testId, dataParse);
+    return { benchmark_data: benchmarkRawData };
 }
 
 async function getBenchmark(testId) {
-    const benchmark = await database.getTestBenchMark(testId);
+    const benchmark = await database.getTestBenchmark(testId);
     if (!benchmark) {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
