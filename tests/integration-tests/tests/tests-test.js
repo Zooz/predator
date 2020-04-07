@@ -93,7 +93,7 @@ describe('the tests api', function() {
             });
         });
     });
-    describe('create bench mark for test', () => {
+    describe('create benchmark for test', () => {
         it('Create bench mark with partial body for existing test', async () => {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
@@ -198,7 +198,7 @@ describe('the tests api', function() {
                 getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
                 getTestResponse.statusCode.should.eql(404);
             });
-            it('Create test, with a file ', async () => {
+            it('Create test, with a file', async () => {
                 let requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
                 const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
@@ -247,16 +247,14 @@ describe('the tests api', function() {
                 let createTestResponse = await testsRequestSender.createTest(simpleTestWithBefore.test, validHeaders);
                 should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
                 createTestResponse.body.should.have.only.keys('id', 'revision_id');
-                const expected = require('../../testResults/Simple_test_before_feature')(dslName, createTestResponse.body.id);
+                const expected = require('../../testResults/Simple_test_before_feature')(dslName, createTestResponse.body.id, createTestResponse.body.revision_id);
                 const getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
                 should(getTestResponse.statusCode).eql(200, JSON.stringify(createTestResponse.body));
                 should.exists(getTestResponse.body.updated_at);
                 delete getTestResponse.body.updated_at;
-                delete getTestResponse.body.revision_id;
-                delete expected.revision_id;
                 should(getTestResponse.body).eql(expected);
             });
-            it('Create test, update dsl, get test', async () => {
+            it('Create dsl test, update dsl, get test should return new dsl', async () => {
                 let requestBody = simpleTest.test;
                 let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
@@ -359,7 +357,7 @@ describe('the tests api', function() {
             let getTestsResponse = await testsRequestSender.getTests(validHeaders);
             let testsIds = [];
             getTestsResponse.body.forEach(test => {
-                test.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at');
+                test.should.have.keys('id', 'description', 'name', 'revision_id', 'type', 'updated_at');
             });
             testsIds = getTestsResponse.body.map(function(test){
                 return test.id;
@@ -373,6 +371,7 @@ describe('the tests api', function() {
             testsIds.should.containEql(createTestResponse.body.id);
             testsIds.should.containEql(createSecondTestResponse.body.id);
             getTestResponse.body.id.should.eql(createTestResponse.body.id);
+            getTestResponse.body.revision_id.should.eql(createTestResponse.body.revision_id);
             getTestResponse.body.artillery_test.should.eql(expectedResult);
         });
         it('create test with several revisions and get all test revisions', async function () {

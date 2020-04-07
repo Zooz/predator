@@ -132,7 +132,7 @@ async function executeQuery(query, params, queryOptions) {
 function sanitizeTestResult(data) {
     const result = data.map(function (row) {
         const dslDataObject = sanitizeHelper.extractDslRootData(row.raw_data);
-        row.artillery_json = JSON.parse(row.artillery_json);
+        row.artillery_json = row.artillery_json ? JSON.parse(row.artillery_json) : undefined;
         row.file_id = row.file_id || undefined;
         row.processor_id = row.processor_id || undefined;
         delete row.raw_data;

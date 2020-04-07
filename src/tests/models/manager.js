@@ -39,15 +39,18 @@ async function insertTestBenchMark(benchMarkRawData, testId) {
 
 async function getTest(testId) {
     let test = await database.getTest(testId);
-    if (test && test.type === consts.TEST_TYPE_DSL) {
-        delete test.artillery_json;
-        test.artillery_test = await generateArtillery(test, testId);
-        return test;
-    } else {
+    if (!test) {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
         throw error;
     }
+    if (test.type === consts.TEST_TYPE_DSL) {
+        test.artillery_test = await testGenerator.createTest(test);
+    } else {
+        test.artillery_test = test.artillery_json;
+    }
+    delete test.artillery_json;
+    return test;
 }
 
 async function getAllTestRevisions(testId) {
@@ -93,16 +96,4 @@ async function getTestsByProcessorId(processorId) {
     const allCurrentTests = await getTests();
     const inUseTestsByProcessor = allCurrentTests.filter(test => test.processor_id && test.processor_id.toString() === processorId);
     return inUseTestsByProcessor;
-}
-
-async function generateArtillery(test, testId) {
-    const testRawData = {
-        name: test.name,
-        description: test.description,
-        type: test.type,
-        scenarios: test.scenarios,
-        before: test.before
-    };
-    const testArtilleryJson = await testGenerator.createTest(testRawData);
-    return testArtilleryJson;
 }
