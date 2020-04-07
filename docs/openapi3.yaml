@@ -2221,12 +2221,8 @@ components:
     benchmark_weights:
       type: object
       required:
-        - factor
-        - percentage
+         - percentage
       properties:
-        factor:
-          type: number
-          description: benchmark factor weight
         percentage:
             type: number
             description: benchmark percentage weight

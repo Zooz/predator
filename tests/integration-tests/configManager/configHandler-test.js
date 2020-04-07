@@ -14,7 +14,14 @@ const defaultBody = {
     runner_cpu: 1,
     runner_memory: 256,
     delay_runner_ms: 0,
-    minimum_wait_for_delayed_report_status_update_in_ms: 30000
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+    benchmark_weights: {
+        percentile_ninety: { percentage: 20 },
+        percentile_fifty: { percentage: 20 },
+        server_errors: { percentage: 20 },
+        client_errors: { percentage: 20 },
+        rps: { percentage: 20 }
+    }
 };
 const updateBodyWithTypes = {
     influx_metrics: {
@@ -40,11 +47,11 @@ const updateBodyWithTypes = {
     benchmark_threshold: 20,
     benchmark_threshold_webhook_url: 'http://slack.com',
     benchmark_weights: {
-        percentile_ninety: { factor: 10, percentage: 20 },
-        percentile_fifty: { factor: 10, percentage: 30 },
-        server_errors: { factor: 10, percentage: 20 },
-        client_errors: { factor: 10, percentage: 20 },
-        rps: { factor: 10, percentage: 10 }
+        percentile_ninety: { percentage: 20 },
+        percentile_fifty: { percentage: 30 },
+        server_errors: { percentage: 20 },
+        client_errors: { percentage: 20 },
+        rps: { percentage: 10 }
     }
 };
 
@@ -85,11 +92,11 @@ const requestBody =
         benchmark_threshold: 20,
         benchmark_threshold_webhook_url: 'http://slack.com',
         benchmark_weights: {
-            percentile_ninety: { factor: 10, percentage: 20 },
-            percentile_fifty: { factor: 10, percentage: 30 },
-            server_errors: { factor: 10, percentage: 20 },
-            client_errors: { factor: 10, percentage: 20 },
-            rps: { factor: 10, percentage: 10 }
+            percentile_ninety: { percentage: 20 },
+            percentile_fifty: { percentage: 30 },
+            server_errors: { percentage: 20 },
+            client_errors: { percentage: 20 },
+            rps: { percentage: 10 }
         }
     };
 const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
@@ -204,11 +211,11 @@ describe('update and get config', () => {
                 benchmark_threshold: 20,
                 benchmark_threshold_webhook_url: 'http://slack.com',
                 benchmark_weights: {
-                    percentile_ninety: { factor: 10, percentage: 50 },
-                    percentile_fifty: { factor: 10, percentage: 30 },
-                    server_errors: { factor: 10, percentage: 20 },
-                    client_errors: { factor: 10, percentage: 30 },
-                    rps: { factor: 10, percentage: 30 }
+                    percentile_ninety: { percentage: 50 },
+                    percentile_fifty: { percentage: 30 },
+                    server_errors: { percentage: 20 },
+                    client_errors: { percentage: 30 },
+                    rps: { percentage: 30 }
                 }
             });
             should(response.statusCode).eql(422);
