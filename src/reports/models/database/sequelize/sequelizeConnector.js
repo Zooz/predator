@@ -266,7 +266,7 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING
         },
         benchmark_weights_data: {
-            type: Sequelize.DataTypes.BLOB
+            type: Sequelize.DataTypes.TEXT('long')
         },
         score: {
             type: Sequelize.DataTypes.FLOAT
