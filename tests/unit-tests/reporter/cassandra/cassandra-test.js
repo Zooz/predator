@@ -140,12 +140,12 @@ describe('Cassandra client tests', function() {
             let queryReport = 'UPDATE reports_summary SET score=?, benchmark_weights_data=? WHERE test_id=? AND report_id=?';
             await cassandraClient.updateReportBenchmark(testId, reportId, 5.3, 'some data');
             loggerErrorStub.callCount.should.eql(0);
-            clientExecuteStub.callCount.should.eql(1); // query last report should not be trig
-            clientExecuteStub.getCall(0).args[0].should.eql(queryReport);
-            clientExecuteStub.getCall(0).args[1][0].should.eql(5.3);
-            clientExecuteStub.getCall(0).args[1][1].should.eql('some data');
-            clientExecuteStub.getCall(0).args[1][2].should.eql(testId);
-            clientExecuteStub.getCall(0).args[1][3].should.eql(reportId);
+            clientExecuteStub.callCount.should.eql(3); // query last report should be trig
+            clientExecuteStub.getCall(1).args[0].should.eql(queryReport);
+            clientExecuteStub.getCall(1).args[1][0].should.eql(5.3);
+            clientExecuteStub.getCall(1).args[1][1].should.eql('some data');
+            clientExecuteStub.getCall(1).args[1][2].should.eql(testId);
+            clientExecuteStub.getCall(1).args[1][3].should.eql(reportId);
         });
     });
 
