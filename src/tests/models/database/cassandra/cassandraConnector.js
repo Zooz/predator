@@ -4,7 +4,7 @@ let client = {};
 let uuid = require('cassandra-driver').types.Uuid;
 const sanitizeHelper = require('../../../helpers/sanitizeHelper');
 
-const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id, file_id, processor_id) values(?,?,?,?,?,?,?,?,?,?)';
+const INSERT_TEST_DETAILS = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id, file_id, csv_file_id, processor_id) values(?,?,?,?,?,?,?,?,?,?,?)';
 const GET_TEST = 'SELECT * FROM tests WHERE id = ? ORDER BY updated_at DESC limit 1';
 const GET_TEST_REVISIONS = 'SELECT * FROM tests WHERE id = ?';
 const GET_TESTS = 'SELECT * FROM tests';
@@ -17,9 +17,6 @@ const DELETE_DSL_DEFINITION = 'DELETE FROM dsl WHERE dsl_name = ? AND definition
 const GET_DSL_DEFINITION = 'SELECT * FROM dsl WHERE dsl_name = ? AND definition_name = ? limit 1';
 const GET_DSL_DEFINITIONS = 'SELECT * FROM dsl WHERE dsl_name = ?';
 
-const INSERT_FILE = 'INSERT INTO files(id,file) values(?,?)';
-const GET_FILE = 'SELECT file FROM files WHERE id = ?';
-
 module.exports = {
     init,
     insertTest,
@@ -31,8 +28,6 @@ module.exports = {
     getDslDefinition,
     getDslDefinitions,
     updateDslDefinition,
-    saveFile,
-    getFile,
     deleteDefinition,
     insertTestBenchMark
 };
@@ -77,9 +72,9 @@ async function getAllTestRevisions(id) {
     return sanitizedResult;
 }
 
-async function insertTest(testInfo, testJson, id, revisionId, fileId) {
+async function insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFileId) {
     let params;
-    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, fileId, testInfo.processor_id];
+    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, processorFileId, csvFileId, testInfo.processor_id];
     const result = await executeQuery(INSERT_TEST_DETAILS, params, queryOptions);
     return result;
 }
@@ -134,6 +129,7 @@ function sanitizeTestResult(data) {
         const dslDataObject = sanitizeHelper.extractDslRootData(row.raw_data);
         row.artillery_json = JSON.parse(row.artillery_json);
         row.file_id = row.file_id || undefined;
+        row.csv_file_id = row.csv_file_id || undefined;
         row.processor_id = row.processor_id || undefined;
         delete row.raw_data;
         return Object.assign(row, dslDataObject);
@@ -147,15 +143,4 @@ function sanitizeDslResult(data) {
         return row;
     });
     return result;
-}
-
-async function saveFile(id, file) {
-    let params = [id, file];
-    const result = await executeQuery(INSERT_FILE, params, queryOptions);
-    return result;
-}
-
-async function getFile(id) {
-    const result = await executeQuery(GET_FILE, [id], queryOptions);
-    return result.rows[0] ? result.rows[0].file : undefined;
 }

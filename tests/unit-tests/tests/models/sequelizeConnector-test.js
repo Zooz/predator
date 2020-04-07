@@ -49,50 +49,9 @@ describe('Testing sequelize connector', function () {
         sandbox.restore();
         clock.restore();
     });
-    describe('handle file insert and get', function () {
-        it('when succeed insert file', async function () {
-            const fileId = uuid();
-            await sequelizeConnector.saveFile(fileId, 'File for test content');
-            const client = sequelizeConnector.__get__('client');
-            should(client.model.args).eql([['file']]);
-            should(createStub.args[0][0].id).eql(fileId);
-            should(createStub.args[0][0].file).eql('File for test content');
-        });
-        it('when fail to insert file', async function () {
-            const error = new Error('error');
-            createStub.rejects(error);
-            const fileId = uuid();
-            try {
-                await sequelizeConnector.saveFile(fileId, 'File for test content');
-                throw new Error('should not get here');
-            } catch (err) {
-                should(err).eql(error);
-            }
-        });
-        it('when succeed to get file', async function () {
-            findStub.returns({});
-            const fileId = uuid();
-            await sequelizeConnector.getFile(fileId);
-            const client = sequelizeConnector.__get__('client');
-            should(client.model.args).eql([['file']]);
-            should(findStub.getCall(0).args[0].where.id).eql(fileId);
-        });
-        it('when fail to get file', async function () {
-            const error = new Error('error');
-            findStub.rejects(error);
-            const fileId = uuid();
-            try {
-                await sequelizeConnector.getFile(fileId);
-                throw new Error('should not get here');
-            } catch (err) {
-                should(err).eql(error);
-            }
-        });
-    });
-
     describe('insertTest', function () {
         it('when succeed insert test', async function () {
-            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', processor_id: '1234', scenarios: { s: '1' } }, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId');
+            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', processor_id: '1234', scenarios: { s: '1' } }, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId', '1234', '5678');
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['test']]);
             should(createStub.args).eql([
@@ -101,7 +60,8 @@ describe('Testing sequelize connector', function () {
                         'artillery_json': '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"}}',
                         'name': 'name',
                         'description': 'desc',
-                        'file_id': undefined,
+                        'csv_file_id': '5678',
+                        'file_id': '1234',
                         'processor_id': '1234',
                         'raw_data': '{"name":"name","description":"desc","type":"type","processor_id":"1234","scenarios":{"s":"1"}}',
                         'revision_id': 'revisionId',
