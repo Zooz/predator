@@ -3,7 +3,8 @@ const testGenerator = require('./testGenerator'),
     database = require('./database'),
     uuid = require('uuid'),
     fileManager = require('./fileManager'),
-    { ERROR_MESSAGES } = require('../../common/consts');
+    { ERROR_MESSAGES } = require('../../common/consts'),
+    consts = require('./../../common/consts');
 
 module.exports = {
     upsertTest,
@@ -17,13 +18,16 @@ module.exports = {
 };
 
 async function upsertTest(testRawData, existingTestId) {
-    const testArtilleryJson = await testGenerator.createTest(testRawData);
+    let testArtilleryJson = await testGenerator.createTest(testRawData);
     let id = existingTestId || uuid();
     let fileId;
-    if (testRawData['processor_file_url']){
+    if (testRawData['processor_file_url']) {
         fileId = await fileManager.saveFile(testRawData['processor_file_url']);
     }
     let revisionId = uuid.v4();
+    if (testRawData.type === consts.TEST_TYPE_DSL) {
+        testArtilleryJson = undefined;
+    }
     await database.insertTest(testRawData, testArtilleryJson, id, revisionId, fileId);
     return { id: id, revision_id: revisionId };
 }
@@ -45,16 +49,19 @@ async function getBenchmark(testId) {
 }
 
 async function getTest(testId) {
-    const result = await database.getTest(testId);
-    if (result) {
-        result.artillery_test = result.artillery_json;
-        delete result.artillery_json;
-        return result;
-    } else {
+    let test = await database.getTest(testId);
+    if (!test) {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
         throw error;
     }
+    if (test.type === consts.TEST_TYPE_DSL) {
+        test.artillery_test = await testGenerator.createTest(test);
+    } else {
+        test.artillery_test = test.artillery_json;
+    }
+    delete test.artillery_json;
+    return test;
 }
 
 async function getAllTestRevisions(testId) {
