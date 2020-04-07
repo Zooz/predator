@@ -438,13 +438,14 @@ describe('Integration tests for the reports api', function() {
                 should(intermediateStatsResponse.statusCode).be.eql(204);
                 const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', runnerId));
                 should(doneStatsResponse.statusCode).be.eql(204);
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                let getLastReport = await reportsRequestCreator.getLastReports(1);
+                const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                const getLastReport = await reportsRequestCreator.getLastReports(25);
                 should(getReportResponse.statusCode).be.eql(200);
                 should(getLastReport.statusCode).be.eql(200);
 
-                let report = getReportResponse.body;
-                let lastReport = getLastReport.body[0];
+                const report = getReportResponse.body;
+                const lastReports = getLastReport.body.filter(report => report.report_id === reportId);
+                const lastReport = lastReports[0];
                 should(lastReport.report_id).eql(reportId);
                 validateFinishedReport(report);
                 should(report.score).eql(100);
