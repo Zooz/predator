@@ -287,7 +287,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Score
                 </TableHeader>
             ),
-            accessor: 'score',
+            accessor: (data) => data.score ? Math.floor(data.score) : '',
             className: css['small-header'],
             headerClassName: css['small-header']
         }, {
