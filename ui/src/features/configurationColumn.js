@@ -504,7 +504,7 @@ const Notes = ({data, onEditNote}) => {
     }
 
     return (
-        <ClickOutHandler onClickOut={save}>
+
             <TooltipWrapper
                 disable={!notes}
                 content={<div>
@@ -516,19 +516,20 @@ const Notes = ({data, onEditNote}) => {
             >
                 <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
                     {editMode &&
+                    <ClickOutHandler onClickOut={save}>
                     <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown}
                               onChange={(evt, value) => {
                                   setEditValue(evt.target.value)
-                              }}/>}
+                              }}/>
+                    </ClickOutHandler>
+                              }
                     {!editMode &&
                     <div onClick={() => onEditNote && setEditMode(true)}
                          style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
 
                     }
                 </div>
-
             </TooltipWrapper>
-        </ClickOutHandler>
     )
 };
 
