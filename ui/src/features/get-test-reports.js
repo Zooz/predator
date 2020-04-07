@@ -126,7 +126,6 @@ class getTests extends React.Component {
         this.setState({showCompareReports: false})
     };
     onReportSelected = (testId, reportId, value) => {
-        console.log("value", value)
         this.props.addReportForCompare(testId, reportId, value);
     };
 

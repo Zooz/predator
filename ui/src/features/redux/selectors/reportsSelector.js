@@ -53,9 +53,6 @@ function buildAggregateReportData(reports, withPrefix) {
             rps.push({name: `${dateFormat(time, 'h:MM:ss')}`,timeMills, [`${prefix}mean`]: bucket.rps.mean});
 
             if (Object.keys(bucket.codes).length > 0) {
-                console.log('manor bucket.codes',bucket.codes);
-                console.log('manor bucket.errors',bucket.errors);
-
                 const errorsData = Object.entries({...bucket.codes,...bucket.errors}).reduce((acc,cur)=>{
                    acc[`${prefix}${cur[0]}`]=cur[1];
                     return acc;

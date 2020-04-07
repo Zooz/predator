@@ -53,12 +53,11 @@ class CompareReports extends React.Component {
     }
     setMergedReports = (reportsList)=>{
         const reportsNames =  reportsList.filter(cur=>cur.show).map(cur=>cur.name);
-        console.log("reportsNames",reportsNames)
         const {aggregateReports} =this.props;
-        const filteredData = aggregateReports.filter((report)=>reportsNames.includes(report.alias))
+        const filteredData = aggregateReports.filter((report)=>reportsNames.includes(report.alias));
+        console.log('manor startTime',new Date());
         const mergedReports = this.mergeGraphs(filteredData);
-        console.log("mergedReports inside mer",mergedReports)
-
+        console.log('manor stop time',new Date());
         this.setState({mergedReports});
     };
 
@@ -122,9 +121,6 @@ class CompareReports extends React.Component {
                 "timeMills": 1585835583279
             }
         ]
-
-        console.log("data graph", data);
-        console.log("data graph keys", keys);
         return (
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
@@ -190,9 +186,7 @@ class CompareReports extends React.Component {
 
     render() {
         const {reportsList,mergedReports} = this.state;
-        const {onClose, aggregateReports} = this.props;
-        console.log("aggregateReports", aggregateReports)
-        // const mergedData = this.mergeGraphs(aggregateReports);
+        const {onClose} = this.props;
         return (
             <Modal onExit={onClose}>
                 <div style={{
@@ -210,7 +204,7 @@ class CompareReports extends React.Component {
 
                         {this.lineChart(mergedReports.latencyGraph, mergedReports.latencyGraphKeys, 'ms')}
                         <h3>Status Codes</h3>
-                        {this.lineChart(mergedReports.errorsCodeGraph, mergedReports.errorsCodeGraphKeys)}
+                        {/*{this.lineChart(mergedReports.errorsCodeGraph, mergedReports.errorsCodeGraphKeys)}*/}
                         <h3>RPS</h3>
                         {this.generateAreaChart(mergedReports.rps, mergedReports.rpsKeys)}
                         <div style={{width: '50%'}}>
@@ -255,8 +249,6 @@ class CompareReports extends React.Component {
                     }
                 })
             });
-        console.log('selectedReportsAsList', selectedReportsAsList);
-
         getAggregateReports(selectedReportsAsList);
     };
 
