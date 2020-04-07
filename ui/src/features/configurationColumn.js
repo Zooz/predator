@@ -279,7 +279,18 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => <Notes data={data} onEditNote={onEditNote}/>
-        }, {
+        },
+        {
+            id: 'score',
+            Header: () => (
+                <TableHeader sortable={false}>
+                    Score
+                </TableHeader>
+            ),
+            accessor: 'score',
+            className: css['small-header'],
+            headerClassName: css['small-header']
+        },{
             id: 'report',
             Header: () => (
                 <TableHeader sortable={false}>

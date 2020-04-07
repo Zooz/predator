@@ -27,6 +27,12 @@ const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
 
 
 class Report extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            disabledCreateBenchmark: false
+        }
+    }
 
     generateAreaChart = (data, keys, labelY) => {
         return (
@@ -106,13 +112,15 @@ class Report extends React.Component {
             </ResponsiveContainer>
         )
     };
-    createBenchmark = ()=>{
+    createBenchmark = () => {
         const {aggregateReport, report} = this.props;
         this.props.createBenchmark(report.test_id, aggregateReport.benchMark);
+        this.setState({disabledCreateBenchmark: true})
     };
 
     render() {
         const {report, onClose, aggregateReport} = this.props;
+        const {disabledCreateBenchmark} = this.state;
         return (
             <Modal onExit={onClose}>
                 <div style={{
@@ -133,7 +141,7 @@ class Report extends React.Component {
                         alignItems: 'center'
                     }}>
                         <h3>Overall Latency</h3>
-                        <Button hover disabled={report.status !== 'finished'}
+                        <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
                                 onClick={this.createBenchmark}>Set as Benchmark</Button>
                     </div>
                     {this.lineChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms')}
