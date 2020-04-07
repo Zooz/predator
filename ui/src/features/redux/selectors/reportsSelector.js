@@ -13,16 +13,16 @@ export const createBenchmarkFailure = (state) => state.ReportsReducer.get('creat
 export const editReportFailure = (state) => state.ReportsReducer.get('edit_report_failure');
 export const selectedReports = (state) => state.ReportsReducer.get('selected_reports');
 
-export const getAggregateReport= createSelector(aggregateReport, (reports) => {
+export const getAggregateReport = createSelector(aggregateReport, (reports) => {
     return buildAggregateReportData(reports)[0] || {};
 });
 
 export const getAggregateReportsForCompare = createSelector(aggregateReport, (reports) => {
-    return buildAggregateReportData(reports, true);
+    return buildAggregateReportData(reports, true, true);
 });
 
 
-function buildAggregateReportData(reports, withPrefix) {
+function buildAggregateReportData(reports, withPrefix, startFromZeroTime) {
     let prefix = withPrefix ? 'A_' : '';
 
     return reports.map((report) => {
@@ -35,14 +35,16 @@ function buildAggregateReportData(reports, withPrefix) {
             errorsBar = [],
             scenarios = [],
             benchMark = {};
-        let errorsCodeGraphKeysAsObjectAcc= {};
+        let errorsCodeGraphKeysAsObjectAcc = {};
 
+        const offset = startFromZeroTime ? new Date(report.start_time).getTime() : 0;
 
-        const startTime = new Date(report.start_time).getTime();
+        const startTime = new Date(report.start_time).getTime() - offset;
         report.intermediates.forEach((bucket, index) => {
             const latency = bucket.latency;
             const time = new Date(startTime + (bucket.bucket * 1000));
-            const timeMills= time.getTime();
+            const timeMills = time.getTime();
+
             latencyGraph.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
                 [`${prefix}median`]: latency.median,
@@ -50,15 +52,15 @@ function buildAggregateReportData(reports, withPrefix) {
                 [`${prefix}p99`]: latency.p99,
                 timeMills
             });
-            rps.push({name: `${dateFormat(time, 'h:MM:ss')}`,timeMills, [`${prefix}mean`]: bucket.rps.mean});
+            rps.push({name: `${dateFormat(time, 'h:MM:ss')}`, timeMills, [`${prefix}mean`]: bucket.rps.mean});
 
             if (Object.keys(bucket.codes).length > 0) {
-                const errorsData = Object.entries({...bucket.codes,...bucket.errors}).reduce((acc,cur)=>{
-                   acc[`${prefix}${cur[0]}`]=cur[1];
+                const errorsData = Object.entries({...bucket.codes, ...bucket.errors}).reduce((acc, cur) => {
+                    acc[`${prefix}${cur[0]}`] = cur[1];
                     return acc;
-                },{});
-                errorsCodeGraphKeysAsObjectAcc = Object.assign(errorsCodeGraphKeysAsObjectAcc,errorsData)
-                errorsCodeGraph.push({name: `${dateFormat(time, 'h:MM:ss')}`,timeMills, ...errorsData});
+                }, {});
+                errorsCodeGraphKeysAsObjectAcc = Object.assign(errorsCodeGraphKeysAsObjectAcc, errorsData)
+                errorsCodeGraph.push({name: `${dateFormat(time, 'h:MM:ss')}`, timeMills, ...errorsData});
                 Object.keys(bucket.codes).forEach((code) => {
                     errorCodes[`${prefix}${code}`] = true;
                 });
@@ -85,9 +87,9 @@ function buildAggregateReportData(reports, withPrefix) {
             benchMark.errors = report.aggregate.errors;
             benchMark.codes = report.aggregate.v;
         }
-        const alias = prefix.substring(0,1);
+        const alias = prefix.substring(0, 1);
 
-        const latencyGraphKeys = [`${prefix}median`,`${prefix}p95`,`${prefix}p99`];
+        const latencyGraphKeys = [`${prefix}median`, `${prefix}p95`, `${prefix}p99`];
         const rpsKeys = [`${prefix}mean`];
         const errorsBarKeys = [`${prefix}count`];
 
@@ -95,7 +97,7 @@ function buildAggregateReportData(reports, withPrefix) {
         const errorsCodeGraphKeys = Object.keys(errorsCodeGraphKeysAsObjectAcc)
 
         if (withPrefix) {
-            prefix = String.fromCharCode(prefix.charCodeAt(0) + 1)+'_';
+            prefix = String.fromCharCode(prefix.charCodeAt(0) + 1) + '_';
         }
 
         return {
@@ -115,6 +117,5 @@ function buildAggregateReportData(reports, withPrefix) {
             benchMark,
             startTime: report.start_time
         }
-
     })
 }

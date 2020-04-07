@@ -3,6 +3,8 @@ import React from 'react';
 import Modal from '../Modal';
 import {prettySeconds} from '../../utils';
 import PieChart from '../PieChart'
+import _ from 'lodash';
+
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     LineChart,
@@ -34,7 +36,8 @@ class CompareReports extends React.Component {
         super(props);
         this.state = {
             reportsList: [],
-            mergedReports: this.mergeGraphs([])
+            mergedReports: this.mergeGraphs([]),
+            filteredKeys: {}
         };
     }
 
@@ -51,21 +54,25 @@ class CompareReports extends React.Component {
         }
 
     }
-    setMergedReports = (reportsList)=>{
-        const reportsNames =  reportsList.filter(cur=>cur.show).map(cur=>cur.name);
-        const {aggregateReports} =this.props;
-        const filteredData = aggregateReports.filter((report)=>reportsNames.includes(report.alias));
+
+    setMergedReports = (reportsList) => {
+        const reportsNames = reportsList.filter(cur => cur.show).map(cur => cur.name);
+        const {aggregateReports} = this.props;
+        const filteredData = aggregateReports.filter((report) => reportsNames.includes(report.alias));
         const mergedReports = this.mergeGraphs(filteredData);
         this.setState({mergedReports});
     };
 
-    generateAreaChart = (data, keys, labelY) => {
+    generateAreaChart = (data, keys, labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys) => {
+
+        const filteredData = this.filterKeysFromArrayOfObject(data, graphType, filteredKeys);
+
         return (
             <ResponsiveContainer width="100%" height={300}>
                 <AreaChart
                     width={700}
                     height={400}
-                    data={data}
+                    data={filteredData}
                     margin={{
                         top: 10, right: 30, left: 0, bottom: 0,
                     }}
@@ -73,7 +80,12 @@ class CompareReports extends React.Component {
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="name"/>
                     <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
-                    <Legend/>
+                    <Legend content={(props) => renderLegend({
+                        ...props,
+                        graphType,
+                        onSelectedGraphPropertyFilter,
+                        filteredKeys
+                    })}/>
                     <Tooltip/>
                     {
                         keys.map((key, index) => {
@@ -87,8 +99,19 @@ class CompareReports extends React.Component {
         )
     }
 
+    filterKeysFromArrayOfObject = (data, graphType, filteredKeys) => {
 
-    lineChart = (data, keys = [], labelY) => {
+        const keysToFilter = Object.keys(_.pickBy(filteredKeys, (value) => value));
+        const filteredData = data.reduce((acc, cur) => {
+            acc.push(_.omitBy(cur, (value, key) => {
+                return keysToFilter.includes(`${graphType}${key}`)
+            }));
+            return acc;
+        }, []);
+
+        return filteredData;
+    }
+    lineChart = (data, keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys) => {
         const data1 = [
             {
                 "name": "4:52:32",
@@ -119,12 +142,15 @@ class CompareReports extends React.Component {
                 "timeMills": 1585835583279
             }
         ]
+
+        const filteredData = this.filterKeysFromArrayOfObject(data, graphType, filteredKeys);
+
         return (
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
                     width={700}
                     height={400}
-                    data={data}
+                    data={filteredData}
                     margin={{
                         top: 10, right: 30, left: 0, bottom: 0,
                     }}
@@ -132,7 +158,12 @@ class CompareReports extends React.Component {
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="name" allowDuplicatedCategory={false}/>
                     <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
-                    <Legend/>
+                    <Legend content={(props) => renderLegend({
+                        ...props,
+                        graphType,
+                        onSelectedGraphPropertyFilter,
+                        filteredKeys
+                    })}/>
                     <Tooltip/>
                     {
                         keys.map((key, index) => {
@@ -146,13 +177,14 @@ class CompareReports extends React.Component {
         )
     }
 
-    barChart = (data, keys) => {
+    barChart = (data, keys, graphType, onSelectedGraphPropertyFilter, filteredKeys) => {
+        const filteredData = this.filterKeysFromArrayOfObject(data, graphType, filteredKeys);
 
         return (
             <ResponsiveContainer width={'100%'} height={300}>
                 <BarChart
                     height={300}
-                    data={data}
+                    data={filteredData}
                     margin={{
                         top: 20, right: 30, left: 20, bottom: 5,
                     }}
@@ -160,6 +192,12 @@ class CompareReports extends React.Component {
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="name"/>
                     <YAxis/>
+                    <Legend content={(props) => renderLegend({
+                        ...props,
+                        graphType,
+                        onSelectedGraphPropertyFilter,
+                        filteredKeys
+                    })}/>
                     <Tooltip/>
                     {
                         keys.map((key, index) => {
@@ -181,9 +219,17 @@ class CompareReports extends React.Component {
         this.setState({reportsList: [...reportsList]})
         this.setMergedReports(reportsList);
     };
+    onSelectedGraphPropertyFilter = (graphType, key, value) => {
+        const {filteredKeys} = this.state;
+        filteredKeys[`${graphType}${key}`] = !value;
+        this.setState({filteredKeys: {...filteredKeys}});
+
+        // this.setMergedReports(reportsList);
+
+    };
 
     render() {
-        const {reportsList,mergedReports} = this.state;
+        const {reportsList, mergedReports, filteredKeys} = this.state;
         const {onClose} = this.props;
         return (
             <Modal onExit={onClose}>
@@ -200,14 +246,14 @@ class CompareReports extends React.Component {
                         <h3>Overall Latency</h3>
                         {/*<Button hover onClick={this.createBenchmark}>Create Benchmark</Button>*/}
 
-                        {this.lineChart(mergedReports.latencyGraph, mergedReports.latencyGraphKeys, 'ms')}
+                        {this.lineChart(mergedReports.latencyGraph, mergedReports.latencyGraphKeys, 'ms', 'latency', this.onSelectedGraphPropertyFilter, filteredKeys)}
                         <h3>Status Codes</h3>
-                        {/*{this.lineChart(mergedReports.errorsCodeGraph, mergedReports.errorsCodeGraphKeys)}*/}
+                        {this.lineChart(mergedReports.errorsCodeGraph, mergedReports.errorsCodeGraphKeys, undefined, 'status_codes', this.onSelectedGraphPropertyFilter, filteredKeys)}
                         <h3>RPS</h3>
-                        {this.generateAreaChart(mergedReports.rps, mergedReports.rpsKeys)}
+                        {this.generateAreaChart(mergedReports.rps, mergedReports.rpsKeys, 'rps', 'rps', this.onSelectedGraphPropertyFilter, filteredKeys)}
                         <div style={{width: '50%'}}>
                             <h3>Status Codes And Errors Distribution</h3>
-                            {this.barChart(mergedReports.errorsBar, mergedReports.errorsBarKeys)}
+                            {this.barChart(mergedReports.errorsBar, mergedReports.errorsBarKeys, 'status_codes_errors', this.onSelectedGraphPropertyFilter, filteredKeys)}
                         </div>
                         <div>
                             <h3>Scenarios</h3>
@@ -408,4 +454,32 @@ function mergeSortedArraysByStartTime(arr1, arr2) {
 }
 
 
-
+const renderLegend = (props) => {
+    const {payload, onSelectedGraphPropertyFilter, graphType, filteredKeys} = props;
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1
+        }}>
+            {
+                payload.map((entry, index) => (
+                    <div key={`item-${index}`}
+                         style={{margin: '5px', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                        <Checkbox
+                            indeterminate={false}
+                            checked={filteredKeys[`${graphType}${entry.value}`] === undefined || filteredKeys[`${graphType}${entry.value}`] === false}
+                            // disabled={}
+                            onChange={(value) => {
+                                onSelectedGraphPropertyFilter(graphType, entry.value, value)
+                            }}
+                        />
+                        <span style={{marginLeft: '5px', color: entry.color}}>{entry.value}</span>
+                    </div>
+                ))
+            }
+        </div>
+    );
+}
