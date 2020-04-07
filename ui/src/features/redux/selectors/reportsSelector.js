@@ -13,6 +13,12 @@ export const createBenchmarkFailure = (state) => state.ReportsReducer.get('creat
 export const editReportFailure = (state) => state.ReportsReducer.get('edit_report_failure');
 export const selectedReports = (state) => state.ReportsReducer.get('selected_reports');
 
+export const isAtLeastOneReportSelected = createSelector(selectedReports, (selectedReports) => {
+    //find report with value true
+    const result = Object.values(selectedReports).find((value)=>(Object.values(value).find((value)=>value)));
+    return !!result;
+});
+
 export const getAggregateReport = createSelector(aggregateReport, (reports) => {
     return buildAggregateReportData(reports)[0] || {};
 });

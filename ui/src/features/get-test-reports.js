@@ -15,6 +15,7 @@ import {createJobRequest} from "./requestBuilder";
 import {createJobSuccess} from "./redux/selectors/jobsSelector";
 import Snackbar from 'material-ui/Snackbar';
 import ErrorDialog from "./components/ErrorDialog";
+import Button from "../components/Button";
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetReports = 'Error occurred while trying to get all reports for test.';
@@ -156,7 +157,15 @@ class getTests extends React.Component {
             <Page
                 title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
                 description={DESCRIPTION}>
-                <div onClick={()=> this.setState({showCompareReports:true})}>show compare report</div>
+                <Button
+                    disabled={!this.props.isAtLeastOneReportSelected}
+                    style={{
+                    marginBottom: '10px',
+                }} onClick={() => {
+                    this.setState({
+                        showCompareReports: true
+                    });
+                }}>Compare Reports</Button>
                 <ReactTableComponent
                     onSearch={this.onSearch}
                     rowHeight={'46px'}
@@ -222,6 +231,7 @@ function mapStateToProps(state) {
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
         selectedReports: selectors.selectedReports(state),
+        isAtLeastOneReportSelected: selectors.isAtLeastOneReportSelected(state),
 
     }
 }

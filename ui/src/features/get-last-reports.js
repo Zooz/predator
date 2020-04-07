@@ -17,6 +17,7 @@ import {ReactTableComponent} from './../components/ReactTable';
 import {getColumns} from './configurationColumn'
 import ErrorDialog from "./components/ErrorDialog";
 import FormWrapper from "../components/FormWrapper";
+import Button from "../components/Button";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -163,7 +164,15 @@ class getReports extends React.Component {
             <Page title={'Last Reports'} description={DESCRIPTION}>
                 <div style={{width: '100%'}}>
                     {showReport && <Report onClose={this.closeReport} key={showReport.report_id} report={showReport}/>}
-                    <div onClick={() => this.setState({showCompareReports: true})}>show compare report</div>
+                    <Button
+                        disabled={!this.props.isAtLeastOneReportSelected}
+                        style={{
+                            marginBottom: '10px',
+                        }} onClick={() => {
+                        this.setState({
+                            showCompareReports: true
+                        });
+                    }}>Compare Reports</Button>
                     <ReactTableComponent
                         // tableRowId={'report_id'}
                         onSearch={this.onSearch}
@@ -237,7 +246,7 @@ function mapStateToProps(state) {
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
         selectedReports: selectors.selectedReports(state),
-
+        isAtLeastOneReportSelected: selectors.isAtLeastOneReportSelected(state),
     }
 }
 

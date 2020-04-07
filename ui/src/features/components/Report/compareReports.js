@@ -462,6 +462,7 @@ const renderLegend = (props) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
+            flexWrap:'wrap',
             flex: 1
         }}>
             {
