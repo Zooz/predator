@@ -18,7 +18,7 @@ import ErrorDialog from "./components/ErrorDialog";
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetReports = 'Error occurred while trying to get all reports for test.';
 const columnsNames = ['start_time', 'end_time', 'duration', 'status', 'arrival_rate',
-    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'grafana_report', 'report', 'rerun', 'raw', 'logs'];
+    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'grafana_report', 'report', 'score', 'rerun', 'raw', 'logs'];
 
 const DESCRIPTION = 'All reports for a given test.';
 
