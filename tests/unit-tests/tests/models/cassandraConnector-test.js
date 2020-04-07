@@ -32,7 +32,7 @@ describe('Cassandra client tests', function () {
             let id = uuid.v4();
             let revisionId = uuid.v4();
 
-            let query = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id, file_id, processor_id) values(?,?,?,?,?,?,?,?,?,?)';
+            let query = 'INSERT INTO tests(id, name, description, type, updated_at, raw_data, artillery_json, revision_id, file_id, csv_file_id, processor_id) values(?,?,?,?,?,?,?,?,?,?,?)';
             return cassandraClient.insertTest({ scenarios: { raw_data: 'raw' } }, { json: 'artillery' }, id, revisionId)
                 .then(function () {
                     loggerErrorStub.callCount.should.eql(0);
@@ -551,30 +551,6 @@ describe('Cassandra client tests', function () {
                     clientExecuteStub.getCall(0).args[0].should.eql('INSERT INTO dsl(dsl_name, definition_name, artillery_json) values(?,?,?) IF NOT EXISTS');
                     loggerErrorStub.callCount.should.eql(1);
                 });
-        });
-        describe('Create new files', function () {
-            it('should succeed simple insert of file', async () => {
-                clientExecuteStub.resolves({ result: { rowLength: 0 } });
-                let id = uuid.v4();
-
-                let query = 'INSERT INTO files(id,file) values(?,?)';
-                await cassandraClient.saveFile(id, 'Test file');
-                loggerErrorStub.callCount.should.eql(0);
-                clientExecuteStub.getCall(0).args[0].should.eql(query);
-                clientExecuteStub.getCall(0).args[1][0].should.eql(id);
-                clientExecuteStub.getCall(0).args[1][1].should.eql('Test file');
-            });
-            it('should succeed simple get of file', async () => {
-                clientExecuteStub.resolves({ rows: [] });
-                let id = uuid.v4();
-
-                let query = 'SELECT file FROM files WHERE id = ?';
-                await cassandraClient.getFile(id);
-
-                loggerErrorStub.callCount.should.eql(0);
-                clientExecuteStub.getCall(0).args[0].should.eql(query);
-                clientExecuteStub.getCall(0).args[1][0].should.eql(id);
-            });
         });
     });
 });

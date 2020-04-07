@@ -5,6 +5,7 @@ const reportsCassandraConnector = require('../../reports/models/database/cassand
 const testsCassandraConnector = require('../../tests/models/database/cassandra/cassandraConnector');
 const configCassandraConnector = require('../../configManager/models/database/cassandra/cassandraConnector');
 const processorsCassandraConnector = require('../../processors/models/database/cassandra/cassandraConnector');
+const files = require('../../files/models/database/cassandra/cassandraConnector');
 const databaseConfig = require('../../config/databaseConfig');
 const cassandraMigration = require('./cassandraMigration');
 const logger = require('../../common/logger');
@@ -19,6 +20,7 @@ module.exports.init = async () => {
     await testsCassandraConnector.init(cassandraClient);
     await configCassandraConnector.init(cassandraClient);
     await processorsCassandraConnector.init(cassandraClient);
+    await files.init(cassandraClient);
     logger.info('cassandra client initialized');
 };
 

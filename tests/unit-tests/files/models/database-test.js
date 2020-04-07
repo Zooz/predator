@@ -1,49 +1,19 @@
 
 const should = require('should'),
     sinon = require('sinon'),
-    cassandra = require('../../../../src/tests/models/database/cassandra/cassandraConnector'),
-    sequelizeConnector = require('../../../../src/tests/models/database/sequelize/sequelizeConnector'),
+    cassandra = require('../../../../src/files/models/database/cassandra/cassandraConnector'),
+    sequelizeConnector = require('../../../../src/files/models/database/sequelize/sequelizeConnector'),
     rewire = require('rewire'),
     databaseConfig = require('../../../../src/config/databaseConfig');
-let database = require('../../../../src/tests/models/database');
+let database = require('../../../../src/files/models/database');
 const functions = [
     {
-        functionName: 'insertTest',
-        args: ['testInfo', 'testJson', 'id', 'revisionId', 'processorFileId', 'csvFileId']
+        functionName: 'saveFile',
+        args: ['id', 'name', 'file']
     },
     {
-        functionName: 'insertTestBenchMark',
-        args: ['testId', 'benchMarkData']
-    },
-    {
-        functionName: 'getTest',
+        functionName: 'getFile',
         args: ['id']
-    },
-    {
-        functionName: 'getTests',
-        args: []
-    },
-    {
-        functionName: 'deleteTest',
-        args: ['id']
-    },
-    {
-        functionName: 'insertDslDefinition',
-        args: ['dslName', 'definitionName', 'data']
-    }, {
-        functionName: 'getDslDefinition',
-        args: ['dslName', 'definitionName']
-    }, {
-        functionName: 'getDslDefinitions',
-        args: ['dslName']
-    },
-    {
-        functionName: 'updateDslDefinition',
-        args: ['dslName', 'definitionName', 'data']
-    },
-    {
-        functionName: 'deleteDefinition',
-        args: ['dslName', 'definitionName']
     }
 ];
 
@@ -67,7 +37,7 @@ describe('Testing database', function () {
     describe('when database type is cassandra - should applied functions on cassandra client', function () {
         before(async function () {
             databaseConfig.type = 'cassandra';
-            database = rewire('../../../../src/tests/models/database');
+            database = rewire('../../../../src/files/models/database');
         });
         functions.forEach(function (func) {
             it(`checking func: ${func.functionName}`, async function () {
@@ -79,7 +49,7 @@ describe('Testing database', function () {
     describe('when database type is not cassandra - should applied functions on sequlize client', function () {
         before(async function () {
             databaseConfig.type = 'not-cassandra';
-            database = rewire('../../../../src/tests/models/database');
+            database = rewire('../../../../src/files/models/database');
         });
         functions.forEach(function (func) {
             it(`checking func: ${func.functionName}`, async function () {

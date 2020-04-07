@@ -1,7 +1,9 @@
 'use strict';
 let should = require('should');
 let manager = require('../../../../src/tests/models/manager');
-let fileManager = require('../../../../src/tests/models/fileManager');
+let downloadManager = require('../../../../src/tests/models/downloadManager');
+let fileManager = require('../../../../src/files/models/fileManager');
+
 let sinon = require('sinon');
 let database = require('../../../../src/tests/models/database');
 let testGenerator = require('../../../../src/tests/models/testGenerator');
@@ -30,8 +32,8 @@ describe('Scenario generator tests', function () {
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
         deleteStub = sandbox.stub(database, 'deleteTest');
         getRequestStub = sandbox.stub(request, 'get');
-        getFileStub = sandbox.stub(database, 'getFile');
-        saveFileStub = sandbox.stub(database, 'saveFile');
+        getFileStub = sandbox.stub(fileManager, 'getFile');
+        saveFileStub = sandbox.stub(fileManager, 'saveFile');
         testGeneratorStub = sandbox.stub(testGenerator, 'createTest');
     });
 
@@ -77,7 +79,7 @@ describe('Scenario generator tests', function () {
             });
             insertStub.resolves();
             getRequestStub.resolves('this is js code from dropbox');
-            saveFileStub.resolves();
+            saveFileStub.resolves('id');
 
             let result = await manager.upsertTest({
                 testInfo: 'info', processor_file_url: 'path to dropbox'
@@ -105,27 +107,6 @@ describe('Scenario generator tests', function () {
                 should.fail('Expected error to throw');
             } catch (err) {
                 should(err.statusCode).eql(422);
-            }
-        });
-    });
-    describe('get a file for test', function () {
-        it('Should get new file to database', async () => {
-            getFileStub.resolves('File content');
-
-            let result = await fileManager.getFile('somneId');
-
-            getFileStub.calledOnce.should.eql(true);
-            should(getFileStub.getCall(0).args[0]).eql('somneId');
-            should(result).eql('File content');
-        });
-        it('Should  throw 404 not found', async () => {
-            getFileStub.resolves(undefined);
-            try {
-                await fileManager.getFile('idNotExist');
-                throw new Error('never should arrived here');
-            } catch (error) {
-                should(error.statusCode).eql(404);
-                should(error.message).eql('Not found');
             }
         });
     });

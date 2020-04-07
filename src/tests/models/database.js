@@ -9,18 +9,16 @@ module.exports = {
     getTest,
     getTests,
     deleteTest,
-    saveFile,
     insertDslDefinition,
     getDslDefinition,
     getDslDefinitions,
     updateDslDefinition,
-    getFile,
     deleteDefinition,
     insertTestBenchMark
 };
 
-function insertTest(testInfo, testJson, id, revisionId, fileId) {
-    return databaseConnector.insertTest(testInfo, testJson, id, revisionId, fileId);
+function insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFileId) {
+    return databaseConnector.insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFileId);
 }
 
 async function getTest(id) {
@@ -55,11 +53,4 @@ async function getDslDefinition(dslName, definitionName) {
 }
 async function getDslDefinitions(dslName) {
     return databaseConnector.getDslDefinitions(dslName);
-}
-
-async function saveFile(id, file) {
-    return databaseConnector.saveFile(id, file);
-}
-async function getFile(id) {
-    return databaseConnector.getFile(id);
 }

@@ -10,8 +10,6 @@ module.exports = {
     getTests,
     deleteTest,
     getAllTestRevisions,
-    saveFile,
-    getFile,
     insertDslDefinition,
     getDslDefinitions,
     getDslDefinition,
@@ -29,21 +27,15 @@ async function init(sequlizeClient) {
 }
 
 async function initSchemas() {
-    const file = client.define('file', {
-        id: {
-            type: Sequelize.DataTypes.UUID,
-            primaryKey: true
-        },
-        file: {
-            type: Sequelize.DataTypes.TEXT('long')
-        }
-    });
     const test = client.define('test', {
         test_id: {
             type: Sequelize.DataTypes.UUID,
             unique: 'compositeIndex'
         },
         file_id: {
+            type: Sequelize.DataTypes.UUID
+        },
+        csv_file_id: {
             type: Sequelize.DataTypes.UUID
         },
         processor_id: {
@@ -103,7 +95,6 @@ async function initSchemas() {
     await test.sync();
     await dslDefinition.sync();
     await benchmarkDefinition.sync();
-    await file.sync();
 }
 
 async function insertTestBenchMark(testId, benchMarkData) {
@@ -116,13 +107,14 @@ async function insertTestBenchMark(testId, benchMarkData) {
     return result;
 }
 
-async function insertTest(testInfo, testJson, id, revisionId, fileId){
+async function insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFileId){
     const test = client.model('test');
     let params = {
         test_id: id,
         name: testInfo.name,
         type: testInfo.type,
-        file_id: fileId,
+        file_id: processorFileId,
+        csv_file_id: csvFileId,
         processor_id: testInfo.processor_id,
         description: testInfo.description,
         updated_at: Date.now(),
@@ -243,27 +235,6 @@ function sanitizeDslResult(data) {
     return result;
 }
 
-async function saveFile(id, file) {
-    const fileClient = client.model('file');
-    let params = {
-        id: id,
-        file: file
-    };
-
-    const result = fileClient.create(params);
-    return result;
-}
-
-async function getFile(id) {
-    const fileClient = client.model('file');
-    const options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
-    };
-    options.where = { id: id };
-    const dbResult = await fileClient.findOne(options);
-    return dbResult ? dbResult.file : dbResult;
-}
-
 function sanitizeTestResult(data) {
     const result = data.map(function (test) {
         const dataValues = test.dataValues;
@@ -271,6 +242,7 @@ function sanitizeTestResult(data) {
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
         dataValues.id = dataValues.test_id;
         dataValues.file_id = dataValues.file_id || undefined;
+        dataValues.csv_file_id = dataValues.csv_file_id || undefined;
         dataValues.processor_id = dataValues.processor_id || undefined;
         delete dataValues.raw_data;
         delete dataValues.test_id;
