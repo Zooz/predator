@@ -1237,8 +1237,12 @@ components:
           type: object
           required:
             - mean
+            - count
           properties:
             mean:
+              type: number
+            count:
+              description: Total number of request will use to calculate errors ratio
               type: number
         latency:
           type: object
@@ -1969,11 +1973,11 @@ components:
                   description: P50 benchmark weight
                   allOf:
                     - $ref: '#/components/schemas/benchmark_weights'
-                server_errors:
+                server_errors_ratio:
                   description: 5xx server errors benchmark weight
                   allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
-                client_errors:
+                client_errors_ratio:
                   description: 4xx server errors benchmark weight
                   allOf:
                    - $ref: '#/components/schemas/benchmark_weights'

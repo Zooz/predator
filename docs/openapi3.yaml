@@ -1520,8 +1520,12 @@ components:
           type: object
           required:
             - mean
+            - count
           properties:
             mean:
+              type: number
+            count:
+              description: Total number of request will use to calculate errors ratio
               type: number
         latency:
           type: object

@@ -18,8 +18,8 @@ const defaultBody = {
     benchmark_weights: {
         percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
-        server_errors: { percentage: 20 },
-        client_errors: { percentage: 20 },
+        server_errors_ratio: { percentage: 20 },
+        client_errors_ratio: { percentage: 20 },
         rps: { percentage: 20 }
     }
 };
@@ -49,8 +49,8 @@ const updateBodyWithTypes = {
     benchmark_weights: {
         percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 30 },
-        server_errors: { percentage: 20 },
-        client_errors: { percentage: 20 },
+        server_errors_ratio: { percentage: 20 },
+        client_errors_ratio: { percentage: 20 },
         rps: { percentage: 10 }
     }
 };
@@ -94,8 +94,8 @@ const requestBody =
         benchmark_weights: {
             percentile_ninety_five: { percentage: 20 },
             percentile_fifty: { percentage: 30 },
-            server_errors: { percentage: 20 },
-            client_errors: { percentage: 20 },
+            server_errors_ratio: { percentage: 20 },
+            client_errors_ratio: { percentage: 20 },
             rps: { percentage: 10 }
         }
     };
@@ -213,8 +213,8 @@ describe('update and get config', () => {
                 benchmark_weights: {
                     percentile_ninety_five: { percentage: 50 },
                     percentile_fifty: { percentage: 30 },
-                    server_errors: { percentage: 20 },
-                    client_errors: { percentage: 30 },
+                    server_errors_ratio: { percentage: 20 },
+                    client_errors_ratio: { percentage: 30 },
                     rps: { percentage: 30 }
                 }
             });
@@ -236,8 +236,8 @@ describe('update and get config', () => {
                 "body/benchmark_weights should NOT have additional properties 'tps'",
                 "body/benchmark_weights should have required property 'percentile_ninety_five'",
                 "body/benchmark_weights should have required property 'percentile_fifty'",
-                "body/benchmark_weights should have required property 'server_errors'",
-                "body/benchmark_weights should have required property 'client_errors'",
+                "body/benchmark_weights should have required property 'server_errors_ratio'",
+                "body/benchmark_weights should have required property 'client_errors_ratio'",
                 "body/benchmark_weights should have required property 'rps'"]);
         });
     });

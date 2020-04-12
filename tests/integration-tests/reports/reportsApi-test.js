@@ -415,6 +415,7 @@ describe('Integration tests for the reports api', function() {
             it('Post done phase stats with benchmark data config for test', async () => {
                 const benchmarkRequest = {
                     'rps': {
+                        'count': 100,
                         'mean': 90.99
                     },
                     'latency': { median: 357.2, p95: 1042 },
@@ -424,11 +425,11 @@ describe('Integration tests for the reports api', function() {
                 const config = {
                     benchmark_threshold: 55,
                     benchmark_weights: {
-                        percentile_ninety_five: { factor: 1, percentage: 20 },
-                        percentile_fifty: { factor: 1, percentage: 30 },
-                        server_errors: { factor: 1, percentage: 20 },
-                        client_errors: { factor: 1, percentage: 20 },
-                        rps: { factor: 1, percentage: 10 }
+                        percentile_ninety_five: { percentage: 20 },
+                        percentile_fifty: { percentage: 30 },
+                        server_errors_ratio: { percentage: 20 },
+                        client_errors_ratio: { percentage: 20 },
+                        rps: { percentage: 10 }
                     }
                 };
                 const configRes = await configRequestCreator.updateConfig(config);
@@ -472,14 +473,14 @@ describe('Integration tests for the reports api', function() {
                         'percentage': 0.3,
                         'score': 30
                     },
-                    'client_errors': {
+                    'client_errors_ratio': {
                         'benchmark_value': 0,
                         'report_value': 0,
                         'percentage': 0.2,
                         'score': 20
                     },
-                    'server_errors': {
-                        'benchmark_value': 1,
+                    'server_errors_ratio': {
+                        'benchmark_value': 0.01,
                         'report_value': 0,
                         'percentage': 0.2,
                         'score': 20

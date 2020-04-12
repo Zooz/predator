@@ -28,13 +28,13 @@ function calculateObjectScore(benchmarkObject, reportObject, configObject) {
 }
 
 function extractCalculateObject(dataObject) {
+    const totalRequests = dataObject.rps.count;
     return {
         rps: dataObject.rps.mean,
         percentile_ninety_five: dataObject.latency.p95,
         percentile_fifty: dataObject.latency.median,
-        client_errors: extractNumberOfErrorsPrefix(dataObject.codes, FOUR_PREFIX),
-        server_errors: calculateServerErrors(dataObject)
-
+        client_errors_ratio: extractNumberOfErrorsPrefix(dataObject.codes, FOUR_PREFIX) / totalRequests,
+        server_errors_ratio: calculateServerErrors(dataObject) / totalRequests
     };
 }
 
@@ -62,6 +62,6 @@ function calculateFieldScore(expectedHigherValue, expectedLowerValue) {
     if (expectedHigherValue >= expectedLowerValue) {
         return 100;
     }
-    const percentage = expectedHigherValue / expectedLowerValue;
+    const percentage = (expectedHigherValue / expectedLowerValue) || 1 - expectedLowerValue;
     return (percentage * 100);
 }
