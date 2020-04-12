@@ -7,7 +7,7 @@ const fs = require('fs'),
     configHandler = require('../../configManager/models/configHandler'),
     configConsts = require('../../common/consts').CONFIG,
     logger = require('../../common/logger');
-module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
+module.exports.sendAggregateReport = async (aggregatedResults, job, emails, reportBenchmark = {}) => {
     let testName = aggregatedResults.test_name;
     let endTime = aggregatedResults.end_time;
     let startTime = aggregatedResults.start_time;
@@ -22,6 +22,12 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
         reportId: aggregatedResults.report_id,
         parallelism: aggregatedResults.parallelism
     };
+    if (reportBenchmark.score) {
+        testInfo['score'] = reportBenchmark.score;
+    }
+    if (reportBenchmark.data) {
+        testInfo['benchmark'] = reportBenchmark.data;
+    }
 
     let htmlBody = generateReportFromTemplate(testName, testInfo, aggregatedResults.grafana_url, aggregatedResults.aggregate);
 
@@ -30,7 +36,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails) => {
             from: configSmtp.from,
             to: [emails].join(','),
             html: htmlBody,
-            subject: `Your test results: ${testName}`
+            subject: `Your test results: ${testName}${reportBenchmark.score ? ` with score: ${reportBenchmark.score.toFixed(2)}` : ''}`
         };
     }
 
@@ -53,8 +59,8 @@ async function createSMTPClient(configSmtp) {
         connectionTimeout: configSmtp.timeout,
         secure: configSmtp.secure,
         auth: {
-            user: configSmtp.username,
-            pass: configSmtp.password
+            user: configSmtp.username || 'test',
+            pass: configSmtp.password || 'test'
         },
         tls: {
             rejectUnauthorized: configSmtp.rejectUnauthCerts
