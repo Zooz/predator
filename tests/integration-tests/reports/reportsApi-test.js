@@ -374,6 +374,7 @@ describe('Integration tests for the reports api', function() {
             });
             after(async () => {
                 await configRequestCreator.deleteConfig(config.BENCHMARK_WEIGHTS);
+                await configRequestCreator.deleteConfig(config.BENCHMARK_THRESHOLD);
             });
 
             it('Post full cycle stats', async function () {
