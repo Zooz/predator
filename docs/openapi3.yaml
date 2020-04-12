@@ -2241,8 +2241,8 @@ components:
               required:
               - percentile_ninety_five
               - percentile_fifty
-              - server_errors
-              - client_errors
+              - server_errors_ratio
+              - client_errors_ratio
               - rps
               properties:
                 percentile_ninety_five:
@@ -2253,11 +2253,11 @@ components:
                   description: P50 benchmark weight
                   allOf:
                     - $ref: '#/components/schemas/benchmark_weights'
-                server_errors:
+                server_errors_ratio:
                   description: 5xx server errors benchmark weight
                   allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
-                client_errors:
+                client_errors_ratio:
                   description: 4xx server errors benchmark weight
                   allOf:
                    - $ref: '#/components/schemas/benchmark_weights'

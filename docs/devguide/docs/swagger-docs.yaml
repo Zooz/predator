@@ -1961,8 +1961,8 @@ components:
               required:
               - percentile_ninety_five
               - percentile_fifty
-              - server_errors
-              - client_errors
+              - server_errors_ratio
+              - client_errors_ratio
               - rps
               properties:
                 percentile_ninety_five:
