@@ -124,7 +124,12 @@ describe('Report emails sender test', () => {
         nodemailerCreateTransportStub.returns(transporter);
         aggregateReportGeneratorStub.resolves(AGGREGATE_REPORT);
         getConfig.resolves({ from: 'Predator 💪 <performance@predator.com>' });
-        const benchmarkData = { score: 95, data: { test: 'some data' } };
+        const benchmarkData = { score: 95,
+            data: { rps: { score: 10, percentage: 0.2 },
+                percentile_ninety_five: { score: 10, percentage: 0.2 },
+                percentile_fifty: { score: 10, percentage: 0.2 },
+                client_errors: { score: 10, percentage: 0.2 },
+                server_errors: { score: 10, percentage: 0.2 } } };
         await reportEmailSender.sendAggregateReport(AGGREGATE_REPORT, JOB, ['eli@zooz.com'], benchmarkData);
 
         sendMailStub.callCount.should.equal(1);
