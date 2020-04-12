@@ -11,7 +11,7 @@ const reportEmailSender = require('./reportEmailSender'),
     reportUtil = require('../utils/reportUtil'),
     configConstants = require('../../common/consts').CONFIG;
 
-module.exports.notifyIfNeeded = async (report, stats) => {
+module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
     let job;
     const metadata = { testId: report.test_id, reportId: report.report_id };
     try {
@@ -31,7 +31,7 @@ module.exports.notifyIfNeeded = async (report, stats) => {
             break;
         case constants.SUBSCRIBER_DONE_STAGE:
             logger.info(metadata, 'handling done message');
-            await handleDone(report, job);
+            await handleDone(report, job, reportBenchmark);
             break;
         case constants.SUBSCRIBER_ABORTED_STAGE:
             logger.info(metadata, 'handling aborted message');
@@ -94,7 +94,7 @@ async function handleFirstIntermediate(report, job) {
     reportWebhookSender.send(webhooks, webhookMessage);
 }
 
-async function handleDone(report, job) {
+async function handleDone(report, job, reportBenchmark) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
@@ -107,7 +107,7 @@ async function handleDone(report, job) {
     }
 
     let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
-    let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate)}\n`;
+    let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, reportBenchmark)}\n`;
 
     if (report.grafana_report) {
         webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;
