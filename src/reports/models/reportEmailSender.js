@@ -36,7 +36,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails, repo
             from: configSmtp.from,
             to: [emails].join(','),
             html: htmlBody,
-            subject: `Your test results: ${testName}`
+            subject: `Your test results: ${testName}${reportBenchmark.score ? ` with score: ${reportBenchmark.score.toFixed(2)}` : ''}`
         };
     }
 
