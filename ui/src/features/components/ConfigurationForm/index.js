@@ -23,12 +23,12 @@ import UiSwitcher from '../../../components/UiSwitcher';
 import {get, set} from 'lodash';
 import Dropdown from "../../../components/Dropdown/Dropdown.export";
 
-const INPUT_TYPES = {SWITCHER: 'switcher',DROPDOWN:'dropdown'};
+const INPUT_TYPES = {SWITCHER: 'switcher', DROPDOWN: 'dropdown'};
 
 class Form extends React.Component {
     constructor(props) {
         super(props);
-        this.Menue = [
+        this.Menu = [
             {
                 name: 'internal_address',
                 key: 'internal_address',
@@ -90,25 +90,38 @@ class Form extends React.Component {
                 type: INPUT_TYPES.SWITCHER
             },
             {
-                category: 'Benchmark weights',
+                category: 'benchmark',
                 inputs: [
                     {
                         name: 'benchmark_threshold',
                         key: 'benchmark_threshold',
-                        floatingLabelText: 'Benchmark threshold',
+                        floatingLabelText: 'Threshold',
                         info: 'insert info',
                         valueType: 'int'
-                    },                    {
+                    },
+                    {
+                        name: 'benchmark_threshold_webhook_url',
+                        key: 'benchmark_threshold_webhook_url',
+                        floatingLabelText: 'Threshold webhook url',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },
+                ]
+            },
+            {
+                category: 'Benchmark weights',
+                inputs: [
+                    {
                         name: 'percentile_ninety_five',
                         key: 'benchmark_weights.percentile_ninety_five.percentage',
-                        floatingLabelText: 'Percentile ninety five',
+                        floatingLabelText: 'Percentile ninety five ratio',
                         info: 'insert info',
                         valueType: 'int'
                     },
                     {
                         name: 'percentile_fifty',
                         key: 'benchmark_weights.percentile_fifty.percentage',
-                        floatingLabelText: 'Percentile fifty',
+                        floatingLabelText: 'Percentile fifty ratio',
                         info: 'insert info',
                         valueType: 'int'
                     },
@@ -122,14 +135,14 @@ class Form extends React.Component {
                     {
                         name: 'client_errors',
                         key: 'benchmark_weights.client_errors.percentage',
-                        floatingLabelText: 'Client errors',
+                        floatingLabelText: 'Client errors ratio',
                         info: 'insert info',
                         valueType: 'int'
                     },
                     {
                         name: 'rps',
                         key: 'benchmark_weights.rps.percentage',
-                        floatingLabelText: 'Rps',
+                        floatingLabelText: 'Rps ratio',
                         info: 'insert info',
                         valueType: 'int'
                     },
@@ -187,54 +200,66 @@ class Form extends React.Component {
                         key: 'metrics_plugin_name',
                         floatingLabelText: 'metrics_plugin_name',
                         info: 'insert info',
-                        type:  INPUT_TYPES.DROPDOWN,
-                        options: ['influx','prometheus'],
+                        type: INPUT_TYPES.DROPDOWN,
+                        options: ['influx', 'prometheus'],
                     },
                     {
                         name: 'push_gateway_url',
                         key: 'prometheus_metrics.push_gateway_url',
                         floatingLabelText: 'Prometheus push gateway url',
                         info: 'Url of push gateway',
+                        isHidden: (state) => (state.config.metrics_plugin_name !== 'prometheus')
                     },
                     {
                         name: 'buckets_sizes',
                         key: 'prometheus_metrics.buckets_sizes',
                         floatingLabelText: 'Prometheus buckets sizes',
                         info: 'Bucket sizes to configure prometheus',
+                        isHidden: (state) => (state.config.metrics_plugin_name !== 'prometheus')
                     },
                     {
                         name: 'host',
                         key: 'influx_metrics.host',
                         floatingLabelText: 'Influx host',
                         info: 'Influx db host',
+                        isHidden: (state) => (state.config.metrics_plugin_name !== 'influx')
+
                     },
                     {
                         name: 'username',
                         key: 'influx_metrics.username',
                         floatingLabelText: 'Influx username',
                         info: 'Influx db username',
+                        isHidden: (state) => (state.config.metrics_plugin_name !== 'influx')
+
                     },
                     {
                         name: 'password',
                         key: 'influx_metrics.password',
                         floatingLabelText: 'Influx password',
                         info: 'Influx db password',
+                        isHidden: (state) => (state.config.metrics_plugin_name !== 'influx')
+
                     },
                     {
                         name: 'database',
                         key: 'influx_metrics.database',
                         floatingLabelText: 'Influx database',
                         info: 'Influx db name',
+                        isHidden: (state) => (state.config.metrics_plugin_name !== 'influx')
+
                     },
                 ]
             }
         ];
-        this.MenueFlatten = this.Menue.flatMap(objectKey=>objectKey.category ? objectKey.inputs : [objectKey])
+        this.MenuFlatten = this.Menu.flatMap(objectKey => objectKey.category ? objectKey.inputs : [objectKey])
+
         function setByKey(src, trg, key) {
             set(trg, key, get(src, key));
         }
+
         const config = this.props.config;
-        const configState = this.Menue.reduce((acc, objectKey) => {
+        const configState = this.Menu.reduce((acc, objectKey) => {
             if (objectKey.category) {
                 for (let input of objectKey.inputs) {
                     setByKey(config, acc, input.key);
@@ -245,7 +270,7 @@ class Form extends React.Component {
             return acc;
         }, {});
         this.state = {
-            config:configState,
+            config: configState,
             errors: {
                 name: undefined,
                 retries: undefined,
@@ -268,8 +293,8 @@ class Form extends React.Component {
 
     onChangeFreeText = (key, value) => {
         const newConfig = {...this.state.config};
-        set(newConfig, key,value);
-        const errors = (validate(newConfig, this.MenueFlatten));
+        set(newConfig, key, value);
+        const errors = (validate(newConfig, this.MenuFlatten));
         this.setState({config: newConfig, errors});
     };
 
@@ -325,13 +350,19 @@ class Form extends React.Component {
         const {processingAction, serverError, clearErrorOnUpdateConfig, updateSuccess} = this.props;
         return (
             <div style={{width: '100%'}}>
-                {this.Menue.map((oneItem, index) => {
+                {this.Menu.map((oneItem, index) => {
                     return (
                         <div key={index}>
                             {oneItem.category && <h3 style={{marginTop: '0'}}>{oneItem.category}</h3>}
-                            {oneItem.category && oneItem.inputs.map(((oneItem, index) => this.generateInput(oneItem, index)), this)}
+                            {oneItem.category && oneItem.inputs.map(((oneItem, index) => {
+                                if (oneItem.isHidden && oneItem.isHidden(this.state)) {
+                                    return null;
+                                }
+                                return this.generateInput(oneItem, index)
+                            }))}
                             {!oneItem.category && this.generateInput(oneItem)}
-                        </div>);
+                        </div>
+                    );
                 }, this)}
 
                 <div className={style.buttons}>
@@ -384,7 +415,7 @@ class Form extends React.Component {
                                 <Dropdown
                                     options={oneItem.options.map((option) => ({key: option, value: option}))}
                                     selectedOption={{key: value, value: value}}
-                                    onChange={(selected)=>{
+                                    onChange={(selected) => {
                                         this.onChangeFreeText(oneItem.key, selected.value)
                                     }}
                                     placeholder={"Method"}
@@ -420,7 +451,7 @@ class Form extends React.Component {
             interval_cleanup_finished_containers_ms: 'int',
         };
         const body = {};
-        const list = this.Menue.flatMap((objectKey) => {
+        const list = this.Menu.flatMap((objectKey) => {
             if (objectKey.category) {
                 return objectKey.inputs;
             }
