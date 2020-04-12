@@ -8,6 +8,8 @@
 <img src="https://zooz.github.io/predator/images/predator-1764x640.png" data-canonical-src="https://zooz.github.io/predator/images/predator-1764x640.png"/>
 </h1>
 
+![](https://zooz.github.io/predator/images/predator-screens.gif)
+
 Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
 
 It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
@@ -92,8 +94,6 @@ if PREDATOR_DOCS_URL was not specified, the default value is `https://zooz.githu
 1. `docker build --build-arg PREDATOR_DOCS_URL=http://your.predator.docs.com/example-path . -t predator`
 2. Deploy the tagged docker image to your preferred platform
 3. One should be redirected to `http://your.predator.docs.com/example-path` when clicking the on the docs link in the UI side menu.
-
-![](https://zooz.github.io/predator/images/predator-screens.gif)
 
 ## Contributing
 

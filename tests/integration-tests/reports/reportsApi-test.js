@@ -7,6 +7,8 @@ const statsGenerator = require('./helpers/statsGenerator');
 const reportsRequestCreator = require('./helpers/requestCreator');
 const jobRequestCreator = require('../jobs/helpers/requestCreator');
 const testsRequestCreator = require('../tests/helpers/requestCreator');
+const configRequestCreator = require('../configManager/helpers/requestCreator');
+const config = require('../../../src/common/consts').CONFIG;
 const constants = require('../../../src/reports/utils/constants');
 
 const mailhogHelper = require('./mailhog/mailhogHelper');
@@ -19,6 +21,7 @@ describe('Integration tests for the reports api', function() {
         await reportsRequestCreator.init();
         await testsRequestCreator.init();
         await jobRequestCreator.init();
+        await configRequestCreator.init();
 
         let requestBody = require('../../testExamples/Basic_test');
         let response = await testsRequestCreator.createTest(requestBody, {});
@@ -341,9 +344,13 @@ describe('Integration tests for the reports api', function() {
             });
 
             beforeEach(async function () {
-                testId = uuid();
                 reportId = uuid();
                 runnerId = uuid();
+                let requestBody = require('../../testExamples/Basic_test');
+                let response = await testsRequestCreator.createTest(requestBody, {});
+                should(response.statusCode).eql(201);
+                should(response.body).have.key('id');
+                testId = response.body.id;
 
                 minimalReportBody = {
                     runner_id: runnerId,
@@ -361,8 +368,12 @@ describe('Integration tests for the reports api', function() {
                         arrival_rate: 20
                     }
                 };
+
                 const reportResponse = await reportsRequestCreator.createReport(testId, minimalReportBody);
                 should(reportResponse.statusCode).be.eql(201);
+            });
+            after(async () => {
+                await configRequestCreator.deleteConfig(config.BENCHMARK_WEIGHTS);
             });
 
             it('Post full cycle stats', async function () {
@@ -399,6 +410,79 @@ describe('Integration tests for the reports api', function() {
                 should(getReportResponse.statusCode).be.eql(200);
                 let report = getReportResponse.body;
                 validateFinishedReport(report);
+            });
+
+            it('Post done phase stats with benchmark data config for test', async () => {
+                const benchmarkRequest = {
+                    'rps': {
+                        'mean': 90.99
+                    },
+                    'latency': { median: 357.2, p95: 1042 },
+                    'errors': { errorTest: 1 },
+                    'codes': { codeTest: 1 }
+                };
+                const config = {
+                    benchmark_weights: {
+                        percentile_ninety_five: { factor: 1, percentage: 20 },
+                        percentile_fifty: { factor: 1, percentage: 30 },
+                        server_errors: { factor: 1, percentage: 20 },
+                        client_errors: { factor: 1, percentage: 20 },
+                        rps: { factor: 1, percentage: 10 }
+                    }
+                };
+                const configRes = await configRequestCreator.updateConfig(config);
+                should(configRes.statusCode).eql(200);
+                const benchmarkRes = await testsRequestCreator.createBenchmark(testId, benchmarkRequest, {});
+                should(benchmarkRes.statusCode).eql(201);
+                const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId));
+                should(intermediateStatsResponse.statusCode).be.eql(204);
+                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', runnerId));
+                should(doneStatsResponse.statusCode).be.eql(204);
+                const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                const getLastReport = await reportsRequestCreator.getLastReports(25);
+                should(getReportResponse.statusCode).be.eql(200);
+                should(getLastReport.statusCode).be.eql(200);
+
+                const report = getReportResponse.body;
+                const lastReports = getLastReport.body.filter(report => report.report_id === reportId);
+                const lastReport = lastReports[0];
+                should(lastReport.report_id).eql(reportId);
+                validateFinishedReport(report);
+                should(report.score).eql(100);
+                should(lastReport.score).eql(100);
+                should(lastReport.benchmark_weights_data).eql(report.benchmark_weights_data);
+                should(report.benchmark_weights_data).eql({
+                    'rps': {
+                        'benchmark_value': 90.99,
+                        'report_value': 90.99,
+                        'percentage': 0.1,
+                        'score': 10
+                    },
+                    'percentile_ninety_five': {
+                        'benchmark_value': 1042,
+                        'report_value': 1042,
+                        'percentage': 0.2,
+                        'score': 20
+                    },
+                    'percentile_fifty': {
+                        'benchmark_value': 357.2,
+                        'report_value': 357.2,
+                        'percentage': 0.3,
+                        'score': 30
+                    },
+                    'client_errors': {
+                        'benchmark_value': 0,
+                        'report_value': 0,
+                        'percentage': 0.2,
+                        'score': 20
+                    },
+                    'server_errors': {
+                        'benchmark_value': 1,
+                        'report_value': 0,
+                        'percentage': 0.2,
+                        'score': 20
+                    }
+                });
             });
 
             it('Post "error" stats', async function () {

@@ -3,7 +3,6 @@ let sinon = require('sinon');
 let logger = require('../../../../src/common/logger');
 let driver = require('cassandra-driver');
 let rewire = require('rewire');
-let should = require('should');
 let cassandraClient = rewire('../../../../src/reports/models/database/cassandra/cassandraConnector');
 
 let uuid = require('uuid');
@@ -133,6 +132,20 @@ describe('Cassandra client tests', function() {
                 .catch(function(){
                     loggerErrorStub.callCount.should.eql(1);
                 });
+        });
+    });
+    describe('should update report with benchmark tests ', async () => {
+        it('should update report with benchmark tests ', async () => {
+            clientExecuteStub.resolves({ rowLength: 1, rows: [{ '[applied]': false }] });
+            let queryReport = 'UPDATE reports_summary SET score=?, benchmark_weights_data=? WHERE test_id=? AND report_id=?';
+            await cassandraClient.updateReportBenchmark(testId, reportId, 5.3, 'some data');
+            loggerErrorStub.callCount.should.eql(0);
+            clientExecuteStub.callCount.should.eql(3); // query last report should be trig
+            clientExecuteStub.getCall(1).args[0].should.eql(queryReport);
+            clientExecuteStub.getCall(1).args[1][0].should.eql(5.3);
+            clientExecuteStub.getCall(1).args[1][1].should.eql('some data');
+            clientExecuteStub.getCall(1).args[1][2].should.eql(testId);
+            clientExecuteStub.getCall(1).args[1][3].should.eql(reportId);
         });
     });
 

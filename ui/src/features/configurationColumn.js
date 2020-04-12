@@ -24,6 +24,7 @@ import {getTimeFromCronExpr} from './utils';
 import UiSwitcher from '../components/UiSwitcher';
 import TextArea from "../components/TextArea";
 import TitleInput from "../components/TitleInput";
+import ClickOutHandler from 'react-onclickout'
 
 
 export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote}) => {
@@ -278,6 +279,17 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => <Notes data={data} onEditNote={onEditNote}/>
+        },
+        {
+            id: 'score',
+            Header: () => (
+                <TableHeader sortable={false}>
+                    Score
+                </TableHeader>
+            ),
+            accessor: (data) => data.score ? Math.floor(data.score) : '',
+            className: css['small-header'],
+            headerClassName: css['small-header']
         }, {
             id: 'report',
             Header: () => (
@@ -480,33 +492,45 @@ const Notes = ({data, onEditNote}) => {
 
     function onKeyDown(e) {
         if (e.key === 'Enter') {
+            save();
+        }
+    }
+
+    function save() {
+        if (editMode) {
             setEditMode(false);
             onEditNote(test_id, report_id, editValue);
         }
     }
 
-    return <TooltipWrapper
-        disable={!notes}
-        content={<div>
-            {cell}
-        </div>}
-        dataId={`tooltipKey_${id}`}
-        place='top'
-        offset={{top: 1}}
-    >
-        <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
-            {editMode &&
-            <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown} onChange={(evt, value) => {
-                setEditValue(evt.target.value)
-            }}/>}
-            {!editMode &&
-            <div onClick={() => onEditNote && setEditMode(true)}
-                 style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
+    return (
 
-            }
-        </div>
+            <TooltipWrapper
+                disable={!notes}
+                content={<div>
+                    {cell}
+                </div>}
+                dataId={`tooltipKey_${id}`}
+                place='top'
+                offset={{top: 1}}
+            >
+                <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
+                    {editMode &&
+                    <ClickOutHandler onClickOut={save}>
+                    <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown}
+                              onChange={(evt, value) => {
+                                  setEditValue(evt.target.value)
+                              }}/>
+                    </ClickOutHandler>
+                              }
+                    {!editMode &&
+                    <div onClick={() => onEditNote && setEditMode(true)}
+                         style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
 
-    </TooltipWrapper>;
+                    }
+                </div>
+            </TooltipWrapper>
+    )
 };
 
 

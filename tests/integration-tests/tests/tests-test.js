@@ -93,75 +93,125 @@ describe('the tests api', function() {
             });
         });
     });
-    describe('create bench mark for test', () => {
-        it('Create bench mark with partial body for existing test', async () => {
+    describe('create benchmark for test', () => {
+        it('Create benchmark with empty body and get 400 response', async () => {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
-            const benchMarkRequest = {
+            const testId = createTestResponse.body.id;
+            const benchmarkResult = await testsRequestSender.createBenchmark(testId, {}, validHeaders);
+            const { body } = benchmarkResult;
+            should(benchmarkResult.statusCode).eql(400);
+            should(body.message).eql('Input validation error');
+            should(body.validation_errors).eql(['body should have required property \'errors\'',
+                'body should have required property \'codes\'',
+                'body should have required property \'rps\'',
+                'body should have required property \'latency\'']);
+        });
+        it('Create benchmark with inner empty body and get 400 response', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const testId = createTestResponse.body.id;
+            const benchmarkResult = await testsRequestSender.createBenchmark(testId, { latency: {}, rps: {} }, validHeaders);
+            const { body } = benchmarkResult;
+            should(benchmarkResult.statusCode).eql(400);
+            should(body.message).eql('Input validation error');
+            should(body.validation_errors).eql(['body should have required property \'errors\'',
+                'body should have required property \'codes\'',
+                'body/rps should have required property \'mean\'',
+                'body/latency should have required property \'median\'',
+                'body/latency should have required property \'p95\'']);
+        });
+        it('Create benchmark with full body for existing test', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const benchmarkRequest = {
                 'rps': {
                     'count': 1270,
                     'mean': 46.74
+                },
+                'latency': {
+                    'min': 419.1,
+                    'max': 1295.4,
+                    'median': 553.9,
+                    'p95': 763.8,
+                    'p99': 929.5
+                },
+                'errors': {
+                    '500': 12
+                },
+                'codes': {
+                    '200': 161,
+                    '201': 1061,
+                    '409': 53
                 }
             };
             const testId = createTestResponse.body.id;
-            const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
-            const { body } = benchMarkResult;
-            should(benchMarkResult.statusCode).eql(201);
-             should(body.benchmark_data).eql(benchMarkRequest);
-
+            const benchmarkResult = await testsRequestSender.createBenchmark(testId, benchmarkRequest, validHeaders);
+            const { body } = benchmarkResult;
+            should(benchmarkResult.statusCode).eql(201);
+            should(body.benchmark_data).eql(benchmarkRequest);
         });
-        it('Create bench mark with full body for existing test', async () => {
-            const requestBody = simpleTest.test;
-            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
-            const benchMarkRequest = {
-                "rps": {
-                    "count": 1270,
-                    "mean": 46.74
-                },
-                "latency": {
-                    "min": 419.1,
-                    "max": 1295.4,
-                    "median": 553.9,
-                    "p95": 763.8,
-                    "p99": 929.5
-                },
-                "errors": {
-                    "500":12
-                },
-                "codes": {
-                    "200": 161,
-                    "201": 1061,
-                    "409": 53
-                }
-            };
-            const testId = createTestResponse.body.id;
-            const benchMarkResult = await testsRequestSender.createBenchMark(testId, benchMarkRequest, validHeaders);
-            const { body } = benchMarkResult;
-            should(benchMarkResult.statusCode).eql(201);
-            should(body.benchmark_data).eql(benchMarkRequest);
-
-        });
-        it('try to create bench mark for not existing test', async () => {
-            const benchMarkRequest = {
+        it('try to create benchmark for not existing test', async () => {
+            const benchmarkRequest = {
                 'rps': {
-                    'count': 1270,
                     'mean': 46.74
-                }
+                },
+                'latency': { median: 1, p95: 1 },
+                'errors': {},
+                'codes': {}
             };
-            const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
-            should(benchMarkResult.body.message).eql('Not found');
-            should(benchMarkResult.statusCode).eql(404);
+            const benchmarkResult = await testsRequestSender.createBenchmark(uuid(), benchmarkRequest, validHeaders);
+            should(benchmarkResult.body.message).eql('Not found');
+            should(benchmarkResult.statusCode).eql(404);
         });
-        it('try to create bench mark with not valid body and fail', async () => {
-            const benchMarkRequest = {
+        it('try to create benchmark with not valid body and fail', async () => {
+            const benchmarkRequest = {
                 'not_valid': {
                     'count': 1270,
                     'mean': 46.74
                 }
             };
-            const benchMarkResult = await testsRequestSender.createBenchMark(uuid(), benchMarkRequest, validHeaders);
-            should(benchMarkResult.body.message).eql('Input validation error');
-            should(benchMarkResult.statusCode).eql(400);
+            const benchmarkResult = await testsRequestSender.createBenchmark(uuid(), benchmarkRequest, validHeaders);
+            should(benchmarkResult.body.message).eql('Input validation error');
+            should(benchmarkResult.statusCode).eql(400);
+        });
+    });
+    describe('get benchmark', () => {
+        it('get benchmark', async () => {
+            const benchmarkRequest = {
+                'rps': {
+                    'mean': 46.74
+                },
+                'latency': { median: 1, p95: 1 },
+                'errors': { errorTest: 1 },
+                'codes': { codeTest: 1 }
+            };
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const testId = createTestResponse.body.id;
+            const benchmarkResult = await testsRequestSender.createBenchmark(testId, benchmarkRequest, validHeaders);
+            should(benchmarkResult.statusCode).eql(201);
+            const getResult = await testsRequestSender.getBenchmark(testId, validHeaders);
+            should(getResult.statusCode).eql(200);
+            should(getResult.body).eql(benchmarkRequest);
+        });
+        it('get benchmark when no bench mark create to this tests and get 404', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const testId = createTestResponse.body.id;
+            const getResult = await testsRequestSender.getBenchmark(testId, validHeaders);
+            should(getResult.statusCode).eql(404);
+            should(getResult.body.message).eql('Not found');
+        });
+        it('get benchmark when tests not created and get 404', async () => {
+            const getResult = await testsRequestSender.getBenchmark(uuid(), validHeaders);
+            should(getResult.statusCode).eql(404);
+            should(getResult.body.message).eql('Not found');
+        });
+        it('get benchmark with no uuid id and get validation error ', async () => {
+            const getResult = await testsRequestSender.getBenchmark(1, validHeaders);
+            should(getResult.statusCode).eql(400);
+            should(getResult.body.message).eql('Input validation error');
         });
     });
     describe('Good request tests', function() {
@@ -200,7 +250,7 @@ describe('the tests api', function() {
                 getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
                 getTestResponse.statusCode.should.eql(404);
             });
-            it('Create test, with a file ', async () => {
+            it('Create test, with a file', async () => {
                 let requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
                 const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
@@ -255,6 +305,42 @@ describe('the tests api', function() {
                 should.exists(getTestResponse.body.updated_at);
                 delete getTestResponse.body.updated_at;
                 should(getTestResponse.body).eql(expected);
+            });
+            it('Create dsl test, update dsl, get test should return new dsl', async () => {
+                let requestBody = simpleTest.test;
+                let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+                createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
+                createTestResponse.body.should.have.only.keys('id', 'revision_id');
+
+                const updateTokenRequest = {
+                    'post': {
+                        'url': '/tokens',
+                        'capture': [{
+                            'json': '$.token',
+                            'as': 'tokenId'
+                        }],
+                        'headers': {
+                            'Content-Type': 'application/json'
+                        },
+                        'json': {
+                            'token_type': 'credit_card',
+                            'holder_name': 'new name',
+                            'expiration_date': '11/2020',
+                            'card_number': '1234458045804123',
+                            'identity_document': {
+                                'number': '1234668464654',
+                                'type': 'NEW_ID'
+                            }
+                        }
+                    }
+                };
+                const updateDSLResponse = await testsRequestSender.updateDsl(dslName, 'createToken', updateTokenRequest);
+                should(updateDSLResponse.statusCode).eql(200, JSON.stringify(updateDSLResponse.body));
+
+                let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+                should(getTestResponse.statusCode).eql(200);
+                const getTestResponseTokenRequest = JSON.parse(getTestResponse.text).artillery_test.scenarios[0].flow[0];
+                should(getTestResponseTokenRequest).eql(updateTokenRequest);
             });
         });
 
@@ -323,7 +409,7 @@ describe('the tests api', function() {
             let getTestsResponse = await testsRequestSender.getTests(validHeaders);
             let testsIds = [];
             getTestsResponse.body.forEach(test => {
-                test.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at');
+                test.should.have.keys('id', 'description', 'name', 'revision_id', 'type', 'updated_at');
             });
             testsIds = getTestsResponse.body.map(function(test){
                 return test.id;

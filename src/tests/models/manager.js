@@ -3,7 +3,8 @@ const testGenerator = require('./testGenerator'),
     database = require('./database'),
     uuid = require('uuid'),
     fileManager = require('./fileManager'),
-    { ERROR_MESSAGES } = require('../../common/consts');
+    { ERROR_MESSAGES } = require('../../common/consts'),
+    consts = require('./../../common/consts');
 
 module.exports = {
     upsertTest,
@@ -12,38 +13,55 @@ module.exports = {
     getTests,
     deleteTest,
     getTestsByProcessorId,
-    insertTestBenchMark
+    insertTestBenchmark,
+    getBenchmark
 };
 
 async function upsertTest(testRawData, existingTestId) {
-    const testArtilleryJson = await testGenerator.createTest(testRawData);
+    let testArtilleryJson = await testGenerator.createTest(testRawData);
     let id = existingTestId || uuid();
     let fileId;
-    if (testRawData['processor_file_url']){
+    if (testRawData['processor_file_url']) {
         fileId = await fileManager.saveFile(testRawData['processor_file_url']);
     }
     let revisionId = uuid.v4();
+    if (testRawData.type === consts.TEST_TYPE_DSL) {
+        testArtilleryJson = undefined;
+    }
     await database.insertTest(testRawData, testArtilleryJson, id, revisionId, fileId);
     return { id: id, revision_id: revisionId };
 }
 
-async function insertTestBenchMark(benchMarkRawData, testId) {
-    const dataParse = JSON.stringify(benchMarkRawData);
-    await database.insertTestBenchMark(testId, dataParse);
-    return { benchmark_data: benchMarkRawData };
+async function insertTestBenchmark(benchmarkRawData, testId) {
+    const dataParse = JSON.stringify(benchmarkRawData);
+    await database.insertTestBenchmark(testId, dataParse);
+    return { benchmark_data: benchmarkRawData };
 }
 
-async function getTest(testId) {
-    const result = await database.getTest(testId);
-    if (result) {
-        result.artillery_test = result.artillery_json;
-        delete result.artillery_json;
-        return result;
-    } else {
+async function getBenchmark(testId) {
+    const benchmark = await database.getTestBenchmark(testId);
+    if (!benchmark) {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
         throw error;
     }
+    return JSON.parse(benchmark);
+}
+
+async function getTest(testId) {
+    let test = await database.getTest(testId);
+    if (!test) {
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
+    if (test.type === consts.TEST_TYPE_DSL) {
+        test.artillery_test = await testGenerator.createTest(test);
+    } else {
+        test.artillery_test = test.artillery_json;
+    }
+    delete test.artillery_json;
+    return test;
 }
 
 async function getAllTestRevisions(testId) {

@@ -323,6 +323,40 @@ paths:
               $ref: '#/components/schemas/benchmark_request'
         description: The bench mark to add
         required: true
+    get:
+      tags:
+        - Tests
+      parameters:
+        - in: path
+          name: test_id
+          description: The test id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      summary: get a bench mark for test
+      description:  Get a benchmark for a test
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/benchmark_request'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
   '/v1/tests/file/{file_id}':
     get:
       operationId: retrieve-a-file
@@ -1465,6 +1499,11 @@ components:
     benchmark_request:
       type: object
       additionalProperties: false
+      required:
+        - errors
+        - codes
+        - rps
+        - latency
       properties:
         errors:
           type: object
@@ -1479,23 +1518,20 @@ components:
             500: 53
         rps:
           type: object
+          required:
+            - mean
           properties:
-            count:
-              type: number
             mean:
               type: number
         latency:
           type: object
+          required:
+            - median
+            - p95
           properties:
-            min:
-              type: number
-            max:
-              type: number
             median:
               type: number
             p95:
-              type: number
-            p99:
               type: number
 
     dsl:
@@ -2047,6 +2083,13 @@ components:
           type: number
           description: The duration of the test in seconds.
           example: 60
+        score:
+          type: number
+          description: The score of a report, calculated based on a benchmark and benchmark weights
+          example: 9.25
+        benchmark_weights_data:
+          type: object
+          description: The way score calualated
         arrival_rate:
           type: number
           description: The arrival rate that was set for the test. This is the number of times per second that the test scenarios will run.
@@ -2146,6 +2189,11 @@ components:
             buckets_sizes:
               type: string
               description: Bucket sizes use to configure prometheus.
+            labels:
+              description: Labels which will be passed to prometheus push gateway.
+              type: object
+              additionalProperties:
+                type: string
         smtp_server:
           additionalProperties: false
           type: object
@@ -2187,14 +2235,14 @@ components:
               type: object
               description: benchmark_weights
               required:
-              - percentile_ninety
+              - percentile_ninety_five
               - percentile_fifty
               - server_errors
               - client_errors
               - rps
               properties:
-                percentile_ninety:
-                  description: P90 benchmark weight
+                percentile_ninety_five:
+                  description: P95 benchmark weight
                   allOf:
                     - $ref: '#/components/schemas/benchmark_weights'
                 percentile_fifty:
@@ -2203,25 +2251,21 @@ components:
                     - $ref: '#/components/schemas/benchmark_weights'
                 server_errors:
                   description: 5xx server errors benchmark weight
-                  allOf: 
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
                 client_errors:
                   description: 4xx server errors benchmark weight
-                  allOf: 
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
                 rps:
                   description: requests per second benchmark weight
-                  allOf: 
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
     benchmark_weights:
       type: object
       required:
-        - factor
-        - percentage
+         - percentage
       properties:
-        factor:
-          type: number
-          description: benchmark factor weight
         percentage:
             type: number
             description: benchmark percentage weight
