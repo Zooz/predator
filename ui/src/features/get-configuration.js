@@ -25,10 +25,10 @@ import {
 import Snackbar from "material-ui/Snackbar";
 
 const errorMsgGetConfig = 'Error occurred while trying to get Predator configuration.';
-const CardWithTitle = ({children, title}) => {
+const CardWithTitle = ({children, title, className}) => {
     return (
-        <div style={{display: 'flex', flexDirection: 'column', width: '50%'}}>
-            <h1 color={'#555555'}>{title}</h1>
+        <div className={className} style={{display: 'flex', flexDirection: 'column', width: '50%'}}>
+            <h1 style={{marginTop:'0px'}} color={'#555555'}>{title}</h1>
             <Card className={style['card-wrapper']}>
                 {children}
             </Card>

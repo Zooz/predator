@@ -1,6 +1,6 @@
 import React from 'react';
 import style from './style.scss';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {
     processingUpdateConfig,
     errorOnUpdateConfig,
@@ -10,94 +10,242 @@ import {
 import * as Actions from '../../redux/action';
 import TooltipWrapper from '../../../components/TooltipWrapper';
 import RactangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons';
 import Button from '../../../components/Button';
 import TitleInput from '../../../components/TitleInput';
 import ErrorWrapper from '../../../components/ErrorWrapper';
 import Input from '../../../components/Input';
 import ErrorDialog from '../../components/ErrorDialog';
-import { validate } from './validator';
+import {validate} from './validator';
 import Snackbar from 'material-ui/Snackbar';
 import UiSwitcher from '../../../components/UiSwitcher';
+import {get, set} from 'lodash';
+import Dropdown from "../../../components/Dropdown/Dropdown.export";
 
-const INPUT_TYPES = { SWITCHER: 'switcher' };
+const INPUT_TYPES = {SWITCHER: 'switcher',DROPDOWN:'dropdown'};
 
 class Form extends React.Component {
     constructor(props) {
         super(props);
-        const config = this.props.config || {};
-        this.GeneralList = {
-            data: [
-                {
-                    name: 'internal_address',
-                    key: 'internal_address',
-                    floatingLabelText: 'Internal address',
-                    info: 'The local ip address of your machine'
-                },
-                {
-                    name: 'runner_docker_image',
-                    key: 'runner_docker_image',
-                    floatingLabelText: 'Docker image name',
-                    info: 'The predator-runner docker image that will run the test'
-                },
-                {
-                    name: 'runner_cpu',
-                    key: 'runner_cpu',
-                    floatingLabelText: 'Runner CPU',
-                    info: 'The CPU allocated by each deployed runner'
-                },
-                {
-                    name: 'runner_memory',
-                    key: 'runner_memory',
-                    floatingLabelText: 'Runner memory (MB)',
-                    info: 'Max memory to use by each deployed runner'
-                },
-                {
-                    name: 'minimum_wait_for_delayed_report_status_update_in_ms',
-                    key: 'minimum_wait_for_delayed_report_status_update_in_ms',
-                    floatingLabelText: 'Minimum delayed time for report update (ms)',
-                    info: 'The minimum of time waiting for runner to report before the test is considered as finished'
-                },
-                {
-                    name: 'delay_runner_ms',
-                    key: 'delay_runner_ms',
-                    floatingLabelText: 'Delay runner (ms)',
-                    info: 'Delay the predator runner from sending http requests (ms)'
-                },
-                {
-                    name: 'default_webhook_url',
-                    key: 'default_webhook_url',
-                    floatingLabelText: 'Default webhook url',
-                    info: 'Default webhook url to send live report statistics to'
-                },
-                {
-                    name: 'interval_cleanup_finished_containers_ms',
-                    key: 'interval_cleanup_finished_containers_ms',
-                    floatingLabelText: 'Interval for clearing finished containers (ms)',
-                    info: 'Interval (in ms) to search and delete finished tests containers. Value of 0 means no auto clearing enabled'
-                },
-                {
-                    name: 'allow_insecure_tls',
-                    key: 'allow_insecure_tls',
-                    floatingLabelText: 'Allow insecure TLS',
-                    info: 'If true, don\'t fail requests on unverified server certificate errors',
-                    type: INPUT_TYPES.SWITCHER
-                }
-            ]
-        };
-        this.state = {
-            config: {
-                internal_address: config.internal_address,
-                runner_docker_image: config.runner_docker_image,
-                runner_cpu: config.runner_cpu,
-                runner_memory: config.runner_memory,
-                minimum_wait_for_delayed_report_status_update_in_ms: config.minimum_wait_for_delayed_report_status_update_in_ms,
-                default_webhook_url: config.default_webhook_url,
-                delay_runner_ms: config.delay_runner_ms,
-                allow_insecure_tls: config.allow_insecure_tls,
-                interval_cleanup_finished_containers_ms: config.interval_cleanup_finished_containers_ms
+        this.Menue = [
+            {
+                name: 'internal_address',
+                key: 'internal_address',
+                floatingLabelText: 'Internal address',
+                info: 'The local ip address of your machine'
             },
+            {
+                name: 'runner_docker_image',
+                key: 'runner_docker_image',
+                floatingLabelText: 'Docker image name',
+                info: 'The predator-runner docker image that will run the test'
+            },
+            {
+                name: 'runner_cpu',
+                key: 'runner_cpu',
+                floatingLabelText: 'Runner CPU',
+                info: 'The CPU allocated by each deployed runner',
+                valueType: 'float'
+            },
+            {
+                name: 'runner_memory',
+                key: 'runner_memory',
+                floatingLabelText: 'Runner memory (MB)',
+                info: 'Max memory to use by each deployed runner',
+                valueType: 'int'
+            },
+            {
+                name: 'minimum_wait_for_delayed_report_status_update_in_ms',
+                key: 'minimum_wait_for_delayed_report_status_update_in_ms',
+                floatingLabelText: 'Minimum delayed time for report update (ms)',
+                info: 'The minimum of time waiting for runner to report before the test is considered as finished',
+                valueType: 'int'
+            },
+            {
+                name: 'delay_runner_ms',
+                key: 'delay_runner_ms',
+                floatingLabelText: 'Delay runner (ms)',
+                info: 'Delay the predator runner from sending http requests (ms)',
+                valueType: 'int'
+            },
+            {
+                name: 'default_webhook_url',
+                key: 'default_webhook_url',
+                floatingLabelText: 'Default webhook url',
+                info: 'Default webhook url to send live report statistics to'
+            },
+            {
+                name: 'interval_cleanup_finished_containers_ms',
+                key: 'interval_cleanup_finished_containers_ms',
+                floatingLabelText: 'Interval for clearing finished containers (ms)',
+                info: 'Interval (in ms) to search and delete finished tests containers. Value of 0 means no auto clearing enabled',
+                valueType: 'int'
+            },
+            {
+                name: 'allow_insecure_tls',
+                key: 'allow_insecure_tls',
+                floatingLabelText: 'Allow insecure TLS',
+                info: 'If true, don\'t fail requests on unverified server certificate errors',
+                type: INPUT_TYPES.SWITCHER
+            },
+            {
+                category: 'Benchmark weights',
+                inputs: [
+                    {
+                        name: 'benchmark_threshold',
+                        key: 'benchmark_threshold',
+                        floatingLabelText: 'Benchmark threshold',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },                    {
+                        name: 'percentile_ninety_five',
+                        key: 'benchmark_weights.percentile_ninety_five.percentage',
+                        floatingLabelText: 'Percentile ninety five',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },
+                    {
+                        name: 'percentile_fifty',
+                        key: 'benchmark_weights.percentile_fifty.percentage',
+                        floatingLabelText: 'Percentile fifty',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },
+                    {
+                        name: 'server_errors',
+                        key: 'benchmark_weights.server_errors.percentage',
+                        floatingLabelText: 'Server errors',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },
+                    {
+                        name: 'client_errors',
+                        key: 'benchmark_weights.client_errors.percentage',
+                        floatingLabelText: 'Client errors',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },
+                    {
+                        name: 'rps',
+                        key: 'benchmark_weights.rps.percentage',
+                        floatingLabelText: 'Rps',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },
+                ]
+            },
+            {
+                category: 'Smtp server',
+                inputs: [
+                    {
+                        name: 'from',
+                        key: 'smtp_server.from',
+                        floatingLabelText: 'From',
+                        info: 'insert info'
+                    },
+                    {
+                        name: 'host',
+                        key: 'smtp_server.host',
+                        floatingLabelText: 'Host',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },
+                    {
+                        name: 'username',
+                        key: 'smtp_server.username',
+                        floatingLabelText: 'Username',
+                        info: 'insert info'
+                    },
+                    {
+                        name: 'password',
+                        key: 'smtp_server.password',
+                        floatingLabelText: 'Password',
+                        info: 'insert info'
+                    },
+                    {
+                        name: 'port',
+                        key: 'smtp_server.port',
+                        floatingLabelText: 'Port',
+                        info: 'insert info',
+                        valueType: 'int'
+                    },
+                    {
+                        name: 'timeout',
+                        key: 'smtp_server.timeout',
+                        floatingLabelText: 'Timeout',
+                        info: 'insert info',
+                        valueType: 'int'
+                    }
+                ]
+            },
+            {
+                category: 'Metrics',
+                inputs: [
+                    {
+                        name: 'metrics_plugin_name',
+                        key: 'metrics_plugin_name',
+                        floatingLabelText: 'metrics_plugin_name',
+                        info: 'insert info',
+                        type:  INPUT_TYPES.DROPDOWN,
+                        options: ['influx','prometheus'],
+                    },
+                    {
+                        name: 'push_gateway_url',
+                        key: 'prometheus_metrics.push_gateway_url',
+                        floatingLabelText: 'Prometheus push gateway url',
+                        info: 'Url of push gateway',
+                    },
+                    {
+                        name: 'buckets_sizes',
+                        key: 'prometheus_metrics.buckets_sizes',
+                        floatingLabelText: 'Prometheus buckets sizes',
+                        info: 'Bucket sizes to configure prometheus',
+                    },
+                    {
+                        name: 'host',
+                        key: 'influx_metrics.host',
+                        floatingLabelText: 'Influx host',
+                        info: 'Influx db host',
+                    },
+                    {
+                        name: 'username',
+                        key: 'influx_metrics.username',
+                        floatingLabelText: 'Influx username',
+                        info: 'Influx db username',
+                    },
+                    {
+                        name: 'password',
+                        key: 'influx_metrics.password',
+                        floatingLabelText: 'Influx password',
+                        info: 'Influx db password',
+                    },
+                    {
+                        name: 'database',
+                        key: 'influx_metrics.database',
+                        floatingLabelText: 'Influx database',
+                        info: 'Influx db name',
+                    },
+                ]
+            }
+        ];
+        this.MenueFlatten = this.Menue.flatMap(objectKey=>objectKey.category ? objectKey.inputs : [objectKey])
+        function setByKey(src, trg, key) {
+            set(trg, key, get(src, key));
+        }
+        const config = this.props.config;
+        const configState = this.Menue.reduce((acc, objectKey) => {
+            if (objectKey.category) {
+                for (let input of objectKey.inputs) {
+                    setByKey(config, acc, input.key);
+                }
+            } else {
+                setByKey(config, acc, objectKey.key);
+            }
+            return acc;
+        }, {});
+        this.state = {
+            config:configState,
             errors: {
                 name: undefined,
                 retries: undefined,
@@ -118,15 +266,16 @@ class Form extends React.Component {
         this.props.clearErrorOnUpdateConfig();
     }
 
-    onChangeFreeText = (name, evt) => {
-        const newConfig = { ...this.state.config, [name]: evt.target.value };
-        const errors = (validate(newConfig));
-        this.setState({ config: newConfig, errors });
+    onChangeFreeText = (key, value) => {
+        const newConfig = {...this.state.config};
+        set(newConfig, key,value);
+        const errors = (validate(newConfig, this.MenueFlatten));
+        this.setState({config: newConfig, errors});
     };
 
     handleChangeForCheckBox = (name, value) => {
-        const newConfig = { ...this.state.config, [name]: value };
-        this.setState({ config: newConfig });
+        const newConfig = {...this.state.config, [name]: value};
+        this.setState({config: newConfig});
     };
 
     closeViewErrorDialog = () => {
@@ -148,7 +297,7 @@ class Form extends React.Component {
                     newConfig[key] = this.props.config[key];
                 }
             });
-            this.setState({ config: newConfig });
+            this.setState({config: newConfig});
         }
     }
 
@@ -159,52 +308,49 @@ class Form extends React.Component {
         return (<TooltipWrapper
             content={
                 <div>
-                {item.info}
-              </div>}
+                    {item.info}
+                </div>}
             dataId={`tooltipKey_${item.key}`}
             place='top'
-            offset={{ top: 1 }}
+            offset={{top: 1}}
         >
-            <div data-tip data-for={`tooltipKey_${item.info}`} style={{ cursor: 'pointer' }}>
-                <FontAwesomeIcon style={{ color: '#557eff', fontSize: '13px' }} icon={faQuestionCircle} />
-          </div>
+            <div data-tip data-for={`tooltipKey_${item.info}`} style={{cursor: 'pointer'}}>
+                <FontAwesomeIcon style={{color: '#557eff', fontSize: '13px'}} icon={faQuestionCircle}/>
+            </div>
 
         </TooltipWrapper>);
     }
 
     render() {
-        const { processingAction, serverError, clearErrorOnUpdateConfig, updateSuccess } = this.props;
+        const {processingAction, serverError, clearErrorOnUpdateConfig, updateSuccess} = this.props;
         return (
-            <div style={{ width: '100%' }}>
-            {this.GeneralList.data.map((oneItem, index) => {
+            <div style={{width: '100%'}}>
+                {this.Menue.map((oneItem, index) => {
                     return (
-                      <div key={index}>
-                          {!oneItem.hidden &&
-                            <RactangleAlignChildrenLeft className={style['input-wrapper']}>
-                              <div style={{ flex: '1' }}>
-                                  {this.generateInput(oneItem)}
-                                </div>
-                            </RactangleAlignChildrenLeft>}
+                        <div key={index}>
+                            {oneItem.category && <h3 style={{marginTop: '0'}}>{oneItem.category}</h3>}
+                            {oneItem.category && oneItem.inputs.map(((oneItem, index) => this.generateInput(oneItem, index)), this)}
+                            {!oneItem.category && this.generateInput(oneItem)}
                         </div>);
                 }, this)}
 
-            <div className={style.buttons}>
+                <div className={style.buttons}>
                     <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm() || processingAction}
-                onClick={this.whenSubmit}>Save</Button>
+                            onClick={this.whenSubmit}>Save</Button>
                 </div>
-            {serverError &&
+                {serverError &&
                 <ErrorDialog closeDialog={() => {
-                clearErrorOnUpdateConfig();
-            }} showMessage={serverError} />
+                    clearErrorOnUpdateConfig();
+                }} showMessage={serverError}/>
                 }
-            {updateSuccess && <Snackbar
+                {updateSuccess && <Snackbar
                     open={updateSuccess}
-                    bodyStyle={{ backgroundColor: '#2fbb67' }}
-                  message={'Configuration updated successfully'}
+                    bodyStyle={{backgroundColor: '#2fbb67'}}
+                    message={'Configuration updated successfully'}
                     autoHideDuration={4000}
-                  onRequestClose={this.handleSnackbarClose}
+                    onRequestClose={this.handleSnackbarClose}
                 />}
-          </div>
+            </div>
         );
     }
 
@@ -212,34 +358,57 @@ class Form extends React.Component {
         this.props.cleanUpdateConfigSuccess();
     };
 
-    generateInput = (oneItem) => {
-        if (oneItem.type === INPUT_TYPES.SWITCHER) {
-            return (
-                <TitleInput style={{ flex: '1' }} key={oneItem.key} title={oneItem.floatingLabelText}
-                rightComponent={this.showInfo(oneItem)}>
-                    <RactangleAlignChildrenLeft>
-                    <UiSwitcher
-                        onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
-                            disabledInp={false}
-                            activeState={this.state.config[oneItem.name]}
-                            height={12}
-                            width={22} />
-                        <div className={style['run-immediately']}>{oneItem.label}</div>
-                  </RactangleAlignChildrenLeft>
-              </TitleInput>
-            );
-        }
+    generateInput = (oneItem, index) => {
+        const value = get(this.state.config, oneItem.key);
+        const error = get(this.state.errors, oneItem.key);
         return (
-            <div>
+            <div key={index} style={{marginBottom: '15px'}}>
                 <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
-                rightComponent={this.showInfo(oneItem)}>
-                    <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
-                        <Input disabled={oneItem.disabled} value={this.state.config[oneItem.name]}
-                        onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)} />
-                  </ErrorWrapper>
-              </TitleInput>
-          </div>
-        );
+                            rightComponent={this.showInfo(oneItem)}>
+                    {
+                        oneItem.type === INPUT_TYPES.SWITCHER && (
+                            <RactangleAlignChildrenLeft>
+                                <UiSwitcher
+                                    onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
+                                    disabledInp={false}
+                                    activeState={value}
+                                    height={12}
+                                    width={22}/>
+                                <div className={style['run-immediately']}>{oneItem.label}</div>
+                            </RactangleAlignChildrenLeft>
+                        )
+                        ||
+
+                        oneItem.type === INPUT_TYPES.DROPDOWN && (
+                            <RactangleAlignChildrenLeft>
+                                <Dropdown
+                                    options={oneItem.options.map((option) => ({key: option, value: option}))}
+                                    selectedOption={{key: value, value: value}}
+                                    onChange={(selected)=>{
+                                        this.onChangeFreeText(oneItem.key, selected.value)
+                                    }}
+                                    placeholder={"Method"}
+                                    height={'35px'}
+                                    disabled={false}
+                                    validationErrorText=''
+                                    enableFilter={false}
+                                />
+                                <div className={style['run-immediately']}>{oneItem.label}</div>
+                            </RactangleAlignChildrenLeft>
+                        )
+
+
+                        ||
+                        <ErrorWrapper errorText={error}>
+                            <Input disabled={oneItem.disabled} value={value}
+                                   onChange={(evt) => this.onChangeFreeText(oneItem.key, evt.target.value)}/>
+                        </ErrorWrapper>
+                    }
+
+                </TitleInput>
+            </div>
+        )
+
     };
 
     whenSubmit = () => {
@@ -248,20 +417,33 @@ class Form extends React.Component {
             runner_cpu: 'float',
             minimum_wait_for_delayed_report_status_update_in_ms: 'int',
             delay_runner_ms: 'int',
-            interval_cleanup_finished_containers_ms: 'int'
+            interval_cleanup_finished_containers_ms: 'int',
         };
         const body = {};
-        Object.keys(this.state.config).forEach((configKey) => {
-            if (keyTypes[configKey] === 'int') {
-                const value = parseInt(this.state.config[configKey]);
-                body[configKey] = _.isNaN(value) ? undefined : value;
-            } else if (keyTypes[configKey] === 'float') {
-                const value = parseFloat(this.state.config[configKey]);
-                body[configKey] = _.isNaN(value) ? undefined : value;
-            } else {
-                body[configKey] = this.state.config[configKey];
+        const list = this.Menue.flatMap((objectKey) => {
+            if (objectKey.category) {
+                return objectKey.inputs;
             }
+            return [objectKey];
         });
+        for (let objectKey of list) {
+            const valueType = objectKey.valueType;
+            const value = get(this.state.config, objectKey.key);
+            switch (valueType) {
+                case 'int':
+                    const newValue = parseInt(value);
+                    set(body, objectKey.key, _.isNaN(newValue) ? undefined : newValue);
+                    break;
+                case 'float':
+                    const newValueFloat = parseFloat(value);
+                    set(body, objectKey.key, _.isNaN(newValueFloat) ? undefined : newValueFloat);
+
+                    break;
+                default:
+                    set(body, objectKey.key, value);
+            }
+        }
+
         this.props.updateConfig(body);
     };
 }

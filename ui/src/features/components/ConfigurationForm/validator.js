@@ -1,20 +1,24 @@
-import {isUndefined} from 'lodash'
+import {isUndefined, get} from 'lodash'
 
 import React from 'react';
-export const validate = (state) => {
-    const errors = {};
-    Object.keys(validatorsByKey)
-        .forEach((field) => {
-            const validators = validatorsByKey[field];
+
+export const validate = (state, objectKeys) => {
+    const errors = customValidator(state);
+    for (let objectKey of objectKeys) {
+        const value = get(state, objectKey.key);
+        if (!isUndefined(value)) {
+
+            const validators = validatorsByKey[objectKey.key] || [];
             let firstError;
             validators.find((validator) => {
-                firstError = validator(state[field], state);
+                firstError = validator(value, state);
                 return firstError;
             });
             if (firstError) {
-                errors[field] = firstError;
+                errors[objectKey.key] = firstError;
             }
-        });
+        }
+    }
     return errors;
 };
 
@@ -24,8 +28,30 @@ const validatorsByKey = {
     runner_cpu: [isPositiveFloatNumberIfExist],
     runner_memory: [isPositiveIntegerNumberIfExist],
     minimum_wait_for_delayed_report_status_update_in_ms: [isPositiveIntegerNumberIfExist],
-    delay_runner_ms: [isIntegerIfExist]
+    delay_runner_ms: [isIntegerIfExist],
+    interval_cleanup_finished_containers_ms: [isIntegerIfExist],
+    benchmark_threshold: [isIntegerIfExist],
+    ['smtp_server.port']: [isIntegerIfExist],
+    ['smtp_server.timeout']: [isIntegerIfExist],
 };
+
+
+function customValidator(state) {
+    return validateBenchmarkWeights(state.benchmark_weights);
+}
+
+function validateBenchmarkWeights(benchmarkWeights) {
+    let errors = {};
+    const entries = Object.entries(benchmarkWeights || {});
+    for (let entry of entries) {
+        const value = entry[1].percentage;
+        const validateResult = isIntegerIfExist(value);
+        if (validateResult) {
+            errors[`benchmark_weights.${entry[0]}.percentage`] = validateResult;
+        }
+    }
+    return errors;
+}
 
 function isRequired(value) {
     if (isUndefined(value) || value === '') {
@@ -53,6 +79,7 @@ function isPositiveFloatNumberIfExist(value) {
     }
 
 }
+
 function isIntegerIfExist(value) {
     if (isUndefined(value)) {
         return;
