@@ -263,7 +263,7 @@ describe('Webhook/email notifier test ', () => {
 
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await notifier.notifyIfNeeded(report, stats);
+        await notifier.notifyIfNeeded(report, stats, { score: 99.4 });
 
         reportWebhookSenderSendStub.callCount.should.equal(1);
         reportWebhookSenderSendStub.args.should.containDeep([
