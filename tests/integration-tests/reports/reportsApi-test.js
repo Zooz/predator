@@ -422,6 +422,7 @@ describe('Integration tests for the reports api', function() {
                     'codes': { codeTest: 1 }
                 };
                 const config = {
+                    benchmark_threshold: 55,
                     benchmark_weights: {
                         percentile_ninety_five: { factor: 1, percentage: 20 },
                         percentile_fifty: { factor: 1, percentage: 30 },
@@ -452,6 +453,7 @@ describe('Integration tests for the reports api', function() {
                 should(lastReport.score).eql(100);
                 should(lastReport.benchmark_weights_data).eql(report.benchmark_weights_data);
                 should(report.benchmark_weights_data).eql({
+                    'benchmark_threshold': 55,
                     'rps': {
                         'benchmark_value': 90.99,
                         'report_value': 90.99,

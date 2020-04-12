@@ -414,12 +414,9 @@ describe('Reports manager tests', function () {
             manager.__set__('configHandler', {
                 getConfig: () => {
                     return {
-                        job_platform: 'KUBERNETES'
-                    };
-                },
-                getConfigValue: () => {
-                    return {
-                        config: 'some value'
+                        job_platform: 'KUBERNETES',
+                        benchmark_weights: { config: 'some value' },
+                        benchmark_threshold: 99
                     };
                 }
             });
@@ -479,7 +476,7 @@ describe('Reports manager tests', function () {
             should(updateReportBenchmarkStub.args[0][0]).eql('test_id');
             should(updateReportBenchmarkStub.args[0][1]).eql('report_id');
             should(updateReportBenchmarkStub.args[0][2]).eql(5.5);
-            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data' }));
+            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data', 'benchmark_threshold': 99 }));
         });
         it('when report done and dont have benchmark data ', async () => {
             databaseGetReportStub.resolves([REPORT_DONE]);
