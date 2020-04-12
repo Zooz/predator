@@ -26,7 +26,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails, repo
         testInfo['score'] = reportBenchmark.score;
     }
     if (reportBenchmark.data) {
-        testInfo['data'] = reportBenchmark.data;
+        testInfo['benchmark'] = reportBenchmark.data;
     }
 
     let htmlBody = generateReportFromTemplate(testName, testInfo, aggregatedResults.grafana_url, aggregatedResults.aggregate);
@@ -59,8 +59,8 @@ async function createSMTPClient(configSmtp) {
         connectionTimeout: configSmtp.timeout,
         secure: configSmtp.secure,
         auth: {
-            user: configSmtp.username,
-            pass: configSmtp.password
+            user: configSmtp.username || 'test',
+            pass: configSmtp.password || 'test'
         },
         tls: {
             rejectUnauthorized: configSmtp.rejectUnauthCerts

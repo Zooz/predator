@@ -590,6 +590,7 @@
                             End time: <%= testInfo.endTime %><br>
                         </div>
                     </div>
+                    <% if (testInfo.benchmark) { %>
                     <div style="Margin-left: 20px;Margin-right: 20px;">
                         <div style="mso-line-height-rule: exactly;mso-text-raise: 4px;">
                             <p style="Margin-top: 0;Margin-bottom: 20px;"><strong>Score data:</strong><br>
@@ -599,6 +600,7 @@
                                 Client errors: <%= testInfo.benchmark.client_errors.score.toFixed(1) %>/<%= (testInfo.benchmark.client_errors.percentage*100).toFixed(1) %><br>
                                 Server errors: <%= testInfo.benchmark.server_errors.score.toFixed(1) %>/<%= (testInfo.benchmark.server_errors.percentage*100).toFixed(1) %><br>
                         </div>
+                        <% } %>
                     <div style="Margin-left: 20px;Margin-right: 20px;">
                         <div class="divider" style="display: block;font-size: 2px;line-height: 2px;Margin-left: auto;Margin-right: auto;width: 40px;background-color: #ccc;Margin-bottom: 20px;">&nbsp;</div>
                     </div>
