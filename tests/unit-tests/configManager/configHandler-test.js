@@ -29,8 +29,8 @@ const defaultConfig = {
     benchmark_weights: {
         percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
-        server_errors: { percentage: 20 },
-        client_errors: { percentage: 20 },
+        server_errors_ratio: { percentage: 20 },
+        client_errors_ratio: { percentage: 20 },
         rps: { percentage: 20 }
     }
 };
@@ -48,8 +48,8 @@ const defaultConfigNotEscaped = {
     benchmark_weights: {
         percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
-        server_errors: { percentage: 20 },
-        client_errors: { percentage: 20 },
+        server_errors_ratio: { percentage: 20 },
+        client_errors_ratio: { percentage: 20 },
         rps: { percentage: 20 }
     }
 };
@@ -85,8 +85,8 @@ const configParseExpected = {
     benchmark_weights: {
         percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
-        server_errors: { percentage: 20 },
-        client_errors: { percentage: 20 },
+        server_errors_ratio: { percentage: 20 },
+        client_errors_ratio: { percentage: 20 },
         rps: { percentage: 20 }
     }
 };
@@ -110,8 +110,8 @@ const resultAfterConvert = {
     benchmark_weights: {
         percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 20 },
-        server_errors: { percentage: 20 },
-        client_errors: { percentage: 20 },
+        server_errors_ratio: { percentage: 20 },
+        client_errors_ratio: { percentage: 20 },
         rps: { percentage: 20 }
     }
 };
