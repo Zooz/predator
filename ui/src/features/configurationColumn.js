@@ -287,7 +287,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Score
                 </TableHeader>
             ),
-            //benchmark_weights_data.benchmark_threshold
             accessor: (data) => {
                 if (data.score) {
                     const color = get(data, 'benchmark_weights_data.benchmark_threshold', 0) <= data.score ? 'green' : 'red';
