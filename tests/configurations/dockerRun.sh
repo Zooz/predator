@@ -98,10 +98,10 @@ function mailhog() {
     stop $APP
     COMMAND="docker run \
                     -d \
-                    --name mailhog \
+                    --name $APP \
                     -p 8025:8025 \
                     -p 1025:1025 \
-                    mailhog/mailhog"
+                    $IMAGE_NAME"
     echo -e "Starting $APP\n"${COMMAND/\s+/ }
     $COMMAND
     COMMAND_EXIT_CODE=$?
