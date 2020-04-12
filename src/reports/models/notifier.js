@@ -114,7 +114,7 @@ async function handleDone(report, job, reportBenchmark) {
     }
 
     if (emails.length > 0) {
-        reportEmailSender.sendAggregateReport(aggregatedReport, job, emails);
+        reportEmailSender.sendAggregateReport(aggregatedReport, job, emails, reportBenchmark);
     }
 
     if (webhooks.length > 0) {
