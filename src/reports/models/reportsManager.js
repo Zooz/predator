@@ -103,12 +103,17 @@ async function updateReportBenchmarkIfNeeded(report) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
-    const configBenchmark = await configHandler.getConfigValue(configConsts.BENCHMARK_WEIGHTS);
+    const config = await configHandler.getConfig();
+    const configBenchmark = {
+        weights: config[configConsts.BENCHMARK_WEIGHTS],
+        threshold: config[configConsts.BENCHMARK_THRESHOLD]
+    };
     const testBenchmarkData = await extractBenchmark(report.test_id);
-    if (testBenchmarkData && configBenchmark) {
+    if (testBenchmarkData) {
         const reportAggregate = await aggregateReportManager.aggregateReport(report);
-        const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark);
+        const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark.weights);
         const { data, score } = reportBenchmark;
+        data[configConsts.BENCHMARK_THRESHOLD] = configBenchmark.threshold;
         await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
     }
 }
