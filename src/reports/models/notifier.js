@@ -109,7 +109,7 @@ async function handleDone(report, job, reportBenchmark) {
     }
 
     let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
-    let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate)}\n`;
+    let webhookMessage = `😎 *Test ${report.test_name} with id: ${report.test_id} is finished.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, reportBenchmark)}\n`;
 
     if (report.grafana_report) {
         webhookMessage += `<${report.grafana_report}|View final grafana dashboard report>`;
