@@ -124,7 +124,7 @@ async function handleDone(report, job, reportBenchmark) {
     }
 
     if (benchmarkWebhook.length > 0) {
-        handleBenchmarkWebhookTreshhold(report, reportBenchmark.score, benchmarkThreshold, benchmarkWebhook);
+        handleBenchmarkWebhookTreshhold(aggregatedReport, reportBenchmark.score, benchmarkThreshold, benchmarkWebhook);
     }
 }
 
@@ -140,12 +140,14 @@ async function handleAbort(report, job) {
     reportWebhookSender.send(webhooks, webhookMessage);
 }
 
-async function handleBenchmarkWebhookTreshhold(report, score, benchmarkThreshold, benchmarkWebhook) {
+async function handleBenchmarkWebhookTreshhold(aggregatedReport, score, benchmarkThreshold, benchmarkWebhook) {
     if (score && benchmarkThreshold && score < benchmarkThreshold) {
-        const lastReports = await reportsManager.getReports(report.test_id);
+        const lastReports = await reportsManager.getReports(aggregatedReport.test_id, true);
         const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
-        let benchmarkWebhookMsg = `:rage: *Test ${report.test_name} got a score of ${score.toFixed(1)} this is below the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}.*`;
-        reportWebhookSender.send([benchmarkWebhook], benchmarkWebhookMsg);
+        let benchmarkWebhookMsg = `:sad_1: *Test ${aggregatedReport.test_name} got a score of ${score.toFixed(1)}` +
+            ` this is below the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
+            `.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;
+        reportWebhookSender.send([benchmarkWebhook], benchmarkWebhookMsg, { icon: ':sad_1:' });
     }
 }
 

@@ -290,7 +290,7 @@ describe('Webhook/email notifier test ', () => {
         getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD).resolves(10);
         getReportsStub.resolves([{ score: 9.44556 }, { score: 8.34556 }, { score: 7.24556 }]);
 
-        aggregateReportGeneratorStub.resolves({});
+
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com'],
             emails: ['test2@predator.com']
@@ -315,12 +315,12 @@ describe('Webhook/email notifier test ', () => {
             data: JSON.stringify({})
         };
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
-
+        aggregateReportGeneratorStub.resolves(report);
         await notifier.notifyIfNeeded(report, stats, { score: 8 });
 
         reportWebhookSenderSendStub.args.should.containDeep([
             [
-                ':rage: *Test some_test_name got a score of 8.0 this is below the threshold of 10. last 3 scores are: 9.4,8.3,7.2.*'
+                ':sad_1: *Test some_test_name got a score of 8.0 this is below the threshold of 10. last 3 scores are: 9.4,8.3,7.2.*\nmax: 1, min: 0.4, median: 0.7\n'
             ]
         ]);
     });
@@ -333,7 +333,7 @@ describe('Webhook/email notifier test ', () => {
         getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD).resolves(10);
         getReportsStub.resolves([]);
 
-        aggregateReportGeneratorStub.resolves({});
+
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com'],
             emails: ['test2@predator.com']
@@ -358,12 +358,12 @@ describe('Webhook/email notifier test ', () => {
             data: JSON.stringify({})
         };
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
-
+        aggregateReportGeneratorStub.resolves(report);
         await notifier.notifyIfNeeded(report, stats, { score: 8 });
 
         reportWebhookSenderSendStub.args.should.containDeep([
             [
-                ':rage: *Test some_test_name got a score of 8.0 this is below the threshold of 10. no last score to show.*'
+                ':sad_1: *Test some_test_name got a score of 8.0 this is below the threshold of 10. no last score to show.*\nmax: 1, min: 0.4, median: 0.7\n'
             ]
         ]);
     });
