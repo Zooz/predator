@@ -144,8 +144,8 @@ async function handleBenchmarkWebhookTreshhold(report, score, benchmarkThreshold
     if (score && benchmarkThreshold && score < benchmarkThreshold) {
         const lastReports = await reportsManager.getReports(report.test_id);
         const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
-        let benchmarkWebhookMsg = `😔*Test ${report.test_name} got a score of ${score} this is below the threshold of ${benchmarkThreshold}.${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}`;
-        reportWebhookSender.send(benchmarkWebhook, benchmarkWebhookMsg);
+        let benchmarkWebhookMsg = `😢*Test ${report.test_name} got a score of ${score.toFixed(1)} this is below the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}.*`;
+        reportWebhookSender.send([benchmarkWebhook], benchmarkWebhookMsg);
     }
 }
 
