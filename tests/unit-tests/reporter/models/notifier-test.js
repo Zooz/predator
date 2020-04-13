@@ -280,12 +280,11 @@ describe('Webhook/email notifier test ', () => {
     });
 
     it('Handing message with phase: done - score is less than threshold', async () => {
-        configConstants.BENCHMARK_THRESHOLD = 10;
-
         getConfigStub.resolves('test@predator.com');
-        getConfigStub.withArgs(sinon.match('default_webhook_url')).resolves('http://www.webhook.com');
-        getConfigStub.withArgs(sinon.match('default_email_address')).resolves('test@predator.com');
-        getConfigStub.withArgs(sinon.match('benchmark_threshold_webhook_url')).resolves('benchmarktest@predator.com');
+        getConfigStub.withArgs(configConstants.DEFAULT_WEBHOOK_URL).resolves('http://www.webhook.com');
+        getConfigStub.withArgs(configConstants.DEFAULT_EMAIL_ADDRESS).resolves('test@predator.com');
+        getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD_WEBHOOK_URL).resolves('benchmarktest@predator.com');
+        getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD).resolves(10);
 
         aggregateReportGeneratorStub.resolves({});
         jobsManagerStub.resolves({
@@ -313,14 +312,13 @@ describe('Webhook/email notifier test ', () => {
         };
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
 
-        await notifier.notifyIfNeeded(report, stats);
+        await notifier.notifyIfNeeded(report, stats, { score: 8 });
 
         reportWebhookSenderSendStub.args.should.containDeep([
             [
                 "😔*Test some_test_name got a score of 8 this is below the threshold of 10. last 3 scores are {y}, {y2}, y{3}'"
             ]
         ]);
-        configConstants.BENCHMARK_THRESHOLD = undefined;
     });
 
     it('Handing message with phase: aborted', async () => {
