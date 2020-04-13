@@ -118,6 +118,7 @@ describe('the tests api', function() {
             should(body.validation_errors).eql(['body should have required property \'errors\'',
                 'body should have required property \'codes\'',
                 'body/rps should have required property \'mean\'',
+                'body/rps should have required property \'count\'',
                 'body/latency should have required property \'median\'',
                 'body/latency should have required property \'p95\'']);
         });
@@ -154,6 +155,7 @@ describe('the tests api', function() {
         it('try to create benchmark for not existing test', async () => {
             const benchmarkRequest = {
                 'rps': {
+                    'count': 100,
                     'mean': 46.74
                 },
                 'latency': { median: 1, p95: 1 },
@@ -180,6 +182,7 @@ describe('the tests api', function() {
         it('get benchmark', async () => {
             const benchmarkRequest = {
                 'rps': {
+                    'count': 100,
                     'mean': 46.74
                 },
                 'latency': { median: 1, p95: 1 },
