@@ -9,6 +9,7 @@ const reportEmailSender = require('./reportEmailSender'),
     constants = require('../utils/constants'),
     configHandler = require('../../configManager/models/configHandler'),
     reportUtil = require('../utils/reportUtil'),
+    reportsManager = require('./reportsManager'),
     configConstants = require('../../common/consts').CONFIG;
 
 module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
@@ -101,8 +102,9 @@ async function handleDone(report, job, reportBenchmark) {
 
     let emails = await getEmailTargets(job);
     let webhooks = await getWebhookTargets(job);
+    const { benchmarkThreshold, benchmarkWebhook } = await getBenchmarkConfig();
 
-    if (emails.length === 0 && webhooks.length === 0) {
+    if (emails.length === 0 && webhooks.length === 0 && benchmarkWebhook.length === 0) {
         return;
     }
 
@@ -120,6 +122,10 @@ async function handleDone(report, job, reportBenchmark) {
     if (webhooks.length > 0) {
         reportWebhookSender.send(webhooks, webhookMessage);
     }
+
+    if (benchmarkWebhook.length > 0) {
+        handleBenchmarkWebhookTreshhold(aggregatedReport, reportBenchmark.score, benchmarkThreshold, benchmarkWebhook);
+    }
 }
 
 async function handleAbort(report, job) {
@@ -134,6 +140,17 @@ async function handleAbort(report, job) {
     reportWebhookSender.send(webhooks, webhookMessage);
 }
 
+async function handleBenchmarkWebhookTreshhold(aggregatedReport, score, benchmarkThreshold, benchmarkWebhook) {
+    if (score && benchmarkThreshold && score < benchmarkThreshold) {
+        const lastReports = await reportsManager.getReports(aggregatedReport.test_id, true);
+        const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
+        let benchmarkWebhookMsg = `:sad_1: *Test ${aggregatedReport.test_name} got a score of ${score.toFixed(1)}` +
+            ` this is below the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
+            `.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;
+        reportWebhookSender.send([benchmarkWebhook], benchmarkWebhookMsg, { icon: ':sad_1:' });
+    }
+}
+
 async function getWebhookTargets(job) {
     let targets = [];
     let defaultWebhookUrl = await configHandler.getConfigValue(configConstants.DEFAULT_WEBHOOK_URL);
@@ -146,6 +163,12 @@ async function getWebhookTargets(job) {
         targets = targets.concat(job.webhooks);
     }
     return targets;
+}
+
+async function getBenchmarkConfig() {
+    const benchmarkWebhook = await configHandler.getConfigValue(configConstants.BENCHMARK_THRESHOLD_WEBHOOK_URL);
+    const benchmarkThreshold = await configHandler.getConfigValue(configConstants.BENCHMARK_THRESHOLD);
+    return { benchmarkThreshold, benchmarkWebhook };
 }
 
 async function getEmailTargets(job) {
