@@ -320,7 +320,7 @@ describe('Webhook/email notifier test ', () => {
 
         reportWebhookSenderSendStub.args.should.containDeep([
             [
-                '😔*Test some_test_name got a score of 8 this is below the threshold of 10.last 3 scores are: 9.4,8.3,7.2'
+                ':rage: *Test some_test_name got a score of 8.0 this is below the threshold of 10. last 3 scores are: 9.4,8.3,7.2.*'
             ]
         ]);
     });
@@ -363,7 +363,7 @@ describe('Webhook/email notifier test ', () => {
 
         reportWebhookSenderSendStub.args.should.containDeep([
             [
-                '😔*Test some_test_name got a score of 8 this is below the threshold of 10.no last score to show'
+                ':rage: *Test some_test_name got a score of 8.0 this is below the threshold of 10. no last score to show.*'
             ]
         ]);
     });
