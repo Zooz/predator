@@ -6,7 +6,7 @@ import PieChart from '../PieChart'
 import _ from 'lodash';
 
 import {
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     LineChart,
     Legend,
     BarChart,
@@ -19,13 +19,41 @@ import * as selectors from "../../redux/selectors/reportsSelector";
 import {connect} from "react-redux";
 import Snackbar from "material-ui/Snackbar";
 import Checkbox from "../../../components/Checkbox/Checkbox";
+import Button from "../../../components/Button";
 
-const REFRESH_DATA_INTERVAL = 30000;
 const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
     {stroke: "#82ca9d", fill: "#82ca9d"},
     {stroke: "#ffc658", fill: "#ffc658"},
     {stroke: "#0935FC", fill: "#0935FC"},
+    {stroke: "#395B56", fill: "#395B56"},
+    {stroke: "#617A70", fill: "#617A70"},
+    {stroke: "#CCC39F", fill: "#CCC39F"},
+    {stroke: "#FFFAD1", fill: "#FFFAD1"},
 ];
+const COLOR_FAMILY = {
+    p95: [{stroke: "#BBDEF0", fill: "#BBDEF0"}, {stroke: "#00A6A6", fill: "#00A6A6"}, {
+        stroke: "#EFCA08",
+        fill: "#EFCA08"
+    }, {stroke: "#F49F0A", fill: "#F49F0A"}, {stroke: "#F08700", fill: "#F08700"}],
+    p99: [{stroke: "#134611", fill: "#134611"}, {stroke: "#3E8914", fill: "#3E8914"}, {
+        stroke: "#3DA35D",
+        fill: "#3DA35D"
+    }, {stroke: "#96E072", fill: "#96E072"}, {stroke: "#ACFC4B", fill: "#ACFC4B"}],
+    median: [{stroke: "#353531", fill: "#353531"}, {stroke: "#EC4E20", fill: "#EC4E20"}, {
+        stroke: "#FF9505",
+        fill: "#FF9505"
+    }, {stroke: "#016FB9", fill: "#016FB9"}, {stroke: "#000000", fill: "#000000"}]
+};
+const getColor = (key) => {
+    const prefix = key.substring(0, 1);
+    const name = key.substring(2);
+    const family = COLOR_FAMILY[name] || COLORS;
+    const loc = prefix.charCodeAt(0) - 'A'.charCodeAt(0);
+    if (family) {
+        return family[loc % family.length];
+    }
+    return COLORS[loc % COLORS.length];
+};
 
 
 class CompareReports extends React.Component {
@@ -48,6 +76,8 @@ class CompareReports extends React.Component {
                 show: true
             }));
 
+            const keysToDefaultFilter = reportsList.flatMap((reportInfo) => [`${reportInfo.name}_p95`, `${reportInfo.name}_p99`]);
+            this.onSelectedGraphPropertyFilter('latency', keysToDefaultFilter, false);
             this.setState({reportsList});
             this.setMergedReports(reportsList)
         }
@@ -62,42 +92,6 @@ class CompareReports extends React.Component {
         this.setState({mergedReports});
     };
 
-    generateAreaChart = (data, keys, labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys) => {
-
-        const filteredData = this.filterKeysFromArrayOfObject(data, graphType, filteredKeys);
-
-        return (
-            <ResponsiveContainer width="100%" height={300}>
-                <AreaChart
-                    width={700}
-                    height={400}
-                    data={filteredData}
-                    margin={{
-                        top: 10, right: 30, left: 0, bottom: 0,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="name"/>
-                    <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
-                    <Legend content={(props) => renderLegend({
-                        ...props,
-                        graphType,
-                        onSelectedGraphPropertyFilter,
-                        filteredKeys
-                    })}/>
-                    <Tooltip/>
-                    {
-                        keys.map((key, index) => {
-                            const color = COLORS[index % COLORS.length];
-                            return (<Area connectNulls key={index} type="monotone" dataKey={key}
-                                          stroke={color.stroke} fill={color.fill}/>)
-                        })
-                    }
-                </AreaChart>
-            </ResponsiveContainer>
-        )
-    }
-
     filterKeysFromArrayOfObject = (data, graphType, filteredKeys) => {
 
         const keysToFilter = Object.keys(_.pickBy(filteredKeys, (value) => value));
@@ -109,39 +103,8 @@ class CompareReports extends React.Component {
         }, []);
 
         return filteredData;
-    }
+    };
     lineChart = (data, keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys) => {
-        const data1 = [
-            {
-                "name": "4:52:32",
-                "B_median": 560.4,
-                "B_p95": 1584.2,
-                "B_p99": 1874.6,
-                "timeMills": 1585835552215
-            },
-            {
-                "name": "4:52:33",
-                "A_median": 305.6,
-                "A_p95": 1463.6,
-                "A_p99": 1833.9,
-                "timeMills": 1585835553279
-            },
-            {
-                "name": "4:53:02",
-                "B_median": 1849.5,
-                "B_p95": 4508.3,
-                "B_p99": 4837,
-                "timeMills": 1585835582215
-            },
-            {
-                "name": "4:53:03",
-                "A_median": 1631.8,
-                "A_p95": 4487.7,
-                "A_p99": 4853.2,
-                "timeMills": 1585835583279
-            }
-        ]
-
         const filteredData = this.filterKeysFromArrayOfObject(data, graphType, filteredKeys);
 
         return (
@@ -166,7 +129,7 @@ class CompareReports extends React.Component {
                     <Tooltip/>
                     {
                         keys.map((key, index) => {
-                            const color = COLORS[index % COLORS.length];
+                            const color = getColor(key);
                             return (<Line connectNulls key={index} type="monotone" dataKey={key} dot={null}
                                           stroke={color.stroke}/>)
                         })
@@ -200,7 +163,7 @@ class CompareReports extends React.Component {
                     <Tooltip/>
                     {
                         keys.map((key, index) => {
-                            const color = COLORS[index % COLORS.length];
+                            const color = getColor(key);
                             return (<Bar barSize={50} key={index} dataKey={key} fill={color.fill}/>)
                         })
                     }
@@ -215,16 +178,21 @@ class CompareReports extends React.Component {
     onSelectedReport = (value, index) => {
         const {reportsList} = this.state;
         reportsList[index].show = value;
-        this.setState({reportsList: [...reportsList]})
+        this.setState({reportsList: [...reportsList]});
         this.setMergedReports(reportsList);
     };
-    onSelectedGraphPropertyFilter = (graphType, key, value) => {
+    onSelectedGraphPropertyFilter = (graphType, keys, value) => {
         const {filteredKeys} = this.state;
-        filteredKeys[`${graphType}${key}`] = !value;
-        this.setState({filteredKeys: {...filteredKeys}});
-
-        // this.setMergedReports(reportsList);
-
+        let newFilteredKeys = {...filteredKeys};
+        if (_.isArray(keys)) {
+            newFilteredKeys = keys.reduce((acc, cur) => {
+                acc[`${graphType}${cur}`] = !value;
+                return acc;
+            }, filteredKeys)
+        } else {
+            newFilteredKeys[`${graphType}${keys}`] = !value;
+        }
+        this.setState({filteredKeys: {...newFilteredKeys}});
     };
 
     render() {
@@ -243,17 +211,13 @@ class CompareReports extends React.Component {
                     <div style={{flex: 1}}>
 
                         <h3>Overall Latency</h3>
-                        {/*<Button hover onClick={this.createBenchmark}>Create Benchmark</Button>*/}
-
                         {this.lineChart(mergedReports.latencyGraph, mergedReports.latencyGraphKeys, 'ms', 'latency', this.onSelectedGraphPropertyFilter, filteredKeys)}
                         <h3>Status Codes</h3>
                         {this.lineChart(mergedReports.errorsCodeGraph, mergedReports.errorsCodeGraphKeys, undefined, 'status_codes', this.onSelectedGraphPropertyFilter, filteredKeys)}
                         <h3>RPS</h3>
-                        {this.generateAreaChart(mergedReports.rps, mergedReports.rpsKeys, 'rps', 'rps', this.onSelectedGraphPropertyFilter, filteredKeys)}
-                        <div style={{width: '50%'}}>
-                            <h3>Status Codes And Errors Distribution</h3>
-                            {this.barChart(mergedReports.errorsBar, mergedReports.errorsBarKeys, 'status_codes_errors', this.onSelectedGraphPropertyFilter, filteredKeys)}
-                        </div>
+                        {this.lineChart(mergedReports.rps, mergedReports.rpsKeys, 'rps', 'rps', this.onSelectedGraphPropertyFilter, filteredKeys)}
+                        <h3>Status Codes And Errors Distribution</h3>
+                        {this.barChart(mergedReports.errorsBar, mergedReports.errorsBarKeys, 'status_codes_errors', this.onSelectedGraphPropertyFilter, filteredKeys)}
                         <div>
                             <h3>Scenarios</h3>
                             <PieChart data={mergedReports.scenarios}/>
@@ -261,7 +225,7 @@ class CompareReports extends React.Component {
                     </div>
                 </div>
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    {/*    <Button inverted onClick={onClose}>Close</Button>*/}
+                    <Button inverted onClick={onClose}>Close</Button>
                 </div>
                 <Snackbar
                     open={this.props.createBenchmarkSucceed}
@@ -327,7 +291,7 @@ class CompareReports extends React.Component {
 
             acc.scenarios = acc.scenarios.concat(cur.scenarios);
             return acc;
-        }, initial)
+        }, initial);
 
         return result;
 
@@ -355,15 +319,11 @@ class CompareReports extends React.Component {
 
     componentDidMount() {
         this.loadData();
-        this.refreshDataInterval = setInterval(this.loadData, REFRESH_DATA_INTERVAL)
     }
-
 
     componentWillUnmount() {
-        clearInterval(this.refreshDataInterval);
         this.props.getAggregateReportSuccess([])
     }
-
 };
 
 
@@ -423,7 +383,7 @@ const ReportsList = ({list = [], onChange}) => {
 
 
     return (
-        <div style={{display: 'flex', flexDirection: 'row',justifyContent:'space-between'}}>
+        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
             <Block style={headerStyle} header={'Select'} dataList={data.checkboxes}/>
             <Block style={headerStyle} header={'Symbol'} dataList={data.symbols}/>
             <Block style={headerStyle} header={'Test Name'} dataList={data.testNames}/>
