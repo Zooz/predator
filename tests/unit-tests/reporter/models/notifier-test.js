@@ -12,11 +12,13 @@ let configHandler = require('../../../../src/configManager/models/configHandler'
 let statsFormatter = require('../../../../src/reports/models/statsFormatter');
 let aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
 let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
+const reportsManager = require('../../../../src/reports/models/reportsManager');
 let configConstants = require('../../../../src/common/consts').CONFIG;
 
 describe('Webhook/email notifier test ', () => {
     let sandbox, loggerInfoStub, loggerWarnStub, reportWebhookSenderSendStub,
-        statsFormatterStub, jobsManagerStub, getConfigStub, aggregateReportGeneratorStub, reportEmailSenderStub;
+        statsFormatterStub, jobsManagerStub, getConfigStub, aggregateReportGeneratorStub, reportEmailSenderStub,
+        getReportsStub;
     before(() => {
         sandbox = sinon.sandbox.create();
         loggerInfoStub = sandbox.stub(logger, 'info');
@@ -27,6 +29,7 @@ describe('Webhook/email notifier test ', () => {
         getConfigStub = sandbox.stub(configHandler, 'getConfigValue');
         aggregateReportGeneratorStub = sandbox.stub(aggregateReportGenerator, 'createAggregateReport');
         reportEmailSenderStub = sandbox.stub(reportEmailSender, 'sendAggregateReport');
+        getReportsStub = sandbox.stub(reportsManager, 'getReports');
     });
 
     beforeEach(() => {
@@ -279,12 +282,13 @@ describe('Webhook/email notifier test ', () => {
         loggerInfoStub.callCount.should.equal(1);
     });
 
-    it('Handing message with phase: done - score is less than threshold', async () => {
+    it('Handing message with phase: done - score is less than threshold with 3 last scores', async () => {
         getConfigStub.resolves('test@predator.com');
         getConfigStub.withArgs(configConstants.DEFAULT_WEBHOOK_URL).resolves('http://www.webhook.com');
         getConfigStub.withArgs(configConstants.DEFAULT_EMAIL_ADDRESS).resolves('test@predator.com');
         getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD_WEBHOOK_URL).resolves('benchmarktest@predator.com');
         getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD).resolves(10);
+        getReportsStub.resolves([{ score: 9.44556 }, { score: 8.34556 }, { score: 7.24556 }]);
 
         aggregateReportGeneratorStub.resolves({});
         jobsManagerStub.resolves({
@@ -316,7 +320,50 @@ describe('Webhook/email notifier test ', () => {
 
         reportWebhookSenderSendStub.args.should.containDeep([
             [
-                "😔*Test some_test_name got a score of 8 this is below the threshold of 10. last 3 scores are {y}, {y2}, y{3}'"
+                '😔*Test some_test_name got a score of 8 this is below the threshold of 10.last 3 scores are: 9.4,8.3,7.2'
+            ]
+        ]);
+    });
+
+    it('Handing message with phase: done - score is less than threshold with  no 3 last scores', async () => {
+        getConfigStub.resolves('test@predator.com');
+        getConfigStub.withArgs(configConstants.DEFAULT_WEBHOOK_URL).resolves('http://www.webhook.com');
+        getConfigStub.withArgs(configConstants.DEFAULT_EMAIL_ADDRESS).resolves('test@predator.com');
+        getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD_WEBHOOK_URL).resolves('benchmarktest@predator.com');
+        getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD).resolves(10);
+        getReportsStub.resolves([]);
+
+        aggregateReportGeneratorStub.resolves({});
+        jobsManagerStub.resolves({
+            webhooks: ['http://www.zooz.com'],
+            emails: ['test2@predator.com']
+
+        });
+        let report = {
+            environment: 'test',
+            report_id: 'report_id',
+            test_id: 'test_id',
+            test_name: 'some_test_name',
+            duration: 10,
+            arrival_rate: 10,
+            parallelism: 2,
+            ramp_to: 20,
+            status: 'started',
+            phase: 0,
+            subscribers: [{ phase_status: 'done' }, { phase_status: 'done' }]
+
+        };
+        let stats = {
+            phase_status: 'done',
+            data: JSON.stringify({})
+        };
+        statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
+
+        await notifier.notifyIfNeeded(report, stats, { score: 8 });
+
+        reportWebhookSenderSendStub.args.should.containDeep([
+            [
+                '😔*Test some_test_name got a score of 8 this is below the threshold of 10.no last score to show'
             ]
         ]);
     });

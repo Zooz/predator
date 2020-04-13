@@ -9,6 +9,7 @@ const reportEmailSender = require('./reportEmailSender'),
     constants = require('../utils/constants'),
     configHandler = require('../../configManager/models/configHandler'),
     reportUtil = require('../utils/reportUtil'),
+    reportsManager = require('./reportsManager'),
     configConstants = require('../../common/consts').CONFIG;
 
 module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
@@ -141,8 +142,9 @@ async function handleAbort(report, job) {
 
 async function handleBenchmarkWebhookTreshhold(report, score, benchmarkThreshold, benchmarkWebhook) {
     if (score && benchmarkThreshold && score < benchmarkThreshold) {
-        // todo get all last scores
-        let benchmarkWebhookMsg = `😔*Test ${report.test_name} got a score of ${score} this is below the threshold of ${benchmarkThreshold}. last 3 scores are {y}, {y2}, y{3}'`;
+        const lastReports = await reportsManager.getReports(report.test_id);
+        const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
+        let benchmarkWebhookMsg = `😔*Test ${report.test_name} got a score of ${score} this is below the threshold of ${benchmarkThreshold}.${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}`;
         reportWebhookSender.send(benchmarkWebhook, benchmarkWebhookMsg);
     }
 }

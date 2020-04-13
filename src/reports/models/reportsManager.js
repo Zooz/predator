@@ -1,17 +1,10 @@
 'use strict';
 
-const _ = require('lodash'),
-    uuid = require('uuid/v4');
+const _ = require('lodash');
 
 const databaseConnector = require('./databaseConnector'),
-    testManager = require('../../tests/models/manager'),
     jobConnector = require('../../jobs/models/jobManager'),
-    aggregateReportManager = require('./aggregateReportManager'),
-    benchmarkCalculator = require('./benchmarkCalculator'),
     configHandler = require('../../configManager/models/configHandler'),
-    configConsts = require('../../common/consts').CONFIG,
-    notifier = require('./notifier'),
-    reportUtil = require('../utils/reportUtil'),
     constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
@@ -77,56 +70,6 @@ module.exports.postReport = async (testId, reportBody) => {
     await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id, constants.SUBSCRIBER_INITIALIZING_STAGE);
     return reportBody;
 };
-
-module.exports.postStats = async (report, stats) => {
-    const statsParsed = JSON.parse(stats.data);
-    const statsTime = statsParsed.timestamp;
-
-    if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE) {
-        await databaseConnector.updateSubscriber(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
-    } else {
-        await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
-    }
-
-    if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
-        await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
-    }
-    await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
-    report = await module.exports.getReport(report.test_id, report.report_id);
-    const reportBenchmark = await updateReportBenchmarkIfNeeded(report);
-    notifier.notifyIfNeeded(report, stats, reportBenchmark);
-
-    return stats;
-};
-
-async function updateReportBenchmarkIfNeeded(report) {
-    if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
-        return;
-    }
-    const config = await configHandler.getConfig();
-    const configBenchmark = {
-        weights: config[configConsts.BENCHMARK_WEIGHTS],
-        threshold: config[configConsts.BENCHMARK_THRESHOLD]
-    };
-    const testBenchmarkData = await extractBenchmark(report.test_id);
-    if (testBenchmarkData) {
-        const reportAggregate = await aggregateReportManager.aggregateReport(report);
-        const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark.weights);
-        const { data, score } = reportBenchmark;
-        data[configConsts.BENCHMARK_THRESHOLD] = configBenchmark.threshold;
-        await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
-        return reportBenchmark;
-    }
-}
-
-async function extractBenchmark(testId) {
-    try {
-        const testBenchmarkData = await testManager.getBenchmark(testId);
-        return testBenchmarkData;
-    } catch (e) {
-        return undefined;
-    }
-}
 
 function getReportResponse(summaryRow, config) {
     let timeEndOrCurrent = summaryRow.end_time || new Date();
