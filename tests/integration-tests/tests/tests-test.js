@@ -118,6 +118,7 @@ describe('the tests api', function() {
             should(body.validation_errors).eql(['body should have required property \'errors\'',
                 'body should have required property \'codes\'',
                 'body/rps should have required property \'mean\'',
+                'body/rps should have required property \'count\'',
                 'body/latency should have required property \'median\'',
                 'body/latency should have required property \'p95\'']);
         });
@@ -154,6 +155,7 @@ describe('the tests api', function() {
         it('try to create benchmark for not existing test', async () => {
             const benchmarkRequest = {
                 'rps': {
+                    'count': 100,
                     'mean': 46.74
                 },
                 'latency': { median: 1, p95: 1 },
@@ -180,6 +182,7 @@ describe('the tests api', function() {
         it('get benchmark', async () => {
             const benchmarkRequest = {
                 'rps': {
+                    'count': 100,
                     'mean': 46.74
                 },
                 'latency': { median: 1, p95: 1 },
@@ -250,7 +253,7 @@ describe('the tests api', function() {
                 getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
                 getTestResponse.statusCode.should.eql(404);
             });
-            it('Create test, with a file ', async () => {
+            it('Create test, with a file', async () => {
                 let requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
                 const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
@@ -305,6 +308,42 @@ describe('the tests api', function() {
                 should.exists(getTestResponse.body.updated_at);
                 delete getTestResponse.body.updated_at;
                 should(getTestResponse.body).eql(expected);
+            });
+            it('Create dsl test, update dsl, get test should return new dsl', async () => {
+                let requestBody = simpleTest.test;
+                let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+                createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
+                createTestResponse.body.should.have.only.keys('id', 'revision_id');
+
+                const updateTokenRequest = {
+                    'post': {
+                        'url': '/tokens',
+                        'capture': [{
+                            'json': '$.token',
+                            'as': 'tokenId'
+                        }],
+                        'headers': {
+                            'Content-Type': 'application/json'
+                        },
+                        'json': {
+                            'token_type': 'credit_card',
+                            'holder_name': 'new name',
+                            'expiration_date': '11/2020',
+                            'card_number': '1234458045804123',
+                            'identity_document': {
+                                'number': '1234668464654',
+                                'type': 'NEW_ID'
+                            }
+                        }
+                    }
+                };
+                const updateDSLResponse = await testsRequestSender.updateDsl(dslName, 'createToken', updateTokenRequest);
+                should(updateDSLResponse.statusCode).eql(200, JSON.stringify(updateDSLResponse.body));
+
+                let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+                should(getTestResponse.statusCode).eql(200);
+                const getTestResponseTokenRequest = JSON.parse(getTestResponse.text).artillery_test.scenarios[0].flow[0];
+                should(getTestResponseTokenRequest).eql(updateTokenRequest);
             });
         });
 
@@ -373,7 +412,7 @@ describe('the tests api', function() {
             let getTestsResponse = await testsRequestSender.getTests(validHeaders);
             let testsIds = [];
             getTestsResponse.body.forEach(test => {
-                test.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at');
+                test.should.have.keys('id', 'description', 'name', 'revision_id', 'type', 'updated_at');
             });
             testsIds = getTestsResponse.body.map(function(test){
                 return test.id;

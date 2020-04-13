@@ -119,6 +119,40 @@ describe('Report emails sender test', () => {
         ]);
     });
 
+    it('Send aggregate report successfully with benchmark data', async () => {
+        sendMailStub.resolves({ status: 201 });
+        nodemailerCreateTransportStub.returns(transporter);
+        aggregateReportGeneratorStub.resolves(AGGREGATE_REPORT);
+        getConfig.resolves({ from: 'Predator 💪 <performance@predator.com>' });
+        const benchmarkData = { score: 95,
+            data: { rps: { score: 10, percentage: 0.2 },
+                percentile_ninety_five: { score: 10, percentage: 0.2 },
+                percentile_fifty: { score: 10, percentage: 0.2 },
+                client_errors_ratio: { score: 10, percentage: 0.2 },
+                server_errors_ratio: { score: 10, percentage: 0.2 } } };
+        await reportEmailSender.sendAggregateReport(AGGREGATE_REPORT, JOB, ['eli@zooz.com'], benchmarkData);
+
+        sendMailStub.callCount.should.equal(1);
+        sendMailStub.args.should.containDeep([
+            [
+                {
+                    from: 'Predator 💪 <performance@predator.com>',
+                    to: [JOB.emails].join(','),
+                    subject: 'Your test results: test name with score: 95.00'
+
+                }
+            ]
+        ]);
+
+        loggerInfoStub.callCount.should.equal(1);
+        loggerInfoStub.args.should.deepEqual([
+            [
+                { status: 201 },
+                'Sent email successfully for testId: test_id, reportId: report_id'
+            ]
+        ]);
+    });
+
     it('Send aggregate report fails because of error invoking smtp client', async () => {
         const error = new Error('Failed to connect to SMTP client');
         sendMailStub.resolves({ status: 201 });

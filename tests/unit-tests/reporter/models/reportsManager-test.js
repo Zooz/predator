@@ -15,6 +15,7 @@ const constants = require('../../../../src/reports/utils/constants');
 const configHandler = require('../../../../src/configManager/models/configHandler');
 
 let manager;
+let statsManager;
 
 const REPORT = {
     'test_id': 'test_id',
@@ -114,6 +115,7 @@ describe('Reports manager tests', function () {
         notifierStub = sandbox.stub(notifier, 'notifyIfNeeded');
 
         manager = rewire('../../../../src/reports/models/reportsManager');
+        statsManager = rewire('../../../../src/reports/models/statsManager');
         manager.__set__('configHandler', {
             getConfig: () => {
                 return {
@@ -411,15 +413,12 @@ describe('Reports manager tests', function () {
 
     describe('Create new stats', function () {
         before(() => {
-            manager.__set__('configHandler', {
+            statsManager.__set__('configHandler', {
                 getConfig: () => {
                     return {
-                        job_platform: 'KUBERNETES'
-                    };
-                },
-                getConfigValue: () => {
-                    return {
-                        config: 'some value'
+                        job_platform: 'KUBERNETES',
+                        benchmark_weights: { config: 'some value' },
+                        benchmark_threshold: 99
                     };
                 }
             });
@@ -432,7 +431,7 @@ describe('Reports manager tests', function () {
             notifierStub.resolves();
             const stats = { phase_status: 'intermediate', data: JSON.stringify({ median: 4 }) };
 
-            const statsResponse = await manager.postStats('test_id', stats);
+            const statsResponse = await statsManager.postStats('test_id', stats);
 
             databaseUpdateSubscriberStub.callCount.should.eql(0);
             databaseUpdateSubscriberWithStatsStub.callCount.should.eql(1);
@@ -449,7 +448,7 @@ describe('Reports manager tests', function () {
             notifierStub.resolves();
             const stats = { phase_status: 'done', data: JSON.stringify({ median: 4 }) };
 
-            const statsResponse = await manager.postStats('test_id', stats);
+            const statsResponse = await statsManager.postStats('test_id', stats);
 
             databaseUpdateSubscriberStub.callCount.should.eql(1);
             databaseUpdateSubscriberWithStatsStub.callCount.should.eql(0);
@@ -465,7 +464,7 @@ describe('Reports manager tests', function () {
             benchmarkCalculatorStub.returns({ score: 5.5, data: { test: 'some calculate data' } });
             updateReportBenchmarkStub.resolves();
             const stats = { phase_status: 'done', data: JSON.stringify({ median: 1 }) };
-            await manager.postStats('test_id', stats);
+            await statsManager.postStats('test_id', stats);
 
             getBenchmarkStub.callCount.should.eql(1);
             aggregateReportManagerStub.callCount.should.eql(1);
@@ -479,13 +478,13 @@ describe('Reports manager tests', function () {
             should(updateReportBenchmarkStub.args[0][0]).eql('test_id');
             should(updateReportBenchmarkStub.args[0][1]).eql('report_id');
             should(updateReportBenchmarkStub.args[0][2]).eql(5.5);
-            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data' }));
+            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data', 'benchmark_threshold': 99 }));
         });
         it('when report done and dont have benchmark data ', async () => {
             databaseGetReportStub.resolves([REPORT_DONE]);
             getBenchmarkStub.resolves();
             const stats = { phase_status: 'done', data: JSON.stringify({ median: 1 }) };
-            await manager.postStats('test_id', stats);
+            await statsManager.postStats('test_id', stats);
 
             getBenchmarkStub.callCount.should.eql(1);
             aggregateReportManagerStub.callCount.should.eql(0);

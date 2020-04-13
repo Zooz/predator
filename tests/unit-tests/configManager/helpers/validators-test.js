@@ -18,8 +18,8 @@ describe('configManager validators tests', function() {
                     benchmark_weights: {
                         percentile_ninety_five: { percentage: 10 },
                         percentile_fifty: { percentage: 10 },
-                        server_errors: { percentage: 10 },
-                        client_errors: { percentage: 10 },
+                        server_errors_ratio: { percentage: 10 },
+                        client_errors_ratio: { percentage: 10 },
                         rps: { percentage: 10 }
                     }
                 }

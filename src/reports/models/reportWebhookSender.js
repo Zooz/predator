@@ -4,22 +4,22 @@ let request = require('request-promise-native');
 
 let logger = require('../../common/logger');
 
-module.exports.send = async (webhooks, message) => {
+module.exports.send = async (webhooks, message, options = {}) => {
     if (!webhooks) {
         return;
     }
-    let options = {
+    let finallOptions = {
         body:
             {
                 'text': message,
-                'icon_emoji': ':muscle:',
+                'icon_emoji': options.icon || ':muscle:',
                 'username': 'reporter'
             },
         json: true
     };
     let promises = [];
     webhooks.forEach(webhookUrl => {
-        promises.push(request.post(Object.assign({ url: webhookUrl }, options)));
+        promises.push(request.post(Object.assign({ url: webhookUrl }, finallOptions)));
     });
 
     try {

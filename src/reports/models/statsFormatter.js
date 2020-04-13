@@ -2,8 +2,10 @@
 
 let _ = require('lodash');
 
-module.exports.getStatsFormatted = (stage, report) => {
-    let beautyReport = `*RPS sent* ${report.rps.mean}`;
+module.exports.getStatsFormatted = (stage, report, reportBenchmark = {}) => {
+    let beautyReport = '';
+    beautyReport += reportBenchmark.score ? `*Score:* ${reportBenchmark.score.toFixed(2)}\n` : '';
+    beautyReport += `*RPS sent* ${report.rps.mean}`;
     beautyReport += `, Scenarios launched: ${report.scenariosCreated}`;
     beautyReport += `, Scenarios completed: ${report.scenariosCompleted}`;
     beautyReport += `, Scenarios avoided: ${report.scenariosAvoided}`;

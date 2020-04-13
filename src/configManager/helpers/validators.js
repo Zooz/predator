@@ -3,8 +3,8 @@ module.exports.validateBenchmarkWeights = (req, res, next) => {
     if (benchmarkWeights){
         const p95Percentage = benchmarkWeights.percentile_ninety_five.percentage;
         const p50Percentage = benchmarkWeights.percentile_fifty.percentage;
-        const serverErrorsPercentage = benchmarkWeights.server_errors.percentage;
-        const clientErrorsPercentage = benchmarkWeights.client_errors.percentage;
+        const serverErrorsPercentage = benchmarkWeights.server_errors_ratio.percentage;
+        const clientErrorsPercentage = benchmarkWeights.client_errors_ratio.percentage;
         const rpsPercentage = benchmarkWeights.rps.percentage;
 
         const percentageSum = p95Percentage + p50Percentage + serverErrorsPercentage + clientErrorsPercentage + rpsPercentage;
