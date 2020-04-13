@@ -32,7 +32,7 @@ module.exports.getReports = async (testId, sort = false) => {
         return getReportResponse(summaryRow, config);
     });
     if (sort) {
-        reports.sort((a, b) => b.end_time - a.end_time);
+        reports.sort((a, b) => (b.end_time || b.start_time) - (a.end_time || b.start_time));
     }
     return reports;
 };
