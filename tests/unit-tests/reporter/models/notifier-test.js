@@ -290,7 +290,6 @@ describe('Webhook/email notifier test ', () => {
         getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD).resolves(10);
         getReportsStub.resolves([{ score: 9.44556 }, { score: 8.34556 }, { score: 7.24556 }]);
 
-
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com'],
             emails: ['test2@predator.com']
@@ -332,7 +331,6 @@ describe('Webhook/email notifier test ', () => {
         getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD_WEBHOOK_URL).resolves('benchmarktest@predator.com');
         getConfigStub.withArgs(configConstants.BENCHMARK_THRESHOLD).resolves(10);
         getReportsStub.resolves([]);
-
 
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com'],
