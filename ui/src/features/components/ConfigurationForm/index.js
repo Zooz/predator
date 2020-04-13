@@ -20,7 +20,7 @@ import ErrorDialog from '../../components/ErrorDialog';
 import {validate} from './validator';
 import Snackbar from 'material-ui/Snackbar';
 import UiSwitcher from '../../../components/UiSwitcher';
-import {get, set} from 'lodash';
+import {get, set, pickBy} from 'lodash';
 import Dropdown from "../../../components/Dropdown/Dropdown.export";
 
 const INPUT_TYPES = {SWITCHER: 'switcher', DROPDOWN: 'dropdown'};
@@ -103,8 +103,7 @@ class Form extends React.Component {
                         name: 'benchmark_threshold_webhook_url',
                         key: 'benchmark_threshold_webhook_url',
                         floatingLabelText: 'Threshold webhook url',
-                        info: 'insert info',
-                        valueType: 'int'
+                        info: 'insert info'
                     },
                 ]
             },
@@ -126,15 +125,15 @@ class Form extends React.Component {
                         valueType: 'int'
                     },
                     {
-                        name: 'server_errors',
-                        key: 'benchmark_weights.server_errors.percentage',
+                        name: 'server_errors_ratio',
+                        key: 'benchmark_weights.server_errors_ratio.percentage',
                         floatingLabelText: 'Server errors ratio',
                         info: 'insert info',
                         valueType: 'int'
                     },
                     {
-                        name: 'client_errors',
-                        key: 'benchmark_weights.client_errors.percentage',
+                        name: 'client_errors_ratio',
+                        key: 'benchmark_weights.client_errors_ratio.percentage',
                         floatingLabelText: 'Client errors ratio',
                         info: 'insert info',
                         valueType: 'int'
@@ -161,8 +160,7 @@ class Form extends React.Component {
                         name: 'host',
                         key: 'smtp_server.host',
                         floatingLabelText: 'Host',
-                        info: 'insert info',
-                        valueType: 'int'
+                        info: 'insert info'
                     },
                     {
                         name: 'username',
@@ -202,6 +200,7 @@ class Form extends React.Component {
                         info: 'insert info',
                         type: INPUT_TYPES.DROPDOWN,
                         options: ['influx', 'prometheus'],
+                        default: 'None'
                     },
                     {
                         name: 'push_gateway_url',
@@ -270,7 +269,8 @@ class Form extends React.Component {
             return acc;
         }, {});
         this.state = {
-            config: configState,
+            config: {},
+            serverConfig: configState,
             errors: {
                 name: undefined,
                 retries: undefined,
@@ -390,7 +390,7 @@ class Form extends React.Component {
     };
 
     generateInput = (oneItem, index) => {
-        const value = get(this.state.config, oneItem.key);
+        const value = get(this.state.config, oneItem.key) || get(this.state.serverConfig, oneItem.key);
         const error = get(this.state.errors, oneItem.key);
         return (
             <div key={index} style={{marginBottom: '15px'}}>
@@ -418,7 +418,6 @@ class Form extends React.Component {
                                     onChange={(selected) => {
                                         this.onChangeFreeText(oneItem.key, selected.value)
                                     }}
-                                    placeholder={"Method"}
                                     height={'35px'}
                                     disabled={false}
                                     validationErrorText=''
@@ -460,22 +459,31 @@ class Form extends React.Component {
         for (let objectKey of list) {
             const valueType = objectKey.valueType;
             const value = get(this.state.config, objectKey.key);
+            if (value === undefined || value==='') {
+                continue;
+            }
             switch (valueType) {
                 case 'int':
                     const newValue = parseInt(value);
-                    set(body, objectKey.key, _.isNaN(newValue) ? undefined : newValue);
+                    if (!_.isNaN(newValue)) {
+                        set(body, objectKey.key, newValue);
+                    }
                     break;
                 case 'float':
                     const newValueFloat = parseFloat(value);
-                    set(body, objectKey.key, _.isNaN(newValueFloat) ? undefined : newValueFloat);
-
+                    if (!_.isNaN(newValueFloat)) {
+                        set(body, objectKey.key, newValueFloat);
+                    }
                     break;
                 default:
                     set(body, objectKey.key, value);
             }
         }
+        const cleanedBody = pickBy(JSON.parse(JSON.stringify(body)), (value) => {
+            return !(value === null || value === undefined || (typeof value === 'object' && Object.keys(value).length === 0));
 
-        this.props.updateConfig(body);
+        });
+        this.props.updateConfig(cleanedBody);
     };
 }
 
