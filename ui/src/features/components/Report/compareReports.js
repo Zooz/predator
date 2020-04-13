@@ -17,9 +17,6 @@ import {
 import * as Actions from "../../redux/actions/reportsActions";
 import * as selectors from "../../redux/selectors/reportsSelector";
 import {connect} from "react-redux";
-import Box from '../Box';
-import dateFormat from 'dateformat';
-import Button from '../../../components/Button';
 import Snackbar from "material-ui/Snackbar";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 
@@ -46,6 +43,8 @@ class CompareReports extends React.Component {
             const reportsList = this.props.aggregateReports.map((report) => ({
                 name: report.alias,
                 startTime: report.startTime,
+                testName: report.testName,
+                duration: report.duration,
                 show: true
             }));
 
@@ -382,47 +381,58 @@ const mapDispatchToProps = {
     getAggregateReportSuccess: Actions.getAggregateReportSuccess,
 };
 
-const ReportsList = ({list, onChange}) => {
-
+const Block = ({header, dataList, style = {}}) => {
+    const headerStyle = {color: '#577DFE', fontWeight: '500'};
 
     return (
-        <div style={{display: 'flex', flexDirection: 'column'}}>
-
-            {
-                list.map((report, index) => {
-                    return (
-                        <div key={index} style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                            <Checkbox
-                                indeterminate={false}
-                                checked={report.show}
-                                // disabled={}
-                                onChange={(value) => onChange(value, index)}
-                            />
-                            <span
-                                style={{
-                                    fontWeight: 'bold',
-                                    marginLeft: '5px',
-                                    marginRight: '5px'
-                                }}>{report.name}:</span><span>{report.startTime}</span>
-                        </div>
-                    )
-                })
-            }
-
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center', ...style
+        }}>
+            <div style={headerStyle}>{header}</div>
+            {dataList.map((element, index) => (
+                <div style={{display: 'flex', flex: 1, alignItems: 'center'}} key={index}>{element}</div>))}
         </div>
     )
+
 };
 
+const ReportsList = ({list = [], onChange}) => {
+    const headerStyle = {marginRight: '10px'};
+    const data = list.reduce((acc, cur, index) => {
+        acc.symbols.push(cur.name);
+        acc.testNames.push(cur.testName);
+        acc.durations.push(prettySeconds(cur.duration));
+        acc.startTimes.push(cur.startTime);
+        acc.checkboxes.push(<Checkbox
+            indeterminate={false}
+            checked={cur.show}
+            // disabled={}
+            onChange={(value) => onChange(value, index)}
+        />);
+        return acc;
+    }, {
+        symbols: [],
+        testNames: [],
+        durations: [],
+        startTimes: [],
+        checkboxes: [],
+    });
 
-const SummeryTable = ({report = {}}) => {
+
     return (
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            {/*<Box title={'Test status'} value={report.status}/>*/}
-            <Box title={'Duration'} value={prettySeconds(Number(report.duration))}/>
-            <Box title={'Parallelism'} value={report.parallelism}/>
+        <div style={{display: 'flex', flexDirection: 'row',justifyContent:'space-between'}}>
+            <Block style={headerStyle} header={'Select'} dataList={data.checkboxes}/>
+            <Block style={headerStyle} header={'Symbol'} dataList={data.symbols}/>
+            <Block style={headerStyle} header={'Test Name'} dataList={data.testNames}/>
+            <Block style={headerStyle} header={'Duration'} dataList={data.durations}/>
+            <Block style={headerStyle} header={'Start Time'} dataList={data.startTimes}/>
         </div>
     );
-}
+};
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(CompareReports);
 
@@ -462,7 +472,7 @@ const renderLegend = (props) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            flexWrap:'wrap',
+            flexWrap: 'wrap',
             flex: 1
         }}>
             {

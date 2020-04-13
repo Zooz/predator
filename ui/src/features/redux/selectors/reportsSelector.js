@@ -105,7 +105,6 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime) {
         if (withPrefix) {
             prefix = String.fromCharCode(prefix.charCodeAt(0) + 1) + '_';
         }
-
         return {
             alias,
             latencyGraph,
@@ -121,7 +120,9 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime) {
             errorsBarKeys,
             scenarios,
             benchMark,
-            startTime: report.start_time
+            startTime: report.start_time,
+            testName: report.test_name,
+            duration: report.duration,
         }
     })
 }
