@@ -142,7 +142,7 @@ async function handleAbort(report, job) {
 
 async function handleBenchmarkWebhookTreshhold(aggregatedReport, score, benchmarkThreshold, benchmarkWebhook) {
     if (score && benchmarkThreshold && score < benchmarkThreshold) {
-        const lastReports = await reportsManager.getReports(aggregatedReport.test_id, true);
+        const lastReports = await reportsManager.getReports(aggregatedReport.test_id);
         const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
         let benchmarkWebhookMsg = `:sad_1: *Test ${aggregatedReport.test_name} got a score of ${score.toFixed(1)}` +
             ` this is below the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +

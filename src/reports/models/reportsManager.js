@@ -25,15 +25,13 @@ module.exports.getReport = async (testId, reportId) => {
     return report;
 };
 
-module.exports.getReports = async (testId, sort = false) => {
+module.exports.getReports = async (testId) => {
     let reportSummaries = await databaseConnector.getReports(testId);
     let config = await configHandler.getConfig();
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
-    if (sort) {
-        reports.sort((a, b) => b.end_time - a.end_time);
-    }
+    reports.sort((a, b) => b.start_time - a.start_time);
     return reports;
 };
 
