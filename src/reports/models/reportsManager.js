@@ -93,8 +93,8 @@ module.exports.postStats = async (report, stats) => {
     }
     await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
     report = await module.exports.getReport(report.test_id, report.report_id);
-    await updateReportBenchmarkIfNeeded(report);
-    notifier.notifyIfNeeded(report, stats);
+    const reportBenchmark = await updateReportBenchmarkIfNeeded(report);
+    notifier.notifyIfNeeded(report, stats, reportBenchmark);
 
     return stats;
 };
@@ -115,6 +115,7 @@ async function updateReportBenchmarkIfNeeded(report) {
         const { data, score } = reportBenchmark;
         data[configConsts.BENCHMARK_THRESHOLD] = configBenchmark.threshold;
         await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
+        return reportBenchmark;
     }
 }
 

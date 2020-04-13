@@ -11,7 +11,7 @@ const reportEmailSender = require('./reportEmailSender'),
     reportUtil = require('../utils/reportUtil'),
     configConstants = require('../../common/consts').CONFIG;
 
-module.exports.notifyIfNeeded = async (report, stats) => {
+module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
     let job;
     const metadata = { testId: report.test_id, reportId: report.report_id };
     try {
@@ -31,7 +31,7 @@ module.exports.notifyIfNeeded = async (report, stats) => {
             break;
         case constants.SUBSCRIBER_DONE_STAGE:
             logger.info(metadata, 'handling done message');
-            await handleDone(report, job);
+            await handleDone(report, job, reportBenchmark);
             break;
         case constants.SUBSCRIBER_ABORTED_STAGE:
             logger.info(metadata, 'handling aborted message');
@@ -94,7 +94,7 @@ async function handleFirstIntermediate(report, job) {
     reportWebhookSender.send(webhooks, webhookMessage);
 }
 
-async function handleDone(report, job) {
+async function handleDone(report, job, reportBenchmark) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
@@ -123,7 +123,7 @@ async function handleDone(report, job) {
     }
 
     if (emails.length > 0) {
-        reportEmailSender.sendAggregateReport(aggregatedReport, job, emails);
+        reportEmailSender.sendAggregateReport(aggregatedReport, job, emails, reportBenchmark);
     }
 
     if (webhooks.length > 0) {
