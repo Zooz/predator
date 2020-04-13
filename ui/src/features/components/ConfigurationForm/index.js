@@ -24,6 +24,7 @@ import {get, set, pickBy} from 'lodash';
 import Dropdown from "../../../components/Dropdown/Dropdown.export";
 
 const INPUT_TYPES = {SWITCHER: 'switcher', DROPDOWN: 'dropdown'};
+const isMetricsDropdownHidden = (state, type) => (state.config.metrics_plugin_name ? state.config.metrics_plugin_name !== type : state.serverConfig.metrics_plugin_name !== type)
 
 class Form extends React.Component {
     constructor(props) {
@@ -115,6 +116,7 @@ class Form extends React.Component {
                         key: 'benchmark_weights.percentile_ninety_five.percentage',
                         floatingLabelText: 'p95',
                         info: 'insert info',
+                        inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
                     {
@@ -122,6 +124,7 @@ class Form extends React.Component {
                         key: 'benchmark_weights.percentile_fifty.percentage',
                         floatingLabelText: 'median',
                         info: 'insert info',
+                        inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
                     {
@@ -129,6 +132,7 @@ class Form extends React.Component {
                         key: 'benchmark_weights.server_errors_ratio.percentage',
                         floatingLabelText: 'Server errors ratio',
                         info: 'insert info',
+                        inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
                     {
@@ -136,6 +140,7 @@ class Form extends React.Component {
                         key: 'benchmark_weights.client_errors_ratio.percentage',
                         floatingLabelText: 'Client errors ratio',
                         info: 'insert info',
+                        inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
                     {
@@ -143,6 +148,7 @@ class Form extends React.Component {
                         key: 'benchmark_weights.rps.percentage',
                         floatingLabelText: 'RPS',
                         info: 'insert info',
+                        inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
                 ]
@@ -154,31 +160,38 @@ class Form extends React.Component {
                         name: 'from',
                         key: 'smtp_server.from',
                         floatingLabelText: 'From',
-                        info: 'insert info'
+                        info: 'insert info',
+                        inheritFromServerKeyObject: 'smtp_server'
                     },
                     {
                         name: 'host',
                         key: 'smtp_server.host',
                         floatingLabelText: 'Host',
-                        info: 'insert info'
+                        info: 'insert info',
+                        inheritFromServerKeyObject: 'smtp_server'
+
                     },
                     {
                         name: 'username',
                         key: 'smtp_server.username',
                         floatingLabelText: 'Username',
-                        info: 'insert info'
+                        info: 'insert info',
+                        inheritFromServerKeyObject: 'smtp_server'
                     },
                     {
                         name: 'password',
                         key: 'smtp_server.password',
                         floatingLabelText: 'Password',
-                        info: 'insert info'
+                        info: 'insert info',
+                        inheritFromServerKeyObject: 'smtp_server',
+                        secret: true
                     },
                     {
                         name: 'port',
                         key: 'smtp_server.port',
                         floatingLabelText: 'Port',
                         info: 'insert info',
+                        inheritFromServerKeyObject: 'smtp_server',
                         valueType: 'int'
                     },
                     {
@@ -186,6 +199,7 @@ class Form extends React.Component {
                         key: 'smtp_server.timeout',
                         floatingLabelText: 'Timeout',
                         info: 'insert info',
+                        inheritFromServerKeyObject: 'smtp_server',
                         valueType: 'int'
                     }
                 ]
@@ -196,7 +210,7 @@ class Form extends React.Component {
                     {
                         name: 'metrics_plugin_name',
                         key: 'metrics_plugin_name',
-                        floatingLabelText: 'metrics_plugin_name',
+                        floatingLabelText: 'Metrics plugin name',
                         info: 'insert info',
                         type: INPUT_TYPES.DROPDOWN,
                         options: ['influx', 'prometheus'],
@@ -207,21 +221,24 @@ class Form extends React.Component {
                         key: 'prometheus_metrics.push_gateway_url',
                         floatingLabelText: 'Prometheus push gateway url',
                         info: 'Url of push gateway',
-                        isHidden: (state) => (state.config.metrics_plugin_name !== 'prometheus')
+                        inheritFromServerKeyObject: 'prometheus_metrics',
+                        isHidden: (state) => isMetricsDropdownHidden(state, 'prometheus')
                     },
                     {
                         name: 'buckets_sizes',
                         key: 'prometheus_metrics.buckets_sizes',
                         floatingLabelText: 'Prometheus buckets sizes',
                         info: 'Bucket sizes to configure prometheus',
-                        isHidden: (state) => (state.config.metrics_plugin_name !== 'prometheus')
+                        inheritFromServerKeyObject: 'prometheus_metrics',
+                        isHidden: (state) => isMetricsDropdownHidden(state, 'prometheus')
                     },
                     {
                         name: 'host',
                         key: 'influx_metrics.host',
                         floatingLabelText: 'Influx host',
                         info: 'Influx db host',
-                        isHidden: (state) => (state.config.metrics_plugin_name !== 'influx')
+                        inheritFromServerKeyObject: 'influx_metrics',
+                        isHidden: (state) => isMetricsDropdownHidden(state, 'influx')
 
                     },
                     {
@@ -229,29 +246,30 @@ class Form extends React.Component {
                         key: 'influx_metrics.username',
                         floatingLabelText: 'Influx username',
                         info: 'Influx db username',
-                        isHidden: (state) => (state.config.metrics_plugin_name !== 'influx')
-
+                        inheritFromServerKeyObject: 'influx_metrics',
+                        isHidden: (state) => isMetricsDropdownHidden(state, 'influx')
                     },
                     {
                         name: 'password',
                         key: 'influx_metrics.password',
                         floatingLabelText: 'Influx password',
                         info: 'Influx db password',
-                        isHidden: (state) => (state.config.metrics_plugin_name !== 'influx')
-
+                        inheritFromServerKeyObject: 'influx_metrics',
+                        secret: true,
+                        isHidden: (state) => isMetricsDropdownHidden(state, 'influx')
                     },
                     {
                         name: 'database',
                         key: 'influx_metrics.database',
                         floatingLabelText: 'Influx database',
                         info: 'Influx db name',
-                        isHidden: (state) => (state.config.metrics_plugin_name !== 'influx')
-
+                        inheritFromServerKeyObject: 'influx_metrics',
+                        isHidden: (state) => isMetricsDropdownHidden(state, 'influx')
                     },
                 ]
             }
         ];
-        this.MenuFlatten = this.Menu.flatMap(objectKey => objectKey.category ? objectKey.inputs : [objectKey])
+        this.MenuFlatten = this.Menu.flatMap(objectKey => objectKey.category ? objectKey.inputs : [objectKey]);
 
         function setByKey(src, trg, key) {
             set(trg, key, get(src, key));
@@ -268,6 +286,7 @@ class Form extends React.Component {
             }
             return acc;
         }, {});
+
         this.state = {
             config: {},
             serverConfig: configState,
@@ -409,7 +428,6 @@ class Form extends React.Component {
                             </RactangleAlignChildrenLeft>
                         )
                         ||
-
                         oneItem.type === INPUT_TYPES.DROPDOWN && (
                             <RactangleAlignChildrenLeft>
                                 <Dropdown
@@ -426,11 +444,10 @@ class Form extends React.Component {
                                 <div className={style['run-immediately']}>{oneItem.label}</div>
                             </RactangleAlignChildrenLeft>
                         )
-
-
                         ||
                         <ErrorWrapper errorText={error}>
-                            <Input disabled={oneItem.disabled} value={value}
+                            <Input type={oneItem.secret ? 'password' : undefined} disabled={oneItem.disabled}
+                                   value={value}
                                    onChange={(evt) => this.onChangeFreeText(oneItem.key, evt.target.value)}/>
                         </ErrorWrapper>
                     }
@@ -442,13 +459,7 @@ class Form extends React.Component {
     };
 
     whenSubmit = () => {
-        const keyTypes = {
-            runner_memory: 'int',
-            runner_cpu: 'float',
-            minimum_wait_for_delayed_report_status_update_in_ms: 'int',
-            delay_runner_ms: 'int',
-            interval_cleanup_finished_containers_ms: 'int',
-        };
+
         const body = {};
         const list = this.Menu.flatMap((objectKey) => {
             if (objectKey.category) {
@@ -459,9 +470,14 @@ class Form extends React.Component {
         for (let objectKey of list) {
             const valueType = objectKey.valueType;
             const value = get(this.state.config, objectKey.key);
-            if (value === undefined || value==='') {
+            if (value === undefined || value === '') {
                 continue;
             }
+
+            if (objectKey.inheritFromServerKeyObject && !body[objectKey.inheritFromServerKeyObject]) {
+                body[objectKey.inheritFromServerKeyObject] = {...this.state.serverConfig[objectKey.inheritFromServerKeyObject]}
+            }
+
             switch (valueType) {
                 case 'int':
                     const newValue = parseInt(value);
