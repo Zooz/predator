@@ -90,12 +90,12 @@ class Form extends React.Component {
                 type: INPUT_TYPES.SWITCHER
             },
             {
-                category: 'benchmark',
+                category: 'Benchmark',
                 inputs: [
                     {
                         name: 'benchmark_threshold',
                         key: 'benchmark_threshold',
-                        floatingLabelText: 'Threshold',
+                        floatingLabelText: 'Threshold score',
                         info: 'insert info',
                         valueType: 'int'
                     },
@@ -114,21 +114,21 @@ class Form extends React.Component {
                     {
                         name: 'percentile_ninety_five',
                         key: 'benchmark_weights.percentile_ninety_five.percentage',
-                        floatingLabelText: 'Percentile ninety five ratio',
+                        floatingLabelText: 'p95',
                         info: 'insert info',
                         valueType: 'int'
                     },
                     {
                         name: 'percentile_fifty',
                         key: 'benchmark_weights.percentile_fifty.percentage',
-                        floatingLabelText: 'Percentile fifty ratio',
+                        floatingLabelText: 'median',
                         info: 'insert info',
                         valueType: 'int'
                     },
                     {
                         name: 'server_errors',
                         key: 'benchmark_weights.server_errors.percentage',
-                        floatingLabelText: 'Server errors',
+                        floatingLabelText: 'Server errors ratio',
                         info: 'insert info',
                         valueType: 'int'
                     },
@@ -142,14 +142,14 @@ class Form extends React.Component {
                     {
                         name: 'rps',
                         key: 'benchmark_weights.rps.percentage',
-                        floatingLabelText: 'Rps ratio',
+                        floatingLabelText: 'RPS',
                         info: 'insert info',
                         valueType: 'int'
                     },
                 ]
             },
             {
-                category: 'Smtp server',
+                category: 'SMTP server',
                 inputs: [
                     {
                         name: 'from',
