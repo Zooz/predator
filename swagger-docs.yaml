@@ -319,6 +319,40 @@ paths:
               $ref: '#/components/schemas/benchmark_request'
         description: The bench mark to add
         required: true
+    get:
+      tags:
+        - Tests
+      parameters:
+        - in: path
+          name: test_id
+          description: The test id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      summary: get a bench mark for test
+      description:  Get a benchmark for a test
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/benchmark_request'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
   '/v1/tests/{test_id}':
     get:
       operationId: retrieve-a-test
@@ -1182,6 +1216,11 @@ components:
     benchmark_request:
       type: object
       additionalProperties: false
+      required:
+        - errors
+        - codes
+        - rps
+        - latency
       properties:
         errors:
           type: object
@@ -1196,24 +1235,27 @@ components:
             500: 53
         rps:
           type: object
+          required:
+            - mean
+            - count
           properties:
-            count:
-              type: number
             mean:
+              description: average RPS per all test run.
+              type: number
+            count:
+              description: Total number of request, will be used to calculate errors ratio.
               type: number
         latency:
           type: object
+          required:
+            - median
+            - p95
           properties:
-            min:
-              type: number
-            max:
-              type: number
             median:
               type: number
             p95:
               type: number
-            p99:
-              type: number
+
     dsl:
       description: A test that is made of scenarios base on domain specific language
       allOf:
@@ -1770,6 +1812,13 @@ components:
           type: number
           description: The duration of the test in seconds.
           example: 60
+        score:
+          type: number
+          description: The score of a report, calculated based on a benchmark and benchmark weights
+          example: 9.25
+        benchmark_weights_data:
+          type: object
+          description: The way score calualated
         arrival_rate:
           type: number
           description: The arrival rate that was set for the test. This is the number of times per second that the test scenarios will run.
@@ -1861,10 +1910,15 @@ components:
           properties:
             push_gateway_url:
               type: string
-              description: Url of push gateway.
+              description: Prometheus push gateway url.
             buckets_sizes:
               type: string
               description: Bucket sizes use to configure prometheus.
+            labels:
+              description: Labels which will be passed to prometheus push gateway.
+              type: object
+              additionalProperties:
+                type: string
         smtp_server:
           additionalProperties: false
           type: object
@@ -1894,53 +1948,49 @@ components:
               type: number
         benchmark_threshold:
               type: number
-              description: benchmark threshold. Test below this threshold considered as failed and webhook will be sent to the threshold_webhook_url.
+              description: Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url.
               minimum: 0
               maximum: 100
         benchmark_threshold_webhook_url:
               type: string
               format: uri
-              description: webhook url to alert when coverage less than threshold
+              description: Url to send webhooks to incase a test receives a score less than the benchmark threshold.
         benchmark_weights:
               additionalProperties: false
               type: object
               description: benchmark_weights
               required:
-              - percentile_ninety
+              - percentile_ninety_five
               - percentile_fifty
-              - server_errors
-              - client_errors
+              - server_errors_ratio
+              - client_errors_ratio
               - rps
               properties:
-                percentile_ninety:
-                  description: P90 benchmark weight
+                percentile_ninety_five:
+                  description: Percentage of the score affected by p95 results.
                   allOf:
                     - $ref: '#/components/schemas/benchmark_weights'
                 percentile_fifty:
-                  description: P50 benchmark weight
+                  description: Percentage of the score affected by median results.
                   allOf:
                     - $ref: '#/components/schemas/benchmark_weights'
-                server_errors:
-                  description: 5xx server errors benchmark weight
-                  allOf: 
+                server_errors_ratio:
+                  description: Percentage of the score affected by server errors ratio.
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
-                client_errors:
-                  description: 4xx server errors benchmark weight
-                  allOf: 
+                client_errors_ratio:
+                  description: Percentage of the score affected by client errors ratio.
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
                 rps:
-                  description: requests per second benchmark weight
-                  allOf: 
+                  description: Percentage of the score affected by requests per second results.
+                  allOf:
                    - $ref: '#/components/schemas/benchmark_weights'
     benchmark_weights:
       type: object
       required:
-        - factor
         - percentage
       properties:
-        factor:
-          type: number
-          description: benchmark factor weight
         percentage:
             type: number
             description: benchmark percentage weight
