@@ -104,7 +104,7 @@ class Form extends React.Component {
                         name: 'benchmark_threshold_webhook_url',
                         key: 'benchmark_threshold_webhook_url',
                         floatingLabelText: 'Threshold webhook url',
-                        info: 'insert info'
+                        info: 'Url to send webhooks to incase a test receives a score less than the benchmark threshold'
                     },
                 ]
             },
