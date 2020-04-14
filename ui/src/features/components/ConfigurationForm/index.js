@@ -131,7 +131,7 @@ class Form extends React.Component {
                         name: 'server_errors_ratio',
                         key: 'benchmark_weights.server_errors_ratio.percentage',
                         floatingLabelText: 'Server errors ratio',
-                        info: 'insert info',
+                        info: 'Percentage of the score affected by server errors ratio',
                         inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
