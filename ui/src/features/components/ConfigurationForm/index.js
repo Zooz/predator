@@ -123,7 +123,7 @@ class Form extends React.Component {
                         name: 'percentile_fifty',
                         key: 'benchmark_weights.percentile_fifty.percentage',
                         floatingLabelText: 'median',
-                        info: 'insert info',
+                        info: 'Percentage of the score affected by median results',
                         inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
