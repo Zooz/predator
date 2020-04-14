@@ -502,13 +502,8 @@ const CompareCheckbox = ({data, onReportSelected,selectedReports}) => {
                 // disabled={}
                 onChange={(value) => onReportSelected(data.test_id, data.report_id, value)}
             />
-
         </div>
-
-
     )
-
-
 }
 
 const Notes = ({data, onEditNote}) => {

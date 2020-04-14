@@ -294,26 +294,6 @@ class CompareReports extends React.Component {
         }, initial);
 
         return result;
-
-        ///convert to graph data
-        const latencyGraph = result.latencyGraphKeys
-            .flatMap((key) => {
-                const allKeyValues = result.latencyGraph.flatMap((data) => {
-                    if (data[key]) {
-                        return {category: data.name, value: data[key]}
-                    }
-                    return [];
-                });
-
-                return {
-                    name: key,
-                    data: allKeyValues
-                }
-            })
-
-        return {
-            latencyGraph
-        }
     }
 
 
