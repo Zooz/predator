@@ -190,7 +190,7 @@ class Form extends React.Component {
                         name: 'port',
                         key: 'smtp_server.port',
                         floatingLabelText: 'Port',
-                        info: 'insert info',
+                        info: 'SMTP server port',
                         inheritFromServerKeyObject: 'smtp_server',
                         valueType: 'int'
                     },
