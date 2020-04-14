@@ -115,7 +115,7 @@ class Form extends React.Component {
                         name: 'percentile_ninety_five',
                         key: 'benchmark_weights.percentile_ninety_five.percentage',
                         floatingLabelText: 'p95',
-                        info: 'insert info',
+                        info: 'Percentage of the score affected by p95 results',
                         inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
