@@ -160,7 +160,7 @@ class Form extends React.Component {
                         name: 'from',
                         key: 'smtp_server.from',
                         floatingLabelText: 'From',
-                        info: 'insert info',
+                        info: 'The address that is used as a FROM address when sending emails',
                         inheritFromServerKeyObject: 'smtp_server'
                     },
                     {
