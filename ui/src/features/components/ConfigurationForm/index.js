@@ -175,7 +175,7 @@ class Form extends React.Component {
                         name: 'username',
                         key: 'smtp_server.username',
                         floatingLabelText: 'Username',
-                        info: 'insert info',
+                        info: 'SMTP server username used for authentication',
                         inheritFromServerKeyObject: 'smtp_server'
                     },
                     {
