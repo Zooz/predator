@@ -225,14 +225,6 @@ class Form extends React.Component {
                         isHidden: (state) => isMetricsDropdownHidden(state, 'prometheus')
                     },
                     {
-                        name: 'buckets_sizes',
-                        key: 'prometheus_metrics.buckets_sizes',
-                        floatingLabelText: 'Prometheus buckets sizes',
-                        info: 'Bucket sizes to configure prometheus',
-                        inheritFromServerKeyObject: 'prometheus_metrics',
-                        isHidden: (state) => isMetricsDropdownHidden(state, 'prometheus')
-                    },
-                    {
                         name: 'host',
                         key: 'influx_metrics.host',
                         floatingLabelText: 'Influx host',
