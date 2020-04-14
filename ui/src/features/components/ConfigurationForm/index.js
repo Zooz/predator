@@ -182,7 +182,7 @@ class Form extends React.Component {
                         name: 'password',
                         key: 'smtp_server.password',
                         floatingLabelText: 'Password',
-                        info: 'insert info',
+                        info: 'SMTP server password used for authentication',
                         inheritFromServerKeyObject: 'smtp_server',
                         secret: true
                     },
