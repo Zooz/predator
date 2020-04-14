@@ -167,7 +167,7 @@ class Form extends React.Component {
                         name: 'host',
                         key: 'smtp_server.host',
                         floatingLabelText: 'Host',
-                        info: 'insert info',
+                        info: 'SMTP server host',
                         inheritFromServerKeyObject: 'smtp_server'
 
                     },
