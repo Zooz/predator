@@ -2,6 +2,7 @@
 'use strict';
 let aggregateReportGenerator = require('../models/aggregateReportGenerator');
 let reports = require('../models/reportsManager');
+let stats = require('../models/statsManager');
 
 module.exports.getAggregateReport = async function (req, res, next) {
     let reportInput;
@@ -71,7 +72,7 @@ module.exports.postReport = async (req, res, next) => {
 module.exports.postStats = async (req, res, next) => {
     try {
         const report = await reports.getReport(req.params.test_id, req.params.report_id);
-        await reports.postStats(report, req.body);
+        await stats.postStats(report, req.body);
     } catch (err) {
         return next(err);
     }
