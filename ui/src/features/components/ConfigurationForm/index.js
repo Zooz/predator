@@ -97,7 +97,7 @@ class Form extends React.Component {
                         name: 'benchmark_threshold',
                         key: 'benchmark_threshold',
                         floatingLabelText: 'Threshold score',
-                        info: 'insert info',
+                        info: 'Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url',
                         valueType: 'int'
                     },
                     {
