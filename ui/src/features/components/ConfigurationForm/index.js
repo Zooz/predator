@@ -198,7 +198,7 @@ class Form extends React.Component {
                         name: 'timeout',
                         key: 'smtp_server.timeout',
                         floatingLabelText: 'Timeout',
-                        info: 'insert info',
+                        info: 'How many milliseconds to wait for the connection to establish to SMTP server (default is 2 minutes)',
                         inheritFromServerKeyObject: 'smtp_server',
                         valueType: 'int'
                     }
