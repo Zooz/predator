@@ -1,6 +1,6 @@
 import {TableHeader} from "../components/ReactTable";
 import React, {useEffect, useState} from "react";
-import {filter, sortedUniqBy} from 'lodash';
+import {get} from 'lodash';
 
 import Moment from 'moment';
 import prettySeconds from 'pretty-seconds';
@@ -287,7 +287,14 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Score
                 </TableHeader>
             ),
-            accessor: (data) => data.score ? Math.floor(data.score) : '',
+            accessor: (data) => {
+                if (data.score) {
+                    const color = get(data, 'benchmark_weights_data.benchmark_threshold', 0) <= data.score ? 'green' : 'red';
+                    return (
+                        <span style={{color}}>{Math.floor(data.score)}</span>
+                    )
+                }
+            },
             className: css['small-header'],
             headerClassName: css['small-header']
         }, {
@@ -505,31 +512,31 @@ const Notes = ({data, onEditNote}) => {
 
     return (
 
-            <TooltipWrapper
-                disable={!notes}
-                content={<div>
-                    {cell}
-                </div>}
-                dataId={`tooltipKey_${id}`}
-                place='top'
-                offset={{top: 1}}
-            >
-                <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
-                    {editMode &&
-                    <ClickOutHandler onClickOut={save}>
+        <TooltipWrapper
+            disable={!notes}
+            content={<div>
+                {cell}
+            </div>}
+            dataId={`tooltipKey_${id}`}
+            place='top'
+            offset={{top: 1}}
+        >
+            <div data-tip data-for={`tooltipKey_${id}`} style={{cursor: 'pointer', width: '100%', height: '100%'}}>
+                {editMode &&
+                <ClickOutHandler onClickOut={save}>
                     <TextArea value={editValue} style={{lineHeight: 'normal'}} onKeyDown={onKeyDown}
                               onChange={(evt, value) => {
                                   setEditValue(evt.target.value)
                               }}/>
-                    </ClickOutHandler>
-                              }
-                    {!editMode &&
-                    <div onClick={() => onEditNote && setEditMode(true)}
-                         style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
+                </ClickOutHandler>
+                }
+                {!editMode &&
+                <div onClick={() => onEditNote && setEditMode(true)}
+                     style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
 
-                    }
-                </div>
-            </TooltipWrapper>
+                }
+            </div>
+        </TooltipWrapper>
     )
 };
 
