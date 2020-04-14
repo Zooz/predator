@@ -147,7 +147,7 @@ class Form extends React.Component {
                         name: 'rps',
                         key: 'benchmark_weights.rps.percentage',
                         floatingLabelText: 'RPS',
-                        info: 'insert info',
+                        info: 'Percentage of the score affected by requests per second results',
                         inheritFromServerKeyObject: 'benchmark_weights',
                         valueType: 'int'
                     },
