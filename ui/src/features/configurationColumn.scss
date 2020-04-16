@@ -12,6 +12,13 @@
   height:46px;
   display:flex;
   align-items: center;
+  justify-content: center;
+}
+
+.center-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .disabled-button {
@@ -33,11 +40,44 @@
 
 .header-name {
   width:15% !important;
+  display:flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .small-header {
   margin:auto;
   width:50px !important;
+  display:flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.medium-header {
+  margin:auto;
+  width:70px !important;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+.xs-header {
+  margin:auto;
+  width:30px !important;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+.xs-xs-header {
+  margin:auto;
+  width:10px !important;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.manor-header {
+  color: red !important;
+}
+.manor {
+  //margin-left:30px;
+}

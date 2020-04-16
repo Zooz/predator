@@ -65,7 +65,7 @@ const filterKeysFromArrayOfObject = (data, graphType, filteredKeys) => {
     return filteredData;
 };
 
-export const BarChartPredator = ({data, keys, graphType, onSelectedGraphPropertyFilter, filteredKeys}) => {
+export const BarChartPredator = ({data = [], keys=[], graphType, onSelectedGraphPropertyFilter, filteredKeys}) => {
     const filteredData = filterKeysFromArrayOfObject(data, graphType, filteredKeys);
 
     return (
@@ -136,7 +136,7 @@ export const LineChartPredator = ({data = [], keys = [], labelY, graphType, onSe
 
 const renderLegend = (props) => {
     const {payload, onSelectedGraphPropertyFilter, graphType, filteredKeys} = props;
-    if(payload.length===1){
+    if (payload.length === 1) {
         return null;
     }
     return (

@@ -24,10 +24,13 @@ import TooltipWrapper from '../components/TooltipWrapper';
 import {getTimeFromCronExpr} from './utils';
 import UiSwitcher from '../components/UiSwitcher';
 import TextArea from "../components/TextArea";
-import TitleInput from "../components/TitleInput";
 import ClickOutHandler from 'react-onclickout'
 
-
+const iconsWidth = 50;
+const mediumSize = 60;
+const semiLarge = 70;
+const largeSize = 85;
+const extraLargeSize = 100;
 export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote, selectedReports, onReportSelected}) => {
 
     const columns = [
@@ -38,9 +41,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Select
                 </TableHeader>
             ),
-            accessor: (data) => <CompareCheckbox onReportSelected={onReportSelected} selectedReports={selectedReports} data={data}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header'],
+            accessor: (data) => <CompareCheckbox onReportSelected={onReportSelected} selectedReports={selectedReports}
+                                                 data={data}/>,
+            width: iconsWidth
         }, {
             id: 'report_id',
             Header: () => (
@@ -48,7 +51,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Test Name
                 </TableHeader>
             ),
-            accessor: 'report_id'
+            accessor: 'report_id',
         },
         {
             id: 'name',
@@ -58,8 +61,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: 'name',
-            headerClassName: css['header-name'],
-            className: css['header-name']
         }, {
             id: 'processor_name',
             Header: () => (
@@ -68,8 +69,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: 'name',
-            headerClassName: css['header-name'],
-            className: css['header-name']
         },
         {
             id: 'description',
@@ -78,7 +77,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Description
                 </TableHeader>
             ),
-            accessor: 'description'
+            accessor: 'description',
+            width: largeSize,
+            className: css['center-flex'],
         }, {
             id: 'updated_at',
             Header: () => (
@@ -101,8 +102,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: 'type',
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: iconsWidth,
+            className: css['center-flex'],
         }, {
             id: 'edit',
             Header: () => (
@@ -127,8 +128,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                         N/A
                     </div>
                 </TooltipWrapper>,
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: iconsWidth,
+            className: css['center-flex'],
         },
         {
             id: 'processor_edit',
@@ -152,8 +153,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: 'test_name',
-            headerClassName: css['header-name'],
-            className: css['header-name']
+
 
         },
         {
@@ -187,7 +187,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     End Time
                 </TableHeader>
             ),
-            accessor: data => (<div className={css['header-time']}>{dateFormatter(data.end_time)}</div>)
+            accessor: data => (<div className={css['header-time']}>{dateFormatter(data.end_time)}</div>),
+            width: extraLargeSize,
+            className: css['center-flex'],
         },
         {
             id: 'duration',
@@ -196,7 +198,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Duration
                 </TableHeader>
             ),
-            accessor: data => (prettySeconds(data.duration))
+            accessor: data => (prettySeconds(data.duration)),
+            className: css['medium-header'],
+            headerClassName: css['medium-header']
         },
         {
             id: 'status',
@@ -205,7 +209,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Status
                 </TableHeader>
             ),
-            accessor: data => statusFormatter(data.status)
+            accessor: data => statusFormatter(data.status),
+            width: mediumSize,
+            className: css['center-flex'],
         },
         {
             id: 'arrival_rate',
@@ -214,7 +220,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Arrival Rate
                 </TableHeader>
             ),
-            accessor: 'arrival_rate'
+            accessor: 'arrival_rate',
+            width: largeSize,
+            className: css['center-flex'],
         },
         {
             id: 'ramp_to',
@@ -223,7 +231,11 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Ramp To
                 </TableHeader>
             ),
-            accessor: data => (data.ramp_to || 'N/A')
+            accessor: data => (data.ramp_to || 'N/A'),
+            width: largeSize,
+            className: css['center-flex'],
+            // className: css['small-header'],
+            // headerClassName: css['small-header']
         },
         {
             id: 'max_virtual_users',
@@ -261,7 +273,11 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Success Rate
                 </TableHeader>
             ),
-            accessor: data => (Math.floor(data.last_success_rate) + '%')
+            accessor: data => (Math.floor(data.last_success_rate) + '%'),
+            width: extraLargeSize,
+            className: css['center-flex'],
+            // className: css['medium-header'],
+            // headerClassName: css['medium-header']
         },
         {
             id: 'last_rps',
@@ -270,7 +286,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     RPS
                 </TableHeader>
             ),
-            accessor: data => (Math.floor(data.last_rps))
+            accessor: data => (Math.floor(data.last_rps)),
+            width: iconsWidth,
+            className: css['center-flex'],
         },
 
         {
@@ -280,7 +298,10 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Parallelism
                 </TableHeader>
             ),
-            accessor: 'parallelism'
+            accessor: 'parallelism',
+            width: largeSize,
+            className: css['center-flex'],
+            // headerClassName: css['medium-header']
         },
         {
             id: 'notes',
@@ -289,7 +310,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Notes
                 </TableHeader>
             ),
-            accessor: data => <Notes data={data} onEditNote={onEditNote}/>
+            accessor: data => <Notes data={data} onEditNote={onEditNote}/>,
+            // className: css['small-header'],
+            // headerClassName: css['small-header']
         },
         {
             id: 'score',
@@ -302,12 +325,14 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 if (data.score) {
                     const color = get(data, 'benchmark_weights_data.benchmark_threshold', 0) <= data.score ? 'green' : 'red';
                     return (
-                        <span style={{color}}>{Math.floor(data.score)}</span>
+                        <span className={css['center-flex']} style={{color}}>{Math.floor(data.score)}</span>
                     )
                 }
             },
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: iconsWidth
+
+            // className: css['xs-header'],
+            // headerClassName: css['xs-header']
         }, {
             id: 'report',
             Header: () => (
@@ -319,8 +344,10 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onReportView(data)
             }}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: mediumSize
+
+            // className: css['small-header'],
+            // headerClassName: css['small-header']
         },
         {
             id: 'grafana_report',
@@ -333,8 +360,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 window.open(data.grafana_report, '_blank')
             }}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: mediumSize
         },
         {
             id: 'raw',
@@ -347,9 +373,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onRawView(data)
             }}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header'],
-
+            width: iconsWidth,
+            className: css['center-flex'],
         },
         {
             id: 'rerun',
@@ -362,9 +387,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onRunTest(data)
             }}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header'],
-
+            width: iconsWidth
         },
         {
             id: 'run_now',
@@ -377,9 +400,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onRunTest(data)
             }}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header'],
-
         },
         {
             id: 'delete',
@@ -392,8 +412,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onDelete(data)
             }}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: mediumSize,
+            className: css['center-flex'],
         },
         {
             id: 'run_test',
@@ -406,8 +426,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onRunTest(data)
             }}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: semiLarge,
+            className: css['center-flex'],
         }, {
             id: 'logs',
             Header: () => (
@@ -420,8 +440,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                                                e.stopPropagation();
                                                window.open(`${env.PREDATOR_URL}/jobs/${data.job_id}/runs/${data.report_id}/logs`, '_blank')
                                            }}/>),
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: iconsWidth
+
         }, {
             id: 'stop',
             Header: () => (
@@ -436,9 +456,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     onStop(data)
                 }}/>)
             },
-            className: css['small-header'],
-            headerClassName: css['small-header']
-
+            width: iconsWidth
         },
         {
             id: 'enabled_disabled',
@@ -460,9 +478,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                         width={22}
                     />)
             },
-            className: css['small-header'],
-            headerClassName: css['small-header']
-
         }
     ];
 
@@ -500,13 +515,13 @@ const ViewButton = ({onClick, icon, disabled, text}) => {
     return (<div className={css['action-style']} onClick={onClick}>{element}</div>)
 };
 
-const CompareCheckbox = ({data, onReportSelected,selectedReports}) => {
+const CompareCheckbox = ({data, onReportSelected, selectedReports}) => {
 
     return (
-        <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
+        <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
             <Checkbox
                 indeterminate={false}
-                checked={selectedReports && selectedReports[data.test_id] &&  selectedReports[data.test_id][data.report_id]}
+                checked={selectedReports && selectedReports[data.test_id] && selectedReports[data.test_id][data.report_id]}
                 // disabled={}
                 onChange={(value) => onReportSelected(data.test_id, data.report_id, value)}
             />
