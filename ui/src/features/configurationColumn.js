@@ -200,7 +200,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => (prettySeconds(data.duration)),
-            width:largeSize,
+            width: largeSize,
             className: css['center-flex'],
         },
         {
@@ -246,7 +246,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => (data.max_virtual_users || 'N/A'),
-            width:extraExLargeSize,
+            width: extraExLargeSize,
             className: css['center-flex'],
         },
         {
@@ -257,7 +257,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => (getTimeFromCronExpr(data.cron_expression) || 'N/A'),
-            width:extraExLargeSize,
+            width: extraExLargeSize,
             className: css['center-flex'],
         },
         {
@@ -405,7 +405,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onRunTest(data)
             }}/>,
-            width:largeSize,
+            width: largeSize,
             className: css['center-flex'],
         },
         {
@@ -475,16 +475,20 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             accessor: (data) => {
                 const activated = (typeof data.enabled === 'undefined' ? true : data.enabled);
                 return (
-                    <UiSwitcher
-                        onChange={(value) => {
-                            onEnableDisable(data, value)
-                        }}
-                        disabledInp={false}
-                        activeState={activated}
-                        height={12}
-                        width={22}
-                    />)
+                    <div>
+                        <UiSwitcher
+                            onChange={(value) => {
+                                onEnableDisable(data, value)
+                            }}
+                            disabledInp={false}
+                            activeState={activated}
+                            height={12}
+                            width={22}
+                        />
+                    </div>)
             },
+            width: semiLarge,
+            className: css['center-flex'],
         }
     ];
 
