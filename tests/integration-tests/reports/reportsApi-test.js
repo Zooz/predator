@@ -404,6 +404,36 @@ describe('Integration tests for the reports api', function() {
                 validateFinishedReport(report);
             });
 
+            it('Post full cycle stats and verify report rps avg', async function () {
+                const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', runnerId));
+                should(phaseStartedStatsResponse.statusCode).be.eql(204);
+
+                const getReport = await reportsRequestCreator.getReport(testId, reportId);
+                should(getReport.statusCode).be.eql(200);
+                const testStartTime = new Date(getReport.body.start_time);
+                const statDateFirst = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 20);
+                let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateFirst, 600));
+                should(intermediateStatsResponse.statusCode).be.eql(204);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                let report = getReportResponse.body;
+                should(report.avg_rps).eql(30);
+
+                const statDateSecond = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 40);
+                intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateSecond, 200));
+                should(intermediateStatsResponse.statusCode).be.eql(204);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                report = getReportResponse.body;
+                should(report.avg_rps).eql(20);
+
+                const statDateThird = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 60);
+                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', runnerId, statDateThird));
+                should(doneStatsResponse.statusCode).be.eql(204);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                should(getReportResponse.statusCode).be.eql(200);
+                report = getReportResponse.body;
+                should(report.avg_rps).eql(13.33);
+            });
+
             it('Post only "done" phase stats', async function () {
                 const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', runnerId));
                 should(doneStatsResponse.statusCode).be.eql(204);
