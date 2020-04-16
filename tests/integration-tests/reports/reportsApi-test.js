@@ -291,7 +291,7 @@ describe('Integration tests for the reports api', function() {
 
                 lastReports.forEach((report) => {
                     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
-                        'phase', 'status'];
+                        'phase', 'status','avg_rps'];
 
                     REPORT_KEYS.forEach((key) => {
                         should(report).hasOwnProperty(key);
