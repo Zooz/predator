@@ -1,6 +1,5 @@
-
 import * as React from 'react'
-import { findDOMNode } from 'react-dom'
+import {findDOMNode} from 'react-dom'
 import {
     DragSource,
     DropTarget,
@@ -21,7 +20,7 @@ const style = {
 }
 
 const cardSource = {
-    beginDrag (props) {
+    beginDrag(props) {
         return {
             id: props.id,
             index: props.index
@@ -30,7 +29,7 @@ const cardSource = {
 };
 
 const cardTarget = {
-    hover (props, monitor, component) {
+    hover(props, monitor, component) {
         if (!component) {
             return null
         }
@@ -80,7 +79,7 @@ const cardTarget = {
 };
 
 class Card extends React.Component {
-    render () {
+    render() {
         const {
             isDragging,
             connectDragSource,
@@ -89,7 +88,7 @@ class Card extends React.Component {
         } = this.props;
         const opacity = isDragging ? 0 : 1;
         return connectDragSource(
-            connectDropTarget(<div style={{ opacity }}>{children}</div>)
+            connectDropTarget(<div style={{width:'100%'}}>{children}</div>)
         )
     }
 }

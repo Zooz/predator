@@ -79,7 +79,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: 'description',
-            width: largeSize,
             className: css['center-flex'],
         }, {
             id: 'updated_at',
@@ -94,7 +93,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Modified
                 </TableHeader>
             ),
-            accessor: (data) => (dateFormatter(data.updated_at))
+            accessor: (data) => (dateFormatter(data.updated_at)),
+            width: extraExLargeSize+20,
+            className: css['center-flex'],
         }, {
             id: 'type',
             Header: () => (
@@ -143,8 +144,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onEdit(data)
             }}/>,
-            className: css['small-header'],
-            headerClassName: css['small-header']
+            width: iconsWidth,
+            className: css['center-flex'],
         },
         {
             id: 'test_name',
@@ -235,8 +236,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             accessor: data => (data.ramp_to || 'N/A'),
             width: largeSize,
             className: css['center-flex'],
-            // className: css['small-header'],
-            // headerClassName: css['small-header']
         },
         {
             id: 'max_virtual_users',
@@ -281,17 +280,15 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             accessor: data => (Math.floor(data.last_success_rate) + '%'),
             width: extraLargeSize,
             className: css['center-flex'],
-            // className: css['medium-header'],
-            // headerClassName: css['medium-header']
         },
         {
-            id: 'last_rps',
+            id: 'avg_rps',
             Header: () => (
                 <TableHeader sortable={false}>
                     RPS
                 </TableHeader>
             ),
-            accessor: data => (Math.floor(data.last_rps)),
+            accessor: data => (Math.floor(data.avg_rps)),
             width: iconsWidth,
             className: css['center-flex'],
         },
@@ -306,7 +303,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             accessor: 'parallelism',
             width: largeSize,
             className: css['center-flex'],
-            // headerClassName: css['medium-header']
         },
         {
             id: 'notes',
@@ -316,8 +312,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => <Notes data={data} onEditNote={onEditNote}/>,
-            // className: css['small-header'],
-            // headerClassName: css['small-header']
         },
         {
             id: 'score',
@@ -335,9 +329,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 }
             },
             width: iconsWidth
-
-            // className: css['xs-header'],
-            // headerClassName: css['xs-header']
         }, {
             id: 'report',
             Header: () => (
@@ -350,9 +341,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 onReportView(data)
             }}/>,
             width: mediumSize
-
-            // className: css['small-header'],
-            // headerClassName: css['small-header']
         },
         {
             id: 'grafana_report',
@@ -493,7 +481,6 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
     ];
 
 
-    // return filter(columns, (column) => columnsNames.includes(column.id))
     return columnsNames.map((name) => {
         const column = columns.find((c) => c.id === name);
         if (!column) {

@@ -23,7 +23,7 @@ import Loader from "./components/Loader";
 const REFRESH_DATA_INTERVAL = 30000;
 
 const columnsNames = ['compare', 'test_name', 'start_time', 'end_time', 'duration', 'status', 'arrival_rate',
-    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'score', 'report', 'grafana_report', 'rerun', 'raw', 'logs', 'stop'];
+    'ramp_to', 'last_success_rate', 'avg_rps', 'parallelism', 'notes', 'score', 'report', 'grafana_report', 'rerun', 'raw', 'logs', 'stop'];
 const DESCRIPTION = 'Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.';
 
 class getReports extends React.Component {
