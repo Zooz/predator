@@ -316,6 +316,18 @@
 
 
   <li class="md-nav__item">
+    <a href="benchmarks.html" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="schedulesandreports.html" title="Schedules and Reports" class="md-nav__link">
       Schedules and Reports
     </a>
@@ -419,6 +431,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmarks" title="Benchmarks" class="md-nav__link">
+    Benchmarks
+  </a>
   
 </li>
       
@@ -588,6 +607,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmarks" title="Benchmarks" class="md-nav__link">
+    Benchmarks
+  </a>
   
 </li>
       
@@ -921,6 +947,69 @@ during runtime with the /config endpoint, please check the API reference for mor
 </tr>
 </tbody>
 </table>
+<h2 id="benchmarks">Benchmarks<a class="headerlink" href="#benchmarks" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Configuration key</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BENCHMARK_THRESHOLD</td>
+<td>benchmark_threshold</td>
+<td>Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>BENCHMARK_THRESHOLD_WEBHOOK_URL</td>
+<td>benchmark_threshold_webhook_url</td>
+<td>Url to send webhooks to incase a test receives a score less than the benchmark threshold</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>benchmark_weights.percentile_ninety_five.percentage</td>
+<td>Percentage of the score affected by p95 results</td>
+<td>✓</td>
+<td>20</td>
+</tr>
+<tr>
+<td></td>
+<td>benchmark_weights.percentile_fifty.percentage</td>
+<td>Percentage of the score affected by median results</td>
+<td>✓</td>
+<td>20</td>
+</tr>
+<tr>
+<td></td>
+<td>benchmark_weights.server_errors_ratio.percentage</td>
+<td>Percentage of the score affected by server errors ratio</td>
+<td>✓</td>
+<td>20</td>
+</tr>
+<tr>
+<td></td>
+<td>benchmark_weights.client_errors_ratio.percentage</td>
+<td>Percentage of the score affected by client errors ratio</td>
+<td>✓</td>
+<td>20</td>
+</tr>
+<tr>
+<td></td>
+<td>benchmark_weights.rps.percentage</td>
+<td>Percentage of the score affected by requests per second results</td>
+<td>✓</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
 <h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">#</a></h2>
 <table>
 <thead>
@@ -1069,7 +1158,7 @@ during runtime with the /config endpoint, please check the API reference for mor
 <tr>
 <td>SMTP_TIMEOUT</td>
 <td>smtp_server.timeout</td>
-<td>timeout to SMTP server in milliseconds</td>
+<td>How many milliseconds to wait for the connection to establish to SMTP server</td>
 <td>✓</td>
 <td>200</td>
 </tr>

@@ -316,6 +316,18 @@
 
 
   <li class="md-nav__item">
+    <a href="benchmarks.html" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="schedulesandreports.html" title="Schedules and Reports" class="md-nav__link">
       Schedules and Reports
     </a>
@@ -679,12 +691,12 @@
 <h3 id="i-run-a-test-successfully-but-no-report-is-created-for-the-test"><b>I run a test successfully but no report is created for the test</b><a class="headerlink" href="#i-run-a-test-successfully-but-no-report-is-created-for-the-test" title="Permanent link">#</a></h3>
 <p>The Predator-Runner docker that is reporting the test results back to Predator isn't able to connect to it, 
 which is why the test runs but no report is generated. When installing Predator in Docker, the following command is used:
-<div class="codehilite"><pre><span></span>docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 \
--p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator
+<div class="codehilite"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">e</span> <span class="n">JOB_PLATFORM</span><span class="o">=</span><span class="n">DOCKER</span> <span class="o">-</span><span class="n">e</span> <span class="n">INTERNAL_ADDRESS</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="err">$</span><span class="n">MACHINE_IP</span><span class="p">:</span><span class="mi">80</span><span class="o">/</span><span class="n">v1</span> <span class="err">\</span>
+<span class="o">-</span><span class="n">p</span> <span class="mi">80</span><span class="p">:</span><span class="mi">80</span> <span class="c1">--name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator</span>
 </pre></div></p>
 <p>The <code>INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1</code> is what the Predator-Runner uses to communicate with Predator, 
 and <code>$MACHINE_IP</code> needs to be your local network address (an IP address). You can get it by running the command: 
-<div class="codehilite"><pre><span></span>ifconfig en0 | grep &#39;inet &#39; | cut -d&#39; &#39; -f2
+<div class="codehilite"><pre><span></span><span class="n">ifconfig</span> <span class="n">en0</span> <span class="o">|</span> <span class="n">grep</span> <span class="s1">&#39;inet &#39;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="s1">&#39; &#39;</span> <span class="o">-</span><span class="n">f2</span>
 </pre></div></p>
 <p>For more information regarding correct installation of Predator using Docker visit the <u><a href="installation.html#docker">Installation</a></u> section.</p>
 <p>It is important to note this is an issue and solution only in Docker installations. 
