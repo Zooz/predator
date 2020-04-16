@@ -62,7 +62,9 @@ import {
     processingGetReports,
     editReport,
     editReportSuccess,
-    cleanAllReportsErrors
+    cleanAllReportsErrors,
+    addReportForCompare,
+    clearReportForCompare,
 } from './actions/reportsActions';
 import {
     updateConfig,
@@ -148,6 +150,8 @@ export {
     editReport,
     editReportSuccess,
     cleanAllReportsErrors,
+    addReportForCompare,
+    clearReportForCompare,
 
     //config
     getConfigDataMapSuccess,

@@ -3,14 +3,6 @@ import React from 'react';
 import Modal from '../Modal';
 import {prettySeconds} from '../../utils';
 import PieChart from '../PieChart'
-import {
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    LineChart,
-    Legend,
-    BarChart, Bar,
-    Line
-} from 'recharts';
-
 import * as Actions from "../../redux/actions/reportsActions";
 import * as selectors from "../../redux/selectors/reportsSelector";
 import {connect} from "react-redux";
@@ -18,6 +10,8 @@ import Box from '../Box';
 import dateFormat from 'dateformat';
 import Button from '../../../components/Button';
 import Snackbar from "material-ui/Snackbar";
+import {BarChartPredator, LineChartPredator} from "./Charts";
+import _ from "lodash";
 
 const REFRESH_DATA_INTERVAL = 30000;
 const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
@@ -30,97 +24,32 @@ class Report extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            disabledCreateBenchmark: false
+            disabledCreateBenchmark: false,
+            filteredKeys: {}
         }
     }
 
-    generateAreaChart = (data, keys, labelY) => {
-        return (
-            <ResponsiveContainer width="100%" height={300}>
-                <AreaChart
-                    width={700}
-                    height={400}
-                    data={data}
-                    margin={{
-                        top: 10, right: 30, left: 0, bottom: 0,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="name"/>
-                    <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
-                    <Legend/>
-                    <Tooltip/>
-                    {
-                        keys.map((key, index) => {
-                            const color = COLORS[index % COLORS.length];
-                            return (<Area key={index} type="monotone" dataKey={key}
-                                          stroke={color.stroke} fill={color.fill}/>)
-                        })
-                    }
-                </AreaChart>
-            </ResponsiveContainer>
-        )
-    }
-    lineChart = (data, keys, labelY) => {
-        return (
-            <ResponsiveContainer width="100%" height={300}>
-                <LineChart
-                    width={700}
-                    height={400}
-                    data={data}
-                    margin={{
-                        top: 10, right: 30, left: 0, bottom: 0,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="name"/>
-                    <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
-                    <Legend/>
-                    <Tooltip/>
-                    {
-                        keys.map((key, index) => {
-                            const color = COLORS[index % COLORS.length];
-                            return (<Line key={index} type="monotone" dataKey={key} dot={null}
-                                          stroke={color.stroke}/>)
-                        })
-                    }
-                </LineChart>
-            </ResponsiveContainer>
-        )
-    }
-    barChart = (data, keys) => {
-        return (
-            <ResponsiveContainer width={'100%'} height={300}>
-                <BarChart
-                    height={300}
-                    data={data}
-                    margin={{
-                        top: 20, right: 30, left: 20, bottom: 5,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="name"/>
-                    <YAxis/>
-                    <Tooltip/>
-                    {
-                        keys.map((key, index) => {
-                            const color = COLORS[index % COLORS.length];
-                            return (<Bar barSize={50} key={index} dataKey={key} fill={color.fill}/>)
-                        })
-                    }
-                </BarChart>
-            </ResponsiveContainer>
-        )
-    };
     createBenchmark = () => {
         const {aggregateReport, report} = this.props;
         this.props.createBenchmark(report.test_id, aggregateReport.benchMark);
         this.setState({disabledCreateBenchmark: true})
     };
-
+    onSelectedGraphPropertyFilter = (graphType, keys, value) => {
+        const {filteredKeys} = this.state;
+        let newFilteredKeys = {...filteredKeys};
+        if (_.isArray(keys)) {
+            newFilteredKeys = keys.reduce((acc, cur) => {
+                acc[`${graphType}${cur}`] = !value;
+                return acc;
+            }, filteredKeys)
+        } else {
+            newFilteredKeys[`${graphType}${keys}`] = !value;
+        }
+        this.setState({filteredKeys: {...newFilteredKeys}});
+    };
     render() {
         const {report, onClose, aggregateReport} = this.props;
-        const {disabledCreateBenchmark} = this.state;
+        const {disabledCreateBenchmark,filteredKeys} = this.state;
         return (
             <Modal onExit={onClose}>
                 <div style={{
@@ -129,7 +58,7 @@ class Report extends React.Component {
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <h1>{report.test_name}</h1>
+                    <h1 style={{minWidth:'310px'}}>{report.test_name}</h1>
                     <SummeryTable report={report}/>
                 </div>
                 <span>Started at {dateFormat(new Date(report.start_time), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</span>
@@ -144,15 +73,28 @@ class Report extends React.Component {
                         <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
                                 onClick={this.createBenchmark}>Set as Benchmark</Button>
                     </div>
-                    {this.lineChart(aggregateReport.latencyGraph, ['median', 'p95', 'p99'], 'ms')}
+                    <LineChartPredator data={aggregateReport.latencyGraph} keys={aggregateReport.latencyGraphKeys}
+                                       labelY={'ms'} graphType={'latency'}
+                                       onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                       filteredKeys={filteredKeys}/>
+
                     <h3>Status Codes</h3>
-                    {this.lineChart(aggregateReport.errorsCodeGraph, Object.keys(aggregateReport.errorCodes))}
+                    <LineChartPredator data={aggregateReport.errorsCodeGraph} keys={aggregateReport.errorsCodeGraphKeys}
+                                        graphType={'status_codes'}
+                                       onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                       filteredKeys={filteredKeys}/>
                     <h3>RPS</h3>
-                    {this.generateAreaChart(aggregateReport.rps, ['mean'])}
+                    <LineChartPredator data={aggregateReport.rps} keys={aggregateReport.rpsKeys} labelY={'rps'}
+                                       graphType={'rps'}
+                                       onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                       filteredKeys={filteredKeys}/>
                     <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                         <div style={{width: '50%'}}>
                             <h3>Status Codes And Errors Distribution</h3>
-                            {this.barChart(aggregateReport.errorsBar, ['count'])}
+                            <BarChartPredator data={aggregateReport.errorsBar} keys={aggregateReport.errorsBarKeys}
+                                              graphType={'status_codes_errors'}
+                                              onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                              filteredKeys={filteredKeys}/>
                         </div>
                         <div>
                             <h3>Scenarios</h3>
@@ -177,8 +119,8 @@ class Report extends React.Component {
     }
 
     loadData = () => {
-        const {getAggregateReport, report} = this.props;
-        getAggregateReport(report.test_id, report.report_id);
+        const {getAggregateReports, report} = this.props;
+        getAggregateReports([{testId:report.test_id, reportId:report.report_id}]);
 
     }
 
@@ -203,7 +145,7 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = {
-    getAggregateReport: Actions.getAggregateReport,
+    getAggregateReports: Actions.getAggregateReports,
     createBenchmark: Actions.createBenchmark,
     createBenchmarkSuccess: Actions.createBenchmarkSuccess,
 };
@@ -211,10 +153,11 @@ const mapDispatchToProps = {
 
 const SummeryTable = ({report = {}}) => {
     return (
-        <div style={{display: 'flex', flexDirection: 'row'}}>
+        <div style={{display: 'flex', flexDirection: 'row',flexWrap:'wrap'}}>
             <Box title={'Test status'} value={report.status}/>
             <Box title={'Duration'} value={prettySeconds(Number(report.duration))}/>
             <Box title={'Parallelism'} value={report.parallelism}/>
+            {report.score && <Box title={'Score'} value={Math.floor(report.score)}/>}
         </div>
     );
 }
