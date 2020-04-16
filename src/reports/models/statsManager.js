@@ -37,7 +37,7 @@ async function updateSubscriberWithStatsInternal(report, stats) {
     const subscriber = report.subscribers.find(subscriber => subscriber.runner_id === stats.runner_id);
     const { last_stats } = subscriber;
     if (last_stats && parseData.rps) {
-        const lastTotalCount = _.get(last_stats, 'rps.total_count') || 0;
+        const lastTotalCount = _.get(last_stats, 'rps.total_count', 0);
         parseData.rps.total_count = lastTotalCount + parseData.rps.count;
     }
     await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, JSON.stringify(parseData));
