@@ -541,6 +541,22 @@ describe('Reports manager tests', function () {
             should.exist(statsResponse);
             statsResponse.should.eql(stats);
         });
+        it('Stats consumer handles message with status aborted', async () => {
+            configStub.resolves({});
+            databaseGetReportStub.resolves([REPORT]);
+            databasePostStatsStub.resolves();
+            getJobStub.resolves(JOB);
+            notifierStub.resolves();
+            const stats = { phase_status: 'aborted', data: JSON.stringify({ median: 4 }) };
+
+            const statsResponse = await statsManager.postStats('test_id', stats);
+
+            databaseUpdateSubscriberStub.callCount.should.eql(1);
+            databaseUpdateSubscriberWithStatsStub.callCount.should.eql(0);
+
+            should.exist(statsResponse);
+            statsResponse.should.eql(stats);
+        });
 
         it('when report done and have benchmark data ', async () => {
             databaseGetReportStub.resolves([REPORT_DONE]);

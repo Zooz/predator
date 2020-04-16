@@ -557,6 +557,7 @@ describe('Integration tests for the reports api', function() {
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('aborted');
+                validateFinishedReport(report,undefined,'aborted');
             });
         });
     });
@@ -884,15 +885,15 @@ describe('Integration tests for the reports api', function() {
     });
 });
 
-function validateFinishedReport(report, expectedValues = {}) {
+function validateFinishedReport(report, expectedValues = {},status) {
     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
         'end_time', 'phase', 'last_updated_at', 'status'];
 
     REPORT_KEYS.forEach((key) => {
         should(report).hasOwnProperty(key);
     });
-
-    should(report.status).eql('finished');
+    status = status || 'finished';
+    should(report.status).eql(status);
     should(report.test_id).eql(testId);
     should(report.report_id).eql(reportId);
     should(report.phase).eql('0');
