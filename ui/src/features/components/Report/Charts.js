@@ -99,7 +99,6 @@ export const BarChartPredator = ({data, keys, graphType, onSelectedGraphProperty
 };
 
 export const LineChartPredator = ({data = [], keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys}) => {
-    console.log("filteredKeys", filteredKeys);
     const filteredData = filterKeysFromArrayOfObject(data, graphType, filteredKeys);
 
     return (

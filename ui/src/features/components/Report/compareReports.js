@@ -277,6 +277,11 @@ function mergeSortedArraysByStartTime(arr1, arr2) {
         if (arr1[i].timeMills < arr2[j].timeMills) {
             arr3.push(arr1[i]);
             i++;
+        } else if (arr1[i].timeMills === arr2[j].timeMills) {
+            const newData = {...arr1[i], ...arr2[j]};
+            arr3.push(newData);
+            i++;
+            j++;
         } else {
             arr3.push(arr2[j]);
             j++;
