@@ -72,11 +72,13 @@ module.exports.postReport = async (testId, reportBody) => {
 };
 
 function getReportResponse(summaryRow, config) {
-    let timeEndOrCurrent = summaryRow.end_time || new Date();
+    let lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
+    const reportDurationSeconds = (new Date(lastUpdateTime).getTime() - new Date(summaryRow.start_time).getTime()) / 1000;
 
     let rps = 0;
+    let totalRequests = 0;
     let completedRequests = 0;
     let successRequests = 0;
 
@@ -84,6 +86,7 @@ function getReportResponse(summaryRow, config) {
         if (subscriber.last_stats && subscriber.last_stats.rps && subscriber.last_stats.codes) {
             completedRequests += subscriber.last_stats.requestsCompleted;
             rps += subscriber.last_stats.rps.mean;
+            totalRequests += subscriber.last_stats.rps.total_count || 0;
             Object.keys(subscriber.last_stats.codes).forEach(key => {
                 if (key[0] === '2') {
                     successRequests += subscriber.last_stats.codes[key];
@@ -104,7 +107,7 @@ function getReportResponse(summaryRow, config) {
         start_time: summaryRow.start_time,
         end_time: summaryRow.end_time || undefined,
         phase: summaryRow.phase,
-        duration_seconds: (new Date(timeEndOrCurrent).getTime() - new Date(summaryRow.start_time).getTime()) / 1000,
+        duration_seconds: reportDurationSeconds,
         arrival_rate: testConfiguration.arrival_rate,
         duration: testConfiguration.duration,
         ramp_to: testConfiguration.ramp_to,
@@ -115,6 +118,7 @@ function getReportResponse(summaryRow, config) {
         environment: testConfiguration.environment,
         subscribers: summaryRow.subscribers,
         last_rps: rps,
+        avg_rps: Number((totalRequests / reportDurationSeconds).toFixed(2)),
         last_success_rate: successRate,
         score: summaryRow.score ? summaryRow.score : undefined,
         benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined

@@ -379,6 +379,45 @@ describe('Reports manager tests', function () {
             should.exist(reports);
             reports.length.should.eql(0);
         });
+
+        it('get last report with avg rsp when test running', async () => {
+            const now = new Date();
+            const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
+            const subscriber = { last_stats: { rps: { total_count: 200 }, codes: { '200': 10 } } };
+            const report = Object.assign({}, REPORT, { last_updated_at: now, start_time: tenSecBefore, subscribers: [subscriber] });
+            databaseGetLastReportsStub.resolves([report]);
+            const reports = await manager.getLastReports();
+            reports.length.should.eql(1);
+            should(reports[0].avg_rps).eql(20);
+        });
+        it('get last report with avg rsp when test finished', async () => {
+            const now = new Date();
+            const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
+            const subscriber = { last_stats: { rps: { total_count: 300 }, codes: { '200': 10 } } };
+            const report = Object.assign({}, REPORT, {
+                end_time: now,
+                start_time: tenSecBefore,
+                subscribers: [subscriber]
+            });
+            databaseGetLastReportsStub.resolves([report]);
+            const reports = await manager.getLastReports();
+            reports.length.should.eql(1);
+            should(reports[0].avg_rps).eql(30);
+        });
+        it('get last report with avg rsp when total_count not exist ', async () => {
+            const now = new Date();
+            const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
+            const subscriber = { last_stats: { rps: { test: 'test' }, codes: { '200': 10 } } };
+            const report = Object.assign({}, REPORT, {
+                end_time: now,
+                start_time: tenSecBefore,
+                subscribers: [subscriber]
+            });
+            databaseGetLastReportsStub.resolves([report]);
+            const reports = await manager.getLastReports();
+            reports.length.should.eql(1);
+            should(reports[0].avg_rps).eql(0);
+        });
     });
 
     describe('Create new report', function () {
@@ -429,13 +468,59 @@ describe('Reports manager tests', function () {
             databasePostStatsStub.resolves();
             getJobStub.resolves(JOB);
             notifierStub.resolves();
-            const stats = { phase_status: 'intermediate', data: JSON.stringify({ median: 4 }) };
+            const stats = { phase_status: 'intermediate', data: JSON.stringify({ median: 4 }), runner_id: 123 };
 
-            const statsResponse = await statsManager.postStats('test_id', stats);
+            const statsResponse = await statsManager.postStats({ subscribers: [{ runner_id: 123 }] }, stats);
 
             databaseUpdateSubscriberStub.callCount.should.eql(0);
             databaseUpdateSubscriberWithStatsStub.callCount.should.eql(1);
 
+            should.exist(statsResponse);
+            statsResponse.should.eql(stats);
+        });
+
+        it('Stats intermediate and verify update subscriber with total_count in first time', async () => {
+            configStub.resolves({});
+            databaseGetReportStub.resolves([REPORT]);
+            databasePostStatsStub.resolves();
+            getJobStub.resolves(JOB);
+            notifierStub.resolves();
+            const stats = {
+                phase_status: 'intermediate',
+                data: JSON.stringify({ rps: { count: 10 } }),
+                runner_id: 123
+            };
+            const statsResponse = await statsManager.postStats({ subscribers: [{ runner_id: 123, last_stats: {} }] }, stats);
+
+            databaseUpdateSubscriberStub.callCount.should.eql(0);
+            databaseUpdateSubscriberWithStatsStub.callCount.should.eql(1);
+            const data = JSON.parse(databaseUpdateSubscriberWithStatsStub.args[0][4]);
+            should(data.rps.total_count).eql(10);
+            should.exist(statsResponse);
+            statsResponse.should.eql(stats);
+        });
+        it('Stats intermediate and verify update subscriber second time with total_count', async () => {
+            configStub.resolves({});
+            databaseGetReportStub.resolves([REPORT]);
+            databasePostStatsStub.resolves();
+            getJobStub.resolves(JOB);
+            notifierStub.resolves();
+            const stats = {
+                phase_status: 'intermediate',
+                data: JSON.stringify({ rps: { count: 10 } }),
+                runner_id: 123
+            };
+            const statsResponse = await statsManager.postStats({
+                subscribers: [{
+                    runner_id: 123,
+                    last_stats: { rps: { total_count: 18 } }
+                }]
+            }, stats);
+
+            databaseUpdateSubscriberStub.callCount.should.eql(0);
+            databaseUpdateSubscriberWithStatsStub.callCount.should.eql(1);
+            const data = JSON.parse(databaseUpdateSubscriberWithStatsStub.args[0][4]);
+            should(data.rps.total_count).eql(28);
             should.exist(statsResponse);
             statsResponse.should.eql(stats);
         });
