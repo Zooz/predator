@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/Zooz/predator/compare/v1.2.1...v1.3.0) (2020-04-16)
+
+
+### Bug Fixes
+
+* **reports:** fixing grafana link for in progress tests ([#277](https://github.com/Zooz/predator/issues/277)) ([9236774](https://github.com/Zooz/predator/commit/9236774))
+
+
+### Features
+
+* add score to mail and webhook ([#287](https://github.com/Zooz/predator/issues/287)) ([4f1e7c2](https://github.com/Zooz/predator/commit/4f1e7c2))
+* **reports:** add avg-rps to reports  ([#292](https://github.com/Zooz/predator/issues/292)) ([fa61a39](https://github.com/Zooz/predator/commit/fa61a39))
+
+
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/Zooz/predator/compare/v1.2.0...v1.2.1) (2020-03-26)
 
