@@ -12,6 +12,7 @@ nav:
   - My First Test: myfirsttest.md
   - Advanced Test Setup: tests.md
   - Processor Creation: processors.md
+  - Benchmarks: benchmarks.md
   - Schedules and Reports: schedulesandreports.md
   - Configuration: configuration.md
   - FAQ: faq.md
