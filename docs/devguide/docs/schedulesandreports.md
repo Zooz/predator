@@ -15,4 +15,4 @@ Predator's test reports give in-depth performance metrics in real-time, while ag
 !!! TIP "Supported from version zooz/predator:1.3.0"
 
 Easily compare two or more test results in one predator report dashboard. This is available under `Last Reports` page 
-and after selecting the desired tests, clicking on `View Report` will display the test results side by side on the same graphs.
+and after selecting the desired tests, clicking on `Compare Reports` will display the test results side by side on the same graphs.
