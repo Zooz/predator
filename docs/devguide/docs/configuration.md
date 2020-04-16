@@ -66,6 +66,18 @@ Additional parameters for the following chosen databases:
 | DOCKER_HOST          	| Docker engine url (host and port number of docker engine) 	| x                        	|               	|
 | DOCKER_CERT_PATH     	| Path to CA certificate directory                          	| x                        	|               	|
 
+
+## Benchmarks
+| Environment Variable 	| Configuration key    	| Description                                               	| Configurable from UI/API 	| Default value 	|
+|----------------------	|----------------------	|-----------------------------------------------------------	|--------------------------	|---------------	|
+| BENCHMARK_THRESHOLD            	| benchmark_threshold     	| Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url 	| ✓                        	|               	|
+| BENCHMARK_THRESHOLD_WEBHOOK_URL  	| benchmark_threshold_webhook_url     	| Url to send webhooks to incase a test receives a score less than the benchmark threshold                      	| ✓                        	|               	|
+|         	| benchmark_weights.percentile_ninety_five.percentage     	| Percentage of the score affected by p95 results                	| ✓                        	| 20              	|
+|         	| benchmark_weights.percentile_fifty.percentage 	| Percentage of the score affected by median results                       	| ✓                        	| 20              	|
+|         	| benchmark_weights.server_errors_ratio.percentage 	| Percentage of the score affected by server errors ratio                  	| ✓                        	| 20              	|
+|          	| benchmark_weights.client_errors_ratio.percentage  	| Percentage of the score affected by client errors ratio              	| ✓                        	| 20              	|
+|          	| benchmark_weights.rps.percentage  	|  Percentage of the score affected by requests per second results                   	| ✓                        	| 20           	    |
+
 ## Metrics
 | PROCESS.ENV Variable 	| Configuration key   	| Description                                    	| Configurable from UI/API 	| Default value 	|
 |----------------------	|---------------------	|------------------------------------------------	|--------------------------	|---------------	|
@@ -94,6 +106,6 @@ Additional parameters for the following chosen databases:
 | SMTP_PORT            	| smtp_server.port     	| SMTP port number                                          	| ✓                        	|               	|
 | SMTP_USERNAME        	| smtp_server.username 	| SMTP username                                             	| ✓                        	|               	|
 | SMTP_PASSWORD        	| smtp_server.password 	| SMTP password                                             	| ✓                        	|               	|
-| SMTP_TIMEOUT         	| smtp_server.timeout  	| timeout to SMTP server in milliseconds                    	| ✓                        	| 200              	|
+| SMTP_TIMEOUT         	| smtp_server.timeout  	| How many milliseconds to wait for the connection to establish to SMTP server                   	| ✓                        	| 200              	|
 | SMTP_SECURE         	| smtp_server.secure  	|  if true the connection will use TLS when connecting to server. [Nodemailer SMTP options](https://nodemailer.com/smtp/)                   	| ✓                        	| false           	|
 | SMTP_REJECT_UNAUTH_CERTS         	| smtp_server.rejectUnauthCerts  	| should fail or succeed on unauthorized certificate                 	| ✓                        	| false              	|
