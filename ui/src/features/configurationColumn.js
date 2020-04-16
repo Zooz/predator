@@ -31,6 +31,7 @@ const mediumSize = 60;
 const semiLarge = 70;
 const largeSize = 85;
 const extraLargeSize = 100;
+const extraExLargeSize = 120;
 export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote, selectedReports, onReportSelected}) => {
 
     const columns = [
@@ -199,8 +200,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => (prettySeconds(data.duration)),
-            className: css['medium-header'],
-            headerClassName: css['medium-header']
+            width:largeSize,
+            className: css['center-flex'],
         },
         {
             id: 'status',
@@ -244,7 +245,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Max Virtual Users
                 </TableHeader>
             ),
-            accessor: data => (data.max_virtual_users || 'N/A')
+            accessor: data => (data.max_virtual_users || 'N/A'),
+            width:extraExLargeSize,
+            className: css['center-flex'],
         },
         {
             id: 'cron_expression',
@@ -253,7 +256,9 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Cron Expression
                 </TableHeader>
             ),
-            accessor: data => (getTimeFromCronExpr(data.cron_expression) || 'N/A')
+            accessor: data => (getTimeFromCronExpr(data.cron_expression) || 'N/A'),
+            width:extraExLargeSize,
+            className: css['center-flex'],
         },
         {
             id: 'last_run',
@@ -400,6 +405,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 e.stopPropagation();
                 onRunTest(data)
             }}/>,
+            width:largeSize,
+            className: css['center-flex'],
         },
         {
             id: 'delete',
