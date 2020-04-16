@@ -12,7 +12,7 @@ const initialState = Immutable.Map({
     edit_report_failure: undefined,
     create_benchmark_failure: undefined,
     selected_reports: {},
-    aggregate_reports:[]
+    aggregate_reports: []
 });
 
 export default function reduce(state = initialState, action = {}) {
@@ -45,7 +45,7 @@ export default function reduce(state = initialState, action = {}) {
             return state.set('create_benchmark_failure', action.error);
         case Types.ADD_REPORT_FOR_COMPARE:
             const currentSelectedReports = JSON.parse(JSON.stringify(state.get('selected_reports')));
-            currentSelectedReports[action.testId]=currentSelectedReports[action.testId] || {};
+            currentSelectedReports[action.testId] = currentSelectedReports[action.testId] || {};
             currentSelectedReports[action.testId][action.reportId] = action.value;
             return state.set('selected_reports', currentSelectedReports);
         case Types.CLEAR_REPORT_FOR_COMPARE:

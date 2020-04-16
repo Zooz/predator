@@ -1,4 +1,4 @@
-import {put, takeLatest, select,all, call} from 'redux-saga/effects'
+import {put, takeLatest, select, all, call} from 'redux-saga/effects'
 import * as Actions from '../actions/reportsActions'
 import * as Types from '../types/reportsTypes'
 import {
@@ -73,9 +73,10 @@ export function* createBenchmark({testId, body}) {
         yield put(Actions.createBenchmarkFailure(e))
     }
 }
-export function* editReport({testId,reportId, body}) {
+
+export function* editReport({testId, reportId, body}) {
     try {
-        yield call(editReportFromFramework, testId,reportId, body);
+        yield call(editReportFromFramework, testId, reportId, body);
         yield put(Actions.editReportSuccess(true));
     } catch (e) {
         yield put(Actions.editReportFailure(e))
@@ -88,7 +89,7 @@ export function* getAggregateReports({reportsData}) {
             return call(getAggregateFromFramework, report.testId, report.reportId)
         }));
 
-        const data = results.map((result)=>result.data);
+        const data = results.map((result) => result.data);
         yield put(Actions.getAggregateReportSuccess(data));
     } catch (e) {
         console.log('error', e);
