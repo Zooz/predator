@@ -4,15 +4,7 @@ import Modal from '../Modal';
 import {prettySeconds} from '../../utils';
 import PieChart from '../PieChart'
 import _ from 'lodash';
-
-import {
-    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    LineChart,
-    Legend,
-    BarChart,
-    Bar,
-    Line
-} from 'recharts';
+import {LineChartPredator, BarChartPredator} from './Charts'
 
 import * as Actions from "../../redux/actions/reportsActions";
 import * as selectors from "../../redux/selectors/reportsSelector";
@@ -20,40 +12,6 @@ import {connect} from "react-redux";
 import Snackbar from "material-ui/Snackbar";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Button from "../../../components/Button";
-
-const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
-    {stroke: "#82ca9d", fill: "#82ca9d"},
-    {stroke: "#ffc658", fill: "#ffc658"},
-    {stroke: "#0935FC", fill: "#0935FC"},
-    {stroke: "#395B56", fill: "#395B56"},
-    {stroke: "#617A70", fill: "#617A70"},
-    {stroke: "#CCC39F", fill: "#CCC39F"},
-    {stroke: "#FFFAD1", fill: "#FFFAD1"},
-];
-const COLOR_FAMILY = {
-    p95: [{stroke: "#BBDEF0", fill: "#BBDEF0"}, {stroke: "#00A6A6", fill: "#00A6A6"}, {
-        stroke: "#EFCA08",
-        fill: "#EFCA08"
-    }, {stroke: "#F49F0A", fill: "#F49F0A"}, {stroke: "#F08700", fill: "#F08700"}],
-    p99: [{stroke: "#134611", fill: "#134611"}, {stroke: "#3E8914", fill: "#3E8914"}, {
-        stroke: "#3DA35D",
-        fill: "#3DA35D"
-    }, {stroke: "#96E072", fill: "#96E072"}, {stroke: "#ACFC4B", fill: "#ACFC4B"}],
-    median: [{stroke: "#353531", fill: "#353531"}, {stroke: "#EC4E20", fill: "#EC4E20"}, {
-        stroke: "#FF9505",
-        fill: "#FF9505"
-    }, {stroke: "#016FB9", fill: "#016FB9"}, {stroke: "#000000", fill: "#000000"}]
-};
-const getColor = (key) => {
-    const prefix = key.substring(0, 1);
-    const name = key.substring(2);
-    const family = COLOR_FAMILY[name] || COLORS;
-    const loc = prefix.charCodeAt(0) - 'A'.charCodeAt(0);
-    if (family) {
-        return family[loc % family.length];
-    }
-    return COLORS[loc % COLORS.length];
-};
 
 
 class CompareReports extends React.Component {
@@ -92,85 +50,7 @@ class CompareReports extends React.Component {
         this.setState({mergedReports});
     };
 
-    filterKeysFromArrayOfObject = (data, graphType, filteredKeys) => {
 
-        const keysToFilter = Object.keys(_.pickBy(filteredKeys, (value) => value));
-        const filteredData = data.reduce((acc, cur) => {
-            acc.push(_.omitBy(cur, (value, key) => {
-                return keysToFilter.includes(`${graphType}${key}`)
-            }));
-            return acc;
-        }, []);
-
-        return filteredData;
-    };
-    lineChart = (data, keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys) => {
-        const filteredData = this.filterKeysFromArrayOfObject(data, graphType, filteredKeys);
-
-        return (
-            <ResponsiveContainer width="100%" height={300}>
-                <LineChart
-                    width={700}
-                    height={400}
-                    data={filteredData}
-                    margin={{
-                        top: 10, right: 30, left: 0, bottom: 0,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="name" allowDuplicatedCategory={false}/>
-                    <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]}/>
-                    <Legend content={(props) => renderLegend({
-                        ...props,
-                        graphType,
-                        onSelectedGraphPropertyFilter,
-                        filteredKeys
-                    })}/>
-                    <Tooltip/>
-                    {
-                        keys.map((key, index) => {
-                            const color = getColor(key);
-                            return (<Line connectNulls key={index} type="monotone" dataKey={key} dot={null}
-                                          stroke={color.stroke}/>)
-                        })
-                    }
-                </LineChart>
-            </ResponsiveContainer>
-        )
-    }
-
-    barChart = (data, keys, graphType, onSelectedGraphPropertyFilter, filteredKeys) => {
-        const filteredData = this.filterKeysFromArrayOfObject(data, graphType, filteredKeys);
-
-        return (
-            <ResponsiveContainer width={'100%'} height={300}>
-                <BarChart
-                    height={300}
-                    data={filteredData}
-                    margin={{
-                        top: 20, right: 30, left: 20, bottom: 5,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="name"/>
-                    <YAxis/>
-                    <Legend content={(props) => renderLegend({
-                        ...props,
-                        graphType,
-                        onSelectedGraphPropertyFilter,
-                        filteredKeys
-                    })}/>
-                    <Tooltip/>
-                    {
-                        keys.map((key, index) => {
-                            const color = getColor(key);
-                            return (<Bar barSize={50} key={index} dataKey={key} fill={color.fill}/>)
-                        })
-                    }
-                </BarChart>
-            </ResponsiveContainer>
-        )
-    };
     createBenchmark = () => {
         const {aggregateReport, report} = this.props;
         this.props.createBenchmark(report.test_id, aggregateReport.benchMark);
@@ -209,15 +89,26 @@ class CompareReports extends React.Component {
                     <h1>Compare reports</h1>
                     <ReportsList onChange={this.onSelectedReport} list={reportsList}/>
                     <div style={{flex: 1}}>
-
                         <h3>Overall Latency</h3>
-                        {this.lineChart(mergedReports.latencyGraph, mergedReports.latencyGraphKeys, 'ms', 'latency', this.onSelectedGraphPropertyFilter, filteredKeys)}
+                        <LineChartPredator data={mergedReports.latencyGraph} keys={mergedReports.latencyGraphKeys}
+                                           labelY={'ms'} graphType={'latency'}
+                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                           filteredKeys={filteredKeys}/>
                         <h3>Status Codes</h3>
-                        {this.lineChart(mergedReports.errorsCodeGraph, mergedReports.errorsCodeGraphKeys, undefined, 'status_codes', this.onSelectedGraphPropertyFilter, filteredKeys)}
+                        <LineChartPredator data={mergedReports.errorsCodeGraph} keys={mergedReports.errorsCodeGraphKeys}
+                                           graphType={'status_codes'}
+                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                           filteredKeys={filteredKeys}/>
                         <h3>RPS</h3>
-                        {this.lineChart(mergedReports.rps, mergedReports.rpsKeys, 'rps', 'rps', this.onSelectedGraphPropertyFilter, filteredKeys)}
+                        <LineChartPredator data={mergedReports.rps} keys={mergedReports.rpsKeys} labelY={'rps'}
+                                           graphType={'rps'}
+                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                           filteredKeys={filteredKeys}/>
                         <h3>Status Codes And Errors Distribution</h3>
-                        {this.barChart(mergedReports.errorsBar, mergedReports.errorsBarKeys, 'status_codes_errors', this.onSelectedGraphPropertyFilter, filteredKeys)}
+                        <BarChartPredator data={mergedReports.errorsBar} keys={mergedReports.errorsBarKeys}
+                                          graphType={'status_codes_errors'}
+                                          onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                          filteredKeys={filteredKeys}/>
                         <div>
                             <h3>Scenarios</h3>
                             <PieChart data={mergedReports.scenarios}/>
@@ -403,34 +294,3 @@ function mergeSortedArraysByStartTime(arr1, arr2) {
     return arr3;
 }
 
-
-const renderLegend = (props) => {
-    const {payload, onSelectedGraphPropertyFilter, graphType, filteredKeys} = props;
-    return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            flex: 1
-        }}>
-            {
-                payload.map((entry, index) => (
-                    <div key={`item-${index}`}
-                         style={{margin: '5px', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                        <Checkbox
-                            indeterminate={false}
-                            checked={filteredKeys[`${graphType}${entry.value}`] === undefined || filteredKeys[`${graphType}${entry.value}`] === false}
-                            // disabled={}
-                            onChange={(value) => {
-                                onSelectedGraphPropertyFilter(graphType, entry.value, value)
-                            }}
-                        />
-                        <span style={{marginLeft: '5px', color: entry.color}}>{entry.value}</span>
-                    </div>
-                ))
-            }
-        </div>
-    );
-}

@@ -18,6 +18,7 @@ import {getColumns} from './configurationColumn'
 import ErrorDialog from "./components/ErrorDialog";
 import FormWrapper from "../components/FormWrapper";
 import Button from "../components/Button";
+import Loader from "./components/Loader";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -57,6 +58,7 @@ class getReports extends React.Component {
         this.props.createJob(requestBody);
         this.setState({rerunJob: job});
     };
+
 
     onEditNote = (testId, reportId, notes) => {
         const {editReport} = this.props;
@@ -133,6 +135,9 @@ class getReports extends React.Component {
     onReportSelected = (testId, reportId, value) => {
         this.props.addReportForCompare(testId, reportId, value);
     };
+    loader() {
+        return this.props.processingGetReports ? <Loader/> : 'There is no data'
+    }
 
     render() {
         const {showReport, sortHeader, sortedReports, showCompareReports} = this.state;
@@ -181,6 +186,7 @@ class getReports extends React.Component {
                         data={sortedReports}
                         pageSize={10}
                         columns={columns}
+                        noDataText={this.loader()}
                         showPagination
                         resizable={false}
                         cursor={'default'}
@@ -230,7 +236,6 @@ class getReports extends React.Component {
 
 
 }
-
 function mapStateToProps(state) {
     return {
         reports: selectors.reports(state),
