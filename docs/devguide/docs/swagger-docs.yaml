@@ -1825,6 +1825,9 @@ components:
         last_stats:
           type: string
           description: The current report metrics.
+        avg_rps:
+          type: number
+          description: The average rps.
         notes:
           type: string
           description: notes about the test

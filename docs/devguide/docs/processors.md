@@ -1,4 +1,6 @@
-Processors are used to inject custom JavaScript into the test flows. This allows the test flow to be as flexible as possible by creating application resources along the way that are needed for future requests or flow processing.
+!!! TIP "Supported from version zooz/predator:1.2.0"
+
+Use `processors` to inject custom JavaScript into the test flows. This allows the test flow to be as flexible as possible by creating application resources along the way that are needed for future requests or flow processing.
 
 !!! TIP
     **Processors allow you to create anything that's possible in JavaScript and integrate it seemlessly into your test flow.**
@@ -8,13 +10,13 @@ There are many use-cases for injecting custom JavaScript into your test flow. So
 
 1. **Prerequistes for a request** 
     - Create resources needed for an API request, such as an authentication token, that shouldn't be calculated into the report's response times for the overall test flow.
-     <br>[*Example*](#1-prerequistes-for-a-request)
+     <br><u>[*Example*](#1-prerequistes-for-a-request)</u>
 2. **Random data generation** 
     - Generate random data to send in your request bodies
-     <br>[*Example*](#2-random-data-generation)
+     <br><u>[*Example*](#2-random-data-generation)</u>
 3. **Response logging** 
     - Log errors if exist
-     <br>[*Example*](#3-response-logging)
+     <br><u>[*Example*](#3-response-logging)</u>
 
 ## Creating a processor
 Creating a processor can be easily done through the Predator UI. An initial template is provided but it is not required to follow it, we recommend using appropriate function names in order to make it easier to import them into your tests. 

@@ -1,4 +1,5 @@
 const uuid = require('uuid');
+const _ = require('lodash');
 const databaseConnector = require('./databaseConnector'),
     notifier = require('./notifier'),
     reportsManager = require('./reportsManager'),
@@ -14,10 +15,10 @@ module.exports.postStats = async (report, stats) => {
     const statsParsed = JSON.parse(stats.data);
     const statsTime = statsParsed.timestamp;
 
-    if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE) {
+    if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE || stats.phase_status === constants.SUBSCRIBER_ABORTED_STAGE) {
         await databaseConnector.updateSubscriber(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
     } else {
-        await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
+        await updateSubscriberWithStatsInternal(report, stats);
     }
 
     if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
@@ -30,6 +31,17 @@ module.exports.postStats = async (report, stats) => {
 
     return stats;
 };
+
+async function updateSubscriberWithStatsInternal(report, stats) {
+    const parseData = JSON.parse(stats.data);
+    const subscriber = report.subscribers.find(subscriber => subscriber.runner_id === stats.runner_id);
+    const { last_stats } = subscriber;
+    if (last_stats && parseData.rps) {
+        const lastTotalCount = _.get(last_stats, 'rps.total_count', 0);
+        parseData.rps.total_count = lastTotalCount + parseData.rps.count;
+    }
+    await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, JSON.stringify(parseData));
+}
 
 async function updateReportBenchmarkIfNeeded(report) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
