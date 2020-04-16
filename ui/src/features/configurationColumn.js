@@ -94,7 +94,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: (data) => (dateFormatter(data.updated_at)),
-            width: extraExLargeSize+20,
+            width: extraExLargeSize + 20,
             className: css['center-flex'],
         }, {
             id: 'type',
@@ -288,7 +288,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     RPS
                 </TableHeader>
             ),
-            accessor: data => (Math.floor(data.avg_rps)),
+            accessor: data => (Math.floor(data.avg_rps === undefined ? data.last_rps : data.avg_rps)),
             width: iconsWidth,
             className: css['center-flex'],
         },
