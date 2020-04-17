@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   setup:
     docker:
@@ -89,32 +89,11 @@ jobs:
     - checkout
     - setup_remote_docker:
         docker_layer_caching: false
-    - run: .circleci/dockerBuild.sh
-  end-to-end-tests:
-    docker:
-    - image: circleci/node:8
-    steps:
-    - checkout
-    - setup_remote_docker:
-        docker_layer_caching: false
-    - restore_cache:
-        key: dependency-cache-{{ checksum "package.json" }}
-    - run: .circleci/dockerRun.sh
-    - run: npm run end-to-end-tests
-  release-patch:
-    docker:
-    - image: circleci/node:8
-    steps:
-    - checkout
-    - setup_remote_docker:
-        docker_layer_caching: false
-    - restore_cache:
-        key: dependency-cache-{{ checksum "package.json" }}
-    - add_ssh_keys:
-        fingerprints:
-        - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-    - run: .circleci/releasePatch.sh
-  release-minor:
+    - run: .circleci/docker-build.sh
+  release:
+    parameters:
+      version:
+        type: string
     docker:
     - image: circleci/node:8
     steps:
@@ -126,24 +105,24 @@ jobs:
     - add_ssh_keys:
         fingerprints:
         - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-    - run: .circleci/releaseMinor.sh
-  release-major:
+    - run: .circleci/release-<< parameters.version >>.sh
+    - run: .circleci/tag-latest-image.sh
+  tag-latest-image:
     docker:
-    - image: circleci/node:8
+      - image: circleci/node:8
     steps:
-    - checkout
-    - setup_remote_docker:
-        docker_layer_caching: false
-    - restore_cache:
-        key: dependency-cache-{{ checksum "package.json" }}
-    - add_ssh_keys:
-        fingerprints:
-        - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
-    - run: .circleci/releaseMajor.sh
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - add_ssh_keys:
+          fingerprints:
+            - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
+      - run: .circleci/tag-latest-image.sh
 
 workflows:
-  version: 2
-  test_build_and_release:
+  test_build_release:
     jobs:
     - setup
     - unit-tests:
@@ -159,48 +138,24 @@ workflows:
           branches:
             # Forked pull requests have CIRCLE_BRANCH set to pull/XXX
             ignore: /pull\/[0-9]+/
-    - end-to-end-tests:
+    - release-approval:
+        name: release-<< matrix.version >>-approval
+        type: approval
         requires:
         - build
-        filters:
-          branches:
-            ignore: /pull\/[0-9]+/
-    - release-patch-approval:
-        type: approval
-        requires:
-        - end-to-end-tests
+        matrix:
+          parameters:
+            version: ["patch", "minor", "major"]
         filters:
           branches:
             only: master
-    - release-minor-approval:
-        type: approval
+    - release:
+        name: release-<< matrix.version >>
+        matrix:
+          parameters:
+            version: ["patch", "minor", "major"]
         requires:
-        - end-to-end-tests
-        filters:
-          branches:
-            only: master
-    - release-major-approval:
-        type: approval
-        requires:
-        - end-to-end-tests
-        filters:
-          branches:
-            only: master
-    - release-patch:
-        requires:
-        - release-patch-approval
-        filters:
-          branches:
-            only: master
-    - release-minor:
-        requires:
-        - release-minor-approval
-        filters:
-          branches:
-            only: master
-    - release-major:
-        requires:
-        - release-major-approval
+          - release-<< matrix.version >>-approval
         filters:
           branches:
             only: master
