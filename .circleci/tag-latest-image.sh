@@ -1,14 +1,16 @@
 #!/bin/sh -e
 
-VERSION=$(awk -F'"' '/"version": ".+"/{ print $4; exit; }' package.json)
-V1=$(echo $VERSION | cut -d'.' -f1)
-V2=$(echo $VERSION | cut -d'.' -f2)
-LATEST_VERSION=$V1.$V2
+TAG=$(node -p "require('./package.json').version")
+V1=$(echo $TAG | cut -d'.' -f1)
+V2=$(echo $TAG | cut -d'.' -f2)
+LATEST_MINOR_TAG=$V1.$V2
 
-echo tagging version: $LATEST_VERSION
-LATEST_TAG_IMAGE=zooz/predator:$LATEST_VERSION
+echo tagging version: $LATEST_MINOR_TAG
+LATEST_MINOR_TAG_IMAGE=zooz/predator:$LATEST_MINOR_TAG
+CONTAINER_IMAGE=zooz/predator:$TAG
 
-echo "Building latest tag image $LATEST_TAG_IMAGE"
-docker build -t $LATEST_TAG_IMAGE .
 echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-docker push $LATEST_TAG_IMAGE
+
+docker pull $CONTAINER_IMAGE
+docker tag $CONTAINER_IMAGE $LATEST_MINOR_TAG_IMAGE
+docker push $LATEST_MINOR_TAG_IMAGE
