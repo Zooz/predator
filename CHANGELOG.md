@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file. See [standa
 * **reports:** Reports will now show avg rps during all test instead of last rps stat  ([#292](https://github.com/Zooz/predator/issues/292)) ([fa61a39](https://github.com/Zooz/predator/commit/fa61a39))
 * **reports** Edit/Add notes from the reports/last reports screen ([#273](https://github.com/Zooz/predator/issues/273))
 * **metrics** Added support for setting custom labels for prometheus ([#278](https://github.com/Zooz/predator/issues/278))
-* **configuration** All configuration is now avaiable through the UI ([#274](https://github.com/Zooz/predator/issues/274))
+* **configuration** All of the configuration is now available to view and edit through the UI ([#274](https://github.com/Zooz/predator/issues/274))
 * **tests** New create/edit test form UI ([#271](https://github.com/Zooz/predator/issues/271)) 
 * **tests** Dynamic DSL. DSL tests will be transalted to predator tests dynamically ([#283](https://github.com/Zooz/predator/issues/283))
 
