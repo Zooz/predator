@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* **reports:** fixing grafana link for in progress tests ([#277](https://github.com/Zooz/predator/issues/277)) ([9236774](https://github.com/Zooz/predator/commit/9236774))
+* **reports:** fixing grafana link for tests in progress ([#277](https://github.com/Zooz/predator/issues/277)) ([9236774](https://github.com/Zooz/predator/commit/9236774))
 * **reports:** Ordering reports by start time in GET: /v1/tests/{test_id}/reports API ([#289](https://github.com/Zooz/predator/issues/289))
 
 
