@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file. See [standa
 * **tests** Dynamic DSL. DSL tests will be transalted to predator tests dynamically ([#283](https://github.com/Zooz/predator/issues/283))
 
 ### Bug Fixes
-
+**reports:** Reports will now show average RPS during the entire test run instead of the last RPS result  ([#292](https://github.com/Zooz/predator/issues/292)) ([fa61a39](https://github.com/Zooz/predator/commit/fa61a39))
 * **reports:** fixing grafana link for tests in progress ([#277](https://github.com/Zooz/predator/issues/277)) ([9236774](https://github.com/Zooz/predator/commit/9236774))
 * **reports:** Ordering reports by start time in GET: /v1/tests/{test_id}/reports API ([#289](https://github.com/Zooz/predator/issues/289))
 
