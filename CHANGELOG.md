@@ -11,7 +11,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 * **benchmarks** Create a benchmark for a specific test, allowing for easy comparisons between subsequent test runs. ([#280](https://github.com/Zooz/predator/issues/280))
 * **reports** Compare multiple tests runs in the UI ([#290](https://github.com/Zooz/predator/issues/290))
-* **reports:** Reports will now show avg rps during all test instead of last rps stat  ([#292](https://github.com/Zooz/predator/issues/292)) ([fa61a39](https://github.com/Zooz/predator/commit/fa61a39))
 * **reports** Edit/Add notes from the reports/last reports screen ([#273](https://github.com/Zooz/predator/issues/273))
 * **metrics** Added support for setting custom labels for prometheus ([#278](https://github.com/Zooz/predator/issues/278))
 * **configuration** All of the configuration is now available to view and edit through the UI ([#274](https://github.com/Zooz/predator/issues/274))
