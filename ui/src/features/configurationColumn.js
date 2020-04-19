@@ -78,8 +78,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Description
                 </TableHeader>
             ),
-            accessor: 'description',
-            className: css['center-flex'],
+            accessor: 'description'
         }, {
             id: 'updated_at',
             Header: () => (
