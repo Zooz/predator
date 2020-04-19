@@ -21,13 +21,23 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 &nbsp; [**API Tests Examples**](https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest)
 
 ## Features
-- **Distributed load**:  Predator supports an unlimited number of load generators that produce multiple load runners concurrently.
+
+***Released in 1.3.0***
+
+- **Benchmarks**: Set benchmarks to compare test runs to ensure performance degradation is discovered early in development. Allows to measure every build and release against specified baseline results guaranteeing safer releases to production.
+
+- **Alerting**: Create alerts based on measured benchmark results and stay notified early about possible bottlenecks or performance degradation.
+
+***Released in 1.2.0 or earlier***
+
+- **Distributed load**: Predator supports an unlimited number of load generators that produce multiple load runners concurrently.
 
 - **Real time reports**: Predator aggregates all concurrent runs into a single beautiful report in real time (latency, rps, status codes and more).
 
-- **Built for the cloud**:  Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
 
-- **One click installation**:  Predator can be installed with just one click in Kubernetes and DC/OS, or on any other machine running Docker.
+- **Built for the cloud**: Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
+
+- **One click installation**: Predator can be installed with just one click in Kubernetes and DC/OS, or on any other machine running Docker.
 
 - **Supports 5 Different databases**: Predator provides out-of-the box functionality for persisting data in Cassandra, Postgres, MySQL, MSSQL and SQLITE.
 
