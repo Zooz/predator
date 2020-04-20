@@ -28,6 +28,8 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 
 - **Alerting**: Create alerts based on measured benchmark results and stay notified early about possible bottlenecks or performance degradation.
 
+- **Results comparison**: Built-in dashboard to compare multiple test runs at once.
+
 ***Released in 1.2.0 or earlier***
 
 - **Distributed load**: Predator supports an unlimited number of load generators that produce multiple load runners concurrently.
