@@ -31,7 +31,7 @@ export default (props) => {
             </SideLabel>
       </div>
         <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <SideLabel label={'forever'}>
+            <SideLabel label={'keep-alive'}>
                 <UiSwitcher
                     onChange={(value) => {
                         onForeverToggleChanged(value)

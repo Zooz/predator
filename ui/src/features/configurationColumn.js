@@ -211,8 +211,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => statusFormatter(data.status),
-            width: mediumSize,
-            className: css['center-flex'],
+            width: mediumSize
         },
         {
             id: 'arrival_rate',
