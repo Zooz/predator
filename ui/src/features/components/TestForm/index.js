@@ -215,7 +215,7 @@ export class TestForm extends React.Component {
     };
 
     initStep() {
-        return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: ''}
+        return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: '', forever: true}
     }
 
     onChooseScenario = (key) => {
@@ -258,10 +258,10 @@ export class TestForm extends React.Component {
         const {scenarios, currentScenarioIndex} = this.state;
         scenarios.splice(currentScenarioIndex, 1);
         let newCurrentScenarioIndex;
-        if(currentScenarioIndex===0){
-            newCurrentScenarioIndex=0;
-        }else{
-            newCurrentScenarioIndex =currentScenarioIndex-1;
+        if (currentScenarioIndex === 0) {
+            newCurrentScenarioIndex = 0;
+        } else {
+            newCurrentScenarioIndex = currentScenarioIndex - 1;
         }
         this.setState({scenarios, currentScenarioIndex: newCurrentScenarioIndex});
     };
