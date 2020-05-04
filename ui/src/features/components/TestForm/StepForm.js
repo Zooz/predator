@@ -81,14 +81,15 @@ export default (props) => {
                             onInputChange('url', evt.target.value)
                         }}/>
                     </TitleInput>
+                    <RequestOptions
+                        onGzipToggleChanged={(value) => onInputChange('gzip', value)}
+                        onForeverToggleChanged={(value) => onInputChange('forever', value)}
+                        gzipValue={step.gzip}
+                        foreverValue={step.forever}
+                    />
                 </RectangleAlignChildrenLeft>
 
-                <RequestOptions
-                    onGzipToggleChanged={(value) => onInputChange('gzip', value)}
-                    onForeverToggleChanged={(value) => onInputChange('forever', value)}
-                    gzipValue={step.gzip}
-                    foreverValue={step.forever}
-                />
+
             </div>
             <RectangleAlignChildrenLeft/>
             <Header text={'Headers'}/>
