@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/Zooz/predator/compare/v1.2.1...v1.3.0) (2020-04-16)
+
+
+### Features
+
+* **benchmarks** Create a benchmark for a specific test, allowing for easy comparisons between subsequent test runs. ([#280](https://github.com/Zooz/predator/issues/280))
+* **reports** Compare multiple tests runs in the UI ([#290](https://github.com/Zooz/predator/issues/290))
+* **reports** Edit/Add notes from the reports/last reports screen ([#273](https://github.com/Zooz/predator/issues/273))
+* **metrics** Added support for setting custom labels for prometheus ([#278](https://github.com/Zooz/predator/issues/278))
+* **configuration** All of the configuration is now available to view and edit through the UI ([#274](https://github.com/Zooz/predator/issues/274))
+* **tests** New create/edit test form UI ([#271](https://github.com/Zooz/predator/issues/271)) 
+* **tests** Dynamic DSL: DSL tests will be translated to predator tests dynamically ([#283](https://github.com/Zooz/predator/issues/283))
+
+### Bug Fixes
+* **reports:** Reports will now show average RPS during the entire test run instead of the last RPS result  ([#292](https://github.com/Zooz/predator/issues/292)) ([fa61a39](https://github.com/Zooz/predator/commit/fa61a39))
+* **reports:** fixing grafana link for tests in progress ([#277](https://github.com/Zooz/predator/issues/277)) ([9236774](https://github.com/Zooz/predator/commit/9236774))
+* **reports:** Ordering reports by start time in GET: /v1/tests/{test_id}/reports API ([#289](https://github.com/Zooz/predator/issues/289))
+
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/Zooz/predator/compare/v1.2.0...v1.2.1) (2020-03-26)
 

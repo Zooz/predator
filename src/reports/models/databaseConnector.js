@@ -15,7 +15,8 @@ module.exports = {
     getStats,
     subscribeRunner,
     updateSubscriberWithStats,
-    updateSubscriber
+    updateSubscriber,
+    updateReportBenchmark
 
 };
 
@@ -29,6 +30,10 @@ function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, 
 
 function updateReport(testId, reportId, reportData) {
     return databaseConnector.updateReport(testId, reportId, reportData);
+}
+
+function updateReportBenchmark(testId, reportId, score, benchmarkData) {
+    return databaseConnector.updateReportBenchmark(testId, reportId, score, benchmarkData);
 }
 
 function getLastReports(limit) {

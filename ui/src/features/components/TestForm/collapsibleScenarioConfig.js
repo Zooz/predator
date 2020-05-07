@@ -37,12 +37,16 @@ export default class CollapsibleScenarioConfig extends React.Component {
             <Section key={1} onClick={(evt) => {
                 evt.stopPropagation();
                 onDuplicateScenario()
-            }} icon='fa-copy' tooltip='Duplicate scenario'/>,
-            <Section key={2} onClick={(evt) => {
+            }} icon='fa-copy' tooltip='Duplicate scenario'/>
+        ]
+
+        if(onDeleteScenario){
+            sections.push( <Section key={2} onClick={(evt) => {
                 evt.stopPropagation();
                 onDeleteScenario()
-            }} icon='fa-trash' tooltip='Delete scenario' borderLeft/>,
-        ]
+            }} icon='fa-trash' tooltip='Delete scenario' borderLeft/>)
+        }
+
         const {expanded} = this.state;
         return (<CollapsibleItem
             onClick={() => {

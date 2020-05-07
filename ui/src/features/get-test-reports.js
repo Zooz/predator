@@ -8,17 +8,19 @@ import Loader from './components/Loader';
 import Page from '../components/Page';
 import _ from 'lodash';
 import Report from "./components/Report";
+import CompareReports from "./components/Report/compareReports";
 import {ReactTableComponent} from "../components/ReactTable";
 import {getColumns} from "./configurationColumn";
 import {createJobRequest} from "./requestBuilder";
 import {createJobSuccess} from "./redux/selectors/jobsSelector";
 import Snackbar from 'material-ui/Snackbar';
 import ErrorDialog from "./components/ErrorDialog";
+import Button from "../components/Button";
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetReports = 'Error occurred while trying to get all reports for test.';
-const columnsNames = ['start_time', 'end_time', 'duration', 'status', 'arrival_rate',
-    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'grafana_report', 'report', 'rerun', 'raw', 'logs'];
+const columnsNames = ['compare', 'start_time', 'end_time', 'duration', 'status', 'arrival_rate',
+    'ramp_to', 'last_success_rate', 'avg_rps', 'parallelism', 'notes', 'grafana_report', 'report', 'score', 'rerun', 'raw', 'logs'];
 
 const DESCRIPTION = 'All reports for a given test.';
 
@@ -28,14 +30,14 @@ class getTests extends React.Component {
         const {match: {params}} = props;
         this.testId = params.testId;
         this.instance = params.instance;
-
         this.state = {
             openSnakeBar: false,
             openViewReport: false,
             showReport: null,
             sortedReports: [],
             sortHeader: '',
-            rerunJob: null
+            rerunJob: null,
+            showCompareReports: false
         };
     }
 
@@ -111,6 +113,7 @@ class getTests extends React.Component {
         this.props.clearErrorOnGetReports();
         this.props.clearSelectedReport();
         this.props.clearSelectedTest();
+        this.props.clearReportForCompare();
     }
 
     loader() {
@@ -119,6 +122,12 @@ class getTests extends React.Component {
 
     closeReport = () => {
         this.setState({showReport: null})
+    };
+    closeCompareReports = () => {
+        this.setState({showCompareReports: false})
+    };
+    onReportSelected = (testId, reportId, value) => {
+        this.props.addReportForCompare(testId, reportId, value);
     };
 
     render() {
@@ -132,12 +141,15 @@ class getTests extends React.Component {
             onRawView: this.onRawView,
             onStop: this.onStop,
             onRunTest: this.onRunTest,
-            onEditNote: this.onEditNote
+            onEditNote: this.onEditNote,
+            onReportSelected: this.onReportSelected,
+            selectedReports: this.props.selectedReports
         });
-        const {showReport} = this.state;
+        const {showReport, showCompareReports} = this.state;
         const {
             errorCreateBenchmark,
             errorEditReport,
+            selectedReports,
         } = this.props;
         const feedbackMessage = this.generateFeedbackMessage();
         const error = errorCreateBenchmark || errorEditReport;
@@ -145,6 +157,15 @@ class getTests extends React.Component {
             <Page
                 title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
                 description={DESCRIPTION}>
+                <Button
+                    disabled={!this.props.isAtLeastOneReportSelected}
+                    style={{
+                    marginBottom: '10px',
+                }} onClick={() => {
+                    this.setState({
+                        showCompareReports: true
+                    });
+                }}>Compare Reports</Button>
                 <ReactTableComponent
                     onSearch={this.onSearch}
                     rowHeight={'46px'}
@@ -160,6 +181,12 @@ class getTests extends React.Component {
                 />
                 {showReport &&
                 <Report onClose={this.closeReport} key={showReport.report_id + 'reports'} report={showReport}/>}
+                {this.state.openViewReport ? <Dialog title_key={'report_id'} data={this.state.openViewReport}
+                                                     closeDialog={this.closeViewReportDialog}/> : null}
+                {
+                    showCompareReports &&
+                    <CompareReports onClose={this.closeCompareReports} selectedReports={selectedReports}/>
+                }
                 {this.state.openViewReport ? <Dialog title_key={'report_id'} data={this.state.openViewReport}
                                                      closeDialog={this.closeViewReportDialog}/> : null}
                 {feedbackMessage && <Snackbar
@@ -203,6 +230,9 @@ function mapStateToProps(state) {
         noteSuccess: selectors.editNotesSuccess(state),
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
+        selectedReports: selectors.selectedReports(state),
+        isAtLeastOneReportSelected: selectors.isAtLeastOneReportSelected(state),
+
     }
 }
 
@@ -218,6 +248,8 @@ const mapDispatchToProps = {
     editNotesSuccess: Actions.editReportSuccess,
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
+    addReportForCompare: Actions.addReportForCompare,
+    clearReportForCompare: Actions.clearReportForCompare,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);

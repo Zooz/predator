@@ -1,0 +1,57 @@
+@import 'style/colors';
+@import "../styles/inputs";
+
+$size: 14px;
+$default-border: solid 1px $active-border-color;
+
+@mixin box() {
+  width: $size;
+  height: $size;
+  border-radius: 2px;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.checkbox {
+  @include box();
+  position: relative;
+  cursor: pointer;
+  font-size: 12px;
+
+  input[type='checkbox'] {
+    cursor: inherit;
+    opacity: 0;
+    width: $size;
+    height: $size;
+    margin: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  &.disabled {
+    cursor: default;
+    background-color: $default-border-color;
+  }
+}
+
+.checkbox--checked {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: $active-border-color;
+  color: $white;
+  &.disabled {
+    color: $checkbox-disabled-color;
+  }
+}
+
+.checkbox--unchecked {
+  border: $default-border;
+  background-color: $white;
+
+  &.disabled {
+    border: solid 1px $checkbox-disabled-border;
+  }
+}
+

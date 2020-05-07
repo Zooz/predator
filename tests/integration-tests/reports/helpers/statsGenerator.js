@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports.generateStats = (phaseStatus, runnerId) => {
+module.exports.generateStats = (phaseStatus, runnerId, statsTime, rpsCount) => {
     let stats;
     switch (phaseStatus) {
     case 'error':
@@ -9,13 +9,13 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
             runner_id: runnerId,
             phase_status: 'error',
             stats_time: Date.now().toString(),
-            data: JSON.stringify({ timestamp: Date.now(), message: error.message}),
+            data: JSON.stringify({ timestamp: statsTime || Date.now(), message: error.message }),
             error
         };
         break;
     case 'started_phase':
         const startedPhaseInfo = {
-            'timestamp': Date.now(),
+            'timestamp': statsTime || Date.now(),
             'duration': 120,
             'arrivalRate': 500,
             'mode': 'uniform',
@@ -31,7 +31,7 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
         break;
     case 'intermediate':
         const intermediatePhaseInfo = {
-            'timestamp': Date.now(),
+            'timestamp': statsTime || Date.now(),
             'scenariosCreated': 101,
             'scenariosCompleted': 101,
             'requestsCompleted': 101,
@@ -43,7 +43,7 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
                 'p99': 1059
             },
             'rps': {
-                'count': 101,
+                'count': rpsCount || 101,
                 'mean': 90.99
             },
             'scenarioDuration': {
@@ -76,7 +76,7 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
         break;
     case 'done':
         const donePhaseInfo = {
-            'timestamp': Date.now(),
+            'timestamp': statsTime || Date.now(),
             'scenariosCreated': 150,
             'scenariosCompleted': 150,
             'requestsCompleted': 150,
@@ -88,7 +88,7 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
                 'p99': 1057.6
             },
             'rps': {
-                'count': 150,
+                'count': rpsCount || 150,
                 'mean': 0.14
             },
             'scenarioDuration': {
@@ -121,7 +121,7 @@ module.exports.generateStats = (phaseStatus, runnerId) => {
         break;
     case 'aborted':
         const abortedPhaseInfo = {
-            'timestamp': Date.now()
+            'timestamp': statsTime || Date.now()
         };
         stats = {
             runner_id: runnerId,

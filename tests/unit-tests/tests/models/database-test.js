@@ -12,8 +12,12 @@ const functions = [
         args: ['testInfo', 'testJson', 'id', 'revisionId', 'processorFileId', 'csvFileId']
     },
     {
-        functionName: 'insertTestBenchMark',
-        args: ['testId', 'benchMarkData']
+        functionName: 'insertTestBenchmark',
+        args: ['testId', 'benchmarkData']
+    },
+    {
+        functionName: 'getTestBenchmark',
+        args: ['testId']
     },
     {
         functionName: 'getTest',

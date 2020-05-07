@@ -1,6 +1,6 @@
 import React from 'react';
 import CollapsibleStep from './collapsibleStep';
-
+import DragableWrapper from './dragableWrapper'
 export default class StepsList extends React.Component {
     constructor(props) {
         super(props);
@@ -16,6 +16,7 @@ export default class StepsList extends React.Component {
             afterStepProcessorValue,
             onDeleteStep,
             onDuplicateStep,
+            updateStepOrder,
         } = this.props;
         return (<div style={{
             width: '100%',
@@ -28,6 +29,12 @@ export default class StepsList extends React.Component {
                 this.props.steps.map((step,index) => {
 
                     return (
+                           <DragableWrapper
+                               key={step.id}
+                               index={index}
+                               id={step.id}
+                               move={updateStepOrder}
+                           >
                             <CollapsibleStep
                                 index={index}
                                 key={index}
@@ -41,6 +48,7 @@ export default class StepsList extends React.Component {
                                 onDeleteStep={onDeleteStep}
                                 onDuplicateStep={onDuplicateStep}
                             />
+                           </DragableWrapper>
                     )
                 })
 

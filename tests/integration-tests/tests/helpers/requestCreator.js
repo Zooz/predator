@@ -19,7 +19,8 @@ module.exports = {
     getFile,
     getTest,
     getAllRevisions,
-    createBenchMark
+    createBenchmark,
+    getBenchmark
 };
 async function init() {
     try {
@@ -85,9 +86,17 @@ function createTest(body, headers) {
         });
 }
 
-function createBenchMark(testId, body, headers) {
+function createBenchmark(testId, body, headers) {
     return request(app).post('/v1/tests/' + testId + '/benchmark')
         .send(body)
+        .set(headers)
+        .expect(function (res) {
+            return res;
+        });
+}
+
+function getBenchmark(testId, headers) {
+    return request(app).get('/v1/tests/' + testId + '/benchmark')
         .set(headers)
         .expect(function (res) {
             return res;

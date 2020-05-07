@@ -10,17 +10,20 @@ import * as Actions from './redux/action';
 import Page from '../components/Page';
 import _ from 'lodash';
 import Report from './components/Report';
+import CompareReports from "./components/Report/compareReports";
 import {createJobRequest} from './requestBuilder';
 
 import {ReactTableComponent} from './../components/ReactTable';
 import {getColumns} from './configurationColumn'
 import ErrorDialog from "./components/ErrorDialog";
 import FormWrapper from "../components/FormWrapper";
+import Button from "../components/Button";
+import Loader from "./components/Loader";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
-const columnsNames = ['test_name', 'start_time', 'end_time', 'duration', 'status', 'arrival_rate',
-    'ramp_to', 'last_success_rate', 'last_rps', 'parallelism', 'notes', 'report', 'grafana_report', 'rerun', 'raw', 'logs', 'stop'];
+const columnsNames = ['compare', 'test_name', 'start_time', 'end_time', 'duration', 'status', 'arrival_rate',
+    'ramp_to', 'last_success_rate', 'avg_rps', 'parallelism', 'notes', 'score', 'report', 'grafana_report', 'rerun', 'raw', 'logs', 'stop'];
 const DESCRIPTION = 'Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.';
 
 class getReports extends React.Component {
@@ -31,7 +34,8 @@ class getReports extends React.Component {
             showReport: false,
             sortedReports: [],
             sortHeader: '',
-            rerunJob: null
+            rerunJob: null,
+            showCompareReports: false
 
         };
     }
@@ -54,6 +58,7 @@ class getReports extends React.Component {
         this.props.createJob(requestBody);
         this.setState({rerunJob: job});
     };
+
 
     onEditNote = (testId, reportId, notes) => {
         const {editReport} = this.props;
@@ -91,6 +96,7 @@ class getReports extends React.Component {
     componentWillUnmount() {
         this.props.clearSelectedReport();
         clearInterval(this.refreshDataInterval);
+        this.props.clearReportForCompare();
     }
 
     onSort = (field) => {
@@ -123,15 +129,25 @@ class getReports extends React.Component {
         this.props.clearErrorOnStopJob();
 
     };
+    closeCompareReports = () => {
+        this.setState({showCompareReports: false})
+    };
+    onReportSelected = (testId, reportId, value) => {
+        this.props.addReportForCompare(testId, reportId, value);
+    };
+    loader() {
+        return this.props.processingGetReports ? <Loader/> : 'There is no data'
+    }
 
     render() {
-        const {showReport, sortHeader, sortedReports} = this.state;
+        const {showReport, sortHeader, sortedReports, showCompareReports} = this.state;
         const {
             errorOnGetReports,
             errorOnGetReport,
             errorOnStopRunningJob,
             errorCreateBenchmark,
-            errorEditReport
+            errorEditReport,
+            selectedReports
         } = this.props;
         const columns = getColumns({
             columnsNames,
@@ -141,7 +157,9 @@ class getReports extends React.Component {
             onRawView: this.onRawView,
             onStop: this.onStop,
             onRunTest: this.onRunTest,
-            onEditNote: this.onEditNote
+            onEditNote: this.onEditNote,
+            onReportSelected: this.onReportSelected,
+            selectedReports: this.props.selectedReports
         });
         const feedbackMessage = this.generateFeedbackMessage();
         const error = errorOnGetReports || errorOnGetReport || errorOnStopRunningJob || errorCreateBenchmark || errorEditReport;
@@ -151,6 +169,15 @@ class getReports extends React.Component {
             <Page title={'Last Reports'} description={DESCRIPTION}>
                 <div style={{width: '100%'}}>
                     {showReport && <Report onClose={this.closeReport} key={showReport.report_id} report={showReport}/>}
+                    <Button
+                        disabled={!this.props.isAtLeastOneReportSelected}
+                        style={{
+                            marginBottom: '10px',
+                        }} onClick={() => {
+                        this.setState({
+                            showCompareReports: true
+                        });
+                    }}>Compare Reports</Button>
                     <ReactTableComponent
                         // tableRowId={'report_id'}
                         onSearch={this.onSearch}
@@ -159,6 +186,7 @@ class getReports extends React.Component {
                         data={sortedReports}
                         pageSize={10}
                         columns={columns}
+                        noDataText={this.loader()}
                         showPagination
                         resizable={false}
                         cursor={'default'}
@@ -168,7 +196,10 @@ class getReports extends React.Component {
                 {this.state.openViewReport
                     ? <Dialog title_key={'id'} data={this.state.openViewReport}
                               closeDialog={this.closeViewReportDialog}/> : null}
-
+                {
+                    showCompareReports &&
+                    <CompareReports onClose={this.closeCompareReports} selectedReports={selectedReports}/>
+                }
                 {feedbackMessage && <Snackbar
                     open={!!feedbackMessage}
                     bodyStyle={{backgroundColor: '#2fbb67'}}
@@ -205,7 +236,6 @@ class getReports extends React.Component {
 
 
 }
-
 function mapStateToProps(state) {
     return {
         reports: selectors.reports(state),
@@ -220,7 +250,8 @@ function mapStateToProps(state) {
         noteSuccess: selectors.editNotesSuccess(state),
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
-
+        selectedReports: selectors.selectedReports(state),
+        isAtLeastOneReportSelected: selectors.isAtLeastOneReportSelected(state),
     }
 }
 
@@ -237,6 +268,9 @@ const mapDispatchToProps = {
     editNotesSuccess: Actions.editReportSuccess,
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
+    addReportForCompare: Actions.addReportForCompare,
+    clearReportForCompare: Actions.clearReportForCompare,
+
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getReports);

@@ -1,12 +1,10 @@
 'use strict';
 
-const _ = require('lodash'),
-    uuid = require('uuid/v4');
+const _ = require('lodash');
 
 const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
-    notifier = require('./notifier'),
     constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
@@ -33,7 +31,7 @@ module.exports.getReports = async (testId) => {
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
-
+    reports.sort((a, b) => b.start_time - a.start_time);
     return reports;
 };
 
@@ -73,32 +71,14 @@ module.exports.postReport = async (testId, reportBody) => {
     return reportBody;
 };
 
-module.exports.postStats = async (report, stats) => {
-    const statsParsed = JSON.parse(stats.data);
-    const statsTime = statsParsed.timestamp;
-
-    if (stats.phase_status === constants.SUBSCRIBER_DONE_STAGE) {
-        await databaseConnector.updateSubscriber(report.test_id, report.report_id, stats.runner_id, stats.phase_status);
-    } else {
-        await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, stats.data);
-    }
-
-    if (stats.phase_status === constants.SUBSCRIBER_INTERMEDIATE_STAGE || stats.phase_status === constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE) {
-        await databaseConnector.insertStats(stats.runner_id, report.test_id, report.report_id, uuid(), statsTime, report.phase, stats.phase_status, stats.data);
-    }
-    await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
-    report = await module.exports.getReport(report.test_id, report.report_id);
-    notifier.notifyIfNeeded(report, stats);
-
-    return stats;
-};
-
 function getReportResponse(summaryRow, config) {
-    let timeEndOrCurrent = summaryRow.end_time || new Date();
+    let lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;
 
     let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
+    const reportDurationSeconds = (new Date(lastUpdateTime).getTime() - new Date(summaryRow.start_time).getTime()) / 1000;
 
     let rps = 0;
+    let totalRequests = 0;
     let completedRequests = 0;
     let successRequests = 0;
 
@@ -106,6 +86,7 @@ function getReportResponse(summaryRow, config) {
         if (subscriber.last_stats && subscriber.last_stats.rps && subscriber.last_stats.codes) {
             completedRequests += subscriber.last_stats.requestsCompleted;
             rps += subscriber.last_stats.rps.mean;
+            totalRequests += subscriber.last_stats.rps.total_count || 0;
             Object.keys(subscriber.last_stats.codes).forEach(key => {
                 if (key[0] === '2') {
                     successRequests += subscriber.last_stats.codes[key];
@@ -126,7 +107,7 @@ function getReportResponse(summaryRow, config) {
         start_time: summaryRow.start_time,
         end_time: summaryRow.end_time || undefined,
         phase: summaryRow.phase,
-        duration_seconds: (new Date(timeEndOrCurrent).getTime() - new Date(summaryRow.start_time).getTime()) / 1000,
+        duration_seconds: reportDurationSeconds,
         arrival_rate: testConfiguration.arrival_rate,
         duration: testConfiguration.duration,
         ramp_to: testConfiguration.ramp_to,
@@ -137,7 +118,10 @@ function getReportResponse(summaryRow, config) {
         environment: testConfiguration.environment,
         subscribers: summaryRow.subscribers,
         last_rps: rps,
-        last_success_rate: successRate
+        avg_rps: Number((totalRequests / reportDurationSeconds).toFixed(2)),
+        last_success_rate: successRate,
+        score: summaryRow.score ? summaryRow.score : undefined,
+        benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined
     };
 
     report.status = calculateReportStatus(report, config);

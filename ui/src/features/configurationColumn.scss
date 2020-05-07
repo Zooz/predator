@@ -12,6 +12,13 @@
   height:46px;
   display:flex;
   align-items: center;
+  justify-content: center;
+}
+
+.center-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .disabled-button {
@@ -30,14 +37,3 @@
   text-overflow: ellipsis;
   max-width: 164px;
 }
-
-.header-name {
-  width:15% !important;
-}
-
-.small-header {
-  margin:auto;
-  width:50px !important;
-}
-
-

@@ -101,7 +101,7 @@
     "react-router-redux": "^5.0.0-alpha.9",
     "react-table": "^6.8.6",
     "react-tooltip": "^3.9.0",
-    "recharts": "^1.5.0",
+    "recharts": "^1.8.5",
     "redux": "^4.0.0",
     "redux-saga": "^0.16.0",
     "reselect": "^4.0.0",

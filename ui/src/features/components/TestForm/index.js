@@ -53,7 +53,7 @@ export class TestForm extends React.Component {
         const {maxSupportedScenariosUi} = this.state;
         const {cleanAllErrors} = this.props;
         cleanAllErrors();
-        if(maxSupportedScenariosUi){
+        if (maxSupportedScenariosUi) {
             this.setState({maxSupportedScenariosUi: null})
         }
 
@@ -92,6 +92,7 @@ export class TestForm extends React.Component {
         const {createTestError, processorsError, closeDialog, processorsLoading, processorsList} = this.props;
         const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi} = this.state;
         const error = createTestError || processorsError || maxSupportedScenariosUi;
+
         return (
             <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
                 <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
@@ -214,7 +215,7 @@ export class TestForm extends React.Component {
     };
 
     initStep() {
-        return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: ''}
+        return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: '', forever: true}
     }
 
     onChooseScenario = (key) => {
@@ -256,7 +257,13 @@ export class TestForm extends React.Component {
     onDeleteScenario = () => {
         const {scenarios, currentScenarioIndex} = this.state;
         scenarios.splice(currentScenarioIndex, 1);
-        this.setState({scenarios, currentScenarioIndex: currentScenarioIndex - 1});
+        let newCurrentScenarioIndex;
+        if (currentScenarioIndex === 0) {
+            newCurrentScenarioIndex = 0;
+        } else {
+            newCurrentScenarioIndex = currentScenarioIndex - 1;
+        }
+        this.setState({scenarios, currentScenarioIndex: newCurrentScenarioIndex});
     };
 
     onDuplicateScenario = () => {
@@ -278,7 +285,19 @@ export class TestForm extends React.Component {
         }
         return steps;
     };
-
+    updateStepOrder = (dragIndex, hoverIndex) => {
+        const {scenarios, currentScenarioIndex, before} = this.state;
+        let steps;
+        if (currentScenarioIndex === null) {
+            steps = before.steps;
+        } else {
+            steps = scenarios[currentScenarioIndex].steps;
+        }
+        const step = steps[dragIndex];
+        steps.splice(dragIndex, 1);
+        steps.splice(hoverIndex, 0, step);
+        this.setState({scenarios, before});
+    };
     calcMaxAllowedWeight = (index) => {
         const {scenarios, currentScenarioIndex} = this.state;
         const exceptIndex = index || currentScenarioIndex;
@@ -318,7 +337,8 @@ export class TestForm extends React.Component {
                     <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
                     <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
                 </div>
-                <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey} className={style.tabs}>
+                <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey}
+                      className={style.tabs}>
                     {
                         tabsData.map((tabData, index) => {
                             return (
@@ -339,7 +359,7 @@ export class TestForm extends React.Component {
                                                 scenario={tabData}
                                                 onChangeValueOfScenario={this.onChangeValueOfScenario}
                                                 processorsExportedFunctions={processorsExportedFunctions}
-                                                onDeleteScenario={this.onDeleteScenario}
+                                                onDeleteScenario={scenarios.length === 1 ? undefined : this.onDeleteScenario}
                                                 onDuplicateScenario={this.onDuplicateScenario}
                                             />
                                         </div>
@@ -351,6 +371,7 @@ export class TestForm extends React.Component {
                                                    processorsExportedFunctions={processorsExportedFunctions}
                                                    onDeleteStep={this.onDeleteStep}
                                                    onDuplicateStep={this.onDuplicateStep}
+                                                   updateStepOrder={this.updateStepOrder}
                                         />
                                     </div>
 

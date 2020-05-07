@@ -211,7 +211,7 @@ ReactTableComponent.defaultProps = {
   resizable: true,
   tableRowId: 'id',
   rowHeight: null,
-  cellPadding: '12px',
+  cellPadding: '8px',
   colors: {
     background: {
       default: '#fff',

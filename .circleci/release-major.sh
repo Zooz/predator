@@ -5,11 +5,11 @@ git config --global user.email $GIT_EMAIL
 git config --global user.name $GIT_USER
 
 # Bump package.json version and tag the release
-npm run release -- --release-as minor
+npm run release -- --release-as major
 
 # Retrieve tag
 TAG=$(node -p "require('./package.json').version")
-echo "Releasing tag: v$TAG"
+echo "Releasing tag: $TAG"
 
 echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
