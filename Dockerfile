@@ -21,9 +21,12 @@ COPY /ui/tsconfig.declarations.json /usr/ui/
 COPY /ui/.babelrc /usr/ui
 ARG BUCKET_PATH
 ARG PREDATOR_DOCS_URL
+# Build UI from sources
 WORKDIR /usr/ui
 RUN npm ci --silent
 RUN BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL npm run build
+# Clean up
+RUN rm -r /usr/ui
 
 WORKDIR /usr
 
