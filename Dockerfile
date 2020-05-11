@@ -26,7 +26,7 @@ WORKDIR /usr/ui
 RUN npm ci --silent
 RUN BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL npm run build
 # Clean up
-RUN rm -r /usr/ui
+RUN mv /usr/ui/dist /tmp/dist && rm -rf /usr/ui/* && mv /tmp/dist /usr/ui/dist
 
 WORKDIR /usr
 
