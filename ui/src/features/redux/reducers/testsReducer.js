@@ -58,6 +58,7 @@ export default function reduce (state = initialState, action = {}) {
   case Types.INIT_CREATE_FORM:
     return state.set('create_test_success', false)
       .set('error_create_test', undefined);
+
   default:
     return state;
   }
