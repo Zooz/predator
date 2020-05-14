@@ -49,7 +49,7 @@ describe('the tests api', function() {
             let requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
             const res = await testsRequestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(422);
-            res.body.message.should.eql('Error to download file: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com www.notrealurl.com:443');
+            res.body.message.should.eql('Error to download file: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com');
         });
         it('Should return error for processor id not exists ', async () => {
             let requestBody = Object.assign({ processor_id: '123e4567-e89b-12d3-a456-426655440000' }, simpleTest.test);
