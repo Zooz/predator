@@ -1410,12 +1410,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:
@@ -1437,12 +1431,6 @@ paths:
                 $ref: '#/components/schemas/webhook'
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '422':
-          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -1501,12 +1489,6 @@ paths:
                   $ref: '#/components/schemas/webhook'
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '422':
-          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -2424,6 +2406,7 @@ components:
         - name
         - webhook_url
         - events
+        - format_type
       properties:
         id:
           description: Unique webhook identifier
@@ -2441,6 +2424,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/webhooks_types'
+        format_type:
+          $ref: '#/components/schemas/webhook_format_types'
 
     webhooks_types:
       type: string
@@ -2450,6 +2435,12 @@ components:
         - aborted
         - failed
         - finished
-        - bencmark_passed
+        - benchmark_passed
         - benchmark_failed
+        - results_interval
 
+    webhook_format_types:
+      type: string
+      enum:
+        - slack
+        - json
