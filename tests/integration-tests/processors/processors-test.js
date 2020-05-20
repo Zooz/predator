@@ -321,7 +321,7 @@ describe('Processors api', function () {
                 };
                 let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
-                createProcessorResponse.body.message.should.eql('javascript syntax validation failed with error: Unexpected token )');
+                createProcessorResponse.body.message.should.eql("javascript syntax validation failed with error: Unexpected token ')'");
             });
         });
         describe('PUT /processors/{processor_id}', () => {

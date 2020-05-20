@@ -1,5 +1,5 @@
 # NODE container which runs this service
-FROM node:8.15-alpine
+FROM node:12.16-slim
 
 RUN mkdir -p /usr/src
 WORKDIR /usr
@@ -21,9 +21,12 @@ COPY /ui/tsconfig.declarations.json /usr/ui/
 COPY /ui/.babelrc /usr/ui
 ARG BUCKET_PATH
 ARG PREDATOR_DOCS_URL
+# Build UI from sources
 WORKDIR /usr/ui
 RUN npm ci --silent
 RUN BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL npm run build
+# Clean up
+RUN mv /usr/ui/dist /tmp/dist && rm -rf /usr/ui/* && mv /tmp/dist /usr/ui/dist
 
 WORKDIR /usr
 
