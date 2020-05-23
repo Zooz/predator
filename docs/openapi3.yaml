@@ -2437,7 +2437,6 @@ components:
         - finished
         - benchmark_passed
         - benchmark_failed
-        -
 
     webhook_format_types:
       type: string
