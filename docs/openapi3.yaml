@@ -2426,6 +2426,9 @@ components:
             $ref: '#/components/schemas/webhooks_types'
         format_type:
           $ref: '#/components/schemas/webhook_format_types'
+        global:
+          type: boolean
+          description: indicates whether the webhook should be applied globally(over all jobs)
 
     webhooks_types:
       type: string
