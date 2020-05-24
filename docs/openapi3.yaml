@@ -2440,7 +2440,6 @@ components:
         - finished
         - benchmark_passed
         - benchmark_failed
-        - results_interval
 
     webhook_format_types:
       type: string
