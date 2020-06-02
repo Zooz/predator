@@ -123,6 +123,7 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime) {
             startTime: report.start_time,
             testName: report.test_name,
             duration: report.duration,
+            notes: report.notes
         }
     })
 }
