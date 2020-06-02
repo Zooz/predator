@@ -30,7 +30,6 @@ export const getAggregateReportsForCompare = createSelector(aggregateReport, (re
 
 function buildAggregateReportData(reports, withPrefix, startFromZeroTime) {
     let prefix = withPrefix ? 'A_' : '';
-    console.log('reports',reports);
 
     return reports.map((report) => {
         const latencyGraph = [],
