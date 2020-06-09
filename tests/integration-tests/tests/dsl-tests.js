@@ -1,4 +1,3 @@
-
 const should = require('should'),
     requestSender = require('./helpers/requestCreator');
 

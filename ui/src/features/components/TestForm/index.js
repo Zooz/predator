@@ -17,6 +17,7 @@ import TextArea from "../../../components/TextArea";
 import StepsList from './stepsList';
 import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
+import {FileDrop} from 'react-file-drop';
 
 export class TestForm extends React.Component {
     constructor(props) {
@@ -34,7 +35,9 @@ export class TestForm extends React.Component {
                 currentScenarioIndex: 0,
                 currentStepIndex: null,
                 processorId: undefined,
-                processorsExportedFunctions: []
+                processorsExportedFunctions: [],
+                csvMode: false,
+                csvFile: null
             }
 
         }
@@ -46,7 +49,7 @@ export class TestForm extends React.Component {
         if (editMode) {
             editTest(createTestRequest(this.state), id)
         } else {
-            createTest(createTestRequest(this.state));
+            createTest(createTestRequest(this.state), this.state.csvFile);
         }
     };
     onCloseErrorDialog = () => {
@@ -313,7 +316,8 @@ export class TestForm extends React.Component {
     generateScenarioDashBoard = () => {
         const {
             scenarios, before, currentScenarioIndex,
-            processorsExportedFunctions
+            processorsExportedFunctions, csvMode,
+            csvFile
         } = this.state;
         let tabsData;
         if (before) {
@@ -331,12 +335,16 @@ export class TestForm extends React.Component {
                     marginRight: '12px',
                     display: 'flex',
                     justifyContent: 'space-between',
-                    width: '250px'
+                    width: '313px'
                 }}>
+
                     <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
                     <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
                     <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
+                    <div className={style['actions-style']} onClick={() => this.setState({csvMode: true})}>+Add CSV
+                    </div>
                 </div>
+                {csvMode && <DragAndDrop csvFile={csvFile} onDropFile={(file) => this.setState({csvFile: file})}/>}
                 <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey}
                       className={style.tabs}>
                     {
@@ -400,6 +408,36 @@ export class TestForm extends React.Component {
         this.setState({scenarios: scenarios, before});
     };
 }
+
+export const DragAndDrop = ({csvFile, onDropFile}) => {
+    const styles = {
+        border: '1px solid black', borderStyle: 'dashed', height: 50, color: 'black',
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex'
+    };
+    return (
+        <div style={styles}>
+            <FileDrop
+                className={style.fileDrop}
+                // onFrameDragEnter={(event) => console.log('onFrameDragEnter', event)}
+                // onFrameDragLeave={(event) => console.log('onFrameDragLeave', event)}
+                // o    nFrameDrop={(event) => console.log('onFrameDrop', event)}
+                // onDragOver={(event) => console.log('onDragOver', event)}
+                // onDragLeave={(event) => console.log('onDragLeave', event)}
+                onDrop={(files, event) => {
+                    onDropFile(files[0])
+                }}
+            >
+                {
+                    csvFile && csvFile.name
+                    ||
+                    <span>Drop csv file here</span>
+                }
+            </FileDrop>
+        </div>
+    );
+};
 
 function mapStateToProps(state) {
     return {
