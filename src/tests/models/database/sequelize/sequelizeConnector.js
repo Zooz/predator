@@ -117,7 +117,7 @@ async function getTestBenchmark(test_id) {
     return benchmarkRes ? benchmarkRes.data : undefined;
 }
 
-async function insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFileId){
+async function insertTest(testInfo, testJson, id, revisionId, processorFileId){
     const test = client.model('test');
     let params = {
         test_id: id,

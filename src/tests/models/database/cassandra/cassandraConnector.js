@@ -79,9 +79,9 @@ async function getAllTestRevisions(id) {
     return sanitizedResult;
 }
 
-async function insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFileId) {
+async function insertTest(testInfo, testJson, id, revisionId, processorFileId) {
     let params;
-    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, processorFileId, csvFileId, testInfo.processor_id];
+    params = [id, testInfo.name, testInfo.description, testInfo.type, Date.now(), JSON.stringify(testInfo), JSON.stringify(testJson), revisionId, processorFileId, testInfo.csv_file_id, testInfo.processor_id];
     const result = await executeQuery(INSERT_TEST_DETAILS, params, queryOptions);
     return result;
 }
