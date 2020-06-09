@@ -31,7 +31,8 @@ class CompareReports extends React.Component {
                 startTime: report.startTime,
                 testName: report.testName,
                 duration: report.duration,
-                show: true
+                show: true,
+                notes: report.notes
             }));
 
             const keysToDefaultFilter = reportsList.flatMap((reportInfo) => [`${reportInfo.name}_p95`, `${reportInfo.name}_p99`]);
@@ -233,6 +234,7 @@ const Block = ({header, dataList, style = {}}) => {
 const ReportsList = ({list = [], onChange}) => {
     const headerStyle = {marginRight: '10px'};
     const data = list.reduce((acc, cur, index) => {
+        acc.notes.push(cur.notes);
         acc.symbols.push(cur.name);
         acc.testNames.push(cur.testName);
         acc.durations.push(prettySeconds(cur.duration));
@@ -250,6 +252,7 @@ const ReportsList = ({list = [], onChange}) => {
         durations: [],
         startTimes: [],
         checkboxes: [],
+        notes: []
     });
 
 
@@ -260,6 +263,7 @@ const ReportsList = ({list = [], onChange}) => {
             <Block style={headerStyle} header={'Test Name'} dataList={data.testNames}/>
             <Block style={headerStyle} header={'Duration'} dataList={data.durations}/>
             <Block style={headerStyle} header={'Start Time'} dataList={data.startTimes}/>
+            <Block style={headerStyle} header={'Notes'} dataList={data.notes}/>
         </div>
     );
 };

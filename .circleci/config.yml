@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   setup:
     docker:
-    - image: circleci/node:8
+    - image: circleci/node:12.16
     steps:
     - checkout
     - setup_remote_docker:
@@ -16,7 +16,7 @@ jobs:
         - node_modules
   unit-tests:
     docker:
-    - image: circleci/node:8
+    - image: circleci/node:12.16
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -32,7 +32,7 @@ jobs:
           path: ./coverage
   integration-tests:
     docker:
-    - image: circleci/node:8
+    - image: circleci/node:12.16
     - image: circleci/cassandra:3.10
       environment:
         MAX_HEAP_SIZE: 2048m
@@ -95,7 +95,7 @@ jobs:
       version:
         type: string
     docker:
-    - image: circleci/node:8
+    - image: circleci/node:12.16
     steps:
     - checkout
     - setup_remote_docker:
@@ -109,7 +109,7 @@ jobs:
     - run: .circleci/tag-latest-image.sh
   tag-latest-image:
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:12.16
     steps:
       - checkout
       - setup_remote_docker:

@@ -2,7 +2,7 @@
 const testGenerator = require('./testGenerator'),
     database = require('./database'),
     uuid = require('uuid'),
-    fileManager = require('./fileManager'),
+    fileManager = require('../../files/models/fileManager'),
     downloadManager = require('./downloadManager'),
     { ERROR_MESSAGES } = require('../../common/consts'),
     consts = require('./../../common/consts');

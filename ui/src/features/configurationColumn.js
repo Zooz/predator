@@ -526,7 +526,8 @@ const CompareCheckbox = ({data, onReportSelected, selectedReports}) => {
 }
 
 const Notes = ({data, onEditNote}) => {
-    const {notes = '', report_id, test_id} = data;
+    const {report_id, test_id} = data;
+    const notes = data.notes || '';
     const [editMode, setEditMode] = useState(false);
     const [editValue, setEditValue] = useState(notes);
     const id = uuid();

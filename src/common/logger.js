@@ -1,8 +1,8 @@
 'use strict';
 
-let bunyan = require('bunyan');
+let pino = require('pino');
 
-let logger = bunyan.createLogger({
+let logger = pino({
     name: 'predator',
     level: process.env.LOG_LEVEL || 'info'
 });
