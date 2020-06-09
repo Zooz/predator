@@ -63,7 +63,7 @@ describe('Testing sequelize connector', function () {
                         'csv_file_id': '5678',
                         'file_id': '1234',
                         'processor_id': '1234',
-                        'raw_data':  '{"name":"name","description":"desc","type":"type","processor_id":"1234","csv_file_id":"5678","scenarios":{"s":"1"}}',
+                        'raw_data': '{"name":"name","description":"desc","type":"type","processor_id":"1234","csv_file_id":"5678","scenarios":{"s":"1"}}',
                         'revision_id': 'revisionId',
                         'test_id': 'id',
                         'type': 'type',
