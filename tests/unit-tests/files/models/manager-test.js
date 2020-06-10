@@ -51,8 +51,8 @@ describe('Scenario generator tests', function () {
             should(getFileStub.getCall(0).args[0]).eql('someId');
             should(file).eql({
                 id: 'someId',
-                fileName: 'mickey.csv',
-                fileContent: 'mickey the predator'
+                filename: 'mickey.csv',
+                content: 'mickey the predator'
             });
         });
         it('Should  throw 404 not found', async () => {

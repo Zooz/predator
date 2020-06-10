@@ -42,12 +42,17 @@ async function saveFile(id, fileName, fileContent) {
     return result;
 }
 
-async function getFile(id) {
+async function getFile(id, isIncludeContent) {
     const fileClient = client.model('file');
     const options = {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
+
+    if (!isIncludeContent) {
+        options.attributes.exclude.push('file');
+    }
     options.where = { id: id };
+
     const dbResult = await fileClient.findOne(options);
     return dbResult;
 }

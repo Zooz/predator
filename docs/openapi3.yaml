@@ -1454,7 +1454,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/upload_file_response'
-
+  '/v1/files/{file_id}/metadata':
+    get:
+      operationId: retrieve-file-medtadata
+      tags:
+        - Files
+      summary: get file name and id
+      description: Retrieve a specific file metadata.
+      parameters:
+        - in: path
+          name: file_id
+          description: The id of file to download
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/upload_file_response'
 components:
   parameters:
     dsl_name:

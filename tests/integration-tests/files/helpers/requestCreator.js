@@ -6,7 +6,8 @@ let testApp;
 module.exports = {
     init,
     uploadFile,
-    downloadFile
+    downloadFile,
+    getFileMetadata
 };
 
 async function init() {
@@ -24,6 +25,14 @@ function uploadFile(fileKey, filePath) {
 
 function downloadFile(id) {
     return request(testApp).get(uri + '/' + id)
+        .expect(function (res) {
+            console.log(res.body);
+            return res;
+        });
+}
+
+function getFileMetadata(id) {
+    return request(testApp).get(uri + '/' + id + '/metadata')
         .expect(function (res) {
             console.log(res.body);
             return res;

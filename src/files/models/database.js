@@ -11,6 +11,6 @@ module.exports = {
 async function saveFile(id, fileName, fileContent) {
     return databaseConnector.saveFile(id, fileName, fileContent);
 }
-async function getFile(id) {
-    return databaseConnector.getFile(id);
+async function getFile(id, isIncludeContent) {
+    return databaseConnector.getFile(id, isIncludeContent);
 }

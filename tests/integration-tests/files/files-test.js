@@ -57,4 +57,21 @@ describe('Upload and download file', () => {
             should(downloadedFile.text).eql(smallCsvDataContent);
         });
     });
+
+    describe('get file metadata', () => {
+        it('get not existing file metadata', async () => {
+            const response = await requestCreator.getFileMetadata('10bc7982-d57b-4917-a952-7a8d8d75bf92');
+            should(response.statusCode).eql(404);
+        });
+
+        it('get exiting file metadata', async () => {
+            const response = await requestCreator.uploadFile('csv', SMALL_CSV_PATH);
+            should(response.statusCode).eql(201);
+            should(response.body.id).not.empty();
+
+            const downloadedFile = await requestCreator.getFileMetadata(response.body.id);
+            should(downloadedFile.statusCode).eql(200);
+            should(downloadedFile.body).eql({ id: response.body.id, filename: 'small.csv' });
+        });
+    });
 });

@@ -3,7 +3,8 @@ let cassandra = require('cassandra-driver');
 let client = {};
 
 const INSERT_FILE = 'INSERT INTO files(id,name,file) values(?,?,?)';
-const GET_FILE = 'SELECT file FROM files WHERE id = ?';
+const GET_FILE_WITH_CONTENT = 'SELECT * FROM files WHERE id = ?';
+const GET_FILE_METADATA = 'SELECT id, name FROM files WHERE id = ?';
 
 module.exports = {
     init,
@@ -41,7 +42,7 @@ async function saveFile(id, fileName, fileContent) {
     return result;
 }
 
-async function getFile(id) {
-    const result = await executeQuery(GET_FILE, [id], queryOptions);
+async function getFile(id, isIncludeContent) {
+    const result = await executeQuery(isIncludeContent ? GET_FILE_WITH_CONTENT : GET_FILE_METADATA, [id], queryOptions);
     return result.rows[0] ? result.rows[0] : undefined;
 }

@@ -9,13 +9,13 @@ module.exports = {
     getFile
 };
 
-async function getFile(fileId) {
-    const file = await database.getFile(fileId);
+async function getFile(fileId, isIncludeContent) {
+    const file = await database.getFile(fileId, isIncludeContent);
     if (file) {
         return {
             id: file.id,
-            fileName: file.name,
-            fileContent: file.file
+            filename: file.name,
+            content: file.file
         };
     } else {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);

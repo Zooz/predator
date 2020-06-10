@@ -36,11 +36,25 @@ describe('Cassandra client tests', function () {
             clientExecuteStub.getCall(0).args[1][2].should.eql('contentcontentcontent');
         });
         it('should succeed simple get of file', async () => {
-            clientExecuteStub.resolves({ rows: [ {name: 'file.txt', file: 'abcdef'}] });
+            clientExecuteStub.resolves({ rows: [ { name: 'file.txt', file: 'abcdef' }] });
             let id = uuid.v4();
 
-            let query = 'SELECT file FROM files WHERE id = ?';
+            let query = 'SELECT id, name FROM files WHERE id = ?';
             let file = await cassandraClient.getFile(id);
+
+            clientExecuteStub.getCall(0).args[0].should.eql(query);
+            clientExecuteStub.getCall(0).args[1][0].should.eql(id);
+
+            file.name.should.eql('file.txt');
+            file.file.should.eql('abcdef');
+        });
+
+        it('should succeed simple get of file with content', async () => {
+            clientExecuteStub.resolves({ rows: [ { name: 'file.txt', file: 'abcdef' }] });
+            let id = uuid.v4();
+
+            let query = 'SELECT * FROM files WHERE id = ?';
+            let file = await cassandraClient.getFile(id, true);
 
             clientExecuteStub.getCall(0).args[0].should.eql(query);
             clientExecuteStub.getCall(0).args[1][0].should.eql(id);
@@ -53,7 +67,7 @@ describe('Cassandra client tests', function () {
             clientExecuteStub.resolves({ rows: [] });
             let id = uuid.v4();
 
-            let query = 'SELECT file FROM files WHERE id = ?';
+            let query = 'SELECT id, name FROM files WHERE id = ?';
             let file = await cassandraClient.getFile(id);
 
             clientExecuteStub.getCall(0).args[0].should.eql(query);

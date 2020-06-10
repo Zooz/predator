@@ -13,8 +13,8 @@ const functions = [
     },
     {
         functionName: 'getFile',
-        args: ['id']
-    }
+        args: ['id', true]
+    },
 ];
 
 describe('Testing database', function () {
