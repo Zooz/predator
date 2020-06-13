@@ -15,7 +15,7 @@ async function init(sequelizeClient) {
 
 async function getAllWebhooks() {
     const webhooksModel = client.model('webhook');
-    return webhooksModel.findAll();
+    return webhooksModel.findAll({ include: ['events'] });
 }
 
 async function initSchemas() {
@@ -33,6 +33,9 @@ async function initSchemas() {
         global: {
             type: Sequelize.DataTypes.BOOLEAN
         },
+        format_type: {
+            type: Sequelize.DataTypes.STRING
+        },
         created_at: {
             type: Sequelize.DataTypes.DATE
         },
@@ -49,33 +52,19 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('medium')
         }
     });
-    const webhookFormatTypes = client.define('webhook_format_type', {
-        id: {
-            type: Sequelize.DataTypes.UUID,
-            primaryKey: true
-        },
-        name: {
-            type: Sequelize.DataTypes.TEXT('medium')
-        }
-    });
     // super many to many relation https://sequelize.org/master/manual/advanced-many-to-many.html
 
     webhooksSchema.belongsToMany(webhooksEvents, {
         through: 'webhook_event_mapping',
-        as: 'webhooks',
+        as: 'events',
         foreignKey: 'webhook_event_id'
     });
     webhooksEvents.belongsToMany(webhooksSchema, {
         through: 'webhook_event_mapping',
-        as: 'webhook_events',
+        as: 'webhooks',
         foreignKey: 'webhook_id'
     });
 
-    webhooksSchema.belongsTo(webhookFormatTypes, {
-        foreignKey: 'webhook_format_type_id',
-        as: 'webhook_format_type'
-    });
-    await webhookFormatTypes.sync();
     await webhooksSchema.sync();
     await webhooksEvents.sync();
 }
