@@ -34,18 +34,18 @@ async function insertJob(jobId, jobInfo) {
         proxy_url: jobInfo.proxy_url,
         enabled: jobInfo.enabled,
         debug: jobInfo.debug,
-        webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => {
-            return { id: uuid(), url: webhookUrl };
-        }) : undefined,
+        // webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => {
+        //     return { id: uuid(), url: webhookUrl };
+        // }) : undefined,
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
             return { id: uuid(), address: emailAddress };
         }) : undefined
     };
 
     let include = [];
-    if (params.webhooks) {
-        include.push({ association: job.webhook });
-    }
+    // if (params.webhooks) {
+    //     include.push({ association: job.webhook });
+    // }
     if (params.emails) {
         include.push({ association: job.email });
     }
@@ -57,7 +57,7 @@ async function getJobsAndParse(jobId) {
 
     let options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
-        include: [job.webhook, job.email]
+        include: [job.email]
     };
 
     if (jobId) {
@@ -68,7 +68,7 @@ async function getJobsAndParse(jobId) {
 
     allJobs.forEach(job => {
         job.emails = job.emails && job.emails.length > 0 ? job.emails.map(sqlJob => sqlJob.dataValues.address) : undefined;
-        job.webhooks = job.webhooks && job.webhooks.length > 0 ? job.webhooks.map(sqlJob => sqlJob.dataValues.url) : undefined;
+        // job.webhooks = job.webhooks && job.webhooks.length > 0 ? job.webhooks.map(sqlJob => sqlJob.dataValues.url) : undefined;
     });
     return allJobs;
 }
@@ -119,15 +119,15 @@ async function deleteJob(jobId) {
 }
 
 async function initSchemas() {
-    const webhook = client.define('webhook', {
-        id: {
-            type: Sequelize.DataTypes.UUID,
-            primaryKey: true
-        },
-        url: {
-            type: Sequelize.DataTypes.STRING
-        }
-    });
+    // const webhook = client.define('webhook', {
+    //     id: {
+    //         type: Sequelize.DataTypes.UUID,
+    //         primaryKey: true
+    //     },
+    //     url: {
+    //         type: Sequelize.DataTypes.STRING
+    //     }
+    // });
 
     const email = client.define('email', {
         id: {
@@ -182,9 +182,9 @@ async function initSchemas() {
         }
     });
 
-    job.webhook = job.hasMany(webhook);
+    // job.webhook = job.hasMany(webhook);
     job.email = job.hasMany(email);
     await job.sync();
-    await webhook.sync();
+    // await webhook.sync();
     await email.sync();
 }
