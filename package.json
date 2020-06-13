@@ -60,7 +60,7 @@
     "replace-in-file": "^3.4.4",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
-    "sequelize": "^5.15.1",
+    "sequelize": "^5.21.12",
     "sqlite3": "^4.0.8",
     "tedious": "^4.2.0",
     "umzug": "^2.2.0",
@@ -86,7 +86,7 @@
     "rewire": "^5.0.0",
     "should": "^13.2.1",
     "sinon": "^4.5.0",
-    "standard-version": "^5.0.2",
+    "standard-version": "^8.0.0",
     "supertest": "^3.4.2"
   },
   "husky": {
