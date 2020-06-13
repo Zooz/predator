@@ -1,6 +1,11 @@
 const Sequelize = require('sequelize');
+const uuid = require('uuid');
+const { EVENT_FORMAT_TYPES, WEBHOOK_EVENT_TYPES } = require('../../../common/consts');
 
 const tableName = 'webhooks';
+const formatTypesTableName = 'webhook_format_types';
+const webhookEventsTableName = 'webhook_events';
+const webhookEventMappingTableName = 'webhook_events';
 const columns = [
     {
         name: 'name',
@@ -19,8 +24,19 @@ async function takeActionOnColumn(describedTable, newColumnName, existAsyncActio
     return notExistAsyncAction();
 }
 
+function createEnumRow(name) {
+    return {
+        name,
+        id: uuid(),
+        created_at: new Date(),
+        updated_at: new Date()
+    };
+}
+
 module.exports.up = async (query, DataTypes) => {
     let describedWebhooks = await query.describeTable(tableName);
+    const webhookFormatTypesRows = EVENT_FORMAT_TYPES.map(createEnumRow);
+    const webhooksEventTypes = WEBHOOK_EVENT_TYPES.map(createEnumRow);
     const promises = [
         ...columns.map(({ name, dt }) =>
             takeActionOnColumn(
@@ -34,14 +50,17 @@ module.exports.up = async (query, DataTypes) => {
     ];
     await Promise.all(promises);
     await query.bulkUpdate(tableName, { name: 'Webhook', global: false });
+    await query.bulkInsert(formatTypesTableName, webhookFormatTypesRows);
+    await query.bulkInsert(webhookEventsTableName, webhooksEventTypes);
 };
 
 module.exports.down = async (query, DataTypes) => {
     const promises = [
         ...columns.map(({ name }) => query.removeColumn(tableName, name)),
         query.renameColumn(tableName, 'webhook_url', 'url'),
-        query.dropTable('webhook_to_events'),
-        query.dropTable('webhook_format_types')
+        query.dropTable(webhookEventMappingTableName),
+        query.dropTable(formatTypesTableName),
+        query.dropTable(webhookEventsTableName)
     ];
     await Promise.all(promises);
 };

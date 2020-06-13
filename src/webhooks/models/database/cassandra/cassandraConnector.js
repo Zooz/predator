@@ -2,7 +2,7 @@ let logger = require('../../../../common/logger');
 
 module.exports = {
     init,
-    getAllProcessors
+    getAllWebhooks
 };
 
 async function init() {
@@ -11,6 +11,6 @@ async function init() {
     throw new Error(errorMessage);
 }
 
-async function getAllProcessors() {
+async function getAllWebhooks() {
     throw new Error('Not implemented.');
 }

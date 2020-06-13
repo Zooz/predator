@@ -5,7 +5,7 @@ let client;
 
 module.exports = {
     init,
-    getAllProcessors
+    getAllWebhooks
 };
 
 async function init(sequelizeClient) {
@@ -13,7 +13,7 @@ async function init(sequelizeClient) {
     await initSchemas();
 }
 
-async function getAllProcessors() {
+async function getAllWebhooks() {
     const webhooksModel = client.model('webhook');
     return webhooksModel.findAll();
 }
@@ -49,18 +49,19 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('medium')
         }
     });
-    // const webhookToEventsMappingSchema = client.define('webhook_to_event', {
-    //     type: Sequelize.DataTypes.INTEGER,
-    //     primaryKey: true,
-    //     autoIncrement: true
-    // });
-
+    const webhookFormatTypes = client.define('webhook_format_type', {
+        id: {
+            type: Sequelize.DataTypes.UUID,
+            primaryKey: true
+        },
+        name: {
+            type: Sequelize.DataTypes.TEXT('medium')
+        }
+    });
     // super many to many relation https://sequelize.org/master/manual/advanced-many-to-many.html
 
-    await webhooksSchema.sync();
-    await webhooksEvents.sync();
     webhooksSchema.belongsToMany(webhooksEvents, {
-        through: 'webhookToEventsMappingSchema',
+        through: 'webhook_event_mapping',
         as: 'webhooks',
         foreignKey: 'webhook_event_id'
     });
@@ -69,8 +70,12 @@ async function initSchemas() {
         as: 'webhook_events',
         foreignKey: 'webhook_id'
     });
-    // await webhookToEventsMappingSchema.sync();
-    // await webhooksSchema.sync();
-    // await webhooksEvents.sync();
-    // await webhookToEventsMappingSchema.sync();
+
+    webhooksSchema.belongsTo(webhookFormatTypes, {
+        foreignKey: 'webhook_format_type_id',
+        as: 'webhook_format_type'
+    });
+    await webhookFormatTypes.sync();
+    await webhooksSchema.sync();
+    await webhooksEvents.sync();
 }
