@@ -52,17 +52,16 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('medium')
         }
     });
-    // super many to many relation https://sequelize.org/master/manual/advanced-many-to-many.html
 
     webhooksSchema.belongsToMany(webhooksEvents, {
         through: 'webhook_event_mapping',
         as: 'events',
-        foreignKey: 'webhook_event_id'
+        foreignKey: 'webhook_id'
     });
     webhooksEvents.belongsToMany(webhooksSchema, {
         through: 'webhook_event_mapping',
         as: 'webhooks',
-        foreignKey: 'webhook_id'
+        foreignKey: 'webhook_event_id'
     });
 
     await webhooksSchema.sync();
