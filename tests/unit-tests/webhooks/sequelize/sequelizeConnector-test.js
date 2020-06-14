@@ -8,7 +8,7 @@ describe('Sequelize client tests', function () {
     const webhookRaw = {
         id: '3e10d10e-2ae0-418e-aa91-0fd659dd86fb',
         name: 'my special webhook',
-        webhook_url: 'http://callback.com',
+        url: 'http://callback.com',
         global: false,
         format_type: 'json',
         created_at: '2020-06-13T13:13:16.763Z',

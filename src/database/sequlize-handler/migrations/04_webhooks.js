@@ -43,8 +43,7 @@ module.exports.up = async (query, DataTypes) => {
                 () => null,
                 () => query.addColumn(tableName, name, dt)
             )
-        ),
-        takeActionOnColumn(describedWebhooks, 'url', () => query.renameColumn(tableName, 'url', 'webhook_url'), () => null)
+        )
     ];
     await Promise.all(promises);
     await query.bulkUpdate(tableName, { name: 'Webhook', global: false });
@@ -54,7 +53,6 @@ module.exports.up = async (query, DataTypes) => {
 module.exports.down = async (query, DataTypes) => {
     const promises = [
         ...columns.map(({ name }) => query.removeColumn(tableName, name)),
-        query.renameColumn(tableName, 'webhook_url', 'url'),
         query.dropTable(webhookEventMappingTableName),
         query.dropTable(webhookEventsTableName)
     ];

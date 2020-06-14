@@ -27,7 +27,7 @@ async function initSchemas() {
         name: {
             type: Sequelize.DataTypes.TEXT('medium')
         },
-        webhook_url: {
+        url: {
             type: Sequelize.DataTypes.STRING
         },
         global: {
