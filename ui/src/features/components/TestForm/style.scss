@@ -1,35 +1,39 @@
 
 .fileDrop {
-  width:100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .top {
   padding: 10px 12px;
-  display:flex;
+  display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
 .bottom {
-  display:flex;
+  display: flex;
   flex-direction: column;
   overflow: auto;
-  flex:1;
+  flex: 1;
 }
+
 .top-inputs {
-  display:flex;
-  flex:1;
+  display: flex;
+  flex: 1;
   flex-direction: row;
   justify-content: space-between;
   flex-wrap: wrap;
 }
-.input-container{
-  width:291px;
+
+.input-container {
+  width: 291px;
 }
 
 .plus-button-wrapper {
-  display:flex;
+  display: flex;
   flex-direction: column;
 }
 
@@ -44,8 +48,8 @@
 .scenario-button {
   width: 165px;
   height: 38px;
-  box-shadow: 0 0 20px 0 rgba(0,0,0,0.5);
-  display:flex;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.5);
+  display: flex;
   align-items: center;
   justify-content: center;
 }
@@ -71,6 +75,12 @@
 .fileDropTarget {
   display: flex;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
   flex-direction: column;
+}
+
+.download-button {
+  @extend .link-style;
+  color: #557eff;
+
 }

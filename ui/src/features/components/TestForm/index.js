@@ -19,6 +19,12 @@ import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import {FileDrop} from 'react-file-drop';
 import env from '../../../App/common/env';
+import {
+    faDownload
+} from '@fortawesome/free-solid-svg-icons'
+import classnames from "classnames";
+import css from "../../configurationColumn.scss";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export class TestForm extends React.Component {
     constructor(props) {
@@ -457,9 +463,9 @@ export const DragAndDrop = ({csvFile, onDropFile, csvMetadata}) => {
                 }
 
                 {csvMetadata &&
-                <div className={style['link-style']}
-                      onClick={() => window.open(`${env.PREDATOR_URL}/files/${csvMetadata.id}`)}>
-                    Download CSV
+                <div className={style['download-button']}
+                     onClick={() => window.open(`${env.PREDATOR_URL}/files/${csvMetadata.id}`)}>
+                    <FontAwesomeIcon icon={faDownload}/>
                 </div>
                 }
 
