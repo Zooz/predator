@@ -27,6 +27,12 @@ export const chooseTest = (test) => (
 export const getTestSuccess = (test) => (
     {type: Types.GET_TEST_SUCCESS, test}
 );
+export const getFileMetadata = (fileId) => (
+    {type: Types.GET_FILE_METADATA, fileId}
+);
+export const getFileMetadataSuccess = (fileMetadata) => (
+    {type: Types.GET_FILE_METADATA_SUCCESS, fileMetadata}
+);
 
 export const getTestFaliure = (error) => (
     {type: Types.GET_TEST_FAILURE, error}
@@ -80,8 +86,8 @@ export const setLoading = (isLoading) => (
 export const initCreateTestForm = () => (
     {type: Types.INIT_CREATE_FORM}
 );
-export const editTest = (body, id) => (
-    {type: Types.EDIT_TEST, body, id}
+export const editTest = (body, id, file) => (
+    {type: Types.EDIT_TEST, body, id, file}
 );
 
 export const getTest = (testId) => (

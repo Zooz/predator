@@ -2,14 +2,14 @@ import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
 export const createTestRequest = (data) => {
-    const {name, description, scenarios, type, baseUrl, before, processorId} = data;
+    const {name, description, scenarios, type, baseUrl, before, processorId, csvFileId} = data;
     const scenariosRequest = scenarios.map((scenario) => {
         return {
             name: scenario.scenario_name,
             weight: scenario.weight,
             beforeScenario: scenario.beforeScenario,
             afterScenario: scenario.afterScenario,
-            flow: prepareFlow(scenario.steps)
+            flow: prepareFlow(scenario.steps),
         }
     });
     return {
@@ -23,7 +23,8 @@ export const createTestRequest = (data) => {
             },
             before: before ? {flow: prepareFlow(before.steps)} : undefined,
             scenarios: scenariosRequest
-        }
+        },
+        csv_file_id: csvFileId
     }
 };
 
@@ -38,11 +39,12 @@ export const createStateForEditTest = (test) => {
         baseUrl: artillery_test.config.target,
         before: testBeforeToStateBefore(artillery_test.before),
         scenarios: scenarios,
-        activeTabKey:scenarios[0] && scenarios[0].id,
+        activeTabKey: scenarios[0] && scenarios[0].id,
         type: test.type,
         processorId: test.processor_id,
         editMode: true,
-        processorsExportedFunctions: []
+        processorsExportedFunctions: [],
+        csvFileId: test.csv_file_id
     }
 
 };

@@ -7,7 +7,8 @@ import {
     getTestFromFramework,
     deleteTestInFramework,
     createTestInFramework,
-    createFileInFramework
+    createFileInFramework,
+    getFileMetadataInFramework
 } from '../apis/testsApi';
 
 export function* getTests() {
@@ -43,6 +44,15 @@ export function* getTest({testId}) {
     }
 }
 
+export function* getFileMetadata({fileId}) {
+    try {
+        const result = yield call(getFileMetadataInFramework, fileId);
+        yield put(Actions.getFileMetadataSuccess(result.data))
+    } catch (e) {
+        console.log("error",e)
+    }
+}
+
 export function* createTest(action) {
     try {
         yield put(Actions.setLoading(true));
@@ -52,7 +62,7 @@ export function* createTest(action) {
             csvFileId = fileResult.data.id;
         }
         const body = {csv_file_id: csvFileId, ...action.body};
-        yield call(createTestInFramework, body);
+        const result = yield call(createTestInFramework, body);
         yield put(Actions.createTestSuccess());
         yield call(getTests);
     } catch (err) {
@@ -64,7 +74,14 @@ export function* createTest(action) {
 export function* editTest(action) {
     try {
         yield put(Actions.setLoading(true));
-        yield call(editTestInFramework, action.body, action.id);
+        let  csvFileId=action.body.csv_file_id;
+        if (action.file) {
+            const fileResult = yield call(createFileInFramework, action.file);
+            csvFileId = fileResult.data.id;
+        }
+        const body = { ...action.body,csv_file_id: csvFileId};
+
+        yield call(editTestInFramework, body, action.id);
         yield put(Actions.createTestSuccess());
         yield call(getTests);
     } catch (err) {
@@ -95,6 +112,7 @@ export function* uploadFile({testId}) {
 export function* testsRegister() {
     yield takeLatest(Types.GET_TESTS, getTests);
     yield takeLatest(Types.GET_TEST, getTest);
+    yield takeLatest(Types.GET_FILE_METADATA, getFileMetadata);
     yield takeLatest(Types.CREATE_TEST, createTest);
     yield takeLatest(Types.DELETE_TEST, deleteTest);
     yield takeLatest(Types.EDIT_TEST, editTest);

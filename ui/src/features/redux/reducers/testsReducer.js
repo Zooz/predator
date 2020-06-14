@@ -12,7 +12,8 @@ const initialState = Immutable.Map({
   error_create_test: undefined,
   processing_delete_test: false,
   create_test_success: false,
-  isLoading: false
+  isLoading: false,
+  csv_metadata: null
 });
 
 export default function reduce (state = initialState, action = {}) {
@@ -58,6 +59,8 @@ export default function reduce (state = initialState, action = {}) {
   case Types.INIT_CREATE_FORM:
     return state.set('create_test_success', false)
       .set('error_create_test', undefined);
+  case Types.GET_FILE_METADATA_SUCCESS:
+    return state.set('csv_metadata', action.fileMetadata);
 
   default:
     return state;

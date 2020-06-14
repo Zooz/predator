@@ -8,3 +8,4 @@ export const processingGetTests = (state) => state.TestsReducer.get('processing_
 export const processingDeleteTest = (state) => state.TestsReducer.get('processing_delete_test');
 export const deleteTestSuccess = (state) => state.TestsReducer.get('delete_test_success');
 export const isLoading = (state) => state.TestsReducer.get('isLoading');
+export const csvMetadata = (state) => state.TestsReducer.get('csv_metadata');

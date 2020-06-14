@@ -18,6 +18,7 @@ import StepsList from './stepsList';
 import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import {FileDrop} from 'react-file-drop';
+import env from '../../../App/common/env';
 
 export class TestForm extends React.Component {
     constructor(props) {
@@ -37,7 +38,8 @@ export class TestForm extends React.Component {
                 processorId: undefined,
                 processorsExportedFunctions: [],
                 csvMode: false,
-                csvFile: null
+                csvFile: null,
+                csvFileId: undefined
             }
 
         }
@@ -47,7 +49,7 @@ export class TestForm extends React.Component {
         const {editMode, id} = this.state;
         const {createTest, editTest} = this.props;
         if (editMode) {
-            editTest(createTestRequest(this.state), id)
+            editTest(createTestRequest(this.state), id, this.state.csvFile)
         } else {
             createTest(createTestRequest(this.state), this.state.csvFile);
         }
@@ -76,10 +78,20 @@ export class TestForm extends React.Component {
 
     }
 
+    componentWillUnmount() {
+        this.props.getFileMetadataSuccess(undefined);
+    }
+
     componentDidMount() {
         this.props.getProcessors({exclude: 'javascript'});
         this.props.initForm();
         if (this.state.editMode) {
+
+            if (this.props.data.csv_file_id) {
+                this.props.getFileMetadata(this.props.data.csv_file_id);
+            }
+
+
             if (this.state.before) {
                 this.onChooseBefore()
             } else if (this.state.scenarios.length > 0) {
@@ -92,10 +104,9 @@ export class TestForm extends React.Component {
     }
 
     render() {
-        const {createTestError, processorsError, closeDialog, processorsLoading, processorsList} = this.props;
+        const {createTestError, processorsError, closeDialog, processorsLoading, processorsList, csvMetadata} = this.props;
         const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi} = this.state;
         const error = createTestError || processorsError || maxSupportedScenariosUi;
-
         return (
             <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
                 <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
@@ -317,8 +328,12 @@ export class TestForm extends React.Component {
         const {
             scenarios, before, currentScenarioIndex,
             processorsExportedFunctions, csvMode,
-            csvFile
+            csvFile,
         } = this.state;
+        const {csvMetadata} = this.props;
+
+        const currentCsvFile = csvFile ? csvFile : (csvMetadata ? {name: csvMetadata.filename} : undefined);
+
         let tabsData;
         if (before) {
             tabsData = [before, ...scenarios];
@@ -335,7 +350,7 @@ export class TestForm extends React.Component {
                     marginRight: '12px',
                     display: 'flex',
                     justifyContent: 'space-between',
-                    width: '313px'
+                    // width: '313px'
                 }}>
 
                     <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
@@ -343,8 +358,14 @@ export class TestForm extends React.Component {
                     <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
                     <div className={style['actions-style']} onClick={() => this.setState({csvMode: true})}>+Add CSV
                     </div>
+                    {csvMetadata &&
+                    <div className={style['actions-style']}
+                         onClick={() => window.open(`${env.PREDATOR_URL}/files/${csvMetadata.id}`)}>
+                        +Download CSV
+                    </div>}
                 </div>
-                {csvMode && <DragAndDrop csvFile={csvFile} onDropFile={(file) => this.setState({csvFile: file})}/>}
+                {csvMode &&
+                <DragAndDrop csvFile={currentCsvFile} onDropFile={(file) => this.setState({csvFile: file})}/>}
                 <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey}
                       className={style.tabs}>
                     {
@@ -447,6 +468,7 @@ function mapStateToProps(state) {
         processorsList: ProcessorsSelector.processorsList(state),
         processorsLoading: ProcessorsSelector.processorsLoading(state),
         processorsError: ProcessorsSelector.processorFailure(state),
+        csvMetadata: Selectors.csvMetadata(state)
     }
 }
 
@@ -455,6 +477,8 @@ const mapDispatchToProps = {
     editTest: Actions.editTest,
     cleanAllErrors: Actions.cleanAllErrors,
     getProcessors: Actions.getProcessors,
-    initForm: Actions.initCreateTestForm
+    initForm: Actions.initCreateTestForm,
+    getFileMetadata: Actions.getFileMetadata,
+    getFileMetadataSuccess: Actions.getFileMetadataSuccess
 };
 export default connect(mapStateToProps, mapDispatchToProps)(TestForm);
