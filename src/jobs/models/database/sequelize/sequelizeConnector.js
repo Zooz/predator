@@ -57,7 +57,7 @@ async function getJobsAndParse(jobId) {
 
     let options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
-        include: [job.email]
+        include: [job.email, 'webhooks']
     };
 
     if (jobId) {
@@ -171,8 +171,19 @@ async function initSchemas() {
             type: Sequelize.DataTypes.BOOLEAN
         }
     });
-
     job.email = job.hasMany(email);
     await job.sync();
     await email.sync();
+
+    const webhooks = client.model('webhook');
+    webhooks.belongsToMany(job, {
+        through: 'webhook_job_mapping',
+        as: 'jobs',
+        foreignKey: 'webhook_id'
+    });
+    job.belongsToMany(webhooks, {
+        through: 'webhook_job_mapping',
+        as: 'webhooks',
+        foreignKey: 'job_id'
+    });
 }

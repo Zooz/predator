@@ -5,6 +5,7 @@ const { WEBHOOK_EVENT_TYPES } = require('../../../common/consts');
 const tableName = 'webhooks';
 const webhookEventsTableName = 'webhook_events';
 const webhookEventMappingTableName = 'webhook_events';
+const webhookJobsMappingTableName = 'webhook_job_mapping';
 const columns = [
     {
         name: 'name',
@@ -54,7 +55,8 @@ module.exports.down = async (query, DataTypes) => {
     const promises = [
         ...columns.map(({ name }) => query.removeColumn(tableName, name)),
         query.dropTable(webhookEventMappingTableName),
-        query.dropTable(webhookEventsTableName)
+        query.dropTable(webhookEventsTableName),
+        query.dropTable(webhookJobsMappingTableName)
     ];
     await Promise.all(promises);
 };
