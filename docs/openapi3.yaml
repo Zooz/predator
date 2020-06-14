@@ -2416,7 +2416,7 @@ components:
         name:
           type: string
           description: Webhook name
-        webhook_url:
+        url:
           type: string
           description: Webhook url to post events
         events:
