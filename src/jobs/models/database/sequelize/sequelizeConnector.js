@@ -34,9 +34,9 @@ async function insertJob(jobId, jobInfo) {
         proxy_url: jobInfo.proxy_url,
         enabled: jobInfo.enabled,
         debug: jobInfo.debug,
-        // webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => {
-        //     return { id: uuid(), url: webhookUrl };
-        // }) : undefined,
+        webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => { // still missing data attributes(name, global, format_type)
+            return { id: uuid(), url: webhookUrl };
+        }) : undefined,
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
             return { id: uuid(), address: emailAddress };
         }) : undefined
