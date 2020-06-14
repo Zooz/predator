@@ -329,6 +329,7 @@ export class TestForm extends React.Component {
             scenarios, before, currentScenarioIndex,
             processorsExportedFunctions, csvMode,
             csvFile,
+
         } = this.state;
         const {csvMetadata} = this.props;
 
@@ -356,16 +357,13 @@ export class TestForm extends React.Component {
                     <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
                     <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
                     <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
-                    <div className={style['actions-style']} onClick={() => this.setState({csvMode: true})}>+Add CSV
-                    </div>
-                    {csvMetadata &&
                     <div className={style['actions-style']}
-                         onClick={() => window.open(`${env.PREDATOR_URL}/files/${csvMetadata.id}`)}>
-                        +Download CSV
-                    </div>}
+                         onClick={() => this.setState({csvMode: true})}>{(csvFile || csvMetadata) ? 'Modify' : '+Add'} CSV
+                    </div>
                 </div>
                 {csvMode &&
-                <DragAndDrop csvFile={currentCsvFile} onDropFile={(file) => this.setState({csvFile: file})}/>}
+                <DragAndDrop csvMetadata={csvMetadata} csvFile={currentCsvFile}
+                             onDropFile={(file) => this.setState({csvFile: file})}/>}
                 <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey}
                       className={style.tabs}>
                     {
@@ -430,7 +428,7 @@ export class TestForm extends React.Component {
     };
 }
 
-export const DragAndDrop = ({csvFile, onDropFile}) => {
+export const DragAndDrop = ({csvFile, onDropFile, csvMetadata}) => {
     const styles = {
         border: '1px solid black', borderStyle: 'dashed', height: 50, color: 'black',
         alignItems: 'center',
@@ -440,6 +438,7 @@ export const DragAndDrop = ({csvFile, onDropFile}) => {
     return (
         <div style={styles}>
             <FileDrop
+                targetClassName={style.fileDropTarget}
                 className={style.fileDrop}
                 // onFrameDragEnter={(event) => console.log('onFrameDragEnter', event)}
                 // onFrameDragLeave={(event) => console.log('onFrameDragLeave', event)}
@@ -450,11 +449,20 @@ export const DragAndDrop = ({csvFile, onDropFile}) => {
                     onDropFile(files[0])
                 }}
             >
+
                 {
                     csvFile && csvFile.name
                     ||
                     <span>Drop csv file here</span>
                 }
+
+                {csvMetadata &&
+                <div className={style['link-style']}
+                      onClick={() => window.open(`${env.PREDATOR_URL}/files/${csvMetadata.id}`)}>
+                    Download CSV
+                </div>
+                }
+
             </FileDrop>
         </div>
     );

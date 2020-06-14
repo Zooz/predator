@@ -51,6 +51,11 @@
 }
 
 .actions-style {
+  margin-left: 20;
+  @extend .link-style;
+}
+
+.link-style {
   cursor: pointer;
   font-family: Roboto;
   font-size: 14px;
@@ -61,5 +66,11 @@
   letter-spacing: normal;
   text-align: center;
   color: #eba205;
-  margin-left: 20;
+}
+
+.fileDropTarget {
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  flex-direction: column;
 }
