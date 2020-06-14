@@ -2,7 +2,8 @@
 const testGenerator = require('./testGenerator'),
     database = require('./database'),
     uuid = require('uuid'),
-    fileManager = require('./fileManager'),
+    fileManager = require('../../files/models/fileManager'),
+    downloadManager = require('./downloadManager'),
     { ERROR_MESSAGES } = require('../../common/consts'),
     consts = require('./../../common/consts');
 
@@ -20,15 +21,16 @@ module.exports = {
 async function upsertTest(testRawData, existingTestId) {
     let testArtilleryJson = await testGenerator.createTest(testRawData);
     let id = existingTestId || uuid();
-    let fileId;
+    let processorFileId;
     if (testRawData['processor_file_url']) {
-        fileId = await fileManager.saveFile(testRawData['processor_file_url']);
+        let downloadedFile = await downloadManager.downloadFile(testRawData['processor_file_url']);
+        processorFileId = await fileManager.saveFile('processor.js', downloadedFile);
     }
     let revisionId = uuid.v4();
     if (testRawData.type === consts.TEST_TYPE_DSL) {
         testArtilleryJson = undefined;
     }
-    await database.insertTest(testRawData, testArtilleryJson, id, revisionId, fileId);
+    await database.insertTest(testRawData, testArtilleryJson, id, revisionId, processorFileId);
     return { id: id, revision_id: revisionId };
 }
 

@@ -129,7 +129,7 @@ function getTest(id, headers) {
 }
 
 function getFile(id, headers) {
-    return request(app).get('/v1/tests/file/' + id)
+    return request(app).get('/v1/files/' + id)
         .set(headers)
         .expect(function (res) {
             return res;

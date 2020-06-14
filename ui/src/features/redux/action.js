@@ -18,7 +18,10 @@ import {
     clearTests,
     getTestsFaliure,
     getTestSuccess,
-    createTest
+    createTest,
+    getFileMetadata,
+    getFileMetadataSuccess,
+
 } from './actions/testsActions';
 import {
     clearStopJobSuccess,
@@ -107,6 +110,8 @@ export {
     clearErrorOnDeleteTest,
     clearDeleteTestSuccess,
     createTest,
+    getFileMetadata,
+    getFileMetadataSuccess,
     // jobs//
     getJobsFaliure,
     processingGetJobs,

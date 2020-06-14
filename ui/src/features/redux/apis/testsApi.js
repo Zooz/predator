@@ -10,6 +10,23 @@ export const getTestsFromFramework = (queryParams) => {
   });
 };
 
+export const createFileInFramework = (file) => {
+    const data = new FormData();
+    data.append('csv', file);
+
+    return axios.post(`${env.PREDATOR_URL}/files`, data, {
+    headers: getAuthorizationHeader(),
+    responseType: 'json'
+  });
+};
+
+export const getFileMetadataInFramework  = (fileId) => {
+    return axios.get(`${env.PREDATOR_URL}/files/${fileId}/metadata`, {
+    headers: getAuthorizationHeader(),
+    responseType: 'json'
+  });
+};
+
 export const createTestInFramework = (body) => {
   return axios.post(`${env.PREDATOR_URL}/tests`, body, {
     headers: getAuthorizationHeader(),

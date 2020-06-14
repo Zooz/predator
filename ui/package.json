@@ -90,6 +90,7 @@
     "react-dnd": "^7.0.2",
     "react-dnd-html5-backend": "^7.0.2",
     "react-dom": "^16.12.0",
+    "react-file-drop": "^3.0.6",
     "react-fontawesome": "^1.6.1",
     "react-json-editor-ajrm": "^2.5.9",
     "react-json-pretty": "^2.0.1",

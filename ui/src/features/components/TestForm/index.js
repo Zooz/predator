@@ -17,6 +17,14 @@ import TextArea from "../../../components/TextArea";
 import StepsList from './stepsList';
 import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
+import {FileDrop} from 'react-file-drop';
+import env from '../../../App/common/env';
+import {
+    faDownload
+} from '@fortawesome/free-solid-svg-icons'
+import classnames from "classnames";
+import css from "../../configurationColumn.scss";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export class TestForm extends React.Component {
     constructor(props) {
@@ -34,7 +42,10 @@ export class TestForm extends React.Component {
                 currentScenarioIndex: 0,
                 currentStepIndex: null,
                 processorId: undefined,
-                processorsExportedFunctions: []
+                processorsExportedFunctions: [],
+                csvMode: false,
+                csvFile: null,
+                csvFileId: undefined
             }
 
         }
@@ -44,9 +55,9 @@ export class TestForm extends React.Component {
         const {editMode, id} = this.state;
         const {createTest, editTest} = this.props;
         if (editMode) {
-            editTest(createTestRequest(this.state), id)
+            editTest(createTestRequest(this.state), id, this.state.csvFile)
         } else {
-            createTest(createTestRequest(this.state));
+            createTest(createTestRequest(this.state), this.state.csvFile);
         }
     };
     onCloseErrorDialog = () => {
@@ -73,10 +84,20 @@ export class TestForm extends React.Component {
 
     }
 
+    componentWillUnmount() {
+        this.props.getFileMetadataSuccess(undefined);
+    }
+
     componentDidMount() {
         this.props.getProcessors({exclude: 'javascript'});
         this.props.initForm();
         if (this.state.editMode) {
+
+            if (this.props.data.csv_file_id) {
+                this.props.getFileMetadata(this.props.data.csv_file_id);
+            }
+
+
             if (this.state.before) {
                 this.onChooseBefore()
             } else if (this.state.scenarios.length > 0) {
@@ -89,10 +110,9 @@ export class TestForm extends React.Component {
     }
 
     render() {
-        const {createTestError, processorsError, closeDialog, processorsLoading, processorsList} = this.props;
+        const {createTestError, processorsError, closeDialog, processorsLoading, processorsList, csvMetadata} = this.props;
         const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi} = this.state;
         const error = createTestError || processorsError || maxSupportedScenariosUi;
-
         return (
             <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
                 <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
@@ -313,8 +333,14 @@ export class TestForm extends React.Component {
     generateScenarioDashBoard = () => {
         const {
             scenarios, before, currentScenarioIndex,
-            processorsExportedFunctions
+            processorsExportedFunctions, csvMode,
+            csvFile,
+
         } = this.state;
+        const {csvMetadata} = this.props;
+
+        const currentCsvFile = csvFile ? csvFile : (csvMetadata ? {name: csvMetadata.filename} : undefined);
+
         let tabsData;
         if (before) {
             tabsData = [before, ...scenarios];
@@ -331,12 +357,19 @@ export class TestForm extends React.Component {
                     marginRight: '12px',
                     display: 'flex',
                     justifyContent: 'space-between',
-                    width: '250px'
+                    // width: '313px'
                 }}>
+
                     <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
                     <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
                     <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
+                    <div className={style['actions-style']}
+                         onClick={() => this.setState({csvMode: true})}>{(csvFile || csvMetadata) ? 'Modify' : '+Add'} CSV
+                    </div>
                 </div>
+                {csvMode &&
+                <DragAndDrop csvMetadata={csvMetadata} csvFile={currentCsvFile}
+                             onDropFile={(file) => this.setState({csvFile: file})}/>}
                 <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey}
                       className={style.tabs}>
                     {
@@ -401,6 +434,46 @@ export class TestForm extends React.Component {
     };
 }
 
+export const DragAndDrop = ({csvFile, onDropFile, csvMetadata}) => {
+    const styles = {
+        border: '1px solid black', borderStyle: 'dashed', height: 50, color: 'black',
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex'
+    };
+    return (
+        <div style={styles}>
+            <FileDrop
+                targetClassName={style.fileDropTarget}
+                className={style.fileDrop}
+                // onFrameDragEnter={(event) => console.log('onFrameDragEnter', event)}
+                // onFrameDragLeave={(event) => console.log('onFrameDragLeave', event)}
+                // o    nFrameDrop={(event) => console.log('onFrameDrop', event)}
+                // onDragOver={(event) => console.log('onDragOver', event)}
+                // onDragLeave={(event) => console.log('onDragLeave', event)}
+                onDrop={(files, event) => {
+                    onDropFile(files[0])
+                }}
+            >
+
+                {
+                    csvFile && csvFile.name
+                    ||
+                    <span>Drop csv file here</span>
+                }
+
+                {csvMetadata &&
+                <div className={style['download-button']}
+                     onClick={() => window.open(`${env.PREDATOR_URL}/files/${csvMetadata.id}`)}>
+                    <FontAwesomeIcon icon={faDownload}/>
+                </div>
+                }
+
+            </FileDrop>
+        </div>
+    );
+};
+
 function mapStateToProps(state) {
     return {
         isLoading: Selectors.isLoading(state),
@@ -409,6 +482,7 @@ function mapStateToProps(state) {
         processorsList: ProcessorsSelector.processorsList(state),
         processorsLoading: ProcessorsSelector.processorsLoading(state),
         processorsError: ProcessorsSelector.processorFailure(state),
+        csvMetadata: Selectors.csvMetadata(state)
     }
 }
 
@@ -417,6 +491,8 @@ const mapDispatchToProps = {
     editTest: Actions.editTest,
     cleanAllErrors: Actions.cleanAllErrors,
     getProcessors: Actions.getProcessors,
-    initForm: Actions.initCreateTestForm
+    initForm: Actions.initCreateTestForm,
+    getFileMetadata: Actions.getFileMetadata,
+    getFileMetadataSuccess: Actions.getFileMetadataSuccess
 };
 export default connect(mapStateToProps, mapDispatchToProps)(TestForm);
