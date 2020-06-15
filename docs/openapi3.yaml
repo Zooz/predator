@@ -2031,8 +2031,9 @@ components:
         webhooks:
           type: array
           description: |
-            A URL to which an event will be sent when the test execution is completed.
-            The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked.
+            An array of webhooks ids, events will be fired to the coresponding webhooks according to their events configuration.
+            The event body will include detailed information about the test, such as the number of scenarios that were executed
+            and the number of requests that were invoked.
           items:
             type: string
             format: uuid
@@ -2476,7 +2477,7 @@ components:
       type: object
       required:
         - name
-        - webhook_url
+        - url
         - events
         - format_type
       properties:
@@ -2488,7 +2489,7 @@ components:
         name:
           type: string
           description: Webhook name
-        webhook_url:
+        url:
           type: string
           description: Webhook url to post events
         events:
