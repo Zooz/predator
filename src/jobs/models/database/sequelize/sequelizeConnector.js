@@ -34,7 +34,7 @@ async function insertJob(jobId, jobInfo) {
         proxy_url: jobInfo.proxy_url,
         enabled: jobInfo.enabled,
         debug: jobInfo.debug,
-        webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => {
+        webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => { // still missing data attributes(name, global, format_type)
             return { id: uuid(), url: webhookUrl };
         }) : undefined,
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
@@ -57,7 +57,7 @@ async function getJobsAndParse(jobId) {
 
     let options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
-        include: [job.webhook, job.email]
+        include: [job.email, 'webhooks']
     };
 
     if (jobId) {
@@ -119,16 +119,6 @@ async function deleteJob(jobId) {
 }
 
 async function initSchemas() {
-    const webhook = client.define('webhook', {
-        id: {
-            type: Sequelize.DataTypes.UUID,
-            primaryKey: true
-        },
-        url: {
-            type: Sequelize.DataTypes.STRING
-        }
-    });
-
     const email = client.define('email', {
         id: {
             type: Sequelize.DataTypes.UUID,
@@ -181,10 +171,19 @@ async function initSchemas() {
             type: Sequelize.DataTypes.BOOLEAN
         }
     });
-
-    job.webhook = job.hasMany(webhook);
     job.email = job.hasMany(email);
     await job.sync();
-    await webhook.sync();
     await email.sync();
+
+    const webhooks = client.model('webhook');
+    webhooks.belongsToMany(job, {
+        through: 'webhook_job_mapping',
+        as: 'jobs',
+        foreignKey: 'webhook_id'
+    });
+    job.belongsToMany(webhooks, {
+        through: 'webhook_job_mapping',
+        as: 'webhooks',
+        foreignKey: 'job_id'
+    });
 }

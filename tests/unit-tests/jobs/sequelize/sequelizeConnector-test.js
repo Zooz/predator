@@ -80,7 +80,7 @@ describe('Sequelize client tests', function () {
     describe('Init tests', () => {
         it('it should initialize sequelize with mysql client successfully', async () => {
             await sequelizeConnector.init(sequelizeStub());
-            should(sequelizeDefineStub.calledThrice).eql(true);
+            should(sequelizeDefineStub.calledTwice).eql(true);
         });
     });
 
