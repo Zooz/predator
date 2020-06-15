@@ -11,6 +11,13 @@ module.exports = {
     createWebhook
 };
 
+function parseWebhook(webhookRecord) {
+    return {
+        ...webhookRecord.dataValues,
+        events: webhookRecord.events && webhookRecord.events.map(eventRecord => eventRecord.dataValues.name)
+    };
+};
+
 async function init(sequelizeClient) {
     client = sequelizeClient;
     await initSchemas();
@@ -18,7 +25,7 @@ async function init(sequelizeClient) {
 
 async function getAllWebhooks() {
     const webhooksModel = client.model('webhook');
-    return webhooksModel.findAll({ include: ['events'] });
+    return webhooksModel.findAll({ include: ['events'] }).map(parseWebhook);
 }
 
 async function createWebhook(webhook) {
@@ -39,7 +46,7 @@ async function createWebhook(webhook) {
         await createdWebhook.setEvents(eventsIds, { transaction });
         return createdWebhook;
     });
-    return webhooksModel.findByPk(id, { include: ['events'] });
+    return webhooksModel.findByPk(id, { include: ['events'] }).then(parseWebhook);
 }
 
 async function initSchemas() {
