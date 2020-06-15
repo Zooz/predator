@@ -5,6 +5,7 @@ let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cass
 module.exports = {
     init,
     getAllWebhooks,
+    createWebhook,
     closeConnection
 };
 
@@ -18,4 +19,8 @@ function closeConnection() {
 
 async function getAllWebhooks(from, limit, exclude) {
     return databaseConnector.getAllWebhooks(from, limit, exclude);
+}
+
+async function createWebhook(webhook) {
+    return databaseConnector.createWebhook(webhook);
 }
