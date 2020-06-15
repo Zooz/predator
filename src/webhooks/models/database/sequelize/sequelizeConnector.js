@@ -25,7 +25,8 @@ async function init(sequelizeClient) {
 
 async function getAllWebhooks() {
     const webhooksModel = client.model('webhook');
-    return webhooksModel.findAll({ include: ['events'] }).map(parseWebhook);
+    const webhooks = await webhooksModel.findAll({ include: ['events'] });
+    return webhooks.map(parseWebhook);
 }
 
 async function createWebhook(webhook) {
@@ -34,7 +35,7 @@ async function createWebhook(webhook) {
     const webhooksEvents = client.model('webhook_event');
     const events = await webhooksEvents.findAll({ where: { name: webhook.events } });
     const eventsIds = events.map(({ id }) => id);
-    const meow = {
+    const webhookToInsert = {
         id,
         name: webhook.name,
         url: webhook.url,
@@ -42,7 +43,7 @@ async function createWebhook(webhook) {
         global: webhook.global
     };
     await client.transaction(async function(transaction) {
-        const createdWebhook = await webhooksModel.create(meow, { transaction });
+        const createdWebhook = await webhooksModel.create(webhookToInsert, { transaction });
         await createdWebhook.setEvents(eventsIds, { transaction });
         return createdWebhook;
     });
