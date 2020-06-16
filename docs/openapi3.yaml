@@ -2425,7 +2425,6 @@ components:
           type: array
           uniqueItems: true
           minItems: 1
-          maxItems: 7
           items:
             $ref: '#/components/schemas/webhooks_types'
         format_type:
