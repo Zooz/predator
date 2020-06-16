@@ -1455,6 +1455,15 @@ paths:
         - Webhooks
       summary: Retrieve a webhook by id
       description: Retrieve a webhook by id.
+      parameters:
+        - in: path
+          name: webhook_id
+          description: The webhook id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -1480,6 +1489,15 @@ paths:
         - Webhooks
       summary: Update a webhook
       description: Update a webhook.
+      parameters:
+        - in: path
+          name: webhook_id
+          description: The webhook id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
