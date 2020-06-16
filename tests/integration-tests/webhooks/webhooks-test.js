@@ -1,7 +1,10 @@
 const { expect } = require('chai');
+const uuid = require('uuid');
+
 const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON } = require('../../../src/common/consts');
 
 const webhookRequestSender = require('./helpers/requestCreator');
+const requestPromise = require('request-promise-native');
 
 describe('Webhooks api', function () {
     this.timeout(5000000);
@@ -20,6 +23,22 @@ describe('Webhooks api', function () {
 
                 const webhooks = webhooksGetResponse.body;
                 expect(webhooks).to.be.an('array').and.have.lengthOf(10);
+            });
+        });
+        describe('GET /webhook/:webhook_id', function () {
+            it('should retrieve the webhook that was created', async function() {
+                const webhook = generateWebhook();
+                let createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                expect(createWebhookResponse.statusCode).to.equal(201);
+
+                const webhookId = createWebhookResponse.body.id;
+                const getWebhookResponse = await webhookRequestSender.getWebhook(webhookId);
+
+                const { events, ...webhookWithoutEvents } = webhook;
+                const { body: { events: responseEvents, ...webhookResponseWithoutEvents } } = getWebhookResponse;
+                expect(getWebhookResponse.statusCode).to.equal(200);
+                expect(webhookResponseWithoutEvents).to.deep.contain(webhookWithoutEvents);
+                expect(events).to.have.members(responseEvents);
             });
         });
         describe('POST /v1/webhooks', function () {
@@ -89,7 +108,27 @@ describe('Webhooks api', function () {
                 });
             });
         });
+        describe('GET /webhook/:webhook_id', function () {
+            it('should return 400 for bad uuid', async function() {
+                const badWebhookValue = 'lalallalalal';
+
+                const response = await webhookRequestSender.getWebhook(badWebhookValue);
+
+                expect(response.statusCode).to.equal(400);
+            });
+        });
     });
+    describe('Sad requests', function() {
+        describe('GET /webhook/:webhook_id', function () {
+            it('should return 404 for no existing webhook', async function() {
+                const notExistingWebhookId = uuid.v4();
+
+                const response = await webhookRequestSender.getWebhook(notExistingWebhookId);
+
+                expect(response.statusCode).to.equal(404);
+            });
+        });
+    })
 });
 
 function generateWebhook(name = 'My webhook', url = 'https://humus.is.love/callback', events = WEBHOOK_EVENT_TYPES) {

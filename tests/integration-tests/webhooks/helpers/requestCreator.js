@@ -9,7 +9,8 @@ const resourceUri = '/v1/webhooks';
 module.exports = {
     init,
     createWebhook,
-    getWebhooks
+    getWebhooks,
+    getWebhook
 };
 
 async function init() {
@@ -34,6 +35,15 @@ function createWebhook(body) {
 function getWebhooks() {
     return request(app)
         .get(resourceUri)
+        .set(headers)
+        .expect(function (res) {
+            return res;
+        });
+}
+
+function getWebhook(webhookdId) {
+    return request(app)
+        .get(`${resourceUri}/${webhookdId}`)
         .set(headers)
         .expect(function (res) {
             return res;
