@@ -45,12 +45,14 @@ describe('Sequelize client tests', function () {
             hasMany: () => {
             },
             sync: () => {
-            }
+            },
+            belongsToMany: () => {}
         });
 
         sequelizeModelStub.returns({
             email: {},
             webhook: {},
+            belongsToMany: () => {},
             create: sequelizeCreateStub,
             update: sequelizeUpdateStub,
             findAll: sequelizeGetStub,
