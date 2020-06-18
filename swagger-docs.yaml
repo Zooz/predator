@@ -40,6 +40,9 @@ tags:
   - name: Files
     description: |
       This resource allows uploading files which can be used by Predator tests like csv.
+  - name: Benchmarks
+    description: |
+      By creating a benchmark for a specific test, each subsequent test run for that test will be given a score from 0-100 summarizing the test run in one simple to analyze numerical value.
 x-tagGroups:
   - name: Reference
     tags:
@@ -276,123 +279,6 @@ paths:
                   $ref: '#/components/schemas/tests_response'
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-  /v1/tests/{test_id}/benchmark:
-    post:
-      tags:
-        - Tests
-      parameters:
-        - in: path
-          name: test_id
-          description: The test id.
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-      summary: Create benchmark for test
-      description: Create benchmark for test
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/benchmark_request'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/benchmark_request'
-        description: The benchmark to add
-        required: true
-    get:
-      tags:
-        - Tests
-      parameters:
-        - in: path
-          name: test_id
-          description: The test id.
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-      summary: get a benchmark for test
-      description:  Get a benchmark for a test
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/benchmark_request'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-
-  '/v1/tests/file/{file_id}':
-    get:
-      operationId: retrieve-a-file
-      tags:
-        - Tests
-      summary: Retrieve a file encoding to base 64
-      description: Retrieve a specific file.
-      parameters:
-        - in: path
-          name: file_id
-          description: The file id.
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-        - in: query
-          name: format
-          description: Should return file content in utf8 or base64 (default)
-          schema:
-            enum: ['base64','utf8']
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '404':
-          description: Not found
           content:
             application/json:
               schema:
@@ -1094,7 +980,80 @@ paths:
               $ref: '#/components/schemas/stats'
         description: stats data
         required: true
-
+  /v1/tests/{test_id}/benchmark:
+    post:
+      tags:
+        - Benchmarks
+      parameters:
+        - in: path
+          name: test_id
+          description: The test id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      summary: Create benchmark for test
+      description: Create benchmark for test
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/benchmark_request'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/benchmark_request'
+        description: The benchmark to add
+        required: true
+    get:
+      tags:
+        - Benchmarks
+      parameters:
+        - in: path
+          name: test_id
+          description: The test id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      summary: get a benchmark for test
+      description:  Get a benchmark for a test
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/benchmark_request'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   # Config
   /v1/config:
     get:
