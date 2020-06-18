@@ -25,6 +25,9 @@ tags:
   - name: Tests
     description: |
       Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.
+  - name: Processors
+    description: |
+      Processor files allow Predator to execute custom javascript code during test flows.
   - name: Jobs
     description: |
       Predator executes tests through so-called **jobs**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
@@ -34,14 +37,19 @@ tags:
   - name: Configuration
     description: |
       This resource allows you to configure Predator programmatically.
+  - name: Files
+    description: |
+      This resource allows uploading files which can be used by Predator tests like csv.
 x-tagGroups:
   - name: Reference
     tags:
       - DSL Definitions
       - Tests
+      - Processors
       - Jobs
       - Reports
       - Configuration
+      - Files
 
 paths:
   #DSL Definitions
@@ -353,6 +361,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
 
+  '/v1/tests/file/{file_id}':
+    get:
+      operationId: retrieve-a-file
+      tags:
+        - Tests
+      summary: Retrieve a file encoding to base 64
+      description: Retrieve a specific file.
+      parameters:
+        - in: path
+          name: file_id
+          description: The file id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+        - in: query
+          name: format
+          description: Should return file content in utf8 or base64 (default)
+          schema:
+            enum: ['base64','utf8']
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}':
     get:
       operationId: retrieve-a-test
@@ -512,6 +562,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+
   # Jobs
   /v1/jobs:
     post:
@@ -585,7 +636,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-
   '/v1/jobs/{job_id}':
     get:
       operationId: retrieve-a-job
@@ -732,6 +782,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+
   /v1/jobs/{job_id}/runs/{run_id}/logs:
     get:
       tags:
@@ -774,7 +825,7 @@ paths:
 
   '/v1/jobs/containers/':
     delete:
-      operationId: Delete all finished containers/pods
+      operationId: delete-all-job-containers
       tags:
         - Jobs
       description: delete all containers/pods of predator-runner
@@ -1043,6 +1094,7 @@ paths:
               $ref: '#/components/schemas/stats'
         description: stats data
         required: true
+
   # Config
   /v1/config:
     get:
@@ -1118,6 +1170,312 @@ paths:
               schema:
                 $ref: "#/components/schemas/error_response"
 
+  # Processors
+  /v1/processors:
+    post:
+      operationId: create-processor-file
+      tags:
+        - Processors
+      summary: Create processor file
+      description: Create a new processor file which will have javascript code that can be executed by tests.
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/processor'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/processor'
+        description: The processor file to create
+        required: true
+    get:
+      operationId: retrieve-all-processor-files
+      tags:
+        - Processors
+      summary: Retrieve all processors files
+      description: Retrieve the details of all processor files.
+      parameters:
+        - in: query
+          name: from
+          description: From which result to start retrieve data
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: limit
+          description: Max results to return from this query ( Limit to 100 )
+          required: false
+          schema:
+            type: integer
+            maximum: 200
+            default: 100
+        - in: query
+          name: exclude
+          description: fields to exclude from response
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - javascript
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/processor'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+  '/v1/processors/{processor_id}':
+    get:
+      operationId: retrieve-processor-file
+      tags:
+        - Processors
+      summary: Retrieve processor file
+      description: Retrieve a specific job.
+      parameters:
+        - in: path
+          name: processor_id
+          description: The id of the processor file to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/processor'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    put:
+      operationId: update-processor-file
+      tags:
+        - Processors
+      summary: Update a processor file
+      description: Update a specific processor file.
+      parameters:
+        - in: path
+          name: processor_id
+          description: The id of the processor file to update.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/processor'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/processor'
+        description: The processor to update
+        required: true
+    delete:
+      operationId: delete-processor-file
+      tags:
+        - Processors
+      summary: Delete processor file
+      description: Delete a specific processor file.
+      parameters:
+        - in: path
+          name: processor_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
+  # Files
+  /v1/files:
+    post:
+      operationId: upload-file
+      tags:
+        - Files
+      summary: Create file
+      description: Upload a file which can be used by Predator tests like csv.
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/upload_file_response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '413':
+          description: Payload Too Large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                csv:
+                  type: string
+                  format: binary
+        description: The file to create upload
+        required: true
+  '/v1/files/{file_id}':
+    get:
+      operationId: retrieve-file
+      tags:
+        - Files
+      summary: Download file
+      description: Retrieve a specific file.
+      parameters:
+        - in: path
+          name: file_id
+          description: The id of file to download
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/upload_file_response'
+  '/v1/files/{file_id}/metadata':
+    get:
+      operationId: retrieve-file-medtadata
+      tags:
+        - Files
+      summary: get file name and id
+      description: Retrieve a specific file metadata.
+      parameters:
+        - in: path
+          name: file_id
+          description: The id of file to download
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/upload_file_response'
 components:
   parameters:
     dsl_name:
@@ -1240,8 +1598,8 @@ components:
             - count
           properties:
             mean:
-              description: average RPS per all test run.
               type: number
+              description: average RPS per all test run.
             count:
               description: Total number of request, will be used to calculate errors ratio.
               type: number
@@ -1268,11 +1626,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/scenario'
-    processor_file_url:
-      type: string
-      format: uri
-      example: http://www.example.com/file.txt
-      description: The URL path to a text file holding custom Javascript code.
     artillery_request_schema:
       description: |
         The request schema used in test scenarios. The property name must be one of the following HTTP methods: `GET`, `HEAD`, `POST`, `PUT`, `DELETE`.
@@ -1400,6 +1753,13 @@ components:
         description:
           type: string
           description: The description of the test.
+        file_id:
+          type: string
+          description: File id.
+        processor_id:
+          description: Unique processor identifier
+          type: string
+          format: uuid
     dsl_test_response:
       type: object
       description: A test that is made of scenarios base on domain specific language
@@ -1689,13 +2049,53 @@ components:
             run_id:
               type: string
               description: The run id. Only shown if the job is ran immediately.
+    processor:
+      required:
+        - name
+        - description
+        - javascript
+      properties:
+        id:
+          description: Unique processor identifier
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          minLength: 1
+          description: The name of the processor.
+          example: Custom javascript for logging
+        description:
+          type: string
+          description: A description of the processor.
+          example: logs every error (5xx).
+        exported_functions:
+          type: array
+          readOnly: true
+          description: Names of all exported function in the javascript file
+          items:
+            type: string
+          example: generateNameBeforeScenario
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time that the procesor file was updated.
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time that the procesor file was created.
+          readOnly: true
+        javascript:
+          type: string
+          description: Raw javascript that will be used by the processor resource.
+          example: module.exports.generateNameBeforeScenario = (context, ee, next) => { context.name = Date.now() + '_mick' }
     edit_report:
       additionalProperties: false
       properties:
         notes:
           type: string
           description: notes for specific report
-
     post_report:
       required:
         - report_id
@@ -1852,6 +2252,10 @@ components:
         allow_insecure_tls:
           type: boolean
           description: If true, don't fail requests on unverified server certificate errors.
+        interval_cleanup_finished_containers_ms:
+          type: number
+          minimum: 0
+          description: Interval (in ms) to search and delete finished tests containers. Value of 0 means no auto clearing enabled.
         metrics_plugin_name:
           type: string
           enum:
@@ -1990,5 +2394,18 @@ components:
         - percentage
       properties:
         percentage:
-            type: number
-            description: benchmark percentage weight
+          type: number
+          description: benchmark percentage weight
+    upload_file_response:
+      type: object
+      required:
+        - id
+        - filename
+      properties:
+        id:
+          type: string
+          pattern: uuid
+          description: the id of the file
+        filename:
+          type: string
+          description: the name of the file
