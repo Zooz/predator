@@ -198,7 +198,7 @@ describe('the tests api', function() {
             should(getResult.statusCode).eql(200);
             should(getResult.body).eql(benchmarkRequest);
         });
-        it('get benchmark when no bench mark create to this tests and get 404', async () => {
+        it('get benchmark when no benchmark create to this tests and get 404', async () => {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;

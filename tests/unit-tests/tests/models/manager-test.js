@@ -62,8 +62,8 @@ describe('Scenario generator tests', function () {
                 });
         });
     });
-    describe('Create new bench mark for test', async () => {
-        it('Should save new bench mark for test', async () => {
+    describe('Create new benchmark for test', async () => {
+        it('Should save new benchmark for test', async () => {
             insertBenchmarkStub.resolves();
             const result = await manager.insertTestBenchmark({ rps: 'some benchmark data' }, 1234);
             insertBenchmarkStub.calledOnce.should.eql(true);
@@ -73,7 +73,7 @@ describe('Scenario generator tests', function () {
                 'benchmark_data': { rps: 'some benchmark data' }
             });
         });
-        it('Should get bench mark for test with no bench mark and get empty data', async () => {
+        it('Should get benchmark for test with no benchmark and get empty data', async () => {
             getTestBenchmarkStub.resolves();
             try {
                 await manager.getBenchmark(1234);
@@ -83,7 +83,7 @@ describe('Scenario generator tests', function () {
                 should(err.statusCode).eql(404);
             }
         });
-        it('Should get bench mark for test with  bench', async () => {
+        it('Should get benchmark for test with  bench', async () => {
             getTestBenchmarkStub.resolves(JSON.stringify({ benchmark: 'some data' }));
             const result = await manager.getBenchmark(1234);
             getTestBenchmarkStub.calledOnce.should.eql(true);
