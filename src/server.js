@@ -3,7 +3,7 @@ const app = require('./app'),
     shutdown = require('graceful-shutdown-express');
 
 app().then(app => {
-    let serverPort = process.env.PORT || '80';
+    let serverPort = process.env.PORT || '8060';
     let server = app.listen(serverPort, function () {
         logger.info('Predator listening on port ' + serverPort);
     });
