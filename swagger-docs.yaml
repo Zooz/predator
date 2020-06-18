@@ -1033,7 +1033,7 @@ paths:
             type: string
             format: uuid
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-      summary: get a benchmark for test
+      summary: Get a benchmark for test
       description:  Get a benchmark for a test
       responses:
         '200':
@@ -1514,12 +1514,22 @@ components:
       properties:
         name:
           type: string
+          minLength: 1
           description: The name of the test.
           example: Order from Pet Store
+        csv_file_id:
+          type: string
+          format: uuid
+          example: 8e83bca3-f04f-4d16-a324-b0d2959db7d4
+          description: The id of the uploaded csv file resource
         description:
           type: string
           description: A description of the test.
           example: Performance test for placing orders from the pet store.
+        processor_id:
+          description: Unique processor identifier
+          type: string
+          format: uuid
         type:
           $ref: '#/components/schemas/test_type'
     test_type:
@@ -2308,49 +2318,49 @@ components:
               description: timout to smtp server in milliseconds
               type: number
         benchmark_threshold:
-              type: number
-              description: Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url.
-              minimum: 0
-              maximum: 100
+          type: number
+          description: Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url.
+          minimum: 0
+          maximum: 100
         benchmark_threshold_webhook_url:
-              type: string
-              format: uri
-              description: Url to send webhooks to incase a test receives a score less than the benchmark threshold.
+          type: string
+          format: uri
+          description: Url to send webhooks to incase a test receives a score less than the benchmark threshold.
         benchmark_weights:
-              additionalProperties: false
-              type: object
-              description: benchmark_weights
-              required:
-              - percentile_ninety_five
-              - percentile_fifty
-              - server_errors_ratio
-              - client_errors_ratio
-              - rps
-              properties:
-                percentile_ninety_five:
-                  description: Percentage of the score affected by p95 results.
-                  allOf:
-                    - $ref: '#/components/schemas/benchmark_weights'
-                percentile_fifty:
-                  description: Percentage of the score affected by median results.
-                  allOf:
-                    - $ref: '#/components/schemas/benchmark_weights'
-                server_errors_ratio:
-                  description: Percentage of the score affected by server errors ratio.
-                  allOf:
-                   - $ref: '#/components/schemas/benchmark_weights'
-                client_errors_ratio:
-                  description: Percentage of the score affected by client errors ratio.
-                  allOf:
-                   - $ref: '#/components/schemas/benchmark_weights'
-                rps:
-                  description: Percentage of the score affected by requests per second results.
-                  allOf:
-                   - $ref: '#/components/schemas/benchmark_weights'
+          additionalProperties: false
+          type: object
+          description: benchmark_weights
+          required:
+            - percentile_ninety_five
+            - percentile_fifty
+            - server_errors_ratio
+            - client_errors_ratio
+            - rps
+          properties:
+            percentile_ninety_five:
+              description: Percentage of the score affected by p95 results.
+              allOf:
+                - $ref: '#/components/schemas/benchmark_weights'
+            percentile_fifty:
+              description: Percentage of the score affected by median results.
+              allOf:
+                - $ref: '#/components/schemas/benchmark_weights'
+            server_errors_ratio:
+              description: Percentage of the score affected by server errors ratio.
+              allOf:
+                - $ref: '#/components/schemas/benchmark_weights'
+            client_errors_ratio:
+              description: Percentage of the score affected by client errors ratio.
+              allOf:
+                - $ref: '#/components/schemas/benchmark_weights'
+            rps:
+              description: Percentage of the score affected by requests per second results.
+              allOf:
+                - $ref: '#/components/schemas/benchmark_weights'
     benchmark_weights:
       type: object
       required:
-        - percentage
+         - percentage
       properties:
         percentage:
           type: number
