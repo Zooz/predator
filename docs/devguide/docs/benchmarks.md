@@ -7,7 +7,7 @@ Load test results increase in their value and importance when compared to a cert
 By creating a benchmark for a specific test, 
 each subsequent test run for that test will be given a `score` from 0-100 summarizing the test run in one simple to analyze numerical value.
 
-The <b>benchmarks</b> feature alongside the <b><u>[compare test runs](schedulesandreports.html#comparing-reports)</u></b> are tools that leverage `predators` reports 
+The <b>benchmarks</b> feature alongside the <b><u>[compare test runs](schedulesandreports.md#comparing-reports)</u></b> are tools that leverage `predators` reports 
 and ensures that new releases stand up to your performance requirements. 
 
 ## Setting Up
