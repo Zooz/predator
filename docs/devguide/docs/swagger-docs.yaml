@@ -53,6 +53,7 @@ x-tagGroups:
       - Reports
       - Configuration
       - Files
+      - Benchmarks
 
 paths:
   #DSL Definitions
@@ -712,6 +713,7 @@ paths:
   '/v1/jobs/containers/':
     delete:
       operationId: delete-all-job-containers
+      summary: Delete all finished containers/pods
       tags:
         - Jobs
       description: delete all containers/pods of predator-runner
@@ -1418,7 +1420,7 @@ paths:
       operationId: retrieve-file-medtadata
       tags:
         - Files
-      summary: get file name and id
+      summary: Get filename by id
       description: Retrieve a specific file metadata.
       parameters:
         - in: path
