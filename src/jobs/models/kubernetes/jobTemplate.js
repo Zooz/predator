@@ -15,6 +15,9 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
                 'metadata': {
                     'labels': {
                         app: predatorRunner
+                    },
+                    'annotations': {
+                        'traffic.sidecar.istio.io/excludeOutboundPorts': '8060'
                     }
                 },
                 'spec': {
