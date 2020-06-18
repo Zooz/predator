@@ -299,8 +299,8 @@ paths:
             type: string
             format: uuid
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-      summary: Create a bench mark for test
-      description: Create a bench mark for test
+      summary: Create benchmark for test
+      description: Create benchmark for test
       responses:
         '201':
           description: Success
@@ -325,7 +325,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/benchmark_request'
-        description: The bench mark to add
+        description: The benchmark to add
         required: true
     get:
       tags:
@@ -339,7 +339,7 @@ paths:
             type: string
             format: uuid
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-      summary: get a bench mark for test
+      summary: get a benchmark for test
       description:  Get a benchmark for a test
       responses:
         '200':
