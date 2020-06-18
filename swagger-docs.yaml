@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 1.0.0
+  version: 1.3.0
   title: Predator
   x-logo:
     url: logo.png
@@ -1315,49 +1315,44 @@ components:
           description: |
             The complete request JSON used in the test.
           example: {
-            "artillery_test": {
-              "config": {
-                "target": "http://127.0.0.1:3000"
-              },
-              "scenarios": [
+            "config": {
+              "target": "http://127.0.0.1:3000"
+            },
+            "scenarios": [
+            {
+              "name": "Get Pets",
+              "weight": 100,
+              "flow": [
               {
-                "name": "Get Pets",
-                "weight": 100,
-                "flow": [
-                {
-                  "post": {
-                    "url": "/pets",
-                    "headers": {
-                      "Content-Type": "application/json",
-                      "request-id": "{{ $randomString() }}"
-                    },
-                    "capture": [
-                    {
-                      "json": "$.id",
-                      "as": "petId"
-                    }
-                    ],
-                    "json": {
-                      "name": "Mickey"
-                    }
+                "post": {
+                  "url": "/pets",
+                  "headers": {
+                    "Content-Type": "application/json",
+                    "request-id": "{{ $randomString() }}"
+                  },
+                  "capture": [
+                  {
+                    "json": "$.id",
+                    "as": "petId"
                   }
-                },
-                {
-                  "get": {
-                    "url": "/pets/{{petId}}",
-                    "headers": {
-                      "Content-Type": "application/json",
-                      "request-id": "{{ $randomString() }}"
-                    }
+                  ],
+                  "json": {
+                    "name": "Mickey"
                   }
                 }
-                ]
+              },
+              {
+                "get": {
+                  "url": "/pets/{{petId}}",
+                  "headers": {
+                    "Content-Type": "application/json",
+                    "request-id": "{{ $randomString() }}"
+                  }
+                }
               }
               ]
-            },
-            "name": "Order from Pet Store",
-            "description": "Performance test for placing orders from the pet store.",
-            "type": "basic"
+            }
+            ]
           }
     test_id:
       required:
@@ -1825,6 +1820,9 @@ components:
         last_stats:
           type: string
           description: The current report metrics.
+        avg_rps:
+          type: number
+          description: The average rps.
         notes:
           type: string
           description: notes about the test
