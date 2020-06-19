@@ -12,9 +12,9 @@ module.exports.getAllWebhooks = async function () {
     return getAllWebhooks;
 };
 
-module.exports.getWebhook= async function (webhookId) {
+module.exports.getWebhook = async function (webhookId) {
     const webhook = await databaseConnector.getWebhook(webhookId);
-    if(!webhook) {
+    if (!webhook) {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
         throw error;
