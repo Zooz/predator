@@ -54,7 +54,9 @@ async function createWebhook(webhook) {
         await createdWebhook.setEvents(eventsIds, { transaction });
         return createdWebhook;
     });
-    return webhooksModel.findByPk(id, { include: ['events'] }).then(parseWebhook);
+    const retrievedWebhook = await webhooksModel.findByPk(id, { include: ['events'] });
+    const parsedWebhook = parseWebhook(retrievedWebhook);
+    return parsedWebhook;
 }
 
 async function initSchemas() {
