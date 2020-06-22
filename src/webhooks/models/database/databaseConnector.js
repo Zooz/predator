@@ -2,10 +2,12 @@ let databaseConfig = require('../../../config/databaseConfig');
 let cassandraConnector = require('./cassandra/cassandraConnector');
 let sequelizeConnector = require('./sequelize/sequelizeConnector');
 let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
+
 module.exports = {
     init,
     getAllWebhooks,
     createWebhook,
+    getWebhook,
     closeConnection
 };
 
@@ -23,4 +25,8 @@ async function getAllWebhooks(from, limit, exclude) {
 
 async function createWebhook(webhook) {
     return databaseConnector.createWebhook(webhook);
+}
+
+async function getWebhook(webhookId) {
+    return databaseConnector.getWebhook(webhookId);
 }
