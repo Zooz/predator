@@ -4,7 +4,6 @@ const uuid = require('uuid');
 const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON } = require('../../../src/common/consts');
 
 const webhookRequestSender = require('./helpers/requestCreator');
-const requestPromise = require('request-promise-native');
 
 describe('Webhooks api', function () {
     this.timeout(5000000);
@@ -37,11 +36,8 @@ describe('Webhooks api', function () {
                 const webhookId = createWebhookResponse.body.id;
                 const getWebhookResponse = await webhookRequestSender.getWebhook(webhookId);
 
-                const { events, ...webhookWithoutEvents } = webhook;
-                const { body: { events: responseEvents, ...webhookResponseWithoutEvents } } = getWebhookResponse;
                 expect(getWebhookResponse.statusCode).to.equal(200);
-                expect(webhookResponseWithoutEvents).to.deep.contain(webhookWithoutEvents);
-                expect(events).to.have.members(responseEvents);
+                assertDeepWebhookEquality(webhook, getWebhookResponse.body);
             });
         });
         describe('POST /v1/webhooks', function () {
@@ -150,7 +146,7 @@ describe('Webhooks api', function () {
                 expect(response.statusCode).to.equal(404);
             });
         });
-    })
+    });
 });
 
 function generateWebhook(name = 'My webhook', url = 'https://humus.is.love/callback', events = WEBHOOK_EVENT_TYPES) {
