@@ -57,6 +57,10 @@ async function createWebhook(webhook) {
     return parsedWebhook;
 }
 
+async function deleteWebhook(webhookId) {
+    // TODO: implement
+}
+
 async function initSchemas() {
     const webhooksSchema = client.define('webhook', {
         id: {
@@ -95,7 +99,8 @@ async function initSchemas() {
     webhooksSchema.belongsToMany(webhooksEvents, {
         through: 'webhook_event_mapping',
         as: 'events',
-        foreignKey: 'webhook_id'
+        foreignKey: 'webhook_id',
+        onDelete: 'CASCADE'
     });
     webhooksEvents.belongsToMany(webhooksSchema, {
         through: 'webhook_event_mapping',
