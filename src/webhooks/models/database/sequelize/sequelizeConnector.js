@@ -14,6 +14,11 @@ module.exports = {
 
 function parseWebhook(webhookRecord) {
     return webhookRecord && {
+    createWebhook
+};
+
+function parseWebhook(webhookRecord) {
+    return {
         ...webhookRecord.dataValues,
         events: webhookRecord.events && webhookRecord.events.map(eventRecord => eventRecord.dataValues.name)
     };

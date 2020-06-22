@@ -11,6 +11,7 @@ module.exports = {
     createWebhook,
     getWebhooks,
     getWebhook
+    getWebhooks
 };
 
 async function init() {

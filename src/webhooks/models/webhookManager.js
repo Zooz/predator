@@ -7,6 +7,10 @@ const webhookDefaultValues = {
     global: false
 };
 
+const webhookDefaultValues = {
+    global: false
+};
+
 module.exports.getAllWebhooks = async function () {
     let getAllWebhooks = await databaseConnector.getAllWebhooks();
     return getAllWebhooks;
