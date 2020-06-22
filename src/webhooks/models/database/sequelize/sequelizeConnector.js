@@ -1,5 +1,3 @@
-'use strict';
-
 const Sequelize = require('sequelize');
 const uuid = require('uuid');
 
@@ -10,11 +8,6 @@ module.exports = {
     getAllWebhooks,
     createWebhook,
     getWebhook
-};
-
-function parseWebhook(webhookRecord) {
-    return webhookRecord && {
-    createWebhook
 };
 
 function parseWebhook(webhookRecord) {
