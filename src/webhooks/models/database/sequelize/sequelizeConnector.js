@@ -1,11 +1,21 @@
 'use strict';
 
 const Sequelize = require('sequelize');
+const uuid = require('uuid');
+
 let client;
 
 module.exports = {
     init,
-    getAllWebhooks
+    getAllWebhooks,
+    createWebhook
+};
+
+function parseWebhook(webhookRecord) {
+    return {
+        ...webhookRecord.dataValues,
+        events: webhookRecord.events && webhookRecord.events.map(eventRecord => eventRecord.dataValues.name)
+    };
 };
 
 async function init(sequelizeClient) {
@@ -15,7 +25,31 @@ async function init(sequelizeClient) {
 
 async function getAllWebhooks() {
     const webhooksModel = client.model('webhook');
-    return webhooksModel.findAll({ include: ['events'] });
+    const webhooks = await webhooksModel.findAll({ include: ['events'] });
+    return webhooks.map(parseWebhook);
+}
+
+async function createWebhook(webhook) {
+    const id = uuid.v4();
+    const webhooksModel = client.model('webhook');
+    const webhooksEvents = client.model('webhook_event');
+    const events = await webhooksEvents.findAll({ where: { name: webhook.events } });
+    const eventsIds = events.map(({ id }) => id);
+    const webhookToInsert = {
+        id,
+        name: webhook.name,
+        url: webhook.url,
+        format_type: webhook.format_type,
+        global: webhook.global
+    };
+    await client.transaction(async function(transaction) {
+        const createdWebhook = await webhooksModel.create(webhookToInsert, { transaction });
+        await createdWebhook.setEvents(eventsIds, { transaction });
+        return createdWebhook;
+    });
+    const retrievedWebhook = await webhooksModel.findByPk(id, { include: ['events'] });
+    const parsedWebhook = parseWebhook(retrievedWebhook);
+    return parsedWebhook;
 }
 
 async function initSchemas() {

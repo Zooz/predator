@@ -2423,6 +2423,8 @@ components:
         events:
           description: list of events which will trigger the webhook
           type: array
+          uniqueItems: true
+          minItems: 1
           items:
             $ref: '#/components/schemas/webhooks_types'
         format_type:

@@ -10,3 +10,13 @@ module.exports.getAllWebhooks = async function (req, res, next) {
         return next(err);
     }
 };
+
+module.exports.createWebhook = async function (req, res, next) {
+    let webhook;
+    try {
+        webhook = await webhookManager.createWebhook(req.body);
+        return res.status(201).json(webhook);
+    } catch (err) {
+        return next(err);
+    }
+};
