@@ -2,6 +2,7 @@ let logger = require('../../../../common/logger');
 
 module.exports = {
     init,
+    createWebhook,
     getAllWebhooks
 };
 
@@ -12,5 +13,9 @@ async function init() {
 }
 
 async function getAllWebhooks() {
+    throw new Error('Not implemented.');
+}
+
+async function createWebhook() {
     throw new Error('Not implemented.');
 }
