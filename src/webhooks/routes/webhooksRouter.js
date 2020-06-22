@@ -8,5 +8,6 @@ let webhooksController = require('../controllers/webhooksController');
 
 router.get('/', swaggerValidator.validate, webhooksController.getAllWebhooks);
 router.post('/', swaggerValidator.validate, webhooksController.createWebhook);
+router.get('/:webhook_id', swaggerValidator.validate, webhooksController.getWebhook);
 
 module.exports = router;

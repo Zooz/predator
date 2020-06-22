@@ -11,6 +11,17 @@ module.exports.getAllWebhooks = async function (req, res, next) {
     }
 };
 
+module.exports.getWebhook = async function (req, res, next) {
+    let webhook;
+    let webhookId = req.params.webhook_id;
+    try {
+        webhook = await webhookManager.getWebhook(webhookId);
+        return res.status(200).json(webhook);
+    } catch (err) {
+        return next(err);
+    }
+};
+
 module.exports.createWebhook = async function (req, res, next) {
     let webhook;
     try {
