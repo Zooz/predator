@@ -1,4 +1,6 @@
 const { expect } = require('chai');
+const uuid = require('uuid');
+
 const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON } = require('../../../src/common/consts');
 
 const webhookRequestSender = require('./helpers/requestCreator');
@@ -23,6 +25,19 @@ describe('Webhooks api', function () {
 
                 const webhooks = webhooksGetResponse.body;
                 expect(webhooks).to.be.an('array').and.have.lengthOf(numOfWebhooksToInsert);
+            });
+        });
+        describe('GET /webhook/:webhook_id', function () {
+            it('should retrieve the webhook that was created', async function() {
+                const webhook = generateWebhook();
+                let createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                expect(createWebhookResponse.statusCode).to.equal(201);
+
+                const webhookId = createWebhookResponse.body.id;
+                const getWebhookResponse = await webhookRequestSender.getWebhook(webhookId);
+
+                expect(getWebhookResponse.statusCode).to.equal(200);
+                assertDeepWebhookEquality(webhook, getWebhookResponse.body);
             });
         });
         describe('POST /v1/webhooks', function () {
@@ -109,6 +124,26 @@ describe('Webhooks api', function () {
                     const createResponse = await webhookRequestSender.createWebhook(webhook);
                     expect(createResponse.statusCode).to.equal(400);
                 });
+            });
+        });
+        describe('GET /webhook/:webhook_id', function () {
+            it('should return 400 for bad uuid', async function() {
+                const badWebhookValue = 'lalallalalal';
+
+                const response = await webhookRequestSender.getWebhook(badWebhookValue);
+
+                expect(response.statusCode).to.equal(400);
+            });
+        });
+    });
+    describe('Sad requests', function() {
+        describe('GET /webhook/:webhook_id', function () {
+            it('should return 404 for no existing webhook', async function() {
+                const notExistingWebhookId = uuid.v4();
+
+                const response = await webhookRequestSender.getWebhook(notExistingWebhookId);
+
+                expect(response.statusCode).to.equal(404);
             });
         });
     });

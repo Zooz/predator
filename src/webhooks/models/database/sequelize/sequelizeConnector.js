@@ -1,5 +1,3 @@
-'use strict';
-
 const Sequelize = require('sequelize');
 const uuid = require('uuid');
 
@@ -8,7 +6,8 @@ let client;
 module.exports = {
     init,
     getAllWebhooks,
-    createWebhook
+    createWebhook,
+    getWebhook
 };
 
 function parseWebhook(webhookRecord) {
@@ -27,6 +26,12 @@ async function getAllWebhooks() {
     const webhooksModel = client.model('webhook');
     const webhooks = await webhooksModel.findAll({ include: ['events'] });
     return webhooks.map(parseWebhook);
+}
+
+async function getWebhook(webhookId) {
+    const webhooksModel = client.model('webhook');
+    const webhook = await webhooksModel.findByPk(webhookId, { include: ['events'] });
+    return parseWebhook(webhook);
 }
 
 async function createWebhook(webhook) {
