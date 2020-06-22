@@ -7,11 +7,12 @@ module.exports = {
     init,
     getAllWebhooks,
     createWebhook,
-    getWebhook
+    getWebhook,
+    deleteWebhook
 };
 
 function parseWebhook(webhookRecord) {
-    return {
+    return webhookRecord && {
         ...webhookRecord.dataValues,
         events: webhookRecord.events && webhookRecord.events.map(eventRecord => eventRecord.dataValues.name)
     };
@@ -58,7 +59,12 @@ async function createWebhook(webhook) {
 }
 
 async function deleteWebhook(webhookId) {
-    // TODO: implement
+    const webhooksModel = client.model('webhook');
+    return webhooksModel.destroy({
+        where: {
+            id: webhookId
+        }
+    });
 }
 
 async function initSchemas() {

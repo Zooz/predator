@@ -27,7 +27,7 @@ describe('Webhooks api', function () {
                 expect(webhooks).to.be.an('array').and.have.lengthOf(numOfWebhooksToInsert);
             });
         });
-        describe('GET /webhook/:webhook_id', function () {
+        describe('GET /v1/webhooks/:webhook_id', function () {
             it('should retrieve the webhook that was created', async function() {
                 const webhook = generateWebhook();
                 let createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
@@ -64,6 +64,27 @@ describe('Webhooks api', function () {
 
                 expect(createWebhookResponse.statusCode).to.equal(201);
                 assertDeepWebhookEquality(webhook, createWebhookResponse.body);
+            });
+        });
+        describe('DELETE /v1/webhooks/:webhook_id', function() {
+            it('Create a webhook -> deleting it -> expecting to get 404 in GET', async function() {
+                const webhook = generateWebhook();
+
+                const insertWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                expect(insertWebhookResponse.statusCode).to.equal(201);
+                const webhookId = insertWebhookResponse.body.id;
+
+                const deleteWebhookResponse = await webhookRequestSender.deleteWebhook(webhookId);
+                expect(deleteWebhookResponse.statusCode).to.equal(204);
+
+                const getWebhookResponse = await webhookRequestSender.getWebhook(webhookId);
+                expect(getWebhookResponse.statusCode).to.equal(404);
+            });
+            it('Deleting unexisting webhook -> expect 204 status code', async function() {
+                const id = uuid.v4();
+
+                const deleteWebhookResponse = await webhookRequestSender.deleteWebhook(id);
+                expect(deleteWebhookResponse.statusCode).to.equal(204);
             });
         });
     });
@@ -126,7 +147,7 @@ describe('Webhooks api', function () {
                 });
             });
         });
-        describe('GET /webhook/:webhook_id', function () {
+        describe('GET /v1/webhooks/:webhook_id', function () {
             it('should return 400 for bad uuid', async function() {
                 const badWebhookValue = 'lalallalalal';
 
@@ -135,9 +156,19 @@ describe('Webhooks api', function () {
                 expect(response.statusCode).to.equal(400);
             });
         });
+        describe('DELETE /v1/webhooks/:webhook_id', function () {
+            it('should return 400 for bad uuid', async function() {
+                const badWebhookValue = 'lalallalalal';
+
+                const response = await webhookRequestSender.deleteWebhook(badWebhookValue);
+
+                expect(response.statusCode).to.equal(400);
+            });
+        });
     });
+
     describe('Sad requests', function() {
-        describe('GET /webhook/:webhook_id', function () {
+        describe('GET /v1/webhooks/:webhook_id', function () {
             it('should return 404 for no existing webhook', async function() {
                 const notExistingWebhookId = uuid.v4();
 
