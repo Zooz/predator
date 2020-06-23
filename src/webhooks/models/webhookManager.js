@@ -7,22 +7,20 @@ const webhookDefaultValues = {
     global: false
 };
 
-module.exports.getAllWebhooks = async function () {
+async function getAllWebhooks() {
     let getAllWebhooks = await databaseConnector.getAllWebhooks();
     return getAllWebhooks;
 };
 
-module.exports.getWebhook = async function (webhookId) {
+async function getWebhook(webhookId) {
     const webhook = await databaseConnector.getWebhook(webhookId);
     if (!webhook) {
-        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
-        error.statusCode = 404;
-        throw error;
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
     }
     return webhook;
 };
 
-module.exports.createWebhook = async function(webhookInfo) {
+async function createWebhook(webhookInfo) {
     const webhook = {
         ...webhookDefaultValues,
         ...webhookInfo
@@ -30,6 +28,28 @@ module.exports.createWebhook = async function(webhookInfo) {
     return databaseConnector.createWebhook(webhook);
 };
 
-module.exports.deleteWebhook = async function(webhookId) {
+async function deleteWebhook(webhookId) {
     return databaseConnector.deleteWebhook(webhookId);
 };
+
+async function updateWebhook(webhookId, webhook) {
+    const webhookInDB = await getWebhook(webhookId);
+    if (!webhookInDB) {
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
+    }
+    return databaseConnector.updateWebhook(webhookId, webhook);
+};
+
+module.exports = {
+    getAllWebhooks,
+    getWebhook,
+    createWebhook,
+    deleteWebhook,
+    updateWebhook
+};
+
+function generateError(stautsCode, message) {
+    const error = new Error(message);
+    error.statusCode = stautsCode;
+    return error;
+}
