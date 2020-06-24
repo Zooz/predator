@@ -11,7 +11,7 @@ export default (props) => {
     const onInputChange = (key, value) => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
-        if(Number.isInteger(Number(value))){
+        if (Number(value)) {
             step[key] = value;
             onChangeValue(step, props.index);
         }
@@ -27,7 +27,7 @@ export default (props) => {
             <div className={style['http-methods-request-options-wrapper']}>
                 <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
 
-                    <TitleInput style={{width: '100%'}} title={'Enter sleep in seconds'}>
+                    <TitleInput style={{width: '100%'}} title={'Seconds to sleep'}>
                         <Input value={step.sleep} onChange={(evt) => {
                             onInputChange('sleep', evt.target.value)
                         }}/>
