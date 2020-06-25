@@ -1,6 +1,7 @@
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
+const SLEEP = 'sleep';
 export const createTestRequest = (data) => {
     const {name, description, scenarios, type, baseUrl, before, processorId, csvFileId} = data;
     const scenariosRequest = scenarios.map((scenario) => {
@@ -82,18 +83,25 @@ function buildStepsFromFlow(flow) {
         return []
     }
     return flow.map((request) => {
-        const method = Object.keys(request)[0];
+        const action = Object.keys(request)[0];
+        if (action.toLowerCase() === 'think') {
+            return {
+                type: SLEEP,
+                sleep: request.think
+            }
+        }
         return {
+            type: 'http',
             id: uuid(),
-            method: method.toUpperCase(),
-            body: request[method].json,
-            gzip: request[method].gzip,
-            forever: request[method].forever,
-            url: request[method].url,
-            beforeRequest: request[method].beforeRequest,
-            afterResponse: request[method].afterResponse,
-            captures: buildCaptureState(request[method].capture),
-            headers: buildHeadersState(request[method].headers)
+            method: action.toUpperCase(),
+            body: request[action].json,
+            gzip: request[action].gzip,
+            forever: request[action].forever,
+            url: request[action].url,
+            beforeRequest: request[action].beforeRequest,
+            afterResponse: request[action].afterResponse,
+            captures: buildCaptureState(request[action].capture),
+            headers: buildHeadersState(request[action].headers)
         }
     })
 }
@@ -126,6 +134,12 @@ function buildCaptureState(captures) {
 
 function prepareFlow(steps) {
     return steps.map((step) => {
+        if (step.type === SLEEP) {
+            return {
+                think: step.sleep
+            }
+        }
+
         return {
             [step.method.toLowerCase()]: {
                 url: step.url,

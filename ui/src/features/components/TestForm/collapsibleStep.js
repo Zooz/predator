@@ -1,22 +1,10 @@
 import React from 'react';
-import DragableWrapper from './dragableWrapper';
-import Button from '../Button';
-import classnames from 'classnames';
-import style from './scenarioList.scss';
 import CollapsibleItem from '../../../components/CollapsibleItem/CollapsibleItem';
 import StepForm from './StepForm';
+import SleepForm from "./SleepForm";
 
-const actions = ['Delete', 'Duplicate'];
-const Section = CollapsibleItem.Section
-
-const sections = [
-
-    <Section key={2} borderLeft icon='fa-chevron-circle-right' tooltip={<div>asdasd</div>}>
-        Hover me!
-    </Section>,
-    <Section key={3} borderLeft>Section3</Section>,
-    <Section key={4} icon='fa-cc-visa' borderLeft>Section4</Section>
-]
+const Section = CollapsibleItem.Section;
+const SLEEP = 'sleep';
 export default class CollapsibleStep extends React.Component {
     constructor(props) {
         super(props);
@@ -25,15 +13,9 @@ export default class CollapsibleStep extends React.Component {
         }
     }
 
-    /*TODO
-    * generate icons for duplicate / delete
-    *
-    * */
     render() {
-
-        // this.props.step;
         const {
-            step, onDuplicateStep,
+            onDuplicateStep,
             onDeleteStep, index
         } = this.props;
         const sections = [
@@ -56,22 +38,50 @@ export default class CollapsibleStep extends React.Component {
             toggleable={true}
             type={CollapsibleItem.TYPES.CLICKER}
             disabled={false}
-            icon={'fa-flash'}
-            title={`${step.method} ${step.url}`}
+            icon={this.generateIcon()}
+            title={this.generateTitle()}
             body={this.generateBody()}
             sections={sections}
         />)
 
     }
 
+    generateIcon = () => {
+        const {step} = this.props;
+        if (step.type === SLEEP) {
+            return 'fa-cloock-o'
+        }
+        return 'fa-flash'
+    };
+
+    generateTitle = () => {
+        const {step} = this.props;
+        if (step.type === SLEEP) {
+            return `SLEEP ${step.sleep} SECONDS`
+        }
+        return `${step.method} ${step.url}`
+    };
+
     generateBody = () => {
-        const {index, onChangeValueOfStep, processorsExportedFunctions} = this.props;
+        const {index, onChangeValueOfStep, processorsExportedFunctions, step} = this.props;
         return (
             <div style={{padding: '10px'}}>
-                <StepForm step={this.props.step}
-                          index={index}
-                          onChangeValue={onChangeValueOfStep}
-                          processorsExportedFunctions={processorsExportedFunctions}/>
+                {
+                    step.type === SLEEP &&
+                    <SleepForm step={step}
+                               index={index}
+                               onChangeValue={onChangeValueOfStep}
+                    />
+                    || <StepForm step={step}
+                                 index={index}
+                                 onChangeValue={onChangeValueOfStep}
+                                 processorsExportedFunctions={processorsExportedFunctions}
+                                 type
+                    />
+
+                }
+
+
             </div>
 
 
@@ -79,3 +89,6 @@ export default class CollapsibleStep extends React.Component {
     }
 
 }
+
+
+
