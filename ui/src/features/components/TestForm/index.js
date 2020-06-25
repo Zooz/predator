@@ -26,6 +26,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const SLEEP = 'sleep';
 
+
 export class TestForm extends React.Component {
     constructor(props) {
         super(props);
@@ -45,8 +46,7 @@ export class TestForm extends React.Component {
                 processorsExportedFunctions: [],
                 csvMode: false,
                 csvFile: null,
-                csvFileId: undefined,
-                visibleTop: true
+                csvFileId: undefined
             }
 
         }
@@ -112,15 +112,12 @@ export class TestForm extends React.Component {
 
     render() {
         const {createTestError, processorsError, closeDialog, processorsLoading, processorsList, csvMetadata} = this.props;
-        const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi, visibleTop} = this.state;
+        const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi} = this.state;
         const error = createTestError || processorsError || maxSupportedScenariosUi;
         return (
             <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
                 <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
-                    {visibleTop && <div className={style['link-style']} style={{marginLeft: 'auto'}}
-                                        onClick={() => this.setState({visibleTop: false})}>Hide</div>
-                    }
-                    {visibleTop && <div className={style['top']}>
+                    <div className={style['top']}>
                         <div className={style['top-inputs']}>
                             {/* left */}
 
@@ -157,7 +154,6 @@ export class TestForm extends React.Component {
                             </div>
                         </div>
                     </div>
-                    }
                     {/* bottom */}
 
                     {this.generateScenarioDashBoard()}
@@ -210,6 +206,8 @@ export class TestForm extends React.Component {
             scenarios,
             currentScenarioIndex: scenarios.length - 1,
             isBeforeSelected: false
+        }, () => {
+            this.addStepHandler();
         })
     };
 
@@ -343,7 +341,6 @@ export class TestForm extends React.Component {
             scenarios, before, currentScenarioIndex,
             processorsExportedFunctions, csvMode,
             csvFile,
-            visibleTop,
 
         } = this.state;
         const {csvMetadata} = this.props;
@@ -359,8 +356,7 @@ export class TestForm extends React.Component {
 
         const activeTabKey = currentScenarioIndex === null ? before.id : scenarios[currentScenarioIndex] && scenarios[currentScenarioIndex].id;
         return (
-            <div onfocusin={() => this.setState({visibleTop: false})}
-                 onfocusout={() => this.setState({visibleTop: true})} className={style['bottom']}>
+            <div className={style['bottom']}>
                 {/* bottom */}
                 <div style={{
                     marginLeft: 'auto',
@@ -370,9 +366,6 @@ export class TestForm extends React.Component {
                     // width: '313px'
                 }}>
 
-                    {!visibleTop &&
-                    <div className={style['actions-style']} onClick={() => this.setState({visibleTop: true})}>+Edit
-                        test</div>}
                     <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
                     <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
                     <div className={style['actions-style']} onClick={() => this.addStepHandler(SLEEP)}>+Add Sleep</div>

@@ -134,7 +134,7 @@ function buildCaptureState(captures) {
 
 function prepareFlow(steps) {
     return steps.map((step) => {
-        if (step.type === 'sleep') {
+        if (step.type === SLEEP) {
             return {
                 think: step.sleep
             }
