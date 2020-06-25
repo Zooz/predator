@@ -22,9 +22,10 @@ import env from '../../../App/common/env';
 import {
     faDownload
 } from '@fortawesome/free-solid-svg-icons'
-import classnames from "classnames";
-import css from "../../configurationColumn.scss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+const SLEEP = 'sleep';
+
 
 export class TestForm extends React.Component {
     constructor(props) {
@@ -205,6 +206,8 @@ export class TestForm extends React.Component {
             scenarios,
             currentScenarioIndex: scenarios.length - 1,
             isBeforeSelected: false
+        }, () => {
+            this.addStepHandler();
         })
     };
 
@@ -217,7 +220,7 @@ export class TestForm extends React.Component {
         this.setState({before});
         this.setState({currentScenarioIndex: null})
     };
-    addStepHandler = () => {
+    addStepHandler = (type) => {
         const {scenarios, currentScenarioIndex, before} = this.state;
 
         let steps;
@@ -227,14 +230,17 @@ export class TestForm extends React.Component {
         } else {
             steps = scenarios[currentScenarioIndex].steps;
         }
-        steps.push(this.initStep());
+        steps.push(this.initStep(type));
         this.setState({
             scenarios,
             before,
         })
     };
 
-    initStep() {
+    initStep(type) {
+        if (type === SLEEP) {
+            return {id: uuid(), sleep: 10, type};
+        }
         return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: '', forever: true}
     }
 
@@ -362,6 +368,7 @@ export class TestForm extends React.Component {
 
                     <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
                     <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
+                    <div className={style['actions-style']} onClick={() => this.addStepHandler(SLEEP)}>+Add Sleep</div>
                     <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
                     <div className={style['actions-style']}
                          onClick={() => this.setState({csvMode: true})}>{(csvFile || csvMetadata) ? 'Modify' : '+Add'} CSV
