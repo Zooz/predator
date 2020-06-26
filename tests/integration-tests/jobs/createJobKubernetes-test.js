@@ -14,7 +14,7 @@ describe('Create job specific kubernetes tests', async function () {
         nock.cleanAll();
     });
     const jobPlatform = process.env.JOB_PLATFORM;
-    if (jobPlatform === 'KUBERNETES') {
+    if (jobPlatform.toUpperCase() === 'KUBERNETES') {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
                 before(async () => {
