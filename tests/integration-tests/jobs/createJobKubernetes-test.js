@@ -354,7 +354,7 @@ describe('Create job specific kubernetes tests', async function () {
                         should(rampTo.value).eql('22');
                         should(arrivalRate.value).eql('15');
                         should(maxVirtualUsers.value).eql('29');
-                        should(actualAnnotations).eql('29');
+                        should(actualAnnotations).eql({ 'traffic.sidecar.istio.io/excludeOutboundPorts': '8060' });
                     });
 
                     it('Get the job', async () => {
