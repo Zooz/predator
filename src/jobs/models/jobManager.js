@@ -258,7 +258,8 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         });
     }
 
-    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX);
+    const customRunnerDefinition = configData.custom_runner_definition;
+    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
 
     return jobRequest;
 }

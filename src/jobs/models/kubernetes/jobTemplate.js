@@ -1,5 +1,5 @@
-module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, predatorRunner) => {
-    return {
+module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, predatorRunner, customDefinition) => {
+    const jobTemplate = {
         'apiVersion': 'batch/v1',
         'kind': 'Job',
         'metadata': {
@@ -15,9 +15,6 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
                 'metadata': {
                     'labels': {
                         app: predatorRunner
-                    },
-                    'annotations': {
-                        'traffic.sidecar.istio.io/excludeOutboundPorts': '8060'
                     }
                 },
                 'spec': {
@@ -39,4 +36,6 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
             'backoffLimit': 0
         }
     };
+    const jobTemplateWithCustomDefinition = Object.assign(jobTemplate, customDefinition);
+    return jobTemplateWithCustomDefinition;
 };

@@ -1,6 +1,7 @@
 const should = require('should'),
     uuid = require('uuid'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
+    configManagerRequestCreator = require('../configManager/helpers/requestCreator'),
     testsRequestCreator = require('../tests/helpers/requestCreator'),
     nock = require('nock'),
     kubernetesConfig = require('../../../src/config/kubernetesConfig');
@@ -17,6 +18,7 @@ describe('Create job specific kubernetes tests', async function () {
         describe('Kubernetes', () => {
             describe('Good requests', () => {
                 before(async () => {
+                    await configManagerRequestCreator.init();
                     await schedulerRequestCreator.init();
                     await testsRequestCreator.init();
 
@@ -101,7 +103,8 @@ describe('Create job specific kubernetes tests', async function () {
                             arrival_rate: 1,
                             duration: 1,
                             environment: 'test',
-                            enabled: true });
+                            enabled: true
+                        });
 
                         should(relevantJobs).containEql({
                             id: cronJobId,
@@ -285,11 +288,23 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                 });
 
-                describe('Create one time job with parallelism, should create job with the right parameters and run it, finally stop and delete it', () => {
+                describe('Create one time job with parallelism and custom runner definition, should create job with the right parameters and run it, finally stop and delete it', () => {
                     let createJobResponse;
                     let getJobsFromService;
                     let expectedResult;
                     it('Create the job', async () => {
+                        await configManagerRequestCreator.updateConfig({ custom_runner_definition: {
+                            'spec': {
+                                'template': {
+                                    'metadata': {
+                                        'annotations': {
+                                            'traffic.sidecar.istio.io/excludeOutboundPorts': '8060'
+                                        }
+                                    }
+                                }
+                            }
+                        } });
+
                         let validBody = {
                             test_id: testId,
                             arrival_rate: 100,
@@ -310,7 +325,9 @@ describe('Create job specific kubernetes tests', async function () {
                             parallelism: 7
                         };
                         let actualJobEnvVars = {};
+                        let actualAnnotations = {};
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
+                            actualAnnotations = body.spec.template.metadata.annotations;
                             actualJobEnvVars = body.spec.template.spec.containers['0'].env;
                             return true;
                         }).reply(200, {
@@ -337,6 +354,7 @@ describe('Create job specific kubernetes tests', async function () {
                         should(rampTo.value).eql('22');
                         should(arrivalRate.value).eql('15');
                         should(maxVirtualUsers.value).eql('29');
+                        should(actualAnnotations).eql('29');
                     });
 
                     it('Get the job', async () => {
@@ -391,18 +409,30 @@ describe('Create job specific kubernetes tests', async function () {
                         nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podA`)
                             .reply(200, {
                                 metadata: { labels: { 'job-name': 'predator.job' } },
-                                status: { containerStatuses: [{ name: 'predator-runner',
-                                    state: { terminated: { finishedAt: '2020' } } }, { name: 'podB',
-                                    state: {} }] }
+                                status: {
+                                    containerStatuses: [{
+                                        name: 'predator-runner',
+                                        state: { terminated: { finishedAt: '2020' } }
+                                    }, {
+                                        name: 'podB',
+                                        state: {}
+                                    }]
+                                }
 
                             });
 
                         nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podB`)
                             .reply(200, {
                                 metadata: { labels: { 'job-name': 'someJob.job' } },
-                                status: { containerStatuses: [{ name: 'podC',
-                                    state: { terminated: { finishedAt: '2020' } } }, { name: 'podD',
-                                    state: {} }] }
+                                status: {
+                                    containerStatuses: [{
+                                        name: 'podC',
+                                        state: { terminated: { finishedAt: '2020' } }
+                                    }, {
+                                        name: 'podD',
+                                        state: {}
+                                    }]
+                                }
 
                             });
 
