@@ -57,31 +57,31 @@ jobs:
         command: npm run integration-tests
         environment:
           DATABASE_TYPE: sqlite
-          JOB_PLATFORM: docker
+          JOB_PLATFORM: DOCKER
     - run:
         name: Integration tests with kubernetes and cassandra configuration
         command: npm run integration-tests
         environment:
           DATABASE_TYPE: cassandra
-          JOB_PLATFORM: kubernetes
+          JOB_PLATFORM: KUBERNETES
     - run:
         name: Integration tests with kubernetes and mysql configuration
         command: npm run integration-tests
         environment:
           DATABASE_TYPE: mysql
-          JOB_PLATFORM: kubernetes
+          JOB_PLATFORM: KUBERNETES
     - run:
         name: Integration tests with kubernetes and sqlite configuration
         command: npm run integration-tests
         environment:
           DATABASE_TYPE: sqlite
-          JOB_PLATFORM: kubernetes
+          JOB_PLATFORM: KUBERNETES
     - run:
         name: Integration tests with metronome and postgres configuration
         command: npm run integration-tests
         environment:
           DATABASE_TYPE: postgres
-          JOB_PLATFORM: metronome
+          JOB_PLATFORM: METRONOME
   build:
     docker:
     - image: docker:18
