@@ -29,3 +29,7 @@ module.exports.createWebhook = async function(webhookInfo) {
     };
     return databaseConnector.createWebhook(webhook);
 };
+
+module.exports.deleteWebhook = async function(webhookId) {
+    return databaseConnector.deleteWebhook(webhookId);
+};

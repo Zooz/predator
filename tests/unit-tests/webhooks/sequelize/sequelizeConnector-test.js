@@ -130,4 +130,20 @@ describe('Sequelize client tests', function () {
             });
         });
     });
+    describe('deleteWebhook', function() {
+        describe('Happy flow', function() {
+            it('expect to delete by query with proper webhook_id', async function() {
+                const id = uuid.v4();
+                const queryOptions = { where: { id } };
+
+                sequelizeDeleteStub.resolves();
+                await sequelizeConnector.deleteWebhook(id);
+
+                expect(sequelizeDeleteStub.calledOnce).to.equal(true);
+
+                const destroyOptions = sequelizeDeleteStub.args[0][0];
+                expect(destroyOptions).to.deep.equal(queryOptions);
+            });
+        });
+    });
 });
