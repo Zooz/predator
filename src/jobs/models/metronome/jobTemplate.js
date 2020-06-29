@@ -1,5 +1,7 @@
-module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData) => {
-    return {
+const _ = require('lodash');
+
+module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, customDefinition) => {
+    const jobTemplate = {
         id: jobName,
         description: 'Runs a performance test',
         run: {
@@ -14,4 +16,7 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
         },
         parallelism: parallelism
     };
+
+    const jobTemplateWithCustomDefinition = _.merge(jobTemplate, customDefinition);
+    return jobTemplateWithCustomDefinition;
 };

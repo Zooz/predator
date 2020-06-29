@@ -29,7 +29,7 @@ describe('Create job specific docker tests', async function () {
         nock.cleanAll();
     });
     const jobPlatform = process.env.JOB_PLATFORM;
-    if (jobPlatform === 'DOCKER') {
+    if (jobPlatform.toUpperCase() === 'DOCKER') {
         describe('DOCKER', () => {
             before(async () => {
                 await schedulerRequestCreator.init();

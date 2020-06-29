@@ -2359,6 +2359,9 @@ components:
               description: Percentage of the score affected by requests per second results.
               allOf:
                 - $ref: '#/components/schemas/benchmark_weights'
+        custom_runner_definition:
+          description: custom json that will be merged with the kubernetes/metronome predator runner job definition
+          type: object
     benchmark_weights:
       type: object
       required:
