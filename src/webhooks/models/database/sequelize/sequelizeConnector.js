@@ -7,11 +7,12 @@ module.exports = {
     init,
     getAllWebhooks,
     createWebhook,
-    getWebhook
+    getWebhook,
+    deleteWebhook
 };
 
 function parseWebhook(webhookRecord) {
-    return {
+    return webhookRecord && {
         ...webhookRecord.dataValues,
         events: webhookRecord.events && webhookRecord.events.map(eventRecord => eventRecord.dataValues.name)
     };
@@ -57,6 +58,15 @@ async function createWebhook(webhook) {
     return parsedWebhook;
 }
 
+async function deleteWebhook(webhookId) {
+    const webhooksModel = client.model('webhook');
+    return webhooksModel.destroy({
+        where: {
+            id: webhookId
+        }
+    });
+}
+
 async function initSchemas() {
     const webhooksSchema = client.define('webhook', {
         id: {
@@ -95,7 +105,8 @@ async function initSchemas() {
     webhooksSchema.belongsToMany(webhooksEvents, {
         through: 'webhook_event_mapping',
         as: 'events',
-        foreignKey: 'webhook_id'
+        foreignKey: 'webhook_id',
+        onDelete: 'CASCADE'
     });
     webhooksEvents.belongsToMany(webhooksSchema, {
         through: 'webhook_event_mapping',

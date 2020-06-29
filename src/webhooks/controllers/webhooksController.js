@@ -31,3 +31,13 @@ module.exports.createWebhook = async function (req, res, next) {
         return next(err);
     }
 };
+
+module.exports.deleteWebhook = async function (req, res, next) {
+    let webhookId = req.params.webhook_id;
+    try {
+        await webhookManager.deleteWebhook(webhookId);
+        return res.status(204).json();
+    } catch (err) {
+        return next(err);
+    }
+};

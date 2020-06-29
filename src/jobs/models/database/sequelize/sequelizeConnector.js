@@ -179,7 +179,8 @@ async function initSchemas() {
     webhooks.belongsToMany(job, {
         through: 'webhook_job_mapping',
         as: 'jobs',
-        foreignKey: 'webhook_id'
+        foreignKey: 'webhook_id',
+        onDelete: 'CASCADE'
     });
     job.belongsToMany(webhooks, {
         through: 'webhook_job_mapping',

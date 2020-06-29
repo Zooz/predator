@@ -1,4 +1,3 @@
-
 const request = require('supertest');
 const expressApp = require('../../../../src/app');
 
@@ -10,8 +9,8 @@ module.exports = {
     init,
     createWebhook,
     getWebhooks,
-    getWebhook
-    getWebhooks
+    getWebhook,
+    deleteWebhook
 };
 
 async function init() {
@@ -42,9 +41,18 @@ function getWebhooks() {
         });
 }
 
-function getWebhook(webhookdId) {
+function getWebhook(webhookId) {
     return request(app)
-        .get(`${resourceUri}/${webhookdId}`)
+        .get(`${resourceUri}/${webhookId}`)
+        .set(headers)
+        .expect(function (res) {
+            return res;
+        });
+}
+
+function deleteWebhook(webhookId) {
+    return request(app)
+        .delete(`${resourceUri}/${webhookId}`)
         .set(headers)
         .expect(function (res) {
             return res;
