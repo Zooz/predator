@@ -1487,6 +1487,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+    delete:
+      operationId: delete-webhook
+      tags:
+        - Webhooks
+      summary: Delete webhook file
+      description: Delete a specific webhook by id.
+      parameters:
+        - in: path
+          name: webhook_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
 
   # Files
   /v1/files:
@@ -2489,8 +2518,6 @@ components:
         filename:
           type: string
           description: the name of the file
-            type: number
-            description: benchmark percentage weight
     webhook:
       type: object
       required:
