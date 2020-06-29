@@ -8,6 +8,7 @@ module.exports = {
     getAllWebhooks,
     createWebhook,
     getWebhook,
+    deleteWebhook,
     closeConnection
 };
 
@@ -30,3 +31,7 @@ async function createWebhook(webhook) {
 async function getWebhook(webhookId) {
     return databaseConnector.getWebhook(webhookId);
 }
+
+async function deleteWebhook(webhookId) {
+    return databaseConnector.deleteWebhook(webhookId);
+};
