@@ -87,7 +87,7 @@ describe('Webhooks api', function () {
                 expect(deleteWebhookResponse.statusCode).to.equal(204);
             });
         });
-        describe('PATCH /v1/webhooks/:webhook_id', function() {
+        describe('PUT /v1/webhooks/:webhook_id', function() {
             it('Insert a webhook -> update global -> ensure it is updated', async function() {
                 const webhook = generateWebhook();
                 const updatedWebhook = { ...webhook, global: !webhook.global };
@@ -96,10 +96,10 @@ describe('Webhooks api', function () {
                 expect(insertResponse.statusCode).to.equal(201);
 
                 const { body: { id } } = insertResponse;
-                const patchResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
+                const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
-                expect(patchResponse.statusCode).to.equal(200);
-                assertDeepWebhookEquality(updatedWebhook, patchResponse.body);
+                expect(putResponse.statusCode).to.equal(200);
+                assertDeepWebhookEquality(updatedWebhook, putResponse.body);
 
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
@@ -112,10 +112,10 @@ describe('Webhooks api', function () {
                 expect(insertResponse.statusCode).to.equal(201);
 
                 const { body: { id } } = insertResponse;
-                const patchResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
+                const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
-                expect(patchResponse.statusCode).to.equal(200);
-                assertDeepWebhookEquality(updatedWebhook, patchResponse.body);
+                expect(putResponse.statusCode).to.equal(200);
+                assertDeepWebhookEquality(updatedWebhook, putResponse.body);
 
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
@@ -129,10 +129,10 @@ describe('Webhooks api', function () {
                 expect(insertResponse.statusCode).to.equal(201);
 
                 const { body: { id } } = insertResponse;
-                const patchResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
+                const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
-                expect(patchResponse.statusCode).to.equal(200);
-                assertDeepWebhookEquality(updatedWebhook, patchResponse.body);
+                expect(putResponse.statusCode).to.equal(200);
+                assertDeepWebhookEquality(updatedWebhook, putResponse.body);
 
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
@@ -145,10 +145,10 @@ describe('Webhooks api', function () {
                 expect(insertResponse.statusCode).to.equal(201);
 
                 const { body: { id } } = insertResponse;
-                const patchResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
+                const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
-                expect(patchResponse.statusCode).to.equal(200);
-                assertDeepWebhookEquality(updatedWebhook, patchResponse.body);
+                expect(putResponse.statusCode).to.equal(200);
+                assertDeepWebhookEquality(updatedWebhook, putResponse.body);
 
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
@@ -167,10 +167,10 @@ describe('Webhooks api', function () {
                 expect(insertResponse.statusCode).to.equal(201);
 
                 const { body: { id } } = insertResponse;
-                const patchResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
+                const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
-                expect(patchResponse.statusCode).to.equal(200);
-                assertDeepWebhookEquality(updatedWebhook, patchResponse.body);
+                expect(putResponse.statusCode).to.equal(200);
+                assertDeepWebhookEquality(updatedWebhook, putResponse.body);
 
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
@@ -254,7 +254,7 @@ describe('Webhooks api', function () {
                 expect(response.statusCode).to.equal(400);
             });
         });
-        describe('PATCH /v1/webhooks/:webhook_id', function() {
+        describe('PUT /v1/webhooks/:webhook_id', function() {
             it('should return 400 for bad uuid', async function() {
                 const webhook = generateWebhook();
                 const badWebhookValue = 'lalallalalal';
@@ -276,7 +276,7 @@ describe('Webhooks api', function () {
                 expect(response.statusCode).to.equal(404);
             });
         });
-        describe('PATCH /v1/webhooks/:webhook_id', function () {
+        describe('PUT /v1/webhooks/:webhook_id', function () {
             it('should return 404 for no existing webhook', async function() {
                 const notExistingWebhookId = uuid.v4();
                 const webhook = generateWebhook();
