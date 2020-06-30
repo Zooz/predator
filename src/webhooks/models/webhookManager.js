@@ -2,6 +2,7 @@
 
 const databaseConnector = require('./database/databaseConnector');
 const { ERROR_MESSAGES } = require('../../common/consts');
+const generateError = require('../../common/generateError');
 
 const webhookDefaultValues = {
     global: false
@@ -47,9 +48,3 @@ module.exports = {
     deleteWebhook,
     updateWebhook
 };
-
-function generateError(stautsCode, message) {
-    const error = new Error(message);
-    error.statusCode = stautsCode;
-    return error;
-}
