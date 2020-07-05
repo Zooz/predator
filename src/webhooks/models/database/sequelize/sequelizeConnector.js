@@ -8,6 +8,7 @@ module.exports = {
     getAllWebhooks,
     createWebhook,
     getWebhook,
+    updateWebhook,
     deleteWebhook
 };
 
@@ -17,6 +18,11 @@ function parseWebhook(webhookRecord) {
         events: webhookRecord.events && webhookRecord.events.map(eventRecord => eventRecord.dataValues.name)
     };
 };
+
+async function _getWebhook(webhookId) {
+    const webhooksModel = client.model('webhook');
+    return webhooksModel.findByPk(webhookId, { include: ['events'] });
+}
 
 async function init(sequelizeClient) {
     client = sequelizeClient;
@@ -30,8 +36,7 @@ async function getAllWebhooks() {
 }
 
 async function getWebhook(webhookId) {
-    const webhooksModel = client.model('webhook');
-    const webhook = await webhooksModel.findByPk(webhookId, { include: ['events'] });
+    const webhook = await _getWebhook(webhookId);
     return parseWebhook(webhook);
 }
 
@@ -65,6 +70,21 @@ async function deleteWebhook(webhookId) {
             id: webhookId
         }
     });
+}
+
+async function updateWebhook(webhookId, updatedWebhook) {
+    const webhooksModel = client.model('webhook');
+    const webhooksEvents = client.model('webhook_event');
+
+    const oldWebhook = await _getWebhook(webhookId);
+    const newWebhookEvents = await webhooksEvents.findAll({ where: { name: updatedWebhook.events } });
+    const newWebhookEventsIds = newWebhookEvents.map(({ id }) => id);
+
+    await client.transaction(async function(transaction) {
+        await oldWebhook.setEvents(newWebhookEventsIds, { transaction });
+        return webhooksModel.update(updatedWebhook, { where: { id: webhookId }, transaction });
+    });
+    return getWebhook(webhookId);
 }
 
 async function initSchemas() {
