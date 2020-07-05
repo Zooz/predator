@@ -10,7 +10,8 @@ module.exports = {
     createWebhook,
     getWebhooks,
     getWebhook,
-    deleteWebhook
+    deleteWebhook,
+    updateWebhook
 };
 
 async function init() {
@@ -53,6 +54,16 @@ function getWebhook(webhookId) {
 function deleteWebhook(webhookId) {
     return request(app)
         .delete(`${resourceUri}/${webhookId}`)
+        .set(headers)
+        .expect(function (res) {
+            return res;
+        });
+}
+
+function updateWebhook(webhookId, webhook) {
+    return request(app)
+        .put(`${resourceUri}/${webhookId}`)
+        .send(webhook)
         .set(headers)
         .expect(function (res) {
             return res;
