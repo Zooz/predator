@@ -41,3 +41,13 @@ module.exports.deleteWebhook = async function (req, res, next) {
         return next(err);
     }
 };
+
+module.exports.updateWebhook = async function (req, res, next) {
+    let { body: updatedWebhook, params: { webhook_id: webhookId } } = req;
+    try {
+        const webhook = await webhookManager.updateWebhook(webhookId, updatedWebhook);
+        return res.status(200).json(webhook);
+    } catch (err) {
+        return next(err);
+    }
+};
