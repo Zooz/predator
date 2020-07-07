@@ -526,8 +526,6 @@ const CompareCheckbox = ({data, onReportSelected, selectedReports}) => {
     )
 }
 const Notes = ({data, onEditNote}) => {
-    // return data.notes;
-    console.log("data.notes",data.notes);
     const {report_id, test_id} = data;
     const notes = data.notes || '';
     const [editMode, setEditMode] = useState(false);
