@@ -1925,6 +1925,14 @@ components:
           type: boolean
           description: Determines if the test will be executed immediately when the job is created.
           example: true
+        type:
+          type: string
+          enum:
+            - load_test
+            - functional_test
+          description: The type of the job to run.
+          default: load_test
+          example: load_test
     job_update:
       properties:
         test_id:
@@ -1949,6 +1957,10 @@ components:
           type: number
           minimum: 1
           description: The number of times per second that the test scenarios will run.
+        arrival_count:
+          type: number
+          minimum: 1
+          description: The number of times to run the scenarios during the full duration of the test. A value of 20 arrival_count in a 60 second test will result in running a scenario once every 3 seconds.
         duration:
           type: number
           minimum: 1

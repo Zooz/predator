@@ -2,6 +2,8 @@
 
 const uuid = require('uuid/v4');
 const Sequelize = require('sequelize');
+
+const { JOB_TYPE_LOAD_TEST } = require('../../../../common/consts');
 let client;
 
 module.exports = {
@@ -23,7 +25,7 @@ async function insertJob(jobId, jobInfo) {
     let params = {
         id: jobId,
         test_id: jobInfo.test_id,
-        arrival_rate: jobInfo.arrival_rate,
+        type: jobInfo.type || JOB_TYPE_LOAD_TEST,
         cron_expression: jobInfo.cron_expression,
         duration: jobInfo.duration,
         environment: jobInfo.environment,
@@ -41,6 +43,12 @@ async function insertJob(jobId, jobInfo) {
             return { id: uuid(), address: emailAddress };
         }) : undefined
     };
+
+    if (params.type === JOB_TYPE_LOAD_TEST) {
+        params.arrival_rate = jobInfo.arrival_rate;
+    } else {
+        params.arrival_count = jobInfo.arrival_count;
+    }
 
     let include = [];
     if (params.webhooks) {

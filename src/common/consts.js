@@ -1,6 +1,8 @@
 module.exports = {
     TEST_TYPE_BASIC: 'basic',
     TEST_TYPE_DSL: 'dsl',
+    JOB_TYPE_LOAD_TEST: 'load_test',
+    JOB_TYPE_FUNCTIONAL_TEST: 'functional_test',
     PROCESSOR_FUNCTIONS_KEYS: ['beforeScenario', 'afterScenario', 'beforeRequest', 'afterResponse'],
     ERROR_MESSAGES: {
         NOT_FOUND: 'Not found',
