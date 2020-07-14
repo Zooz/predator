@@ -335,6 +335,45 @@ describe('Integration tests for the reports api', function() {
                 should(allRelvntResults[1].report_id).eql(secondReportId);
                 should(allRelvntResults[2].report_id).eql(lastReportId);
             });
+        });
+
+        describe('Delete reports', function () {
+            const getReportsTestId = uuid();
+            let reportId = uuid();
+            let reportBody = {
+                report_id: reportId,
+                revision_id: uuid(),
+                test_type: 'basic',
+                test_name: 'integration-test',
+                test_description: 'doing some integration testing',
+                start_time: Date.now().toString(),
+                last_updated_at: Date.now().toString(),
+                test_configuration: {
+                    enviornment: 'test',
+                    duration: 10,
+                    arrival_rate: 20
+                }
+            };
+            before(async function () {
+                const jobResponse = await createJob(testId);
+                jobId = jobResponse.body.id;
+                reportBody.job_id = jobId;
+                reportBody.runner_id = uuid();
+                let createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
+
+                reportId = uuid();
+                reportBody.report_id = reportId;
+                reportBody.runner_id = uuid();
+                createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
+
+                reportId = uuid();
+                reportBody.report_id = reportId;
+                reportBody.runner_id = uuid();
+                createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
+                should(createReportResponse.statusCode).eql(201);
+            });
 
             it('Delete report successfully', async function () {
                 let testId = uuid();
@@ -377,7 +416,7 @@ describe('Integration tests for the reports api', function() {
                 should(deleteResponse.statusCode).eql(404);
             });
 
-            it('DELETE report which is in progress', async function() {
+            it('Delete report which is in progress', async function() {
                 let testId = uuid();
                 const reportId = uuid();
                 reportBody.report_id = reportId;
