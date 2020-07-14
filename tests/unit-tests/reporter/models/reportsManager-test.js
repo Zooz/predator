@@ -457,7 +457,14 @@ describe('Reports manager tests', function () {
             .forEach(subscriberStatus => {
                 it(`Successfully delete report with subscriber status ${subscriberStatus}`, async () => {
                     const finishedReport = JSON.parse(JSON.stringify(REPORT));
-                    finishedReport.subscribers[0].phase_status = subscriberStatus;
+                    finishedReport.start_time = new Date();
+                    finishedReport.subscribers = [
+                        {
+                            'runner_id': '1234',
+                            'phase_status': subscriberStatus,
+                            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+                        }
+                    ];
                     databaseGetReportStub.resolves([finishedReport]);
                     await manager.deleteReport('test_id', 'report_id');
                 });
@@ -467,7 +474,14 @@ describe('Reports manager tests', function () {
             .forEach(subscriberStatus => {
                 it(`Failure delete in-progress report with subscriber status ${subscriberStatus}`, async () => {
                     const inProgressReport = JSON.parse(JSON.stringify(REPORT));
-                    inProgressReport.subscribers[0].phase_status = subscriberStatus;
+                    inProgressReport.start_time = new Date();
+                    inProgressReport.subscribers = [
+                        {
+                            'runner_id': '1234',
+                            'phase_status': subscriberStatus,
+                            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+                        }
+                    ];
                     databaseGetReportStub.resolves([inProgressReport]);
 
                     try {
