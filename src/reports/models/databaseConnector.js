@@ -9,6 +9,7 @@ module.exports = {
     insertReport,
     insertStats,
     updateReport,
+    deleteReport,
     getReport,
     getReports,
     getLastReports,
@@ -30,6 +31,10 @@ function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, 
 
 function updateReport(testId, reportId, reportData) {
     return databaseConnector.updateReport(testId, reportId, reportData);
+}
+
+function deleteReport(testId, reportId) {
+    return databaseConnector.deleteReport(testId, reportId);
 }
 
 function updateReportBenchmark(testId, reportId, score, benchmarkData) {

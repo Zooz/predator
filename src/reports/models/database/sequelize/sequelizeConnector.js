@@ -11,6 +11,7 @@ module.exports = {
     insertReport,
     insertStats,
     updateReport,
+    deleteReport,
     getReport,
     getReports,
     getLastReports,
@@ -72,6 +73,18 @@ async function updateReport(testId, reportId, reportData) {
     };
 
     return report.update(reportData, options);
+}
+
+async function deleteReport(testId, reportId) {
+    const report = client.model('report');
+    const options = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+
+    return report.destroy(options);
 }
 
 async function updateReportBenchmark(testId, reportId, score, benchmarkData) {

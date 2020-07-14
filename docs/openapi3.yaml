@@ -900,6 +900,54 @@ paths:
               $ref: '#/components/schemas/edit_report'
         description: report data
         required: true
+    delete:
+      operationId: delete-a-report
+      tags:
+        - Reports
+      summary: delete a Report
+      description: delete a specific report for the specified test.
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          description: The id of the test for which to delete the report.
+          schema:
+            type: string
+            example: 81a27853-0db5-4e57-ad63-4b637528398a
+        - in: path
+          name: report_id
+          description: The id of the report to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/edit_report'
+        description: report data
+        required: true
   /v1/tests/last_reports:
     get:
       operationId: retrieve-recent-reports

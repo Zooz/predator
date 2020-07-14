@@ -50,6 +50,10 @@ module.exports.editReport = async (testId, reportId, reportBody) => {
     await databaseConnector.updateReport(testId, reportId, { notes });
 };
 
+module.exports.deleteReport = async (testId, reportId,) => {;
+    await databaseConnector.deleteReport(testId, reportId);
+};
+
 module.exports.postReport = async (testId, reportBody) => {
     const startTime = new Date(Number(reportBody.start_time));
     const job = await jobConnector.getJob(reportBody.job_id);
