@@ -354,38 +354,19 @@ describe('Integration tests for the reports api', function() {
                     arrival_rate: 20
                 }
             };
-            before(async function () {
-                const jobResponse = await createJob(testId);
-                jobId = jobResponse.body.id;
-                reportBody.job_id = jobId;
-                reportBody.runner_id = uuid();
-                let createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
-                should(createReportResponse.statusCode).eql(201);
-
-                reportId = uuid();
-                reportBody.report_id = reportId;
-                reportBody.runner_id = uuid();
-                createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
-                should(createReportResponse.statusCode).eql(201);
-
-                reportId = uuid();
-                reportBody.report_id = reportId;
-                reportBody.runner_id = uuid();
-                createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
-                should(createReportResponse.statusCode).eql(201);
-            });
-
             it('Delete report successfully', async function () {
                 let testId = uuid();
                 const reportId = uuid();
                 reportBody.report_id = reportId;
+                reportBody.job_id = jobId;
+
                 reportBody.runner_id = uuid();
                 const lastDate = new Date();
                 reportBody.start_time = lastDate.setMinutes(lastDate.getMinutes() + 10).toString();
                 let createReportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
-                await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', 'runner_id'));
+                await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', reportBody.runner_id));
 
                 let getLastReportsResponse = await reportsRequestCreator.getLastReports(1);
                 console.log(JSON.stringify(getLastReportsResponse));
