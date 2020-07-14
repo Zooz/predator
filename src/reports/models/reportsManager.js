@@ -50,7 +50,8 @@ module.exports.editReport = async (testId, reportId, reportBody) => {
     await databaseConnector.updateReport(testId, reportId, { notes });
 };
 
-module.exports.deleteReport = async (testId, reportId,) => {;
+module.exports.deleteReport = async (testId, reportId) => {
+    ;
     await databaseConnector.deleteReport(testId, reportId);
 };
 
