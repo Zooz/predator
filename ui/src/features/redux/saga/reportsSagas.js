@@ -7,7 +7,9 @@ import {
     getLastReportsFromFramework,
     getAggregateFromFramework,
     createBenchmarkFromFramework,
-    editReportFromFramework
+    editReportFromFramework,
+    getBenchmarkFromFramework,
+    deleteReportFromFramework
 } from '../apis/reportsApi'
 
 export function* getReports({testId}) {
@@ -83,6 +85,15 @@ export function* editReport({testId, reportId, body}) {
     }
 }
 
+export function* deleteReports({selectedReports}) {
+    try {
+        yield  all(selectedReports.map(({testId, reportId}) => call(deleteReportFromFramework, testId, reportId)));
+        yield put(Actions.deleteReportSuccess(true));
+    } catch (e) {
+        yield put(Actions.deleteReportFailure(e))
+    }
+}
+
 export function* getAggregateReports({reportsData}) {
     try {
         const results = yield all(reportsData.map(report => {
@@ -98,6 +109,17 @@ export function* getAggregateReports({reportsData}) {
     }
 }
 
+
+export function* getBenchmark({testId}) {
+    try {
+        const result = yield call(getBenchmarkFromFramework, testId);
+        yield put(Actions.getBenchmarkSuccess(result.data));
+    } catch (e) {
+        console.log('error', e);
+    }
+}
+
+
 export function* reportsRegister() {
     yield takeLatest(Types.GET_REPORTS, getReports);
     yield takeLatest(Types.GET_REPORT, getReport);
@@ -105,4 +127,6 @@ export function* reportsRegister() {
     yield takeLatest(Types.GET_AGGREGATE_REPORTS, getAggregateReports);
     yield takeLatest(Types.CREATE_BENCHMARK, createBenchmark);
     yield takeLatest(Types.EDIT_REPORT, editReport);
+    yield takeLatest(Types.GET_BENCHMARK, getBenchmark);
+    yield takeLatest(Types.DELETE_REPORT, deleteReports);
 }

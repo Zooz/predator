@@ -531,7 +531,7 @@ const Notes = ({data, onEditNote}) => {
     const [editMode, setEditMode] = useState(false);
     const [editValue, setEditValue] = useState(notes);
     const id = uuid();
-    const cell = notes.split('\n').map((row) => (<p>{row}</p>));
+    const cell = notes.split('\n').map((row,index) => (<p key={index}>{row}</p>));
 
     function onKeyDown(e) {
         if (e.key === 'Enter') {
