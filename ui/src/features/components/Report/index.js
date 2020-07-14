@@ -47,18 +47,26 @@ class Report extends React.Component {
         }
         this.setState({filteredKeys: {...newFilteredKeys}});
     };
+
+    onExitReport = () => {
+        const {clearAggregateReportAndBenchmark, onClose} = this.props;
+        clearAggregateReportAndBenchmark();
+        onClose();
+    };
+
     render() {
-        const {report, onClose, aggregateReport} = this.props;
-        const {disabledCreateBenchmark,filteredKeys} = this.state;
+        const {report, aggregateReport} = this.props;
+        const {disabledCreateBenchmark, filteredKeys} = this.state;
+
         return (
-            <Modal onExit={onClose}>
+            <Modal onExit={this.onExitReport}>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <h1 style={{minWidth:'310px'}}>{report.test_name}</h1>
+                    <h1 style={{minWidth: '310px'}}>{report.test_name}</h1>
                     <SummeryTable report={report}/>
                 </div>
                 <span>Started at {dateFormat(new Date(report.start_time), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</span>
@@ -80,7 +88,7 @@ class Report extends React.Component {
 
                     <h3>Status Codes</h3>
                     <LineChartPredator data={aggregateReport.errorsCodeGraph} keys={aggregateReport.errorsCodeGraphKeys}
-                                        graphType={'status_codes'}
+                                       graphType={'status_codes'}
                                        onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                                        filteredKeys={filteredKeys}/>
                     <h3>RPS</h3>
@@ -103,7 +111,7 @@ class Report extends React.Component {
                     </div>
                 </div>
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <Button inverted onClick={onClose}>Close</Button>
+                    <Button inverted onClick={this.onExitReport}>Close</Button>
                 </div>
                 <Snackbar
                     open={this.props.createBenchmarkSucceed}
@@ -119,10 +127,10 @@ class Report extends React.Component {
     }
 
     loadData = () => {
-        const {getAggregateReports, report} = this.props;
-        getAggregateReports([{testId:report.test_id, reportId:report.report_id}]);
-
-    }
+        const {getAggregateReports, getBenchmark, report} = this.props;
+        getAggregateReports([{testId: report.test_id, reportId: report.report_id}]);
+        getBenchmark(report.test_id);
+    };
 
     componentDidMount() {
         this.loadData();
@@ -148,12 +156,14 @@ const mapDispatchToProps = {
     getAggregateReports: Actions.getAggregateReports,
     createBenchmark: Actions.createBenchmark,
     createBenchmarkSuccess: Actions.createBenchmarkSuccess,
+    getBenchmark: Actions.getBenchmark,
+    clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
 };
 
 
 const SummeryTable = ({report = {}}) => {
     return (
-        <div style={{display: 'flex', flexDirection: 'row',flexWrap:'wrap'}}>
+        <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
             <Box title={'Test status'} value={report.status}/>
             <Box title={'Duration'} value={prettySeconds(Number(report.duration))}/>
             <Box title={'Parallelism'} value={report.parallelism}/>

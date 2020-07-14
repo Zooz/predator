@@ -13,7 +13,6 @@ import Snackbar from "material-ui/Snackbar";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Button from "../../../components/Button";
 
-
 class CompareReports extends React.Component {
     constructor(props) {
         super(props);
@@ -134,21 +133,8 @@ class CompareReports extends React.Component {
 
 
     loadData = () => {
-        const {getAggregateReports, selectedReports} = this.props;
-        const selectedReportsAsList = Object.entries(selectedReports)
-            .flatMap(selectedReport => {
-                const testId = selectedReport[0];
-                const selectedList = Object.entries(selectedReport[1])
-                    .filter((isSelected) => isSelected[1])
-                    .map((pairs) => pairs[0]);
-                return selectedList.map((reportId) => {
-                    return {
-                        testId,
-                        reportId
-                    }
-                })
-            });
-        getAggregateReports(selectedReportsAsList);
+        const {getAggregateReports, selectedReportsAsArray} = this.props;
+        getAggregateReports(selectedReportsAsArray);
     };
 
     mergeGraphs = (data) => {

@@ -2,7 +2,6 @@ import React from 'react';
 import {connect} from 'react-redux';
 import * as selectors from './redux/selectors/reportsSelector';
 import {createJobSuccess, errorOnStopRunningJob, stopRunningJobSuccess} from './redux/selectors/jobsSelector';
-import {tests} from './redux/selectors/testsSelector';
 import Snackbar from 'material-ui/Snackbar';
 import style from './style.scss';
 import Dialog from './components/Dialog';
@@ -16,7 +15,6 @@ import {createJobRequest} from './requestBuilder';
 import {ReactTableComponent} from './../components/ReactTable';
 import {getColumns} from './configurationColumn'
 import ErrorDialog from "./components/ErrorDialog";
-import FormWrapper from "../components/FormWrapper";
 import Button from "../components/Button";
 import Loader from "./components/Loader";
 
@@ -89,7 +87,6 @@ class getReports extends React.Component {
         this.setState({showReport: null})
     }
     loadPageData = () => {
-        this.props.getTests();
         this.props.getAllReports();
     };
 
@@ -135,6 +132,7 @@ class getReports extends React.Component {
     onReportSelected = (testId, reportId, value) => {
         this.props.addReportForCompare(testId, reportId, value);
     };
+
     loader() {
         return this.props.processingGetReports ? <Loader/> : 'There is no data'
     }
@@ -147,7 +145,9 @@ class getReports extends React.Component {
             errorOnStopRunningJob,
             errorCreateBenchmark,
             errorEditReport,
-            selectedReports
+            deleteReportFailure,
+            selectedReports,
+            selectedReportsAsArray
         } = this.props;
         const columns = getColumns({
             columnsNames,
@@ -162,22 +162,31 @@ class getReports extends React.Component {
             selectedReports: this.props.selectedReports
         });
         const feedbackMessage = this.generateFeedbackMessage();
-        const error = errorOnGetReports || errorOnGetReport || errorOnStopRunningJob || errorCreateBenchmark || errorEditReport;
-
+        const error = errorOnGetReports || errorOnGetReport || errorOnStopRunningJob || errorCreateBenchmark || errorEditReport || deleteReportFailure;
 
         return (
             <Page title={'Last Reports'} description={DESCRIPTION}>
                 <div style={{width: '100%'}}>
                     {showReport && <Report onClose={this.closeReport} key={showReport.report_id} report={showReport}/>}
-                    <Button
-                        disabled={!this.props.isAtLeastOneReportSelected}
-                        style={{
-                            marginBottom: '10px',
-                        }} onClick={() => {
-                        this.setState({
-                            showCompareReports: true
-                        });
-                    }}>Compare Reports</Button>
+                    <div>
+                        <Button
+                            disabled={!this.props.isAtLeastOneReportSelected}
+                            style={{
+                                marginBottom: '10px',
+                            }} onClick={() => {
+                            this.setState({
+                                showCompareReports: true
+                            });
+                        }}>Compare Reports</Button>
+                        <Button
+                            disabled={!this.props.isAtLeastOneReportSelected}
+                            style={{
+                                marginLeft: '10px',
+                            }} onClick={() => {
+                            this.props.deleteReports(this.props.selectedReportsAsArray)
+                        }}>Delete Reports</Button>
+
+                    </div>
                     <ReactTableComponent
                         // tableRowId={'report_id'}
                         onSearch={this.onSearch}
@@ -198,7 +207,7 @@ class getReports extends React.Component {
                               closeDialog={this.closeViewReportDialog}/> : null}
                 {
                     showCompareReports &&
-                    <CompareReports onClose={this.closeCompareReports} selectedReports={selectedReports}/>
+                    <CompareReports onClose={this.closeCompareReports} selectedReports={selectedReportsAsArray}/>
                 }
                 {feedbackMessage && <Snackbar
                     open={!!feedbackMessage}
@@ -210,6 +219,11 @@ class getReports extends React.Component {
                         this.props.clearStopJobSuccess();
                         this.props.createJobSuccess(undefined);
                         this.props.editNotesSuccess(false);
+
+                        if(this.props.deleteReportSuccess){
+                            this.loadPageData();
+                        }
+                        this.props.setDeleteReportSuccess(false);
                         this.setState({
                             rerunJob: null
                         });
@@ -231,11 +245,16 @@ class getReports extends React.Component {
         if (this.props.noteSuccess) {
             return `report notes edited successfully`;
         }
+         if (this.props.deleteReportSuccess) {
+            return `selected reports are deleted successfully`;
+        }
+
 
     }
 
 
 }
+
 function mapStateToProps(state) {
     return {
         reports: selectors.reports(state),
@@ -245,13 +264,15 @@ function mapStateToProps(state) {
         errorOnGetReport: selectors.errorOnGetReport(state),
         errorOnStopRunningJob: errorOnStopRunningJob(state),
         stopRunningJobSuccess: stopRunningJobSuccess(state),
-        tests: tests(state),
         jobSuccess: createJobSuccess(state),
         noteSuccess: selectors.editNotesSuccess(state),
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
         selectedReports: selectors.selectedReports(state),
+        selectedReportsAsArray: selectors.selectedReportsAsArray(state),
         isAtLeastOneReportSelected: selectors.isAtLeastOneReportSelected(state),
+        deleteReportSuccess: selectors.deleteReportSuccess(state),
+        deleteReportFailure: selectors.deleteReportFailure(state)
     }
 }
 
@@ -262,7 +283,6 @@ const mapDispatchToProps = {
     stopRunningJob: Actions.stopRunningJob,
     clearStopJobSuccess: Actions.clearStopJobSuccess,
     createJob: Actions.createJob,
-    getTests: Actions.getTests,
     createJobSuccess: Actions.createJobSuccess,
     editReport: Actions.editReport,
     editNotesSuccess: Actions.editReportSuccess,
@@ -270,7 +290,8 @@ const mapDispatchToProps = {
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
     addReportForCompare: Actions.addReportForCompare,
     clearReportForCompare: Actions.clearReportForCompare,
-
+    deleteReports: Actions.deleteReports,
+    setDeleteReportSuccess: Actions.deleteReportSuccess,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getReports);

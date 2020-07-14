@@ -36,9 +36,23 @@ export const createBenchmarkFromFramework = (testId, body) => {
     });
 };
 
+export const getBenchmarkFromFramework = (testId) => {
+    const url = `${env.PREDATOR_URL}/tests/${testId}/benchmark`;
+    return axios.get(url, {
+        headers: getAuthorizationHeader()
+    });
+};
+
 export const editReportFromFramework = (testId, reportId, body) => {
     const url = `${env.PREDATOR_URL}/tests/${testId}/reports/${reportId}`;
     return axios.put(url, body, {
+        headers: getAuthorizationHeader()
+    });
+};
+
+export const deleteReportFromFramework = (testId, reportId) => {
+    const url = `${env.PREDATOR_URL}/tests/${testId}/reports/${reportId}`;
+    return axios.delete(url, {
         headers: getAuthorizationHeader()
     });
 };
