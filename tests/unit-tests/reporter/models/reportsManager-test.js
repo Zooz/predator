@@ -84,6 +84,7 @@ describe('Reports manager tests', function () {
     let databaseUpdateSubscriberStub;
     let databaseUpdateSubscriberWithStatsStub;
     let databaseUpdateReportStub;
+    let databaseDeleteReportStub;
     let getJobStub;
     let configStub;
     let notifierStub;
@@ -108,6 +109,7 @@ describe('Reports manager tests', function () {
         benchmarkCalculatorStub = sandbox.stub(benchmarkCalculator, 'calculate');
         updateReportBenchmarkStub = sandbox.stub(databaseConnector, 'updateReportBenchmark');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
+        databaseDeleteReportStub = sandbox.stub(databaseConnector, 'deleteReport');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
@@ -447,6 +449,75 @@ describe('Reports manager tests', function () {
             databaseGetReportStub.resolves(['report']);
             databaseUpdateReportStub.resolves();
             await manager.editReport('test_id', REPORT, { notes: 'notes' });
+        });
+    });
+
+    describe('delete report', function () {
+        [constants.SUBSCRIBER_DONE_STAGE, constants.SUBSCRIBER_ABORTED_STAGE, constants.SUBSCRIBER_FAILED_STAGE]
+            .forEach(subscriberStatus => {
+                it(`Successfully delete report with subscriber status ${subscriberStatus}`, async () => {
+                    const finishedReport = JSON.parse(JSON.stringify(REPORT));
+                    finishedReport.start_time = new Date();
+                    finishedReport.subscribers = [
+                        {
+                            'runner_id': '1234',
+                            'phase_status': subscriberStatus,
+                            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+                        }
+                    ];
+                    databaseGetReportStub.resolves([finishedReport]);
+                    await manager.deleteReport('test_id', 'report_id');
+                });
+            });
+
+        [constants.SUBSCRIBER_INITIALIZING_STAGE, constants.SUBSCRIBER_STARTED_STAGE, constants.SUBSCRIBER_INTERMEDIATE_STAGE, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE]
+            .forEach(subscriberStatus => {
+                it(`Failure delete in-progress report with subscriber status ${subscriberStatus}`, async () => {
+                    const inProgressReport = JSON.parse(JSON.stringify(REPORT));
+                    inProgressReport.start_time = new Date();
+                    inProgressReport.subscribers = [
+                        {
+                            'runner_id': '1234',
+                            'phase_status': subscriberStatus,
+                            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+                        }
+                    ];
+                    databaseGetReportStub.resolves([inProgressReport]);
+
+                    try {
+                        await manager.deleteReport('test_id', 'report_id');
+                        throw new Error('should not get here');
+                    } catch (error) {
+                        should.exist(error);
+                        should(error.message).startWith('Can\'t delete running test with status');
+                        should(error.statusCode).eql(409);
+                    }
+                });
+            });
+
+        it('Failure delete test due to db error on delete report', async () => {
+            const finishedReport = JSON.parse(JSON.stringify(REPORT));
+            finishedReport.subscribers[0].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
+            databaseGetReportStub.resolves([finishedReport]);
+            databaseDeleteReportStub.rejects(new Error('DB Error'));
+            try {
+                await manager.deleteReport('test_id', 'report_id');
+                throw new Error('should not get here');
+            } catch (error) {
+                should.exist(error);
+                should(error.message).eql('DB Error');
+            }
+        });
+
+        it('Failure delete test due to db error on get report', async () => {
+            databaseGetReportStub.rejects(new Error('DB Error'));
+            try {
+                await manager.deleteReport('test_id', 'report_id');
+                throw new Error('should not get here');
+            } catch (error) {
+                should.exist(error);
+                should(error.message).eql('DB Error');
+            }
         });
     });
 

@@ -12,6 +12,7 @@ module.exports = {
     createReport,
     postStats,
     getReport,
+    deleteReport,
     getReports,
     editReport,
     getLastReports
@@ -49,6 +50,14 @@ function editReport(testId, reportId, body) {
 
 function getReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}`)
+        .set(HEADERS)
+        .expect(function(res){
+            return res;
+        });
+}
+
+function deleteReport(testId, reportId) {
+    return request(testApp).delete(`/v1/tests/${testId}/reports/${reportId}`)
         .set(HEADERS)
         .expect(function(res){
             return res;

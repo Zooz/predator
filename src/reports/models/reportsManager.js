@@ -51,7 +51,16 @@ module.exports.editReport = async (testId, reportId, reportBody) => {
 };
 
 module.exports.deleteReport = async (testId, reportId) => {
-    ;
+    let reportSummary = await databaseConnector.getReport(testId, reportId);
+    let config = await configHandler.getConfig();
+    let report = await getReportResponse(reportSummary[0], config);
+
+    if (!FINAL_REPORT_STATUSES_WITH_END_TIME.includes(report.status)) {
+        let error = new Error(`Can't delete running test with status ${report.status}`);
+        error.statusCode = 409;
+        throw error;
+    }
+
     await databaseConnector.deleteReport(testId, reportId);
 };
 

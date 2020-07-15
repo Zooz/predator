@@ -165,6 +165,91 @@ describe('Sequelize client tests', function () {
         });
     });
 
+    describe('Delete report', async () => {
+        it('should delete report with subscribers successfully', async () => {
+            let sequelizeResponse = [{
+                dataValues: {
+                    reportId,
+                    testId,
+                    jobId,
+                    revisionId,
+                    testType,
+                    startTime,
+                    testName,
+                    testDescription,
+                    testConfiguration,
+                    notes
+                },
+                getSubscribers: sequelizeGetSubscribersStatsStub
+            }];
+
+            sequelizeGetSubscribersStatsStub.resolves([{
+                runner_id: 'runnerId'
+            }]);
+
+            sequelizeGetStub.resolves(sequelizeResponse);
+
+            await sequelizeConnector.deleteReport('testId', 'reportId');
+
+            sequelizeDestroyStub.callCount.should.eql(3); // query last report should not be trig
+            sequelizeDestroyStub.args[0][0].should.eql({
+                'where': {
+                    'test_id': 'testId',
+                    'report_id': 'reportId'
+                }
+            });
+            sequelizeDestroyStub.args[1][0].should.eql({
+                'where': {
+                    'test_id': 'testId',
+                    'report_id': 'reportId'
+                }
+            });
+            sequelizeDestroyStub.args[2][0].should.eql({
+                'where': {
+                    'runner_id': ['runnerId']
+                }
+            });
+        });
+
+        it('should delete report without subscribers successfully', async () => {
+            let sequelizeResponse = [{
+                dataValues: {
+                    reportId,
+                    testId,
+                    jobId,
+                    revisionId,
+                    testType,
+                    startTime,
+                    testName,
+                    testDescription,
+                    testConfiguration,
+                    notes
+                },
+                getSubscribers: sequelizeGetSubscribersStatsStub
+            }];
+
+            sequelizeGetSubscribersStatsStub.resolves([]);
+
+            sequelizeGetStub.resolves(sequelizeResponse);
+
+            await sequelizeConnector.deleteReport('testId', 'reportId');
+
+            sequelizeDestroyStub.callCount.should.eql(2); // query last report should not be trig
+            sequelizeDestroyStub.args[0][0].should.eql({
+                'where': {
+                    'test_id': 'testId',
+                    'report_id': 'reportId'
+                }
+            });
+            sequelizeDestroyStub.args[1][0].should.eql({
+                'where': {
+                    'test_id': 'testId',
+                    'report_id': 'reportId'
+                }
+            });
+        });
+    });
+
     describe('Get reports', () => {
         it('should get multiple reports', async () => {
             let sequelizeResponse = [{
@@ -431,13 +516,15 @@ describe('Sequelize client tests', function () {
             }]);
 
             let sequelizeResponse = [{
-                dataValues: {
-                },
+                dataValues: {},
                 getSubscribers: sequelizeGetSubscribersStatsStub
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            await sequelizeConnector.updateSubscriberWithStats('test_id', 'report_id', 'runner_id', 'started_phase', { codes: {}, errors: {} });
+            await sequelizeConnector.updateSubscriberWithStats('test_id', 'report_id', 'runner_id', 'started_phase', {
+                codes: {},
+                errors: {}
+            });
         });
         it('Should successfully update subscriber without stats', async () => {
             sequelizeGetSubscribersStatsStub.resolves([{
@@ -452,8 +539,7 @@ describe('Sequelize client tests', function () {
             }]);
 
             let sequelizeResponse = [{
-                dataValues: {
-                },
+                dataValues: {},
                 getSubscribers: sequelizeGetSubscribersStatsStub
             }];
 
