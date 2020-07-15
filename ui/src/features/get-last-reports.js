@@ -220,6 +220,7 @@ class getReports extends React.Component {
 
                 {
                     this.state.showDeleteReportWarning && <DeleteDialog
+                        display={'selected reports'}
                         onSubmit={this.onDeleteSelectedReports}
                         onCancel={() => {
                             this.setState({showDeleteReportWarning: false})
