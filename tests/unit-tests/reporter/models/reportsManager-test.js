@@ -490,7 +490,7 @@ describe('Reports manager tests', function () {
                     } catch (error) {
                         should.exist(error);
                         should(error.message).startWith('Can\'t delete running test with status');
-                        should(error.statusCode).eql(400);
+                        should(error.statusCode).eql(409);
                     }
                 });
             });

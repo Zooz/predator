@@ -408,7 +408,7 @@ describe('Integration tests for the reports api', function() {
                 should(createReportResponse.statusCode).eql(201);
 
                 const deleteRunningTestResponse = await reportsRequestCreator.deleteReport(testId, reportId);
-                deleteRunningTestResponse.statusCode.should.eql(400);
+                deleteRunningTestResponse.statusCode.should.eql(409);
                 deleteRunningTestResponse.body.should.eql({
                     'message': "Can't delete running test with status initializing"
                 });

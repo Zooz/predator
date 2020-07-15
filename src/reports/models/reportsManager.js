@@ -57,7 +57,7 @@ module.exports.deleteReport = async (testId, reportId) => {
 
     if (!FINAL_REPORT_STATUSES_WITH_END_TIME.includes(report.status)) {
         let error = new Error(`Can't delete running test with status ${report.status}`);
-        error.statusCode = 400;
+        error.statusCode = 409;
         throw error;
     }
 

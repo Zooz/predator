@@ -76,15 +76,41 @@ async function updateReport(testId, reportId, reportData) {
 }
 
 async function deleteReport(testId, reportId) {
-    const report = client.model('report');
-    const options = {
+    const reportModel = client.model('report');
+    const getReportOptions = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+    let report = await reportModel.findAll(getReportOptions);
+    report = report[0];
+    const subscribers = await report.getSubscribers();
+    let subscriberRunnerIds;
+    if (subscribers) {
+        subscriberRunnerIds = subscribers.map(subscriber => subscriber.runner_id);
+    }
+
+    const deleteStatsAndReportOptions = {
         where: {
             test_id: testId,
             report_id: reportId
         }
     };
 
-    return report.destroy(options);
+    await reportModel.destroy(deleteStatsAndReportOptions);
+    const statsModel = client.model('stats');
+    await statsModel.destroy(deleteStatsAndReportOptions);
+
+    if (subscriberRunnerIds && subscriberRunnerIds.length > 0) {
+        const deleteSubscribersOptions = {
+            where: {
+                runner_id: subscriberRunnerIds
+            }
+        };
+        const subscribersModel = client.model('subscriber');
+        await subscribersModel.destroy(deleteSubscribersOptions);
+    }
 }
 
 async function updateReportBenchmark(testId, reportId, score, benchmarkData) {

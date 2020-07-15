@@ -924,15 +924,8 @@ paths:
     responses:
       '204':
         description: Success
-
-      '400':
-        description: Bad request
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/error_response'
-      '404':
-        description: Not found
+      '409':
+        description: Conflict
         content:
           application/json:
             schema:
@@ -943,13 +936,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/error_response'
-    requestBody:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/edit_report'
-      description: report data
-      required: true
   /v1/tests/last_reports:
     get:
       operationId: retrieve-recent-reports
