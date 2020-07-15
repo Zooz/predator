@@ -65,7 +65,6 @@ export default function reduce(state = initialState, action = {}) {
 
             return newState;
         case Types.GET_BENCHMARK_SUCCESS:
-            console.log("action.data", action.data);
             return state.set('benchmark', action.data);
         case Types.CLEAR_AGGREGATE_REPORT_AND_BENCHMARK:
             return state.set('aggregate_reports', [])
