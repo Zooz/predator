@@ -205,6 +205,7 @@ class getTests extends React.Component {
                                                      closeDialog={this.closeViewReportDialog}/> : null}
                 {
                     this.state.showDeleteReportWarning && <DeleteDialog
+                        display={'selected reports'}
                         onSubmit={this.onDeleteSelectedReports}
                         onCancel={() => {
                             this.setState({showDeleteReportWarning: false})
