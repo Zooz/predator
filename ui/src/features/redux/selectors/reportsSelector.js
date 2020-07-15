@@ -50,7 +50,6 @@ export const getAggregateReportsForCompare = createSelector(aggregateReport, (re
 
 
 function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBenchmark) {
-    console.log('lastBenchmark', lastBenchmark);
     let prefix = withPrefix ? 'A_' : '';
 
     return reports.map((report) => {
