@@ -17,6 +17,7 @@ import {getColumns} from './configurationColumn'
 import ErrorDialog from "./components/ErrorDialog";
 import Button from "../components/Button";
 import Loader from "./components/Loader";
+import DeleteDialog from "./components/DeleteDialog";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -33,7 +34,8 @@ class getReports extends React.Component {
             sortedReports: [],
             sortHeader: '',
             rerunJob: null,
-            showCompareReports: false
+            showCompareReports: false,
+            showDeleteReportWarning: false
 
         };
     }
@@ -42,6 +44,11 @@ class getReports extends React.Component {
         if (prevProps.reports !== this.props.reports) {
             this.setState({sortedReports: [...this.props.reports]})
         }
+
+        if (prevProps.deleteReportSuccess === false && this.props.deleteReportSuccess) {
+            this.loadPageData();
+        }
+
     }
 
 
@@ -87,13 +94,13 @@ class getReports extends React.Component {
         this.setState({showReport: null})
     }
     loadPageData = () => {
-        this.props.getAllReports();
+        this.props.getLastReports();
     };
 
     componentWillUnmount() {
         this.props.clearSelectedReport();
         clearInterval(this.refreshDataInterval);
-        this.props.clearReportForCompare();
+        this.props.clearSelectedReports();
     }
 
     onSort = (field) => {
@@ -137,6 +144,13 @@ class getReports extends React.Component {
         return this.props.processingGetReports ? <Loader/> : 'There is no data'
     }
 
+    onDeleteSelectedReports = () => {
+        this.setState({showDeleteReportWarning: false})
+        this.props.deleteReports(this.props.selectedReportsAsArray)
+
+    };
+
+
     render() {
         const {showReport, sortHeader, sortedReports, showCompareReports} = this.state;
         const {
@@ -159,7 +173,7 @@ class getReports extends React.Component {
             onRunTest: this.onRunTest,
             onEditNote: this.onEditNote,
             onReportSelected: this.onReportSelected,
-            selectedReports: this.props.selectedReports
+            selectedReports: selectedReports
         });
         const feedbackMessage = this.generateFeedbackMessage();
         const error = errorOnGetReports || errorOnGetReport || errorOnStopRunningJob || errorCreateBenchmark || errorEditReport || deleteReportFailure;
@@ -182,9 +196,7 @@ class getReports extends React.Component {
                             disabled={!this.props.isAtLeastOneReportSelected}
                             style={{
                                 marginLeft: '10px',
-                            }} onClick={() => {
-                            this.props.deleteReports(this.props.selectedReportsAsArray)
-                        }}>Delete Reports</Button>
+                            }} onClick={() => this.setState({showDeleteReportWarning: true})}>Delete Reports</Button>
 
                     </div>
                     <ReactTableComponent
@@ -205,9 +217,17 @@ class getReports extends React.Component {
                 {this.state.openViewReport
                     ? <Dialog title_key={'id'} data={this.state.openViewReport}
                               closeDialog={this.closeViewReportDialog}/> : null}
+
+                {
+                    this.state.showDeleteReportWarning && <DeleteDialog
+                        onSubmit={this.onDeleteSelectedReports}
+                        onCancel={() => {
+                            this.setState({showDeleteReportWarning: false})
+                        }}/>
+                }
                 {
                     showCompareReports &&
-                    <CompareReports onClose={this.closeCompareReports} selectedReports={selectedReportsAsArray}/>
+                    <CompareReports onClose={this.closeCompareReports} selectedReportsAsArray={selectedReportsAsArray}/>
                 }
                 {feedbackMessage && <Snackbar
                     open={!!feedbackMessage}
@@ -215,14 +235,10 @@ class getReports extends React.Component {
                     message={feedbackMessage}
                     autoHideDuration={4000}
                     onRequestClose={() => {
-                        this.props.getAllReports();
+                        this.props.getLastReports();
                         this.props.clearStopJobSuccess();
                         this.props.createJobSuccess(undefined);
                         this.props.editNotesSuccess(false);
-
-                        if(this.props.deleteReportSuccess){
-                            this.loadPageData();
-                        }
                         this.props.setDeleteReportSuccess(false);
                         this.setState({
                             rerunJob: null
@@ -245,7 +261,7 @@ class getReports extends React.Component {
         if (this.props.noteSuccess) {
             return `report notes edited successfully`;
         }
-         if (this.props.deleteReportSuccess) {
+        if (this.props.deleteReportSuccess) {
             return `selected reports are deleted successfully`;
         }
 
@@ -278,7 +294,7 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = {
     clearSelectedReport: Actions.clearSelectedReport,
-    getAllReports: Actions.getLastReports,
+    getLastReports: Actions.getLastReports,
     getReport: Actions.getReport,
     stopRunningJob: Actions.stopRunningJob,
     clearStopJobSuccess: Actions.clearStopJobSuccess,
@@ -289,7 +305,7 @@ const mapDispatchToProps = {
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
     addReportForCompare: Actions.addReportForCompare,
-    clearReportForCompare: Actions.clearReportForCompare,
+    clearSelectedReports: Actions.clearSelectedReports,
     deleteReports: Actions.deleteReports,
     setDeleteReportSuccess: Actions.deleteReportSuccess,
 };

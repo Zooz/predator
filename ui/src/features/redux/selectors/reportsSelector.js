@@ -81,7 +81,7 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
                     [`benchmark_median`]: lastBenchmark.latency.median,
                     [`benchmark_p95`]: lastBenchmark.latency.p95,
                     [`benchmark_p99`]: lastBenchmark.latency.p99,
-                }
+                };
                 lastBenchmarkRps = {
                     [`benchmark_mean`]: lastBenchmark.rps.mean
                 }
@@ -104,12 +104,12 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
 
 
             const errorsData = buildErrorDataObject(bucket, prefix);
-            const lastBenchmarkErrorsData = lastBenchmark && buildErrorDataObject(lastBenchmark, 'benchmark_');
+            // const lastBenchmarkErrorsData = lastBenchmark && buildErrorDataObject(lastBenchmark, 'benchmark_');
 
-            errorsCodeGraphKeysAsObjectAcc = Object.assign(errorsCodeGraphKeysAsObjectAcc, errorsData, lastBenchmarkErrorsData);
+            errorsCodeGraphKeysAsObjectAcc = Object.assign(errorsCodeGraphKeysAsObjectAcc, errorsData);
             errorsCodeGraph.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
-                timeMills, ...errorsData, ...lastBenchmarkErrorsData
+                timeMills, ...errorsData
             });
 
             const bucketErrorCodeData = lastBenchmark ? {...bucket.codes, ...lastBenchmark.codes} : bucket;

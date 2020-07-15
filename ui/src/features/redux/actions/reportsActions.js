@@ -98,8 +98,8 @@ export const addReportForCompare = (testId, reportId, value) => (
     {type: Types.ADD_REPORT_FOR_COMPARE, testId, reportId, value}
 );
 
-export const clearReportForCompare = () => (
-    {type: Types.CLEAR_REPORT_FOR_COMPARE }
+export const clearSelectedReports = () => (
+    {type: Types.CLEAR_SELECTED_REPORTS }
 );
 
 
