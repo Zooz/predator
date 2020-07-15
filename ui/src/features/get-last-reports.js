@@ -220,7 +220,7 @@ class getReports extends React.Component {
 
                 {
                     this.state.showDeleteReportWarning && <DeleteDialog
-                        display={'selected reports'}
+                        display={this.props.selectedReportsAsArray.length === 1 ? 'report' : this.props.selectedReportsAsArray.length + ' selected reports'}
                         onSubmit={this.onDeleteSelectedReports}
                         onCancel={() => {
                             this.setState({showDeleteReportWarning: false})
