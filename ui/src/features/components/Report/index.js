@@ -14,10 +14,6 @@ import {BarChartPredator, LineChartPredator} from "./Charts";
 import _ from "lodash";
 
 const REFRESH_DATA_INTERVAL = 30000;
-const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
-    {stroke: "#82ca9d", fill: "#82ca9d"},
-    {stroke: "#ffc658", fill: "#ffc658"}
-];
 
 
 class Report extends React.Component {
@@ -57,7 +53,6 @@ class Report extends React.Component {
     render() {
         const {report, aggregateReport} = this.props;
         const {disabledCreateBenchmark, filteredKeys} = this.state;
-
         return (
             <Modal onExit={this.onExitReport}>
                 <div style={{

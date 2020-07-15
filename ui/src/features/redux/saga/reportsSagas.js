@@ -86,9 +86,24 @@ export function* editReport({testId, reportId, body}) {
 }
 
 export function* deleteReports({selectedReports}) {
+    const failedDeletedReportsList = [];
     try {
-        yield  all(selectedReports.map(({testId, reportId}) => call(deleteReportFromFramework, testId, reportId)));
+        yield all(selectedReports.map(function* ({testId, reportId}) {
+            try {
+                yield call(deleteReportFromFramework, testId, reportId)
+            } catch (err) {
+                console.log('err',err);
+                failedDeletedReportsList.push(`(test id: ${testId}, report id: ${reportId})`);
+            }
+
+        }));
+        if (failedDeletedReportsList.length > 0) {
+            throw new Error("Failed to delete these reports: " + failedDeletedReportsList.join(',')
+                +". Notice that only reports with status: finished,aborted,failed,and partially_finished can be deleted");
+        }
+
         yield put(Actions.deleteReportSuccess(true));
+        yield put(Actions.clearSelectedReports());
     } catch (e) {
         yield put(Actions.deleteReportFailure(e))
     }

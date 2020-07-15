@@ -16,6 +16,7 @@ import {createJobSuccess} from "./redux/selectors/jobsSelector";
 import Snackbar from 'material-ui/Snackbar';
 import ErrorDialog from "./components/ErrorDialog";
 import Button from "../components/Button";
+import DeleteDialog from "./components/DeleteDialog";
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetReports = 'Error occurred while trying to get all reports for test.';
@@ -52,6 +53,9 @@ class getTests extends React.Component {
     componentDidUpdate(prevProps) {
         if (prevProps.reports !== this.props.reports) {
             this.setState({sortedReports: [...this.props.reports]})
+        }
+        if (prevProps.deleteReportSuccess === false && this.props.deleteReportSuccess) {
+            this.props.getReports(this.testId);
         }
     }
 
@@ -113,7 +117,7 @@ class getTests extends React.Component {
         this.props.clearErrorOnGetReports();
         this.props.clearSelectedReport();
         this.props.clearSelectedTest();
-        this.props.clearReportForCompare();
+        this.props.clearSelectedReports();
     }
 
     loader() {
@@ -128,6 +132,12 @@ class getTests extends React.Component {
     };
     onReportSelected = (testId, reportId, value) => {
         this.props.addReportForCompare(testId, reportId, value);
+    };
+
+    onDeleteSelectedReports = () => {
+        this.setState({showDeleteReportWarning: false})
+        this.props.deleteReports(this.props.selectedReportsAsArray)
+
     };
 
     render() {
@@ -150,22 +160,32 @@ class getTests extends React.Component {
             errorCreateBenchmark,
             errorEditReport,
             selectedReports,
+            deleteReportFailure,
         } = this.props;
         const feedbackMessage = this.generateFeedbackMessage();
-        const error = errorCreateBenchmark || errorEditReport;
+        const error = errorCreateBenchmark || errorEditReport || deleteReportFailure;
         return (
             <Page
                 title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
                 description={DESCRIPTION}>
-                <Button
-                    disabled={!this.props.isAtLeastOneReportSelected}
-                    style={{
-                    marginBottom: '10px',
-                }} onClick={() => {
-                    this.setState({
-                        showCompareReports: true
-                    });
-                }}>Compare Reports</Button>
+               <div>
+                   <Button
+                       disabled={!this.props.isAtLeastOneReportSelected}
+                       style={{
+                           marginBottom: '10px',
+                       }} onClick={() => {
+                       this.setState({
+                           showCompareReports: true
+                       });
+                   }}>Compare Reports</Button>
+                   <Button
+                       disabled={!this.props.isAtLeastOneReportSelected}
+                       style={{
+                           marginLeft: '10px',
+                       }} onClick={() => this.setState({showDeleteReportWarning: true})}>Delete Reports</Button>
+
+               </div>
+
                 <ReactTableComponent
                     onSearch={this.onSearch}
                     rowHeight={'46px'}
@@ -184,6 +204,13 @@ class getTests extends React.Component {
                 {this.state.openViewReport ? <Dialog title_key={'report_id'} data={this.state.openViewReport}
                                                      closeDialog={this.closeViewReportDialog}/> : null}
                 {
+                    this.state.showDeleteReportWarning && <DeleteDialog
+                        onSubmit={this.onDeleteSelectedReports}
+                        onCancel={() => {
+                            this.setState({showDeleteReportWarning: false})
+                        }}/>
+                }
+                {
                     showCompareReports &&
                     <CompareReports onClose={this.closeCompareReports} selectedReports={selectedReports}/>
                 }
@@ -199,6 +226,7 @@ class getTests extends React.Component {
                         this.setState({
                             rerunJob: null
                         });
+                        this.props.setDeleteReportSuccess(false);
                         this.props.editNotesSuccess(false);
                     }}
                 />}
@@ -216,9 +244,11 @@ class getTests extends React.Component {
         if (this.props.noteSuccess) {
             return `report notes edited successfully`;
         }
+        if (this.props.deleteReportSuccess) {
+            return `selected reports are deleted successfully`;
+        }
     }
 }
-
 function mapStateToProps(state) {
     return {
         reports: selectors.reports(state),
@@ -231,8 +261,10 @@ function mapStateToProps(state) {
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
         selectedReports: selectors.selectedReports(state),
+        selectedReportsAsArray: selectors.selectedReportsAsArray(state),
         isAtLeastOneReportSelected: selectors.isAtLeastOneReportSelected(state),
-
+        deleteReportSuccess: selectors.deleteReportSuccess(state),
+        deleteReportFailure: selectors.deleteReportFailure(state)
     }
 }
 
@@ -249,7 +281,9 @@ const mapDispatchToProps = {
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
     addReportForCompare: Actions.addReportForCompare,
-    clearReportForCompare: Actions.clearReportForCompare,
+    clearSelectedReports: Actions.clearSelectedReports,
+    deleteReports: Actions.deleteReports,
+    setDeleteReportSuccess: Actions.deleteReportSuccess,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);
