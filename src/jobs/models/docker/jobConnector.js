@@ -100,7 +100,7 @@ module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId) 
 
     for (let i = 0; i < containers.length; i++) {
         let containerToGetLogsFrom = await docker.getContainer(containers[i].Id);
-        let logBuffer = await containerToGetLogsFrom.logs({ stdout: true });
+        let logBuffer = await containerToGetLogsFrom.logs({ stdout: true, stderr: true });
         let logString = logBuffer.toString('utf-8');
         logs.push({ type: 'file', name: containers[i].Id + '.txt', content: logString });
     }
