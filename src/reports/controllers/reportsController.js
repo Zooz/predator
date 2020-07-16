@@ -36,6 +36,15 @@ module.exports.editReport = async (req, res, next) => {
     return res.status(204).send();
 };
 
+module.exports.deleteReport = async (req, res, next) => {
+    try {
+        await reports.deleteReport(req.params.test_id, req.params.report_id);
+    } catch (err) {
+        return next(err);
+    }
+    return res.status(204).send();
+};
+
 module.exports.getReports = async (req, res, next) => {
     let reportSummaries;
     try {

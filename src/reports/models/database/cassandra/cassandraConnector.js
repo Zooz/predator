@@ -9,6 +9,7 @@ const isRowAppliedField = '[applied]';
 const INSERT_REPORT_SUMMARY = 'INSERT INTO reports_summary(test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const INSERT_LAST_REPORT_SUMMARY = 'INSERT INTO last_reports(start_time_year,start_time_month,test_id, revision_id, report_id, job_id, test_type, phase, start_time, test_name, test_description, test_configuration, notes, last_updated_at) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) IF NOT EXISTS';
 const UPDATE_REPORT_BENCHMARK = 'UPDATE reports_summary SET score=?, benchmark_weights_data=? WHERE test_id=? AND report_id=?';
+const DELETE_REPORT_SUMMARY = 'DELETE from reports_summary WHERE test_id=? AND report_id=?';
 const GET_REPORT_SUMMARY = 'SELECT * FROM reports_summary WHERE test_id=? AND report_id=?';
 const GET_REPORTS_SUMMARIES = 'SELECT * FROM reports_summary WHERE test_id=?';
 const GET_LAST_SUMMARIES = 'SELECT * FROM last_reports WHERE start_time_year=? AND start_time_month=? LIMIT ?';
@@ -23,6 +24,7 @@ module.exports = {
     init,
     insertReport,
     updateReport,
+    deleteReport,
     getReport,
     getReports,
     getLastReports,
@@ -76,6 +78,21 @@ async function updateReport(testId, reportId, reportData) {
 
     updateLastReportAsync(testId, reportId, reportData);
     return executeQuery(queryData.query, queryData.params, queryOptions);
+}
+
+async function deleteReport(testId, reportId) {
+    const reportToDelete = await executeQuery(GET_REPORT_SUMMARY, [testId, reportId], queryOptions);
+
+    const startTime = reportToDelete[0].start_time;
+    const startTimeDate = new Date(startTime);
+    const startTimeYear = startTimeDate.getFullYear();
+    const startTimeMonth = startTimeDate.getMonth() + 1;
+    const where = 'WHERE start_time_year=? AND start_time_month=? AND start_time=? AND test_id=? AND report_id=?';
+    const whereParams = [startTimeYear, startTimeMonth, startTime, testId, reportId];
+    const deleteLastReport = 'DELETE from last_reports';
+
+    await executeQuery(`${deleteLastReport} ${where}`, whereParams, queryOptions);
+    await executeQuery(DELETE_REPORT_SUMMARY, [testId, reportId], queryOptions);
 }
 
 function buildUpdateQuery(baseQuery, values, where, whereDataArray) {
