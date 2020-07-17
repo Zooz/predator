@@ -1913,9 +1913,14 @@ components:
             Allows for the probability (in %) of a scenario being picked by a new virtual user to be "weighed" relative to other scenarios. If not specified, each scenario is equally likely to be picked.
           example: 20
     job:
+      discriminator:
+        propertyName: type
+      oneOf:
+          - $ref: '#/components/schemas/load_test'
+          - $ref: '#/components/schemas/functional_test'
       required:
+        - type
         - test_id
-        - arrival_rate
         - duration
       allOf:
         - $ref: '#/components/schemas/job_update'
@@ -1953,25 +1958,11 @@ components:
           items:
             type: string
             description: The url of where to send the webhook with the report information
-        arrival_rate:
-          type: number
-          minimum: 1
-          description: The number of times per second that the test scenarios will run.
-        arrival_count:
-          type: number
-          minimum: 1
-          description: The number of times to run the scenarios during the full duration of the test. A value of 20 arrival_count in a 60 second test will result in running a scenario once every 3 seconds.
         duration:
           type: number
           minimum: 1
           description: The time during which the test will run. In seconds.
           example: 20
-        ramp_to:
-          type: number
-          minimum: 1
-          description: |
-            Used in combination with the `arrival_rate` and `duration` values. Increases the arrival rate linearly to the value specified, within the specified duration.
-          example: 5
         max_virtual_users:
           type: number
           minimum: 1
@@ -2393,3 +2384,27 @@ components:
         filename:
           type: string
           description: the name of the file
+    load_test:
+      type: object
+      required:
+        - arrival_rate
+      properties:
+        arrival_rate:
+          type: number
+          minimum: 1
+          description: The number of times to run the scenarios during the full duration of the test. A value of 20 arrival_count in a 60 second test will result in running a scenario once every 3 seconds.
+        ramp_to:
+          type: number
+          minimum: 1
+          description: |
+            Used in combination with the `arrival_rate` and `duration` values. Increases the arrival rate linearly to the value specified, within the specified duration.
+          example: 5
+    functional_test:
+      type: object
+      required:
+        - arrival_count
+      properties:
+        arrival_count:
+          type: number
+          minimum: 1
+          description: The number of times per second that the test scenarios will run.
