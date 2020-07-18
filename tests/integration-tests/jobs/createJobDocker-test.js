@@ -74,6 +74,7 @@ describe('Create job specific docker tests', async function () {
                             test_id: testId,
                             arrival_rate: 1,
                             parallelism: 2,
+                            test_type: 'load_test',
                             duration: 1,
                             environment: 'test',
                             run_immediately: true,

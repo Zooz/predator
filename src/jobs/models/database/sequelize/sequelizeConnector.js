@@ -25,11 +25,10 @@ async function insertJob(jobId, jobInfo) {
     let params = {
         id: jobId,
         test_id: jobInfo.test_id,
-        type: jobInfo.type || JOB_TYPE_LOAD_TEST,
+        type: jobInfo.type,
         cron_expression: jobInfo.cron_expression,
         duration: jobInfo.duration,
         environment: jobInfo.environment,
-        ramp_to: jobInfo.ramp_to,
         parallelism: jobInfo.parallelism,
         max_virtual_users: jobInfo.max_virtual_users,
         notes: jobInfo.notes,
@@ -46,6 +45,7 @@ async function insertJob(jobId, jobInfo) {
 
     if (params.type === JOB_TYPE_LOAD_TEST) {
         params.arrival_rate = jobInfo.arrival_rate;
+        params.ramp_to = jobInfo.ramp_to;
     } else {
         params.arrival_count = jobInfo.arrival_count;
     }
