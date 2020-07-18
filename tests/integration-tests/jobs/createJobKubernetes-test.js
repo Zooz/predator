@@ -197,6 +197,7 @@ describe('Create job specific kubernetes tests', async function () {
                         let validBody = {
                             test_id: testId,
                             arrival_rate: 1,
+                            test_type: 'load_test',
                             duration: 1,
                             environment: 'test',
                             run_immediately: true,
@@ -309,6 +310,7 @@ describe('Create job specific kubernetes tests', async function () {
                             test_id: testId,
                             arrival_rate: 100,
                             ramp_to: 150,
+                            test_type: 'load_test',
                             max_virtual_users: 200,
                             duration: 1,
                             parallelism: 7,
@@ -469,6 +471,7 @@ describe('Create job specific kubernetes tests', async function () {
                             let validBody = {
                                 test_id: testId,
                                 arrival_rate: 1,
+                                test_type: 'load_test',
                                 duration: 1,
                                 environment: 'test',
                                 run_immediately: runImmediately,

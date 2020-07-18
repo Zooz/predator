@@ -54,6 +54,7 @@ describe('Update scheduled job', function () {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
+                type: 'load_test',
                 environment: 'test',
                 run_immediately: false,
                 cron_expression: date.getSeconds() + ' * * * * *',
@@ -125,6 +126,7 @@ describe('Update scheduled job', function () {
             let validBody = {
                 test_id: testId,
                 arrival_rate: 1,
+                type: 'load_test',
                 duration: 1,
                 environment: 'test',
                 run_immediately: false,
@@ -169,6 +171,7 @@ describe('Update scheduled job', function () {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
+                type: 'load_test',
                 environment: 'test',
                 run_immediately: false,
                 cron_expression: '* ' + date.getHours() + ' * * * *',
@@ -237,6 +240,7 @@ describe('Update scheduled job', function () {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
+                type: 'load_test',
                 environment: 'test',
                 run_immediately: false,
                 cron_expression: '* * * * * *'
