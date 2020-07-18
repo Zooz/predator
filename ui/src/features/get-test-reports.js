@@ -137,7 +137,6 @@ class getTests extends React.Component {
     onDeleteSelectedReports = () => {
         this.setState({showDeleteReportWarning: false})
         this.props.deleteReports(this.props.selectedReportsAsArray)
-
     };
 
     render() {

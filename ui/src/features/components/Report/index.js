@@ -12,6 +12,7 @@ import Button from '../../../components/Button';
 import Snackbar from "material-ui/Snackbar";
 import {BarChartPredator, LineChartPredator} from "./Charts";
 import _ from "lodash";
+import Checkbox from "../../../components/Checkbox/Checkbox";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -21,7 +22,16 @@ class Report extends React.Component {
         super(props);
         this.state = {
             disabledCreateBenchmark: false,
-            filteredKeys: {}
+            filteredKeys: {
+                latency: {benchmark_p99: true, benchmark_p95: true, benchmark_median: true},
+                rps: {
+                    benchmark_mean: true
+                },
+                status_codes_errors: {
+                    benchmark_count: true
+                }
+            },
+            enableBenchmark: false
         }
     }
 
@@ -30,16 +40,18 @@ class Report extends React.Component {
         this.props.createBenchmark(report.test_id, aggregateReport.benchMark);
         this.setState({disabledCreateBenchmark: true})
     };
+
+
     onSelectedGraphPropertyFilter = (graphType, keys, value) => {
-        const {filteredKeys} = this.state;
+        const {filteredKeys = {}} = this.state;
         let newFilteredKeys = {...filteredKeys};
         if (_.isArray(keys)) {
             newFilteredKeys = keys.reduce((acc, cur) => {
-                acc[`${graphType}${cur}`] = !value;
+                _.set(acc, `${graphType}.${cur}`, !value);
                 return acc;
             }, filteredKeys)
         } else {
-            newFilteredKeys[`${graphType}${keys}`] = !value;
+            _.set(newFilteredKeys, `${graphType}.${keys}`, !value);
         }
         this.setState({filteredKeys: {...newFilteredKeys}});
     };
@@ -52,7 +64,7 @@ class Report extends React.Component {
 
     render() {
         const {report, aggregateReport} = this.props;
-        const {disabledCreateBenchmark, filteredKeys} = this.state;
+        const {disabledCreateBenchmark, filteredKeys, enableBenchmark} = this.state;
         return (
             <Modal onExit={this.onExitReport}>
                 <div style={{
@@ -65,6 +77,26 @@ class Report extends React.Component {
                     <SummeryTable report={report}/>
                 </div>
                 <span>Started at {dateFormat(new Date(report.start_time), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</span>
+                {
+                    aggregateReport.isBenchmarkExist && <div style={{
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}>
+                        <div style={{color: 'rgb(87, 125, 254)', marginRight: '5px'}}>Enable benchmark</div>
+                        <Checkbox
+                            indeterminate={false}
+                            checked={enableBenchmark}
+                            // disabled={}
+                            onChange={(value) => {
+                                this.onSelectedGraphPropertyFilter('latency', ['benchmark_p99', 'benchmark_p95', 'benchmark_median'], value);
+                                this.onSelectedGraphPropertyFilter('rps', ['benchmark_mean'], value);
+                                this.onSelectedGraphPropertyFilter('status_codes_errors', ['benchmark_count'], value);
+                                this.setState({enableBenchmark: value});
+                            }}
+                        />
+
+                    </div>
+                }
                 <div>
                     <div style={{
                         display: 'flex',
@@ -135,6 +167,7 @@ class Report extends React.Component {
 
     componentWillUnmount() {
         clearInterval(this.refreshDataInterval);
+        this.props.clearAggregateReportAndBenchmark();
     }
 
 };

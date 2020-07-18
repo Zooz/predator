@@ -19,12 +19,21 @@ class CompareReports extends React.Component {
         this.state = {
             reportsList: [],
             mergedReports: this.mergeGraphs([]),
-            filteredKeys: {}
+            filteredKeys: {
+                latency: {benchmark_p99: true, benchmark_p95: true, benchmark_median: true},
+                rps: {
+                    benchmark_mean: true
+                },
+                status_codes_errors: {
+                    benchmark_count: true
+                }
+            },
+            enableBenchmark: false
         };
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.aggregateReports !== this.props.aggregateReports) {
+        if (prevProps.aggregateReports !== this.props.aggregateReports || prevProps.benchmark !== this.props.benchmark) {
             const reportsList = this.props.aggregateReports.map((report) => ({
                 name: report.alias,
                 startTime: report.startTime,
@@ -37,16 +46,16 @@ class CompareReports extends React.Component {
             const keysToDefaultFilter = reportsList.flatMap((reportInfo) => [`${reportInfo.name}_p95`, `${reportInfo.name}_p99`]);
             this.onSelectedGraphPropertyFilter('latency', keysToDefaultFilter, false);
             this.setState({reportsList});
-            this.setMergedReports(reportsList)
+            this.setMergedReports(reportsList, this.props.benchmark)
         }
 
     }
 
-    setMergedReports = (reportsList) => {
+    setMergedReports = (reportsList, benchmark) => {
         const reportsNames = reportsList.filter(cur => cur.show).map(cur => cur.name);
         const {aggregateReports} = this.props;
         const filteredData = aggregateReports.filter((report) => reportsNames.includes(report.alias));
-        const mergedReports = this.mergeGraphs(filteredData);
+        const mergedReports = this.mergeGraphs(filteredData, benchmark);
         this.setState({mergedReports});
     };
 
@@ -61,23 +70,25 @@ class CompareReports extends React.Component {
         this.setState({reportsList: [...reportsList]});
         this.setMergedReports(reportsList);
     };
+
     onSelectedGraphPropertyFilter = (graphType, keys, value) => {
-        const {filteredKeys} = this.state;
+        const {filteredKeys = {}} = this.state;
         let newFilteredKeys = {...filteredKeys};
         if (_.isArray(keys)) {
             newFilteredKeys = keys.reduce((acc, cur) => {
-                acc[`${graphType}${cur}`] = !value;
+                _.set(acc, `${graphType}.${cur}`, !value);
                 return acc;
             }, filteredKeys)
         } else {
-            newFilteredKeys[`${graphType}${keys}`] = !value;
+            _.set(newFilteredKeys, `${graphType}.${keys}`, !value);
         }
         this.setState({filteredKeys: {...newFilteredKeys}});
     };
 
+
     render() {
-        const {reportsList, mergedReports, filteredKeys} = this.state;
-        const {onClose} = this.props;
+        const {reportsList, mergedReports, filteredKeys, enableBenchmark} = this.state;
+        const {onClose, benchmark} = this.props;
         return (
             <Modal onExit={onClose}>
                 <div style={{
@@ -88,6 +99,28 @@ class CompareReports extends React.Component {
                 }}>
                     <h1>Compare reports</h1>
                     <ReportsList onChange={this.onSelectedReport} list={reportsList}/>
+                    {
+                        benchmark &&
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginTop: '10px'
+                        }}>
+                            <div style={{color: 'rgb(87, 125, 254)', marginRight: '5px'}}>Enable benchmark</div>
+                            <Checkbox
+                                indeterminate={false}
+                                checked={enableBenchmark}
+                                // disabled={}
+                                onChange={(value) => {
+                                    this.onSelectedGraphPropertyFilter('latency', ['benchmark_p99', 'benchmark_p95', 'benchmark_median'], value);
+                                    this.onSelectedGraphPropertyFilter('rps', ['benchmark_mean'], value);
+                                    this.onSelectedGraphPropertyFilter('status_codes_errors', ['benchmark_count'], value);
+                                    this.setState({enableBenchmark: value});
+                                }}
+                            />
+
+                        </div>
+                    }
                     <div style={{flex: 1}}>
                         <h3>Overall Latency</h3>
                         <LineChartPredator data={mergedReports.latencyGraph} keys={mergedReports.latencyGraphKeys}
@@ -133,11 +166,16 @@ class CompareReports extends React.Component {
 
 
     loadData = () => {
-        const {getAggregateReports, selectedReportsAsArray} = this.props;
+        const {getAggregateReports, selectedReportsAsArray, getBenchmark} = this.props;
+        const firstSelected = selectedReportsAsArray[0];
+        const isAllSelectedReportsBelongToSameTest = _.every(selectedReportsAsArray, (data) => data.testId === firstSelected.testId);
         getAggregateReports(selectedReportsAsArray);
+        if (isAllSelectedReportsBelongToSameTest) {
+            getBenchmark(firstSelected.testId);
+        }
     };
 
-    mergeGraphs = (data) => {
+    mergeGraphs = (data, benchmark) => {
         const initial = {
             latencyGraph: [],
             latencyGraphKeys: [],
@@ -152,7 +190,6 @@ class CompareReports extends React.Component {
         if (data.length === 0) {
             return initial;
         }
-
         //merged sorted data by time
         const result = data.reduce((acc, cur) => {
             acc.latencyGraph = mergeSortedArraysByStartTime(acc.latencyGraph, cur.latencyGraph);
@@ -171,8 +208,28 @@ class CompareReports extends React.Component {
             return acc;
         }, initial);
 
+        //assign benchmark;
+        if (benchmark) {
+            result.latencyGraph.forEach(function (data) {
+                Object.assign(data, benchmark.latency);
+            });
+            result.rps.forEach(function (data) {
+                Object.assign(data, benchmark.rps);
+            });
+            result.latencyGraphKeys.push(...benchmark.latencyKeys);
+            result.rpsKeys.push(...benchmark.rpsKeys);
+
+            const benchmarkCodeAndErrors = Object.entries({...benchmark.codes, ...benchmark.errors})
+                .map(function ([key, value]) {
+                    return {name: key, benchmark_count: value}
+                });
+
+            result.errorsBarKeys.push('benchmark_count');
+            result.errorsBar.push(...benchmarkCodeAndErrors);
+            result.errorsBar = mergeArrayOfObjectsPropsByParameter(result.errorsBar, benchmarkCodeAndErrors, 'name');
+        }
         return result;
-    }
+    };
 
 
     componentDidMount() {
@@ -180,7 +237,8 @@ class CompareReports extends React.Component {
     }
 
     componentWillUnmount() {
-        this.props.getAggregateReportSuccess([])
+        this.props.getAggregateReportSuccess([]);
+        this.props.clearAggregateReportAndBenchmark();
     }
 };
 
@@ -189,14 +247,17 @@ function mapStateToProps(state) {
     return {
         aggregateReports: selectors.getAggregateReportsForCompare(state),
         createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
+        benchmark: selectors.benchmarkWithKeys(state),
     }
 }
 
 const mapDispatchToProps = {
     getAggregateReports: Actions.getAggregateReports,
+    getBenchmark: Actions.getBenchmark,
     createBenchmark: Actions.createBenchmark,
     createBenchmarkSuccess: Actions.createBenchmarkSuccess,
     getAggregateReportSuccess: Actions.getAggregateReportSuccess,
+    clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
 };
 
 const Block = ({header, dataList, style = {}}) => {
@@ -258,22 +319,22 @@ const ReportsList = ({list = [], onChange}) => {
 export default connect(mapStateToProps, mapDispatchToProps)(CompareReports);
 
 
-function mergeSortedArraysByStartTime(arr1, arr2) {
+function mergeSortedArraysByStartTime(arr1, arr2, assignProps = {}) {
     const arr3 = [];
 
     let i = 0, j = 0;
     while (i < arr1.length && j < arr2.length) {
 
         if (arr1[i].timeMills < arr2[j].timeMills) {
-            arr3.push(arr1[i]);
+            arr3.push(Object.assign({}, arr1[i], assignProps));
             i++;
         } else if (arr1[i].timeMills === arr2[j].timeMills) {
-            const newData = {...arr1[i], ...arr2[j]};
+            const newData = {...arr1[i], ...arr2[j], ...assignProps};
             arr3.push(newData);
             i++;
             j++;
         } else {
-            arr3.push(arr2[j]);
+            arr3.push(Object.assign({}, arr2[j], assignProps));
             j++;
         }
 
@@ -289,3 +350,20 @@ function mergeSortedArraysByStartTime(arr1, arr2) {
     return arr3;
 }
 
+
+function mergeArrayOfObjectsPropsByParameter(arr1, arr2, propName) {
+    const resultAsObject = _.groupBy(arr1.concat(arr2), function (data) {
+        return data[propName];
+    });
+
+    return Object.entries(resultAsObject).map(function ([key, value]) {
+        const props = value.reduce((acc, cur) => {
+            return Object.assign(acc, cur);
+        }, {});
+
+        return {
+            [propName]: key,
+            ...props
+        }
+    })
+}

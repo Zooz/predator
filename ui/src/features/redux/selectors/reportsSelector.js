@@ -16,6 +16,27 @@ export const editReportFailure = (state) => state.ReportsReducer.get('edit_repor
 export const selectedReports = (state) => state.ReportsReducer.get('selected_reports');
 export const benchmark = (state) => state.ReportsReducer.get('benchmark');
 
+export const benchmarkWithKeys = createSelector(benchmark, (benchmark) => {
+    if (benchmark) {
+        return {
+            rps: {
+                benchmark_mean: benchmark.rps.mean
+            },
+            latency: {
+                benchmark_p99: benchmark.latency.p99,
+                benchmark_p95: benchmark.latency.p95,
+                benchmark_median: benchmark.latency.median,
+            },
+            latencyKeys: ['benchmark_median', 'benchmark_p95', 'benchmark_p99'],
+            rpsKeys: ['benchmark_mean'],
+            errorsBarKeys: ['benchmark_count'],
+            codes: benchmark.codes,
+            errors: benchmark.errors,
+        }
+    }
+
+})
+
 export const selectedReportsAsArray = createSelector(selectedReports, (selectedReports) => {
     const selectedReportsAsList = Object.entries(selectedReports)
         .flatMap(selectedReport => {
@@ -40,8 +61,8 @@ export const isAtLeastOneReportSelected = createSelector(selectedReports, (selec
     return !!result;
 });
 
-export const getAggregateReport = createSelector(aggregateReport, benchmark, (reports, benchmark) => {
-    return buildAggregateReportData(reports, false, false, benchmark)[0] || {};
+export const getAggregateReport = createSelector(aggregateReport, benchmarkWithKeys, (reports, benchmarkWithKeys) => {
+    return buildAggregateReportData(reports, false, false, benchmarkWithKeys)[0] || {};
 });
 
 export const getAggregateReportsForCompare = createSelector(aggregateReport, (reports) => {
@@ -49,7 +70,7 @@ export const getAggregateReportsForCompare = createSelector(aggregateReport, (re
 });
 
 
-function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBenchmark) {
+function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBenchmark = {}) {
     let prefix = withPrefix ? 'A_' : '';
 
     return reports.map((report) => {
@@ -72,46 +93,29 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
             const latency = bucket.latency;
             const time = new Date(startTime + (bucket.bucket * 1000));
             const timeMills = time.getTime();
-            let lastBenchmarkLatency = {};
-            let lastBenchmarkRps = {};
-
-            if (lastBenchmark) {
-                lastBenchmarkLatency = {
-                    [`benchmark_median`]: lastBenchmark.latency.median,
-                    [`benchmark_p95`]: lastBenchmark.latency.p95,
-                    [`benchmark_p99`]: lastBenchmark.latency.p99,
-                };
-                lastBenchmarkRps = {
-                    [`benchmark_mean`]: lastBenchmark.rps.mean
-                }
-
-            }
-
             latencyGraph.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
                 [`${prefix}median`]: latency.median,
                 [`${prefix}p95`]: latency.p95,
                 [`${prefix}p99`]: latency.p99,
-                ...lastBenchmarkLatency,
+                ...lastBenchmark.latency,
                 timeMills
             });
             rps.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
                 timeMills,
-                [`${prefix}mean`]: bucket.rps.mean, ...lastBenchmarkRps
+                [`${prefix}mean`]: bucket.rps.mean, ...lastBenchmark.rps
             });
 
 
             const errorsData = buildErrorDataObject(bucket, prefix);
-            // const lastBenchmarkErrorsData = lastBenchmark && buildErrorDataObject(lastBenchmark, 'benchmark_');
-
             errorsCodeGraphKeysAsObjectAcc = Object.assign(errorsCodeGraphKeysAsObjectAcc, errorsData);
             errorsCodeGraph.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
                 timeMills, ...errorsData
             });
 
-            const bucketErrorCodeData = lastBenchmark ? {...bucket.codes, ...lastBenchmark.codes} : bucket;
+            const bucketErrorCodeData = lastBenchmark.codes ? {...bucket.codes, ...lastBenchmark.codes} : bucket;
 
 
             Object.keys(bucketErrorCodeData).forEach((code) => {
@@ -125,7 +129,7 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
         });
 
         // aggregate data
-        buildErrorBars(errorsBar, report.aggregate, prefix);
+        buildErrorBars(errorsBar, report.aggregate, lastBenchmark, prefix);
 
 
         Object.keys(report.aggregate.scenarioCounts).forEach((key) => {
@@ -149,13 +153,9 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
         if (withPrefix) {
             prefix = String.fromCharCode(prefix.charCodeAt(0) + 1) + '_';
         }
-        if (lastBenchmark) {
-            buildErrorBars(errorsBar, lastBenchmark, 'benchmark_');
-
-            latencyGraphKeys.push('benchmark_median');
-            latencyGraphKeys.push('benchmark_p95');
-            latencyGraphKeys.push('benchmark_p99');
-            rpsKeys.push('benchmark_mean');
+        if (Object.keys(lastBenchmark).length > 0) {
+            latencyGraphKeys.push(...lastBenchmark.latencyKeys);
+            rpsKeys.push(...lastBenchmark.rpsKeys);
             errorsBarKeys.push('benchmark_count');
         }
 
@@ -178,7 +178,8 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
             startTime: report.start_time,
             testName: report.test_name,
             duration: report.duration,
-            notes: report.notes
+            notes: report.notes,
+            isBenchmarkExist: Object.keys(lastBenchmark).length > 0
         }
     })
 }
@@ -192,14 +193,22 @@ function buildErrorDataObject(bucket, prefix) {
     return errorsData;
 }
 
-function buildErrorBars(errorsBar, data, prefix) {
-
-    Object.keys(data.codes).forEach((code) => {
-        errorsBar.push({name: code, [`${prefix}count`]: data.codes[code]})
+function buildErrorBars(errorsBar, data, benchmark, prefix) {
+    const allBenchmarkStatuses = Object.keys(benchmark).length > 0 ? {...benchmark.codes, ...benchmark.errors} : {};
+    const reportStatuses = {...data.codes, ...data.errors};
+    Object.keys(reportStatuses).forEach((status) => {
+        const data = {name: status, [`${prefix}count`]: reportStatuses[status]};
+        if (allBenchmarkStatuses[status]) {
+            data.benchmark_count = allBenchmarkStatuses[status];
+            delete allBenchmarkStatuses[status];
+        }
+        errorsBar.push(data)
     });
-    Object.keys(data.errors).forEach((error) => {
-        errorsBar.push({name: error, [`${prefix}count`]: data.errors[error]})
-    });
+    const restOfBenchmarkStatuses = Object.keys(allBenchmarkStatuses);
 
-
+    if (restOfBenchmarkStatuses.length > 0) {
+        restOfBenchmarkStatuses.forEach((status) => {
+            errorsBar.push({name: status, benchmark_count: restOfBenchmarkStatuses[status]});
+        })
+    }
 }
