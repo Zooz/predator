@@ -142,6 +142,14 @@ class getTests extends React.Component {
     render() {
         const noDataText = this.props.errorOnGetReports ? errorMsgGetReports : this.loader();
         const {sortHeader, sortedReports} = this.state;
+        const {
+            errorCreateBenchmark,
+            errorEditReport,
+            selectedReports,
+            selectedReportsAsArray,
+            deleteReportFailure,
+        } = this.props;
+
         const columns = getColumns({
             columnsNames,
             sortHeader,
@@ -152,38 +160,33 @@ class getTests extends React.Component {
             onRunTest: this.onRunTest,
             onEditNote: this.onEditNote,
             onReportSelected: this.onReportSelected,
-            selectedReports: this.props.selectedReports
+            selectedReports: selectedReports,
         });
         const {showReport, showCompareReports} = this.state;
-        const {
-            errorCreateBenchmark,
-            errorEditReport,
-            selectedReports,
-            deleteReportFailure,
-        } = this.props;
+
         const feedbackMessage = this.generateFeedbackMessage();
         const error = errorCreateBenchmark || errorEditReport || deleteReportFailure;
         return (
             <Page
                 title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
                 description={DESCRIPTION}>
-               <div>
-                   <Button
-                       disabled={!this.props.isAtLeastOneReportSelected}
-                       style={{
-                           marginBottom: '10px',
-                       }} onClick={() => {
-                       this.setState({
-                           showCompareReports: true
-                       });
-                   }}>Compare Reports</Button>
-                   <Button
-                       disabled={!this.props.isAtLeastOneReportSelected}
-                       style={{
-                           marginLeft: '10px',
-                       }} onClick={() => this.setState({showDeleteReportWarning: true})}>Delete Reports</Button>
+                <div>
+                    <Button
+                        disabled={!this.props.isAtLeastOneReportSelected}
+                        style={{
+                            marginBottom: '10px',
+                        }} onClick={() => {
+                        this.setState({
+                            showCompareReports: true
+                        });
+                    }}>Compare Reports</Button>
+                    <Button
+                        disabled={!this.props.isAtLeastOneReportSelected}
+                        style={{
+                            marginLeft: '10px',
+                        }} onClick={() => this.setState({showDeleteReportWarning: true})}>Delete Reports</Button>
 
-               </div>
+                </div>
 
                 <ReactTableComponent
                     onSearch={this.onSearch}
@@ -212,7 +215,7 @@ class getTests extends React.Component {
                 }
                 {
                     showCompareReports &&
-                    <CompareReports onClose={this.closeCompareReports} selectedReports={selectedReports}/>
+                    <CompareReports onClose={this.closeCompareReports} selectedReportsAsArray={selectedReportsAsArray}/>
                 }
                 {this.state.openViewReport ? <Dialog title_key={'report_id'} data={this.state.openViewReport}
                                                      closeDialog={this.closeViewReportDialog}/> : null}
@@ -249,6 +252,7 @@ class getTests extends React.Component {
         }
     }
 }
+
 function mapStateToProps(state) {
     return {
         reports: selectors.reports(state),

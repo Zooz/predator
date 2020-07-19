@@ -201,7 +201,7 @@ class CompareReports extends React.Component {
             acc.rps = mergeSortedArraysByStartTime(acc.rps, cur.rps);
             acc.rpsKeys = acc.rpsKeys.concat(cur.rpsKeys);
 
-            acc.errorsBar = acc.errorsBar.concat(cur.errorsBar);
+            acc.errorsBar = mergeArrayOfObjectsPropsByParameter(acc.errorsBar, cur.errorsBar, 'name');
             acc.errorsBarKeys = acc.errorsBarKeys.concat(cur.errorsBarKeys);
 
             acc.scenarios = acc.scenarios.concat(cur.scenarios);
