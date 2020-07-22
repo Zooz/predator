@@ -70,6 +70,52 @@ In this example, the content-type used in the request is `text/html` and the bod
 
 ## Configuration
 
+### <b>I deployed Predator with Kuberenetes/Metronome but I need to customize the predator-runner job configuration (change CPU, memory, add image pull policy, etc).</b>
+
+!!! TIP "Supported from version zooz/predator:1.4.0"
+
+This is possible by configuring Predator with the `custom_runner_definition` parameter. This is a JSON value that will 
+be merged with the runner job definition when creating new jobs in both Kuberenetes and Metronome platforms. 
+
+Example usage for Predator deployed with Kubernetes and need to change memory/cpu requests and limits while adding security context and image pull secrets:
+```
+curl -X PUT \
+  http://PREDATOR-API-URL/v1/config \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"custom_runner_definition": {
+		"spec": {
+			"template": {
+				"spec": {
+					"imagePullSecrets": [{
+						"name": "****"
+					}],
+					"securityContext": {
+						"runAsUser": 1000
+					},
+					"containers": [{
+						"resources": {
+							"requests": {
+								"memory": "128Mi",
+								"cpu": "0.5"
+							},
+							"limits": {
+								"memory": "1024Mi",
+								"cpu": "1"
+							}
+						}
+					}]
+				}
+			}
+		}
+	}
+}'
+``` 
+This will spawn each predator-runner with the desired specs. 
+
+Note: this parameter is applied <b>globally</b>, meaning that <b>all</b> runners will be applied the above specs once configured.
+Of course, it's possible to delete this configuration if it is not needed anymore by applying the `DELETE` method on the `/v1/config/custom_runner_definition` API.
+
 ### <b>I ran Predator with SQLITE and would like to migrate now to a different database. How do I do this?</b>
 
 Migration between different databases is not possible. 
