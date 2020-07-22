@@ -77,7 +77,7 @@ In this example, the content-type used in the request is `text/html` and the bod
 This is possible by configuring Predator with the `custom_runner_definition` parameter. This is a JSON value that will 
 be merged with the runner job definition when creating new jobs in both Kuberenetes and Metronome platforms. 
 
-Example usage for Predator deployed with Kubernetes and need to change memory/cpu requests and limits:
+Example usage for Predator deployed with Kubernetes and need to change memory/cpu requests and limits while adding security context and image pull secrets:
 ```
 curl -X PUT \
   http://PREDATOR-API-URL/v1/config \
@@ -87,6 +87,12 @@ curl -X PUT \
 		"spec": {
 			"template": {
 				"spec": {
+					"imagePullSecrets": [{
+						"name": "****"
+					}],
+					"securityContext": {
+						"runAsUser": 1000
+					},
 					"containers": [{
 						"resources": {
 							"requests": {
@@ -105,7 +111,6 @@ curl -X PUT \
 	}
 }'
 ``` 
-
 This will spawn each predator-runner with the desired specs. 
 
 Note: this parameter is applied <b>globally</b>, meaning that <b>all</b> runners will be applied the above specs once configured.
