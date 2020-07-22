@@ -17,6 +17,7 @@ Below are variables Predator can be configured with.
 | ALLOW_INSECURE_TLS                              | allow_insecure_tls    	                    | If true, don't fail requests on unverified server certificate errors                                                                                | ✓                        	| false                         |
 | DELAY_RUNNER_MS                                 | delay_runner_ms    	                        | Delay the predator runner from sending http requests (ms)                                                                                           | ✓                        	|                               |
 | INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS         | interval_cleanup_finished_containers_ms    	| Interval (in ms) to search and delete finished tests containers. Value of 0 means no auto clearing enabled                                          | ✓                        	| 0                             |
+| CUSTOM_RUNNER_DEFINITION                        | custom_runner_definition                    | Custom json that will be merged with the kubernetes/metronome predator runner job definition. See FAQ for usage examples.                           | API                         |                               |
 
 ## Database
 | Environment Variable 	| Description                                                                     	| Configurable from UI/API 	| Default value 	|
