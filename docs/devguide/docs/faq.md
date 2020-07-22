@@ -72,7 +72,9 @@ In this example, the content-type used in the request is `text/html` and the bod
 
 ### <b>I deployed Predator with Kuberenetes/Metronome but I need to customize the predator-runner job configuration (change CPU, memory, add image pull policy, etc).</b>
 
-This is possible by configuring Predator with the `custom_runner_definition` parameter (Released in `v1.4`). This is a JSON value that will 
+!!! TIP "Supported from version zooz/predator:1.4.0"
+
+This is possible by configuring Predator with the `custom_runner_definition` parameter. This is a JSON value that will 
 be merged with the runner job definition when creating new jobs in both Kuberenetes and Metronome platforms. 
 
 Example usage for Predator deployed with Kubernetes and need to change memory/cpu requests and limits:
