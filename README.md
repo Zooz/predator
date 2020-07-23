@@ -21,8 +21,10 @@
 | Slack notifications             | :sparkle:          |Predator support notification to slack upon important test events. 
 | Benchmarks                      | :sparkle:          |Set benchmarks to compare test runs to ensure performance degradation is discovered early in development. Allows to measure every build and release against specified baseline results guaranteeing safer releases to production.|
 | Cloud Native                    | :sparkle:          |Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
-| Prometheus/Influx integration   | :sparkle:          |redator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
+| Prometheus/Influx integration   | :sparkle:          |Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
 | Compare Multiple tests results  | :sparkle:          |Built-in dashboard to compare multiple test runs at once.
+| Webhooks API                    | :soon:             |Coming soon in v1.5
+| Functional Testing              | :soon:             |Coming soon in v1.5
 
 
 ![](https://zooz.github.io/predator/images/predator-screens.gif)
