@@ -335,6 +335,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#csv-files" title="CSV Files" class="md-nav__link">
+    CSV Files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#built-in-functions" title="Built-in Functions" class="md-nav__link">
     Built-in Functions
   </a>
@@ -536,6 +543,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#csv-files" title="CSV Files" class="md-nav__link">
+    CSV Files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#built-in-functions" title="Built-in Functions" class="md-nav__link">
     Built-in Functions
   </a>
@@ -653,6 +667,30 @@ on
 <span class="p">]</span>
 </pre></div>
 will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...-8a9a1ae5c47a</code> in <code>{{dataId}}</code> for further usage in the scenario.</p>
+<h2 id="csv-files">CSV Files<a class="headerlink" href="#csv-files" title="Permanent link">#</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Supported from version zooz/predator:1.4.0</p>
+</div>
+<p>Predator supports uploading CSV files and using them as data set for the test.</p>
+<p>Each new virtual user that starts a scenario will pick a row from the data set.</p>
+<p>Usage Example:</p>
+<ol>
+<li>Save a csv file with headers and delimited by ','</li>
+</ol>
+<div class="codehilite"><pre><span></span>amount, currency
+10, USD
+30, GBP
+50, EUR
+</pre></div>
+
+<ol start="2">
+<li>When creating a test, click on add 'Add csv' and drag and drop the file into the box  </li>
+</ol>
+<p><img alt="Screenshot" src="images/upload_csv.png" /></p>
+<ol start="3">
+<li>All headers available in the csv are ready to use as variables</li>
+</ol>
+<p><img alt="Screenshot" src="images/csv_use_headers.png" /></p>
 <h2 id="built-in-functions">Built-in Functions<a class="headerlink" href="#built-in-functions" title="Permanent link">#</a></h2>
 <p>Predator supports some generic functions out of the box and they can be used to generate random data.</p>
 <ul>
