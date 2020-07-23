@@ -22,6 +22,23 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 
 ## Features
 
+|                                 |                    |
+|-------------------------------- |:------------------:|
+| Distributed Load                | :sparkle:          |
+| Rich UI                         | :sparkle:          |
+| Reports && Tests Persistence    | :sparkle:          |
+| Real time reports               | :sparkle:          |
+| CSV Datasets                    | :sparkle:          |
+| Scheduled runs                  | :sparkle:          |
+| REST API                        | :sparkle:          |
+| Slack notifications             | :sparkle:          |
+| Benchmarks                      | :sparkle:          |
+| Kubernetes integration          | :sparkle:          |
+| Prometheus/Influx integration   | :sparkle:          |
+
+
+## Features
+
 ***Released in 1.3.0***
 
 - **Benchmarks**: Set benchmarks to compare test runs to ensure performance degradation is discovered early in development. Allows to measure every build and release against specified baseline results guaranteeing safer releases to production.
@@ -43,7 +60,7 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 
 - **Supports 5 Different databases**: Predator provides out-of-the box functionality for persisting data in Cassandra, Postgres, MySQL, MSSQL and SQLITE.
 
-- **Scheduled jobs**: Predator can run recurring tests using cron expressions.
+- **Scheduled runs**: Predator can run recurring tests using cron expressions.
 
 - **3rd partry metrics**: Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
 

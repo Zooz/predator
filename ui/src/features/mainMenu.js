@@ -20,7 +20,7 @@ export default [
     },
     {
         key: 1,
-        primaryText: 'Scheduled Jobs',
+        primaryText: 'Scheduled Runs',
         navigateTo: 'jobs',
         icon: faBriefcase
     },
