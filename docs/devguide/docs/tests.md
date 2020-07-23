@@ -40,6 +40,33 @@ on
 ```
 will randomly store `45697038-...-ed7a4a20e014` or `f02392e8-...-8a9a1ae5c47a` in `{{dataId}}` for further usage in the scenario.
 
+## CSV Files
+
+!!! TIP "Supported from version zooz/predator:1.4.0"
+
+Predator supports uploading CSV files and using them as data set for the test.
+
+Each new virtual user that starts a scenario will pick a row from the data set.
+
+Usage Example:
+
+1. Save a csv file with headers and delimited by ','
+
+```
+amount, currency
+10, USD
+30, GBP
+50, EUR
+
+```
+
+2. When creating a test, click on add 'Add csv' and drag and drop the file into the box  
+
+![Screenshot](images/upload_csv.png)
+
+3. All headers available in the csv are ready to use as variables
+
+![Screenshot](images/csv_use_headers.png)
 
 ## Built-in Functions
 
