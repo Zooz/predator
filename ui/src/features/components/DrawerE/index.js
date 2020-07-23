@@ -67,14 +67,18 @@ class DrawerE extends Component {
         return (
             <div className={classes}>
                 <Drawer
-                    containerStyle={{backgroundImage: 'linear-gradient(142deg,#00041a,#00126b)'}}
+                    containerStyle={{
+                        backgroundImage: 'linear-gradient(142deg,#00041a,#00126b)',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
                     docked
                     open={open}
                     onClose={this.handleClose}>
                     <AppBar showMenuIconButton={false} title={<Logo/>} titleStyle={style['appbar-logo']}
                             titleStyle={appLogoTitleStyle} style={appLogoInnerStyle} className={style.appbar}/>
                     <div style={{
-                        marginTop: '45px', paddingLeft: '9px', width: '100%', height: '85%',
+                        marginTop: '45px', paddingLeft: '9px', width: '100%',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between'
@@ -113,7 +117,13 @@ class DrawerE extends Component {
                             })}
                         </List>
                     </div>
-                    <div style={{color: '#c2c2c28f',display:'flex',justifyContent:'center'}}>v{VERSION}</div>
+                    <div style={{
+                        color: '#c2c2c28f',
+                        display: 'flex',
+                        flex: 1,
+                        justifyContent: 'flex-end',
+                        alignItems: 'center'
+                    }}>v{VERSION}</div>
                 </Drawer>
                 <AppBar
                     // title={<span style={{ cursor: 'default' }}><img width={'50px'} height={'50px'} src={Logo} alt={'Mickey'}/>Predator</span>}
