@@ -112,8 +112,8 @@ class DrawerE extends Component {
                                 )
                             })}
                         </List>
-                        <div style={{color: 'yellow'}}>Version: {VERSION}</div>
                     </div>
+                    <div style={{color: '#c2c2c28f',display:'flex',justifyContent:'center'}}>v{VERSION}</div>
                 </Drawer>
                 <AppBar
                     // title={<span style={{ cursor: 'default' }}><img width={'50px'} height={'50px'} src={Logo} alt={'Mickey'}/>Predator</span>}
