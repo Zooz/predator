@@ -1507,25 +1507,21 @@ components:
           additionalProperties:
             $ref: '#/components/schemas/artillery_request_schema'
           example: {
-            "name": "create-pet",
-            "request": {
-              "post": {
-                "url": "http://127.0.0.1:3000/pets",
-                "headers": {
-                  "Content-Type": "application/json"
-                },
-                "json": {
-                  "name": "mickey",
-                  "species": "dog"
-                },
-                "capture": [
-                {
-                  "json": "$.id",
-                  "as": "petId"
-                }
-                ]
-              }
+            "post": {
+              "url": "http://127.0.0.1:3000/pets",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "json": {
+                "name": "mickey",
+                "species": "dog"
+              },
+              "capture": [{
+                            "json": "$.id",
+                            "as": "petId"
+                          }]
             }
+
           }
     update_definition:
       required:
