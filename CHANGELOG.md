@@ -1,7 +1,27 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/Zooz/predator/compare/v1.3.1...v1.4.0) (2020-07-23)
+
+
+### Features
+
+* **add notes to ui compare reports:** add notes to ui compare reports ([#314](https://github.com/Zooz/predator/issues/314)) ([5303acd](https://github.com/Zooz/predator/commit/5303acde9681a2b05faf070a65291581117d17be))
+* **keep-alive:** keep-alive ([#299](https://github.com/Zooz/predator/issues/299)) ([04eb8d1](https://github.com/Zooz/predator/commit/04eb8d188197722190e4eb8cc36decbb1fc2d247))
+* **reports:** api for delete reports ([#337](https://github.com/Zooz/predator/issues/337)) ([8e68471](https://github.com/Zooz/predator/commit/8e68471e6f7b9f8dd02e76681983e54e162e64d7))
+* **runner:** support custom job template ([ad191e9](https://github.com/Zooz/predator/commit/ad191e99c7cf760c0a3715abbd028cf8f56c9441))
+* **sleep,extra http methods:** sleep,extra http methods ([#323](https://github.com/Zooz/predator/issues/323)) ([6ac9a53](https://github.com/Zooz/predator/commit/6ac9a532ea49900e36ae16d01add5f2e15e4d99d))
+
+
+### Bug Fixes
+
+* **docker:** fixing docker debug logs to include stderr ([#338](https://github.com/Zooz/predator/issues/338)) ([8498a3d](https://github.com/Zooz/predator/commit/8498a3d1dca268d20c8c28a247e123cdedfc5914))
+* package.json & package-lock.json to reduce vulnerabilities ([#333](https://github.com/Zooz/predator/issues/333)) ([129773a](https://github.com/Zooz/predator/commit/129773a3f9ec791f73abe9b852bf4a355668cd85))
+* reduce vulnerabilities ([#332](https://github.com/Zooz/predator/issues/332)) ([1824ad0](https://github.com/Zooz/predator/commit/1824ad0588c14f9e7a56c34a0835265f6ec409b0))
+* **align keep  alive\:** align keep  alive ([#304](https://github.com/Zooz/predator/issues/304)) ([3bdedad](https://github.com/Zooz/predator/commit/3bdedadba3116c9af474e461a0e0b61459f15cff))
+* **last_reports:** notes render bug ([#331](https://github.com/Zooz/predator/issues/331)) ([5440e5a](https://github.com/Zooz/predator/commit/5440e5a6f4716640d152f7f8c5ef6a136b121cf2))
+* **reports:** fix avg rps when notes are updated ([#328](https://github.com/Zooz/predator/issues/328)) ([4dc8e9d](https://github.com/Zooz/predator/commit/4dc8e9dc72d6886087d80aeeb17555d3d46dd876))
 
 <a name="1.3.0"></a>
 # [1.3.0](https://github.com/Zooz/predator/compare/v1.2.1...v1.3.0) (2020-04-16)
