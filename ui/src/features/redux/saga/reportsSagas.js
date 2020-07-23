@@ -7,7 +7,9 @@ import {
     getLastReportsFromFramework,
     getAggregateFromFramework,
     createBenchmarkFromFramework,
-    editReportFromFramework
+    editReportFromFramework,
+    getBenchmarkFromFramework,
+    deleteReportFromFramework
 } from '../apis/reportsApi'
 
 export function* getReports({testId}) {
@@ -83,6 +85,30 @@ export function* editReport({testId, reportId, body}) {
     }
 }
 
+export function* deleteReports({selectedReports}) {
+    const failedDeletedReportsList = [];
+    try {
+        yield all(selectedReports.map(function* ({testId, reportId}) {
+            try {
+                yield call(deleteReportFromFramework, testId, reportId)
+            } catch (err) {
+                console.log('err', err);
+                failedDeletedReportsList.push(`(test id: ${testId}, report id: ${reportId})`);
+            }
+
+        }));
+        if (failedDeletedReportsList.length > 0) {
+            throw new Error("Failed to delete the next reports: " + failedDeletedReportsList.join(',')
+                + ". Please note that it’s impossible to delete in-progress reports");
+        }
+
+        yield put(Actions.deleteReportSuccess(selectedReports.length));
+        yield put(Actions.clearSelectedReports());
+    } catch (e) {
+        yield put(Actions.deleteReportFailure(e))
+    }
+}
+
 export function* getAggregateReports({reportsData}) {
     try {
         const results = yield all(reportsData.map(report => {
@@ -98,6 +124,17 @@ export function* getAggregateReports({reportsData}) {
     }
 }
 
+
+export function* getBenchmark({testId}) {
+    try {
+        const result = yield call(getBenchmarkFromFramework, testId);
+        yield put(Actions.getBenchmarkSuccess(result.data));
+    } catch (e) {
+        console.log('error', e);
+    }
+}
+
+
 export function* reportsRegister() {
     yield takeLatest(Types.GET_REPORTS, getReports);
     yield takeLatest(Types.GET_REPORT, getReport);
@@ -105,4 +142,6 @@ export function* reportsRegister() {
     yield takeLatest(Types.GET_AGGREGATE_REPORTS, getAggregateReports);
     yield takeLatest(Types.CREATE_BENCHMARK, createBenchmark);
     yield takeLatest(Types.EDIT_REPORT, editReport);
+    yield takeLatest(Types.GET_BENCHMARK, getBenchmark);
+    yield takeLatest(Types.DELETE_REPORT, deleteReports);
 }

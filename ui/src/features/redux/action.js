@@ -67,7 +67,10 @@ import {
     editReportSuccess,
     cleanAllReportsErrors,
     addReportForCompare,
-    clearReportForCompare,
+    clearSelectedReports,
+    deleteReports,
+    deleteReportSuccess,
+    deleteReportFailure,
 } from './actions/reportsActions';
 import {
     updateConfig,
@@ -156,8 +159,10 @@ export {
     editReportSuccess,
     cleanAllReportsErrors,
     addReportForCompare,
-    clearReportForCompare,
-
+    clearSelectedReports,
+    deleteReports,
+    deleteReportSuccess,
+    deleteReportFailure,
     //config
     getConfigDataMapSuccess,
     getConfigSuccess,

@@ -12,12 +12,9 @@ import Button from '../../../components/Button';
 import Snackbar from "material-ui/Snackbar";
 import {BarChartPredator, LineChartPredator} from "./Charts";
 import _ from "lodash";
+import Checkbox from "../../../components/Checkbox/Checkbox";
 
 const REFRESH_DATA_INTERVAL = 30000;
-const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
-    {stroke: "#82ca9d", fill: "#82ca9d"},
-    {stroke: "#ffc658", fill: "#ffc658"}
-];
 
 
 class Report extends React.Component {
@@ -25,7 +22,16 @@ class Report extends React.Component {
         super(props);
         this.state = {
             disabledCreateBenchmark: false,
-            filteredKeys: {}
+            filteredKeys: {
+                latency: {benchmark_p99: true, benchmark_p95: true, benchmark_median: true},
+                rps: {
+                    benchmark_mean: true
+                },
+                status_codes_errors: {
+                    benchmark_count: true
+                }
+            },
+            enableBenchmark: false
         }
     }
 
@@ -34,34 +40,63 @@ class Report extends React.Component {
         this.props.createBenchmark(report.test_id, aggregateReport.benchMark);
         this.setState({disabledCreateBenchmark: true})
     };
+
+
     onSelectedGraphPropertyFilter = (graphType, keys, value) => {
-        const {filteredKeys} = this.state;
+        const {filteredKeys = {}} = this.state;
         let newFilteredKeys = {...filteredKeys};
         if (_.isArray(keys)) {
             newFilteredKeys = keys.reduce((acc, cur) => {
-                acc[`${graphType}${cur}`] = !value;
+                _.set(acc, `${graphType}.${cur}`, !value);
                 return acc;
             }, filteredKeys)
         } else {
-            newFilteredKeys[`${graphType}${keys}`] = !value;
+            _.set(newFilteredKeys, `${graphType}.${keys}`, !value);
         }
         this.setState({filteredKeys: {...newFilteredKeys}});
     };
+
+    onExitReport = () => {
+        const {clearAggregateReportAndBenchmark, onClose} = this.props;
+        clearAggregateReportAndBenchmark();
+        onClose();
+    };
+
     render() {
-        const {report, onClose, aggregateReport} = this.props;
-        const {disabledCreateBenchmark,filteredKeys} = this.state;
+        const {report, aggregateReport} = this.props;
+        const {disabledCreateBenchmark, filteredKeys, enableBenchmark} = this.state;
         return (
-            <Modal onExit={onClose}>
+            <Modal onExit={this.onExitReport}>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <h1 style={{minWidth:'310px'}}>{report.test_name}</h1>
+                    <h1 style={{minWidth: '310px'}}>{report.test_name}</h1>
                     <SummeryTable report={report}/>
                 </div>
                 <span>Started at {dateFormat(new Date(report.start_time), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</span>
+                {
+                    aggregateReport.isBenchmarkExist && <div style={{
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}>
+                        <div style={{color: 'rgb(87, 125, 254)', marginRight: '5px'}}>Enable benchmark</div>
+                        <Checkbox
+                            indeterminate={false}
+                            checked={enableBenchmark}
+                            // disabled={}
+                            onChange={(value) => {
+                                this.onSelectedGraphPropertyFilter('latency', ['benchmark_p99', 'benchmark_p95', 'benchmark_median'], value);
+                                this.onSelectedGraphPropertyFilter('rps', ['benchmark_mean'], value);
+                                this.onSelectedGraphPropertyFilter('status_codes_errors', ['benchmark_count'], value);
+                                this.setState({enableBenchmark: value});
+                            }}
+                        />
+
+                    </div>
+                }
                 <div>
                     <div style={{
                         display: 'flex',
@@ -80,7 +115,7 @@ class Report extends React.Component {
 
                     <h3>Status Codes</h3>
                     <LineChartPredator data={aggregateReport.errorsCodeGraph} keys={aggregateReport.errorsCodeGraphKeys}
-                                        graphType={'status_codes'}
+                                       graphType={'status_codes'}
                                        onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                                        filteredKeys={filteredKeys}/>
                     <h3>RPS</h3>
@@ -103,7 +138,7 @@ class Report extends React.Component {
                     </div>
                 </div>
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <Button inverted onClick={onClose}>Close</Button>
+                    <Button inverted onClick={this.onExitReport}>Close</Button>
                 </div>
                 <Snackbar
                     open={this.props.createBenchmarkSucceed}
@@ -119,10 +154,10 @@ class Report extends React.Component {
     }
 
     loadData = () => {
-        const {getAggregateReports, report} = this.props;
-        getAggregateReports([{testId:report.test_id, reportId:report.report_id}]);
-
-    }
+        const {getAggregateReports, getBenchmark, report} = this.props;
+        getAggregateReports([{testId: report.test_id, reportId: report.report_id}]);
+        getBenchmark(report.test_id);
+    };
 
     componentDidMount() {
         this.loadData();
@@ -132,6 +167,7 @@ class Report extends React.Component {
 
     componentWillUnmount() {
         clearInterval(this.refreshDataInterval);
+        this.props.clearAggregateReportAndBenchmark();
     }
 
 };
@@ -148,12 +184,14 @@ const mapDispatchToProps = {
     getAggregateReports: Actions.getAggregateReports,
     createBenchmark: Actions.createBenchmark,
     createBenchmarkSuccess: Actions.createBenchmarkSuccess,
+    getBenchmark: Actions.getBenchmark,
+    clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
 };
 
 
 const SummeryTable = ({report = {}}) => {
     return (
-        <div style={{display: 'flex', flexDirection: 'row',flexWrap:'wrap'}}>
+        <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
             <Box title={'Test status'} value={report.status}/>
             <Box title={'Duration'} value={prettySeconds(Number(report.duration))}/>
             <Box title={'Parallelism'} value={report.parallelism}/>

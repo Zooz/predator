@@ -1,7 +1,8 @@
 module.exports = {
     PREDATOR_URL: generatePredatorUrl(),
     PREDATOR_DOCS_URL: generatePredatorDocsUrl(),
-    BUCKET_PATH: generateBucketPath()
+    BUCKET_PATH: generateBucketPath(),
+    VERSION: process.env.VERSION || 'dev-mode'
 };
 
 function generatePredatorUrl() {
