@@ -6,7 +6,7 @@ import history from '../../../store/history';
 import logo from '../../../images/logo.png';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {VERSION} from '../../../App/common/env';
-
+import {faPoll} from "@fortawesome/free-solid-svg-icons";
 
 const Logo = () => {
 
@@ -121,9 +121,11 @@ class DrawerE extends Component {
                         color: '#c2c2c28f',
                         display: 'flex',
                         flex: 1,
-                        justifyContent: 'flex-end',
-                        alignItems: 'center'
-                    }}>v{VERSION}</div>
+                        justifyContent: 'center',
+                        alignItems: 'flex-end',
+                    }}>
+                        <Bottom/>
+                    </div>
                 </Drawer>
                 <AppBar
                     // title={<span style={{ cursor: 'default' }}><img width={'50px'} height={'50px'} src={Logo} alt={'Mickey'}/>Predator</span>}
@@ -140,10 +142,34 @@ class DrawerE extends Component {
     }
 }
 
+
+const Bottom = () => {
+    return (
+        <div style={{
+            display: 'flex', marginBottom: '10px',
+            flexDirection: 'row',
+            flex: 1,
+            justifyContent: 'space-between',
+            marginLeft: '10px',
+            marginRight: '10px',
+            alignItems: 'center'
+        }}>
+            <FontAwesomeIcon size={'2x'} style={{
+                color: 'white',
+                cursor: 'pointer'
+            }} icon={faPoll}
+                             onClick={() => window.open("https://docs.google.com/forms/d/15dozkkA2xBUV7T7ls5XMyBj-JDg5Tj-TXNMp9PkdFsM/viewform?edit_requested=true")}/>
+            <div> v{VERSION}</div>
+        </div>
+    )
+}
+
+
 function mapStateToProps(state) {
     return {
         url: state.router.location.pathname
     }
 }
+
 
 export default connect(mapStateToProps)(DrawerE);
