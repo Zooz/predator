@@ -52,7 +52,7 @@ Usage Example:
 
 1. Save a csv file with headers and delimited by ','
 
-```$xslt
+```
 amount, currency
 10, USD
 30, GBP
