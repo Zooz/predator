@@ -82,8 +82,8 @@ export const deleteReports = (selectedReports) => (
     {type: Types.DELETE_REPORT, selectedReports}
 );
 
-export const deleteReportSuccess = (value) => (
-    {type: Types.DELETE_REPORT_SUCCESS, value}
+export const deleteReportSuccess = (numberOfDeletedReports) => (
+    {type: Types.DELETE_REPORT_SUCCESS, numberOfDeletedReports}
 );
 
 export const deleteReportFailure = (error) => (

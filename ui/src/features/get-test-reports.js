@@ -245,10 +245,10 @@ class getTests extends React.Component {
             return `Job created successfully: ${this.props.jobSuccess.id}`;
         }
         if (this.props.noteSuccess) {
-            return `report notes edited successfully`;
+            return `Successfully updated note`;
         }
         if (this.props.deleteReportSuccess) {
-            return `selected reports are deleted successfully`;
+            return `Successfully deleted ${this.props.deleteReportSuccess} reports`;
         }
     }
 }

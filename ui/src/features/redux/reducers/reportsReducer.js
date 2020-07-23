@@ -44,7 +44,7 @@ export default function reduce(state = initialState, action = {}) {
         case Types.EDIT_REPORT_FAILURE:
             return state.set('edit_report_failure', action.error);
         case Types.DELETE_REPORT_SUCCESS:
-            return state.set('delete_report_success', action.value);
+            return state.set('delete_report_success', action.numberOfDeletedReports);
         case Types.DELETE_REPORT_FAILURE:
             return state.set('delete_report_failure', action.error);
         case Types.CREATE_BENCHMARK_FAILURE:

@@ -92,17 +92,17 @@ export function* deleteReports({selectedReports}) {
             try {
                 yield call(deleteReportFromFramework, testId, reportId)
             } catch (err) {
-                console.log('err',err);
+                console.log('err', err);
                 failedDeletedReportsList.push(`(test id: ${testId}, report id: ${reportId})`);
             }
 
         }));
         if (failedDeletedReportsList.length > 0) {
-            throw new Error("Failed to delete these reports: " + failedDeletedReportsList.join(',')
-                +". Notice that only reports with status: finished,aborted,failed,and partially_finished can be deleted");
+            throw new Error("Failed to delete the next reports: " + failedDeletedReportsList.join(',')
+                + ". Please note that it’s impossible to delete in-progress reports");
         }
 
-        yield put(Actions.deleteReportSuccess(true));
+        yield put(Actions.deleteReportSuccess(selectedReports.length));
         yield put(Actions.clearSelectedReports());
     } catch (e) {
         yield put(Actions.deleteReportFailure(e))
