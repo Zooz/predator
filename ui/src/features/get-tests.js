@@ -245,7 +245,7 @@ class getTests extends React.Component {
                     <Snackbar
                         open={this.props.createJobSuccess || this.props.deleteTestSuccess}
                         bodyStyle={{backgroundColor: '#2fbb67'}}
-                        message={(this.props.createJobSuccess && this.props.createJobSuccess.run_id) ? `Job created successfully with Run ID: ${this.props.createJobSuccess.run_id}` : 'Test deleted successfully'}
+                            message={(this.props.createJobSuccess && this.props.createJobSuccess.run_id) ? `Job created successfully with Run ID: ${this.props.createJobSuccess.run_id}` : 'Test deleted successfully'}
                         autoHideDuration={4000}
                         onRequestClose={this.handleSnackbarClose}
                     />

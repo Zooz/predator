@@ -78,6 +78,18 @@ export const editReportFailure = (error) => (
     {type: Types.EDIT_REPORT_FAILURE, error}
 );
 
+export const deleteReports = (selectedReports) => (
+    {type: Types.DELETE_REPORT, selectedReports}
+);
+
+export const deleteReportSuccess = (numberOfDeletedReports) => (
+    {type: Types.DELETE_REPORT_SUCCESS, numberOfDeletedReports}
+);
+
+export const deleteReportFailure = (error) => (
+    {type: Types.EDIT_REPORT_FAILURE, error}
+);
+
 export const cleanAllReportsErrors = () => (
     {type: Types.CLEAN_ALL_ERRORS}
 );
@@ -86,6 +98,22 @@ export const addReportForCompare = (testId, reportId, value) => (
     {type: Types.ADD_REPORT_FOR_COMPARE, testId, reportId, value}
 );
 
-export const clearReportForCompare = () => (
-    {type: Types.CLEAR_REPORT_FOR_COMPARE }
+export const clearSelectedReports = () => (
+    {type: Types.CLEAR_SELECTED_REPORTS }
 );
+
+
+export const getBenchmarkSuccess = (data) => (
+    {type: Types.GET_BENCHMARK_SUCCESS,data }
+);
+
+
+export const getBenchmark = (testId) => (
+    {type: Types.GET_BENCHMARK,testId }
+);
+
+
+export const clearAggregateReportAndBenchmark = () => (
+    {type: Types.CLEAR_AGGREGATE_REPORT_AND_BENCHMARK }
+);
+

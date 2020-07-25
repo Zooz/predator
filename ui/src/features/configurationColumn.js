@@ -121,7 +121,8 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                         <div>
                             DSL not supported
                         </div>}
-                    dataId={`tooltipKey`}
+                    dataId={
+                        `tooltipKey`}
                     place='top'
                     offset={{top: 1}}
                 >
@@ -309,7 +310,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                     Notes
                 </TableHeader>
             ),
-            accessor: data => <Notes data={data} onEditNote={onEditNote}/>,
+            accessor: data => <Notes key={data.report_id} data={data} onEditNote={onEditNote}/>,
         },
         {
             id: 'score',
@@ -524,14 +525,13 @@ const CompareCheckbox = ({data, onReportSelected, selectedReports}) => {
         </div>
     )
 }
-
 const Notes = ({data, onEditNote}) => {
     const {report_id, test_id} = data;
     const notes = data.notes || '';
     const [editMode, setEditMode] = useState(false);
     const [editValue, setEditValue] = useState(notes);
     const id = uuid();
-    const cell = notes.split('\n').map((row) => (<p>{row}</p>));
+    const cell = notes.split('\n').map((row,index) => (<p key={index}>{row}</p>));
 
     function onKeyDown(e) {
         if (e.key === 'Enter') {
@@ -546,7 +546,7 @@ const Notes = ({data, onEditNote}) => {
         }
     }
 
-    return (
+    return(
 
         <TooltipWrapper
             disable={!notes}
@@ -567,8 +567,8 @@ const Notes = ({data, onEditNote}) => {
                 </ClickOutHandler>
                 }
                 {!editMode &&
-                <div onClick={() => onEditNote && setEditMode(true)}
-                     style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
+        <div onClick={() => onEditNote && setEditMode(true)}
+             style={onEditNote && {cursor: 'pointer', width: '100%', height: '100%'}}>{editValue}</div>
 
                 }
             </div>

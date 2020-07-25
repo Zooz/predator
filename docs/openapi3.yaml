@@ -904,6 +904,41 @@ paths:
               $ref: '#/components/schemas/edit_report'
         description: report data
         required: true
+    delete:
+      operationId: delete-a-report
+      tags:
+        - Reports
+      summary: delete a Report
+      description: delete a specific report for the specified test.
+      parameters:
+        - in: path
+          name: test_id
+          required: true
+          description: The id of the test for which to delete the report.
+          schema:
+            type: string
+            example: 81a27853-0db5-4e57-ad63-4b637528398a
+        - in: path
+          name: report_id
+          description: The id of the report to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   /v1/tests/last_reports:
     get:
       operationId: retrieve-recent-reports
@@ -1640,25 +1675,21 @@ components:
           additionalProperties:
             $ref: '#/components/schemas/artillery_request_schema'
           example: {
-            "name": "create-pet",
-            "request": {
-              "post": {
-                "url": "http://127.0.0.1:3000/pets",
-                "headers": {
-                  "Content-Type": "application/json"
-                },
-                "json": {
-                  "name": "mickey",
-                  "species": "dog"
-                },
-                "capture": [
-                {
-                  "json": "$.id",
-                  "as": "petId"
-                }
-                ]
-              }
+            "post": {
+              "url": "http://127.0.0.1:3000/pets",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "json": {
+                "name": "mickey",
+                "species": "dog"
+              },
+              "capture": [{
+                            "json": "$.id",
+                            "as": "petId"
+                          }]
             }
+
           }
     update_definition:
       required:
@@ -2497,6 +2528,9 @@ components:
               description: Percentage of the score affected by requests per second results.
               allOf:
                 - $ref: '#/components/schemas/benchmark_weights'
+        custom_runner_definition:
+          description: custom json that will be merged with the kubernetes/metronome predator runner job definition
+          type: object
     benchmark_weights:
       type: object
       required:

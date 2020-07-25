@@ -5,7 +5,8 @@ import {connect} from 'react-redux'
 import history from '../../../store/history';
 import logo from '../../../images/logo.png';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-
+import {VERSION} from '../../../App/common/env';
+import {faPoll} from "@fortawesome/free-solid-svg-icons";
 
 const Logo = () => {
 
@@ -56,7 +57,7 @@ class DrawerE extends Component {
             flex: 'initial'
 
         }
-        const appLogoInnerStyle={
+        const appLogoInnerStyle = {
             display: 'flex',
             paddingLeft: '0px',
             paddingRight: '0',
@@ -66,13 +67,22 @@ class DrawerE extends Component {
         return (
             <div className={classes}>
                 <Drawer
-                    containerStyle={{backgroundImage: 'linear-gradient(142deg,#00041a,#00126b)'}}
+                    containerStyle={{
+                        backgroundImage: 'linear-gradient(142deg,#00041a,#00126b)',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
                     docked
                     open={open}
                     onClose={this.handleClose}>
                     <AppBar showMenuIconButton={false} title={<Logo/>} titleStyle={style['appbar-logo']}
                             titleStyle={appLogoTitleStyle} style={appLogoInnerStyle} className={style.appbar}/>
-                    <div style={{marginTop: '45px', paddingLeft: '9px', width: '100%'}}>
+                    <div style={{
+                        marginTop: '45px', paddingLeft: '9px', width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
+                    }}>
 
                         <List>
                             {listItemData.map((listItem) => {
@@ -94,7 +104,7 @@ class DrawerE extends Component {
                                                           // className={url.includes(nestedItem.navigateTo) ? style['menu-selected'] : undefined}
                                                                 primaryText={nestedItem.primaryText}
                                                                 onClick={nestedItem.linkUrl ? () => window.open(nestedItem.linkUrl, '_blank') : () => this.apiClick(`/${nestedItem.navigateTo}`)}
-                                                                iconStyle={{fontSize:'5px'}}
+                                                                iconStyle={{fontSize: '5px'}}
                                                                 leftIcon={nestedItem.icon &&
                                                                 <FontAwesomeIcon size={'xs'} className={style.icon}
                                                                                  icon={nestedItem.icon} fixedWidth/>}
@@ -106,6 +116,15 @@ class DrawerE extends Component {
                                 )
                             })}
                         </List>
+                    </div>
+                    <div style={{
+                        color: '#c2c2c28f',
+                        display: 'flex',
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'flex-end',
+                    }}>
+                        <Bottom/>
                     </div>
                 </Drawer>
                 <AppBar
@@ -123,10 +142,34 @@ class DrawerE extends Component {
     }
 }
 
+
+const Bottom = () => {
+    return (
+        <div style={{
+            display: 'flex', marginBottom: '10px',
+            flexDirection: 'row',
+            flex: 1,
+            justifyContent: 'space-between',
+            marginLeft: '10px',
+            marginRight: '10px',
+            alignItems: 'center'
+        }}>
+            <FontAwesomeIcon size={'2x'} style={{
+                color: 'white',
+                cursor: 'pointer'
+            }} icon={faPoll}
+                             onClick={() => window.open("https://docs.google.com/forms/d/15dozkkA2xBUV7T7ls5XMyBj-JDg5Tj-TXNMp9PkdFsM/viewform?edit_requested=true")}/>
+            <div> v{VERSION}</div>
+        </div>
+    )
+}
+
+
 function mapStateToProps(state) {
     return {
         url: state.router.location.pathname
     }
 }
+
 
 export default connect(mapStateToProps)(DrawerE);

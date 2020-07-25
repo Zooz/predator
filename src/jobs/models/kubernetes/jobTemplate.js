@@ -1,5 +1,7 @@
-module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, predatorRunner) => {
-    return {
+const _ = require('lodash');
+
+module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, predatorRunner, customDefinition) => {
+    const jobTemplate = {
         'apiVersion': 'batch/v1',
         'kind': 'Job',
         'metadata': {
@@ -36,4 +38,7 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
             'backoffLimit': 0
         }
     };
+
+    const jobTemplateWithCustomDefinition = _.merge(jobTemplate, customDefinition);
+    return jobTemplateWithCustomDefinition;
 };

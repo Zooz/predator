@@ -145,8 +145,13 @@ const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => 
     const headersList = value
         .map((header, index) => {
             return (
-                <div style={{display: 'flex', flexDirection: 'row', width: '100%',marginBottom: index!==headersList-1 ? '5px': undefined}} key={index}>
-                    <Input style={{marginRight:'10px'}} value={header.key} onChange={(evt) => {
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    width: '100%',
+                    marginBottom: index !== headersList - 1 ? '5px' : undefined
+                }} key={index}>
+                    <Input style={{marginRight: '10px'}} value={header.key} onChange={(evt) => {
                         onChange('key', evt.target.value, index)
                     }} placeholder={keyHintText || 'key'}/>
 
@@ -165,13 +170,13 @@ const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => 
 }
 
 const HttpMethodDropdown = (props) => {
-    const httpMethods = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE'];
+    const httpMethods = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'CONNECT', 'TRACE'];
     const {onChange, value} = props;
     return (
         <Dropdown
             options={httpMethods.map((option) => ({key: option, value: option}))}
             selectedOption={{key: value, value: value}}
-            onChange={(selected)=>{
+            onChange={(selected) => {
                 onChange(selected.value)
             }}
             placeholder={"Method"}

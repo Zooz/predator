@@ -26,6 +26,7 @@ const expectedTypes = {
     delay_runner_ms: 'int',
     benchmark_threshold: 'int',
     benchmark_threshold_webhook_url: 'string',
+    custom_runner_definition: 'json',
     benchmark_weights: 'json'
 };
 

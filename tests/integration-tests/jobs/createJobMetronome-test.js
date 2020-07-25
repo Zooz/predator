@@ -13,7 +13,7 @@ describe('Create job specific metronome tests', async function () {
         nock.cleanAll();
     });
     const jobPlatform = process.env.JOB_PLATFORM;
-    if (jobPlatform === 'METRONOME') {
+    if (jobPlatform.toUpperCase() === 'METRONOME') {
         describe('Metronome', () => {
             before(async () => {
                 await schedulerRequestCreator.init();

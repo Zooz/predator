@@ -21,7 +21,7 @@ const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
     {stroke: "#395B56", fill: "#395B56"},
     {stroke: "#617A70", fill: "#617A70"},
     {stroke: "#CCC39F", fill: "#CCC39F"},
-    {stroke: "#FFFAD1", fill: "#FFFAD1"},
+    {stroke: "#827e5b", fill: "#827e5b"},
 ];
 const COLOR_FAMILY = {
     p95: [{stroke: "#BBDEF0", fill: "#BBDEF0"}, {stroke: "#00A6A6", fill: "#00A6A6"}, {
@@ -54,10 +54,10 @@ const getColor = (key, index) => {
 };
 
 const filterKeysFromArrayOfObject = (data, graphType, filteredKeys) => {
-    const keysToFilter = Object.keys(_.pickBy(filteredKeys, (value) => value));
+    const keysToFilter = Object.keys(_.pickBy(filteredKeys[graphType] || {}, (value) => value));
     const filteredData = data.reduce((acc, cur) => {
         acc.push(_.omitBy(cur, (value, key) => {
-            return keysToFilter.includes(`${graphType}${key}`)
+            return keysToFilter.includes(`${key}`)
         }));
         return acc;
     }, []);
@@ -100,7 +100,6 @@ export const BarChartPredator = ({data = [], keys=[], graphType, onSelectedGraph
 
 export const LineChartPredator = ({data = [], keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys}) => {
     const filteredData = filterKeysFromArrayOfObject(data, graphType, filteredKeys);
-
     return (
         <ResponsiveContainer width="100%" height={300}>
             <LineChart
@@ -154,7 +153,7 @@ const renderLegend = (props) => {
                          style={{margin: '5px', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                         <Checkbox
                             indeterminate={false}
-                            checked={filteredKeys[`${graphType}${entry.value}`] === undefined || filteredKeys[`${graphType}${entry.value}`] === false}
+                            checked={_.get(filteredKeys,`${graphType}.${entry.value}`) === undefined || _.get(filteredKeys,`${graphType}.${entry.value}`) === false}
                             // disabled={}
                             onChange={(value) => {
                                 onSelectedGraphPropertyFilter(graphType, entry.value, value)
