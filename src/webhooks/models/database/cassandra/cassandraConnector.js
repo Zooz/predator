@@ -4,7 +4,8 @@ module.exports = {
     init,
     createWebhook,
     getAllWebhooks,
-    updateWebhook
+    updateWebhook,
+    getAllGlobalWebhooks
 };
 
 async function init() {
@@ -22,5 +23,9 @@ async function createWebhook() {
 }
 
 async function updateWebhook() {
+    throw new Error('Not implemented.');
+}
+
+async function getAllGlobalWebhooks() {
     throw new Error('Not implemented.');
 }

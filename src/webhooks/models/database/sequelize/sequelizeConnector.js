@@ -9,7 +9,8 @@ module.exports = {
     createWebhook,
     getWebhook,
     updateWebhook,
-    deleteWebhook
+    deleteWebhook,
+    getAllGlobalWebhooks
 };
 
 function parseWebhook(webhookRecord) {
@@ -38,6 +39,12 @@ async function getAllWebhooks() {
 async function getWebhook(webhookId) {
     const webhook = await _getWebhook(webhookId);
     return parseWebhook(webhook);
+}
+
+async function getAllGlobalWebhooks() {
+    const webhooksModel = client.model('webhook');
+    const webhooks = await webhooksModel.findAll({ include: ['events'], where: { global: true } });
+    return webhooks.map(parseWebhook);
 }
 
 async function createWebhook(webhook) {
