@@ -13,7 +13,7 @@
     "rules": {
         "eol-last": "off",
         "space-before-function-paren": "off",
-        "indent": ["error", 4],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
         "quotes": ["error", "single", { "avoidEscape": true }],
         "semi": ["error", "always",{ "omitLastInOneLineBlock": true}],
         "one-var": ["off"],
