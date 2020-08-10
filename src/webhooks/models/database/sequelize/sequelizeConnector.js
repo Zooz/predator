@@ -41,6 +41,7 @@ async function getWebhook(webhookId) {
     return parseWebhook(webhook);
 }
 
+// TEST THIS FUNCTION
 async function getAllGlobalWebhooks() {
     const webhooksModel = client.model('webhook');
     const webhooks = await webhooksModel.findAll({ include: ['events'], where: { global: true } });

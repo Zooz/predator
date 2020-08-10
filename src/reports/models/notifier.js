@@ -1,9 +1,7 @@
 'use strict';
 
 const reportEmailSender = require('./reportEmailSender'),
-    reportWebhookSender = require('./reportWebhookSender'),
     jobsManager = require('../../jobs/models/jobManager'),
-    statsFromatter = require('../../webhooks/models/statsFormatter'),
     aggregateReportGenerator = require('./aggregateReportGenerator'),
     logger = require('../../common/logger'),
     constants = require('../utils/constants'),
@@ -30,7 +28,7 @@ module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
         switch (stats.phase_status) {
             case constants.SUBSCRIBER_FAILED_STAGE: {
                 logger.info(metadata, stats.error, 'handling error message');
-                await webhooksManager.fireWebhookByEvent(job.id, WEBHOOK_EVENT_TYPE_FAILED, { report, stats });
+                await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FAILED, { report, stats });
                 break;
             }
             case constants.SUBSCRIBER_STARTED_STAGE: {
@@ -67,7 +65,7 @@ async function handleStart(report, job) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_STARTED_STAGE)) {
         return;
     }
-    await webhooksManager.fireWebhookByEvent(job.id, WEBHOOK_EVENT_TYPE_STARTED, { report });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report);
 }
 
 async function handleFirstIntermediate(report, job) {
@@ -76,7 +74,7 @@ async function handleFirstIntermediate(report, job) {
     }
     // WHAT DO WE DO WITH BATCHES
     let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
-    webhooksManager.fireWebhookByEvent(job.id, WEBHOOK_EVENT_TYPE_IN_PROGRESS, { report, aggregatedReport });
+    webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, { report, aggregatedReport });
 }
 
 async function handleDone(report, job, reportBenchmark) {
@@ -84,44 +82,25 @@ async function handleDone(report, job, reportBenchmark) {
         return;
     }
     let emails = await getEmailTargets(job);
-    const { benchmarkThreshold, benchmarkWebhook } = await getBenchmarkConfig();
-
-    if (emails.length === 0 && benchmarkWebhook.length === 0) {
-        return;
-    }
+    const { benchmarkThreshold } = await getBenchmarkConfig();
 
     let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
 
-    if (emails.length > 0) {
-        reportEmailSender.sendAggregateReport(aggregatedReport, job, emails, reportBenchmark);
+    if (emails && emails.length > 0) {
+        await reportEmailSender.sendAggregateReport(aggregatedReport, job, emails, reportBenchmark);
     }
-
-    await webhooksManager.fireWebhookByEvent(job.id, WEBHOOK_EVENT_TYPE_FINISHED, { report, aggregatedReport, reportBenchmark });
 
     if (reportBenchmark.score && benchmarkThreshold) {
         const lastReports = await reportsManager.getReports(aggregatedReport.test_id);
         const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
-        let event = reportBenchmark.score < benchmarkThreshold ? WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED : WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED;
-        await webhooksManager.fireWebhookByEvent(job.id, event, { aggregatedReport, score: reportBenchmark.score, lastScores, icon: ':sad_1:' });
+        const { event, icon } = reportBenchmark.score < benchmarkThreshold ? { event: WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, icon: ':sad_1:' } : { event: WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, icon: ':grin:' };
+        await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon });
     }
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport, score: reportBenchmark.score }, { icon: ':rocket:' });
 }
 
 async function handleAbort(report, job) {
-    await webhooksManager.fireWebhookByEvent(job.id, WEBHOOK_EVENT_TYPE_ABORTED, { report });
-}
-
-async function getWebhookTargets(job) {
-    let targets = [];
-    let defaultWebhookUrl = await configHandler.getConfigValue(configConstants.DEFAULT_WEBHOOK_URL);
-
-    if (defaultWebhookUrl) {
-        targets.push(defaultWebhookUrl);
-    }
-
-    if (job.webhooks) {
-        targets = targets.concat(job.webhooks);
-    }
-    return targets;
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_ABORTED, { report });
 }
 
 async function getBenchmarkConfig() {

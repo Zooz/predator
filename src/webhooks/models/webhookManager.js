@@ -44,8 +44,9 @@ async function updateWebhook(webhookId, webhook) {
     return databaseConnector.updateWebhook(webhookId, webhook);
 };
 
+// TEST THIS FUNCTION
 async function getAllGlobalWebhooks() {
-    return databaseConnector.getAllWebhooks();
+    return databaseConnector.getAllGlobalWebhooks();
 }
 
 async function fireSingleWebhook(webhook, payload) {
@@ -56,27 +57,34 @@ async function fireSingleWebhook(webhook, payload) {
             url: webhook.url,
             body: payload
         });
-        logger.info(`Webhook fired successfully, url=${webhook.url}`);
+        logger.info(`Webhook fired successfully, url = ${webhook.url}`);
     } catch (requestError) {
-        logger.error(`Webhook failed, url=${webhook.url}`);
+        logger.error(`Webhook failed, url = ${webhook.url}`);
         throw requestError;
     }
-    return webhookResponse;
 }
 
-async function fireWebhooks(webhooks, payload) {
-    return webhooks.map(webhook => fireSingleWebhook(webhook, webhooksFormatter[webhook.format_type](payload)));
+//format, eventType, jobId, testId, report, additionalInfo = {}, options = {}
+function fireWebhooks(webhooks, eventType, jobId, testId, report, additionalInfo, options) {
+    return webhooks.map(webhook => fireSingleWebhook(webhook, webhooksFormatter(webhook.format_type, eventType, jobId, testId, report, additionalInfo, options)));
 }
 
-async function fireWebhookByEvent(jobId, eventType, payload) {
-    const job = await getWebhook(jobId);
+// FAILED: report, stats
+// STARTED: report
+// IN_PROGRESS: report, aggregatedReport
+// report, aggregatedReport, reportBenchmark
+// BENCHMARK_FAILED/PASSED: report, aggregatedReport, score, lastScores, icon
+// ABORTED: report
+async function fireWebhookByEvent(job, eventType, report, additionalInfo = {}, options = {}) {
+    const jobWebhooks = await Promise.all(job.webhooks.map(webhookId => getWebhook(webhookId)));
     const globalWebhooks = await getAllGlobalWebhooks();
-    const webhooks = [...job.webhooks, ...globalWebhooks];
-    const webhooksWithEventType = webhooks.filter(webhook => webhook.events.include(eventType));
+    const webhooks = [...jobWebhooks, ...globalWebhooks];
+    const webhooksWithEventType = webhooks.filter(webhook => webhook.events.includes(eventType));
     if (webhooksWithEventType.length === 0) {
         return;
     }
-    await Promise.allSettled(fireWebhooks(webhooksWithEventType, payload));
+    const webhooksPromises = fireWebhooks(webhooksWithEventType, eventType, job.id, job.test_id, report, additionalInfo, options);
+    await Promise.allSettled(webhooksPromises);
 }
 
 module.exports = {

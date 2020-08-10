@@ -1,3 +1,5 @@
+const cloneDeep = require('lodash/cloneDeep');
+
 const {
     EVENT_FORMAT_TYPE_JSON,
     EVENT_FORMAT_TYPE_SLACK,
@@ -19,6 +21,18 @@ function unknownWebhookEventTypeError(badWebhookEventTypeValue) {
     return new Error(`Unrecognized webhook event: ${badWebhookEventTypeValue}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`);
 }
 
+function getThresholdSlackMessage(state, { testName, benchmarkThreshold, lastScores, aggregatedReport, score }) {
+    let resultText = 'above';
+    let icon = ':rocket:';
+    if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
+        resultText = 'below';
+        icon = ':sad_1:';
+    }
+    return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}` +
+        ` this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
+        `.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;;
+}
+
 function slackWebhookFormat(message, options) {
     return {
         text: message,
@@ -27,89 +41,92 @@ function slackWebhookFormat(message, options) {
     };
 }
 
-function json(event, testId, jobId, report, options) {
+function json(event, testId, jobId, report, additionalInfo, options) {
     let payload = {
         test_id: testId,
         job_id: jobId,
         event: event,
-        additional_details: {}
+        additional_details: {
+            ...cloneDeep({ report, ...additionalInfo }),
+
+        }
     };
-    let additionalDetails = {};
-    switch (event) {
-        case WEBHOOK_EVENT_TYPE_STARTED: {
-            additionalDetails = {
-                test_name: ,
-                environment: ,
-                duration: ,
-                arrival_rate: ,
-                parallelism: ,
-                ramp_to: rampTo,
-            };
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_FINISHED: {
-            additionalDetails = {
-                test_name: ,
-                grafana_report: ,
-                aggregated_report: {
-                    ...aggregatedReport.aggregate
-                },
-                report_benchmark: {
-                    ...reportBenchmark
-                }
-            };
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_FAILED: {
-            additionalDetails = {
-                environment: ,
-                stats: {
-                    ...stats.data
-                }
-            };
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_ABORTED: {
-            additionalDetails = {
-                testName,
-                grafanaReport: 
-            };
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED: {
-            additionalDetails = {
-                aggregated_test_name: ,
-                benchmark_threshold: ,
-                score: ,
-                last_three_scores: ,
-                aggregated_report: 
-            };
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            additionalDetails = {
+    // let additionalDetails = {};
+    // switch (event) {
+    //     case WEBHOOK_EVENT_TYPE_STARTED: {
+    //         additionalDetails = {
+    //             test_name: ,
+    //             environment: ,
+    //             duration: ,
+    //             arrival_rate: ,
+    //             parallelism: ,
+    //             ramp_to: rampTo,
+    //         };
+    //         break;
+    //     }
+    //     case WEBHOOK_EVENT_TYPE_FINISHED: {
+    //         additionalDetails = {
+    //             test_name: ,
+    //             grafana_report: ,
+    //             aggregated_report: {
+    //                 ...aggregatedReport.aggregate
+    //             },
+    //             report_benchmark: {
+    //                 ...reportBenchmark
+    //             }
+    //         };
+    //         break;
+    //     }
+    //     case WEBHOOK_EVENT_TYPE_FAILED: {
+    //         additionalDetails = {
+    //             environment: ,
+    //             stats: {
+    //                 ...stats.data
+    //             }
+    //         };
+    //         break;
+    //     }
+    //     case WEBHOOK_EVENT_TYPE_ABORTED: {
+    //         additionalDetails = {
+    //             testName,
+    //             grafanaReport: 
+    //         };
+    //         break;
+    //     }
+    //     case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED: {
+    //         additionalDetails = {
+    //             aggregated_test_name: ,
+    //             benchmark_threshold: ,
+    //             score: ,
+    //             last_three_scores: ,
+    //             aggregated_report: 
+    //         };
+    //         break;
+    //     }
+    //     case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
+    //         break;
+    //     }
+    //     case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
+    //         additionalDetails = {
 
-            };
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            additionalDetails = {
+    //         };
+    //         break;
+    //     }
+    //     case WEBHOOK_EVENT_TYPE_API_FAILURE: {
+    //         additionalDetails = {
 
-            };
-            break;
-        }
-        default: {
-            throw unknownWebhookEventTypeError();
-        }
-    }
-    payload.additional_details = additionalDetails;
+    //         };
+    //         break;
+    //     }
+    //     default: {
+    //         throw unknownWebhookEventTypeError();
+    //     }
+    // }
+    // payload.additional_details = additionalDetails;
     return payload;
 }
 
-function slack(event, testId, jobId, report, options) {
+function slack(event, testId, jobId, report, additionalInfo, options) {
     let message = null;
     const {
         environment,
@@ -120,20 +137,16 @@ function slack(event, testId, jobId, report, options) {
         test_name: testName,
         grafana_report: grafanaReport
     } = report;
-    const { aggregatedReport, reportBenchmark } = options;
+    const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
-            let rampToMessage = rampTo ? `, ramp to: ${rampTo} scenarios per second` : '';
+            let rampToMessage = rampTo ? `ramp to: ${rampTo} scenarios per second` : '';
             message = `🤓 *Test ${testName} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${environment} duration: ${duration} seconds, arrival rate: ${arrivalRate} scenarios per second, number of runners: ${parallelism}${rampToMessage}`;
+            *test configuration:* environment: ${environment} duration: ${duration} seconds, arrival rate: ${arrivalRate} scenarios per second, number of runners: ${parallelism}, ${rampToMessage}`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_FINISHED: {
-            message = `😎 *Test ${testName} with id: ${testId} is finished.*\n
-            ${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, reportBenchmark)}\n`;
-            if (grafanaReport) {
-                message += `<${grafanaReport}|View final grafana dashboard report>`;
-            }
+            message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, reportBenchmark)}\n`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_FAILED: {
@@ -145,43 +158,41 @@ function slack(event, testId, jobId, report, options) {
         }
         case WEBHOOK_EVENT_TYPE_ABORTED: {
             message = `😢 *Test ${testName} with id: ${testId} was aborted.*\n`;
-            if (grafanaReport) {
-                message += `<${grafanaReport}|View final grafana dashboard report>`;
-            }
             break;
         }
-        case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED: {
-            message = `:sad_1: *Test ${aggregatedtestName} got a score of ${score.toFixed(1)}` +
-            ` this is below the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
-            `.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;
+        case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
+        case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
+            message = getThresholdSlackMessage(event, { testName, lastScores, benchmarkThreshold, score });
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
+            message = `:hammer_and_wrench: *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
+            message = `::boom:: *Test ${testName} with id: ${testId} has encountered an API failure!*`;
             break;
         }
         default: {
             throw unknownWebhookEventTypeError();
         }
     }
-    return slackWebhookFormat(message);
+    if (grafanaReport) {
+        message += `<${grafanaReport} | View final grafana dashboard report>`;
+    }
+    return slackWebhookFormat(message, options);
 }
 
-module.exports = function(format, eventType, jobId, testId, report, options={}) {
-    switch(format) {
+module.exports = function(format, eventType, jobId, testId, report, additionalInfo = {}, options = {}) {
+    switch (format) {
         case EVENT_FORMAT_TYPE_SLACK: {
-            return slack(eventType, testId, jobId, report, options);
+            return slack(eventType, testId, jobId, report, additionalInfo, options);
         }
         case EVENT_FORMAT_TYPE_JSON: {
-            return json(eventType, testId, jobId, report, options);
+            return json(eventType, testId, jobId, report, additionalInfo, options);
         }
         default: {
-            throw new Error(`Unrecognized webhook format: ${format}, available options: ${[EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPE_SLACK].join()}`)
+            throw new Error(`Unrecognized webhook format: ${format}, available options: ${[EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPE_SLACK].join()}`);
         }
     }
-}
+};

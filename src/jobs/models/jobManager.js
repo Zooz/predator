@@ -137,26 +137,32 @@ module.exports.getJob = async (jobId) => {
 
 module.exports.updateJob = async (jobId, jobConfig) => {
     const configData = await configHandler.getConfig();
-    return databaseConnector.updateJob(jobId, jobConfig)
-        .then(function () {
-            return databaseConnector.getJob(jobId)
-                .then(function (updatedJob) {
-                    if (updatedJob.length === 0) {
-                        let error = new Error('Not found');
-                        error.statusCode = 404;
-                        throw error;
-                    }
-                    if (cronJobs[jobId]) {
-                        cronJobs[jobId].stop();
-                        delete cronJobs[jobId];
-                    }
-                    addCron(jobId, updatedJob[0], updatedJob[0].cron_expression, configData);
-                    logger.info('Job updated successfully to database');
-                });
-        }).catch(function (err) {
-            logger.error(err, 'Error occurred trying to update job');
-            return Promise.reject(err);
-        });
+    let job = null;
+    let updatedJob = null;
+    [ job ] = await databaseConnector.getJob(jobId);
+    if (!job.cron_expression) {
+        let error = new Error('Can not update jobs from type run_immediately: true');
+        error.statusCode = 422;
+        throw error;
+    }
+    try {
+        updatedJob = await databaseConnector.updateJob(jobId, jobConfig);
+        job = await databaseConnector.getJob(jobId);
+    } catch (err) {
+        logger.error(err, 'Error occurred trying to update job');
+        throw err;
+    }
+    if (job.length === 0) {
+        let error = new Error('Not found');
+        error.statusCode = 404;
+        throw error;
+    }
+    if (cronJobs[jobId]) {
+        cronJobs[jobId].stop();
+        delete cronJobs[jobId];
+    }
+    addCron(jobId, job[0], job[0].cron_expression, configData);
+    logger.info('Job updated successfully to database');
 };
 
 function createResponse(jobId, jobBody, runId) {
