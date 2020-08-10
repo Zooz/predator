@@ -10,7 +10,6 @@ const should = require('should'),
     jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate'),
     config = require('../../../../src/common/consts').CONFIG;
 
-
 let manager;
 
 const TEST_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaa';
@@ -109,6 +108,8 @@ const jobBodyWithCustomEnvVars = {
     max_virtual_users: 100
 };
 
+// TODO: this tests suite runs over cassandra, cassandra should be dropped
+
 describe('Manager tests', function () {
     let sandbox;
     let cassandraInsertStub;
@@ -160,7 +161,7 @@ describe('Manager tests', function () {
         getConfigValueStub.withArgs(config.JOB_PLATFORM).returns('KUBERNETES');
     });
 
-    beforeEach(async () =>  {
+    beforeEach(async () => {
         await manager.init();
         sandbox.resetHistory();
     });
