@@ -50,9 +50,8 @@ async function getAllGlobalWebhooks() {
 }
 
 async function fireSingleWebhook(webhook, payload) {
-    let webhookResponse = null;
     try {
-        webhookResponse = await requestSender.send({
+        await requestSender.send({
             method: 'POST',
             url: webhook.url,
             body: payload

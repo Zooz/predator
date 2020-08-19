@@ -51,78 +51,6 @@ function json(event, testId, jobId, report, additionalInfo, options) {
 
         }
     };
-    // let additionalDetails = {};
-    // switch (event) {
-    //     case WEBHOOK_EVENT_TYPE_STARTED: {
-    //         additionalDetails = {
-    //             test_name: ,
-    //             environment: ,
-    //             duration: ,
-    //             arrival_rate: ,
-    //             parallelism: ,
-    //             ramp_to: rampTo,
-    //         };
-    //         break;
-    //     }
-    //     case WEBHOOK_EVENT_TYPE_FINISHED: {
-    //         additionalDetails = {
-    //             test_name: ,
-    //             grafana_report: ,
-    //             aggregated_report: {
-    //                 ...aggregatedReport.aggregate
-    //             },
-    //             report_benchmark: {
-    //                 ...reportBenchmark
-    //             }
-    //         };
-    //         break;
-    //     }
-    //     case WEBHOOK_EVENT_TYPE_FAILED: {
-    //         additionalDetails = {
-    //             environment: ,
-    //             stats: {
-    //                 ...stats.data
-    //             }
-    //         };
-    //         break;
-    //     }
-    //     case WEBHOOK_EVENT_TYPE_ABORTED: {
-    //         additionalDetails = {
-    //             testName,
-    //             grafanaReport: 
-    //         };
-    //         break;
-    //     }
-    //     case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED: {
-    //         additionalDetails = {
-    //             aggregated_test_name: ,
-    //             benchmark_threshold: ,
-    //             score: ,
-    //             last_three_scores: ,
-    //             aggregated_report: 
-    //         };
-    //         break;
-    //     }
-    //     case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-    //         break;
-    //     }
-    //     case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-    //         additionalDetails = {
-
-    //         };
-    //         break;
-    //     }
-    //     case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-    //         additionalDetails = {
-
-    //         };
-    //         break;
-    //     }
-    //     default: {
-    //         throw unknownWebhookEventTypeError();
-    //     }
-    // }
-    // payload.additional_details = additionalDetails;
     return payload;
 }
 
@@ -170,7 +98,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `::boom:: *Test ${testName} with id: ${testId} has encountered an API failure!*`;
+            message = `::boom:: *Test ${testName} with id: ${testId} has encountered an API failure!* :skull:`;
             break;
         }
         default: {

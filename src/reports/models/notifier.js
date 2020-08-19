@@ -17,7 +17,8 @@ const {
     WEBHOOK_EVENT_TYPE_ABORTED,
     WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED,
     WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED,
-    WEBHOOK_EVENT_TYPE_IN_PROGRESS
+    WEBHOOK_EVENT_TYPE_IN_PROGRESS,
+    WEBHOOK_EVENT_TYPE_API_FAILURE
 } = require('../../common/consts');
 
 module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
@@ -49,6 +50,10 @@ module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
             case constants.SUBSCRIBER_ABORTED_STAGE: {
                 logger.info(metadata, 'handling aborted message');
                 await handleAbort(report, job);
+                break;
+            }
+            case constants.SUBSCRIBER_INTERMEDIATE_STAGE: {
+                await handleIntermediate(report, job);
                 break;
             }
             default: {
@@ -100,13 +105,32 @@ async function handleDone(report, job, reportBenchmark) {
 }
 
 async function handleAbort(report, job) {
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_ABORTED, { report });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_ABORTED, report);
 }
 
 async function getBenchmarkConfig() {
     const benchmarkWebhook = await configHandler.getConfigValue(configConstants.BENCHMARK_THRESHOLD_WEBHOOK_URL);
     const benchmarkThreshold = await configHandler.getConfigValue(configConstants.BENCHMARK_THRESHOLD);
     return { benchmarkThreshold, benchmarkWebhook };
+}
+
+async function handleIntermediate(report, job) {
+    const reportSubscribers = report.subscribers;
+    const accumulatedStatusCodesCounter = reportSubscribers.reduce((accumulated, { last_stats: { codes: statusCodesCounter } }) => {
+        const statusCodes = Object.keys(statusCodesCounter);
+        for (const statusCode of statusCodes) {
+            if (!accumulated[statusCode]) {
+                accumulated[statusCode] = 0;
+            }
+            accumulated[statusCode] += Number(statusCodesCounter[statusCode]);
+        }
+        return accumulated;
+    }, {});
+    // if there are no stats that have a status code of >= 500, do nothing 
+    if (Object.keys(accumulatedStatusCodesCounter).every(statusCode => statusCode < 500)) {
+        return;
+    }
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_API_FAILURE, report, { accumulatedStatusCodesCounter }, { icon: ':skull:' });
 }
 
 async function getEmailTargets(job) {
