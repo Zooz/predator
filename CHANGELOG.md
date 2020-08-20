@@ -1,7 +1,25 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/Zooz/predator/compare/v1.3.1...v1.4.0) (2020-07-23)
+
+
+### Features
+* **reports** Show benchmark results on test report graph when benchmark is set. ([#346](https://github.com/Zooz/predator/issues/346))
+* **test-generator** Support for upload csv files and use them as data for test. ([#268](https://github.com/Zooz/predator/issues/268))
+* **compare-reports:** add notes to ui compare reports ([#314](https://github.com/Zooz/predator/issues/314)) ([5303acd](https://github.com/Zooz/predator/commit/5303acde9681a2b05faf070a65291581117d17be))
+* **test-generator:** set keep-alive as default ([#299](https://github.com/Zooz/predator/issues/299)) ([04eb8d1](https://github.com/Zooz/predator/commit/04eb8d188197722190e4eb8cc36decbb1fc2d247))
+* **reports:** api and ui for delete reports ([#337](https://github.com/Zooz/predator/issues/337)) ([8e68471](https://github.com/Zooz/predator/commit/8e68471e6f7b9f8dd02e76681983e54e162e64d7))
+* **runner:** support custom job template ([ad191e9](https://github.com/Zooz/predator/commit/ad191e99c7cf760c0a3715abbd028cf8f56c9441))
+* **test-generator:** added sleep and extra http methods ([#323](https://github.com/Zooz/predator/issues/323)) ([6ac9a53](https://github.com/Zooz/predator/commit/6ac9a532ea49900e36ae16d01add5f2e15e4d99d))
+
+
+### Bug Fixes
+
+* **docker:** fixing docker debug logs to include stderr ([#338](https://github.com/Zooz/predator/issues/338)) ([8498a3d](https://github.com/Zooz/predator/commit/8498a3d1dca268d20c8c28a247e123cdedfc5914))
+* **last_reports:** notes render bug ([#331](https://github.com/Zooz/predator/issues/331)) ([5440e5a](https://github.com/Zooz/predator/commit/5440e5a6f4716640d152f7f8c5ef6a136b121cf2))
+* **reports:** fix avg rps when notes are updated ([#328](https://github.com/Zooz/predator/issues/328)) ([4dc8e9d](https://github.com/Zooz/predator/commit/4dc8e9dc72d6886087d80aeeb17555d3d46dd876))
 
 <a name="1.3.0"></a>
 # [1.3.0](https://github.com/Zooz/predator/compare/v1.2.1...v1.3.0) (2020-04-16)
