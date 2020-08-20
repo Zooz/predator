@@ -3,7 +3,7 @@ import {
     initCreateTestForm,
     editTest,
     cleanAllErrors,
-    clearDeleteTestSuccess,
+    clearAllSuccessOperationsState,
     deleteTest,
     deleteTestFailure,
     deleteTestSuccess,
@@ -21,7 +21,7 @@ import {
     createTest,
     getFileMetadata,
     getFileMetadataSuccess,
-
+    cloneTest,
 } from './actions/testsActions';
 import {
     clearStopJobSuccess,
@@ -111,10 +111,11 @@ export {
     deleteTestSuccess,
     deleteTestFailure,
     clearErrorOnDeleteTest,
-    clearDeleteTestSuccess,
+    clearAllSuccessOperationsState,
     createTest,
     getFileMetadata,
     getFileMetadataSuccess,
+    cloneTest,
     // jobs//
     getJobsFaliure,
     processingGetJobs,

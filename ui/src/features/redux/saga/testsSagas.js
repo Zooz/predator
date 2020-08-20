@@ -71,6 +71,18 @@ export function* createTest(action) {
     yield put(Actions.setLoading(false));
 }
 
+export function* cloneTest(action) {
+    try {
+        yield put(Actions.setLoading(true));
+        const result = yield call(createTestInFramework, action.body);
+        yield put(Actions.cloneTestSuccess());
+        yield call(getTests);
+    } catch (err) {
+        yield put(Actions.cloneTestFailure(err));
+    }
+    yield put(Actions.setLoading(false));
+}
+
 export function* editTest(action) {
     try {
         yield put(Actions.setLoading(true));
@@ -94,7 +106,8 @@ export function* editTest(action) {
 export function* deleteTest({testId}) {
     try {
         yield call(deleteTestInFramework, testId);
-        yield put(Actions.deleteTestSuccess())
+        yield put(Actions.deleteTestSuccess());
+        yield call(getTests);
     } catch (e) {
         yield put(Actions.deleteTestFailure(e))
     }
@@ -114,6 +127,7 @@ export function* testsRegister() {
     yield takeLatest(Types.GET_TEST, getTest);
     yield takeLatest(Types.GET_FILE_METADATA, getFileMetadata);
     yield takeLatest(Types.CREATE_TEST, createTest);
+    yield takeLatest(Types.CLONE_TEST, cloneTest);
     yield takeLatest(Types.DELETE_TEST, deleteTest);
     yield takeLatest(Types.EDIT_TEST, editTest);
 }
