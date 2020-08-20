@@ -1,4 +1,7 @@
 'use strict';
+
+const webhookManager = require('../../webhooks/models/webhookManager');
+
 const logger = require('../../common/logger'),
     uuid = require('uuid'),
     CronJob = require('cron').CronJob,
@@ -6,6 +9,7 @@ const logger = require('../../common/logger'),
     util = require('util'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
+    webhooksManager = require('../../webhooks/models/webhookManager'),
     configConstants = require('../../common/consts').CONFIG;
 
 let jobConnector;
@@ -47,6 +51,7 @@ module.exports.scheduleFinishedContainersCleanup = async () => {
 module.exports.createJob = async (job) => {
     let jobId = uuid.v4();
     const configData = await configHandler.getConfig();
+    await globalWebhookAssignmentGuard(job.webhooks);
     try {
         await databaseConnector.insertJob(jobId, job);
         logger.info('Job saved successfully to database');
@@ -137,16 +142,15 @@ module.exports.getJob = async (jobId) => {
 
 module.exports.updateJob = async (jobId, jobConfig) => {
     const configData = await configHandler.getConfig();
-    let job = null;
-    let updatedJob = null;
-    [ job ] = await databaseConnector.getJob(jobId);
+    await globalWebhookAssignmentGuard(jobConfig.webhooks);
+    let [job] = await databaseConnector.getJob(jobId);
     if (!job.cron_expression) {
         let error = new Error('Can not update jobs from type run_immediately: true');
         error.statusCode = 422;
         throw error;
     }
     try {
-        updatedJob = await databaseConnector.updateJob(jobId, jobConfig);
+        await databaseConnector.updateJob(jobId, jobConfig);
         job = await databaseConnector.getJob(jobId);
     } catch (err) {
         logger.error(err, 'Error occurred trying to update job');
@@ -288,4 +292,16 @@ function addCron(jobId, job, cronExpression, configData) {
         logger.info('Job: ' + jobId + ' completed.');
     }, true);
     cronJobs[jobId] = scheduledJob;
+}
+
+async function globalWebhookAssignmentGuard(webhookIds) {
+    let webhooks = [];
+    if (webhookIds && webhookIds.length > 0) {
+        webhooks = await Promise.all(webhookIds.map(webhookId => webhookManager.getWebhook(webhookId)));
+    }
+    if (webhooks.some(webhook => webhook.global)) {
+        const error = new Error('Assigning global webhook to a job is not allowed!');
+        error.statusCode = 422;
+        throw error;
+    }
 }

@@ -475,6 +475,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         '409':
           description: Conflict
           content:
