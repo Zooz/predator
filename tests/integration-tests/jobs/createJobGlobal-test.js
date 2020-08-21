@@ -1,12 +1,21 @@
 const should = require('should'),
     uuid = require('uuid'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
+    webhooksRequestSender = require('../webhooks/helpers/requestCreator'),
+    testsRequestSender = require('../tests/helpers/requestCreator'),
+    { WEBHOOK_EVENT_TYPE_STARTED, EVENT_FORMAT_TYPE_JSON } = require('../../../src/common/consts'),
+    basicTest = require('../../testExamples/Basic_test.json'),
     nock = require('nock');
+
+const { expect } = require('chai');
+const { createJob } = require('../../../src/jobs/models/jobManager');
 
 describe('Create job global tests', function () {
     this.timeout(20000);
     before(async () => {
         await schedulerRequestCreator.init();
+        await webhooksRequestSender.init();
+        await testsRequestSender.init();
     });
 
     beforeEach(async () => {
@@ -168,6 +177,90 @@ describe('Create job global tests', function () {
             });
             should(response.statusCode).eql(404);
             should(response.body.message).eql('Not found');
+        });
+
+        describe('Create a job with a global webhook', () => {
+            it('should return 422', async () => {
+                const globalWebhook = {
+                    name: 'Some webhook name',
+                    url: 'https://predator.dev',
+                    events: [WEBHOOK_EVENT_TYPE_STARTED],
+                    global: true,
+                    format_type: EVENT_FORMAT_TYPE_JSON
+                };
+
+                const job = {
+                    arrival_rate: 1,
+                    duration: 120,
+                    environment: 'test',
+                    run_immediately: true,
+                    emails: [],
+                    parallelism: 1,
+                    max_virtual_users: 500
+                };
+                const headers = { 'Content-Type': 'application/json' };
+
+                const webhookCreateResponse = await webhooksRequestSender.createWebhook(globalWebhook);
+                expect(webhookCreateResponse.status).to.be.equal(201);
+                const webhookId = webhookCreateResponse.body.id;
+
+                const createTestResponse = await testsRequestSender.createTest(basicTest, headers);
+                expect(createTestResponse.status).to.be.equal(201);
+                const testId = createTestResponse.body.id;
+
+                
+                job.webhooks = [webhookId];
+                job.test_id = testId;
+
+                const createJobResponse = await schedulerRequestCreator.createJob(job, headers);
+                expect(createJobResponse.status).to.be.equal(422);
+                expect(createJobResponse.body.message).to.be.equal('Assigning global webhook to a job is not allowed!');
+            });
+        });
+        describe('Update a job with a global webhook', () => {
+            it('should return 422', async () => {
+                const globalWebhook = {
+                    name: 'Some webhook name',
+                    url: 'https://predator.dev',
+                    events: [WEBHOOK_EVENT_TYPE_STARTED],
+                    global: true,
+                    format_type: EVENT_FORMAT_TYPE_JSON
+                };
+
+                const job = {
+                    arrival_rate: 1,
+                    duration: 120,
+                    environment: 'test',
+                    run_immediately: false,
+                    enabled: true,
+                    cron_expression: '* * * 1 1',
+                    webhooks: [],
+                    emails: [],
+                    parallelism: 1,
+                    max_virtual_users: 500
+                };
+                const headers = { 'Content-Type': 'application/json' };
+
+                const createTestResponse = await testsRequestSender.createTest(basicTest, headers);
+                expect(createTestResponse.status).to.be.equal(201);
+                const testId = createTestResponse.body.id;
+
+                job.test_id = testId;
+
+                const createJobResponse = await schedulerRequestCreator.createJob(job, headers);
+                expect(createJobResponse.status).to.be.equal(201);
+                const jobId = createJobResponse.body.id;
+
+                const webhookCreateResponse = await webhooksRequestSender.createWebhook(globalWebhook);
+                expect(webhookCreateResponse.status).to.be.equal(201);
+                const webhookId = webhookCreateResponse.body.id;
+
+                job.webhooks = [webhookId];                
+
+                const updateJobResponse = await schedulerRequestCreator.updateJob(jobId, job, headers);
+                expect(updateJobResponse.status).to.be.equal(422);
+                expect(updateJobResponse.body.message).to.be.equal('Assigning global webhook to a job is not allowed!');
+            });
         });
     });
 });
