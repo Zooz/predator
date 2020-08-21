@@ -191,7 +191,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => (<div className={css['header-time']}>{dateFormatter(data.end_time)}</div>),
-            width: extraLargeSize,
+            width: extraExLargeSize,
             className: css['center-flex'],
         },
         {
