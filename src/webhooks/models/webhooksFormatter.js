@@ -30,7 +30,7 @@ function getThresholdSlackMessage(state, { testName, benchmarkThreshold, lastSco
     }
     return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}` +
         ` this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
-        `.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;;
+        `.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;
 }
 
 function slackWebhookFormat(message, options) {
@@ -90,7 +90,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
         case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            message = getThresholdSlackMessage(event, { testName, lastScores, benchmarkThreshold, score });
+            message = getThresholdSlackMessage(event, { testName, lastScores, aggregatedReport, benchmarkThreshold, score });
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
