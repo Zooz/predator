@@ -2,7 +2,6 @@ const EVENT_FORMAT_TYPE_SLACK = 'slack';
 const EVENT_FORMAT_TYPE_JSON = 'json';
 const WEBHOOK_EVENT_TYPE_STARTED = 'started';
 const WEBHOOK_EVENT_TYPE_FINISHED = 'finished';
-// TODO: how to recognize api_failure?
 const WEBHOOK_EVENT_TYPE_API_FAILURE = 'api_failure';
 const WEBHOOK_EVENT_TYPE_ABORTED = 'aborted';
 const WEBHOOK_EVENT_TYPE_FAILED = 'failed';
