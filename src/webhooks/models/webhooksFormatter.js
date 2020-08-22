@@ -47,8 +47,7 @@ function json(event, testId, jobId, report, additionalInfo, options) {
         job_id: jobId,
         event: event,
         additional_details: {
-            ...cloneDeep({ report, ...additionalInfo }),
-
+            ...cloneDeep({ report, ...additionalInfo })
         }
     };
     return payload;

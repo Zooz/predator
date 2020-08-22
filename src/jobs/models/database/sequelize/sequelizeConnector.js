@@ -104,12 +104,10 @@ async function updateJob(jobId, jobInfo) {
             id: jobId
         }
     };
-    let updatedJob = null;
     let oldJob = await job.findByPk(jobId);
-    await client.transaction(async function(transaction) {
-        updatedJob = await job.update(params, { ...options, transaction });
+    const updatedJob = await client.transaction(async function(transaction) {
         await oldJob.setWebhooks(jobInfo.webhooks || [], { transaction });
-        return updatedJob;
+        return job.update(params, { ...options, transaction });
     });
     return updatedJob;
 }

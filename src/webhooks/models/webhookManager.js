@@ -63,17 +63,13 @@ async function fireSingleWebhook(webhook, payload) {
     }
 }
 
-//format, eventType, jobId, testId, report, additionalInfo = {}, options = {}
-function fireWebhooks(webhooks, eventType, jobId, testId, report, additionalInfo, options) {
-    return webhooks.map(webhook => fireSingleWebhook(webhook, webhooksFormatter(webhook.format_type, eventType, jobId, testId, report, additionalInfo, options)));
+function fireWebhooksPromisesArray(webhooks, eventType, jobId, testId, report, additionalInfo, options) {
+    return webhooks.map(webhook => {
+        const webhookPayload = webhooksFormatter(webhook.format_type, eventType, jobId, testId, report, additionalInfo, options);
+        return fireSingleWebhook(webhook, webhookPayload);
+    });
 }
 
-// FAILED: report, stats
-// STARTED: report
-// IN_PROGRESS: report, aggregatedReport
-// report, aggregatedReport, reportBenchmark
-// BENCHMARK_FAILED/PASSED: report, aggregatedReport, score, lastScores, icon
-// ABORTED: report
 async function fireWebhookByEvent(job, eventType, report, additionalInfo = {}, options = {}) {
     const jobWebhooks = await Promise.all(job.webhooks.map(webhookId => getWebhook(webhookId)));
     const globalWebhooks = await getAllGlobalWebhooks();
@@ -82,7 +78,7 @@ async function fireWebhookByEvent(job, eventType, report, additionalInfo = {}, o
     if (webhooksWithEventType.length === 0) {
         return;
     }
-    const webhooksPromises = fireWebhooks(webhooksWithEventType, eventType, job.id, job.test_id, report, additionalInfo, options);
+    const webhooksPromises = fireWebhooksPromisesArray(webhooksWithEventType, eventType, job.id, job.test_id, report, additionalInfo, options);
     await Promise.allSettled(webhooksPromises);
 }
 

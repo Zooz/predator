@@ -144,6 +144,11 @@ module.exports.updateJob = async (jobId, jobConfig) => {
     const configData = await configHandler.getConfig();
     await globalWebhookAssignmentGuard(jobConfig.webhooks);
     let [job] = await databaseConnector.getJob(jobId);
+    if (job.length === 0) {
+        let error = new Error('Not found');
+        error.statusCode = 404;
+        throw error;
+    }
     if (!job.cron_expression) {
         let error = new Error('Can not update jobs from type run_immediately: true');
         error.statusCode = 422;
@@ -155,11 +160,6 @@ module.exports.updateJob = async (jobId, jobConfig) => {
     } catch (err) {
         logger.error(err, 'Error occurred trying to update job');
         throw err;
-    }
-    if (job.length === 0) {
-        let error = new Error('Not found');
-        error.statusCode = 404;
-        throw error;
     }
     if (cronJobs[jobId]) {
         cronJobs[jobId].stop();
@@ -300,7 +300,7 @@ async function globalWebhookAssignmentGuard(webhookIds) {
         webhooks = await Promise.all(webhookIds.map(webhookId => webhookManager.getWebhook(webhookId)));
     }
     if (webhooks.some(webhook => webhook.global)) {
-        const error = new Error('Assigning global webhook to a job is not allowed!');
+        const error = new Error('Assigning a global webhook to a job is not allowed');
         error.statusCode = 422;
         throw error;
     }
