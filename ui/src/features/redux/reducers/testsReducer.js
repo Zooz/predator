@@ -12,10 +12,8 @@ const initialState = Immutable.Map({
     error_create_test: undefined,
     processing_delete_test: false,
     create_test_success: false,
-    clone_test_success: false,
     isLoading: false,
     csv_metadata: null,
-    error_clone_test: undefined
 });
 
 export default function reduce(state = initialState, action = {}) {
@@ -44,8 +42,7 @@ export default function reduce(state = initialState, action = {}) {
             return state.set('create_test_success', true);
         case Types.CLEAR_ALL_SUCCESS_OPERATIONS_STATE:
             return state.set('delete_test_success', false)
-                .set('create_test_success',false)
-                .set('clone_test_success',false);
+                .set('create_test_success',false);
         case Types.DELETE_TEST_FAILURE:
             return state.set('error_delete_test', action.error);
         case Types.CREATE_TEST_FAILURE:
@@ -59,18 +56,12 @@ export default function reduce(state = initialState, action = {}) {
         case Types.CLEAN_ALL_ERRORS:
             return state.set('error_create_test', undefined)
                 .set('error_get_tests', undefined)
-                .set('error_delete_test', undefined)
-                .set('error_clone_test', undefined);
+                .set('error_delete_test', undefined);
         case Types.INIT_CREATE_FORM:
             return state.set('create_test_success', false)
                 .set('error_create_test', undefined);
         case Types.GET_FILE_METADATA_SUCCESS:
             return state.set('csv_metadata', action.fileMetadata);
-        case Types.CLONE_TEST_SUCCESS:
-            return state.set('clone_test_success', true);
-        case Types.CLONE_TEST_FAILURE:
-            return state.set('error_clone_test', action.error);
-
         default:
             return state;
     }

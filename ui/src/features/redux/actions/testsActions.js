@@ -69,20 +69,12 @@ export const clearAllSuccessOperationsState = () => (
 export const createTest = (body, file) => (
     {type: Types.CREATE_TEST, body, file}
 );
-export const cloneTest = (body) => (
-    {type: Types.CLONE_TEST, body}
-);
+
 export const createTestSuccess = () => (
     {type: Types.CREATE_TEST_SUCCESS}
 );
 export const createTestFailure = (error) => (
     {type: Types.CREATE_TEST_FAILURE, error}
-);
-export const cloneTestSuccess = () => (
-    {type: Types.CLONE_TEST_SUCCESS}
-);
-export const cloneTestFailure = (error) => (
-    {type: Types.CLONE_TEST_FAILURE, error}
 );
 
 export const cleanAllErrors = () => (

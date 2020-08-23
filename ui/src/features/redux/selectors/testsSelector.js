@@ -1,9 +1,7 @@
 export const tests = (state) => state.TestsReducer.get('tests');
 export const errorOnGetTests = (state) => state.TestsReducer.get('error_get_tests');
 export const errorOnCreateTest = (state) => state.TestsReducer.get('error_create_test');
-export const errorOnCloneTest = (state) => state.TestsReducer.get('error_clone_test');
 export const errorOnDeleteTest = (state) => state.TestsReducer.get('error_delete_test');
-export const cloneTestSuccess = (state) => state.TestsReducer.get('clone_test_success');
 export const createTestSuccess = (state) => state.TestsReducer.get('create_test_success');
 export const test = (state) => state.TestsReducer.get('test');
 export const errorOnGetTest = (state) => state.TestsReducer.get('error_get_test');

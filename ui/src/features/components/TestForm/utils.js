@@ -29,7 +29,7 @@ export const createTestRequest = (data) => {
     }
 };
 
-export const createStateForEditTest = (test) => {
+export const createStateForEditTest = (test, cloneMode) => {
     test = cloneDeep(test);
     const {artillery_test} = test;
     const scenarios = testScenarioToTestScenario(artillery_test.scenarios);
@@ -43,7 +43,7 @@ export const createStateForEditTest = (test) => {
         activeTabKey: scenarios[0] && scenarios[0].id,
         type: test.type,
         processorId: test.processor_id,
-        editMode: true,
+        editMode: !cloneMode,
         processorsExportedFunctions: [],
         csvFileId: test.csv_file_id
     }

@@ -9,8 +9,6 @@ import {
     errorOnGetTest,
     processingDeleteTest,
     deleteTestSuccess,
-    cloneTestSuccess,
-    errorOnCloneTest,
     errorOnDeleteTest
 } from './redux/selectors/testsSelector';
 import {createJobSuccess} from './redux/selectors/jobsSelector';
@@ -26,8 +24,8 @@ import TestForm from './components/TestForm';
 import {ReactTableComponent} from "../components/ReactTable";
 import {getColumns} from "./configurationColumn";
 import Button from '../components/Button';
-import _ from "lodash";
 import ErrorDialog from "./components/ErrorDialog";
+import _ from "lodash";
 
 
 const noDataMsg = 'There is no data to display.';
@@ -143,7 +141,8 @@ class getTests extends React.Component {
     closeCreateTest = () => {
         this.setState({
             createTest: false,
-            testForEdit: null
+            testForEdit: null,
+            testForClone: null
         });
     };
 
@@ -186,24 +185,24 @@ class getTests extends React.Component {
         }
     }
 
-    onCloseErrorDialog = ()=>{
+    onCloseErrorDialog = () => {
         this.props.cleanAllErrors();
     };
-
+    onClone = (data) => {
+        this.setState({createTest: true, testForClone: data});
+    };
     generateFeedbackMessage = () => {
-        const {createJobSuccess, deleteTestSuccess, cloneTestSuccess} = this.props;
+        const {createJobSuccess, deleteTestSuccess} = this.props;
         if (createJobSuccess && createJobSuccess.run_id) {
             return `Job created successfully with Run ID: ${this.props.createJobSuccess.run_id}`;
         } else if (deleteTestSuccess) {
             return 'Test deleted successfully';
-        } else if (cloneTestSuccess) {
-            return 'Test cloned successfully';
         }
     };
 
     render() {
-        const {sortedTests, sortHeader} = this.state;
-        const {errorOnCloneTest, errorOnDeleteTest} = this.props;
+        const {sortedTests, sortHeader, testForEdit, testForClone} = this.state;
+        const {errorOnDeleteTest} = this.props;
         const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
         const columns = getColumns({
             columnsNames,
@@ -214,12 +213,10 @@ class getTests extends React.Component {
             onRunTest: this.onRunTest,
             onSort: this.onSort,
             sortHeader: sortHeader,
-            onClone: (data) => {
-                this.props.cloneTest(data);
-            }
+            onClone: this.onClone,
         });
         const feedbackMsg = this.generateFeedbackMessage();
-        const error = errorOnCloneTest || errorOnDeleteTest;
+        const error = errorOnDeleteTest;
         return (
             <Page title={'Tests'} description={DESCRIPTION}>
                 <Button className={style['create-button']} onClick={() => {
@@ -246,7 +243,8 @@ class getTests extends React.Component {
                     <Dialog title_key={'id'} data={this.state.openViewTest}
                             closeDialog={this.closeViewTestDialog}/> : null}
                 {this.state.createTest &&
-                <TestForm data={this.state.testForEdit} closeDialog={this.closeCreateTest}/>}
+                <TestForm data={testForEdit || testForClone} closeDialog={this.closeCreateTest}
+                          cloneMode={!!testForClone}/>}
                 {(this.state.openViewCreateJob && !this.props.createJobSuccess)
                     ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog}/> : null}
 
@@ -277,16 +275,13 @@ function mapStateToProps(state) {
         errorOnGetTests: errorOnGetTests(state),
         errorOnGetTest: errorOnGetTest(state),
         createJobSuccess: createJobSuccess(state),
-        cloneTestSuccess: cloneTestSuccess(state),
         processingDeleteTest: processingDeleteTest(state),
         deleteTestSuccess: deleteTestSuccess(state),
-        errorOnCloneTest: errorOnCloneTest(state),
         errorOnDeleteTest: errorOnDeleteTest(state)
     }
 }
 
 const mapDispatchToProps = {
-    cloneTest: Actions.cloneTest,
     clearSelectedTest: Actions.clearSelectedTest,
     clearSelectedJob: Actions.clearSelectedJob,
     clearErrorOnGetTests: Actions.clearErrorOnGetTests,

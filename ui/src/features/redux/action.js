@@ -21,7 +21,6 @@ import {
     createTest,
     getFileMetadata,
     getFileMetadataSuccess,
-    cloneTest,
 } from './actions/testsActions';
 import {
     clearStopJobSuccess,
@@ -115,7 +114,6 @@ export {
     createTest,
     getFileMetadata,
     getFileMetadataSuccess,
-    cloneTest,
     // jobs//
     getJobsFaliure,
     processingGetJobs,
