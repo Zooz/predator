@@ -14,6 +14,7 @@ import {
     faCloudDownloadAlt,
     faStopCircle,
     faTrashAlt,
+    faClone,
     faPen
 } from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames';
@@ -32,7 +33,7 @@ const semiLarge = 70;
 const largeSize = 85;
 const extraLargeSize = 100;
 const extraExLargeSize = 120;
-export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote, selectedReports, onReportSelected}) => {
+export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView, onRawView, onStop, onDelete, onEdit, onRunTest, onEnableDisable, onEditNote, selectedReports, onReportSelected, onClone}) => {
 
     const columns = [
         {
@@ -190,7 +191,7 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => (<div className={css['header-time']}>{dateFormatter(data.end_time)}</div>),
-            width: extraLargeSize,
+            width: extraExLargeSize,
             className: css['center-flex'],
         },
         {
@@ -405,6 +406,19 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             accessor: data => <ViewButton icon={faTrashAlt} onClick={(e) => {
                 e.stopPropagation();
                 onDelete(data)
+            }}/>,
+            width: mediumSize,
+            className: css['center-flex'],
+        },  {
+            id: 'clone',
+            Header: () => (
+                <TableHeader sortable={false}>
+                    Clone
+                </TableHeader>
+            ),
+            accessor: data => <ViewButton icon={faClone} onClick={(e) => {
+                e.stopPropagation();
+                onClone(data)
             }}/>,
             width: mediumSize,
             className: css['center-flex'],
