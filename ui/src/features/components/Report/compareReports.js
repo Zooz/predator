@@ -130,6 +130,7 @@ class CompareReports extends React.Component {
                         <h3>Status Codes</h3>
                         <LineChartPredator data={mergedReports.errorsCodeGraph} keys={mergedReports.errorsCodeGraphKeys}
                                            graphType={'status_codes'}
+                                           connectNulls={false}
                                            onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                                            filteredKeys={filteredKeys}/>
                         <h3>RPS</h3>
