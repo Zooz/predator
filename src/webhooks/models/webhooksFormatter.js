@@ -15,7 +15,7 @@ const {
     WEBHOOK_SLACK_DEFAULT_REPORTER_NAME,
     WEBHOOK_EVENT_TYPE_IN_PROGRESS
 } = require('../../common/consts');
-const statsFromatter = require('./statsFormatter');
+const statsFormatter = require('./statsFormatter');
 
 function unknownWebhookEventTypeError(badWebhookEventTypeValue) {
     return new Error(`Unrecognized webhook event: ${badWebhookEventTypeValue}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`);
@@ -30,7 +30,7 @@ function getThresholdSlackMessage(state, { testName, benchmarkThreshold, lastSco
     }
     return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}` +
         ` this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
-        `.*\n${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;
+        `.*\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;
 }
 
 function slackWebhookFormat(message, options) {
@@ -73,7 +73,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
             break;
         }
         case WEBHOOK_EVENT_TYPE_FINISHED: {
-            message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFromatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, reportBenchmark)}\n`;
+            message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFormatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, reportBenchmark)}\n`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_FAILED: {
@@ -111,6 +111,9 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
 }
 
 module.exports = function(format, eventType, jobId, testId, report, additionalInfo = {}, options = {}) {
+    if (!WEBHOOK_EVENT_TYPES.includes(eventType)) {
+        throw unknownWebhookEventTypeError(eventType);
+    }
     switch (format) {
         case EVENT_FORMAT_TYPE_SLACK: {
             return slack(eventType, testId, jobId, report, additionalInfo, options);

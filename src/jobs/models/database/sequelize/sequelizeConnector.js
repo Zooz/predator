@@ -43,12 +43,11 @@ async function insertJob(jobId, jobInfo) {
     if (params.emails) {
         include.push({ association: job.email });
     }
-    let createdJob = null;
     await client.transaction(async function(transaction) {
-        createdJob = await job.create(params, { include, transaction });
-        return createdJob.setWebhooks(jobInfo.webhooks || [], { transaction });
+        const createdJobTransaction = await job.create(params, { include, transaction });
+        createdJobTransaction.setWebhooks(jobInfo.webhooks || [], { transaction });
+        return createdJobTransaction;
     });
-    return createdJob;
 }
 
 async function getJobsAndParse(jobId) {

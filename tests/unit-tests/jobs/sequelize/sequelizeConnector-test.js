@@ -134,10 +134,10 @@ describe('Sequelize client tests', function () {
 
             createdJob.setWebhooks.resolves();
             sequelizeCreateStub.resolves(createdJob);
-            sequelizeTransactionStub.resolves();
+            sequelizeTransactionStub.resolves(createdJob);
 
             await sequelizeConnector.insertJob(id, job);
-            await sequelizeTransactionStub.yields(transaction);
+            await sequelizeTransactionStub.yield(transaction);
 
             const jobParams = cloneDeep(job);
             jobParams.emails = createdJob.dataValues.emails;

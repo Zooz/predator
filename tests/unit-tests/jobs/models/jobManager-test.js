@@ -1,4 +1,5 @@
 'use strict';
+
 const should = require('should'),
     rewire = require('rewire'),
     sinon = require('sinon'),
@@ -8,6 +9,7 @@ const should = require('should'),
     jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector'),
     dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector'),
     jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate'),
+    webhooksManager = require('../../../../src/webhooks/models/webhookManager'),
     config = require('../../../../src/common/consts').CONFIG;
 
 let manager;
@@ -15,104 +17,9 @@ let manager;
 const TEST_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaa';
 const JOB_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaf';
 
-const jobBodyWithCron = {
-    test_id: TEST_ID,
-    id: TEST_ID,
-    arrival_rate: 1,
-    duration: 1,
-    cron_expression: '* * * * * *',
-    run_immediately: true,
-    emails: ['dina@niv.eli'],
-    environment: 'test',
-    ramp_to: '1',
-    webhooks: ['dina', 'niv', 'eli']
-};
-const jobBodyWithCronNotImmediately = {
-    test_id: TEST_ID,
-    arrival_rate: 1,
-    duration: 1,
-    cron_expression: '',
-    run_immediately: false,
-    emails: ['dina@niv.eli'],
-    environment: 'test',
-    ramp_to: '1',
-    webhooks: ['dina', 'niv', 'eli']
-};
-const jobBodyWithoutCron = {
-    test_id: TEST_ID,
-    arrival_rate: 1,
-    duration: 1,
-    run_immediately: true,
-    emails: ['dina@niv.eli'],
-    environment: 'test',
-    ramp_to: '1',
-    webhooks: ['dina', 'niv', 'eli']
-};
-
-const jobBodyWithParallelismThatSplitsNicely = {
-    test_id: TEST_ID,
-    arrival_rate: 99,
-    duration: 1,
-    run_immediately: true,
-    emails: ['dina@niv.eli'],
-    environment: 'test',
-    ramp_to: '150',
-    parallelism: 3,
-    webhooks: ['dina', 'niv', 'eli'],
-    max_virtual_users: 198
-};
-
-const jobBodyWithParallelismThatSplitsWithDecimal = {
-    test_id: TEST_ID,
-    arrival_rate: 99,
-    duration: 1,
-    run_immediately: true,
-    emails: ['dina@niv.eli'],
-    environment: 'test',
-    ramp_to: '150',
-    parallelism: 20,
-    webhooks: ['dina', 'niv', 'eli'],
-    max_virtual_users: 510
-};
-
-const jobBodyWithoutRampTo = {
-    test_id: TEST_ID,
-    arrival_rate: 1,
-    duration: 1,
-    run_immediately: true,
-    emails: ['dina@niv.eli'],
-    environment: 'test',
-    webhooks: ['dina', 'niv', 'eli']
-};
-
-const jobBodyWithEnabledFalse = {
-    test_id: TEST_ID,
-    arrival_rate: 1,
-    duration: 1,
-    run_immediately: true,
-    emails: ['dina@niv.eli'],
-    environment: 'test',
-    webhooks: ['dina', 'niv', 'eli'],
-    enabled: false
-};
-
-const jobBodyWithCustomEnvVars = {
-    test_id: TEST_ID,
-    arrival_rate: 1,
-    duration: 1,
-    run_immediately: true,
-    emails: ['dina@niv.eli'],
-    environment: 'test',
-    webhooks: ['dina', 'niv', 'eli'],
-    custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' },
-    max_virtual_users: 100
-};
-
-// TODO: this tests suite runs over cassandra, cassandra should be dropped
-
 describe('Manager tests', function () {
     let sandbox;
-    let cassandraInsertStub;
+    let databaseConnectorInsertStub;
     let loggerErrorStub;
     let loggerInfoStub;
     let jobConnectorRunJobStub;
@@ -120,32 +27,42 @@ describe('Manager tests', function () {
     let jobGetLogsStub;
     let jobDeleteContainerStub;
     let uuidStub;
-    let cassandraDeleteStub;
-    let cassandraGetStub;
-    let cassandraGetSingleJobStub;
-    let cassandraUpdateJobStub;
+    let databaseConnectorDeleteStub;
+    let databaseConnectorGetStub;
+    let databaseConnectorGetSingleJobStub;
+    let databaseConnectorUpdateJobStub;
     let dockerHubConnectorGetMostRecentTagStub;
     let jobTemplateCreateJobRequestStub;
     let getConfigValueStub;
 
+    let webhooksManagerGetWebhook;
+
     before(() => {
         sandbox = sinon.sandbox.create();
 
-        cassandraInsertStub = sandbox.stub(databaseConnector, 'insertJob');
-        cassandraGetStub = sandbox.stub(databaseConnector, 'getJobs');
-        cassandraGetSingleJobStub = sandbox.stub(databaseConnector, 'getJob');
-        cassandraDeleteStub = sandbox.stub(databaseConnector, 'deleteJob');
-        cassandraUpdateJobStub = sandbox.stub(databaseConnector, 'updateJob');
+        databaseConnectorInsertStub = sandbox.stub(databaseConnector, 'insertJob');
+        databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getJobs');
+        databaseConnectorGetSingleJobStub = sandbox.stub(databaseConnector, 'getJob');
+        databaseConnectorDeleteStub = sandbox.stub(databaseConnector, 'deleteJob');
+        databaseConnectorUpdateJobStub = sandbox.stub(databaseConnector, 'updateJob');
+
+        webhooksManagerGetWebhook = sandbox.stub(webhooksManager, 'getWebhook');
+
         jobGetLogsStub = sandbox.stub(jobConnector, 'getLogs');
         jobDeleteContainerStub = sandbox.stub(jobConnector, 'deleteAllContainers');
         jobStopRunStub = sandbox.stub(jobConnector, 'stopRun');
+
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
+
         jobConnectorRunJobStub = sandbox.stub(jobConnector, 'runJob');
+
         dockerHubConnectorGetMostRecentTagStub = sandbox.stub(dockerHubConnector, 'getMostRecentRunnerTag');
         uuidStub = sandbox.stub(uuid, 'v4');
+
         jobTemplateCreateJobRequestStub = sandbox.spy(jobTemplate, 'createJobRequest');
         getConfigValueStub = sandbox.stub();
+
         manager = rewire('../../../../src/jobs/models/jobManager');
 
         manager.__set__('configHandler', {
@@ -175,21 +92,33 @@ describe('Manager tests', function () {
             dockerHubConnectorGetMostRecentTagStub.resolves();
         });
 
-        it('Cassandra connector returns an empty array', async () => {
-            cassandraGetStub.resolves([]);
+        it('databaseConnector connector returns an empty array', async () => {
+            databaseConnectorGetStub.resolves([]);
             await manager.reloadCronJobs();
             manager.__get__('cronJobs').should.eql({});
         });
 
-        it('Cassandra connector returns an array with job with no schedules', async () => {
-            cassandraGetStub.resolves([{ cron_expression: null }]);
+        it('databaseConnector connector returns an array with job with no schedules', async () => {
+            databaseConnectorGetStub.resolves([{ cron_expression: null }]);
             await manager.reloadCronJobs();
             manager.__get__('cronJobs').should.eql({});
         });
 
-        describe('Cassandra connector returns an array with job with schedules, and job exist and can be run', function () {
+        describe('databaseConnector connector returns an array with job with schedules, and job exist and can be run', function () {
             it('Verify job added', async function () {
-                cassandraGetStub.resolves([jobBodyWithCron]);
+                const jobBodyWithCron = {
+                    test_id: TEST_ID,
+                    id: TEST_ID,
+                    arrival_rate: 1,
+                    duration: 1,
+                    cron_expression: '* * * * * *',
+                    run_immediately: true,
+                    emails: ['dina@niv.eli'],
+                    environment: 'test',
+                    ramp_to: '1',
+                    webhooks: []
+                };
+                databaseConnectorGetStub.resolves([jobBodyWithCron]);
                 await manager.reloadCronJobs();
                 manager.__get__('cronJobs').should.have.key('5a9eee73-cf56-47aa-ac77-fad59e961aaa');
             });
@@ -256,29 +185,53 @@ describe('Manager tests', function () {
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
 
-        it('Simple request with custom env vars, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
+        it('Simple request with custom env vars, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
+            const webhooks = [
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    name: 'dina',
+                    url: 'dina@mail.com',
+                    global: false
+                },
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                    name: 'niv',
+                    url: 'niv@mail.com',
+                    global: false
+                }
+            ];
+            const jobBodyWithCustomEnvVars = {
+                test_id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                webhooks: webhooks.map(({ id }) => id),
+                custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' },
+                max_virtual_users: 100
+            };
             jobConnectorRunJobStub.resolves({ id: 'run_id' });
-            cassandraInsertStub.resolves({ success: 'success' });
+            databaseConnectorInsertStub.resolves({ success: 'success' });
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 environment: 'test',
                 emails: ['dina@niv.eli'],
-                webhooks: ['dina', 'niv', 'eli'],
+                webhooks: webhooks.map(({ id }) => id),
                 arrival_rate: 1,
                 duration: 1,
                 max_virtual_users: 100,
                 enabled: true,
-                'custom_env_vars':
-                    {
-                        'KEY1': 'A',
-                        'KEY2': 'B'
-                    }
+                'custom_env_vars': {
+                    KEY1: 'A',
+                    KEY2: 'B'
+                }
             };
-
+            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
             let jobResponse = await manager.createJob(jobBodyWithCustomEnvVars);
             jobResponse.should.containEql(expectedResult);
-            cassandraInsertStub.callCount.should.eql(1);
+            databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
             jobTemplateCreateJobRequestStub.args[0][3].should.containEql({
                 JOB_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
@@ -288,7 +241,7 @@ describe('Manager tests', function () {
                 ARRIVAL_RATE: '1',
                 DURATION: '1',
                 EMAILS: 'dina@niv.eli',
-                WEBHOOKS: 'dina;niv;eli',
+                WEBHOOKS: webhooks.map(({ url }) => url).join(';'),
                 CUSTOM_KEY1: 'A',
                 CUSTOM_KEY2: 'B'
             });
@@ -296,29 +249,80 @@ describe('Manager tests', function () {
             jobTemplateCreateJobRequestStub.args[0][3].should.have.key('RUN_ID');
         });
 
-        it('Simple request, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
+        it('Simple request, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
+            const webhooks = [
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    name: 'dina',
+                    url: 'dina@mail.com',
+                    global: false
+                },
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                    name: 'niv',
+                    url: 'niv@mail.com',
+                    global: false
+                }
+            ];
+            const jobBodyWithoutCron = {
+                test_id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                ramp_to: '1',
+                webhooks: webhooks.map(({ id }) => id)
+            };
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
+            databaseConnectorInsertStub.resolves({ success: 'success' });
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '1',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 environment: 'test',
                 emails: ['dina@niv.eli'],
-                webhooks: ['dina', 'niv', 'eli'],
+                webhooks: webhooks.map(({ id }) => id),
                 arrival_rate: 1,
                 duration: 1
             };
+            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
             let jobResponse = await manager.createJob(jobBodyWithoutCron);
             jobResponse.should.containEql(expectedResult);
-            cassandraInsertStub.callCount.should.eql(1);
+            databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
         });
 
-        it('Simple request, with parallelism, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
+        it('Simple request, with parallelism, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
+            const webhooks = [
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    name: 'dina',
+                    url: 'dina@mail.com',
+                    global: false
+                },
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                    name: 'niv',
+                    url: 'niv@mail.com',
+                    global: false
+                }
+            ];
+            const jobBodyWithParallelismThatSplitsNicely = {
+                test_id: TEST_ID,
+                arrival_rate: 99,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                ramp_to: '150',
+                parallelism: 3,
+                webhooks: webhooks.map(({ id }) => id),
+                max_virtual_users: 198
+            };
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
+            databaseConnectorInsertStub.resolves({ success: 'success' });
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '150',
@@ -326,15 +330,16 @@ describe('Manager tests', function () {
                 environment: 'test',
                 emails: ['dina@niv.eli'],
                 parallelism: 3,
-                webhooks: ['dina', 'niv', 'eli'],
+                webhooks: webhooks.map(({ id }) => id),
                 arrival_rate: 99,
                 duration: 1,
                 max_virtual_users: 198
             };
+            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
             let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsNicely);
             jobResponse.should.containEql(expectedResult);
-            cassandraInsertStub.callCount.should.eql(1);
+            databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
 
             should(jobConnectorRunJobStub.args[0][0].spec.parallelism).eql(3);
@@ -354,8 +359,34 @@ describe('Manager tests', function () {
         });
 
         it('Simple request, with parallelism, and arrival rate splits with decimal point, should round up', async () => {
+            const webhooks = [
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    name: 'dina',
+                    url: 'dina@mail.com',
+                    global: false
+                },
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                    name: 'niv',
+                    url: 'niv@mail.com',
+                    global: false
+                }
+            ];
+            const jobBodyWithParallelismThatSplitsWithDecimal = {
+                test_id: TEST_ID,
+                arrival_rate: 99,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                ramp_to: '150',
+                parallelism: 20,
+                webhooks: webhooks.map(({ id }) => id),
+                max_virtual_users: 510
+            };
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
+            databaseConnectorInsertStub.resolves({ success: 'success' });
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '150',
@@ -363,15 +394,16 @@ describe('Manager tests', function () {
                 environment: 'test',
                 emails: ['dina@niv.eli'],
                 parallelism: 20,
-                webhooks: ['dina', 'niv', 'eli'],
+                webhooks: webhooks.map(({ id }) => id),
                 arrival_rate: 99,
                 duration: 1,
                 max_virtual_users: 510
             };
+            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
             let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsWithDecimal);
             jobResponse.should.containEql(expectedResult);
-            cassandraInsertStub.callCount.should.eql(1);
+            databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
 
             should(jobConnectorRunJobStub.args[0][0].spec.parallelism).eql(20);
@@ -390,34 +422,68 @@ describe('Manager tests', function () {
             should(maxVirtualUsers.value).eql('26');
         });
 
-        it('Simple request without ramp to, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
+        it('Simple request without ramp to, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
+            const webhooks = [
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    name: 'dina',
+                    url: 'dina@mail.com',
+                    global: false
+                },
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                    name: 'niv',
+                    url: 'niv@mail.com',
+                    global: false
+                }
+            ];
+            const jobBodyWithoutRampTo = {
+                test_id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                webhooks: webhooks.map(({ id }) => id)
+            };
             jobConnectorRunJobStub.resolves({ id: 'run_id' });
-            cassandraInsertStub.resolves({ success: 'success' });
+            databaseConnectorInsertStub.resolves({ success: 'success' });
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 environment: 'test',
                 emails: ['dina@niv.eli'],
-                webhooks: ['dina', 'niv', 'eli'],
+                webhooks: webhooks.map(({ id }) => id),
                 arrival_rate: 1,
                 duration: 1
             };
+            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
             let jobResponse = await manager.createJob(jobBodyWithoutRampTo);
             jobResponse.should.containEql(expectedResult);
-            cassandraInsertStub.callCount.should.eql(1);
+            databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
         });
 
         it('Simple request with enabled as false', async () => {
+            const jobBodyWithEnabledFalse = {
+                test_id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                webhooks: ['5a9eee73-cf56-47aa-ac77-fad59e961aaa', '5a9eee73-cf56-47aa-ac77-fad59e961aab'],
+                enabled: false
+            };
             jobConnectorRunJobStub.resolves({ id: 'run_id' });
-            cassandraInsertStub.resolves({ success: 'success' });
+            databaseConnectorInsertStub.resolves({ success: 'success' });
             let expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 environment: 'test',
                 emails: ['dina@niv.eli'],
-                webhooks: ['dina', 'niv', 'eli'],
+                webhooks: ['5a9eee73-cf56-47aa-ac77-fad59e961aaa', '5a9eee73-cf56-47aa-ac77-fad59e961aab'],
                 arrival_rate: 1,
                 duration: 1,
                 enabled: false
@@ -425,25 +491,71 @@ describe('Manager tests', function () {
 
             let jobResponse = await manager.createJob(jobBodyWithEnabledFalse);
             jobResponse.should.containEql(expectedResult);
-            cassandraInsertStub.callCount.should.eql(1);
+            databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
         });
 
-        it('Fail to save job to cassandra', function () {
-            cassandraInsertStub.rejects({ error: 'cassandra error' });
+        it('Fail to save job to databaseConnector', function () {
+            const webhooks = [
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    name: 'dina',
+                    url: 'dina@mail.com',
+                    global: false
+                },
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                    name: 'niv',
+                    url: 'niv@mail.com',
+                    global: false
+                }
+            ];
+            const jobBodyWithoutRampTo = {
+                test_id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                webhooks: webhooks.map(({ id }) => id)
+            };
+            databaseConnectorInsertStub.rejects({ error: 'databaseConnector error' });
 
             return manager.createJob(jobBodyWithoutRampTo)
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(0);
                     loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'cassandra error' }, 'Error occurred trying to create new job']);
-                    error.should.eql({ error: 'cassandra error' });
+                    loggerErrorStub.args[0].should.eql([{ error: 'databaseConnector error' }, 'Error occurred trying to create new job']);
+                    error.should.eql({ error: 'databaseConnector error' });
                 });
         });
 
         it('Fail to create a job', function () {
+            const webhooks = [
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    name: 'dina',
+                    url: 'dina@mail.com',
+                    global: false
+                },
+                {
+                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                    name: 'niv',
+                    url: 'niv@mail.com',
+                    global: false
+                }
+            ];
+            const jobBodyWithoutRampTo = {
+                test_id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                webhooks: webhooks.map(({ id }) => id)
+            };
             jobConnectorRunJobStub.rejects({ error: 'job creator error' });
-            cassandraInsertStub.resolves({ success: 'success' });
+            databaseConnectorInsertStub.resolves({ success: 'success' });
 
             return manager.createJob(jobBodyWithoutRampTo)
                 .catch(function (error) {
@@ -454,14 +566,40 @@ describe('Manager tests', function () {
                 });
         });
 
-        describe('Request with cron expression, should save new job to cassandra, deploy the job and return the job id and the job configuration', function () {
+        describe('Request with cron expression, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', function () {
             before(() => {
                 jobConnectorRunJobStub.resolves({});
             });
 
             it('Validate response', function () {
-                cassandraInsertStub.resolves({ success: 'success' });
-                cassandraDeleteStub.resolves({});
+                const webhooks = [
+                    {
+                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                        name: 'dina',
+                        url: 'dina@mail.com',
+                        global: false
+                    },
+                    {
+                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                        name: 'niv',
+                        url: 'niv@mail.com',
+                        global: false
+                    }
+                ];
+                const jobBodyWithCron = {
+                    test_id: TEST_ID,
+                    id: TEST_ID,
+                    arrival_rate: 1,
+                    duration: 1,
+                    cron_expression: '* * * * * *',
+                    run_immediately: true,
+                    emails: ['dina@niv.eli'],
+                    environment: 'test',
+                    ramp_to: '1',
+                    webhooks: webhooks.map(({ id }) => id)
+                };
+                databaseConnectorInsertStub.resolves({ success: 'success' });
+                databaseConnectorDeleteStub.resolves({});
                 let expectedResult = {
                     'cron_expression': '* * * * * *',
                     ramp_to: '1',
@@ -469,10 +607,11 @@ describe('Manager tests', function () {
                     test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                     environment: 'test',
                     emails: ['dina@niv.eli'],
-                    webhooks: ['dina', 'niv', 'eli'],
+                    webhooks: webhooks.map(({ id }) => id),
                     arrival_rate: 1,
                     duration: 1
                 };
+                webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
                 return manager.createJob(jobBodyWithCron)
                     .then(function (result) {
@@ -495,14 +634,40 @@ describe('Manager tests', function () {
             });
         });
 
-        describe('Request with cron expression and enabled=false should save new job to cassandra, deploy the job and return the job id and the job configuration and not run the job', function () {
+        describe('Request with cron expression and enabled=false should save new job to databaseConnector, deploy the job and return the job id and the job configuration and not run the job', function () {
             before(() => {
                 jobConnectorRunJobStub.resolves({});
             });
 
             it('Validate response', function () {
-                cassandraInsertStub.resolves({ success: 'success' });
-                cassandraDeleteStub.resolves({});
+                const webhooks = [
+                    {
+                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                        name: 'dina',
+                        url: 'dina@mail.com',
+                        global: false
+                    },
+                    {
+                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                        name: 'niv',
+                        url: 'niv@mail.com',
+                        global: false
+                    }
+                ];
+                const jobBodyWithCron = {
+                    test_id: TEST_ID,
+                    id: TEST_ID,
+                    arrival_rate: 1,
+                    duration: 1,
+                    cron_expression: '* * * * * *',
+                    run_immediately: true,
+                    emails: ['dina@niv.eli'],
+                    environment: 'test',
+                    ramp_to: '1',
+                    webhooks: webhooks.map(({ id }) => id)
+                };
+                databaseConnectorInsertStub.resolves({ success: 'success' });
+                databaseConnectorDeleteStub.resolves({});
                 let expectedResult = {
                     'cron_expression': '* * * * * *',
                     ramp_to: '1',
@@ -510,12 +675,13 @@ describe('Manager tests', function () {
                     test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                     environment: 'test',
                     emails: ['dina@niv.eli'],
-                    webhooks: ['dina', 'niv', 'eli'],
+                    webhooks: webhooks.map(({ id }) => id),
                     arrival_rate: 1,
                     duration: 1
                 };
+                webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
-                let jobBodyWithCronDisabled = {...jobBodyWithCron, enabled: false};
+                let jobBodyWithCronDisabled = { ...jobBodyWithCron, enabled: false };
                 return manager.createJob(jobBodyWithCronDisabled)
                     .then(function (result) {
                         result.should.containEql(expectedResult);
@@ -544,9 +710,35 @@ describe('Manager tests', function () {
             });
 
             it('Validate response', function () {
+                const webhooks = [
+                    {
+                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                        name: 'dina',
+                        url: 'dina@mail.com',
+                        global: false
+                    },
+                    {
+                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                        name: 'niv',
+                        url: 'niv@mail.com',
+                        global: false
+                    }
+                ];
+                const jobBodyWithCron = {
+                    test_id: TEST_ID,
+                    id: TEST_ID,
+                    arrival_rate: 1,
+                    duration: 1,
+                    cron_expression: '* * * * * *',
+                    run_immediately: true,
+                    emails: ['dina@niv.eli'],
+                    environment: 'test',
+                    ramp_to: '1',
+                    webhooks: webhooks.map(({ id }) => id)
+                };
                 jobConnectorRunJobStub.resolves({});
-                cassandraInsertStub.resolves({ success: 'success' });
-                cassandraDeleteStub.resolves({});
+                databaseConnectorInsertStub.resolves({ success: 'success' });
+                databaseConnectorDeleteStub.resolves({});
                 let expectedResult = {
                     cron_expression: '* * * * * *',
                     ramp_to: '1',
@@ -554,10 +746,11 @@ describe('Manager tests', function () {
                     test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                     environment: 'test',
                     emails: ['dina@niv.eli'],
-                    webhooks: ['dina', 'niv', 'eli'],
+                    webhooks: webhooks.map(({ id }) => id),
                     arrival_rate: 1,
                     duration: 1
                 };
+                webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
                 return manager.createJob(jobBodyWithCron)
                     .then(function (result) {
@@ -581,9 +774,34 @@ describe('Manager tests', function () {
 
         describe('Request with cron expression, that is not invoked immediately', function () {
             it('Validate response', function () {
+                const webhooks = [
+                    {
+                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                        name: 'dina',
+                        url: 'dina@mail.com',
+                        global: false
+                    },
+                    {
+                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aab',
+                        name: 'niv',
+                        url: 'niv@mail.com',
+                        global: false
+                    }
+                ];
+                const jobBodyWithCronNotImmediately = {
+                    test_id: TEST_ID,
+                    arrival_rate: 1,
+                    duration: 1,
+                    cron_expression: '',
+                    run_immediately: false,
+                    emails: ['dina@niv.eli'],
+                    environment: 'test',
+                    ramp_to: '1',
+                    webhooks: webhooks.map(({ id }) => id)
+                };
                 jobConnectorRunJobStub.resolves({});
-                cassandraInsertStub.resolves({ success: 'success' });
-                cassandraDeleteStub.resolves({});
+                databaseConnectorInsertStub.resolves({ success: 'success' });
+                databaseConnectorDeleteStub.resolves({});
                 let date = new Date();
                 date.setSeconds(date.getSeconds() + 5);
                 jobBodyWithCronNotImmediately.cron_expression = date.getSeconds() + ' * * * * *';
@@ -594,10 +812,11 @@ describe('Manager tests', function () {
                     test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                     environment: 'test',
                     emails: ['dina@niv.eli'],
-                    webhooks: ['dina', 'niv', 'eli'],
+                    webhooks: webhooks.map(({ id }) => id),
                     arrival_rate: 1,
                     duration: 1
                 };
+                webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
                 return manager.createJob(jobBodyWithCronNotImmediately)
                     .then(function (result) {
@@ -649,10 +868,36 @@ describe('Manager tests', function () {
         });
 
         it('Should update job successfully', async function () {
+            const webhooks = [
+                {
+                    id: uuid.v4(),
+                    name: 'dina',
+                    url: 'dina@mail.com',
+                    global: false
+                },
+                {
+                    id: uuid.v4(),
+                    name: 'niv',
+                    url: 'niv@mail.com',
+                    global: false
+                }
+            ];
+            const jobBodyWithCron = {
+                test_id: TEST_ID,
+                id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                cron_expression: '* * * * * *',
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                ramp_to: '1',
+                webhooks: webhooks.map(({ id }) => id)
+            };
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
-            cassandraUpdateJobStub.resolves({});
-            cassandraGetSingleJobStub.resolves([{
+            databaseConnectorInsertStub.resolves({ success: 'success' });
+            databaseConnectorUpdateJobStub.resolves({});
+            databaseConnectorGetSingleJobStub.resolves([{
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: 'secondId',
                 environment: 'test',
@@ -660,9 +905,10 @@ describe('Manager tests', function () {
                 duration: 1,
                 cron_expression: '20 * * * *',
                 emails: null,
-                webhooks: ['dina', 'niv'],
+                webhooks: jobBodyWithCron.webhooks,
                 ramp_to: '1'
             }]);
+            webhooks.forEach(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
             await manager.createJob(jobBodyWithCron);
             await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
             loggerInfoStub.callCount.should.eql(4);
@@ -670,11 +916,23 @@ describe('Manager tests', function () {
             await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
 
-        it('Updating data in cassandra fails', async function () {
+        it('Updating data in databaseConnector fails', async function () {
+            const jobBodyWithCron = {
+                test_id: TEST_ID,
+                id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                cron_expression: '* * * * * *',
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                ramp_to: '1',
+                webhooks: []
+            };
             try {
                 jobConnectorRunJobStub.resolves({});
-                cassandraInsertStub.resolves({ success: 'success' });
-                cassandraUpdateJobStub.rejects({ error: 'error' });
+                databaseConnectorInsertStub.resolves({ success: 'success' });
+                databaseConnectorUpdateJobStub.rejects({ error: 'error' });
                 await manager.createJob(jobBodyWithCron);
                 await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
             } catch (error) {
@@ -689,6 +947,18 @@ describe('Manager tests', function () {
 
     describe('Delete scheduled job', function () {
         it('Deletes an existing job', async function () {
+            const jobBodyWithCron = {
+                test_id: TEST_ID,
+                id: TEST_ID,
+                arrival_rate: 1,
+                duration: 1,
+                cron_expression: '* * * * * *',
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                ramp_to: '1',
+                webhooks: []
+            };
             manager.__set__('configHandler', {
                 getConfig: () => {
                     return {
@@ -703,12 +973,12 @@ describe('Manager tests', function () {
             });
             uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
             jobConnectorRunJobStub.resolves({});
-            cassandraInsertStub.resolves({ success: 'success' });
-            cassandraDeleteStub.resolves({});
+            databaseConnectorInsertStub.resolves({ success: 'success' });
+            databaseConnectorDeleteStub.resolves({});
 
             await manager.createJob(jobBodyWithCron);
             await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
-            cassandraDeleteStub.callCount.should.eql(1);
+            databaseConnectorDeleteStub.callCount.should.eql(1);
             loggerInfoStub.args[2].should.eql(['Job: 5a9eee73-cf56-47aa-ac77-fad59e961aaf completed.']);
         });
     });
@@ -726,7 +996,7 @@ describe('Manager tests', function () {
 
     describe('Get jobs', function () {
         it('Get a list of all jobs - also one time jobs', async function () {
-            cassandraGetStub.resolves([{
+            databaseConnectorGetStub.resolves([{
                 id: 'id',
                 test_id: 'test_id',
                 environment: 'test',
@@ -793,11 +1063,11 @@ describe('Manager tests', function () {
             }];
             let jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
-            cassandraGetStub.callCount.should.eql(1);
+            databaseConnectorGetStub.callCount.should.eql(1);
         });
 
         it('Get a list of jobs - only scheduled jobs', async function () {
-            cassandraGetStub.resolves([{
+            databaseConnectorGetStub.resolves([{
                 id: 'id',
                 test_id: 'test_id',
                 environment: 'test',
@@ -842,34 +1112,34 @@ describe('Manager tests', function () {
             }];
             let jobs = await manager.getJobs();
             jobs.should.eql(expectedResult);
-            cassandraGetStub.callCount.should.eql(1);
+            databaseConnectorGetStub.callCount.should.eql(1);
         });
 
         it('Get empty list of jobs', async function () {
-            cassandraGetStub.resolves([]);
+            databaseConnectorGetStub.resolves([]);
 
             let jobs = await manager.getJobs();
             jobs.should.eql([]);
-            cassandraGetStub.callCount.should.eql(1);
+            databaseConnectorGetStub.callCount.should.eql(1);
             loggerInfoStub.callCount.should.eql(1);
         });
 
-        it('Fail to get jobs from cassandra', function () {
-            cassandraGetStub.rejects({ error: 'cassandra error' });
+        it('Fail to get jobs from databaseConnector', function () {
+            databaseConnectorGetStub.rejects({ error: 'databaseConnector error' });
 
             return manager.getJobs()
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(0);
                     loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'cassandra error' }, 'Error occurred trying to get jobs']);
-                    error.should.eql({ error: 'cassandra error' });
+                    loggerErrorStub.args[0].should.eql([{ error: 'databaseConnector error' }, 'Error occurred trying to get jobs']);
+                    error.should.eql({ error: 'databaseConnector error' });
                 });
         });
     });
 
     describe('Get job', function () {
         it('Get a list of jobs', async function () {
-            cassandraGetSingleJobStub.resolves([{
+            databaseConnectorGetSingleJobStub.resolves([{
                 id: 'id',
                 test_id: 'test_id',
                 environment: 'test',
@@ -905,11 +1175,11 @@ describe('Manager tests', function () {
 
             let job = await manager.getJob('id');
             job.should.eql(expectedResult);
-            cassandraGetSingleJobStub.callCount.should.eql(1);
+            databaseConnectorGetSingleJobStub.callCount.should.eql(1);
         });
 
-        it('cassandra returns empty list, should return job not found', function () {
-            cassandraGetSingleJobStub.resolves([]);
+        it('databaseConnector returns empty list, should return job not found', function () {
+            databaseConnectorGetSingleJobStub.resolves([]);
             return manager.getJob('id')
                 .then(function () {
                     return Promise.reject(new Error('Should not get here'));
@@ -920,8 +1190,8 @@ describe('Manager tests', function () {
                 });
         });
 
-        it('cassandra returns list of few rows, should return error', function () {
-            cassandraGetSingleJobStub.resolves(['one row', 'second row']);
+        it('databaseConnector returns list of few rows, should return error', function () {
+            databaseConnectorGetSingleJobStub.resolves(['one row', 'second row']);
             return manager.getJob('id')
                 .then(function () {
                     return Promise.reject(new Error('Should not get here'));
@@ -932,15 +1202,15 @@ describe('Manager tests', function () {
                 });
         });
 
-        it('Fail to get jobs from cassandra', function () {
-            cassandraGetSingleJobStub.rejects({ error: 'cassandra error' });
+        it('Fail to get jobs from databaseConnector', function () {
+            databaseConnectorGetSingleJobStub.rejects({ error: 'databaseConnector error' });
 
             return manager.getJob('id')
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(0);
                     loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'cassandra error' }, 'Error occurred trying to get job']);
-                    error.should.eql({ error: 'cassandra error' });
+                    loggerErrorStub.args[0].should.eql([{ error: 'databaseConnector error' }, 'Error occurred trying to get job']);
+                    error.should.eql({ error: 'databaseConnector error' });
                 });
         });
     });
@@ -986,5 +1256,9 @@ describe('Manager tests', function () {
                 error.message.should.eql('Failed to delete containers');
             }
         });
+    });
+
+    describe('meow', function() {
+
     });
 });

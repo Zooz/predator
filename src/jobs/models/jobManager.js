@@ -1,7 +1,5 @@
 'use strict';
 
-const webhookManager = require('../../webhooks/models/webhookManager');
-
 const logger = require('../../common/logger'),
     uuid = require('uuid'),
     CronJob = require('cron').CronJob,
@@ -57,7 +55,7 @@ module.exports.createJob = async (job) => {
         logger.info('Job saved successfully to database');
         let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
         let runId = Date.now();
-        let jobSpecificPlatformRequest = createJobRequest(jobId, runId, job, latestDockerImage, configData);
+        let jobSpecificPlatformRequest = await createJobRequest(jobId, runId, job, latestDockerImage, configData);
         if (job.run_immediately) {
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
@@ -199,7 +197,7 @@ function createResponse(jobId, jobBody, runId) {
     return response;
 }
 
-function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
+async function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
     const jobTemplate = require(`./${configData.job_platform.toLowerCase()}/jobTemplate`);
     let jobName = util.format(JOB_PLATFORM_NAME, jobId);
     let rampToPerRunner = jobBody.ramp_to;
@@ -248,7 +246,8 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
         environmentVariables.EMAILS = jobBody.emails.join(';');
     }
     if (jobBody.webhooks) {
-        environmentVariables.WEBHOOKS = jobBody.webhooks.join(';');
+        const webhooks = await Promise.all(jobBody.webhooks.map(id => webhooksManager.getWebhook(id)));
+        environmentVariables.WEBHOOKS = webhooks.map(({ url }) => url).join(';');
     }
     if (rampToPerRunner) {
         environmentVariables.RAMP_TO = rampToPerRunner.toString();
@@ -282,7 +281,7 @@ function addCron(jobId, job, cronExpression, configData) {
             } else {
                 let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
                 let runId = Date.now();
-                let jobSpecificPlatformConfig = createJobRequest(jobId, runId, job, latestDockerImage, configData);
+                let jobSpecificPlatformConfig = await createJobRequest(jobId, runId, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
         } catch (error) {
@@ -297,7 +296,7 @@ function addCron(jobId, job, cronExpression, configData) {
 async function globalWebhookAssignmentGuard(webhookIds) {
     let webhooks = [];
     if (webhookIds && webhookIds.length > 0) {
-        webhooks = await Promise.all(webhookIds.map(webhookId => webhookManager.getWebhook(webhookId)));
+        webhooks = await Promise.all(webhookIds.map(webhookId => webhooksManager.getWebhook(webhookId)));
     }
     if (webhooks.some(webhook => webhook.global)) {
         const error = new Error('Assigning a global webhook to a job is not allowed');
