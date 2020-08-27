@@ -102,7 +102,7 @@ describe('webhooksFormatter', function () {
             };
             const statsText = 'some text';
             statsFormatterStub.returns(statsText);
-            const expectedResult = `:sad_1: *Test ${report.test_name} got a score of ${additionalInfo.score.toFixed(1)}` +
+            const expectedResult = `:cry: *Test ${report.test_name} got a score of ${additionalInfo.score.toFixed(1)}` +
                 ` this is below the threshold of ${additionalInfo.benchmarkThreshold}. last 3 scores are: ${additionalInfo.lastScores.join()}` +
                 `.*\n${statsText}\n`;
 

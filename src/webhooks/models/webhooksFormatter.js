@@ -26,7 +26,7 @@ function getThresholdSlackMessage(state, { testName, benchmarkThreshold, lastSco
     let icon = ':rocket:';
     if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
         resultText = 'below';
-        icon = ':sad_1:';
+        icon = ':cry:';
     }
     return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}` +
         ` this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
