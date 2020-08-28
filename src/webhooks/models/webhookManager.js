@@ -44,7 +44,6 @@ async function updateWebhook(webhookId, webhook) {
     return databaseConnector.updateWebhook(webhookId, webhook);
 };
 
-// TEST THIS FUNCTION
 async function getAllGlobalWebhooks() {
     return databaseConnector.getAllGlobalWebhooks();
 }
@@ -65,7 +64,7 @@ async function fireSingleWebhook(webhook, payload) {
 
 function fireWebhooksPromisesArray(webhooks, eventType, jobId, testId, report, additionalInfo, options) {
     return webhooks.map(webhook => {
-        const webhookPayload = webhooksFormatter(webhook.format_type, eventType, jobId, testId, report, additionalInfo, options);
+        const webhookPayload = webhooksFormatter.format(webhook.format_type, eventType, jobId, testId, report, additionalInfo, options);
         return fireSingleWebhook(webhook, webhookPayload);
     });
 }

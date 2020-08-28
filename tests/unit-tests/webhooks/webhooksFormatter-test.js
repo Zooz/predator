@@ -15,7 +15,7 @@ const {
     WEBHOOK_EVENT_TYPE_IN_PROGRESS,
     WEBHOOK_EVENT_TYPE_FAILED,
     WEBHOOK_EVENT_TYPES
-} = require('../../../../src/common/consts');
+} = require('../../../src/common/consts');
 const webhooksFormatter = rewire('../../../../src/webhooks/models/webhooksFormatter');
 
 describe('webhooksFormatter', function () {
@@ -49,7 +49,7 @@ describe('webhooksFormatter', function () {
             const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
             *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${report.parallelism}, ramp to: ${report.ramp_to} scenarios per second`;
 
-            const payload = webhooksFormatter(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
             expect(payload.text).to.be.equal(expectedResult);
         });
@@ -60,7 +60,7 @@ describe('webhooksFormatter', function () {
             };
             const expectedResult = `😢 *Test ${report.test_name} with id: ${testId} was aborted.*\n`;
 
-            const payload = webhooksFormatter(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_ABORTED, uuid.v4(), testId, report);
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_ABORTED, uuid.v4(), testId, report);
 
             expect(payload.text).to.be.equal(expectedResult);
         });
@@ -81,7 +81,7 @@ describe('webhooksFormatter', function () {
 
             const expectedResult = `😎 *Test ${report.test_name} with id: ${testId} is finished.*\n ${stats}\n`;
 
-            const payload = webhooksFormatter(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_FINISHED, uuid.v4(), testId, report, additionalInfo);
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_FINISHED, uuid.v4(), testId, report, additionalInfo);
 
             expect(payload.text).to.be.equal(expectedResult);
         });
@@ -106,7 +106,7 @@ describe('webhooksFormatter', function () {
                 ` this is below the threshold of ${additionalInfo.benchmarkThreshold}. last 3 scores are: ${additionalInfo.lastScores.join()}` +
                 `.*\n${statsText}\n`;
 
-            const payload = webhooksFormatter(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, uuid.v4(), testId, report, additionalInfo);
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, uuid.v4(), testId, report, additionalInfo);
 
             expect(payload.text).to.be.equal(expectedResult);
         });
@@ -131,7 +131,7 @@ describe('webhooksFormatter', function () {
                 ` this is above the threshold of ${additionalInfo.benchmarkThreshold}. last 3 scores are: ${additionalInfo.lastScores.join()}` +
                 `.*\n${statsText}\n`;
 
-            const payload = webhooksFormatter(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, uuid.v4(), testId, report, additionalInfo);
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, uuid.v4(), testId, report, additionalInfo);
 
             expect(payload.text).to.be.equal(expectedResult);
         });
@@ -151,7 +151,7 @@ describe('webhooksFormatter', function () {
             environment: ${report.environment}\n
             ${additionalInfo.stats.data}`;
 
-            const payload = webhooksFormatter(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_FAILED, uuid.v4(), testId, report, additionalInfo);
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_FAILED, uuid.v4(), testId, report, additionalInfo);
 
             expect(payload.text).to.be.equal(expectedResult);
         });
@@ -162,7 +162,7 @@ describe('webhooksFormatter', function () {
             };
             const expectedResult = `:hammer_and_wrench: *Test ${report.test_name} with id: ${testId} is in progress!*`;
 
-            const payload = webhooksFormatter(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_IN_PROGRESS, uuid.v4(), testId, report);
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_IN_PROGRESS, uuid.v4(), testId, report);
 
             expect(payload.text).to.be.equal(expectedResult);
         });
@@ -173,7 +173,7 @@ describe('webhooksFormatter', function () {
             };
             const expectedResult = `::boom:: *Test ${report.test_name} with id: ${testId} has encountered an API failure!* :skull:`;
 
-            const payload = webhooksFormatter(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_API_FAILURE, uuid.v4(), testId, report);
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_API_FAILURE, uuid.v4(), testId, report);
 
             expect(payload.text).to.be.equal(expectedResult);
         });
@@ -213,7 +213,7 @@ describe('webhooksFormatter', function () {
                     }
                 };
 
-                const payload = webhooksFormatter(EVENT_FORMAT_TYPE_JSON, webhookEventType, jobId, testId, report, additionalInfo);
+                const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_JSON, webhookEventType, jobId, testId, report, additionalInfo);
 
                 expect(payload).to.be.deep.equal(expectedResult);
             });
