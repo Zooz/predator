@@ -94,21 +94,12 @@ export function* editTest(action) {
 export function* deleteTest({testId}) {
     try {
         yield call(deleteTestInFramework, testId);
-        yield put(Actions.deleteTestSuccess())
+        yield put(Actions.deleteTestSuccess());
+        yield call(getTests);
     } catch (e) {
         yield put(Actions.deleteTestFailure(e))
     }
 }
-
-export function* uploadFile({testId}) {
-    try {
-        yield call(deleteTestInFramework, testId);
-        yield put(Actions.deleteTestSuccess())
-    } catch (e) {
-        yield put(Actions.deleteTestFailure(e))
-    }
-}
-
 export function* testsRegister() {
     yield takeLatest(Types.GET_TESTS, getTests);
     yield takeLatest(Types.GET_TEST, getTest);

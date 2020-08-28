@@ -8,7 +8,8 @@ import {
     errorOnGetTests,
     errorOnGetTest,
     processingDeleteTest,
-    deleteTestSuccess
+    deleteTestSuccess,
+    errorOnDeleteTest
 } from './redux/selectors/testsSelector';
 import {createJobSuccess} from './redux/selectors/jobsSelector';
 import style from './style.scss';
@@ -23,12 +24,13 @@ import TestForm from './components/TestForm';
 import {ReactTableComponent} from "../components/ReactTable";
 import {getColumns} from "./configurationColumn";
 import Button from '../components/Button';
+import ErrorDialog from "./components/ErrorDialog";
 import _ from "lodash";
 
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
-const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test','report', 'edit', 'raw', 'delete'];
+const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test', 'report', 'edit', 'raw', 'clone', 'delete'];
 const DESCRIPTION = 'Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.';
 
 class getTests extends React.Component {
@@ -44,7 +46,7 @@ class getTests extends React.Component {
             createTest: false,
             testForEdit: null,
             sortedTests: [],
-            sortHeader:''
+            sortHeader: ''
         }
     }
 
@@ -57,7 +59,7 @@ class getTests extends React.Component {
     }
 
 
-    onDelete= (data)=>{
+    onDelete = (data) => {
         this.setState({
             deleteDialog: true,
             testToDelete: data
@@ -69,9 +71,9 @@ class getTests extends React.Component {
         }
         const newSorted = _.filter(this.props.tests, (test) => {
             return (
-                _.includes(String(test.name).toLowerCase(),value.toLowerCase()) ||
-                _.includes(String(test.type).toLowerCase(),value.toLowerCase()) ||
-                _.includes(String(test.description).toLowerCase(),value.toLowerCase())
+                _.includes(String(test.name).toLowerCase(), value.toLowerCase()) ||
+                _.includes(String(test.type).toLowerCase(), value.toLowerCase()) ||
+                _.includes(String(test.description).toLowerCase(), value.toLowerCase())
             )
 
         });
@@ -98,23 +100,16 @@ class getTests extends React.Component {
 
     submitDelete = () => {
         this.props.deleteTest(this.state.testToDelete.id);
-        this.props.getAllTests();
         this.setState({
             deleteDialog: false
         });
     };
 
-    clearDeleteError = () => {
-        this.props.getAllTests();
-        this.props.clearErrorOnDelete();
-    };
 
     cancelDelete = () => {
         this.setState({
             deleteDialog: false
         });
-
-        this.props.deleteError ? this.clearDeleteError() : undefined
     };
 
     onRawView = (data) => {
@@ -122,16 +117,16 @@ class getTests extends React.Component {
 
     };
 
-    onEdit = (data)=>{
+    onEdit = (data) => {
         this.setState({createTest: true, testForEdit: data});
         this.props.chooseTest(data);
     };
 
-    onReportView=(data)=>{
+    onReportView = (data) => {
         history.push(`/tests/${data.id}/reports`)
     };
 
-    onRunTest=(data)=>{
+    onRunTest = (data) => {
         this.setState({
             openViewCreateJob: data
         });
@@ -146,7 +141,8 @@ class getTests extends React.Component {
     closeCreateTest = () => {
         this.setState({
             createTest: false,
-            testForEdit: null
+            testForEdit: null,
+            testForClone: null
         });
     };
 
@@ -159,10 +155,9 @@ class getTests extends React.Component {
 
 
     handleSnackbarClose = () => {
-        this.props.getAllTests();
         this.props.clearSelectedJob();
         this.props.clearSelectedTest();
-        this.props.clearDeleteTestSuccess();
+        this.props.clearAllSuccessOperationsState();
         this.setState({
             testToDelete: undefined
         });
@@ -190,8 +185,24 @@ class getTests extends React.Component {
         }
     }
 
+    onCloseErrorDialog = () => {
+        this.props.cleanAllErrors();
+    };
+    onClone = (data) => {
+        this.setState({createTest: true, testForClone: data});
+    };
+    generateFeedbackMessage = () => {
+        const {createJobSuccess, deleteTestSuccess} = this.props;
+        if (createJobSuccess && createJobSuccess.run_id) {
+            return `Job created successfully with Run ID: ${this.props.createJobSuccess.run_id}`;
+        } else if (deleteTestSuccess) {
+            return 'Test deleted successfully';
+        }
+    };
+
     render() {
-        const {sortedTests, sortHeader} = this.state;
+        const {sortedTests, sortHeader, testForEdit, testForClone} = this.state;
+        const {errorOnDeleteTest} = this.props;
         const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
         const columns = getColumns({
             columnsNames,
@@ -201,9 +212,11 @@ class getTests extends React.Component {
             onEdit: this.onEdit,
             onRunTest: this.onRunTest,
             onSort: this.onSort,
-            sortHeader: sortHeader
+            sortHeader: sortHeader,
+            onClone: this.onClone,
         });
-
+        const feedbackMsg = this.generateFeedbackMessage();
+        const error = errorOnDeleteTest;
         return (
             <Page title={'Tests'} description={DESCRIPTION}>
                 <Button className={style['create-button']} onClick={() => {
@@ -225,30 +238,30 @@ class getTests extends React.Component {
                     // className={style.table}
                 />
 
-                    {this.state.openViewTest
-                        ?
-                        <Dialog title_key={'id'} data={this.state.openViewTest} closeDialog={this.closeViewTestDialog}/> : null}
-                    {this.state.createTest &&
-                    <TestForm data={this.state.testForEdit} closeDialog={this.closeCreateTest}/>}
-                    {(this.state.openViewCreateJob && !this.props.createJobSuccess)
-                        ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog}/> : null}
+                {this.state.openViewTest
+                    ?
+                    <Dialog title_key={'id'} data={this.state.openViewTest}
+                            closeDialog={this.closeViewTestDialog}/> : null}
+                {this.state.createTest &&
+                <TestForm data={testForEdit || testForClone} closeDialog={this.closeCreateTest}
+                          cloneMode={!!testForClone}/>}
+                {(this.state.openViewCreateJob && !this.props.createJobSuccess)
+                    ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog}/> : null}
 
+                {(this.state.deleteDialog && !this.props.deleteTestSuccess)
+                    ? <DeleteDialog loader={this.props.processingDeleteTest}
+                                    display={this.state.testToDelete ? this.state.testToDelete.name : ''}
+                                    onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
+                                    onCancel={this.cancelDelete}/> : null}
+                <Snackbar
+                    open={!!feedbackMsg}
+                    bodyStyle={{backgroundColor: '#2fbb67'}}
+                    message={feedbackMsg}
+                    autoHideDuration={4000}
+                    onRequestClose={this.handleSnackbarClose}
+                />
+                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
 
-                    {(this.state.deleteDialog && !this.props.deleteTestSuccess)
-                        ? <DeleteDialog loader={this.props.processingDeleteTest}
-                                        display={this.state.testToDelete ? this.state.testToDelete.name : ''}
-                                        onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
-                                        onCancel={this.cancelDelete}/> : null}
-                    {/* TODO snack bar is common to al; page, need to extract it
-                    fix using redux to be with less variables.
-                  */}
-                    <Snackbar
-                        open={this.props.createJobSuccess || this.props.deleteTestSuccess}
-                        bodyStyle={{backgroundColor: '#2fbb67'}}
-                            message={(this.props.createJobSuccess && this.props.createJobSuccess.run_id) ? `Job created successfully with Run ID: ${this.props.createJobSuccess.run_id}` : 'Test deleted successfully'}
-                        autoHideDuration={4000}
-                        onRequestClose={this.handleSnackbarClose}
-                    />
             </Page>
         )
     }
@@ -263,7 +276,8 @@ function mapStateToProps(state) {
         errorOnGetTest: errorOnGetTest(state),
         createJobSuccess: createJobSuccess(state),
         processingDeleteTest: processingDeleteTest(state),
-        deleteTestSuccess: deleteTestSuccess(state)
+        deleteTestSuccess: deleteTestSuccess(state),
+        errorOnDeleteTest: errorOnDeleteTest(state)
     }
 }
 
@@ -274,7 +288,8 @@ const mapDispatchToProps = {
     getAllTests: Actions.getTests,
     chooseTest: Actions.chooseTest,
     deleteTest: Actions.deleteTest,
-    clearDeleteTestSuccess: Actions.clearDeleteTestSuccess
+    clearAllSuccessOperationsState: Actions.clearAllSuccessOperationsState,
+    cleanAllErrors: Actions.cleanAllErrors,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);
