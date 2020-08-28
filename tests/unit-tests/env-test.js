@@ -60,7 +60,7 @@ describe.skip('Env Suite', function () {
 
         it('Should Failed - missing all mandatory env', () => {
             should(logErrorStub.called).eql(true);
-            should(logErrorStub.args[0][0]).eql('DATABASE_TYPE should be one of: CASSANDRA,MYSQL,POSTGRES,MSSQL,SQLITE');
+            should(logErrorStub.args[0][0]).eql('DATABASE_TYPE should be one of: MYSQL,POSTGRES,MSSQL,SQLITE');
         });
 
         MANDATORY_VARS.forEach(function (varb) {

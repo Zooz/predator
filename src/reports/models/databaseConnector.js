@@ -1,9 +1,7 @@
 'use strict';
 
-let databaseConfig = require('../../config/databaseConfig');
-let cassandraConnector = require('./database/cassandra/cassandraConnector');
 let sequelizeConnector = require('./database/sequelize/sequelizeConnector');
-let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
+let databaseConnector = sequelizeConnector;
 
 module.exports = {
     insertReport,

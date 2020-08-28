@@ -12,7 +12,7 @@
 |-------------------------------- |:------------------:|:---------|
 | Distributed Load                | :sparkle:          |Predator supports an unlimited number of load generators that produce multiple load runners concurrently.
 | Rich UI                         | :sparkle:          |Predator offers a rich UI where you can write tests, run them and compare results.
-| Reports && Tests Persistence    | :sparkle:          |Predator provides out-of-the box functionality for persisting data in Cassandra, Postgres, MySQL, MSSQL and SQLITE.
+| Reports && Tests Persistence    | :sparkle:          |Predator provides out-of-the box functionality for persisting data in Postgres, MySQL, MSSQL and SQLITE.
 | Real time reports               | :sparkle:          |Predator aggregates all concurrent runs into a single beautiful report in real time (latency, rps, status codes and more).
 | CSV Datasets                    | :sparkle:          |Predator support uploading files like csv to provide dataset for test inputs
 | Scheduled runs                  | :sparkle:          |Predator can run recurring tests using cron expressions.
