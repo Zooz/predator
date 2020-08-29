@@ -19,7 +19,8 @@ describe('Create job global tests', function () {
                 test_id: uuid.v4(),
                 arrival_rate: 1,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                test_type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -37,7 +38,8 @@ describe('Create job global tests', function () {
                 duration: 1,
                 environment: 'test',
                 run_immediately: true,
-                enabled: false
+                enabled: false,
+                test_type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -56,7 +58,8 @@ describe('Create job global tests', function () {
                 parallelism: 0,
                 max_virtual_users: 0,
                 ramp_to: 0,
-                environment: 'test'
+                environment: 'test',
+                test_type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -94,7 +97,8 @@ describe('Create job global tests', function () {
                 arrival_rate: 1,
                 run_immediately: true,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                test_type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -109,7 +113,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing arrival_rate', () => {
-            let bodyWithoutTestId = { test_id: uuid.v4(), duration: 1, environment: 'test' };
+            let bodyWithoutTestId = { test_id: uuid.v4(), duration: 1, environment: 'test', test_type: 'load_test'};
             return schedulerRequestCreator.createJob(bodyWithoutTestId, {
                 'Content-Type': 'application/json'
             })
@@ -123,7 +127,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing duration', () => {
-            let illegalBody = { test_id: uuid.v4(), arrival_rate: 1, environment: 'test', 'is_use_akamai': true };
+            let illegalBody = { test_id: uuid.v4(), arrival_rate: 1, environment: 'test', test_type: 'load_test'};
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
             })
@@ -142,7 +146,8 @@ describe('Create job global tests', function () {
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',
-                run_immediately: true
+                run_immediately: true,
+                test_type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'

@@ -45,7 +45,7 @@ describe('Create job specific metronome tests', async function () {
                         let validBody = {
                             test_id: testId,
                             arrival_rate: 1,
-                            test_type: 'load_test',
+                            type: 'load_test',
                             duration: 1,
                             environment: 'test',
                             run_immediately: true,
@@ -127,7 +127,7 @@ describe('Create job specific metronome tests', async function () {
                             test_id: testId,
                             arrival_rate: 1,
                             duration: 1,
-                            test_type: 'load_test',
+                            type: 'load_test',
                             parallelism: 2,
                             environment: 'test',
                             run_immediately: true,

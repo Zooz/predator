@@ -1936,7 +1936,6 @@ components:
             - load_test
             - functional_test
           description: The type of the job to run.
-          default: load_test
           example: load_test
     job_update:
       properties:
