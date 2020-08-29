@@ -13,6 +13,10 @@ describe('Webhooks api', function () {
 
     describe('Good requests', async function () {
         describe('GET /v1/webhooks', async function () {
+            before('clean webhooks', async function() {
+                const webhooksResponse = await webhookRequestSender.getWebhooks();
+                await Promise.all(webhooksResponse.body.map(hook => webhookRequestSender.deleteWebhook(hook.id)));
+            });
             const numOfWebhooksToInsert = 5;
             it(`return ${numOfWebhooksToInsert} webhooks`, async function() {
                 const webhooksToInsert = (new Array(numOfWebhooksToInsert))

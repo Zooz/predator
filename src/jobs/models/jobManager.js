@@ -142,7 +142,7 @@ module.exports.updateJob = async (jobId, jobConfig) => {
     const configData = await configHandler.getConfig();
     await globalWebhookAssignmentGuard(jobConfig.webhooks);
     let [job] = await databaseConnector.getJob(jobId);
-    if (job.length === 0) {
+    if (!job || job.length === 0) {
         let error = new Error('Not found');
         error.statusCode = 404;
         throw error;
