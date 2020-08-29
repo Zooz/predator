@@ -155,6 +155,9 @@ async function initSchemas() {
         test_id: {
             type: Sequelize.DataTypes.UUID
         },
+        type: {
+            type: Sequelize.DataTypes.STRING
+        },
         environment: {
             type: Sequelize.DataTypes.STRING
         },
