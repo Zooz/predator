@@ -73,12 +73,14 @@ describe('Create job global tests', function () {
                             'body/duration should be >= 1',
                             'body/ramp_to should be >= 1',
                             'body/max_virtual_users should be >= 1',
-                            'body/parallelism should be >= 1'] });
+                            'body/parallelism should be >= 1'
+                        ]
+                    });
                 });
         });
 
         it('Should return error for missing test_id', () => {
-            let illegalBody = { arrival_rate: 1, duration: 1, environment: 'test' };
+            let illegalBody = { arrival_rate: 1, duration: 1, environment: 'test', type: 'load_test' };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
             })

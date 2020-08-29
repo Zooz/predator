@@ -1922,9 +1922,6 @@ components:
         - type
         - test_id
         - duration
-      allOf:
-        - $ref: '#/components/schemas/job_update'
-        - type: object
       properties:
         run_immediately:
           type: boolean
@@ -2385,6 +2382,9 @@ components:
           description: the name of the file
     load_test:
       type: object
+      allOf:
+        - $ref: '#/components/schemas/job_update'
+        - type: object
       required:
         - arrival_rate
       properties:
@@ -2399,6 +2399,9 @@ components:
             Used in combination with the `arrival_rate` and `duration` values. Increases the arrival rate linearly to the value specified, within the specified duration.
           example: 5
     functional_test:
+      allOf:
+        - $ref: '#/components/schemas/job_update'
+        - type: object
       type: object
       required:
         - arrival_count
