@@ -213,6 +213,7 @@ describe('Update scheduled job', function () {
             should(getJobResponseAfterUpdate.body).eql({
                 id: jobId,
                 test_id: testId,
+                type: 'load_test',
                 cron_expression: updatedCronExpression,
                 webhooks: ['a@webhooks.com'],
                 emails: ['b@emails.com'],
