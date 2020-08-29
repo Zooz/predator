@@ -70,8 +70,8 @@ describe('Create job global tests', function () {
                         'message': 'Input validation error',
                         'validation_errors': [
                             'body/arrival_rate should be >= 1',
-                            'body/duration should be >= 1',
                             'body/ramp_to should be >= 1',
+                            'body/duration should be >= 1',
                             'body/max_virtual_users should be >= 1',
                             'body/parallelism should be >= 1'
                         ]
