@@ -26,7 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Version:**
  - Predator: [e.g. 1.0.8]
  - Predator-runner [e.g. 1.0.5]
- - Database [e.g. cassandra]
+ - Database [e.g. Sqlite]
 
 **Additional context**
 Add any other context about the problem here.

@@ -201,7 +201,7 @@ describe('Artillery report generator test', () => {
     });
 
     describe('Bad flows - With parallelism', function () {
-        it('create final report fails when cassandra returns error', async () => {
+        it('create final report fails when DB returns error', async () => {
             databaseConnectorGetStatsStub.rejects(new Error('Database failure'));
             reportsManagerGetReportStub.resolves(REPORT);
 
@@ -216,7 +216,7 @@ describe('Artillery report generator test', () => {
             testShouldFail.should.eql(false, 'Test action was supposed to get exception');
         });
 
-        it('create final report fails when no rows returned from cassandra ', async () => {
+        it('create final report fails when no rows returned from DB ', async () => {
             databaseConnectorGetStatsStub.resolves([]);
             reportsManagerGetReportStub.resolves(REPORT);
 

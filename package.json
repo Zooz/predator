@@ -37,8 +37,6 @@
     "artillery": "^1.6.0-29",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
-    "cassandra-driver": "4.3.1",
-    "cassandra-migration": "^2.7.0",
     "copy-dir": "^0.3.0",
     "cron": "1.7.2",
     "dockerode": "^2.5.8",

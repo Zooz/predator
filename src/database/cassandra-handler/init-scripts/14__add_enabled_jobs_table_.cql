@@ -1,1 +1,0 @@
-ALTER TABLE jobs ADD enabled boolean;

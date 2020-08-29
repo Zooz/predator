@@ -33,7 +33,6 @@ jobs:
   integration-tests:
     docker:
     - image: circleci/node:12.16
-    - image: circleci/cassandra:3.10
       environment:
         MAX_HEAP_SIZE: 2048m
         HEAP_NEWSIZE: 512m
@@ -58,12 +57,6 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: docker
-    - run:
-        name: Integration tests with kubernetes and cassandra configuration
-        command: npm run integration-tests
-        environment:
-          DATABASE_TYPE: cassandra
-          JOB_PLATFORM: kubernetes
     - run:
         name: Integration tests with kubernetes and mysql configuration
         command: npm run integration-tests

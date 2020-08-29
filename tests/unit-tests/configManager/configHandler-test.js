@@ -118,15 +118,15 @@ const resultAfterConvert = {
 
 describe('Manager config', function () {
     let sandbox;
-    let cassandraGetStub;
-    let cassandraGetValueStub;
-    let cassandraUpdateStub;
+    let databaseConnectorGetStub;
+    let databaseConnectorGetValueStub;
+    let databaseConnectorUpdateStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
-        cassandraGetStub = sandbox.stub(databaseConnector, 'getConfigAsObject');
-        cassandraGetValueStub = sandbox.stub(databaseConnector, 'getConfigValue');
-        cassandraUpdateStub = sandbox.stub(databaseConnector, 'updateConfig');
+        databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getConfigAsObject');
+        databaseConnectorGetValueStub = sandbox.stub(databaseConnector, 'getConfigValue');
+        databaseConnectorUpdateStub = sandbox.stub(databaseConnector, 'updateConfig');
         manager = rewire('../../../src/configManager/models/configHandler');
     });
 
@@ -140,7 +140,7 @@ describe('Manager config', function () {
 
     describe('get default config', function () {
         it('get default config success', async () => {
-            cassandraGetStub.resolves([]);
+            databaseConnectorGetStub.resolves([]);
 
             let result = await manager.getConfig();
 
@@ -152,7 +152,7 @@ describe('Manager config', function () {
 
     describe('get config from default and DB', function () {
         it('get config success', async () => {
-            cassandraGetStub.resolves({ 'runner_cpu': 2 });
+            databaseConnectorGetStub.resolves({ 'runner_cpu': 2 });
             let result = await manager.getConfig();
             should(Object.keys(result).length).eql(Object.keys(configConstants).length);
             Object.keys(result).forEach(key => {
@@ -166,7 +166,7 @@ describe('Manager config', function () {
 
     describe('get config with corrupted data from DB', function () {
         it('get config success', async () => {
-            cassandraGetStub.resolves({ 'key_not_valid': 2 });
+            databaseConnectorGetStub.resolves({ 'key_not_valid': 2 });
             let result = await manager.getConfig();
             const resultEscapedUndefined = escapeUndefinedValues(result);
             should(resultEscapedUndefined).eql(defaultConfig);
@@ -175,7 +175,7 @@ describe('Manager config', function () {
 
     describe('get config and parse types, types are valid', function () {
         it('get config success', async () => {
-            cassandraGetStub.resolves(configResponseParseObject);
+            databaseConnectorGetStub.resolves(configResponseParseObject);
 
             let result = await manager.getConfig();
 
@@ -186,7 +186,7 @@ describe('Manager config', function () {
 
     describe('get config value from env variables', function () {
         it('get config  value success', async () => {
-            cassandraGetValueStub.resolves(undefined);
+            databaseConnectorGetValueStub.resolves(undefined);
 
             let result = await manager.getConfigValue('runner_cpu');
             should(result).eql(1);
@@ -195,7 +195,7 @@ describe('Manager config', function () {
 
     describe('update config ', function () {
         it('update config success', async () => {
-            cassandraUpdateStub.resolves([]);
+            databaseConnectorUpdateStub.resolves([]);
 
             let result = await manager.updateConfig({ runner_cpu: 'test_runner_cpu' });
             should(result).eql([]);
