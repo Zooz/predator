@@ -4,7 +4,7 @@ const sinon = require('sinon'),
     databaseConfig = require('../../../../src/config/databaseConfig'),
     sequelizeConnector = require('../../../../src/webhooks/models/database/sequelize/sequelizeConnector');
 
-const { WEBHOOK_EVENT_TYPES } = require('../../../../src/common/consts');
+const { WEBHOOK_EVENT_TYPES, WEBHOOK_EVENT_TYPE_STARTED } = require('../../../../src/common/consts');
 const uuid = require('uuid');
 
 describe('Sequelize client tests', function () {
@@ -65,6 +65,7 @@ describe('Sequelize client tests', function () {
         sequelizeModelStub.returns({
             key: {},
             value: {},
+            update: sequelizeUpdateStub,
             findAll: sequelizeGetStub,
             findOne: sequelizeGeValueStub,
             destroy: sequelizeDeleteStub,
@@ -144,6 +145,107 @@ describe('Sequelize client tests', function () {
                 const destroyOptions = sequelizeDeleteStub.args[0][0];
                 expect(destroyOptions).to.deep.equal(queryOptions);
             });
+        });
+    });
+
+    describe('updateWebhook', function() {
+        it('update webhook name', async function() {
+            const id = uuid.v4();
+            const eventId = uuid.v4();
+            const eventsDataValues = {
+                id: eventId,
+                name: WEBHOOK_EVENT_TYPE_STARTED
+            };
+            const event = {
+                ...eventsDataValues,
+                dataValues: {
+                    ...eventsDataValues
+                }
+            };
+            const dataValues = {
+                id,
+                name: 'avi',
+                url: 'http://avi.com',
+                global: false,
+                format: 'slack',
+                events: [event]
+            };
+            const oldWebhook = {
+                id,
+                name: 'avi',
+                url: 'http://avi.com',
+                global: false,
+                format: 'slack',
+                dataValues,
+                events: [event],
+                setEvents: sandbox.stub()
+            };
+            const updatedWebhook = {
+                ...oldWebhook,
+                name: 'iva'
+            };
+            const updatedWebhookFromDB = {
+                ...updatedWebhook.dataValues,
+                name: updatedWebhook.name,
+                dataValues: {
+                    ...updatedWebhook.dataValues,
+                    name: updatedWebhook.name
+                }
+            };
+            const transaction = {};
+
+            sequelizeGetStub.onCall(0).resolves(oldWebhook);
+            sequelizeGetStub.onCall(1).resolves([event]);
+            sequelizeGetStub.onCall(2).resolves(updatedWebhookFromDB);
+            sequelizeTransactionStub.resolves();
+            oldWebhook.setEvents.resolves();
+            sequelizeUpdateStub.resolves();
+
+            const updateResult = await sequelizeConnector.updateWebhook(id, updatedWebhook);
+            await sequelizeTransactionStub.yield(transaction);
+
+            expect(sequelizeTransactionStub.calledOnce).to.be.equal(true);
+            expect(oldWebhook.setEvents.calledOnce).to.be.equal(true);
+            expect(sequelizeUpdateStub.calledOnce).to.be.equal(true);
+
+            expect(updateResult).to.be.deep.equal({
+                id,
+                events: [WEBHOOK_EVENT_TYPE_STARTED],
+                format: 'slack',
+                global: false,
+                name: 'iva',
+                url: 'http://avi.com'
+            });
+            expect(oldWebhook.setEvents.args[0]).to.be.deep.equal([[event.id], { transaction }]);
+            expect(sequelizeUpdateStub.args[0]).to.be.deep.equal([updatedWebhook, { where: { id }, transaction }]);
+        });
+    });
+    describe('getAllGlobalWebhooks', function() {
+        it('should have global: true where statement', async function() {
+            const globalWebhooks = [
+                {
+                    name: 'niv',
+                    url: 'http://predator.niv',
+                    global: true,
+                    events: [],
+                    format: 'slack'
+                },
+                {
+                    name: 'niv22',
+                    url: 'http://predator2.niv',
+                    global: true,
+                    events: [],
+                    format: 'json'
+                }
+            ];
+            const globalWebhooksFromDB = globalWebhooks.map(globWebhook => ({ ...globWebhook, dataValues: { ...globWebhook } }))
+            sequelizeGetStub.resolves(globalWebhooksFromDB);
+
+            const resultWebhooks = await sequelizeConnector.getAllGlobalWebhooks();
+
+            expect(sequelizeGetStub.calledOnce).to.be.equal(true);
+            expect(sequelizeGetStub.args[0]).to.be.deep.equal([{ include: ['events'], where: { global: true } }]);
+            expect(resultWebhooks).to.be.deep.equal(globalWebhooks);
         });
     });
 });

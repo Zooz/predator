@@ -16,7 +16,7 @@ const {
     WEBHOOK_EVENT_TYPE_FAILED,
     WEBHOOK_EVENT_TYPES
 } = require('../../../src/common/consts');
-const webhooksFormatter = rewire('../../../../src/webhooks/models/webhooksFormatter');
+const webhooksFormatter = rewire('../../../src/webhooks/models/webhooksFormatter');
 
 describe('webhooksFormatter', function () {
     let sandbox;
@@ -180,7 +180,7 @@ describe('webhooksFormatter', function () {
         it('uknown event type -> expect error to be thrown', function () {
             const unknownEventType = 'superUknownEventType';
             const expectedErrorMessage = `Unrecognized webhook event: ${unknownEventType}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`;
-            expect(webhooksFormatter.bind(null, EVENT_FORMAT_TYPE_SLACK, unknownEventType)).to.throw(expectedErrorMessage);
+            expect(webhooksFormatter.format.bind(null, EVENT_FORMAT_TYPE_SLACK, unknownEventType)).to.throw(expectedErrorMessage);
         });
     });
     describe(EVENT_FORMAT_TYPE_JSON, function () {
@@ -221,13 +221,13 @@ describe('webhooksFormatter', function () {
         it('uknown event type -> expect error to be thrown', function() {
             const unknownEventType = 'superUknownEventType';
             const expectedErrorMessage = `Unrecognized webhook event: ${unknownEventType}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`;
-            expect(webhooksFormatter.bind(null, EVENT_FORMAT_TYPE_JSON, unknownEventType)).to.throw(expectedErrorMessage);
+            expect(webhooksFormatter.format.bind(null, EVENT_FORMAT_TYPE_JSON, unknownEventType)).to.throw(expectedErrorMessage);
         });
     });
     describe('Unknown format', function() {
         it('should throw an error', function() {
             const unknownFormat = 'some_random_format';
-            expect(webhooksFormatter.bind(null, unknownFormat, WEBHOOK_EVENT_TYPE_STARTED)).to.throw(`Unrecognized webhook format: ${unknownFormat}, available options: ${[EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPE_SLACK].join()}`);
+            expect(webhooksFormatter.format.bind(null, unknownFormat, WEBHOOK_EVENT_TYPE_STARTED)).to.throw(`Unrecognized webhook format: ${unknownFormat}, available options: ${[EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPE_SLACK].join()}`);
         });
     });
 });
