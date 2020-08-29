@@ -727,6 +727,7 @@ describe('Manager tests', function () {
         it('Get a list of all jobs - also one time jobs', async function () {
             cassandraGetStub.resolves([{
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 environment: 'test',
                 arrival_rate: 1,
@@ -742,6 +743,7 @@ describe('Manager tests', function () {
             },
             {
                 id: 'id2',
+                type: 'load_test',
                 test_id: 'test_id2',
                 arrival_rate: 1,
                 duration: 1,
@@ -758,6 +760,7 @@ describe('Manager tests', function () {
 
             let expectedResult = [{
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
@@ -775,6 +778,7 @@ describe('Manager tests', function () {
                 enabled: false
             }, {
                 id: 'id2',
+                type: 'load_test',
                 test_id: 'test_id2',
                 emails: ['eli@eli.eli'],
                 ramp_to: '1',
@@ -798,6 +802,7 @@ describe('Manager tests', function () {
         it('Get a list of jobs - only scheduled jobs', async function () {
             cassandraGetStub.resolves([{
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 environment: 'test',
                 arrival_rate: 1,
@@ -810,6 +815,7 @@ describe('Manager tests', function () {
             },
             {
                 id: 'id2',
+                type: 'load_test',
                 test_id: 'test_id2',
                 arrival_rate: 1,
                 duration: 1,
@@ -823,6 +829,7 @@ describe('Manager tests', function () {
 
             let expectedResult = [{
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
@@ -870,6 +877,7 @@ describe('Manager tests', function () {
         it('Get a list of jobs', async function () {
             cassandraGetSingleJobStub.resolves([{
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 environment: 'test',
                 arrival_rate: 1,
@@ -885,6 +893,7 @@ describe('Manager tests', function () {
 
             let expectedResult = {
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
