@@ -182,6 +182,25 @@ describe('webhooksFormatter', function () {
             const expectedErrorMessage = `Unrecognized webhook event: ${unknownEventType}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`;
             expect(webhooksFormatter.format.bind(null, EVENT_FORMAT_TYPE_SLACK, unknownEventType)).to.throw(expectedErrorMessage);
         });
+        it('should display the grafana url if specified in report', function() {
+            const testId = uuid.v4();
+            const jobId = uuid.v4();
+            const report = {
+                ramp_to: 100,
+                test_name: 'some test name',
+                arrival_rate: 5,
+                duration: 120,
+                environment: 'test',
+                parallelism: 10,
+                grafana_report: 'http://local.grafana.io/predator'
+            };
+            let expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
+            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${report.parallelism}, ramp to: ${report.ramp_to} scenarios per second`;
+            expectedResult += `<${report.grafana_report} | View final grafana dashboard report>`;
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
+
+            expect(payload.text).to.be.equal(expectedResult);
+        });
     });
     describe(EVENT_FORMAT_TYPE_JSON, function () {
         WEBHOOK_EVENT_TYPES.forEach(webhookEventType => {
@@ -222,6 +241,39 @@ describe('webhooksFormatter', function () {
             const unknownEventType = 'superUknownEventType';
             const expectedErrorMessage = `Unrecognized webhook event: ${unknownEventType}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`;
             expect(webhooksFormatter.format.bind(null, EVENT_FORMAT_TYPE_JSON, unknownEventType)).to.throw(expectedErrorMessage);
+        });
+        it('should display the grafana url if specified in report', function () {
+            const testId = uuid.v4();
+            const jobId = uuid.v4();
+            const report = {
+                ramp_to: 100,
+                test_name: 'some test name',
+                arrival_rate: 5,
+                duration: 120,
+                environment: 'test',
+                parallelism: 10,
+                grafana_report: 'https://local.predator.io/grafana'
+            };
+            const additionalInfo = {
+                some: {
+                    nested: {
+                        value: ['Look', 'more', 'values']
+                    }
+                }
+            };
+            const expectedResult = {
+                test_id: testId,
+                job_id: jobId,
+                event: WEBHOOK_EVENT_TYPE_STARTED,
+                additional_details: {
+                    report,
+                    ...additionalInfo
+                }
+            };
+
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_JSON, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report, additionalInfo);
+
+            expect(payload).to.be.deep.equal(expectedResult);
         });
     });
     describe('Unknown format', function() {

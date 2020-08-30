@@ -1,22 +1,24 @@
 'use strict';
-const sinon = require('sinon'),
-    { expect } = require('chai'),
-    databaseConfig = require('../../../../src/config/databaseConfig'),
-    sequelizeConnector = require('../../../../src/webhooks/models/database/sequelize/sequelizeConnector');
-
-const { WEBHOOK_EVENT_TYPES, WEBHOOK_EVENT_TYPE_STARTED } = require('../../../../src/common/consts');
+const sinon = require('sinon');
+const { expect } = require('chai');
 const uuid = require('uuid');
 
+const databaseConfig = require('../../../../src/config/databaseConfig');
+const sequelizeConnector = require('../../../../src/webhooks/models/database/sequelize/sequelizeConnector');
+
+const { WEBHOOK_EVENT_TYPES, WEBHOOK_EVENT_TYPE_STARTED } = require('../../../../src/common/consts');
+
 describe('Sequelize client tests', function () {
+    const uuidStubValue = '3e10d10e-2ae0-418e-aa91-0fd659dd86fb'; 
     const webhookRaw = {
         dataValues: {
-            id: '3e10d10e-2ae0-418e-aa91-0fd659dd86fb',
+            id: uuidStubValue,
             name: 'my special webhook',
             url: 'http://callback.com',
             global: false,
             format_type: 'json',
             created_at: '2020-06-13T13:13:16.763Z',
-            updated_at: '2020-06-13T13:13:16.763Z',
+            updated_at: '2020-06-13T13:13:16.763Z'
         },
         events: []
     };
@@ -30,10 +32,12 @@ describe('Sequelize client tests', function () {
         sequelizeCreateStub,
         sequelizeUpdateStub,
         sequelizeBelongsToMany,
-        sequelizeTransactionStub;
+        sequelizeTransactionStub,
+        uuidV4Stub;
 
     before(async () => {
         sandbox = sinon.sandbox.create();
+        uuidV4Stub = sandbox.stub(uuid, 'v4');
     });
 
     beforeEach(async () => {
@@ -51,6 +55,8 @@ describe('Sequelize client tests', function () {
         sequelizeUpdateStub = sandbox.stub();
         sequelizeBelongsToMany = sandbox.stub();
         sequelizeTransactionStub = sandbox.stub();
+
+        uuidV4Stub.returns(uuidStubValue);
 
         sequelizeDefineStub.returns({
             hasMany: () => {
@@ -108,7 +114,11 @@ describe('Sequelize client tests', function () {
         describe('Happy flow', function() {
             it('expect to return a webhook with a valid uuid', async function() {
                 const events = [WEBHOOK_EVENT_TYPES[0], WEBHOOK_EVENT_TYPES[1]];
-                const eventRecords = events.map(event => ({dataValues: {id: uuid(), name: event}}));
+                const eventRecords = events.map(event => {
+                    const id = uuid.v4();
+                    const dataValues = { id, name: event };
+                    return { dataValues, ...dataValues };
+                });
                 const webhook = {
                     ...webhookRaw.dataValues,
                     events
@@ -119,15 +129,30 @@ describe('Sequelize client tests', function () {
                     },
                     events: eventRecords
                 };
+                const createReturnValue = {
+                    ...webhookWithEvents,
+                    setEvents: sandbox.stub()
+                };
+                const transaction = { id: uuid.v4() };
+
                 sequelizeGetStub.onFirstCall().resolves(eventRecords);
                 sequelizeGetStub.onSecondCall().resolves(webhookWithEvents);
                 sequelizeTransactionStub.resolves();
+                sequelizeCreateStub.resolves(createReturnValue);
+
                 const createdWebhook = await sequelizeConnector.createWebhook(webhook);
+
+                await sequelizeTransactionStub.yield(transaction);
 
                 expect(createdWebhook).to.be.an('object');
                 expect(createdWebhook).to.be.deep.contain(webhookWithEvents.dataValues);
                 expect(createdWebhook.events).to.be.deep.equal(events);
                 expect(createdWebhook).to.have.a.property('id');
+                expect(sequelizeCreateStub.calledOnce).to.be.equal(true);
+                expect(webhook).to.be.deep.contain(sequelizeCreateStub.args[0][0]);
+                expect(sequelizeCreateStub.args[0][1]).to.be.deep.contain({ transaction });
+                expect(createReturnValue.setEvents.calledOnce).to.be.equal(true);
+                expect(createReturnValue.setEvents.args[0]).to.be.deep.equal([eventRecords.map(event => event.dataValues.id), { transaction }]);
             });
         });
     });
