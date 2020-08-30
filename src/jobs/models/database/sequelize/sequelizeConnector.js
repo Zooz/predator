@@ -2,6 +2,9 @@
 
 const uuid = require('uuid/v4');
 const Sequelize = require('sequelize');
+
+const { WEBHOOKS_TABLE_NAME, WEBHOOKS_JOBS_MAPPING_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
+
 let client;
 
 module.exports = {
@@ -176,14 +179,14 @@ async function initSchemas() {
     await job.sync();
     await email.sync();
 
-    const webhooks = client.model('webhook');
+    const webhooks = client.model(WEBHOOKS_TABLE_NAME);
     webhooks.belongsToMany(job, {
-        through: 'webhook_job_mapping',
+        through: WEBHOOKS_JOBS_MAPPING_TABLE_NAME,
         as: 'jobs',
         foreignKey: 'webhook_id'
     });
     job.belongsToMany(webhooks, {
-        through: 'webhook_job_mapping',
+        through: WEBHOOKS_JOBS_MAPPING_TABLE_NAME,
         as: 'webhooks',
         foreignKey: 'job_id'
     });
