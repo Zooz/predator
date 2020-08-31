@@ -92,7 +92,7 @@ export default (props) => {
 
             </div>
             <RectangleAlignChildrenLeft/>
-            <div style={{display:'flex',flexDirection:'row',marginBottom:'22px'}}>
+            <div style={{display: 'flex', flexDirection: 'row', marginBottom: '22px', justifyContent: 'space-evenly'}}>
                 <div>
                     <Header text={'Headers'}/>
                     <DynamicKeyValueInput value={step.headers} onChange={onHeaderChange}/>
