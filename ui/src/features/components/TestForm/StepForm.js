@@ -85,7 +85,7 @@ export default (props) => {
     return (
         <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
             <div className={style['http-methods-request-options-wrapper']}>
-                <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
+                <RectangleAlignChildrenLeft className={style['rectangle-url-row']}>
                     <TitleInput style={{flex: 0, marginRight: '10px'}} width={'120px'} title={'Method'}>
                         <HttpMethodDropdown
                             value={step.method}
