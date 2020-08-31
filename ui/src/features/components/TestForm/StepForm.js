@@ -92,15 +92,21 @@ export default (props) => {
 
             </div>
             <RectangleAlignChildrenLeft/>
-            <Header text={'Headers'}/>
-            <DynamicKeyValueInput value={step.headers} onChange={onHeaderChange}/>
-            <Button style={{width: '100px', minWidth: '0', marginBottom: '40px'}} inverted
-                    onClick={onAddHeader}>+Add</Button>
-            <Header text={'Captures'}/>
-            <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange}
-                                  keyHintText={'$.id'} valueHintText={'id'}/>
-            <Button style={{width: '100px', minWidth: '0', marginBottom: '40px'}} inverted
-                    onClick={onAddCapture}>+Add</Button>
+            <div style={{display:'flex',flexDirection:'row',marginBottom:'22px'}}>
+                <div>
+                    <Header text={'Headers'}/>
+                    <DynamicKeyValueInput value={step.headers} onChange={onHeaderChange}/>
+                    <Button style={{width: '100px', minWidth: '0'}} inverted
+                            onClick={onAddHeader}>+Add</Button>
+                </div>
+                <div>
+                    <Header text={'Captures'}/>
+                    <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange}
+                                          keyHintText={'$.id'} valueHintText={'id'}/>
+                    <Button style={{width: '100px', minWidth: '0'}} inverted
+                            onClick={onAddCapture}>+Add</Button>
+                </div>
+            </div>
             <Header text={'Processors'}/>
             <div style={{
                 display: 'flex',
@@ -163,7 +169,7 @@ const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => 
         });
 
     return (
-        <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '22px'}}>
+        <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '10px'}}>
             {headersList}
         </div>
     )
