@@ -10,8 +10,12 @@ import ProcessorsDropDown from './ProcessorsDropDown';
 import style from './stepform.scss';
 import Input from "../../../components/Input";
 import TitleInput from "../../../components/TitleInput";
-import Button from "../../../components/Button";
 import Dropdown from "../../../components/Dropdown/Dropdown.export";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {
+    faPlus,
+    faMinus
+} from '@fortawesome/free-solid-svg-icons'
 
 export default (props) => {
     const sampleObject = {};
@@ -29,10 +33,22 @@ export default (props) => {
         step.headers.push({});
         onChangeValue(step, props.index);
     };
+    const onDeleteHeader = (index) => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.headers.splice(index, 1);
+        onChangeValue(step, props.index);
+    };
     const onAddCapture = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.captures.push({});
+        onChangeValue(step, props.index);
+    };
+    const onDeleteCapture = (index) => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.captures.splice(index, 1);
         onChangeValue(step, props.index);
     };
     const onCaptureChange = (key, value, index) => {
@@ -70,16 +86,26 @@ export default (props) => {
         <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
             <div className={style['http-methods-request-options-wrapper']}>
                 <RectangleAlignChildrenLeft className={style['rectangle-http-methods']}>
-                    <TitleInput title={'Method'}>
+                    <TitleInput style={{flex: 0, marginRight: '10px'}} width={'120px'} title={'Method'}>
                         <HttpMethodDropdown
                             value={step.method}
                             onChange={(value) => onInputChange('method', value)}
                         />
                     </TitleInput>
-                    <TitleInput style={{width: '100%'}} title={'Enter Url'}>
+                    <TitleInput style={{marginRight: '10px'}} title={'Enter Url'}>
                         <Input value={step.url} onChange={(evt) => {
                             onInputChange('url', evt.target.value)
                         }}/>
+                    </TitleInput>
+                    <TitleInput style={{marginRight: '10px'}} title={'Before Request'}>
+                        <ProcessorsDropDown options={processorsExportedFunctions}
+                                            onChange={(value) => onInputChange('beforeRequest', value)}
+                                            value={step.beforeRequest}/>
+                    </TitleInput>
+                    <TitleInput title={'After Response'}>
+                        <ProcessorsDropDown options={processorsExportedFunctions}
+                                            onChange={(value) => onInputChange('afterResponse', value)}
+                                            value={step.afterResponse}/>
                     </TitleInput>
                     <RequestOptions
                         onGzipToggleChanged={(value) => onInputChange('gzip', value)}
@@ -92,42 +118,22 @@ export default (props) => {
 
             </div>
             <RectangleAlignChildrenLeft/>
-            <div style={{display: 'flex', flexDirection: 'row', marginBottom: '22px', justifyContent: 'space-evenly'}}>
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly'}}>
                 <div>
                     <Header text={'Headers'}/>
-                    <DynamicKeyValueInput value={step.headers} onChange={onHeaderChange}/>
-                    <Button style={{width: '100px', minWidth: '0'}} inverted
-                            onClick={onAddHeader}>+Add</Button>
+                    <DynamicKeyValueInput value={step.headers} onAdd={onAddHeader} onDelete={onDeleteHeader}
+                                          onChange={onHeaderChange}/>
                 </div>
                 <div>
                     <Header text={'Captures'}/>
-                    <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange}
-                                          keyHintText={'$.id'} valueHintText={'id'}/>
-                    <Button style={{width: '100px', minWidth: '0'}} inverted
-                            onClick={onAddCapture}>+Add</Button>
+                    <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange} onAdd={onAddCapture}
+                                          onDelete={onDeleteCapture} keyHintText={'$.id'} valueHintText={'id'}/>
+
                 </div>
-            </div>
-            <Header text={'Processors'}/>
-            <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                width: '100%',
-                alignItems: 'center',
-                marginBottom: '40px'
-            }}>
-                <TitleInput title={'Before Request'}>
-                    <ProcessorsDropDown options={processorsExportedFunctions}
-                                        onChange={(value) => onInputChange('beforeRequest', value)}
-                                        value={step.beforeRequest}/>
-                </TitleInput>
-                <TitleInput title={'After Response'}>
-                    <ProcessorsDropDown options={processorsExportedFunctions}
-                                        onChange={(value) => onInputChange('afterResponse', value)}
-                                        value={step.afterResponse}/>
-                </TitleInput>
             </div>
             <Header text={'Body'}/>
             <JSONInput
+                style={{container: {border: '1px solid #557EFF', borderStyle: 'dashed'}}}
                 key={jsonObjectKey}
                 id='a_unique_id'
                 placeholder={step.body || (disableSampleBody ? undefined : sampleObject)}
@@ -147,7 +153,7 @@ export default (props) => {
     )
 }
 
-const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => {
+const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, valueHintText}) => {
     const headersList = value
         .map((header, index) => {
             return (
@@ -156,7 +162,7 @@ const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => 
                     flexDirection: 'row',
                     width: '100%',
                     marginBottom: index !== headersList - 1 ? '5px' : undefined
-                }} key={index}>
+                }} key={`${index}.${header.key}.${header.value}`}>
                     <Input style={{marginRight: '10px'}} value={header.key} onChange={(evt) => {
                         onChange('key', evt.target.value, index)
                     }} placeholder={keyHintText || 'key'}/>
@@ -164,6 +170,19 @@ const DynamicKeyValueInput = ({value, onChange, keyHintText, valueHintText}) => 
                     <Input value={header.value} onChange={(evt) => {
                         onChange('value', evt.target.value, index)
                     }} placeholder={valueHintText || 'value'}/>
+
+                    {
+                        (value.length - 1 === index || value.length === 1) &&
+                        <FontAwesomeIcon
+                            style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
+                            onClick={() => onAdd(index)}
+                            icon={faPlus}/>
+                        ||
+                        (index < value.length - 1 && <FontAwesomeIcon
+                            style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
+                            onClick={() => onDelete(index)}
+                            icon={faMinus}/>)
+                    }
                 </div>
             )
         });
