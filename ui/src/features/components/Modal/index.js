@@ -27,10 +27,10 @@ class Modal extends React.Component {
 
 
     render() {
-        const {children, width, height, style: customStyle} = this.props;
+        const {children, width, height, style: customStyle, maxWidth} = this.props;
         return (
             <div style={customStyle} className={style['modal']}>
-                <div className={style['modal-content']} style={{width: width, height}}>
+                <div className={style['modal-content']} style={{width: width, maxWidth, height}}>
                     <div className={style['icon-wrapper']}>
                         <FontAwesomeIcon className={style["exit-icon"]} onClick={this.onEscape} icon={faTimes}/>
                     </div>
