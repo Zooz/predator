@@ -16,15 +16,14 @@
 | Real time reports               | :sparkle:          |Predator aggregates all concurrent runs into a single beautiful report in real time (latency, rps, status codes and more).
 | CSV Datasets                    | :sparkle:          |Predator support uploading files like csv to provide dataset for test inputs
 | Scheduled runs                  | :sparkle:          |Predator can run recurring tests using cron expressions.
-| REST API                        | :sparkle:          |Full REST API to integrate Predator with CI/CD frameworks 
-| Slack notifications             | :sparkle:          |Predator support notification to slack upon important test events. 
+| REST API                        | :sparkle:          |Full REST API to integrate Predator with CI/CD frameworks
+| Slack notifications             | :sparkle:          |Predator support notification to slack upon important test events.
 | Benchmarks                      | :sparkle:          |Set benchmarks to compare test runs to ensure performance degradation is discovered early in development. Allows to measure every build and release against specified baseline results guaranteeing safer releases to production.|
 | Cloud Native                    | :sparkle:          |Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
 | Prometheus/Influx integration   | :sparkle:          |Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
 | Compare Multiple tests results  | :sparkle:          |Built-in dashboard to compare multiple test runs at once.
 | Webhooks API                    | :soon:             |Coming soon in v1.5
 | Functional Testing              | :soon:             |Coming soon in v1.5
-
 
 ![](https://zooz.github.io/predator/images/predator-screens.gif)
 
@@ -104,6 +103,13 @@ We use [SemVer](http://semver.org/) for versioning. For a complete list of Docke
 
 * [Artillery](https://github.com/artilleryio/artillery) - Load test engine
 * [React](https://github.com/facebook/react) - Web framework
+
+-----------------------------------------------------
+
+## Major Updates Notes
+1. In `v1.5.0` Predator's support of Cassandra DB will be dropped, to see the progress of `v1.5.0` [click here](https://github.com/Zooz/predator/issues?q=is%3Aissue+is%3Aopen+label%3A1.5.0)
+
+-----------------------------------------------------
 
 ## Contact
 
