@@ -147,7 +147,6 @@ export default (props) => {
                     keys: 'blue'
                 }}
                 locale={locale}
-                // height={'200px'}
                 width={'100%'}
                 onChange={onBodyChange}
             />
@@ -175,7 +174,7 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, va
                     }} placeholder={valueHintText || 'value'}/>
 
                     {
-                        (value.length - 1 === index || value.length === 1) &&
+                        value.length - 1 === index &&
                         <FontAwesomeIcon
                             style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
                             onClick={() => onAdd(index)}
