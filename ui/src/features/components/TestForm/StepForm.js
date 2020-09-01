@@ -92,7 +92,7 @@ export default (props) => {
                             onChange={(value) => onInputChange('method', value)}
                         />
                     </TitleInput>
-                    <TitleInput style={{marginRight: '10px', flexGrow: 3}} title={'Url'}>
+                    <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Url'}>
                         <Input value={step.url} onChange={(evt) => {
                             onInputChange('url', evt.target.value)
                         }}/>
@@ -134,7 +134,7 @@ export default (props) => {
             <Header text={'Body'}/>
             <JSONInput
                 style={{
-                    outerBox: {height: null,'min-height': '200px'},
+                    outerBox: {height: null, 'min-height': '200px'},
                     container: {height: null, border: '1px solid #557EFF', 'min-height': '200px'}
                 }}
                 key={jsonObjectKey}
