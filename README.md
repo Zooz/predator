@@ -7,6 +7,16 @@
 <img src="https://zooz.github.io/predator/images/predator-1764x640.png" data-canonical-src="https://zooz.github.io/predator/images/predator-1764x640.png"/>
 </h1>
 
+Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
+
+It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
+
+[**Installation**](https://www.predator.dev/#installation) &nbsp; |
+&nbsp; [**Site**](https://predator.dev) &nbsp; |
+&nbsp; [**Documentation**](https://zooz.github.io/predator/about.html) &nbsp; |
+&nbsp; [**API Reference**](https://zooz.github.io/predator//indexapiref.html) | 
+&nbsp; [**API Tests Examples**](https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest)
+
 ## Features
 |                                 |                    |          |
 |-------------------------------- |:------------------:|:---------|
@@ -40,19 +50,10 @@
 To see the progress of `v1.5.0` [click here](https://github.com/Zooz/predator/issues?q=is%3Aissue+is%3Aopen+label%3A1.5.0)
 
 -----------------------------------------------------
-
+## Quick View
 
 ![](https://zooz.github.io/predator/images/predator-screens.gif)
 
-Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
-
-It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
-
-[**Installation**](https://www.predator.dev/#installation) &nbsp; |
-&nbsp; [**Site**](https://predator.dev) &nbsp; |
-&nbsp; [**Documentation**](https://zooz.github.io/predator/about.html) &nbsp; |
-&nbsp; [**API Reference**](https://zooz.github.io/predator//indexapiref.html) | 
-&nbsp; [**API Tests Examples**](https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest)
 
 ## System Overview
 
