@@ -22,7 +22,7 @@ export default class CollapsibleScenarioConfig extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            expanded: true
+            expanded: false
         }
     }
 
