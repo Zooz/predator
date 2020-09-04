@@ -229,7 +229,7 @@ describe('Update scheduled job', function () {
         });
     });
 
-    describe.only('Unsuccessful Updates', () => {
+    describe('Unsuccessful Updates', () => {
         let jobId;
         before(() => {
             nock.cleanAll();
