@@ -1,7 +1,5 @@
 'use strict';
-const sequelizeConnector = require('./sequelize/sequelizeConnector');
-
-const databaseConnector = sequelizeConnector;
+const databaseConnector = require('./sequelize/sequelizeConnector');
 
 module.exports = {
     init,
