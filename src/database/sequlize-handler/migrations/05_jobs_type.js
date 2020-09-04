@@ -3,10 +3,12 @@ const Sequelize = require('sequelize');
 module.exports.up = async (query, DataTypes) => {
     let jobsTable = await query.describeTable('jobs');
 
-    if (!jobsTable.enabled) {
+    if (!jobsTable.type) {
         await query.addColumn(
             'jobs', 'type',
             Sequelize.DataTypes.STRING);
+
+        await query.bulkUpdate('jobs', { type: 'load_test' });
     }
 };
 

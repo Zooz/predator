@@ -93,6 +93,11 @@ async function getJob(jobId) {
 
 async function getJobType(jobId) {
     const jobs = await getJob(jobId);
+    if (jobs.length === 0) {
+        let error = new Error('Not found');
+        error.statusCode = 404;
+        throw error;
+    }
     return jobs[0].type;
 }
 
