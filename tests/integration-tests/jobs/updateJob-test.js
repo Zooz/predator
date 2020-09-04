@@ -193,11 +193,11 @@ describe('Update scheduled job', function () {
             let updateJobResponse = await schedulerRequestCreator.updateJob(jobId,
                 {
                     cron_expression: updatedCronExpression,
-                    arrival_rate: 10,
-                    ramp_to: 20,
+                    arrival_count: 5,
                     duration: 30,
                     environment: 'updated env',
-                    enabled: false
+                    enabled: false,
+                    type: 'functional_test'
                 },
                 {
                     'Content-Type': 'application/json'
@@ -213,12 +213,11 @@ describe('Update scheduled job', function () {
             should(getJobResponseAfterUpdate.body).eql({
                 id: jobId,
                 test_id: testId,
-                type: 'load_test',
+                type: 'functional_test',
                 cron_expression: updatedCronExpression,
                 webhooks: ['a@webhooks.com'],
                 emails: ['b@emails.com'],
-                ramp_to: 20,
-                arrival_rate: 10,
+                arrival_count: 5,
                 duration: 30,
                 environment: 'updated env',
                 enabled: false
@@ -230,7 +229,7 @@ describe('Update scheduled job', function () {
         });
     });
 
-    describe('Unsuccessful Updates', () => {
+    describe.only('Unsuccessful Updates', () => {
         let jobId;
         before(() => {
             nock.cleanAll();
@@ -250,13 +249,6 @@ describe('Update scheduled job', function () {
                 'Content-Type': 'application/json'
             });
             jobId = createJobResponse.body.id;
-        });
-
-        it('Update job with not existing column', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { something: 'something' }, {
-                'Content-Type': 'application/json'
-            });
-            updateJobResponse.statusCode.should.eql(200);
         });
 
         it('Update job with non existing test id', async () => {

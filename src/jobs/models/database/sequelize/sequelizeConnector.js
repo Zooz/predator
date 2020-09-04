@@ -3,7 +3,7 @@
 const uuid = require('uuid/v4');
 const Sequelize = require('sequelize');
 
-const { JOB_TYPE_LOAD_TEST } = require('../../../../common/consts');
+const { JOB_TYPE_FUNCTIONAL_TEST, JOB_TYPE_LOAD_TEST } = require('../../../../common/consts');
 let client;
 
 module.exports = {
@@ -43,11 +43,11 @@ async function insertJob(jobId, jobInfo) {
         }) : undefined
     };
 
-    if (params.type === JOB_TYPE_LOAD_TEST) {
+    if (params.type === JOB_TYPE_FUNCTIONAL_TEST) {
+        params.arrival_count = jobInfo.arrival_count;
+    } else {
         params.arrival_rate = jobInfo.arrival_rate;
         params.ramp_to = jobInfo.ramp_to;
-    } else {
-        params.arrival_count = jobInfo.arrival_count;
     }
 
     let include = [];
@@ -91,22 +91,40 @@ async function getJob(jobId) {
     return allJobs;
 }
 
+async function getJobType(jobId) {
+    const jobs = await getJob(jobId);
+    return jobs[0].type;
+}
+
 async function updateJob(jobId, jobInfo) {
     const job = client.model('job');
 
-    let params = {
+    const params = {
         test_id: jobInfo.test_id,
-        arrival_rate: jobInfo.arrival_rate,
+        type: jobInfo.type,
         cron_expression: jobInfo.cron_expression,
         duration: jobInfo.duration,
         environment: jobInfo.environment,
-        ramp_to: jobInfo.ramp_to,
         parallelism: jobInfo.parallelism,
         max_virtual_users: jobInfo.max_virtual_users,
         proxy_url: jobInfo.proxy_url,
         debug: jobInfo.debug,
         enabled: jobInfo.enabled
     };
+
+    const jobType = jobInfo.type || await getJobType(jobId);
+    switch (jobType) {
+    case JOB_TYPE_FUNCTIONAL_TEST:
+        params.arrival_count = jobInfo.arrival_count;
+        params.arrival_rate = null;
+        params.ramp_to = null;
+        break;
+    case JOB_TYPE_LOAD_TEST:
+        params.arrival_rate = jobInfo.arrival_rate;
+        params.ramp_to = jobInfo.ramp_to;
+        params.arrival_count = null;
+        break;
+    }
 
     let options = {
         where: {
@@ -165,6 +183,9 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING
         },
         arrival_rate: {
+            type: Sequelize.DataTypes.INTEGER
+        },
+        arrival_count: {
             type: Sequelize.DataTypes.INTEGER
         },
         duration: {

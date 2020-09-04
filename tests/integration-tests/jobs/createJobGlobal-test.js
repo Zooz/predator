@@ -14,6 +14,49 @@ describe('Create job global tests', function () {
     });
 
     describe('Bad requests', () => {
+        it('Create a job without type should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_rate: 1,
+                duration: 1,
+                environment: 'test'
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({
+                        message: 'Input validation error',
+                        validation_errors: [
+                            'body/type should be equal to one of the allowed values [load_test,functional_test]'
+                            ]
+                    });
+                });
+        });
+
+        it('Create a job with a wrong type should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_rate: 1,
+                duration: 1,
+                environment: 'test',
+                type: 'mickey'
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({
+                        message: 'Input validation error',
+                        validation_errors: [
+                            'body/type should be equal to one of the allowed values [load_test,functional_test]'
+                        ]
+                    });
+                });
+        });
+
         it('Create a job without run_immediately or cron_expression parameters, should return error', () => {
             let illegalBody = {
                 test_id: uuid.v4(),

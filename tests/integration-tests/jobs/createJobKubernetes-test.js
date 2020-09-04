@@ -35,7 +35,7 @@ describe('Create job specific kubernetes tests', async function () {
                     let cronJobId;
                     let oneTimeJobId;
 
-                    it('Create first job which is one time', async () => {
+                    it('Create first job which is one time load_test', async () => {
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
                             .reply(200, {
                                 metadata: { name: 'jobName', uid: 'uid' },
@@ -59,15 +59,15 @@ describe('Create job specific kubernetes tests', async function () {
                         oneTimeJobId = createJobResponse.body.id;
                     });
 
-                    it('Create second job which is cron', async () => {
+                    it('Create second job which is cron functional_test', async () => {
                         let jobBody = {
                             test_id: testId,
-                            arrival_rate: 1,
+                            arrival_count: 1,
                             duration: 1,
                             environment: 'test',
                             run_immediately: false,
                             cron_expression: '* 10 * * * *',
-                            type: 'load_test'
+                            type: 'functional_test'
                         };
 
                         createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
@@ -113,11 +113,11 @@ describe('Create job specific kubernetes tests', async function () {
                             id: cronJobId,
                             test_id: testId,
                             cron_expression: '* 10 * * * *',
-                            arrival_rate: 1,
+                            arrival_count: 1,
                             duration: 1,
                             environment: 'test',
                             enabled: true,
-                            type: 'load_test'
+                            type: 'functional_test'
                         });
                     });
 

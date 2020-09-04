@@ -765,6 +765,7 @@ describe('Manager tests', function () {
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
                 ramp_to: '1',
+                arrival_count: undefined,
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',
@@ -782,6 +783,7 @@ describe('Manager tests', function () {
                 test_id: 'test_id2',
                 emails: ['eli@eli.eli'],
                 ramp_to: '1',
+                arrival_count: undefined,
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',
@@ -802,15 +804,14 @@ describe('Manager tests', function () {
         it('Get a list of jobs - only scheduled jobs', async function () {
             cassandraGetStub.resolves([{
                 id: 'id',
-                type: 'load_test',
+                type: 'functional_test',
                 test_id: 'test_id',
                 environment: 'test',
-                arrival_rate: 1,
+                arrival_count: 1,
                 duration: 1,
                 cron_expression: '* * * * *',
                 emails: null,
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1',
                 enabled: false
             },
             {
@@ -829,12 +830,13 @@ describe('Manager tests', function () {
 
             let expectedResult = [{
                 id: 'id',
-                type: 'load_test',
+                type: 'functional_test',
                 test_id: 'test_id',
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1',
-                arrival_rate: 1,
+                ramp_to: undefined,
+                arrival_count: 1,
+                arrival_rate: undefined,
                 duration: 1,
                 environment: 'test',
                 custom_env_vars: undefined,
@@ -898,6 +900,7 @@ describe('Manager tests', function () {
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
                 ramp_to: '1',
+                arrival_count: undefined,
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',

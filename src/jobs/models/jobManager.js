@@ -173,6 +173,7 @@ function createResponse(jobId, jobBody, runId) {
         custom_env_vars: jobBody.custom_env_vars,
         run_id: runId,
         arrival_rate: jobBody.arrival_rate,
+        arrival_count: jobBody.arrival_count,
         duration: jobBody.duration,
         environment: jobBody.environment,
         notes: jobBody.notes,
