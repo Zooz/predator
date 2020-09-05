@@ -185,6 +185,16 @@ describe('Create job specific kubernetes tests', async function () {
                         });
                     });
 
+                    it('Get the job and verify it is enabled', async () => {
+                        jobId = createJobResponse.body.id;
+                        getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(200);
+                        should(getJobsFromService.body.enabled).eql(true);
+                    });
+
                     it('Wait 4 seconds to let scheduler run the job', (done) => {
                         setTimeout(done, 4000);
                     });

@@ -132,7 +132,7 @@ async function updateJob(jobId, jobInfo) {
         mergedParams.ramp_to = null;
         break;
     case JOB_TYPE_LOAD_TEST:
-        if (!jobInfo.arrival_rate) {
+        if (!mergedParams.arrival_rate) {
             const error = new Error('arrival_rate is mandatory when updating job to load_test');
             error.statusCode = 400;
             throw error;
