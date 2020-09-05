@@ -499,7 +499,7 @@ describe('Sequelize client tests', function () {
 
             should(sequelizeUpdateStub.args[0][0]).eql({
                 'test_id': testId,
-                'type': undefined,
+                'type': 'load_test',
                 "arrival_count": null,
                 'arrival_rate': 1,
                 'cron_expression': '* * * *',
@@ -510,7 +510,9 @@ describe('Sequelize client tests', function () {
                 'parallelism': 3,
                 'proxy_url': 'http://proxy.com',
                 'debug': '*',
-                'enabled': false
+                'enabled': false,
+                'webhooks': undefined,
+                'emails': undefined
             });
 
             should(sequelizeUpdateStub.args[0][1]).eql({
@@ -565,7 +567,9 @@ describe('Sequelize client tests', function () {
                 'parallelism': 3,
                 'proxy_url': 'http://proxy.com',
                 'debug': '*',
-                'enabled': false
+                'enabled': false,
+                'webhooks': undefined,
+                'emails': undefined
             });
 
             should(sequelizeUpdateStub.args[0][1]).eql({

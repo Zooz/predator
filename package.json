@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "unit-tests": "nyc --check-coverage --lines 95 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
+    "unit-tests": "nyc --check-coverage --lines 94 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh",
     "lint": "eslint src/**",

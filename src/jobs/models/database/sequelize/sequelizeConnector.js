@@ -92,16 +92,6 @@ async function getJob(jobId) {
     return allJobs;
 }
 
-async function getJobType(jobId) {
-    const jobs = await getJob(jobId);
-    if (jobs.length === 0) {
-        let error = new Error('Not found');
-        error.statusCode = 404;
-        throw error;
-    }
-    return jobs[0].type;
-}
-
 async function updateJob(jobId, jobInfo) {
     const job = client.model('job');
 
@@ -123,7 +113,7 @@ async function updateJob(jobId, jobInfo) {
 
     const oldJob = await findJob(jobId);
     if (!oldJob) {
-        const error = new Error(`Not found`);
+        const error = new Error('Not found');
         error.statusCode = 404;
         throw error;
     }
@@ -134,7 +124,7 @@ async function updateJob(jobId, jobInfo) {
     switch (mergedParams.type) {
     case JOB_TYPE_FUNCTIONAL_TEST:
         if (!mergedParams.arrival_count) {
-            const error = new Error(`arrival_count is mandatory when updating job to functional_test`);
+            const error = new Error('arrival_count is mandatory when updating job to functional_test');
             error.statusCode = 400;
             throw error;
         }
@@ -143,7 +133,7 @@ async function updateJob(jobId, jobInfo) {
         break;
     case JOB_TYPE_LOAD_TEST:
         if (!jobInfo.arrival_rate) {
-            const error = new Error(`arrival_rate is mandatory when updating job to load_test`);
+            const error = new Error('arrival_rate is mandatory when updating job to load_test');
             error.statusCode = 400;
             throw error;
         }
@@ -161,6 +151,7 @@ async function updateJob(jobId, jobInfo) {
         }
     };
 
+    delete mergedParams.id;
     let result = await job.update(mergedParams, options);
     return result;
 }
