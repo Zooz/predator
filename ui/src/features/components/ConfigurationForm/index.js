@@ -22,6 +22,7 @@ import Snackbar from 'material-ui/Snackbar';
 import UiSwitcher from '../../../components/UiSwitcher';
 import {get, set, pickBy} from 'lodash';
 import Dropdown from "../../../components/Dropdown/Dropdown.export";
+import _ from "lodash";
 
 const INPUT_TYPES = {SWITCHER: 'switcher', DROPDOWN: 'dropdown'};
 const isMetricsDropdownHidden = (state, type) => (state.config.metrics_plugin_name ? state.config.metrics_plugin_name !== type : state.serverConfig.metrics_plugin_name !== type)

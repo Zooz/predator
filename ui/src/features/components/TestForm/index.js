@@ -114,7 +114,8 @@ export class TestForm extends React.Component {
         const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi} = this.state;
         const error = createTestError || processorsError || maxSupportedScenariosUi;
         return (
-            <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
+            <Modal style={{paddingTop: '12px', paddingBottom: '12px', paddingLeft: '40px', paddingRight: '40px'}}
+                   height={'100%'} width={'100%'} maxWidth={'1440px'} onExit={closeDialog}>
                 <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
                     <div className={style['top']}>
                         <div className={style['top-inputs']}>
