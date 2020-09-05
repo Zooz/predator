@@ -230,13 +230,13 @@ describe('Update scheduled job', function () {
     });
 
     describe('Unsuccessful Updates', () => {
-        let jobId;
+        let jobId, functionalJobId;
         before(() => {
             nock.cleanAll();
         });
 
         before(async () => {
-            let validBody = {
+            const validBody = {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
@@ -245,10 +245,24 @@ describe('Update scheduled job', function () {
                 run_immediately: false,
                 cron_expression: '* * * * * *'
             };
-            let createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+            const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
             });
             jobId = createJobResponse.body.id;
+
+            const validFunctionalJobBody = {
+                test_id: testId,
+                arrival_count: 1,
+                duration: 1,
+                type: 'functional_test',
+                environment: 'test',
+                run_immediately: false,
+                cron_expression: '* * * * * *'
+            }
+            const createFunctionalJobResponse = await schedulerRequestCreator.createJob(validFunctionalJobBody, {
+                'Content-Type': 'application/json'
+            });
+            functionalJobId = createFunctionalJobResponse.body.id;
         });
 
         it('Update job with wrong type', async () => {
@@ -259,7 +273,7 @@ describe('Update scheduled job', function () {
             updateJobResponse.body.should.eql({ message: 'job type is in an unsupported value: mickey' }  );
         });
 
-        it('Update job to functional_test with arrival_rate', async () => {
+        it('Update load_test job to functional_test with arrival_rate', async () => {
             let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { type: 'functional_test', arrival_rate: 5 }, {
                 'Content-Type': 'application/json'
             });
@@ -267,8 +281,8 @@ describe('Update scheduled job', function () {
             updateJobResponse.body.should.eql({ message: 'arrival_count is mandatory when updating job to functional_test' }  );
         });
 
-        it('Update job to functional_test with arrival_rate', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { type: 'load_test', arrival_count: 5 }, {
+        it('Update functional_test job to load_test with arrival_count', async () => {
+            let updateJobResponse = await schedulerRequestCreator.updateJob(functionalJobId, { type: 'load_test', arrival_count: 5 }, {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(400);
