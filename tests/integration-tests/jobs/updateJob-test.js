@@ -54,6 +54,7 @@ describe('Update scheduled job', function () {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
+                type: 'load_test',
                 environment: 'test',
                 run_immediately: false,
                 cron_expression: date.getSeconds() + ' * * * * *',
@@ -125,6 +126,7 @@ describe('Update scheduled job', function () {
             let validBody = {
                 test_id: testId,
                 arrival_rate: 1,
+                type: 'load_test',
                 duration: 1,
                 environment: 'test',
                 run_immediately: false,
@@ -169,6 +171,7 @@ describe('Update scheduled job', function () {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
+                type: 'load_test',
                 environment: 'test',
                 run_immediately: false,
                 cron_expression: '* ' + date.getHours() + ' * * * *',
@@ -190,11 +193,11 @@ describe('Update scheduled job', function () {
             let updateJobResponse = await schedulerRequestCreator.updateJob(jobId,
                 {
                     cron_expression: updatedCronExpression,
-                    arrival_rate: 10,
-                    ramp_to: 20,
+                    arrival_count: 5,
                     duration: 30,
                     environment: 'updated env',
-                    enabled: false
+                    enabled: false,
+                    type: 'functional_test'
                 },
                 {
                     'Content-Type': 'application/json'
@@ -210,11 +213,11 @@ describe('Update scheduled job', function () {
             should(getJobResponseAfterUpdate.body).eql({
                 id: jobId,
                 test_id: testId,
+                type: 'functional_test',
                 cron_expression: updatedCronExpression,
                 webhooks: ['a@webhooks.com'],
                 emails: ['b@emails.com'],
-                ramp_to: 20,
-                arrival_rate: 10,
+                arrival_count: 5,
                 duration: 30,
                 environment: 'updated env',
                 enabled: false
@@ -227,31 +230,63 @@ describe('Update scheduled job', function () {
     });
 
     describe('Unsuccessful Updates', () => {
-        let jobId;
+        let jobId, functionalJobId;
         before(() => {
             nock.cleanAll();
         });
 
         before(async () => {
-            let validBody = {
+            const validBody = {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
+                type: 'load_test',
                 environment: 'test',
                 run_immediately: false,
                 cron_expression: '* * * * * *'
             };
-            let createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+            const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
             });
             jobId = createJobResponse.body.id;
-        });
 
-        it('Update job with not existing column', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { something: 'something' }, {
+            const validFunctionalJobBody = {
+                test_id: testId,
+                arrival_count: 1,
+                duration: 1,
+                type: 'functional_test',
+                environment: 'test',
+                run_immediately: false,
+                cron_expression: '* * * * * *'
+            }
+            const createFunctionalJobResponse = await schedulerRequestCreator.createJob(validFunctionalJobBody, {
                 'Content-Type': 'application/json'
             });
-            updateJobResponse.statusCode.should.eql(200);
+            functionalJobId = createFunctionalJobResponse.body.id;
+        });
+
+        it('Update job with wrong type', async () => {
+            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { type: 'mickey' }, {
+                'Content-Type': 'application/json'
+            });
+            updateJobResponse.statusCode.should.eql(400);
+            updateJobResponse.body.should.eql({ message: 'job type is in an unsupported value: mickey' }  );
+        });
+
+        it('Update load_test job to functional_test with arrival_rate', async () => {
+            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { type: 'functional_test', arrival_rate: 5 }, {
+                'Content-Type': 'application/json'
+            });
+            updateJobResponse.statusCode.should.eql(400);
+            updateJobResponse.body.should.eql({ message: 'arrival_count is mandatory when updating job to functional_test' }  );
+        });
+
+        it('Update functional_test job to load_test with arrival_count', async () => {
+            let updateJobResponse = await schedulerRequestCreator.updateJob(functionalJobId, { type: 'load_test', arrival_count: 5 }, {
+                'Content-Type': 'application/json'
+            });
+            updateJobResponse.statusCode.should.eql(400);
+            updateJobResponse.body.should.eql({ message: 'arrival_rate is mandatory when updating job to load_test' }  );
         });
 
         it('Update job with non existing test id', async () => {
@@ -261,20 +296,6 @@ describe('Update scheduled job', function () {
             });
             updateJobResponse.statusCode.should.eql(400);
             updateJobResponse.body.should.eql({ message: `test with id: ${nonExistingTestId} does not exist` });
-        });
-
-        it('Try to update the job Id', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { job_id: 'some job id' }, {
-                'Content-Type': 'application/json'
-            });
-            updateJobResponse.statusCode.should.eql(200);
-        });
-
-        it('Try to update the id', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { id: 'some job id' }, {
-                'Content-Type': 'application/json'
-            });
-            updateJobResponse.statusCode.should.eql(200);
         });
 
         it('Try to update enabled to not boolean', async () => {

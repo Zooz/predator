@@ -992,6 +992,7 @@ function createJob(testId, emails, webhooks) {
         test_id: testId,
         arrival_rate: 10,
         duration: 10,
+        type: 'load_test',
         environment: 'test',
         cron_expression: '0 0 1 * *',
         notes: 'My first performance test',
