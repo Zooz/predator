@@ -1,6 +1,7 @@
 'use strict';
 
 const uuid = require('uuid/v4');
+const _ = require('lodash');
 const Sequelize = require('sequelize');
 
 const { JOB_TYPE_FUNCTIONAL_TEST, JOB_TYPE_LOAD_TEST } = require('../../../../common/consts');
@@ -107,6 +108,9 @@ async function updateJob(jobId, jobInfo) {
     const params = {
         test_id: jobInfo.test_id,
         type: jobInfo.type,
+        arrival_rate: jobInfo.arrival_rate,
+        ramp_to: jobInfo.ramp_to,
+        arrival_count: jobInfo.arrival_count,
         cron_expression: jobInfo.cron_expression,
         duration: jobInfo.duration,
         environment: jobInfo.environment,
@@ -117,18 +121,38 @@ async function updateJob(jobId, jobInfo) {
         enabled: jobInfo.enabled
     };
 
-    const jobType = jobInfo.type || await getJobType(jobId);
-    switch (jobType) {
+    const oldJob = await findJob(jobId);
+    if (!oldJob) {
+        const error = new Error(`Not found`);
+        error.statusCode = 404;
+        throw error;
+    }
+    const mergedParams = _.mergeWith(params, oldJob, (newValue, oldJobValue) => {
+        return newValue !== undefined ? newValue : oldJobValue;
+    });
+
+    switch (mergedParams.type) {
     case JOB_TYPE_FUNCTIONAL_TEST:
-        params.arrival_count = jobInfo.arrival_count;
-        params.arrival_rate = null;
-        params.ramp_to = null;
+        if (!mergedParams.arrival_count) {
+            const error = new Error(`arrival_count is mandatory when updating job to functional_test`);
+            error.statusCode = 400;
+            throw error;
+        }
+        mergedParams.arrival_rate = null;
+        mergedParams.ramp_to = null;
         break;
     case JOB_TYPE_LOAD_TEST:
-        params.arrival_rate = jobInfo.arrival_rate;
-        params.ramp_to = jobInfo.ramp_to;
-        params.arrival_count = null;
+        if (!jobInfo.arrival_rate) {
+            const error = new Error(`arrival_rate is mandatory when updating job to load_test`);
+            error.statusCode = 400;
+            throw error;
+        }
+        mergedParams.arrival_count = null;
         break;
+    default:
+        const error = new Error(`job type is in an unsupported value: ${mergedParams.type}`);
+        error.statusCode = 400;
+        throw error;
     }
 
     let options = {
@@ -137,7 +161,7 @@ async function updateJob(jobId, jobInfo) {
         }
     };
 
-    let result = await job.update(params, options);
+    let result = await job.update(mergedParams, options);
     return result;
 }
 
@@ -224,4 +248,9 @@ async function initSchemas() {
     await job.sync();
     await webhook.sync();
     await email.sync();
+}
+
+async function findJob(jobId) {
+    let jobAsArray = await getJob(jobId);
+    return jobAsArray[0];
 }

@@ -57,6 +57,50 @@ describe('Create job global tests', function () {
                 });
         });
 
+        it('Create a job with type load_test and arrival_count should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_count: 1,
+                duration: 1,
+                environment: 'test',
+                type: 'load_test'
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({
+                        message: 'Input validation error',
+                        validation_errors: [
+                            'body should have required property \'arrival_rate\''
+                        ]
+                    });
+                });
+        });
+
+        it('Create a job with type functional_test and arrival_rate should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_rate: 1,
+                duration: 1,
+                environment: 'test',
+                type: 'functional_test'
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({
+                        message: 'Input validation error',
+                        validation_errors: [
+                            'body should have required property \'arrival_count\''
+                        ]
+                    });
+                });
+        });
+
         it('Create a job without run_immediately or cron_expression parameters, should return error', () => {
             let illegalBody = {
                 test_id: uuid.v4(),
