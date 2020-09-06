@@ -163,6 +163,7 @@ function createResponse(jobId, jobBody, runId) {
     let response = {
         id: jobId,
         test_id: jobBody.test_id,
+        type: jobBody.type,
         cron_expression: jobBody.cron_expression,
         webhooks: jobBody.webhooks,
         emails: jobBody.emails,
@@ -172,6 +173,7 @@ function createResponse(jobId, jobBody, runId) {
         custom_env_vars: jobBody.custom_env_vars,
         run_id: runId,
         arrival_rate: jobBody.arrival_rate,
+        arrival_count: jobBody.arrival_count,
         duration: jobBody.duration,
         environment: jobBody.environment,
         notes: jobBody.notes,

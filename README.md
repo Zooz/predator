@@ -7,6 +7,16 @@
 <img src="https://zooz.github.io/predator/images/predator-1764x640.png" data-canonical-src="https://zooz.github.io/predator/images/predator-1764x640.png"/>
 </h1>
 
+Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
+
+It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
+
+[**Installation**](https://www.predator.dev/#installation) &nbsp; |
+&nbsp; [**Site**](https://predator.dev) &nbsp; |
+&nbsp; [**Documentation**](https://zooz.github.io/predator/about.html) &nbsp; |
+&nbsp; [**API Reference**](https://zooz.github.io/predator//indexapiref.html) | 
+&nbsp; [**API Tests Examples**](https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest)
+
 ## Features
 |                                 |                    |          |
 |-------------------------------- |:------------------:|:---------|
@@ -25,17 +35,25 @@
 | Webhooks API                    | :soon:             |Coming soon in v1.5
 | Functional Testing              | :soon:             |Coming soon in v1.5
 
+
+-----------------------------------------------------
+
+## Major Updates Notes
+### v1.5.0 - Breaking changes
+#### DB Support
+1. Predator's support of **Cassandra** will be dropped. Before opensourcing Predator and using an ORM abstraction in order to support multiple databases, Predator was only integrated with Cassandra as a backend storage. Since Cassandra's pros are not fully leveraged in the usecases of Predator's integration with a database and because it was delaying our development on new features, we decided to fully drop support of it. We plan to provide migration scripts to our other supported databases.  
+
+#### Jobs API
+2. Functional tests support will break the `POST /jobs` API. A new parameter `type` to the create job body will be added and will require either a value of `load_test` or `functional_test`, check out our [API documentation](https://zooz.github.io/predator/indexapiref.html#operation/create-a-job) for more details.
+3. New Webhooks API will break the current webhooks feature implemented in <= v1.4. `POST /jobs` API will now include in the body `webhook_id` field instead of `webhook_url`.
+
+To see the progress of `v1.5.0` [click here](https://github.com/Zooz/predator/issues?q=is%3Aissue+is%3Aopen+label%3A1.5.0)
+
+-----------------------------------------------------
+## Quick View
+
 ![](https://zooz.github.io/predator/images/predator-screens.gif)
 
-Predator manages the entire lifecycle of stress-testing servers, from creating performance tests, to running these tests on a scheduled and on-demand basis, and finally viewing the test results in a highly informative and live report.
-
-It has a simple, one-click installation, built with support for Kubernetes, DC/OS and Docker Engine, and can persist the created performance tests and their reports in 5 different databases. It also supports running distributed load out of the box. Bootstrapped with a user-friendly UI alongside a simple REST API, Predator helps developers simplify the performance testing regime.
-
-[**Installation**](https://www.predator.dev/#installation) &nbsp; |
-&nbsp; [**Site**](https://predator.dev) &nbsp; |
-&nbsp; [**Documentation**](https://zooz.github.io/predator/about.html) &nbsp; |
-&nbsp; [**API Reference**](https://zooz.github.io/predator//indexapiref.html) | 
-&nbsp; [**API Tests Examples**](https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest)
 
 ## System Overview
 
@@ -103,13 +121,6 @@ We use [SemVer](http://semver.org/) for versioning. For a complete list of Docke
 
 * [Artillery](https://github.com/artilleryio/artillery) - Load test engine
 * [React](https://github.com/facebook/react) - Web framework
-
------------------------------------------------------
-
-## Major Updates Notes
-1. In `v1.5.0` Predator's support of Cassandra DB will be dropped, to see the progress of `v1.5.0` [click here](https://github.com/Zooz/predator/issues?q=is%3Aissue+is%3Aopen+label%3A1.5.0)
-
------------------------------------------------------
 
 ## Contact
 

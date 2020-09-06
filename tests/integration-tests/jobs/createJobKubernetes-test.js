@@ -35,7 +35,7 @@ describe('Create job specific kubernetes tests', async function () {
                     let cronJobId;
                     let oneTimeJobId;
 
-                    it('Create first job which is one time', async () => {
+                    it('Create first job which is one time load_test', async () => {
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
                             .reply(200, {
                                 metadata: { name: 'jobName', uid: 'uid' },
@@ -47,7 +47,8 @@ describe('Create job specific kubernetes tests', async function () {
                             arrival_rate: 1,
                             duration: 1,
                             environment: 'test',
-                            run_immediately: true
+                            run_immediately: true,
+                            type: 'load_test'
                         };
 
                         createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
@@ -58,14 +59,15 @@ describe('Create job specific kubernetes tests', async function () {
                         oneTimeJobId = createJobResponse.body.id;
                     });
 
-                    it('Create second job which is cron', async () => {
+                    it('Create second job which is cron functional_test', async () => {
                         let jobBody = {
                             test_id: testId,
-                            arrival_rate: 1,
+                            arrival_count: 1,
                             duration: 1,
                             environment: 'test',
                             run_immediately: false,
-                            cron_expression: '* 10 * * * *'
+                            cron_expression: '* 10 * * * *',
+                            type: 'functional_test'
                         };
 
                         createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
@@ -103,17 +105,19 @@ describe('Create job specific kubernetes tests', async function () {
                             arrival_rate: 1,
                             duration: 1,
                             environment: 'test',
-                            enabled: true
+                            enabled: true,
+                            type: 'load_test'
                         });
 
                         should(relevantJobs).containEql({
                             id: cronJobId,
                             test_id: testId,
                             cron_expression: '* 10 * * * *',
-                            arrival_rate: 1,
+                            arrival_count: 1,
                             duration: 1,
                             environment: 'test',
-                            enabled: true
+                            enabled: true,
+                            type: 'functional_test'
                         });
                     });
 
@@ -146,7 +150,8 @@ describe('Create job specific kubernetes tests', async function () {
                             environment: 'test',
                             run_immediately: false,
                             cron_expression: '* * * * * *',
-                            enabled: false
+                            enabled: false,
+                            type: 'load_test'
                         };
 
                         createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
@@ -180,6 +185,16 @@ describe('Create job specific kubernetes tests', async function () {
                         });
                     });
 
+                    it('Get the job and verify it is enabled', async () => {
+                        jobId = createJobResponse.body.id;
+                        getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(200);
+                        should(getJobsFromService.body.enabled).eql(true);
+                    });
+
                     it('Wait 4 seconds to let scheduler run the job', (done) => {
                         setTimeout(done, 4000);
                     });
@@ -197,10 +212,11 @@ describe('Create job specific kubernetes tests', async function () {
                         let validBody = {
                             test_id: testId,
                             arrival_rate: 1,
+                            type: 'load_test',
                             duration: 1,
                             environment: 'test',
                             run_immediately: true,
-                            max_virtual_users: 500
+                            max_virtual_users: 500,
                         };
 
                         expectedResult = {
@@ -208,7 +224,8 @@ describe('Create job specific kubernetes tests', async function () {
                             test_id: testId,
                             duration: 1,
                             arrival_rate: 1,
-                            max_virtual_users: 500
+                            max_virtual_users: 500,
+                            type: 'load_test',
                         };
 
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
@@ -309,11 +326,12 @@ describe('Create job specific kubernetes tests', async function () {
                             test_id: testId,
                             arrival_rate: 100,
                             ramp_to: 150,
+                            type: 'load_test',
                             max_virtual_users: 200,
                             duration: 1,
                             parallelism: 7,
                             environment: 'test',
-                            run_immediately: true
+                            run_immediately: true,
                         };
 
                         expectedResult = {
@@ -322,7 +340,8 @@ describe('Create job specific kubernetes tests', async function () {
                             arrival_rate: 100,
                             ramp_to: 150,
                             duration: 1,
-                            parallelism: 7
+                            parallelism: 7,
+                            type: 'load_test'
                         };
                         let actualJobEnvVars = {};
                         let actualAnnotations = {};
@@ -469,6 +488,7 @@ describe('Create job specific kubernetes tests', async function () {
                             let validBody = {
                                 test_id: testId,
                                 arrival_rate: 1,
+                                type: 'load_test',
                                 duration: 1,
                                 environment: 'test',
                                 run_immediately: runImmediately,
