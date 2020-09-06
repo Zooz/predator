@@ -1,0 +1,7 @@
+export const CONTENT_TYPES = {
+    APPLICATION_JSON: 'application/json',
+    OTHER: 'other',
+    NONE: 'none',
+};
+
+export const SUPPORTED_CONTENT_TYPES = [CONTENT_TYPES.NONE, CONTENT_TYPES.APPLICATION_JSON, CONTENT_TYPES.OTHER];

@@ -1,5 +1,6 @@
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
+import {CONTENT_TYPES} from './constants';
 
 const SLEEP = 'sleep';
 export const createTestRequest = (data) => {
@@ -94,14 +95,15 @@ function buildStepsFromFlow(flow) {
             type: 'http',
             id: uuid(),
             method: action.toUpperCase(),
-            body: request[action].json,
+            body: request[action].json || request[action].body,
             gzip: request[action].gzip,
             forever: request[action].forever,
             url: request[action].url,
             beforeRequest: request[action].beforeRequest,
             afterResponse: request[action].afterResponse,
             captures: buildCaptureState(request[action].capture),
-            headers: buildHeadersState(request[action].headers)
+            headers: buildHeadersState(request[action].headers),
+            contentType: request[action].json && CONTENT_TYPES.APPLICATION_JSON || CONTENT_TYPES.OTHER
         }
     })
 }
@@ -144,7 +146,8 @@ function prepareFlow(steps) {
             [step.method.toLowerCase()]: {
                 url: step.url,
                 headers: prepareHeadersFromArray(step.headers),
-                json: step.body,
+                json: step.contentType === CONTENT_TYPES.APPLICATION_JSON ? step.body : undefined,
+                body: step.contentType === CONTENT_TYPES.OTHER ? step.body : undefined,
                 capture: prepareCapture(step.captures),
                 gzip: step.gzip,
                 forever: step.forever,

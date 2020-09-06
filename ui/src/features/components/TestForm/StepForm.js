@@ -1,11 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-import JSONInput from 'react-json-editor-ajrm';
-import locale from 'react-json-editor-ajrm/locale/en';
 import RectangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft'
 import {cloneDeep} from 'lodash'
 import RequestOptions from './requestOptions';
 import ProcessorsDropDown from './ProcessorsDropDown';
+import ContentTypeList from './ContentTypeList';
+import BodyEditor from './BodyEditor';
+import {SUPPORTED_CONTENT_TYPES, CONTENT_TYPES} from './constants'
 
 import style from './stepform.scss';
 import Input from "../../../components/Input";
@@ -18,7 +19,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 
 export default (props) => {
-    const sampleObject = {};
 
     const onHeaderChange = (key, value, index) => {
         const {onChangeValue} = props;
@@ -58,13 +58,15 @@ export default (props) => {
         onChangeValue(step, props.index);
     };
 
-    const onBodyChange = (value) => {
-        if (!value.error) {
-            const {onChangeValue} = props;
-            const step = cloneDeep(props.step);
-            step.body = value.jsObject;
-            onChangeValue(step, props.index);
+    const onBodyChange = (editorType, value) => {
+        if (editorType === CONTENT_TYPES.APPLICATION_JSON && value.error) {
+            return; //error in json parsing
         }
+        const content = editorType === CONTENT_TYPES.APPLICATION_JSON ? value.jsObject : value;
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.body = content;
+        onChangeValue(step, props.index);
     };
 
     const onInputChange = (key, value) => {
@@ -75,11 +77,27 @@ export default (props) => {
         onChangeValue(step, props.index);
     };
 
+    const onChangeContentType = (value) => {
+        const step = cloneDeep(props.step);
+        let body = step.body;
+        if (value === CONTENT_TYPES.APPLICATION_JSON) {
+            if (typeof step.body !== 'object') {
+                try {
+                    body = JSON.parse(step.body)
+                } catch (err) {
+                    body = undefined;
+                }
+            }
+        }
+        const {onChangeValue} = props;
+        step.contentType = value;
+        step.body = body;
+        onChangeValue(step, props.index);
+    };
 
     const {
         step, processorsExportedFunctions
     } = props;
-    const disableSampleBody = step.method === 'GET';
     const jsonObjectKey = step.method === 'GET' ? 'get' : 'not-get';
 
     return (
@@ -89,7 +107,12 @@ export default (props) => {
                     <TitleInput style={{flex: 0, marginRight: '10px'}} width={'120px'} title={'Method'}>
                         <HttpMethodDropdown
                             value={step.method}
-                            onChange={(value) => onInputChange('method', value)}
+                            onChange={(value) => {
+                                onInputChange('method', value);
+                                if (value === 'GET') {
+                                    onInputChange('contentType', CONTENT_TYPES.NONE);
+                                }
+                            }}
                         />
                     </TitleInput>
                     <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Url'}>
@@ -131,25 +154,12 @@ export default (props) => {
 
                 </div>
             </div>
-            <Header text={'Body'}/>
-            <JSONInput
-                style={{
-                    outerBox: {height: null, 'min-height': '200px'},
-                    container: {height: null, border: '1px solid #557EFF', 'min-height': '200px'}
-                }}
-                key={jsonObjectKey}
-                id='a_unique_id'
-                placeholder={step.body || (disableSampleBody ? undefined : sampleObject)}
-                colors={{
-                    default: 'black',
-                    background: 'white',
-                    string: 'red',
-                    keys: 'blue'
-                }}
-                locale={locale}
-                width={'100%'}
-                onChange={onBodyChange}
-            />
+            <RectangleAlignChildrenLeft style={{alignItems: 'center', marginBottom: '11px'}}>
+                <Header text={'Body'} style={{marginBottom: 0, marginRight: '5px'}}/>
+                <ContentTypeList value={step.contentType} list={SUPPORTED_CONTENT_TYPES}
+                                 onChange={onChangeContentType}/>
+            </RectangleAlignChildrenLeft>
+            <BodyEditor type={step.contentType} content={step.body} key={jsonObjectKey} onChange={onBodyChange}/>
         </div>
 
     )
@@ -216,7 +226,7 @@ const HttpMethodDropdown = (props) => {
 }
 
 
-const Header = ({text}) => {
+const Header = ({text, style = {}}) => {
     return (
         <div style={{
             // fontFamily: 'Roboto',
@@ -227,8 +237,8 @@ const Header = ({text}) => {
             color: '#778195',
             lineHeight: 'normal',
             letterSpacing: 'normal',
-            marginBottom: '11px'
-
+            marginBottom: '11px',
+            ...style
         }}>{text}</div>
     )
 }
