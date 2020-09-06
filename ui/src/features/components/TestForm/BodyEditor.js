@@ -1,8 +1,9 @@
 import JSONInput from "react-json-editor-ajrm";
 import locale from "react-json-editor-ajrm/locale/en";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import MonacoEditor from "@uiw/react-monacoeditor";
 import {CONTENT_TYPES} from './constants'
+import DynamicKeyValueInput from './DynamicKeyValueInput';
 
 const monacoOptions = {
     selectOnLineNumbers: true,
@@ -14,20 +15,26 @@ const monacoOptions = {
 };
 
 const BodyEditor = ({key, type, content, placeHolder, onChange}) => {
+    let jsonEditorContent;
+    if (typeof content !== "object") {
+        try {
+            jsonEditorContent = JSON.parse(content);
+        } catch (err) {
 
+        }
+    } else {
+        jsonEditorContent = content;
+    }
     switch (type) {
+        case CONTENT_TYPES.FORM:
+            return (
+                <FormEditor
+                    content={jsonEditorContent}
+                    onChange={(value) => onChange(CONTENT_TYPES.FORM, value)}
+                />
+            );
+
         case CONTENT_TYPES.APPLICATION_JSON:
-            let jsonEditorContent;
-            if (typeof content !== "object") {
-                try {
-                    jsonEditorContent = JSON.parse(content);
-                } catch (err) {
-
-                }
-            } else {
-                jsonEditorContent = content;
-            }
-
             return (
                 <JSONInput
                     style={{
@@ -89,6 +96,50 @@ const BodyEditor = ({key, type, content, placeHolder, onChange}) => {
                 <div>not supported</div>
             )
     }
+}
+
+
+const FormEditor = ({content = {}, onChange}) => {
+    const [state, setState] = useState([{}]);
+
+    useEffect(() => {
+        const value = Object.entries(content).map((entry) => ({key: entry[0], value: entry[1]}));
+        if (value.length === 0) {
+            setState([{}]);
+
+        } else {
+            setState(value);
+        }
+    }, []);
+
+    const onDynamicInputChange = (type, value, index) => {
+        state[index][type] = value;
+        const newContent = state.reduce((acc, cur) => {
+            if (cur.key) {
+                acc[cur.key] = cur.value;
+            }
+            return acc;
+        }, {});
+        console.log("newContent", newContent)
+        onChange(newContent);
+    };
+
+    const onAdd = () => {
+        console.log('add')
+        state.push({});
+        setState([...state]);
+    };
+    const onDelete = (index) => {
+        state.splice(index, 1);
+        setState([...state]);
+    };
+
+
+    return (
+        <DynamicKeyValueInput onAdd={onAdd} onDelete={onDelete} keyHintText={'key'} valueHintText={'value'}
+                              onChange={onDynamicInputChange} value={state}/>
+    )
+
 }
 
 

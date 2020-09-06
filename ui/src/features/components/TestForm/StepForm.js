@@ -6,17 +6,19 @@ import RequestOptions from './requestOptions';
 import ProcessorsDropDown from './ProcessorsDropDown';
 import ContentTypeList from './ContentTypeList';
 import BodyEditor from './BodyEditor';
-import {SUPPORTED_CONTENT_TYPES, CONTENT_TYPES} from './constants'
+import {
+    SUPPORTED_CONTENT_TYPES,
+    SUPPORTED_CAPTURE_TYPES,
+    CONTENT_TYPES,
+    CAPTURE_TYPES,
+    HTTP_METHODS
+} from './constants'
 
 import style from './stepform.scss';
 import Input from "../../../components/Input";
 import TitleInput from "../../../components/TitleInput";
-import Dropdown from "../../../components/Dropdown/Dropdown.export";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faPlus,
-    faMinus
-} from '@fortawesome/free-solid-svg-icons'
+import DynamicKeyValueInput from './DynamicKeyValueInput';
+import CustomDropdown from './CustomDropdown';
 
 export default (props) => {
 
@@ -42,13 +44,19 @@ export default (props) => {
     const onAddCapture = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
-        step.captures.push({});
+        step.captures.push({type: CAPTURE_TYPES.JSON_PATH});
         onChangeValue(step, props.index);
     };
     const onDeleteCapture = (index) => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.captures.splice(index, 1);
+        onChangeValue(step, props.index);
+    };
+    const onChangeCaptureType = (value, index) => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.captures[index].type = value;
         onChangeValue(step, props.index);
     };
     const onCaptureChange = (key, value, index) => {
@@ -69,11 +77,9 @@ export default (props) => {
         onChangeValue(step, props.index);
     };
 
-    const onInputChange = (key, value) => {
+    const onInputChange = (newProps) => {
         const {onChangeValue} = props;
-        const step = cloneDeep(props.step);
-
-        step[key] = value;
+        const step = Object.assign(cloneDeep(props.step), newProps);
         onChangeValue(step, props.index);
     };
 
@@ -105,34 +111,33 @@ export default (props) => {
             <div className={style['http-methods-request-options-wrapper']}>
                 <RectangleAlignChildrenLeft className={style['rectangle-url-row']}>
                     <TitleInput style={{flex: 0, marginRight: '10px'}} width={'120px'} title={'Method'}>
-                        <HttpMethodDropdown
+                        <CustomDropdown
+                            list={HTTP_METHODS}
                             value={step.method}
                             onChange={(value) => {
-                                onInputChange('method', value);
-                                if (value === 'GET') {
-                                    onInputChange('contentType', CONTENT_TYPES.NONE);
-                                }
+                                onInputChange({method: value, contentType: CONTENT_TYPES.NONE});
                             }}
+                            placeHolder={'Method'}
                         />
                     </TitleInput>
                     <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Url'}>
                         <Input value={step.url} onChange={(evt) => {
-                            onInputChange('url', evt.target.value)
+                            onInputChange({url: evt.target.value})
                         }}/>
                     </TitleInput>
                     <TitleInput style={{marginRight: '10px'}} title={'Before Request'}>
                         <ProcessorsDropDown options={processorsExportedFunctions}
-                                            onChange={(value) => onInputChange('beforeRequest', value)}
+                                            onChange={(value) => onInputChange({beforeRequest: value})}
                                             value={step.beforeRequest}/>
                     </TitleInput>
                     <TitleInput title={'After Response'}>
                         <ProcessorsDropDown options={processorsExportedFunctions}
-                                            onChange={(value) => onInputChange('afterResponse', value)}
+                                            onChange={(value) => onInputChange({afterResponse: value})}
                                             value={step.afterResponse}/>
                     </TitleInput>
                     <RequestOptions
-                        onGzipToggleChanged={(value) => onInputChange('gzip', value)}
-                        onForeverToggleChanged={(value) => onInputChange('forever', value)}
+                        onGzipToggleChanged={(value) => onInputChange({gzip: value})}
+                        onForeverToggleChanged={(value) => onInputChange({forever: value})}
                         gzipValue={step.gzip}
                         foreverValue={step.forever}
                     />
@@ -150,7 +155,13 @@ export default (props) => {
                 <div>
                     <Header text={'Captures'}/>
                     <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange} onAdd={onAddCapture}
-                                          onDelete={onDeleteCapture} keyHintText={'$.id'} valueHintText={'id'}/>
+                                          onDelete={onDeleteCapture}
+                                          keyHintText={'$.id'}
+                                          valueHintText={'id'}
+                                          dropdownOptions={SUPPORTED_CAPTURE_TYPES}
+                                          dropDownPlaceHolder={'Type'}
+                                          dropDownOnChange={onChangeCaptureType}
+                    />
 
                 </div>
             </div>
@@ -162,66 +173,6 @@ export default (props) => {
             <BodyEditor type={step.contentType} content={step.body} key={jsonObjectKey} onChange={onBodyChange}/>
         </div>
 
-    )
-}
-
-const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, valueHintText}) => {
-    const headersList = value
-        .map((header, index) => {
-            return (
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    width: '100%',
-                    marginBottom: index !== headersList - 1 ? '5px' : undefined
-                }} key={`${index}.${header.key}.${header.value}`}>
-                    <Input style={{marginRight: '10px'}} value={header.key} onChange={(evt) => {
-                        onChange('key', evt.target.value, index)
-                    }} placeholder={keyHintText || 'key'}/>
-
-                    <Input value={header.value} onChange={(evt) => {
-                        onChange('value', evt.target.value, index)
-                    }} placeholder={valueHintText || 'value'}/>
-
-                    {
-                        value.length - 1 === index &&
-                        <FontAwesomeIcon
-                            style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
-                            onClick={() => onAdd(index)}
-                            icon={faPlus}/>
-                        ||
-                        (index < value.length - 1 && <FontAwesomeIcon
-                            style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
-                            onClick={() => onDelete(index)}
-                            icon={faMinus}/>)
-                    }
-                </div>
-            )
-        });
-
-    return (
-        <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '10px'}}>
-            {headersList}
-        </div>
-    )
-}
-
-const HttpMethodDropdown = (props) => {
-    const httpMethods = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'CONNECT', 'TRACE'];
-    const {onChange, value} = props;
-    return (
-        <Dropdown
-            options={httpMethods.map((option) => ({key: option, value: option}))}
-            selectedOption={{key: value, value: value}}
-            onChange={(selected) => {
-                onChange(selected.value)
-            }}
-            placeholder={"Method"}
-            height={'35px'}
-            disabled={false}
-            validationErrorText=''
-            enableFilter={false}
-        />
     )
 }
 
