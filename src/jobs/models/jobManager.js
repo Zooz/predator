@@ -6,7 +6,7 @@ const logger = require('../../common/logger'),
     util = require('util'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
-    { CONFIG, JOB_TYPE_FUNCTIONAL_TEST  } = require('../../common/consts');
+    { CONFIG, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts');
 
 let jobConnector;
 let cronJobs = {};
@@ -208,13 +208,13 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
     };
     if (jobBody.type === JOB_TYPE_FUNCTIONAL_TEST) {
         const arrivalCountPerRunner = Math.ceil(jobBody.arrival_count / parallelism);
-        environmentVariables.ARRIVAL_COUNT = arrivalCountPerRunner;
+        environmentVariables.ARRIVAL_COUNT = arrivalCountPerRunner.toString();
     } else {
         const arrivalRatePerRunner = Math.ceil(jobBody.arrival_rate / parallelism);
-        environmentVariables.ARRIVAL_RATE = arrivalRatePerRunner;
+        environmentVariables.ARRIVAL_RATE = arrivalRatePerRunner.toString();
         if (jobBody.ramp_to) {
             const rampToPerRunner = Math.ceil(jobBody.ramp_to / parallelism);
-            environmentVariables.RAMP_TO = rampToPerRunner;
+            environmentVariables.RAMP_TO = rampToPerRunner.toString();
         }
     }
     if (jobBody.max_virtual_users) {
