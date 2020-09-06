@@ -136,7 +136,6 @@ function buildCaptureState(captures) {
 }
 
 function prepareFlow(steps) {
-    console.log('prepare steps',steps)
     return steps.map((step) => {
         if (step.type === SLEEP) {
             return {

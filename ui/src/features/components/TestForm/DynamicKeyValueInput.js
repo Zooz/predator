@@ -15,14 +15,15 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, va
                     marginBottom: index !== headersList - 1 ? '5px' : undefined
                 }} key={index}>
                     {dropdownOptions &&
-                        <CustomDropdown
-                            style={{marginRight:'10px'}}
-                            list={dropdownOptions}
-                            value={keyValuePair.type}
-                            onChange={(value) => dropDownOnChange(value, index)}
-                            placeHolder={dropDownPlaceHolder}
-                        />
-                 }
+                    <CustomDropdown
+                        width={'100px'}
+                        style={{marginRight: '10px'}}
+                        list={dropdownOptions}
+                        value={keyValuePair.type}
+                        onChange={(value) => dropDownOnChange(value, index)}
+                        placeHolder={dropDownPlaceHolder}
+                    />
+                    }
                     <Input style={{marginRight: '10px'}} value={keyValuePair.key} onChange={(evt) => {
                         onChange('key', evt.target.value, index)
                     }} placeholder={keyHintText || 'key'}/>

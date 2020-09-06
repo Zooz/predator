@@ -109,7 +109,8 @@ class Dropdown extends Component {
             placeholder,
             disabled,
             height,
-            selectedOption, style:customStyle
+            selectedOption, style:customStyle,
+            width,
         } = this.props
 
         const inputComponent = (
@@ -120,6 +121,7 @@ class Dropdown extends Component {
                     height={height}
                     onKeyDown={this.handleInputKeyDown}
                     onClick={this.handleOptionListOpen}
+                    width={width}
                 >
                     {!selectedOption || !selectedOption.value
                         ? <Placeholder>{placeholder}</Placeholder>

@@ -120,12 +120,10 @@ const FormEditor = ({content = {}, onChange}) => {
             }
             return acc;
         }, {});
-        console.log("newContent", newContent)
         onChange(newContent);
     };
 
     const onAdd = () => {
-        console.log('add')
         state.push({});
         setState([...state]);
     };
