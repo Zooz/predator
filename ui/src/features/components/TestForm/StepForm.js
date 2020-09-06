@@ -44,7 +44,7 @@ export default (props) => {
     const onAddCapture = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
-        step.captures.push({type: CAPTURE_TYPES.JSON_PATH});
+        step.captures.push({type: step.captures[step.captures.length - 1].type || CAPTURE_TYPES.JSON_PATH});
         onChangeValue(step, props.index);
     };
     const onDeleteCapture = (index) => {
