@@ -19,7 +19,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import {FileDrop} from 'react-file-drop';
 import env from '../../../App/common/env';
-import {CONTENT_TYPES,CAPTURE_TYPES} from './constants'
+import {CONTENT_TYPES, CAPTURE_TYPES, CAPTURE_KEY_VALUE_PLACEHOLDER} from './constants'
 
 import {
     faDownload
@@ -247,7 +247,11 @@ export class TestForm extends React.Component {
             id: uuid(),
             method: 'POST',
             headers: [{}],
-            captures: [{type: CAPTURE_TYPES.JSON_PATH}],
+            captures: [{
+                type: CAPTURE_TYPES.JSON_PATH,
+                keyPlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].key,
+                valuePlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].value
+            }],
             url: '',
             forever: true,
             contentType: CONTENT_TYPES.APPLICATION_JSON

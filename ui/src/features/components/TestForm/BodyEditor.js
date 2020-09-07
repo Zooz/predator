@@ -27,6 +27,7 @@ const BodyEditor = ({key, type, content, placeHolder, onChange}) => {
     }
     switch (type) {
         case CONTENT_TYPES.FORM:
+        case CONTENT_TYPES.FORM_DATA:
             return (
                 <FormEditor
                     content={jsonEditorContent}
@@ -38,8 +39,8 @@ const BodyEditor = ({key, type, content, placeHolder, onChange}) => {
             return (
                 <JSONInput
                     style={{
-                        outerBox: {height: null, 'min-height': '200px'},
-                        container: {height: null, border: '1px solid #557EFF', 'min-height': '200px'}
+                        outerBox: {height: null, minHeight: '200px'},
+                        container: {height: null, border: '1px solid #557EFF', minHeight: '200px'}
                     }}
                     key={key}
                     id='a_unique_id'

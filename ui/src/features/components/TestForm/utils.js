@@ -150,6 +150,7 @@ function prepareFlow(steps) {
                 json: step.contentType === CONTENT_TYPES.APPLICATION_JSON ? step.body : undefined,
                 body: step.contentType === CONTENT_TYPES.OTHER ? step.body : undefined,
                 form: step.contentType === CONTENT_TYPES.FORM ? step.body : undefined,
+                formData: step.contentType === CONTENT_TYPES.FORM_DATA ? step.body : undefined,
                 capture: prepareCapture(step.captures),
                 gzip: step.gzip,
                 forever: step.forever,

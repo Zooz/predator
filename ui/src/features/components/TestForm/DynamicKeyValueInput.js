@@ -5,6 +5,7 @@ import React from "react";
 import CustomDropdown from './CustomDropdown';
 
 const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, valueHintText, dropdownOptions, dropDownOnChange, dropDownPlaceHolder}) => {
+
     const headersList = value
         .map((keyValuePair, index) => {
             return (
@@ -26,11 +27,11 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, va
                     }
                     <Input style={{marginRight: '10px'}} value={keyValuePair.key} onChange={(evt) => {
                         onChange('key', evt.target.value, index)
-                    }} placeholder={keyHintText || 'key'}/>
+                    }} placeholder={keyValuePair.keyPlaceholder || keyHintText || 'key'}/>
 
                     <Input value={keyValuePair.value} onChange={(evt) => {
                         onChange('value', evt.target.value, index)
-                    }} placeholder={valueHintText || 'value'}/>
+                    }} placeholder={keyValuePair.valuePlaceholder || valueHintText || 'value'}/>
 
                     {
                         value.length - 1 === index &&

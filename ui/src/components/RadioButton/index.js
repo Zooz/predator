@@ -15,8 +15,8 @@ const RadioButton = ({onClick, style = {}, selected, label, size}) => {
                 height: size,
                 border: '1px solid rgb(85, 126, 255)',
                 backgroundColor: selected && '#557eff',
-                borderRadius: '50%', marginRight: '2px',
-                marginTop: '3px'
+                borderRadius: '50%',
+                marginRight: '2px',
             }}/>
             <div>{label}</div>
         </div>

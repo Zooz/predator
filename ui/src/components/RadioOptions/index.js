@@ -1,8 +1,8 @@
-import RadioButton from '../../../components/RadioButton';
+import RadioButton from '../RadioButton';
 import React from "react";
 
 
-const ContentTypeList = ({list=[], value, onChange}) => {
+const RadioOptions = ({list=[], value, onChange}) => {
 
     const content = list.map((type, index) => {
         return (
@@ -21,4 +21,4 @@ const ContentTypeList = ({list=[], value, onChange}) => {
 
 };
 
-export default ContentTypeList;
+export default RadioOptions;

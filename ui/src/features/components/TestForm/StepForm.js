@@ -4,14 +4,14 @@ import RectangleAlignChildrenLeft from '../../../components/RectangleAlign/Recta
 import {cloneDeep} from 'lodash'
 import RequestOptions from './requestOptions';
 import ProcessorsDropDown from './ProcessorsDropDown';
-import ContentTypeList from './ContentTypeList';
+import ContentTypeList from './../../../components/RadioOptions';
 import BodyEditor from './BodyEditor';
 import {
     SUPPORTED_CONTENT_TYPES,
     SUPPORTED_CAPTURE_TYPES,
     CONTENT_TYPES,
     CAPTURE_TYPES,
-    HTTP_METHODS
+    HTTP_METHODS, CAPTURE_KEY_VALUE_PLACEHOLDER
 } from './constants'
 
 import style from './stepform.scss';
@@ -44,7 +44,10 @@ export default (props) => {
     const onAddCapture = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
-        step.captures.push({type: step.captures[step.captures.length - 1].type || CAPTURE_TYPES.JSON_PATH});
+        const newCapture = {type: step.captures[step.captures.length - 1].type || CAPTURE_TYPES.JSON_PATH};
+        newCapture.keyPlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[newCapture.type].key;
+        newCapture.valuePlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[newCapture.type].value;
+        step.captures.push(newCapture);
         onChangeValue(step, props.index);
     };
     const onDeleteCapture = (index) => {
@@ -57,6 +60,8 @@ export default (props) => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.captures[index].type = value;
+        step.captures[index].valuePlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[step.captures[index].type].value;
+        step.captures[index].keyPlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[step.captures[index].type].key;
         onChangeValue(step, props.index);
     };
     const onCaptureChange = (key, value, index) => {
@@ -156,8 +161,6 @@ export default (props) => {
                     <Header text={'Captures'}/>
                     <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange} onAdd={onAddCapture}
                                           onDelete={onDeleteCapture}
-                                          keyHintText={'$.id'}
-                                          valueHintText={'id'}
                                           dropdownOptions={SUPPORTED_CAPTURE_TYPES}
                                           dropDownPlaceHolder={'Type'}
                                           dropDownOnChange={onChangeCaptureType}
