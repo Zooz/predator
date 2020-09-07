@@ -99,6 +99,7 @@ const jobBodyWithEnabledFalse = {
 
 const jobBodyWithCustomEnvVars = {
     test_id: TEST_ID,
+    type: 'load_test',
     arrival_rate: 1,
     duration: 1,
     run_immediately: true,
@@ -106,6 +107,15 @@ const jobBodyWithCustomEnvVars = {
     environment: 'test',
     webhooks: ['dina', 'niv', 'eli'],
     custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' },
+    max_virtual_users: 100
+};
+
+const functionalTestJob = {
+    test_id: TEST_ID,
+    type: 'functional_test',
+    arrival_count: 1,
+    duration: 1,
+    run_immediately: true,
     max_virtual_users: 100
 };
 
@@ -284,12 +294,40 @@ describe('Manager tests', function () {
                 ENVIRONMENT: 'test',
                 TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 PREDATOR_URL: 'localhost:80',
+                JOB_TYPE: 'load_test',
                 ARRIVAL_RATE: '1',
                 DURATION: '1',
                 EMAILS: 'dina@niv.eli',
                 WEBHOOKS: 'dina;niv;eli',
                 CUSTOM_KEY1: 'A',
                 CUSTOM_KEY2: 'B'
+            });
+
+            jobTemplateCreateJobRequestStub.args[0][3].should.have.key('RUN_ID');
+        });
+
+        it('Simple request with functional_test, should save new job to cassandra, deploy the job and return the job id and the job configuration', async () => {
+            jobConnectorRunJobStub.resolves({ id: 'run_id' });
+            cassandraInsertStub.resolves({ success: 'success' });
+            let expectedResult = {
+                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                arrival_count: 1,
+                duration: 1,
+                max_virtual_users: 100
+            };
+
+            let jobResponse = await manager.createJob(functionalTestJob);
+            jobResponse.should.containEql(expectedResult);
+            cassandraInsertStub.callCount.should.eql(1);
+            jobConnectorRunJobStub.callCount.should.eql(1);
+            jobTemplateCreateJobRequestStub.args[0][3].should.containEql({
+                JOB_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                PREDATOR_URL: 'localhost:80',
+                JOB_TYPE: 'functional_test',
+                ARRIVAL_COUNT: '1',
+                DURATION: '1'
             });
 
             jobTemplateCreateJobRequestStub.args[0][3].should.have.key('RUN_ID');
