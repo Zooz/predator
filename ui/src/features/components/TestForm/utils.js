@@ -1,6 +1,6 @@
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
-import {CONTENT_TYPES,CAPTURE_TYPE_TO_REQUEST,CAPTURE_RES_TYPE_TO_CAPTURE_TYPE} from './constants';
+import {CONTENT_TYPES, CAPTURE_TYPE_TO_REQUEST, CAPTURE_RES_TYPE_TO_CAPTURE_TYPE} from './constants';
 
 const SLEEP = 'sleep';
 export const createTestRequest = (data) => {
@@ -103,7 +103,7 @@ function buildStepsFromFlow(flow) {
             afterResponse: request[action].afterResponse,
             captures: buildCaptureState(request[action].capture),
             headers: buildHeadersState(request[action].headers),
-            contentType: (request[action].json && CONTENT_TYPES.APPLICATION_JSON) || (request[action].form && CONTENT_TYPES.FORM) || CONTENT_TYPES.OTHER
+            contentType: (request[action].json && CONTENT_TYPES.APPLICATION_JSON) || (request[action].form && CONTENT_TYPES.FORM) || (request[action].formData && CONTENT_TYPES.FORM_DATA) || CONTENT_TYPES.OTHER
         }
     })
 }
@@ -128,9 +128,12 @@ function buildCaptureState(captures) {
     }
     return captures.map((cur) => {
         return {
-            key: cur.json || cur.xpath,
+            key: cur.json || cur.xpath || cur.regexp || cur.header,
             value: cur.as,
-            type: (cur.json && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.json) || (cur.xpath && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.xpath)
+            type: (cur.json && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.json)
+                || (cur.xpath && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.xpath) ||
+                (cur.regexp && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.regexp) ||
+                (cur.header && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.header)
         }
     })
 }
