@@ -95,7 +95,7 @@ function buildStepsFromFlow(flow) {
             type: 'http',
             id: uuid(),
             method: action.toUpperCase(),
-            body: request[action].json || request[action].body || request[action].form,
+            body: request[action].json || request[action].body || request[action].form || request[action].formData,
             gzip: request[action].gzip,
             forever: request[action].forever,
             url: request[action].url,
