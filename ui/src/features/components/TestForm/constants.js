@@ -23,12 +23,12 @@ export const CAPTURE_KEY_VALUE_PLACEHOLDER = {
         value: 'id'
     },
     [CAPTURE_TYPES.REGEXP]: {
-        key: 'id$',
+        key: '/id',
         value: 'id'
     },
     [CAPTURE_TYPES.HEADER]: {
-        key: 'access-control-allow-origin',
-        value: 'allowedOrigin'
+        key: 'header-name',
+        value: 'id'
     },
 };
 export const CAPTURE_TYPE_TO_REQUEST = {
