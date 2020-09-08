@@ -62,7 +62,7 @@ const BodyEditor = ({key, type, content, placeHolder, onChange}) => {
             return (
                 <div style={{border: '1px solid #557EFF', position: 'relative', width: '100%'}}>
                     <MonacoEditor
-                        language='xml'
+                        language='html'
                         value={monacoContent}
                         options={monacoOptions}
                         height={'200px'}
