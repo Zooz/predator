@@ -29,11 +29,11 @@ export default class CollapsibleStep extends React.Component {
 
                 }} onChange={this.onStepNameChange}/>
             </Section>   ,
-            <Section key={1} onClick={(evt) => {
+            <Section key={2} onClick={(evt) => {
                 evt.stopPropagation();
                 onDuplicateStep(index)
             }} icon='fa-copy' tooltip='Duplicate step' borderLeft/>,
-            <Section key={2} onClick={(evt) => {
+            <Section key={3} onClick={(evt) => {
                 evt.stopPropagation();
                 onDeleteStep(index)
             }} icon='fa-trash' tooltip='Delete step' borderLeft/>,
