@@ -14,7 +14,7 @@ const monacoOptions = {
     theme: 'vs'
 };
 
-const BodyEditor = ({key, type, content, placeHolder, onChange}) => {
+const BodyEditor = ({type, content, placeHolder, onChange}) => {
     let jsonEditorContent;
     if (typeof content !== "object") {
         try {
@@ -42,7 +42,7 @@ const BodyEditor = ({key, type, content, placeHolder, onChange}) => {
                         outerBox: {height: null, minHeight: '200px'},
                         container: {height: null, border: '1px solid #557EFF', minHeight: '200px'}
                     }}
-                    key={key}
+                    // key={key}
                     id='a_unique_id'
                     placeholder={jsonEditorContent || placeHolder || {}}
                     colors={{

@@ -99,6 +99,7 @@ function buildStepsFromFlow(flow) {
             gzip: request[action].gzip,
             forever: request[action].forever,
             url: request[action].url,
+            name: request[action].name,
             beforeRequest: request[action].beforeRequest,
             afterResponse: request[action].afterResponse,
             captures: buildCaptureState(request[action].capture),
@@ -149,6 +150,7 @@ function prepareFlow(steps) {
         return {
             [step.method.toLowerCase()]: {
                 url: step.url,
+                name:step.name,
                 headers: prepareHeadersFromArray(step.headers),
                 json: step.contentType === CONTENT_TYPES.APPLICATION_JSON ? step.body : undefined,
                 body: step.contentType === CONTENT_TYPES.OTHER ? step.body : undefined,

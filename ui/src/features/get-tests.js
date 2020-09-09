@@ -253,13 +253,13 @@ class getTests extends React.Component {
                                     display={this.state.testToDelete ? this.state.testToDelete.name : ''}
                                     onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
                                     onCancel={this.cancelDelete}/> : null}
-                <Snackbar
+                {feedbackMsg && <Snackbar
                     open={!!feedbackMsg}
                     bodyStyle={{backgroundColor: '#2fbb67'}}
                     message={feedbackMsg}
                     autoHideDuration={4000}
                     onRequestClose={this.handleSnackbarClose}
-                />
+                />}
                 {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
 
             </Page>

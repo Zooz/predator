@@ -2,6 +2,7 @@ import React from 'react';
 import CollapsibleItem from '../../../components/CollapsibleItem/CollapsibleItem';
 import StepForm from './StepForm';
 import SleepForm from "./SleepForm";
+import Input from "../../../components/Input";
 
 const Section = CollapsibleItem.Section;
 const SLEEP = 'sleep';
@@ -30,7 +31,7 @@ export default class CollapsibleStep extends React.Component {
         ]
         const {expanded} = this.state;
         return (<CollapsibleItem
-            onClick={() => {
+            onClick={(evt) => {
                 this.setState({expanded: !this.state.expanded})
             }}
             editable={true}
@@ -49,17 +50,36 @@ export default class CollapsibleStep extends React.Component {
     generateIcon = () => {
         const {step} = this.props;
         if (step.type === SLEEP) {
-            return 'fa-cloock-o'
+            return 'fa-clock-o'
         }
         return 'fa-flash'
     };
-
+    onStepNameChange = (evt) => {
+        evt.stopPropagation();
+        const step = {...this.props.step};
+        step.name = evt.target.value;
+        this.props.onChangeValueOfStep(step, this.props.index)
+    };
     generateTitle = () => {
         const {step} = this.props;
+        const {expanded} = this.state;
         if (step.type === SLEEP) {
             return `SLEEP ${step.sleep} SECONDS`
         }
-        return `${step.method} ${step.url}`
+
+        if (expanded) {
+            return (
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <Input style={{marginRight: '5px'}} value={step.name} placeholder={'Name'} onClick={(evt) => {
+                        evt.stopPropagation();
+
+                    }} onChange={this.onStepNameChange}/>
+                    {`${step.method} ${step.url}`}
+                </div>
+            )
+        }
+
+        return `${(step.name && step.name + ': ') || ''}${step.method} ${step.url}`
     };
 
     generateBody = () => {
