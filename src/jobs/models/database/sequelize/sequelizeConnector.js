@@ -110,39 +110,39 @@ async function updateJob(jobId, jobInfo) {
         debug: jobInfo.debug,
         enabled: jobInfo.enabled
     };
-
-    const oldJob = await findJob(jobId);
-    if (!oldJob) {
-        const error = new Error('Not found');
-        error.statusCode = 404;
-        throw error;
-    }
+    let oldJob = await job.findByPk(jobId);
+    // const oldJob = await findJob(jobId);
+    // if (!oldJob) {
+    //     const error = new Error('Not found');
+    //     error.statusCode = 404;
+    //     throw error;
+    // }
     const mergedParams = _.mergeWith(params, oldJob, (newValue, oldJobValue) => {
         return newValue !== undefined ? newValue : oldJobValue;
     });
 
     switch (mergedParams.type) {
-    case JOB_TYPE_FUNCTIONAL_TEST:
-        if (!mergedParams.arrival_count) {
-            const error = new Error('arrival_count is mandatory when updating job to functional_test');
+        case JOB_TYPE_FUNCTIONAL_TEST:
+            if (!mergedParams.arrival_count) {
+                const error = new Error('arrival_count is mandatory when updating job to functional_test');
+                error.statusCode = 400;
+                throw error;
+            }
+            mergedParams.arrival_rate = null;
+            mergedParams.ramp_to = null;
+            break;
+        case JOB_TYPE_LOAD_TEST:
+            if (!mergedParams.arrival_rate) {
+                const error = new Error('arrival_rate is mandatory when updating job to load_test');
+                error.statusCode = 400;
+                throw error;
+            }
+            mergedParams.arrival_count = null;
+            break;
+        default:
+            const error = new Error(`job type is in an unsupported value: ${mergedParams.type}`);
             error.statusCode = 400;
             throw error;
-        }
-        mergedParams.arrival_rate = null;
-        mergedParams.ramp_to = null;
-        break;
-    case JOB_TYPE_LOAD_TEST:
-        if (!mergedParams.arrival_rate) {
-            const error = new Error('arrival_rate is mandatory when updating job to load_test');
-            error.statusCode = 400;
-            throw error;
-        }
-        mergedParams.arrival_count = null;
-        break;
-    default:
-        const error = new Error(`job type is in an unsupported value: ${mergedParams.type}`);
-        error.statusCode = 400;
-        throw error;
     }
 
     let options = {
@@ -150,14 +150,13 @@ async function updateJob(jobId, jobInfo) {
             id: jobId
         }
     };
-    let oldJob = await job.findByPk(jobId);
+
     delete mergedParams.id;
     const updatedJob = await client.transaction(async function(transaction) {
         await oldJob.setWebhooks(jobInfo.webhooks || [], { transaction });
         return job.update(mergedParams, { ...options, transaction });
     });
     return updatedJob;
-    
 }
 
 async function deleteJob(jobId) {
@@ -244,7 +243,7 @@ async function initSchemas() {
     });
 }
 
-async function findJob(jobId) {
-    let jobAsArray = await getJob(jobId);
-    return jobAsArray[0];
-}
+// async function findJob(jobId) {
+//     let jobAsArray = await getJob(jobId);
+//     return jobAsArray[0];
+// }
