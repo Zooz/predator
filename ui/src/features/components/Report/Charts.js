@@ -65,7 +65,7 @@ const filterKeysFromArrayOfObject = (data, graphType, filteredKeys) => {
     return filteredData;
 };
 
-export const BarChartPredator = ({data = [], keys=[], graphType, onSelectedGraphPropertyFilter, filteredKeys}) => {
+export const BarChartPredator = ({data = [], keys = [], graphType, onSelectedGraphPropertyFilter, filteredKeys}) => {
     const filteredData = filterKeysFromArrayOfObject(data, graphType, filteredKeys);
 
     return (
@@ -98,7 +98,7 @@ export const BarChartPredator = ({data = [], keys=[], graphType, onSelectedGraph
     )
 };
 
-export const LineChartPredator = ({data = [], keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys}) => {
+export const LineChartPredator = ({data = [], keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys, connectNulls = true}) => {
     const filteredData = filterKeysFromArrayOfObject(data, graphType, filteredKeys);
     return (
         <ResponsiveContainer width="100%" height={300}>
@@ -123,7 +123,7 @@ export const LineChartPredator = ({data = [], keys = [], labelY, graphType, onSe
                 {
                     keys.map((key, index) => {
                         const color = getColor(key, index);
-                        return (<Line connectNulls key={index} type="monotone" dataKey={key} dot={null}
+                        return (<Line connectNulls={connectNulls} key={index} type="monotone" dataKey={key} dot={null}
                                       stroke={color.stroke}/>)
                     })
                 }
@@ -153,7 +153,7 @@ const renderLegend = (props) => {
                          style={{margin: '5px', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                         <Checkbox
                             indeterminate={false}
-                            checked={_.get(filteredKeys,`${graphType}.${entry.value}`) === undefined || _.get(filteredKeys,`${graphType}.${entry.value}`) === false}
+                            checked={_.get(filteredKeys, `${graphType}.${entry.value}`) === undefined || _.get(filteredKeys, `${graphType}.${entry.value}`) === false}
                             // disabled={}
                             onChange={(value) => {
                                 onSelectedGraphPropertyFilter(graphType, entry.value, value)
