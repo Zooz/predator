@@ -35,6 +35,10 @@ export default class CollapsibleStep extends React.Component {
             }} icon='fa-copy' tooltip='Duplicate step' borderLeft/>,
             <Section key={3} onClick={(evt) => {
                 evt.stopPropagation();
+                onDuplicateStep(index)
+            }} icon='fa-copy' tooltip='Duplicate step' borderLeft/>,
+            <Section key={4} onClick={(evt) => {
+                evt.stopPropagation();
                 onDeleteStep(index)
             }} icon='fa-trash' tooltip='Delete step' borderLeft/>,
 
