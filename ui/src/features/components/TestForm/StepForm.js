@@ -19,6 +19,8 @@ import Input from "../../../components/Input";
 import TitleInput from "../../../components/TitleInput";
 import DynamicKeyValueInput from './DynamicKeyValueInput';
 import CustomDropdown from './CustomDropdown';
+import Expectations from './Expectations';
+import Example from "../PieChart";
 
 export default (props) => {
 
@@ -174,6 +176,8 @@ export default (props) => {
                                  onChange={onChangeContentType}/>
             </RectangleAlignChildrenLeft>
             <BodyEditor type={step.contentType} content={step.body} key={jsonObjectKey} onChange={onBodyChange}/>
+            <Header style={{marginTop:'11px'}} text={'Expectations'}/>
+            <Expectations step={step} stepIndex={props.index} onChangeStep={props.onChangeValue}/>
         </div>
 
     )

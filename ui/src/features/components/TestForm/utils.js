@@ -103,6 +103,7 @@ function buildStepsFromFlow(flow) {
             beforeRequest: request[action].beforeRequest,
             afterResponse: request[action].afterResponse,
             captures: buildCaptureState(request[action].capture),
+            expectations: buildExpectationState(request[action].expect),
             headers: buildHeadersState(request[action].headers),
             contentType: (request[action].json && CONTENT_TYPES.APPLICATION_JSON) || (request[action].form && CONTENT_TYPES.FORM) || (request[action].formData && CONTENT_TYPES.FORM_DATA) || CONTENT_TYPES.OTHER
         }
@@ -139,6 +140,21 @@ function buildCaptureState(captures) {
     })
 }
 
+function buildExpectationState(expectations) {
+    if (!expectations || expectations.length === 0) {
+        return [{}];//todo understand how it effect , also in capture.
+    }
+    return expectations.map((cur) => {
+        const action = Object.keys(cur)[0];
+
+        return {
+            type: action,
+            key: Array.isArray(cur[action]) ? cur[action][0] : undefined,
+            value: Array.isArray(cur[action]) ? cur[action][1] : cur[action],
+        }
+    })
+}
+
 function prepareFlow(steps) {
     return steps.map((step) => {
         if (step.type === SLEEP) {
@@ -150,13 +166,14 @@ function prepareFlow(steps) {
         return {
             [step.method.toLowerCase()]: {
                 url: step.url,
-                name:step.name,
+                name: step.name,
                 headers: prepareHeadersFromArray(step.headers),
                 json: step.contentType === CONTENT_TYPES.APPLICATION_JSON ? step.body : undefined,
                 body: step.contentType === CONTENT_TYPES.OTHER ? step.body : undefined,
                 form: step.contentType === CONTENT_TYPES.FORM ? step.body : undefined,
                 formData: step.contentType === CONTENT_TYPES.FORM_DATA ? step.body : undefined,
                 capture: prepareCapture(step.captures),
+                expect: prepareExpec(step.expectations),
                 gzip: step.gzip,
                 forever: step.forever,
                 beforeRequest: step.beforeRequest,
@@ -183,6 +200,23 @@ function prepareCapture(captures) {
             result.push({
                 [CAPTURE_TYPE_TO_REQUEST[captureObject.type]]: captureObject.key,
                 as: captureObject.value
+            });
+        }
+    });
+
+    return result;
+}
+
+function prepareExpec(expectations) {
+    const result = [];
+    expectations.forEach((expectObject) => {
+        if (expectObject.hasOwnProperty("key") && expectObject.hasOwnProperty("value")) {
+            result.push({
+                [expectObject.type]: [expectObject.key, expectObject.value]
+            });
+        }else if (expectObject.hasOwnProperty('value')) {
+            result.push({
+                [expectObject.type]: expectObject.value,
             });
         }
     });

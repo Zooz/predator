@@ -19,7 +19,13 @@ import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import {FileDrop} from 'react-file-drop';
 import env from '../../../App/common/env';
-import {CONTENT_TYPES, CAPTURE_TYPES, CAPTURE_KEY_VALUE_PLACEHOLDER} from './constants'
+import {
+    CONTENT_TYPES,
+    CAPTURE_TYPES,
+    CAPTURE_KEY_VALUE_PLACEHOLDER,
+    EXPECTATIONS_TYPE,
+    EXPECTATIONS_SPEC_BY_PROP
+} from './constants'
 
 import {
     faDownload
@@ -254,7 +260,8 @@ export class TestForm extends React.Component {
             }],
             url: '',
             forever: true,
-            contentType: CONTENT_TYPES.APPLICATION_JSON
+            contentType: CONTENT_TYPES.APPLICATION_JSON,
+            expectations: [{type: EXPECTATIONS_TYPE.STATUS_CODE, ...EXPECTATIONS_SPEC_BY_PROP[EXPECTATIONS_TYPE.STATUS_CODE]}]
         }
     }
 

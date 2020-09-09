@@ -17,7 +17,7 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, va
                 }} key={index}>
                     {dropdownOptions &&
                     <CustomDropdown
-                        width={'100px'}
+                        width={'125px'}
                         style={{marginRight: '10px'}}
                         list={dropdownOptions}
                         value={keyValuePair.type}
@@ -25,9 +25,13 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, va
                         placeHolder={dropDownPlaceHolder}
                     />
                     }
-                    <Input style={{marginRight: '10px'}} value={keyValuePair.key} onChange={(evt) => {
-                        onChange('key', evt.target.value, index)
-                    }} placeholder={keyValuePair.keyPlaceholder || keyHintText || 'key'}/>
+                    {
+                        (!keyValuePair.onlyValue) &&
+                        <Input style={{marginRight: '10px'}} value={keyValuePair.key} onChange={(evt) => {
+                            onChange('key', evt.target.value, index)
+                        }} placeholder={keyValuePair.keyPlaceholder || keyHintText || 'key'}/>
+
+                    }
 
                     <Input value={keyValuePair.value} onChange={(evt) => {
                         onChange('value', evt.target.value, index)

@@ -109,7 +109,7 @@ class Dropdown extends Component {
             placeholder,
             disabled,
             height,
-            selectedOption, style:customStyle,
+            selectedOption, style: customStyle = {},
             width,
         } = this.props
 
@@ -154,9 +154,9 @@ class Dropdown extends Component {
             </ListWrapper>
         )
         return (
-            <div data-disabled={String(disabled)} style={customStyle} className={style.wrapper}>
+            <div data-disabled={String(disabled)} style={{width, ...customStyle}} className={style.wrapper}>
                 <DynamicDropdown
-                    inputComponent={inputComponent}
+                    inputComponent={inputComponent}s
                     listOptionsComponent={listOptionsComponent}
                     isListOpen={isDropDownListOpen}
                     onListClose={this.handleOptionListClose}
