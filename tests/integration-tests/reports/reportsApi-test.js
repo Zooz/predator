@@ -214,7 +214,6 @@ describe('Integration tests for the reports api', function() {
                 });
             });
         });
-
         describe('Get reports', function () {
             const getReportsTestId = uuid();
             let reportId = uuid();
@@ -252,7 +251,6 @@ describe('Integration tests for the reports api', function() {
                 createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
             });
-
             it('Get all reports for specific testId', async function () {
                 let getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId);
                 const reports = getReportsResponse.body;
@@ -271,7 +269,6 @@ describe('Integration tests for the reports api', function() {
                     should.not.exist(report.end_time);
                 });
             });
-
             it('Get last reports', async function () {
                 let lastReportsIdtestId = uuid();
                 reportId = uuid();
@@ -336,7 +333,81 @@ describe('Integration tests for the reports api', function() {
                 should(allRelvntResults[2].report_id).eql(lastReportId);
             });
         });
+        describe('Get report', function () {
+            const getReportTestId = uuid();
+            let reportId = uuid();
+            let reportBody = {
+                report_id: reportId,
+                revision_id: uuid(),
+                test_type: 'basic',
+                test_name: 'integration-test',
+                test_description: 'doing some integration testing',
+                start_time: Date.now().toString(),
+                last_updated_at: Date.now().toString(),
+            };
+            describe('report of load_test', function () {
+                before(async () => {
+                    reportBody.test_configuration = generateTestConfiguration('load_test');
 
+                    const jobResponse = await createJob(testId);
+                    jobId = jobResponse.body.id;
+                    reportBody.job_id = jobId;
+                    reportBody.runner_id = uuid();
+                    let createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
+                    should(createReportResponse.statusCode).eql(201);
+
+                    reportId = uuid();
+                    reportBody.report_id = reportId;
+                    reportBody.runner_id = uuid();
+                    createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
+                    should(createReportResponse.statusCode).eql(201);
+                });
+
+                it('should return report with arrival rate in response', async function () {
+                    let getReportResponse = await reportsRequestCreator.getReport(getReportTestId, reportId);
+                    should(getReportResponse.statusCode).eql(200);
+                    const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
+                        'phase', 'status', 'job_type', 'arrival_rate'];
+                    REPORT_KEYS.forEach((key) => {
+                        should(getReportResponse.body).hasOwnProperty(key);
+                    });
+                    should(getReportResponse.body.job_type).eql('load_test');
+                    should(getReportResponse.body.arrival_rate).eql(20);
+                    should(getReportResponse.body.arrival_count).eql(undefined);
+                });
+            });
+            describe('report of functional_test', function () {
+                before(async () => {
+                    reportBody.test_configuration = generateTestConfiguration('functional_test');
+
+                    const jobResponse = await createJob(testId);
+                    jobId = jobResponse.body.id;
+                    reportBody.job_id = jobId;
+                    reportBody.runner_id = uuid();
+                    let createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
+                    should(createReportResponse.statusCode).eql(201);
+
+                    reportId = uuid();
+                    reportBody.report_id = reportId;
+                    reportBody.runner_id = uuid();
+                    createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
+                    should(createReportResponse.statusCode).eql(201);
+                });
+
+                it('should return report with arrival rate in response', async function () {
+                    let getReportResponse = await reportsRequestCreator.getReport(getReportTestId, reportId);
+                    should(getReportResponse.statusCode).eql(200);
+                    const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
+                        'phase', 'status', 'job_type', 'arrival_count'];
+                    REPORT_KEYS.forEach((key) => {
+                        should(getReportResponse.body).hasOwnProperty(key);
+                    });
+                    should(getReportResponse.body.job_type === 'functional_test');
+                    should(getReportResponse.body.arrival_count).eql(50);
+                    should(getReportResponse.body.arrival_rate).eql(undefined);
+                });
+            });
+        });
         describe('Delete reports', function () {
             const getReportsTestId = uuid();
             let reportId = uuid();
@@ -414,7 +485,6 @@ describe('Integration tests for the reports api', function() {
                 });
             });
         });
-
         describe('Post stats', function () {
             before(async function () {
                 const jobResponse = await createJob(testId);
@@ -692,7 +762,6 @@ describe('Integration tests for the reports api', function() {
                 should(secondSubscriber.phase_status).eql(constants.SUBSCRIBER_INITIALIZING_STAGE);
             });
         });
-
         describe('Create report, post stats, and get final report', function () {
             it('should successfully create report', async function () {
                 let reportBody = minimalReportBody;
@@ -753,7 +822,6 @@ describe('Integration tests for the reports api', function() {
                 validateFinishedReport(report);
             });
         });
-
         describe('Post stats', function () {
             before(async function () {
                 if (!jobId) {
@@ -1010,4 +1078,14 @@ function createJob(testId, emails, webhooks) {
     return jobRequestCreator.createJob(jobOptions, {
         'Content-Type': 'application/json'
     });
+}
+
+function generateTestConfiguration(jobType) {
+    return {
+        job_type: jobType,
+        enviornment: 'test',
+        duration: 10,
+        arrival_rate: jobType === 'load_test' ? 20 : undefined,
+        arrival_count: jobType === 'functional_test' ? 50 : undefined
+    };
 }
