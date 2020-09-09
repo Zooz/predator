@@ -156,7 +156,7 @@ class Dropdown extends Component {
         return (
             <div data-disabled={String(disabled)} style={{width, ...customStyle}} className={style.wrapper}>
                 <DynamicDropdown
-                    inputComponent={inputComponent}s
+                    inputComponent={inputComponent}
                     listOptionsComponent={listOptionsComponent}
                     isListOpen={isDropDownListOpen}
                     onListClose={this.handleOptionListClose}
