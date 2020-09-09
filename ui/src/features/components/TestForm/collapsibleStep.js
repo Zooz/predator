@@ -23,11 +23,21 @@ export default class CollapsibleStep extends React.Component {
             <Section key={1} onClick={(evt) => {
                 evt.stopPropagation();
                 onDuplicateStep(index)
-            }} icon='fa-copy' tooltip='Duplicate step'/>,
+            }} borderLeft>
+                <Input style={{marginRight: '5px'}} value={this.props.step.name} placeholder={'Name'} onClick={(evt) => {
+                    evt.stopPropagation();
+
+                }} onChange={this.onStepNameChange}/>
+            </Section>   ,
+            <Section key={1} onClick={(evt) => {
+                evt.stopPropagation();
+                onDuplicateStep(index)
+            }} icon='fa-copy' tooltip='Duplicate step' borderLeft/>,
             <Section key={2} onClick={(evt) => {
                 evt.stopPropagation();
                 onDeleteStep(index)
             }} icon='fa-trash' tooltip='Delete step' borderLeft/>,
+
         ]
         const {expanded} = this.state;
         return (<CollapsibleItem
@@ -62,24 +72,10 @@ export default class CollapsibleStep extends React.Component {
     };
     generateTitle = () => {
         const {step} = this.props;
-        const {expanded} = this.state;
         if (step.type === SLEEP) {
             return `SLEEP ${step.sleep} SECONDS`
         }
-
-        if (expanded) {
-            return (
-                <div style={{display: 'flex', alignItems: 'center'}}>
-                    <Input style={{marginRight: '5px'}} value={step.name} placeholder={'Name'} onClick={(evt) => {
-                        evt.stopPropagation();
-
-                    }} onChange={this.onStepNameChange}/>
-                    {`${step.method} ${step.url}`}
-                </div>
-            )
-        }
-
-        return `${(step.name && step.name + ': ') || ''}${step.method} ${step.url}`
+        return `${step.method} ${step.url}`
     };
 
     generateBody = () => {
