@@ -37,7 +37,6 @@ export default class Section extends Component {
                     onClick={onClick}
                 >
                     <div className={css.sectionWrapper__content}>
-                        {tooltip &&
                         <Tooltip content={tooltip} placement={PopoverPlacements.TopCenter} disabled={!tooltip}>
                             <div
                                 className={classes}
@@ -45,7 +44,7 @@ export default class Section extends Component {
                                 {icon && (<span className={`${css.icon} ${icon}`}/>)}
                                 {children !== undefined && (<span className={css.text}>{children}</span>)}
                             </div>
-                        </Tooltip>}
+                        </Tooltip>
                     </div>
                 </div>
             )

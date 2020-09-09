@@ -37,7 +37,7 @@ Tooltip.Placements = Popover.Placements
 Tooltip.propTypes = {
   placement: PropTypes.oneOf(Object.values(Tooltip.Placements)),
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.string]).isRequired,
-  content: PropTypes.oneOfType([PropTypes.element, PropTypes.string]).isRequired,
+  content: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
   disabled: PropTypes.bool,
   pointerEvents: PropTypes.bool
 }
