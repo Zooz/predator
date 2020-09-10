@@ -124,6 +124,7 @@ function getReportResponse(summaryRow, config) {
         revision_id: summaryRow.revision_id,
         report_id: summaryRow.report_id,
         job_id: summaryRow.job_id,
+        job_type: testConfiguration.job_type,
         test_type: summaryRow.test_type,
         start_time: summaryRow.start_time,
         end_time: summaryRow.end_time || undefined,
