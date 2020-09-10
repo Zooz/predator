@@ -380,7 +380,7 @@ describe('Integration tests for the reports api', function() {
                         should(getReportResponse.body).hasOwnProperty(key);
                     });
                     should(getReportResponse.body.job_type).eql('load_test');
-                    should(getReportResponse.body.arrival_rate).eql(20);
+                    should(getReportResponse.body.arrival_rate).eql(10);
                     should(getReportResponse.body.arrival_count).eql(undefined);
                 });
             });
