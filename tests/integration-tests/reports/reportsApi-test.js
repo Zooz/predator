@@ -86,7 +86,10 @@ describe('Integration tests for the reports api', function() {
 
             describe('Create report with minimal fields and webhooks', async function () {
                 before(async function () {
-                    const jobResponse = await createJob(testId, undefined, ['https://webhook.to.here.com']);
+                    const options = {
+                        webhooks: ['https://webhook.to.here.com']
+                    };
+                    const jobResponse = await createJob(testId, options);
                     jobId = jobResponse.body.id;
                 });
 
@@ -108,7 +111,10 @@ describe('Integration tests for the reports api', function() {
 
             describe('Create report with minimal fields and emails', async function () {
                 before(async function () {
-                    const jobResponse = await createJob(testId, ['mickey@dog.com']);
+                    const options = {
+                        emails: ['https://webhook.to.here.com']
+                    };
+                    const jobResponse = await createJob(testId, options);
                     jobId = jobResponse.body.id;
                 });
 
@@ -176,7 +182,11 @@ describe('Integration tests for the reports api', function() {
         describe('Create report, post stats, and get final report', function () {
             describe('Create report with all fields, and post full cycle stats', async function () {
                 before(async function () {
-                    const jobResponse = await createJob(testId, ['mickey@dog.com'], ['https://webhook.here.com']);
+                    const options = {
+                        webhooks: ['https://webhook.to.here.com'],
+                        emails: ['mickey@dog.com']
+                    };
+                    const jobResponse = await createJob(testId, options);
                     jobId = jobResponse.body.id;
                 });
 
@@ -346,10 +356,13 @@ describe('Integration tests for the reports api', function() {
             };
             describe('report of load_test', function () {
                 before(async () => {
-                    reportBody.test_configuration = generateTestConfiguration('load_test');
-
-                    const jobResponse = await createJob(testId);
+                    const jobOptions = {
+                        arrival_rate: 10
+                    };
+                    const jobResponse = await createJob(testId, jobOptions);
                     jobId = jobResponse.body.id;
+
+                    reportBody.test_configuration = generateTestConfiguration('load_test');
                     reportId = uuid();
                     reportBody.report_id = reportId;
                     reportBody.job_id = jobId;
@@ -373,11 +386,15 @@ describe('Integration tests for the reports api', function() {
             });
             describe('report of functional_test', function () {
                 before(async () => {
-                    reportBody.test_configuration = generateTestConfiguration('functional_test');
-
-                    const jobResponse = await createJob(testId);
+                    const jobOptions = {
+                        arrival_count: 50,
+                        type: 'functional_test'
+                    };
+                    const jobResponse = await createJob(testId, jobOptions);
                     jobId = jobResponse.body.id;
+
                     reportId = uuid();
+                    reportBody.test_configuration = generateTestConfiguration('functional_test');
                     reportBody.report_id = reportId;
                     reportBody.job_id = jobId;
                     reportBody.runner_id = uuid();
@@ -1046,25 +1063,20 @@ function validateFinishedReport(report, expectedValues = {}, status) {
     }
 }
 
-function createJob(testId, emails, webhooks) {
+function createJob(testId, { emails, webhooks, type = 'load_test', arrival_count, arrival_rate = 10 } = options) {
     let jobOptions = {
         test_id: testId,
-        arrival_rate: 10,
+        type,
+        arrival_rate,
+        arrival_count,
         duration: 10,
-        type: 'load_test',
         environment: 'test',
         cron_expression: '0 0 1 * *',
         notes: 'My first performance test',
-        max_virtual_users: 500
+        max_virtual_users: 500,
+        emails,
+        webhooks
     };
-
-    if (emails) {
-        jobOptions.emails = emails;
-    }
-
-    if (webhooks) {
-        jobOptions.webhooks = webhooks;
-    }
 
     return jobRequestCreator.createJob(jobOptions, {
         'Content-Type': 'application/json'
@@ -1076,7 +1088,7 @@ function generateTestConfiguration(jobType) {
         job_type: jobType,
         enviornment: 'test',
         duration: 10,
-        arrival_rate: jobType === 'load_test' ? 20 : undefined,
+        arrival_rate: jobType === 'load_test' ? 10 : undefined,
         arrival_count: jobType === 'functional_test' ? 50 : undefined
     };
 }
