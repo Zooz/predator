@@ -1063,7 +1063,7 @@ function validateFinishedReport(report, expectedValues = {}, status) {
     }
 }
 
-function createJob(testId, { emails, webhooks, type = 'load_test', arrival_count, arrival_rate = 10 } = options) {
+function createJob(testId, { emails, webhooks, type = 'load_test', arrival_count, arrival_rate = 10 } = {}) {
     let jobOptions = {
         test_id: testId,
         type,
