@@ -1,91 +1,122 @@
 import React from 'react';
 import CollapsibleItem from '../../../components/CollapsibleItem/CollapsibleItem';
-import {EVENTS} from './constatns';
-import WebhookForm  from './WebhookForm';
+import WebhookForm from './WebhookForm';
+import {buildStateFromWebhook, createWebhookRequest} from './utils'
+import {webhooks, loading, webhookSuccess} from "../../redux/selectors/webhooksSelector";
+import * as Actions from "../../redux/action";
+import {connect} from "react-redux";
+
 const Section = CollapsibleItem.Section;
 
 
-export default class CollapsibleWebhook extends React.Component {
+export class CollapsibleWebhook extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            expanded: true
+        if (props.webhook) {
+            this.state = {webhook: buildStateFromWebhook(props.webhook)}
+        } else {
+            this.state = {
+                webhook: {
+                    events: {},
+                    format_type: 'slack'
+                }
+            }
+        }
+        this.state.expanded = props.createMode || false;
+    }
+
+    onChangeWebhook = (webhook) => {
+        this.setState({webhook});
+    };
+
+    onSubmit = () => {
+        const {createMode} = this.props;
+        const {webhook} = this.state;
+        if (createMode) {
+            this.props.createWebhook(createWebhookRequest(webhook));
+        } else {
+            this.props.editWebhook(createWebhookRequest(webhook), webhook.id);
+            this.setState({expanded: false});
+        }
+    };
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.webhookSuccess === true && prevProps.webhookSuccess === false) {
+            this.props.setWebhookSuccess(false);
+            this.props.onClose();
         }
     }
 
     render() {
-        const {
-            onDuplicateStep,
-            onDeleteStep, index
-        } = this.props;
-        const sections = [
-            <Section key={1} borderLeft>
-                {/*<Input style={{marginRight: '5px'}} value={this.props.step.name} placeholder={'Name'}*/}
-                {/*       onClick={(evt) => {*/}
-                {/*           evt.stopPropagation();*/}
 
-                {/*       }} onChange={this.onStepNameChange}/>*/}
-            </Section>,
-            <Section key={2} onClick={(evt) => {
+        const sections = createMode ? undefined : [
+            <Section key={1} onClick={(evt) => {
                 evt.stopPropagation();
-                onDuplicateStep(index)
-            }} icon='fa-copy' tooltip='Duplicate step' borderLeft/>,
-            <Section key={3} onClick={(evt) => {
-                evt.stopPropagation();
-                onDeleteStep(index)
-            }} icon='fa-trash' tooltip='Delete step' borderLeft/>,
+                this.props.deleteWebhook(this.state.webhook.id)
+            }} icon='fa-trash' tooltip='Delete webhook' borderLeft/>,
 
         ]
         const {expanded} = this.state;
-        return (<CollapsibleItem
-            onClick={(evt) => {
-                this.setState({expanded: !this.state.expanded})
-            }}
-            editable={true}
-            expanded={expanded}
-            toggleable={true}
-            type={CollapsibleItem.TYPES.CLICKER}
-            disabled={false}
-            icon={this.generateIcon()}
-            title={this.generateTitle()}
-            body={this.generateBody()}
-            sections={sections}
-        />)
+        const {createMode} = this.props;
+        return (
+            <div style={{width: '756px'}}>
+                <CollapsibleItem
+                    onClick={(evt) => {
+                        !createMode && this.setState({expanded: !this.state.expanded})
+                    }}
+                    editable={true}
+                    expanded={expanded}
+                    toggleable={!createMode}
+                    type={createMode ? CollapsibleItem.TYPES.DEFAULT : CollapsibleItem.TYPES.CLICKER}
+                    disabled={false}
+                    icon={this.generateIcon()}
+                    title={this.generateTitle()}
+                    body={this.generateBody()}
+                    sections={sections}
+                />
+            </div>
+
+        )
 
     }
 
     generateIcon = () => {
-        // const {step} = this.props;
-        // if (step.type === SLEEP) {
-        //     return 'fa-clock-o'
-        // }
-        // return 'fa-flash'
+        return 'fa-slack'
     };
-    onStepNameChange = (evt) => {
-        // evt.stopPropagation();
-        // const step = {...this.props.step};
-        // step.name = evt.target.value;
-        // this.props.onChangeValueOfStep(step, this.props.index)
-    };
+
     generateTitle = () => {
-        const {webhook} = this.props;
+        const {webhook} = this.state;
         return <div style={{
             textOverflow: 'ellipsis',
             maxWidth: '600px',
             overflow: 'hidden',
             whiteSpace: 'nowrap'
-        }}>{`${webhook.name} ${webhook.url}`}</div>
+        }}>{`${webhook.name || ''} ${webhook.url || ''}`}</div>
     };
 
-    generateBody = () => {
-        // const {index, onChangeValueOfStep, processorsExportedFunctions, step} = this.props;
 
+    generateBody = () => {
         return (
-           <WebhookForm webhook={this.props.webhook}/>
+            <WebhookForm onCancel={this.props.onClose} loading={this.props.loading} onSubmit={this.onSubmit}
+                         onChangeWebhook={this.onChangeWebhook} webhook={this.state.webhook}/>
         )
     }
 
 }
 
 
+function mapStateToProps(state) {
+    return {
+        loading: loading(state),
+        webhookSuccess: webhookSuccess(state),
+    }
+}
 
+const mapDispatchToProps = {
+    createWebhook: Actions.createWebhook,
+    editWebhook: Actions.editWebhook,
+    deleteWebhook: Actions.deleteWebHook,
+    setWebhookSuccess: Actions.createWebHookSuccess,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CollapsibleWebhook);

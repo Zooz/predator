@@ -4,6 +4,7 @@ import { processorsRegister } from '../features/redux/saga/processorsSagas';
 import { reportsRegister } from '../features/redux/saga/reportsSagas';
 import { jobsRegister } from '../features/redux/saga/jobsSagas';
 import { configRegister } from '../features/redux/saga/configSagas';
+import { webhooksRegister } from '../features/redux/saga/webhooksSagas';
 
 export default function * rootSaga () {
   yield all([
@@ -11,6 +12,7 @@ export default function * rootSaga () {
     testsRegister(),
     reportsRegister(),
     jobsRegister(),
-    configRegister()
+    configRegister(),
+    webhooksRegister()
   ]);
 }

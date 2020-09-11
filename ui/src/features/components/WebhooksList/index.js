@@ -1,25 +1,25 @@
 import React from 'react';
 import CollapsibleWebhook from './CollapsibleWebhook';
 
-const WebhooksList = ({webhooks}) => {
+const WebhooksList = ({webhooks, onClose, createMode}) => {
 
 
     return (
-        <div style={{flex: 1, display: 'flex', flexDirection:'column', alignItems: 'center'}}>
+        <div style={{flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+
             {
-                webhooks.map((webhook) => {
+                (createMode && <CollapsibleWebhook onClose={onClose} createMode={createMode}/>)
+                ||
+                webhooks.map((webhook, index) => {
                     return (
-                        <div style={{flex: 1, maxWidth: '746px'}}>
-                            <CollapsibleWebhook webhook={webhook}/>
-                        </div>
+                        <CollapsibleWebhook key={index} webhook={webhook}/>
                     )
                 })
             }
 
         </div>
     )
-
-
 };
+
 
 export default WebhooksList;

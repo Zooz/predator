@@ -1,22 +1,13 @@
-import React, {useState} from "react";
-
-const statusToColor = {
-    'UP': 'green',
-    'DOWN': 'red',
-    'N/A': 'grey',
-    'SERVICE_DEPENDENCIES': '#dde02f'
-};
-
 const headerFontStyle = {
     color: '#557eff',
     fontWeight: 'bold',
 };
 
 
-const SimpleTable = ({style,headers=[], rows=[]}) => {
+const SimpleTable = ({style, headers = [], rows = []}) => {
 
     return (
-        <div style={{borderRadius: '25px',...style}}>
+        <div style={{borderRadius: '25px', ...style}}>
             <div style={{
                 ...headerFontStyle,
                 display: 'flex',
@@ -24,7 +15,7 @@ const SimpleTable = ({style,headers=[], rows=[]}) => {
                 justifyContent: 'space-between'
             }}>
                 {
-                    headers.map((header,index) => <div key={index}>{header}</div>)
+                    headers.map((header, index) => <div key={index}>{header}</div>)
                 }
             </div>
             {
@@ -36,21 +27,12 @@ const SimpleTable = ({style,headers=[], rows=[]}) => {
     )
 };
 
-const SideHeader = ({title, children, style = {}}) => {
-    return (
-        <div style={{display: 'flex', marginBottom: '5px', flexDirection: 'column', ...style}}>
-            <div style={{...headerFontStyle}}>{title}</div>
-            {children}
-        </div>
-    )
-}
-
-const Row = ({rowContent=[]}) => {
+const Row = ({rowContent = []}) => {
     return (
         <div style={rowStyle}>
-            <div style={{cursor: 'pointer', ...rowContentStyle}}>
+            <div style={{...rowContentStyle}}>
                 {
-                    rowContent.map((content) => <div>{content}</div>)
+                    rowContent.map((content,index) => <div key={index}>{content}</div>)
                 }
             </div>
         </div>

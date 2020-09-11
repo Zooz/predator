@@ -1,27 +1,32 @@
 import TitleInput from "../../../components/TitleInput";
 import Input from "../../../components/Input";
 import RectangleAlignChildrenLeft from "../../../components/RectangleAlign/RectangleAlignChildrenLeft";
-import React from "react";
+import React, {useState} from "react";
 import {EVENTS, WEBHOOK_TYPES} from "./constatns";
 import SimpleTable from "../SimpleTable";
 import RadioOptions from "../../../components/RadioOptions";
-import ErrorWrapper from "../../../components/ErrorWrapper";
-import Button from "../../../components/Button";
 import UiSwitcher from "../../../components/UiSwitcher";
+import SubmitBar from '../SubmitBar'
 
+const WebhookForm = ({loading, onSubmit, onCancel, onChangeWebhook, webhook}) => {
 
-const WebhookForm = ({webhook}) => {
+    const onChangeProps = (props) => {
+        const newWebhook = {...webhook, ...props};
+        onChangeWebhook(newWebhook)
+    };
 
-    const rows = EVENTS.map((event) => {
-
+    const rows = EVENTS.map((event, index) => {
         return [
-            <div>{event}</div>,
+            <div key={'header' + index}>{event}</div>,
             <UiSwitcher
+                key={index}
                 onChange={(value) => {
-                    // onGzipToggleChanged(value)
+                    const newWebhook = {...webhook};
+                    newWebhook.events[event] = value;
+                    onChangeWebhook(newWebhook)
                 }}
-                disabledInp={false}
-                activeState={true}
+                disabledInp={loading}
+                activeState={webhook.events[event]}
                 height={12}
                 width={22}
             />,
@@ -32,28 +37,25 @@ const WebhookForm = ({webhook}) => {
         <div style={{padding: '10px', display: 'flex', flexDirection: 'column'}}>
             <RectangleAlignChildrenLeft style={{marginBottom: '10px'}}>
                 <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Name'}>
-                    <Input value={webhook.name} onChange={(evt) => {
-                        // onInputChange({url: evt.target.value})
+                    <Input disabled={loading} value={webhook.name} onChange={(evt) => {
+                        onChangeProps({name: evt.target.value})
                     }}/>
                 </TitleInput>
                 <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Url'}>
-                    <Input value={webhook.url} onChange={(evt) => {
-                        // onInputChange({url: evt.target.value})
+                    <Input disabled={loading} value={webhook.url} onChange={(evt) => {
+                        onChangeProps({url: evt.target.value})
                     }}/>
                 </TitleInput>
 
             </RectangleAlignChildrenLeft>
             <SimpleTable style={{paddingLeft: '40px', paddingRight: '40px'}} headers={['Event', 'On/Off']} rows={rows}/>
             <TitleInput style={{marginRight: '10px', flexGrow: 1}} title={'Type'}>
-                <RadioOptions value={WEBHOOK_TYPES[0]} list={WEBHOOK_TYPES}
+                <RadioOptions value={webhook.format_type} list={WEBHOOK_TYPES}
                               onChange={(value) => {
+                                  onChangeProps({format_type: value})
                               }}/>
             </TitleInput>
-            <div style={{alignSelf: 'flex-end'}}>
-                <Button spinner={false} hover disabled={false}
-                        onClick={() => {
-                        }}>Submit</Button>
-            </div>
+            <SubmitBar onCancel={onCancel} onSubmit={onSubmit} loading={loading}/>
         </div>
     )
 
