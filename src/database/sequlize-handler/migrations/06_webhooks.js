@@ -14,6 +14,10 @@ const columns = [
     {
         name: 'global',
         dt: Sequelize.DataTypes.BOOLEAN
+    },
+    {
+        name: 'format_type',
+        dt: Sequelize.DataTypes.TEXT('medium')
     }
 ];
 
