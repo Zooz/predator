@@ -5,6 +5,7 @@ const _ = require('lodash');
 const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
+    { JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
     constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
@@ -70,13 +71,19 @@ module.exports.postReport = async (testId, reportBody) => {
     const phase = '0';
 
     const testConfiguration = {
-        arrival_rate: job.arrival_rate,
+        job_type: job.type,
         duration: job.duration,
-        ramp_to: job.ramp_to,
         parallelism: job.parallelism || 1,
         max_virtual_users: job.max_virtual_users,
         environment: job.environment
     };
+
+    if (job.type === JOB_TYPE_FUNCTIONAL_TEST) {
+        testConfiguration.arrival_count = job.arrival_count;
+    } else {
+        testConfiguration.arrival_rate = job.arrival_rate;
+        testConfiguration.ramp_to = job.ramp_to;
+    }
 
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, phase, startTime, reportBody.test_name,
@@ -117,11 +124,13 @@ function getReportResponse(summaryRow, config) {
         revision_id: summaryRow.revision_id,
         report_id: summaryRow.report_id,
         job_id: summaryRow.job_id,
+        job_type: testConfiguration.job_type,
         test_type: summaryRow.test_type,
         start_time: summaryRow.start_time,
         end_time: summaryRow.end_time || undefined,
         phase: summaryRow.phase,
         duration_seconds: reportDurationSeconds,
+        arrival_count: testConfiguration.arrival_count,
         arrival_rate: testConfiguration.arrival_rate,
         duration: testConfiguration.duration,
         ramp_to: testConfiguration.ramp_to,

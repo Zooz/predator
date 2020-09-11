@@ -11,7 +11,6 @@ const STATS_INTERVAL = 30;
 
 module.exports = {
     aggregateReport
-
 };
 
 async function aggregateReport(report) {
