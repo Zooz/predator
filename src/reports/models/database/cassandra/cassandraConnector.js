@@ -233,9 +233,9 @@ async function joinReportsWIthSubscribers(reports) {
         subscribers = await getReportSubscribers(report.test_id, report.report_id);
         subscribers = subscribers.map((subscriber) => {
             return {
-                'runner_id': subscriber.runner_id,
-                'phase_status': subscriber.phase_status,
-                'last_stats': JSON.parse(subscriber.last_stats)
+                runner_id: subscriber.runner_id,
+                phase_status: subscriber.phase_status,
+                last_stats: JSON.parse(subscriber.last_stats)
             };
         });
         report.subscribers = subscribers;

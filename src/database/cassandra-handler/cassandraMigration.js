@@ -17,9 +17,9 @@ let initFileNameTemplate = 'cassandra_config_template.json',
     initFileName = 'cassandra_config.json';
 
 let cassandraHandlerLogContext = {
-    'key_space_name': cassandraConfig.name,
-    'initFileNameTemplate': initFileNameTemplate,
-    'init_file_name': initFileName
+    key_space_name: cassandraConfig.name,
+    initFileNameTemplate: initFileNameTemplate,
+    init_file_name: initFileName
 };
 
 const options = {
@@ -68,7 +68,7 @@ module.exports.runMigration = function () {
         .then(function () {
             initKeyspaceCassandraConnection(args.key_space_name);
             cassandraHandlerLogContext = {
-                'key_space_name': cassandraConfig.name
+                key_space_name: cassandraConfig.name
             };
         })
         .catch(function (error) {
