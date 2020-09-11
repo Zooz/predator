@@ -14,7 +14,7 @@ module.exports = {
 
 };
 
-async function aggregateReport (report) {
+async function aggregateReport(report) {
     let stats = await databaseConnector.getStats(report.test_id, report.report_id);
 
     if (stats.length === 0) {
@@ -75,6 +75,7 @@ function createAggregateManually(listOfStats) {
         scenariosCompleted: 0,
         pendingRequests: 0,
         scenarioCounts: {},
+        assertions: {},
         errors: {},
         concurrency: 0,
         codes: {},
@@ -114,6 +115,28 @@ function createAggregateManually(listOfStats) {
 
         result.rps.count += stats.rps.count;
         result.rps.mean += stats.rps.mean;
+
+        _.each(stats.assertions, function (assertions, name) {
+            if (!result.assertions[name]) {
+                result.assertions[name] = {};
+            }
+
+            Object.keys(assertions).forEach(assertResultName => {
+                if (!result.assertions[name][assertResultName]) {
+                    result.assertions[name][assertResultName] = { success: 0, fail: 0, failureResponses: {} };
+                }
+
+                result.assertions[name][assertResultName].success += assertions[assertResultName].success;
+                result.assertions[name][assertResultName].fail += assertions[assertResultName].fail;
+
+                Object.keys(assertions[assertResultName].failureResponses).forEach((failureResponseName) => {
+                    if (!result.assertions[name][assertResultName].failureResponses[failureResponseName]) {
+                        result.assertions[name][assertResultName].failureResponses[failureResponseName] = 0;
+                    }
+                    result.assertions[name][assertResultName].failureResponses[failureResponseName] += assertions[assertResultName].failureResponses[failureResponseName];
+                });
+            });
+        });
 
         _.each(stats.scenarioCounts, function (count, name) {
             if (result.scenarioCounts[name]) {
