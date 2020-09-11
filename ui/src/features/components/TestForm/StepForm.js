@@ -20,7 +20,6 @@ import TitleInput from "../../../components/TitleInput";
 import DynamicKeyValueInput from './DynamicKeyValueInput';
 import CustomDropdown from './CustomDropdown';
 import Expectations from './Expectations';
-import Example from "../PieChart";
 
 export default (props) => {
 

@@ -21,11 +21,12 @@ export default class CollapsibleStep extends React.Component {
         } = this.props;
         const sections = [
             <Section key={1} borderLeft>
-                <Input style={{marginRight: '5px'}} value={this.props.step.name} placeholder={'Name'} onClick={(evt) => {
-                    evt.stopPropagation();
+                <Input style={{marginRight: '5px'}} value={this.props.step.name} placeholder={'Name'}
+                       onClick={(evt) => {
+                           evt.stopPropagation();
 
-                }} onChange={this.  onStepNameChange}/>
-            </Section>   ,
+                       }} onChange={this.onStepNameChange}/>
+            </Section>,
             <Section key={2} onClick={(evt) => {
                 evt.stopPropagation();
                 onDuplicateStep(index)
@@ -93,11 +94,7 @@ export default class CollapsibleStep extends React.Component {
                     />
 
                 }
-
-
             </div>
-
-
         )
     }
 

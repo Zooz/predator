@@ -1,6 +1,11 @@
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
-import {CONTENT_TYPES, CAPTURE_TYPE_TO_REQUEST, CAPTURE_RES_TYPE_TO_CAPTURE_TYPE} from './constants';
+import {
+    CONTENT_TYPES,
+    CAPTURE_TYPE_TO_REQUEST,
+    CAPTURE_RES_TYPE_TO_CAPTURE_TYPE,
+    EXPECTATIONS_SPEC_BY_PROP
+} from './constants';
 
 const SLEEP = 'sleep';
 export const createTestRequest = (data) => {
@@ -21,7 +26,8 @@ export const createTestRequest = (data) => {
         processor_id: processorId,
         artillery_test: {
             config: {
-                target: baseUrl
+                target: baseUrl,
+                expect: {}
             },
             before: before ? {flow: prepareFlow(before.steps)} : undefined,
             scenarios: scenariosRequest
@@ -148,6 +154,7 @@ function buildExpectationState(expectations) {
         const action = Object.keys(cur)[0];
 
         return {
+            ...(EXPECTATIONS_SPEC_BY_PROP[action] || {}),
             type: action,
             key: Array.isArray(cur[action]) ? cur[action][0] : undefined,
             value: Array.isArray(cur[action]) ? cur[action][1] : cur[action],
@@ -214,7 +221,7 @@ function prepareExpec(expectations) {
             result.push({
                 [expectObject.type]: [expectObject.key, expectObject.value]
             });
-        }else if (expectObject.hasOwnProperty('value')) {
+        } else if (expectObject.hasOwnProperty('value')) {
             result.push({
                 [expectObject.type]: expectObject.value,
             });
