@@ -6,7 +6,7 @@ const logger = require('../../common/logger'),
     util = require('util'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
-    configConstants = require('../../common/consts').CONFIG;
+    { CONFIG, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts');
 
 let jobConnector;
 let cronJobs = {};
@@ -14,7 +14,7 @@ const PREDATOR_RUNNER_PREFIX = 'predator';
 const JOB_PLATFORM_NAME = PREDATOR_RUNNER_PREFIX + '.%s';
 
 module.exports.init = async () => {
-    let jobPlatform = await configHandler.getConfigValue(configConstants.JOB_PLATFORM);
+    let jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     jobConnector = require(`./${jobPlatform.toLowerCase()}/jobConnector`);
 };
 
@@ -33,7 +33,7 @@ module.exports.reloadCronJobs = async () => {
 };
 
 module.exports.scheduleFinishedContainersCleanup = async () => {
-    let interval = await configHandler.getConfigValue(configConstants.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
+    let interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
     if (interval > 0) {
         logger.info(`Setting containers clean up with interval of ${interval}`);
         return setInterval(async () => {
@@ -194,28 +194,33 @@ function createResponse(jobId, jobBody, runId) {
 function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
     const jobTemplate = require(`./${configData.job_platform.toLowerCase()}/jobTemplate`);
     let jobName = util.format(JOB_PLATFORM_NAME, jobId);
-    let rampToPerRunner = jobBody.ramp_to;
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
-
     let parallelism = jobBody.parallelism || 1;
-    let arrivalRatePerRunner = Math.ceil(jobBody.arrival_rate / parallelism);
-    if (jobBody.ramp_to) {
-        rampToPerRunner = Math.ceil(jobBody.ramp_to / parallelism);
+    const environmentVariables = {
+        JOB_ID: jobId,
+        RUN_ID: runId.toString(),
+        JOB_TYPE: jobBody.type,
+        ENVIRONMENT: jobBody.environment,
+        TEST_ID: jobBody.test_id,
+        PREDATOR_URL: configData.internal_address,
+        DELAY_RUNNER_MS: configData.delay_runner_ms.toString(),
+        DURATION: jobBody.duration.toString()
+    };
+    if (jobBody.type === JOB_TYPE_FUNCTIONAL_TEST) {
+        const arrivalCountPerRunner = Math.ceil(jobBody.arrival_count / parallelism);
+        environmentVariables.ARRIVAL_COUNT = arrivalCountPerRunner.toString();
+    } else {
+        const arrivalRatePerRunner = Math.ceil(jobBody.arrival_rate / parallelism);
+        environmentVariables.ARRIVAL_RATE = arrivalRatePerRunner.toString();
+        if (jobBody.ramp_to) {
+            const rampToPerRunner = Math.ceil(jobBody.ramp_to / parallelism);
+            environmentVariables.RAMP_TO = rampToPerRunner.toString();
+        }
     }
     if (jobBody.max_virtual_users) {
         maxVirtualUsersPerRunner = Math.ceil(jobBody.max_virtual_users / parallelism);
     }
 
-    let environmentVariables = {
-        JOB_ID: jobId,
-        RUN_ID: runId.toString(),
-        ENVIRONMENT: jobBody.environment,
-        TEST_ID: jobBody.test_id,
-        PREDATOR_URL: configData.internal_address,
-        DELAY_RUNNER_MS: configData.delay_runner_ms.toString(),
-        ARRIVAL_RATE: arrivalRatePerRunner.toString(),
-        DURATION: jobBody.duration.toString()
-    };
     let metricsExport = configData.metrics_plugin_name === 'influx' ? configData.influx_metrics : configData.prometheus_metrics;
 
     if (configData.metrics_plugin_name && metricsExport) {
@@ -241,11 +246,6 @@ function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
     }
     if (jobBody.webhooks) {
         environmentVariables.WEBHOOKS = jobBody.webhooks.join(';');
-    }
-    if (rampToPerRunner) {
-        environmentVariables.RAMP_TO = rampToPerRunner.toString();
-    } else {
-        delete environmentVariables.RAMP_TO;
     }
 
     if (maxVirtualUsersPerRunner) {

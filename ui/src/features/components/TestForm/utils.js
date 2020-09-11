@@ -1,5 +1,6 @@
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
+import {CONTENT_TYPES, CAPTURE_TYPE_TO_REQUEST, CAPTURE_RES_TYPE_TO_CAPTURE_TYPE} from './constants';
 
 const SLEEP = 'sleep';
 export const createTestRequest = (data) => {
@@ -94,14 +95,16 @@ function buildStepsFromFlow(flow) {
             type: 'http',
             id: uuid(),
             method: action.toUpperCase(),
-            body: request[action].json,
+            body: request[action].json || request[action].body || request[action].form || request[action].formData,
             gzip: request[action].gzip,
             forever: request[action].forever,
             url: request[action].url,
+            name: request[action].name,
             beforeRequest: request[action].beforeRequest,
             afterResponse: request[action].afterResponse,
             captures: buildCaptureState(request[action].capture),
-            headers: buildHeadersState(request[action].headers)
+            headers: buildHeadersState(request[action].headers),
+            contentType: (request[action].json && CONTENT_TYPES.APPLICATION_JSON) || (request[action].form && CONTENT_TYPES.FORM) || (request[action].formData && CONTENT_TYPES.FORM_DATA) || CONTENT_TYPES.OTHER
         }
     })
 }
@@ -126,8 +129,12 @@ function buildCaptureState(captures) {
     }
     return captures.map((cur) => {
         return {
-            key: cur.json,
-            value: cur.as
+            key: cur.json || cur.xpath || cur.regexp || cur.header,
+            value: cur.as,
+            type: (cur.json && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.json)
+                || (cur.xpath && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.xpath) ||
+                (cur.regexp && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.regexp) ||
+                (cur.header && CAPTURE_RES_TYPE_TO_CAPTURE_TYPE.header)
         }
     })
 }
@@ -143,8 +150,12 @@ function prepareFlow(steps) {
         return {
             [step.method.toLowerCase()]: {
                 url: step.url,
+                name:step.name,
                 headers: prepareHeadersFromArray(step.headers),
-                json: step.body,
+                json: step.contentType === CONTENT_TYPES.APPLICATION_JSON ? step.body : undefined,
+                body: step.contentType === CONTENT_TYPES.OTHER ? step.body : undefined,
+                form: step.contentType === CONTENT_TYPES.FORM ? step.body : undefined,
+                formData: step.contentType === CONTENT_TYPES.FORM_DATA ? step.body : undefined,
                 capture: prepareCapture(step.captures),
                 gzip: step.gzip,
                 forever: step.forever,
@@ -170,7 +181,7 @@ function prepareCapture(captures) {
     captures.forEach((captureObject) => {
         if (captureObject.key) {
             result.push({
-                json: captureObject.key,
+                [CAPTURE_TYPE_TO_REQUEST[captureObject.type]]: captureObject.key,
                 as: captureObject.value
             });
         }
