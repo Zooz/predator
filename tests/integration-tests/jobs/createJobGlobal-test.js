@@ -37,9 +37,7 @@ describe('Create job global tests', function () {
                     res.statusCode.should.eql(400);
                     res.body.should.eql({
                         message: 'Input validation error',
-                        validation_errors: [
-                            'body/type should be equal to one of the allowed values [load_test,functional_test]'
-                            ]
+                        validation_errors: ['body/type should be equal to one of the allowed values [load_test,functional_test]']
                     });
                 });
         });
@@ -284,6 +282,7 @@ describe('Create job global tests', function () {
                 };
 
                 const job = {
+                    type: 'load_test',
                     arrival_rate: 1,
                     duration: 120,
                     environment: 'test',
@@ -321,6 +320,7 @@ describe('Create job global tests', function () {
                 };
 
                 const job = {
+                    type: 'load_test',
                     arrival_rate: 1,
                     duration: 120,
                     environment: 'test',
