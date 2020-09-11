@@ -2318,17 +2318,22 @@ components:
           type: object
           description: Error thrown while running test
     report_response:
+      discriminator:
+        propertyName: job_type
+      oneOf:
+        - $ref: '#/components/schemas/load_test'
+        - $ref: '#/components/schemas/functional_test'
       required:
         - test_id
         - revision_id
         - report_id
         - job_id
+        - job_type
         - test_type
         - status
         - start_time
         - end_time
         - duration_seconds
-        - arrival_rate
       properties:
         test_id:
           type: string

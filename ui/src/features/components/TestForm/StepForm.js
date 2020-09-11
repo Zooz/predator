@@ -1,24 +1,26 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-import JSONInput from 'react-json-editor-ajrm';
-import locale from 'react-json-editor-ajrm/locale/en';
 import RectangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft'
 import {cloneDeep} from 'lodash'
 import RequestOptions from './requestOptions';
 import ProcessorsDropDown from './ProcessorsDropDown';
+import ContentTypeList from './../../../components/RadioOptions';
+import BodyEditor from './BodyEditor';
+import {
+    SUPPORTED_CONTENT_TYPES,
+    SUPPORTED_CAPTURE_TYPES,
+    CONTENT_TYPES,
+    CAPTURE_TYPES,
+    HTTP_METHODS, CAPTURE_KEY_VALUE_PLACEHOLDER
+} from './constants'
 
 import style from './stepform.scss';
 import Input from "../../../components/Input";
 import TitleInput from "../../../components/TitleInput";
-import Dropdown from "../../../components/Dropdown/Dropdown.export";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faPlus,
-    faMinus
-} from '@fortawesome/free-solid-svg-icons'
+import DynamicKeyValueInput from './DynamicKeyValueInput';
+import CustomDropdown from './CustomDropdown';
 
 export default (props) => {
-    const sampleObject = {};
 
     const onHeaderChange = (key, value, index) => {
         const {onChangeValue} = props;
@@ -42,13 +44,24 @@ export default (props) => {
     const onAddCapture = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
-        step.captures.push({});
+        const newCapture = {type: step.captures[step.captures.length - 1].type || CAPTURE_TYPES.JSON_PATH};
+        newCapture.keyPlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[newCapture.type].key;
+        newCapture.valuePlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[newCapture.type].value;
+        step.captures.push(newCapture);
         onChangeValue(step, props.index);
     };
     const onDeleteCapture = (index) => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
         step.captures.splice(index, 1);
+        onChangeValue(step, props.index);
+    };
+    const onChangeCaptureType = (value, index) => {
+        const {onChangeValue} = props;
+        const step = cloneDeep(props.step);
+        step.captures[index].type = value;
+        step.captures[index].valuePlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[step.captures[index].type].value;
+        step.captures[index].keyPlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[step.captures[index].type].key;
         onChangeValue(step, props.index);
     };
     const onCaptureChange = (key, value, index) => {
@@ -58,28 +71,44 @@ export default (props) => {
         onChangeValue(step, props.index);
     };
 
-    const onBodyChange = (value) => {
-        if (!value.error) {
-            const {onChangeValue} = props;
-            const step = cloneDeep(props.step);
-            step.body = value.jsObject;
-            onChangeValue(step, props.index);
+    const onBodyChange = (editorType, value) => {
+        if (editorType === CONTENT_TYPES.APPLICATION_JSON && value.error) {
+            return; //error in json parsing
         }
-    };
-
-    const onInputChange = (key, value) => {
+        const content = editorType === CONTENT_TYPES.APPLICATION_JSON ? value.jsObject : value;
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
-
-        step[key] = value;
+        step.body = content;
         onChangeValue(step, props.index);
     };
 
+    const onInputChange = (newProps) => {
+        const {onChangeValue} = props;
+        const step = Object.assign(cloneDeep(props.step), newProps);
+        onChangeValue(step, props.index);
+    };
+
+    const onChangeContentType = (value) => {
+        const step = cloneDeep(props.step);
+        let body = step.body;
+        if (value === CONTENT_TYPES.APPLICATION_JSON) {
+            if (typeof step.body !== 'object') {
+                try {
+                    body = JSON.parse(step.body)
+                } catch (err) {
+                    body = undefined;
+                }
+            }
+        }
+        const {onChangeValue} = props;
+        step.contentType = value;
+        step.body = body;
+        onChangeValue(step, props.index);
+    };
 
     const {
         step, processorsExportedFunctions
     } = props;
-    const disableSampleBody = step.method === 'GET';
     const jsonObjectKey = step.method === 'GET' ? 'get' : 'not-get';
 
     return (
@@ -87,29 +116,33 @@ export default (props) => {
             <div className={style['http-methods-request-options-wrapper']}>
                 <RectangleAlignChildrenLeft className={style['rectangle-url-row']}>
                     <TitleInput style={{flex: 0, marginRight: '10px'}} width={'120px'} title={'Method'}>
-                        <HttpMethodDropdown
+                        <CustomDropdown
+                            list={HTTP_METHODS}
                             value={step.method}
-                            onChange={(value) => onInputChange('method', value)}
+                            onChange={(value) => {
+                                onInputChange({method: value, contentType: CONTENT_TYPES.NONE});
+                            }}
+                            placeHolder={'Method'}
                         />
                     </TitleInput>
                     <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Url'}>
                         <Input value={step.url} onChange={(evt) => {
-                            onInputChange('url', evt.target.value)
+                            onInputChange({url: evt.target.value})
                         }}/>
                     </TitleInput>
                     <TitleInput style={{marginRight: '10px'}} title={'Before Request'}>
                         <ProcessorsDropDown options={processorsExportedFunctions}
-                                            onChange={(value) => onInputChange('beforeRequest', value)}
+                                            onChange={(value) => onInputChange({beforeRequest: value})}
                                             value={step.beforeRequest}/>
                     </TitleInput>
                     <TitleInput title={'After Response'}>
                         <ProcessorsDropDown options={processorsExportedFunctions}
-                                            onChange={(value) => onInputChange('afterResponse', value)}
+                                            onChange={(value) => onInputChange({afterResponse: value})}
                                             value={step.afterResponse}/>
                     </TitleInput>
                     <RequestOptions
-                        onGzipToggleChanged={(value) => onInputChange('gzip', value)}
-                        onForeverToggleChanged={(value) => onInputChange('forever', value)}
+                        onGzipToggleChanged={(value) => onInputChange({gzip: value})}
+                        onForeverToggleChanged={(value) => onInputChange({forever: value})}
                         gzipValue={step.gzip}
                         foreverValue={step.forever}
                     />
@@ -127,96 +160,27 @@ export default (props) => {
                 <div>
                     <Header text={'Captures'}/>
                     <DynamicKeyValueInput value={step.captures} onChange={onCaptureChange} onAdd={onAddCapture}
-                                          onDelete={onDeleteCapture} keyHintText={'$.id'} valueHintText={'id'}/>
+                                          onDelete={onDeleteCapture}
+                                          dropdownOptions={SUPPORTED_CAPTURE_TYPES}
+                                          dropDownPlaceHolder={'Type'}
+                                          dropDownOnChange={onChangeCaptureType}
+                    />
 
                 </div>
             </div>
-            <Header text={'Body'}/>
-            <JSONInput
-                style={{
-                    outerBox: {height: null, 'min-height': '200px'},
-                    container: {height: null, border: '1px solid #557EFF', 'min-height': '200px'}
-                }}
-                key={jsonObjectKey}
-                id='a_unique_id'
-                placeholder={step.body || (disableSampleBody ? undefined : sampleObject)}
-                colors={{
-                    default: 'black',
-                    background: 'white',
-                    string: 'red',
-                    keys: 'blue'
-                }}
-                locale={locale}
-                width={'100%'}
-                onChange={onBodyChange}
-            />
+            <RectangleAlignChildrenLeft style={{alignItems: 'center', marginBottom: '11px'}}>
+                <Header text={'Body'} style={{marginBottom: 0, marginRight: '5px'}}/>
+                <ContentTypeList value={step.contentType} list={SUPPORTED_CONTENT_TYPES}
+                                 onChange={onChangeContentType}/>
+            </RectangleAlignChildrenLeft>
+            <BodyEditor type={step.contentType} content={step.body} key={jsonObjectKey} onChange={onBodyChange}/>
         </div>
 
     )
 }
 
-const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, valueHintText}) => {
-    const headersList = value
-        .map((header, index) => {
-            return (
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    width: '100%',
-                    marginBottom: index !== headersList - 1 ? '5px' : undefined
-                }} key={`${index}.${header.key}.${header.value}`}>
-                    <Input style={{marginRight: '10px'}} value={header.key} onChange={(evt) => {
-                        onChange('key', evt.target.value, index)
-                    }} placeholder={keyHintText || 'key'}/>
 
-                    <Input value={header.value} onChange={(evt) => {
-                        onChange('value', evt.target.value, index)
-                    }} placeholder={valueHintText || 'value'}/>
-
-                    {
-                        value.length - 1 === index &&
-                        <FontAwesomeIcon
-                            style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
-                            onClick={() => onAdd(index)}
-                            icon={faPlus}/>
-                        ||
-                        (index < value.length - 1 && <FontAwesomeIcon
-                            style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
-                            onClick={() => onDelete(index)}
-                            icon={faMinus}/>)
-                    }
-                </div>
-            )
-        });
-
-    return (
-        <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '10px'}}>
-            {headersList}
-        </div>
-    )
-}
-
-const HttpMethodDropdown = (props) => {
-    const httpMethods = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'CONNECT', 'TRACE'];
-    const {onChange, value} = props;
-    return (
-        <Dropdown
-            options={httpMethods.map((option) => ({key: option, value: option}))}
-            selectedOption={{key: value, value: value}}
-            onChange={(selected) => {
-                onChange(selected.value)
-            }}
-            placeholder={"Method"}
-            height={'35px'}
-            disabled={false}
-            validationErrorText=''
-            enableFilter={false}
-        />
-    )
-}
-
-
-const Header = ({text}) => {
+const Header = ({text, style = {}}) => {
     return (
         <div style={{
             // fontFamily: 'Roboto',
@@ -227,8 +191,8 @@ const Header = ({text}) => {
             color: '#778195',
             lineHeight: 'normal',
             letterSpacing: 'normal',
-            marginBottom: '11px'
-
+            marginBottom: '11px',
+            ...style
         }}>{text}</div>
     )
 }

@@ -178,7 +178,6 @@ describe('Manager tests', function () {
                         internal_address: 'localhost:80',
                         delay_runner_ms: 0
                     };
-
                 },
                 getConfigValue: getConfigValueStub
             });
@@ -205,10 +204,11 @@ describe('Manager tests', function () {
                 arrival_rate: 1,
                 duration: 1,
                 run_immediately: true,
+                type: 'load_test',
                 emails: ['dina@niv.eli'],
                 environment: 'test',
                 webhooks: webhooks.map(({ id }) => id),
-                custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' },
+                custom_env_vars: { KEY1: 'A', KEY2: 'B' },
                 max_virtual_users: 100
             };
             jobConnectorRunJobStub.resolves({ id: 'run_id' });
@@ -223,7 +223,7 @@ describe('Manager tests', function () {
                 duration: 1,
                 max_virtual_users: 100,
                 enabled: true,
-                'custom_env_vars': {
+                custom_env_vars: {
                     KEY1: 'A',
                     KEY2: 'B'
                 }
@@ -238,6 +238,7 @@ describe('Manager tests', function () {
                 ENVIRONMENT: 'test',
                 TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 PREDATOR_URL: 'localhost:80',
+                JOB_TYPE: 'load_test',
                 ARRIVAL_RATE: '1',
                 DURATION: '1',
                 EMAILS: 'dina@niv.eli',
@@ -1268,9 +1269,5 @@ describe('Manager tests', function () {
                 error.message.should.eql('Failed to delete containers');
             }
         });
-    });
-
-    describe('meow', function() {
-
     });
 });
