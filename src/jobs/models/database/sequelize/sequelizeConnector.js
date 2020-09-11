@@ -111,18 +111,12 @@ async function updateJob(jobId, jobInfo) {
         enabled: jobInfo.enabled
     };
     let oldJob = await job.findByPk(jobId);
-    // const oldJob = await findJob(jobId);
-    // if (!oldJob) {
-    //     const error = new Error('Not found');
-    //     error.statusCode = 404;
-    //     throw error;
-    // }
-    const mergedParams = _.mergeWith(params, oldJob, (newValue, oldJobValue) => {
+    const mergedParams = _.mergeWith(params, oldJob.dataValues, (newValue, oldJobValue) => {
         return newValue !== undefined ? newValue : oldJobValue;
     });
 
     switch (mergedParams.type) {
-        case JOB_TYPE_FUNCTIONAL_TEST:
+        case JOB_TYPE_FUNCTIONAL_TEST: {
             if (!mergedParams.arrival_count) {
                 const error = new Error('arrival_count is mandatory when updating job to functional_test');
                 error.statusCode = 400;
@@ -131,7 +125,8 @@ async function updateJob(jobId, jobInfo) {
             mergedParams.arrival_rate = null;
             mergedParams.ramp_to = null;
             break;
-        case JOB_TYPE_LOAD_TEST:
+        }
+        case JOB_TYPE_LOAD_TEST: {
             if (!mergedParams.arrival_rate) {
                 const error = new Error('arrival_rate is mandatory when updating job to load_test');
                 error.statusCode = 400;
@@ -139,10 +134,12 @@ async function updateJob(jobId, jobInfo) {
             }
             mergedParams.arrival_count = null;
             break;
-        default:
+        }
+        default: {
             const error = new Error(`job type is in an unsupported value: ${mergedParams.type}`);
             error.statusCode = 400;
             throw error;
+        }
     }
 
     let options = {
@@ -161,10 +158,7 @@ async function updateJob(jobId, jobInfo) {
 
 async function deleteJob(jobId) {
     const job = client.model('job');
-    await job.destroy(
-        {
-            where: { id: jobId }
-        });
+    await job.destroy({ where: { id: jobId } });
 }
 
 async function initSchemas() {

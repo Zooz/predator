@@ -257,7 +257,7 @@ describe('Update scheduled job', function () {
                 environment: 'test',
                 run_immediately: false,
                 cron_expression: '* * * * * *'
-            }
+            };
             const createFunctionalJobResponse = await schedulerRequestCreator.createJob(validFunctionalJobBody, {
                 'Content-Type': 'application/json'
             });
