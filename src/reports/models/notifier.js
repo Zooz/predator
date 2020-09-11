@@ -104,7 +104,7 @@ async function handleDone(report, job, reportBenchmark) {
     let webhooks = await getWebhookTargets(job);
     const { benchmarkThreshold, benchmarkWebhook } = await getBenchmarkConfig();
 
-    if (emails.length === 0 && webhooks.length === 0 && benchmarkWebhook.length === 0) {
+    if (emails.length === 0 && webhooks.length === 0 && !benchmarkWebhook) {
         return;
     }
 
@@ -123,7 +123,7 @@ async function handleDone(report, job, reportBenchmark) {
         reportWebhookSender.send(webhooks, webhookMessage);
     }
 
-    if (benchmarkWebhook.length > 0) {
+    if (benchmarkWebhook) {
         handleBenchmarkWebhookTreshhold(aggregatedReport, reportBenchmark.score, benchmarkThreshold, benchmarkWebhook);
     }
 }

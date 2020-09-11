@@ -60,6 +60,46 @@ module.exports.generateStats = (phaseStatus, runnerId, statsTime, rpsCount) => {
             'codes': {
                 '200': 101
             },
+            'assertions': {
+                '/users': {
+                    'statusCode 201': {
+                        'success': 0,
+                        'fail': 297,
+                        'failureResponses': {
+                            '200': 297
+                        }
+                    },
+                    'header content-type values equals json': {
+                        'success': 50,
+                        'fail': 247,
+                        'failureResponses': {
+                            'application/json; charset=utf-8': 247
+                        }
+                    },
+                    'hasHeader proxy-id': {
+                        'success': 0,
+                        'fail': 297,
+                        'failureResponses': {
+                            'response has no proxy-id header': 297
+                        }
+                    }
+                },
+                '/accounts': {
+                    'statusCode 201': {
+                        'success': 40,
+                        'fail': 0,
+                        'failureResponses': {
+                        }
+                    },
+                    'hasHeader proxy-id': {
+                        'success': 0,
+                        'fail': 40,
+                        'failureResponses': {
+                            'response has no proxy-id header': 40
+                        }
+                    }
+                }
+            },
             'matches': 0,
             'customStats': {},
             'counters': {},
