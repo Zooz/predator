@@ -15,7 +15,8 @@ module.exports = {
     deleteReport,
     getReports,
     editReport,
-    getLastReports
+    getLastReports,
+    getAggregatedReport
 };
 
 async function init() {
@@ -48,6 +49,14 @@ function editReport(testId, reportId, body) {
         });
 }
 
+function getAggregatedReport(testId, reportId) {
+    return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}/aggregate`)
+        .set(HEADERS)
+        .expect(function(res){
+            return res;
+        });
+}
+
 function getReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}`)
         .set(HEADERS)
@@ -55,7 +64,6 @@ function getReport(testId, reportId) {
             return res;
         });
 }
-
 function deleteReport(testId, reportId) {
     return request(testApp).delete(`/v1/tests/${testId}/reports/${reportId}`)
         .set(HEADERS)

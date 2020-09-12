@@ -86,7 +86,10 @@ describe('Integration tests for the reports api', function() {
 
             describe('Create report with minimal fields and webhooks', async function () {
                 before(async function () {
-                    const jobResponse = await createJob(testId, undefined, ['https://webhook.to.here.com']);
+                    const options = {
+                        webhooks: ['https://webhook.to.here.com']
+                    };
+                    const jobResponse = await createJob(testId, options);
                     jobId = jobResponse.body.id;
                 });
 
@@ -108,7 +111,10 @@ describe('Integration tests for the reports api', function() {
 
             describe('Create report with minimal fields and emails', async function () {
                 before(async function () {
-                    const jobResponse = await createJob(testId, ['mickey@dog.com']);
+                    const options = {
+                        emails: ['https://webhook.to.here.com']
+                    };
+                    const jobResponse = await createJob(testId, options);
                     jobId = jobResponse.body.id;
                 });
 
@@ -176,7 +182,11 @@ describe('Integration tests for the reports api', function() {
         describe('Create report, post stats, and get final report', function () {
             describe('Create report with all fields, and post full cycle stats', async function () {
                 before(async function () {
-                    const jobResponse = await createJob(testId, ['mickey@dog.com'], ['https://webhook.here.com']);
+                    const options = {
+                        webhooks: ['https://webhook.to.here.com'],
+                        emails: ['mickey@dog.com']
+                    };
+                    const jobResponse = await createJob(testId, options);
                     jobId = jobResponse.body.id;
                 });
 
@@ -214,7 +224,6 @@ describe('Integration tests for the reports api', function() {
                 });
             });
         });
-
         describe('Get reports', function () {
             const getReportsTestId = uuid();
             let reportId = uuid();
@@ -252,7 +261,6 @@ describe('Integration tests for the reports api', function() {
                 createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
             });
-
             it('Get all reports for specific testId', async function () {
                 let getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId);
                 const reports = getReportsResponse.body;
@@ -271,7 +279,6 @@ describe('Integration tests for the reports api', function() {
                     should.not.exist(report.end_time);
                 });
             });
-
             it('Get last reports', async function () {
                 let lastReportsIdtestId = uuid();
                 reportId = uuid();
@@ -336,9 +343,80 @@ describe('Integration tests for the reports api', function() {
                 should(allRelvntResults[2].report_id).eql(lastReportId);
             });
         });
+        describe('Get report', function () {
+            const getReportTestId = uuid();
+            let reportId;
+            let reportBody = {
+                revision_id: uuid(),
+                test_type: 'basic',
+                test_name: 'integration-test',
+                test_description: 'doing some integration testing',
+                start_time: Date.now().toString(),
+                last_updated_at: Date.now().toString()
+            };
+            describe('report of load_test', function () {
+                before(async () => {
+                    const jobOptions = {
+                        arrival_rate: 10
+                    };
+                    const jobResponse = await createJob(testId, jobOptions);
+                    jobId = jobResponse.body.id;
 
+                    reportBody.test_configuration = generateTestConfiguration('load_test');
+                    reportId = uuid();
+                    reportBody.report_id = reportId;
+                    reportBody.job_id = jobId;
+                    reportBody.runner_id = uuid();
+                    let createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
+                    should(createReportResponse.statusCode).eql(201);
+                });
+
+                it('should return report with arrival_rate in response', async function () {
+                    let getReportResponse = await reportsRequestCreator.getReport(getReportTestId, reportId);
+                    should(getReportResponse.statusCode).eql(200);
+                    const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
+                        'phase', 'status', 'job_type', 'arrival_rate'];
+                    REPORT_KEYS.forEach((key) => {
+                        should(getReportResponse.body).hasOwnProperty(key);
+                    });
+                    should(getReportResponse.body.job_type).eql('load_test');
+                    should(getReportResponse.body.arrival_rate).eql(10);
+                    should(getReportResponse.body.arrival_count).eql(undefined);
+                });
+            });
+            describe('report of functional_test', function () {
+                before(async () => {
+                    const jobOptions = {
+                        arrival_count: 50,
+                        type: 'functional_test'
+                    };
+                    const jobResponse = await createJob(testId, jobOptions);
+                    jobId = jobResponse.body.id;
+
+                    reportId = uuid();
+                    reportBody.test_configuration = generateTestConfiguration('functional_test');
+                    reportBody.report_id = reportId;
+                    reportBody.job_id = jobId;
+                    reportBody.runner_id = uuid();
+                    let createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
+                    should(createReportResponse.statusCode).eql(201);
+                });
+
+                it('should return report with arrival_count in response', async function () {
+                    let getReportResponse = await reportsRequestCreator.getReport(getReportTestId, reportId);
+                    should(getReportResponse.statusCode).eql(200);
+                    const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
+                        'phase', 'status', 'job_type', 'arrival_count'];
+                    REPORT_KEYS.forEach((key) => {
+                        should(getReportResponse.body).hasOwnProperty(key);
+                    });
+                    should(getReportResponse.body.job_type === 'functional_test');
+                    should(getReportResponse.body.arrival_count).eql(50);
+                    should(getReportResponse.body.arrival_rate).eql(undefined);
+                });
+            });
+        });
         describe('Delete reports', function () {
-            const getReportsTestId = uuid();
             let reportId = uuid();
             let reportBody = {
                 report_id: reportId,
@@ -414,7 +492,6 @@ describe('Integration tests for the reports api', function() {
                 });
             });
         });
-
         describe('Post stats', function () {
             before(async function () {
                 const jobResponse = await createJob(testId);
@@ -482,7 +559,7 @@ describe('Integration tests for the reports api', function() {
                 validateFinishedReport(report);
             });
 
-            it('Post full cycle stats and verify report rps avg', async function () {
+            it('Post full cycle stats and verify report rps avg and assertions', async function () {
                 const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', runnerId));
                 should(phaseStartedStatsResponse.statusCode).be.eql(204);
 
@@ -510,6 +587,48 @@ describe('Integration tests for the reports api', function() {
                 should(getReportResponse.statusCode).be.eql(200);
                 report = getReportResponse.body;
                 should(report.avg_rps).eql(13.33);
+
+                // Verify assertions aggregation
+                const getAggregatedReportResponse = await reportsRequestCreator.getAggregatedReport(testId, reportId);
+                should(getAggregatedReportResponse.body.aggregate.assertions).eql({
+                    '/users': {
+                        'statusCode 201': {
+                            'success': 0,
+                            'fail': 594,
+                            'failureResponses': {
+                                '200': 594
+                            }
+                        },
+                        'header content-type values equals json': {
+                            'success': 100,
+                            'fail': 494,
+                            'failureResponses': {
+                                'application/json; charset=utf-8': 494
+                            }
+                        },
+                        'hasHeader proxy-id': {
+                            'success': 0,
+                            'fail': 594,
+                            'failureResponses': {
+                                'response has no proxy-id header': 594
+                            }
+                        }
+                    },
+                    '/accounts': {
+                        'statusCode 201': {
+                            'success': 80,
+                            'fail': 0,
+                            'failureResponses': {}
+                        },
+                        'hasHeader proxy-id': {
+                            'success': 0,
+                            'fail': 80,
+                            'failureResponses': {
+                                'response has no proxy-id header': 80
+                            }
+                        }
+                    }
+                });
             });
 
             it('Post only "done" phase stats', async function () {
@@ -692,7 +811,6 @@ describe('Integration tests for the reports api', function() {
                 should(secondSubscriber.phase_status).eql(constants.SUBSCRIBER_INITIALIZING_STAGE);
             });
         });
-
         describe('Create report, post stats, and get final report', function () {
             it('should successfully create report', async function () {
                 let reportBody = minimalReportBody;
@@ -753,7 +871,6 @@ describe('Integration tests for the reports api', function() {
                 validateFinishedReport(report);
             });
         });
-
         describe('Post stats', function () {
             before(async function () {
                 if (!jobId) {
@@ -987,27 +1104,32 @@ function validateFinishedReport(report, expectedValues = {}, status) {
     }
 }
 
-function createJob(testId, emails, webhooks) {
+function createJob(testId, { emails, webhooks, type = 'load_test', arrival_count, arrival_rate = 10 } = {}) {
     let jobOptions = {
         test_id: testId,
-        arrival_rate: 10,
+        type,
+        arrival_rate,
+        arrival_count,
         duration: 10,
-        type: 'load_test',
         environment: 'test',
         cron_expression: '0 0 1 * *',
         notes: 'My first performance test',
-        max_virtual_users: 500
+        max_virtual_users: 500,
+        emails,
+        webhooks
     };
-
-    if (emails) {
-        jobOptions.emails = emails;
-    }
-
-    if (webhooks) {
-        jobOptions.webhooks = webhooks;
-    }
 
     return jobRequestCreator.createJob(jobOptions, {
         'Content-Type': 'application/json'
     });
+}
+
+function generateTestConfiguration(jobType) {
+    return {
+        job_type: jobType,
+        enviornment: 'test',
+        duration: 10,
+        arrival_rate: jobType === 'load_test' ? 10 : undefined,
+        arrival_count: jobType === 'functional_test' ? 50 : undefined
+    };
 }
