@@ -27,7 +27,7 @@ export const createTestRequest = (data) => {
         artillery_test: {
             config: {
                 target: baseUrl,
-                expect: {}
+                plugins: {expect: {}}
             },
             before: before ? {flow: prepareFlow(before.steps)} : undefined,
             scenarios: scenariosRequest
@@ -217,7 +217,7 @@ function prepareCapture(captures) {
 function prepareExpec(expectations) {
     const result = [];
     expectations.forEach((expectObject) => {
-        if (expectObject.hasOwnProperty("key") && expectObject.hasOwnProperty("value")) {
+        if (expectObject.key && expectObject.hasOwnProperty("value")) {
             result.push({
                 [expectObject.type]: [expectObject.key, expectObject.value]
             });
