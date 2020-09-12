@@ -12,7 +12,7 @@ const WebhooksList = ({webhooks, onClose, createMode}) => {
                 ||
                 webhooks.map((webhook, index) => {
                     return (
-                        <CollapsibleWebhook key={index} webhook={webhook}/>
+                        <CollapsibleWebhook key={`${webhook.id}_${index}`} webhook={webhook}/>
                     )
                 })
             }

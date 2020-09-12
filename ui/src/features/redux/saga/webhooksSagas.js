@@ -19,6 +19,7 @@ export function* createWebhook({body}) {
         yield put(Actions.setLoading(true));
         const result = yield call(createWebhookApi, body);
         yield put(Actions.createWebHookSuccess(true));
+        yield call(getWebhooks)
     } catch (e) {
         yield put(Actions.createWebHookFailure(e))
 
@@ -43,6 +44,7 @@ export function* deleteWebhook({id}) {
         yield put(Actions.setLoading(true));
         const result = yield call(deleteWebhookApi, id);
         yield put(Actions.deleteWebHookSuccess(true));
+        yield call(getWebhooks)
     } catch (e) {
         yield put(Actions.deleteWebHookFailure(e))
 

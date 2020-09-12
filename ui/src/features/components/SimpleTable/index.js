@@ -1,3 +1,5 @@
+import React from "react";
+
 const headerFontStyle = {
     color: '#557eff',
     fontWeight: 'bold',
