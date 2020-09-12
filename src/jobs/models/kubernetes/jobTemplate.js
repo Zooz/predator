@@ -2,40 +2,40 @@ const _ = require('lodash');
 
 module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, predatorRunner, customDefinition) => {
     const jobTemplate = {
-        'apiVersion': 'batch/v1',
-        'kind': 'Job',
-        'metadata': {
-            'name': jobName + '-' + runId,
-            'labels': {
+        apiVersion: 'batch/v1',
+        kind: 'Job',
+        metadata: {
+            name: jobName + '-' + runId,
+            labels: {
                 app: predatorRunner,
                 runId: runId.toString()
             }
         },
-        'spec': {
-            'parallelism': parallelism,
-            'template': {
-                'metadata': {
-                    'labels': {
+        spec: {
+            parallelism: parallelism,
+            template: {
+                metadata: {
+                    labels: {
                         app: predatorRunner
                     }
                 },
-                'spec': {
-                    'containers': [
+                spec: {
+                    containers: [
                         {
-                            'name': 'predator-runner',
-                            'image': dockerImage,
-                            'resources': {
-                                'requests': {
-                                    'cpu': configData['runner_cpu']
+                            name: 'predator-runner',
+                            image: dockerImage,
+                            resources: {
+                                requests: {
+                                    cpu: configData['runner_cpu']
                                 }
                             },
-                            'env': Object.keys(environmentVariables).map(environmentVariable => ({ name: environmentVariable, value: environmentVariables[environmentVariable] }))
+                            env: Object.keys(environmentVariables).map(environmentVariable => ({ name: environmentVariable, value: environmentVariables[environmentVariable] }))
                         }
                     ],
-                    'restartPolicy': 'Never'
+                    restartPolicy: 'Never'
                 }
             },
-            'backoffLimit': 0
+            backoffLimit: 0
         }
     };
 

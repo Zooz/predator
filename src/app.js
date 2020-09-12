@@ -10,6 +10,7 @@ let dslRouter = require('./tests/routes/dslRoute.js');
 let testsRouter = require('./tests/routes/testsRoute.js');
 let processorsRouter = require('./processors/routes/processorsRoute.js');
 let filesRouter = require('./files/routes/filesRoute.js');
+let webhooksRouter = require('./webhooks/routes/webhooksRouter');
 
 let swaggerValidator = require('express-ajv-swagger-validation');
 let audit = require('express-requests-logger');
@@ -66,6 +67,7 @@ module.exports = async () => {
     app.use('/v1/tests', testsRouter);
     app.use('/v1/processors', processorsRouter);
     app.use('/v1/files', filesRouter);
+    app.use('/v1/webhooks', webhooksRouter);
 
     app.use('/', function (req, res, next) {
         res.redirect('/ui');

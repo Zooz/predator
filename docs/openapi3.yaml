@@ -43,6 +43,9 @@ tags:
   - name: Benchmarks
     description: |
       By creating a benchmark for a specific test, each subsequent test run for that test will be given a score from 0-100 summarizing the test run in one simple to analyze numerical value.
+  - name: Webhooks
+    description: |
+      This resource allows you to configure webhooks.
 x-tagGroups:
   - name: Reference
     tags:
@@ -54,6 +57,7 @@ x-tagGroups:
       - Configuration
       - Files
       - Benchmarks
+      - Webhooks
 
 paths:
   #DSL Definitions
@@ -471,6 +475,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         '409':
           description: Conflict
           content:
@@ -590,6 +600,12 @@ paths:
                 $ref: '#/components/schemas/error_response'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -1382,6 +1398,171 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Webhooks
+  /v1/webhooks:
+    get:
+      operationId: retrieve-webhooks
+      tags:
+        - Webhooks
+      summary: Retrieve webhooks
+      description: Retrieve all webhooks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+               schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/webhook'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    post:
+      operationId: create-a-webhook
+      tags:
+        - Webhooks
+      summary: Create a Webhook
+      description: Create a new Webhook.
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook'
+        description: The webhook to add
+        required: true
+  /v1/webhooks/{webhook_id}:
+    get:
+      operationId: retrieve-a-webhook
+      tags:
+        - Webhooks
+      summary: Retrieve a webhook by id
+      description: Retrieve a webhook by id.
+      parameters:
+        - in: path
+          name: webhook_id
+          description: The webhook id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+               schema:
+                  $ref: '#/components/schemas/webhook'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    put:
+      operationId: update-a-webhook
+      tags:
+        - Webhooks
+      summary: Update a webhook
+      description: Update a webhook.
+      parameters:
+        - in: path
+          name: webhook_id
+          description: The webhook id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+               schema:
+                  $ref: '#/components/schemas/webhook'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    delete:
+      operationId: delete-webhook
+      tags:
+        - Webhooks
+      summary: Delete webhook file
+      description: Delete a specific webhook by id.
+      parameters:
+        - in: path
+          name: webhook_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
 
   # Files
   /v1/files:
@@ -1948,12 +2129,15 @@ components:
           example: 0 0 12 * * ?
         webhooks:
           type: array
+          uniqueItems: true
           description: |
-            A URL to which an event will be sent when the test execution is completed.
-            The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked.
+            An array of webhooks ids, events will be fired to the coresponding webhooks according to their events configuration.
+            The event body will include detailed information about the test, such as the number of scenarios that were executed
+            and the number of requests that were invoked.
           items:
             type: string
-            description: The url of where to send the webhook with the report information
+            format: uuid
+            description: The id of the webhook
         duration:
           type: number
           minimum: 1
@@ -2415,3 +2599,50 @@ components:
           type: number
           minimum: 1
           description: The number of times per second that the test scenarios will run.
+    webhook:
+      type: object
+      required:
+        - name
+        - url
+        - events
+        - format_type
+      properties:
+        id:
+          description: Unique webhook identifier
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          description: Webhook name
+        url:
+          type: string
+          description: Webhook url to post events
+        events:
+          description: list of events which will trigger the webhook
+          type: array
+          uniqueItems: true
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/webhooks_types'
+        format_type:
+          $ref: '#/components/schemas/webhook_format_types'
+        global:
+          type: boolean
+          description: indicates whether the webhook should be applied globally(over all jobs)
+    webhooks_types:
+      type: string
+      enum:
+        - started
+        - finished
+        - in_progress
+        - api_failure
+        - failed
+        - aborted
+        - benchmark_passed
+        - benchmark_failed
+    webhook_format_types:
+      type: string
+      enum:
+        - slack
+        - json
