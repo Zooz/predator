@@ -5,6 +5,8 @@ const _ = require('lodash');
 const Sequelize = require('sequelize');
 
 const { JOB_TYPE_FUNCTIONAL_TEST, JOB_TYPE_LOAD_TEST } = require('../../../../common/consts');
+const { WEBHOOKS_TABLE_NAME, WEBHOOKS_JOBS_MAPPING_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
+
 let client;
 
 module.exports = {
@@ -36,9 +38,6 @@ async function insertJob(jobId, jobInfo) {
         proxy_url: jobInfo.proxy_url,
         enabled: jobInfo.enabled,
         debug: jobInfo.debug,
-        webhooks: jobInfo.webhooks ? jobInfo.webhooks.map(webhookUrl => { // still missing data attributes(name, global, format_type)
-            return { id: uuid(), url: webhookUrl };
-        }) : undefined,
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
             return { id: uuid(), address: emailAddress };
         }) : undefined
@@ -52,13 +51,14 @@ async function insertJob(jobId, jobInfo) {
     }
 
     let include = [];
-    if (params.webhooks) {
-        include.push({ association: job.webhook });
-    }
     if (params.emails) {
         include.push({ association: job.email });
     }
-    return job.create(params, { include });
+    await client.transaction(async function(transaction) {
+        const createdJobTransaction = await job.create(params, { include, transaction });
+        createdJobTransaction.setWebhooks(jobInfo.webhooks || [], { transaction });
+        return createdJobTransaction;
+    });
 }
 
 async function getJobsAndParse(jobId) {
@@ -77,7 +77,7 @@ async function getJobsAndParse(jobId) {
 
     allJobs.forEach(job => {
         job.emails = job.emails && job.emails.length > 0 ? job.emails.map(sqlJob => sqlJob.dataValues.address) : undefined;
-        job.webhooks = job.webhooks && job.webhooks.length > 0 ? job.webhooks.map(sqlJob => sqlJob.dataValues.url) : undefined;
+        job.webhooks = job.webhooks && job.webhooks.length > 0 ? job.webhooks.map(sqlJob => sqlJob.dataValues.id) : undefined;
     });
     return allJobs;
 }
@@ -110,39 +110,36 @@ async function updateJob(jobId, jobInfo) {
         debug: jobInfo.debug,
         enabled: jobInfo.enabled
     };
-
-    const oldJob = await findJob(jobId);
-    if (!oldJob) {
-        const error = new Error('Not found');
-        error.statusCode = 404;
-        throw error;
-    }
-    const mergedParams = _.mergeWith(params, oldJob, (newValue, oldJobValue) => {
+    let oldJob = await job.findByPk(jobId);
+    const mergedParams = _.mergeWith(params, oldJob.dataValues, (newValue, oldJobValue) => {
         return newValue !== undefined ? newValue : oldJobValue;
     });
 
     switch (mergedParams.type) {
-    case JOB_TYPE_FUNCTIONAL_TEST:
-        if (!mergedParams.arrival_count) {
-            const error = new Error('arrival_count is mandatory when updating job to functional_test');
+        case JOB_TYPE_FUNCTIONAL_TEST: {
+            if (!mergedParams.arrival_count) {
+                const error = new Error('arrival_count is mandatory when updating job to functional_test');
+                error.statusCode = 400;
+                throw error;
+            }
+            mergedParams.arrival_rate = null;
+            mergedParams.ramp_to = null;
+            break;
+        }
+        case JOB_TYPE_LOAD_TEST: {
+            if (!mergedParams.arrival_rate) {
+                const error = new Error('arrival_rate is mandatory when updating job to load_test');
+                error.statusCode = 400;
+                throw error;
+            }
+            mergedParams.arrival_count = null;
+            break;
+        }
+        default: {
+            const error = new Error(`job type is in an unsupported value: ${mergedParams.type}`);
             error.statusCode = 400;
             throw error;
         }
-        mergedParams.arrival_rate = null;
-        mergedParams.ramp_to = null;
-        break;
-    case JOB_TYPE_LOAD_TEST:
-        if (!mergedParams.arrival_rate) {
-            const error = new Error('arrival_rate is mandatory when updating job to load_test');
-            error.statusCode = 400;
-            throw error;
-        }
-        mergedParams.arrival_count = null;
-        break;
-    default:
-        const error = new Error(`job type is in an unsupported value: ${mergedParams.type}`);
-        error.statusCode = 400;
-        throw error;
     }
 
     let options = {
@@ -152,16 +149,16 @@ async function updateJob(jobId, jobInfo) {
     };
 
     delete mergedParams.id;
-    let result = await job.update(mergedParams, options);
-    return result;
+    const updatedJob = await client.transaction(async function(transaction) {
+        await oldJob.setWebhooks(jobInfo.webhooks || [], { transaction });
+        return job.update(mergedParams, { ...options, transaction });
+    });
+    return updatedJob;
 }
 
 async function deleteJob(jobId) {
     const job = client.model('job');
-    await job.destroy(
-        {
-            where: { id: jobId }
-        });
+    await job.destroy({ where: { id: jobId } });
 }
 
 async function initSchemas() {
@@ -227,21 +224,20 @@ async function initSchemas() {
     await job.sync();
     await email.sync();
 
-    const webhooks = client.model('webhook');
+    const webhooks = client.model(WEBHOOKS_TABLE_NAME);
     webhooks.belongsToMany(job, {
-        through: 'webhook_job_mapping',
+        through: WEBHOOKS_JOBS_MAPPING_TABLE_NAME,
         as: 'jobs',
-        foreignKey: 'webhook_id',
-        onDelete: 'CASCADE'
+        foreignKey: 'webhook_id'
     });
     job.belongsToMany(webhooks, {
-        through: 'webhook_job_mapping',
+        through: WEBHOOKS_JOBS_MAPPING_TABLE_NAME,
         as: 'webhooks',
         foreignKey: 'job_id'
     });
 }
 
-async function findJob(jobId) {
-    let jobAsArray = await getJob(jobId);
-    return jobAsArray[0];
-}
+// async function findJob(jobId) {
+//     let jobAsArray = await getJob(jobId);
+//     return jobAsArray[0];
+// }

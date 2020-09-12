@@ -27,7 +27,7 @@ function updateConfig(updateValues) {
     let queriesArr = [];
     Object.keys(updateValues).forEach(key => {
         let value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key] + '';
-        queriesArr.push({ 'query': INSERT_DATA, 'params': [key, value] });
+        queriesArr.push({ query: INSERT_DATA, params: [key, value] });
     });
     return batchUpsert(queriesArr, queryOptions);
 }

@@ -10,6 +10,7 @@ module.exports = {
     getWebhook,
     deleteWebhook,
     updateWebhook,
+    getAllGlobalWebhooks,
     closeConnection
 };
 
@@ -40,3 +41,7 @@ async function deleteWebhook(webhookId) {
 async function updateWebhook(webhookId, webhook) {
     return databaseConnector.updateWebhook(webhookId, webhook);
 };
+
+async function getAllGlobalWebhooks() {
+    return databaseConnector.getAllGlobalWebhooks();
+}

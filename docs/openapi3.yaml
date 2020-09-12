@@ -475,6 +475,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         '409':
           description: Conflict
           content:
@@ -594,6 +600,12 @@ paths:
                 $ref: '#/components/schemas/error_response'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -2117,6 +2129,7 @@ components:
           example: 0 0 12 * * ?
         webhooks:
           type: array
+          uniqueItems: true
           description: |
             An array of webhooks ids, events will be fired to the coresponding webhooks according to their events configuration.
             The event body will include detailed information about the test, such as the number of scenarios that were executed
@@ -2621,10 +2634,11 @@ components:
       type: string
       enum:
         - started
-        - api_failure
-        - aborted
-        - failed
         - finished
+        - in_progress
+        - api_failure
+        - failed
+        - aborted
         - benchmark_passed
         - benchmark_failed
     webhook_format_types:
