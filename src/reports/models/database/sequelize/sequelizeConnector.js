@@ -149,14 +149,14 @@ async function subscribeRunner(testId, reportId, runnerId) {
 async function updateSubscriberWithStats(testId, reportId, runnerId, phaseStatus, lastStats) {
     const subscriberToUpdate = await getSubscriber(testId, reportId, runnerId);
 
-    await subscriberToUpdate.set({ 'phase_status': phaseStatus, last_stats: lastStats });
+    await subscriberToUpdate.set({ phase_status: phaseStatus, last_stats: lastStats });
     return subscriberToUpdate.save();
 }
 
 async function updateSubscriber(testId, reportId, runnerId, phaseStatus) {
     const subscriberToUpdate = await getSubscriber(testId, reportId, runnerId);
 
-    await subscriberToUpdate.set({ 'phase_status': phaseStatus });
+    await subscriberToUpdate.set({ phase_status: phaseStatus });
     return subscriberToUpdate.save();
 }
 

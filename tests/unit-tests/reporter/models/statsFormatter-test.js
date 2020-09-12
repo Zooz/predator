@@ -1,7 +1,7 @@
 'use strict';
 let sinon = require('sinon');
 let should = require('should');
-let statsFormatter = require('../../../../src/reports/models/statsFormatter');
+let statsFormatter = require('../../../../src/webhooks/models/statsFormatter');
 
 const REPORT = {
     'timestamp': '2018-05-15T14:20:02.109Z',
