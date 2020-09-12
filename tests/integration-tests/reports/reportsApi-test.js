@@ -84,10 +84,10 @@ describe('Integration tests for the reports api', function() {
                 });
             });
 
-            describe('Create report with minimal fields and webhooks', async function () {
+            describe('Create report with minimal fields', async function () {
                 before(async function () {
                     const options = {
-                        webhooks: ['https://webhook.to.here.com']
+                        webhooks: []
                     };
                     const jobResponse = await createJob(testId, options);
                     jobId = jobResponse.body.id;
@@ -183,7 +183,7 @@ describe('Integration tests for the reports api', function() {
             describe('Create report with all fields, and post full cycle stats', async function () {
                 before(async function () {
                     const options = {
-                        webhooks: ['https://webhook.to.here.com'],
+                        webhooks: [],
                         emails: ['mickey@dog.com']
                     };
                     const jobResponse = await createJob(testId, options);
