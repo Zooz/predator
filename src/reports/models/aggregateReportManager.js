@@ -74,7 +74,6 @@ function createAggregateManually(listOfStats) {
         scenariosCompleted: 0,
         pendingRequests: 0,
         scenarioCounts: {},
-        assertions: {},
         errors: {},
         concurrency: 0,
         codes: {},

@@ -352,7 +352,7 @@ describe('Integration tests for the reports api', function() {
                 test_name: 'integration-test',
                 test_description: 'doing some integration testing',
                 start_time: Date.now().toString(),
-                last_updated_at: Date.now().toString()
+                last_updated_at: Date.now().toString(),
             };
             describe('report of load_test', function () {
                 before(async () => {
@@ -417,6 +417,7 @@ describe('Integration tests for the reports api', function() {
             });
         });
         describe('Delete reports', function () {
+            const getReportsTestId = uuid();
             let reportId = uuid();
             let reportBody = {
                 report_id: reportId,
@@ -559,7 +560,7 @@ describe('Integration tests for the reports api', function() {
                 validateFinishedReport(report);
             });
 
-            it('Post full cycle stats and verify report rps avg and assertions', async function () {
+            it('Post full cycle stats and verify report rps avg', async function () {
                 const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', runnerId));
                 should(phaseStartedStatsResponse.statusCode).be.eql(204);
 
@@ -587,48 +588,6 @@ describe('Integration tests for the reports api', function() {
                 should(getReportResponse.statusCode).be.eql(200);
                 report = getReportResponse.body;
                 should(report.avg_rps).eql(13.33);
-
-                // Verify assertions aggregation
-                const getAggregatedReportResponse = await reportsRequestCreator.getAggregatedReport(testId, reportId);
-                should(getAggregatedReportResponse.body.aggregate.assertions).eql({
-                    '/users': {
-                        'statusCode 201': {
-                            'success': 0,
-                            'fail': 594,
-                            'failureResponses': {
-                                '200': 594
-                            }
-                        },
-                        'header content-type values equals json': {
-                            'success': 100,
-                            'fail': 494,
-                            'failureResponses': {
-                                'application/json; charset=utf-8': 494
-                            }
-                        },
-                        'hasHeader proxy-id': {
-                            'success': 0,
-                            'fail': 594,
-                            'failureResponses': {
-                                'response has no proxy-id header': 594
-                            }
-                        }
-                    },
-                    '/accounts': {
-                        'statusCode 201': {
-                            'success': 80,
-                            'fail': 0,
-                            'failureResponses': {}
-                        },
-                        'hasHeader proxy-id': {
-                            'success': 0,
-                            'fail': 80,
-                            'failureResponses': {
-                                'response has no proxy-id header': 80
-                            }
-                        }
-                    }
-                });
             });
 
             it('Post only "done" phase stats', async function () {
