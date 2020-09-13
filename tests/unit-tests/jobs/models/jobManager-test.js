@@ -1270,8 +1270,4 @@ describe('Manager tests', function () {
             }
         });
     });
-
-    describe('meow', function() {
-
-    });
 });
