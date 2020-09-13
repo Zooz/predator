@@ -10,7 +10,7 @@ import Box from '../Box';
 import dateFormat from 'dateformat';
 import Button from '../../../components/Button';
 import Snackbar from "material-ui/Snackbar";
-import {BarChartPredator, LineChartPredator} from "./Charts";
+import {BarChartPredator, LineChartPredator, AssertionsReport} from "./Charts";
 import _ from "lodash";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 
@@ -137,6 +137,14 @@ class Report extends React.Component {
                             <PieChart data={aggregateReport.scenarios}/>
                         </div>
                     </div>
+                    {
+                        aggregateReport.assertionsTable && aggregateReport.assertionsTable.headers.length > 0 &&
+                        <>
+                            <h3>Assertions</h3>
+                            <AssertionsReport data={aggregateReport.assertionsTable}/>
+                        </>
+                    }
+
                 </div>
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                     <Button inverted onClick={this.onExitReport}>Close</Button>

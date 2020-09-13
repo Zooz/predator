@@ -10,6 +10,7 @@ import {
     XAxis,
     YAxis
 } from "recharts";
+import SimpleTable from '../SimpleTable';
 import React from "react";
 import _ from "lodash";
 import Checkbox from "../../../components/Checkbox/Checkbox";
@@ -165,4 +166,19 @@ const renderLegend = (props) => {
             }
         </div>
     );
+}
+
+
+export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
+    const rows = data.rows.map((row) => {
+        return row.map((column) => {
+            return (<div style={{width: '150px'}}>{column}</div>)
+        })
+    });
+    const headers = data.headers.map(header => <div style={{width: '150px'}}>{header}</div>);
+    return (
+        <SimpleTable headers={headers} rows={rows}/>
+    )
+
+
 }

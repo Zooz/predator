@@ -70,6 +70,18 @@ export const getAggregateReportsForCompare = createSelector(aggregateReport, (re
 });
 
 
+function buildAssertionsTable(assertionsTable, data) {
+    const rows = Object.entries(data).flatMap((entry) => {
+        const testName = entry[0];
+        return Object.entries(entry[1]).map((assertEntry) => {
+            return [testName, assertEntry[0], assertEntry[1].fail, assertEntry[1].success, assertEntry[1].success / (assertEntry[1].success + assertEntry[1].fail), assertEntry[1].failureResponses]
+        })
+    });
+    assertionsTable.rows = rows;
+    assertionsTable.headers = ['Request Name', 'Assertion', 'Fail', 'Success', 'Success ratio', 'Failure response']
+}
+
+
 function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBenchmark = {}) {
     let prefix = withPrefix ? 'A_' : '';
 
@@ -82,7 +94,8 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
             rps = [],
             errorsBar = [],
             scenarios = [],
-            benchMark = {};
+            benchMark = {},
+            assertionsTable = {rows: [], headers: []};
         let errorsCodeGraphKeysAsObjectAcc = {};
 
         const offset = startFromZeroTime ? new Date(report.start_time).getTime() : 0;
@@ -142,6 +155,12 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
             benchMark.errors = report.aggregate.errors;
             benchMark.codes = report.aggregate.codes;
         }
+
+        if (report.aggregate && report.aggregate.assertions) {
+            buildAssertionsTable(assertionsTable, report.aggregate.assertions)
+        }
+
+
         const alias = prefix.substring(0, 1);
 
         const latencyGraphKeys = [`${prefix}median`, `${prefix}p95`, `${prefix}p99`];
@@ -175,6 +194,7 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
             errorsBarKeys,
             scenarios,
             benchMark,
+            assertionsTable,
             startTime: report.start_time,
             testName: report.test_name,
             duration: report.duration,
