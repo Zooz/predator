@@ -32,7 +32,7 @@ const Webhhooks = ({loading, cleanErrors, webhookError, webhooks, getWebhooks}) 
             <Button disabled={showCreateWebhook} className={style['create-button']} onClick={() => {
                 setShowCreateWebhook(true);
             }}>Create Webhook</Button>
-            {!showCreateWebhook && loading && <Loader/>}
+            {!showCreateWebhook && webhooks.length === 0 && loading && <Loader/>}
             <WebhooksList onClose={onClose} createMode={showCreateWebhook} webhooks={webhooks}/>
             {webhookError && <ErrorDialog closeDialog={cleanErrors} showMessage={webhookError}/>}
 
