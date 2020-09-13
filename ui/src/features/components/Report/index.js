@@ -138,7 +138,7 @@ class Report extends React.Component {
                         </div>
                     </div>
                     {
-                        aggregateReport.assertionsTable && aggregateReport.assertionsTable.headers.length > 0 &&
+                        aggregateReport.assertionsTable && aggregateReport.assertionsTable.rows.length > 0 &&
                         <>
                             <h3>Assertions</h3>
                             <AssertionsReport data={aggregateReport.assertionsTable}/>
