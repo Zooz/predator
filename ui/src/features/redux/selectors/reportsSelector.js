@@ -74,7 +74,8 @@ function buildAssertionsTable(assertionsTable, data) {
     const rows = Object.entries(data).flatMap((entry) => {
         const testName = entry[0];
         return Object.entries(entry[1]).map((assertEntry) => {
-            return [testName, assertEntry[0], assertEntry[1].fail, assertEntry[1].success, assertEntry[1].success / (assertEntry[1].success + assertEntry[1].fail), assertEntry[1].failureResponses]
+            const failureResponses = Object.entries(assertEntry[1].failureResponses);
+            return [testName, assertEntry[0], assertEntry[1].fail, assertEntry[1].success, assertEntry[1].success / (assertEntry[1].success + assertEntry[1].fail), `${failureResponses[0][0]} = ${failureResponses[0][1]}`]
         })
     });
     assertionsTable.rows = rows;
