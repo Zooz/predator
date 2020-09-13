@@ -23,12 +23,98 @@ describe('Create job global tests', function () {
     });
 
     describe('Bad requests', () => {
-        it('Create a job without run_immediately or cron_expression parameters, should return error', () => {
+        it('Create a job without type should return error', () => {
             let illegalBody = {
                 test_id: uuid.v4(),
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test'
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({
+                        message: 'Input validation error',
+                        validation_errors: ['body/type should be equal to one of the allowed values [load_test,functional_test]']
+                    });
+                });
+        });
+
+        it('Create a job with a wrong type should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_rate: 1,
+                duration: 1,
+                environment: 'test',
+                type: 'mickey'
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({
+                        message: 'Input validation error',
+                        validation_errors: [
+                            'body/type should be equal to one of the allowed values [load_test,functional_test]'
+                        ]
+                    });
+                });
+        });
+
+        it('Create a job with type load_test and arrival_count should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_count: 1,
+                duration: 1,
+                environment: 'test',
+                type: 'load_test'
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({
+                        message: 'Input validation error',
+                        validation_errors: [
+                            'body should have required property \'arrival_rate\''
+                        ]
+                    });
+                });
+        });
+
+        it('Create a job with type functional_test and arrival_rate should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_rate: 1,
+                duration: 1,
+                environment: 'test',
+                type: 'functional_test'
+            };
+            return schedulerRequestCreator.createJob(illegalBody, {
+                'Content-Type': 'application/json'
+            })
+                .then(function (res) {
+                    res.statusCode.should.eql(400);
+                    res.body.should.eql({
+                        message: 'Input validation error',
+                        validation_errors: [
+                            'body should have required property \'arrival_count\''
+                        ]
+                    });
+                });
+        });
+
+        it('Create a job without run_immediately or cron_expression parameters, should return error', () => {
+            let illegalBody = {
+                test_id: uuid.v4(),
+                arrival_rate: 1,
+                duration: 1,
+                environment: 'test',
+                type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -46,7 +132,8 @@ describe('Create job global tests', function () {
                 duration: 1,
                 environment: 'test',
                 run_immediately: true,
-                enabled: false
+                enabled: false,
+                type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -65,7 +152,8 @@ describe('Create job global tests', function () {
                 parallelism: 0,
                 max_virtual_users: 0,
                 ramp_to: 0,
-                environment: 'test'
+                environment: 'test',
+                type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -76,15 +164,17 @@ describe('Create job global tests', function () {
                         'message': 'Input validation error',
                         'validation_errors': [
                             'body/arrival_rate should be >= 1',
-                            'body/duration should be >= 1',
                             'body/ramp_to should be >= 1',
+                            'body/duration should be >= 1',
                             'body/max_virtual_users should be >= 1',
-                            'body/parallelism should be >= 1'] });
+                            'body/parallelism should be >= 1'
+                        ]
+                    });
                 });
         });
 
         it('Should return error for missing test_id', () => {
-            let illegalBody = { arrival_rate: 1, duration: 1, environment: 'test' };
+            let illegalBody = { arrival_rate: 1, duration: 1, environment: 'test', type: 'load_test' };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
             })
@@ -103,7 +193,8 @@ describe('Create job global tests', function () {
                 arrival_rate: 1,
                 run_immediately: true,
                 duration: 1,
-                environment: 'test'
+                environment: 'test',
+                type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -118,7 +209,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing arrival_rate', () => {
-            let bodyWithoutTestId = { test_id: uuid.v4(), duration: 1, environment: 'test' };
+            let bodyWithoutTestId = { test_id: uuid.v4(), duration: 1, environment: 'test', type: 'load_test'};
             return schedulerRequestCreator.createJob(bodyWithoutTestId, {
                 'Content-Type': 'application/json'
             })
@@ -132,7 +223,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing duration', () => {
-            let illegalBody = { test_id: uuid.v4(), arrival_rate: 1, environment: 'test', 'is_use_akamai': true };
+            let illegalBody = { test_id: uuid.v4(), arrival_rate: 1, environment: 'test', type: 'load_test'};
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
             })
@@ -151,7 +242,8 @@ describe('Create job global tests', function () {
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',
-                run_immediately: true
+                run_immediately: true,
+                type: 'load_test'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -190,6 +282,7 @@ describe('Create job global tests', function () {
                 };
 
                 const job = {
+                    type: 'load_test',
                     arrival_rate: 1,
                     duration: 120,
                     environment: 'test',
@@ -208,13 +301,12 @@ describe('Create job global tests', function () {
                 expect(createTestResponse.status).to.be.equal(201);
                 const testId = createTestResponse.body.id;
 
-                
                 job.webhooks = [webhookId];
                 job.test_id = testId;
 
                 const createJobResponse = await schedulerRequestCreator.createJob(job, headers);
                 expect(createJobResponse.status).to.be.equal(422);
-                expect(createJobResponse.body.message).to.be.equal('Assigning global webhook to a job is not allowed!');
+                expect(createJobResponse.body.message).to.be.equal('Assigning a global webhook to a job is not allowed');
             });
         });
         describe('Update a job with a global webhook', () => {
@@ -228,6 +320,7 @@ describe('Create job global tests', function () {
                 };
 
                 const job = {
+                    type: 'load_test',
                     arrival_rate: 1,
                     duration: 120,
                     environment: 'test',
@@ -255,11 +348,11 @@ describe('Create job global tests', function () {
                 expect(webhookCreateResponse.status).to.be.equal(201);
                 const webhookId = webhookCreateResponse.body.id;
 
-                job.webhooks = [webhookId];                
+                job.webhooks = [webhookId];
 
                 const updateJobResponse = await schedulerRequestCreator.updateJob(jobId, job, headers);
                 expect(updateJobResponse.status).to.be.equal(422);
-                expect(updateJobResponse.body.message).to.be.equal('Assigning global webhook to a job is not allowed!');
+                expect(updateJobResponse.body.message).to.be.equal('Assigning a global webhook to a job is not allowed');
             });
         });
     });

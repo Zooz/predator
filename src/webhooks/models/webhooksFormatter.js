@@ -110,7 +110,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
     return slackWebhookFormat(message, options);
 }
 
-module.exports = function(format, eventType, jobId, testId, report, additionalInfo = {}, options = {}) {
+module.exports.format = function(format, eventType, jobId, testId, report, additionalInfo = {}, options = {}) {
     if (!WEBHOOK_EVENT_TYPES.includes(eventType)) {
         throw unknownWebhookEventTypeError(eventType);
     }

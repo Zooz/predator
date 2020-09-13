@@ -21,13 +21,11 @@ import MultiValueInput from '../../../components/MultiValueInput';
 import UiSwitcher from '../../../components/UiSwitcher';
 import {filter} from 'lodash';
 import {createJobRequest} from '../../requestBuilder';
+import RadioOptions from '../../../components/RadioOptions';
+import {inputTypes, testTypes} from './constants';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
-const inputTypes = {
-    INPUT_LIST: 'INPUT_LIST',
-    SWITCHER: 'SWITCHER',
-    TEXT_FIELD: 'TEXT_FIELD'
-};
+
 
 class Form extends React.Component {
     constructor(props) {
@@ -48,6 +46,17 @@ class Form extends React.Component {
                 info: 'The test name that you are going to run.'
             },
             {
+                name: 'type',
+                key: 'type',
+                disabled: false,
+                floatingLabelText: 'Test Type',
+                info: 'The type of test that you are going to run.',
+                type: inputTypes.RADIO,
+                options: ['Load test', 'Functional test'],
+                optionToValue: {'Load test': 'load_test', 'Functional test': 'functional_test'},
+                valueToOption: {'load_test': 'Load test', 'functional_test': 'Functional test'},
+            },
+            {
                 name: 'notes',
                 key: 'notes',
                 floatingLabelText: 'Notes',
@@ -59,7 +68,15 @@ class Form extends React.Component {
                 name: 'arrival_rate',
                 key: 'arrival_rate',
                 floatingLabelText: 'Arrival rate',
-                info: 'Number of scenarios per second that the test fires.'
+                info: 'Number of scenarios per second that the test fires.',
+                hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST
+            },
+            {
+                name: 'arrival_count',
+                key: 'arrival_count',
+                floatingLabelText: 'Arrival count',
+                info: 'Fixed count of arrivals in the tests duration. Resembles the number of scenarios that will be run by the end of the test.',
+                hiddenCondition: (state) => state.type === testTypes.LOAD_TEST
             },
             {
                 name: 'duration',
@@ -71,7 +88,8 @@ class Form extends React.Component {
                 name: 'ramp_to',
                 key: 'ramp_to',
                 floatingLabelText: 'Ramp to',
-                info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.'
+                info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.',
+                hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST
             },
             {
                 name: 'parallelism',
@@ -135,6 +153,7 @@ class Form extends React.Component {
             test_id: this.props.data ? this.props.data.id : '',
             test_name: this.props.data ? this.props.data.name : '',
             arrival_rate: undefined,
+            arrival_count: undefined,
             duration: undefined,
             ramp_to: undefined,
             environment: 'test',
@@ -145,6 +164,7 @@ class Form extends React.Component {
             helpInfo: undefined,
             parallelism: undefined,
             max_virtual_users: undefined,
+            type: 'load_test',
             errors: {
                 name: undefined,
                 retries: undefined,
@@ -174,8 +194,8 @@ class Form extends React.Component {
         this.props.clearErrorOnCreateJob();
     }
 
-    onChangeFreeText = (name, evt) => {
-        const newState = Object.assign({}, this.state, {[name]: evt.target.value});
+    onChangeProperty = (name, value) => {
+        const newState = Object.assign({}, this.state, {[name]: value});
         newState.errors = validate(newState);
         this.setState(newState);
     };
@@ -222,14 +242,14 @@ class Form extends React.Component {
     }
 
     render() {
-        const {closeDialog, processingAction, serverError,clearErrorOnCreateJob} = this.props;
+        const {closeDialog, processingAction, serverError, clearErrorOnCreateJob} = this.props;
         return (
-            <Modal style={{paddingTop:'64px'}} width={'50%'} onExit={closeDialog}>
-                <FormWrapper style={{height:null}} title={'Create a new job'} description={DESCRIPTION}>
+            <Modal style={{paddingTop: '64px'}} width={'50%'} onExit={closeDialog}>
+                <FormWrapper style={{height: null}} title={'Create a new job'} description={DESCRIPTION}>
                     <div style={{width: '100%'}}>
                         {this.FormList.map((oneItem, index) => {
                             return (<Fragment key={index}>
-                                {!oneItem.hidden &&
+                                {!(oneItem.hiddenCondition && oneItem.hiddenCondition(this.state)) &&
                                 <RactangleAlignChildrenLeft className={style['input-wrapper']}>
                                     <div style={{flex: '1'}}>
                                         {this.generateInput(oneItem)}
@@ -242,8 +262,10 @@ class Form extends React.Component {
                             <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
                                     onClick={this.whenSubmit}>Submit</Button>
                         </div>
-                        { serverError &&
-                        <ErrorDialog closeDialog={() => {clearErrorOnCreateJob()}} showMessage={serverError}/>
+                        {serverError &&
+                        <ErrorDialog closeDialog={() => {
+                            clearErrorOnCreateJob()
+                        }} showMessage={serverError}/>
                         }
                     </div>
                 </FormWrapper>
@@ -256,22 +278,21 @@ class Form extends React.Component {
         switch (oneItem.type) {
             case inputTypes.SWITCHER:
                 return (
-                    <TitleInput style={{flex:'1'}} key={oneItem.key} title={oneItem.floatingLabelText}
+                    <TitleInput style={{flex: '1'}} key={oneItem.key} title={oneItem.floatingLabelText}
                                 rightComponent={this.showInfo(oneItem)}>
-                    <RactangleAlignChildrenLeft>
-                        <UiSwitcher
-                            onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
-                            disabledInp={false}
-                            activeState={this.state[oneItem.name]}
-                            height={12}
-                            width={22}/>
-                        <div className={style['run-immediately']}>{oneItem.label}</div>
-                    </RactangleAlignChildrenLeft>
-            </TitleInput>
+                        <RactangleAlignChildrenLeft>
+                            <UiSwitcher
+                                onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
+                                disabledInp={false}
+                                activeState={this.state[oneItem.name]}
+                                height={12}
+                                width={22}/>
+                            <div className={style['run-immediately']}>{oneItem.label}</div>
+                        </RactangleAlignChildrenLeft>
+                    </TitleInput>
 
 
-
-            );
+                );
             case inputTypes.INPUT_LIST:
                 return (
                     <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
@@ -293,9 +314,20 @@ class Form extends React.Component {
                         <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
                             <TextArea
                                 disabled={oneItem.disabled}
-                                onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}
+                                onChange={(evt) => this.onChangeProperty(oneItem.name, evt.target.value)}
 
                             />
+                        </ErrorWrapper>
+                    </TitleInput>
+                );
+
+            case inputTypes.RADIO:
+                return (
+                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+                                rightComponent={this.showInfo(oneItem)}>
+                        <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
+                            <RadioOptions value={oneItem.valueToOption[this.state[oneItem.name]]} list={oneItem.options}
+                                          onChange={(value) => this.onChangeProperty(oneItem.name, oneItem.optionToValue[value])}/>
                         </ErrorWrapper>
                     </TitleInput>
                 );
@@ -305,8 +337,10 @@ class Form extends React.Component {
                         <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
                                     rightComponent={this.showInfo(oneItem)}>
                             <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
-                                <Input disabled={oneItem.disabled} value={this.state[oneItem.name]}
-                                       onChange={(evt) => this.onChangeFreeText(oneItem.name, evt)}/>
+                                <Input
+                                    disabled={oneItem.disabled}
+                                    value={this.state[oneItem.name]}
+                                    onChange={(evt) => this.onChangeProperty(oneItem.name, evt.target.value)}/>
                             </ErrorWrapper>
                         </TitleInput>
                         {oneItem.name === 'cron_expression' && <CronViewer value={cron_expression}/>}
@@ -321,8 +355,8 @@ class Form extends React.Component {
             test_id: this.props.data.id,
             duration: parseInt(this.state.duration) * 60,
         };
-        if(this.state.debug){
-            convertedArgs.debug='*';
+        if (this.state.debug) {
+            convertedArgs.debug = '*';
         }
         this.props.createJob(createJobRequest(Object.assign({}, this.state, convertedArgs)));
     };

@@ -14,6 +14,8 @@ const WEBHOOK_SLACK_DEFAULT_REPORTER_NAME = 'reporter';
 module.exports = {
     TEST_TYPE_BASIC: 'basic',
     TEST_TYPE_DSL: 'dsl',
+    JOB_TYPE_LOAD_TEST: 'load_test',
+    JOB_TYPE_FUNCTIONAL_TEST: 'functional_test',
     PROCESSOR_FUNCTIONS_KEYS: ['beforeScenario', 'afterScenario', 'beforeRequest', 'afterResponse'],
     WEBHOOK_EVENT_TYPE_STARTED,
     WEBHOOK_EVENT_TYPE_FINISHED,

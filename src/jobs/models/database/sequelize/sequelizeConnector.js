@@ -1,7 +1,12 @@
 'use strict';
 
 const uuid = require('uuid/v4');
+const _ = require('lodash');
 const Sequelize = require('sequelize');
+
+const { JOB_TYPE_FUNCTIONAL_TEST, JOB_TYPE_LOAD_TEST } = require('../../../../common/consts');
+const { WEBHOOKS_TABLE_NAME, WEBHOOKS_JOBS_MAPPING_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
+
 let client;
 
 module.exports = {
@@ -23,11 +28,10 @@ async function insertJob(jobId, jobInfo) {
     let params = {
         id: jobId,
         test_id: jobInfo.test_id,
-        arrival_rate: jobInfo.arrival_rate,
+        type: jobInfo.type,
         cron_expression: jobInfo.cron_expression,
         duration: jobInfo.duration,
         environment: jobInfo.environment,
-        ramp_to: jobInfo.ramp_to,
         parallelism: jobInfo.parallelism,
         max_virtual_users: jobInfo.max_virtual_users,
         notes: jobInfo.notes,
@@ -38,6 +42,13 @@ async function insertJob(jobId, jobInfo) {
             return { id: uuid(), address: emailAddress };
         }) : undefined
     };
+
+    if (params.type === JOB_TYPE_FUNCTIONAL_TEST) {
+        params.arrival_count = jobInfo.arrival_count;
+    } else {
+        params.arrival_rate = jobInfo.arrival_rate;
+        params.ramp_to = jobInfo.ramp_to;
+    }
 
     let include = [];
     if (params.emails) {
@@ -84,39 +95,70 @@ async function getJob(jobId) {
 async function updateJob(jobId, jobInfo) {
     const job = client.model('job');
 
-    let params = {
+    const params = {
         test_id: jobInfo.test_id,
+        type: jobInfo.type,
         arrival_rate: jobInfo.arrival_rate,
+        ramp_to: jobInfo.ramp_to,
+        arrival_count: jobInfo.arrival_count,
         cron_expression: jobInfo.cron_expression,
         duration: jobInfo.duration,
         environment: jobInfo.environment,
-        ramp_to: jobInfo.ramp_to,
         parallelism: jobInfo.parallelism,
         max_virtual_users: jobInfo.max_virtual_users,
         proxy_url: jobInfo.proxy_url,
         debug: jobInfo.debug,
         enabled: jobInfo.enabled
     };
+    let oldJob = await job.findByPk(jobId);
+    const mergedParams = _.mergeWith(params, oldJob.dataValues, (newValue, oldJobValue) => {
+        return newValue !== undefined ? newValue : oldJobValue;
+    });
+
+    switch (mergedParams.type) {
+        case JOB_TYPE_FUNCTIONAL_TEST: {
+            if (!mergedParams.arrival_count) {
+                const error = new Error('arrival_count is mandatory when updating job to functional_test');
+                error.statusCode = 400;
+                throw error;
+            }
+            mergedParams.arrival_rate = null;
+            mergedParams.ramp_to = null;
+            break;
+        }
+        case JOB_TYPE_LOAD_TEST: {
+            if (!mergedParams.arrival_rate) {
+                const error = new Error('arrival_rate is mandatory when updating job to load_test');
+                error.statusCode = 400;
+                throw error;
+            }
+            mergedParams.arrival_count = null;
+            break;
+        }
+        default: {
+            const error = new Error(`job type is in an unsupported value: ${mergedParams.type}`);
+            error.statusCode = 400;
+            throw error;
+        }
+    }
 
     let options = {
         where: {
             id: jobId
         }
     };
-    let oldJob = await job.findByPk(jobId);
+
+    delete mergedParams.id;
     const updatedJob = await client.transaction(async function(transaction) {
         await oldJob.setWebhooks(jobInfo.webhooks || [], { transaction });
-        return job.update(params, { ...options, transaction });
+        return job.update(mergedParams, { ...options, transaction });
     });
     return updatedJob;
 }
 
 async function deleteJob(jobId) {
     const job = client.model('job');
-    await job.destroy(
-        {
-            where: { id: jobId }
-        });
+    await job.destroy({ where: { id: jobId } });
 }
 
 async function initSchemas() {
@@ -138,6 +180,9 @@ async function initSchemas() {
         test_id: {
             type: Sequelize.DataTypes.UUID
         },
+        type: {
+            type: Sequelize.DataTypes.STRING
+        },
         environment: {
             type: Sequelize.DataTypes.STRING
         },
@@ -145,6 +190,9 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING
         },
         arrival_rate: {
+            type: Sequelize.DataTypes.INTEGER
+        },
+        arrival_count: {
             type: Sequelize.DataTypes.INTEGER
         },
         duration: {
@@ -176,15 +224,20 @@ async function initSchemas() {
     await job.sync();
     await email.sync();
 
-    const webhooks = client.model('webhook');
+    const webhooks = client.model(WEBHOOKS_TABLE_NAME);
     webhooks.belongsToMany(job, {
-        through: 'webhook_job_mapping',
+        through: WEBHOOKS_JOBS_MAPPING_TABLE_NAME,
         as: 'jobs',
         foreignKey: 'webhook_id'
     });
     job.belongsToMany(webhooks, {
-        through: 'webhook_job_mapping',
+        through: WEBHOOKS_JOBS_MAPPING_TABLE_NAME,
         as: 'webhooks',
         foreignKey: 'job_id'
     });
 }
+
+// async function findJob(jobId) {
+//     let jobAsArray = await getJob(jobId);
+//     return jobAsArray[0];
+// }

@@ -1,6 +1,7 @@
+let databaseConfig = require('../../../config/databaseConfig');
+let cassandraConnector = require('./cassandra/cassandraConnector');
 let sequelizeConnector = require('./sequelize/sequelizeConnector');
-
-let databaseConnector = sequelizeConnector;
+let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
 
 module.exports = {
     init,
