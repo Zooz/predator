@@ -15,7 +15,8 @@ module.exports = {
     deleteReport,
     getReports,
     editReport,
-    getLastReports
+    getLastReports,
+    getAggregatedReport
 };
 
 async function init() {
