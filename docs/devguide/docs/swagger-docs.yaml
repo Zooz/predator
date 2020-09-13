@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 1.4.0
+  version: 1.5.0
   title: Predator
   x-logo:
     url: logo.png
@@ -19,41 +19,45 @@ info:
     For an introduction to Predator and its concepts, see the <a href="https://www.zooz.com" target="_blank">Predator Documentation</a>.
 
 tags:
-  - name: DSL Definitions
-    description: |
-      Predator's Domain Specific Language (DSL) allows you to generate request templates, which you can then reuse in the same test and in other tests, reducing replication.
   - name: Tests
     description: |
       Tests include end-to-end scenarios that are executed at pre-configured intervals to provide in-depth performance metrics of your API.
-  - name: Processors
+  - name: DSL Definitions
     description: |
-      Processor files allow Predator to execute custom javascript code during test flows.
+      Predator's Domain Specific Language (DSL) allows you to generate request templates, which you can then reuse in the same test and in other tests, reducing replication.
   - name: Jobs
     description: |
       Predator executes tests through so-called **jobs**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
-  - name: Reports
+  - name: Processors
     description: |
-      Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.
-  - name: Configuration
-    description: |
-      This resource allows you to configure Predator programmatically.
+      Processor files allow Predator to execute custom javascript code during test flows.
   - name: Files
     description: |
       This resource allows uploading files which can be used by Predator tests like csv.
+  - name: Webhooks
+    description: |
+      This resource allows you to configure webhooks.
   - name: Benchmarks
     description: |
       By creating a benchmark for a specific test, each subsequent test run for that test will be given a score from 0-100 summarizing the test run in one simple to analyze numerical value.
+  - name: Configuration
+    description: |
+      This resource allows you to configure Predator programmatically.
+  - name: Reports
+    description: |
+      Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.
 x-tagGroups:
   - name: Reference
     tags:
-      - DSL Definitions
       - Tests
-      - Processors
+      - DSL Definitions
       - Jobs
-      - Reports
-      - Configuration
+      - Processors
       - Files
+      - Webhooks
       - Benchmarks
+      - Configuration
+      - Reports
 
 paths:
   #DSL Definitions
@@ -471,6 +475,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
         '409':
           description: Conflict
           content:
@@ -590,6 +600,12 @@ paths:
                 $ref: '#/components/schemas/error_response'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
           content:
             application/json:
               schema:
@@ -1383,6 +1399,171 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Webhooks
+  /v1/webhooks:
+    get:
+      operationId: retrieve-webhooks
+      tags:
+        - Webhooks
+      summary: Retrieve webhooks
+      description: Retrieve all webhooks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+               schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/webhook'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    post:
+      operationId: create-a-webhook
+      tags:
+        - Webhooks
+      summary: Create a Webhook
+      description: Create a new Webhook.
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook'
+        description: The webhook to add
+        required: true
+  /v1/webhooks/{webhook_id}:
+    get:
+      operationId: retrieve-a-webhook
+      tags:
+        - Webhooks
+      summary: Retrieve a webhook by id
+      description: Retrieve a webhook by id.
+      parameters:
+        - in: path
+          name: webhook_id
+          description: The webhook id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+               schema:
+                  $ref: '#/components/schemas/webhook'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    put:
+      operationId: update-a-webhook
+      tags:
+        - Webhooks
+      summary: Update a webhook
+      description: Update a webhook.
+      parameters:
+        - in: path
+          name: webhook_id
+          description: The webhook id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+               schema:
+                  $ref: '#/components/schemas/webhook'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    delete:
+      operationId: delete-webhook
+      tags:
+        - Webhooks
+      summary: Delete webhook file
+      description: Delete a specific webhook by id.
+      parameters:
+        - in: path
+          name: webhook_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
 
   # Files
   /v1/files:
@@ -1540,6 +1721,9 @@ components:
       type: object
       discriminator:
         propertyName: type
+      oneOf:
+        - $ref: '#/components/schemas/basic'
+        - $ref: '#/components/schemas/dsl'
       required:
         - name
         - description
@@ -1550,6 +1734,11 @@ components:
           minLength: 1
           description: The name of the test.
           example: Order from Pet Store
+        processor_file_url:
+          type: string
+          format: uri
+          example: http://www.example.com/file.txt
+          description: Url to text file location , will be used by the processor
         csv_file_id:
           type: string
           format: uuid
@@ -1572,6 +1761,9 @@ components:
         * `basic`: Tests of this type cannot reuse request templates (DSL definition). All request specifications must be directly included in the test itself.
           This test type is identical to the type of tests you can create through the Predator UI.
         * `dsl`: Tests of this type reuse request templates based on previously created DSL definitons.
+        enum:
+        - dsl
+        - basic
       example: dsl
     benchmark_request:
       type: object
@@ -1946,18 +2138,27 @@ components:
             Allows for the probability (in %) of a scenario being picked by a new virtual user to be "weighed" relative to other scenarios. If not specified, each scenario is equally likely to be picked.
           example: 20
     job:
+      discriminator:
+        propertyName: type
+      oneOf:
+          - $ref: '#/components/schemas/load_test'
+          - $ref: '#/components/schemas/functional_test'
       required:
+        - type
         - test_id
-        - arrival_rate
         - duration
-      allOf:
-        - $ref: '#/components/schemas/job_update'
-        - type: object
       properties:
         run_immediately:
           type: boolean
           description: Determines if the test will be executed immediately when the job is created.
           example: true
+        type:
+          type: string
+          enum:
+            - load_test
+            - functional_test
+          description: The type of the job to run.
+          example: load_test
     job_update:
       properties:
         test_id:
@@ -1972,27 +2173,19 @@ components:
           example: 0 0 12 * * ?
         webhooks:
           type: array
+          uniqueItems: true
           description: |
-            A URL to which an event will be sent when the test execution is completed.
+            An array of webhooks ids, events will be fired to the coresponding webhooks according to their events configuration.
             The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked.
           items:
             type: string
-            description: The url of where to send the webhook with the report information
-        arrival_rate:
-          type: number
-          minimum: 1
-          description: The number of times per second that the test scenarios will run.
+            format: uuid
+            description: The id of the webhook
         duration:
           type: number
           minimum: 1
           description: The time during which the test will run. In seconds.
           example: 20
-        ramp_to:
-          type: number
-          minimum: 1
-          description: |
-            Used in combination with the `arrival_rate` and `duration` values. Increases the arrival rate linearly to the value specified, within the specified duration.
-          example: 5
         max_virtual_users:
           type: number
           minimum: 1
@@ -2168,17 +2361,22 @@ components:
           type: object
           description: Error thrown while running test
     report_response:
+      discriminator:
+        propertyName: job_type
+      oneOf:
+        - $ref: '#/components/schemas/load_test'
+        - $ref: '#/components/schemas/functional_test'
       required:
         - test_id
         - revision_id
         - report_id
         - job_id
+        - job_type
         - test_type
         - status
         - start_time
         - end_time
         - duration_seconds
-        - arrival_rate
       properties:
         test_id:
           type: string
@@ -2414,3 +2612,80 @@ components:
         filename:
           type: string
           description: the name of the file
+    load_test:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/job_update'
+        - type: object
+      required:
+        - arrival_rate
+      properties:
+        arrival_rate:
+          type: number
+          minimum: 1
+          description: The number of times to run the scenarios during the full duration of the test. A value of 20 arrival_count in a 60 second test will result in running a scenario once every 3 seconds.
+        ramp_to:
+          type: number
+          minimum: 1
+          description: |
+            Used in combination with the `arrival_rate` and `duration` values. Increases the arrival rate linearly to the value specified, within the specified duration.
+          example: 5
+    functional_test:
+      allOf:
+        - $ref: '#/components/schemas/job_update'
+        - type: object
+      type: object
+      required:
+        - arrival_count
+      properties:
+        arrival_count:
+          type: number
+          minimum: 1
+          description: The number of times per second that the test scenarios will run.
+    webhook:
+      type: object
+      required:
+        - name
+        - url
+        - events
+        - format_type
+      properties:
+        id:
+          description: Unique webhook identifier
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          description: Webhook name
+        url:
+          type: string
+          description: Webhook url to post events
+        events:
+          description: list of events which will trigger the webhook
+          type: array
+          uniqueItems: true
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/webhooks_types'
+        format_type:
+          $ref: '#/components/schemas/webhook_format_types'
+        global:
+          type: boolean
+          description: indicates whether the webhook should be applied globally(over all jobs)
+    webhooks_types:
+      type: string
+      enum:
+        - started
+        - finished
+        - in_progress
+        - api_failure
+        - failed
+        - aborted
+        - benchmark_passed
+        - benchmark_failed
+    webhook_format_types:
+      type: string
+      enum:
+        - slack
+        - json

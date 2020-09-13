@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 const uuid = require('uuid');
 
+const { WEBHOOKS_EVENTS_TABLE_NAME, WEBHOOKS_TABLE_NAME, WEBHOOKS_EVENTS_MAPPING_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
+
 let client;
 
 module.exports = {
@@ -21,7 +23,7 @@ function parseWebhook(webhookRecord) {
 };
 
 async function _getWebhook(webhookId) {
-    const webhooksModel = client.model('webhook');
+    const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     return webhooksModel.findByPk(webhookId, { include: ['events'] });
 }
 
@@ -31,7 +33,7 @@ async function init(sequelizeClient) {
 }
 
 async function getAllWebhooks() {
-    const webhooksModel = client.model('webhook');
+    const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooks = await webhooksModel.findAll({ include: ['events'] });
     return webhooks.map(parseWebhook);
 }
@@ -41,17 +43,16 @@ async function getWebhook(webhookId) {
     return parseWebhook(webhook);
 }
 
-// TEST THIS FUNCTION
 async function getAllGlobalWebhooks() {
-    const webhooksModel = client.model('webhook');
+    const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooks = await webhooksModel.findAll({ include: ['events'], where: { global: true } });
     return webhooks.map(parseWebhook);
 }
 
 async function createWebhook(webhook) {
     const id = uuid.v4();
-    const webhooksModel = client.model('webhook');
-    const webhooksEvents = client.model('webhook_event');
+    const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
+    const webhooksEvents = client.model(WEBHOOKS_EVENTS_TABLE_NAME);
     const events = await webhooksEvents.findAll({ where: { name: webhook.events } });
     const eventsIds = events.map(({ id }) => id);
     const webhookToInsert = {
@@ -72,7 +73,7 @@ async function createWebhook(webhook) {
 }
 
 async function deleteWebhook(webhookId) {
-    const webhooksModel = client.model('webhook');
+    const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     return webhooksModel.destroy({
         where: {
             id: webhookId
@@ -81,8 +82,8 @@ async function deleteWebhook(webhookId) {
 }
 
 async function updateWebhook(webhookId, updatedWebhook) {
-    const webhooksModel = client.model('webhook');
-    const webhooksEvents = client.model('webhook_event');
+    const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
+    const webhooksEvents = client.model(WEBHOOKS_EVENTS_TABLE_NAME);
 
     const oldWebhook = await _getWebhook(webhookId);
     const newWebhookEvents = await webhooksEvents.findAll({ where: { name: updatedWebhook.events } });
@@ -96,7 +97,7 @@ async function updateWebhook(webhookId, updatedWebhook) {
 }
 
 async function initSchemas() {
-    const webhooksSchema = client.define('webhook', {
+    const webhooksSchema = client.define(WEBHOOKS_TABLE_NAME, {
         id: {
             type: Sequelize.DataTypes.UUID,
             primaryKey: true
@@ -120,7 +121,7 @@ async function initSchemas() {
             type: Sequelize.DataTypes.DATE
         }
     });
-    const webhooksEvents = client.define('webhook_event', {
+    const webhooksEvents = client.define(WEBHOOKS_EVENTS_TABLE_NAME, {
         id: {
             type: Sequelize.DataTypes.UUID,
             primaryKey: true
@@ -131,13 +132,13 @@ async function initSchemas() {
     });
 
     webhooksSchema.belongsToMany(webhooksEvents, {
-        through: 'webhook_event_mapping',
+        through: WEBHOOKS_EVENTS_MAPPING_TABLE_NAME,
         as: 'events',
         foreignKey: 'webhook_id',
         onDelete: 'CASCADE'
     });
     webhooksEvents.belongsToMany(webhooksSchema, {
-        through: 'webhook_event_mapping',
+        through: WEBHOOKS_EVENTS_MAPPING_TABLE_NAME,
         as: 'webhooks',
         foreignKey: 'webhook_event_id'
     });

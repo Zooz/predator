@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/Zooz/predator/compare/v1.4.0...v1.4.1) (2020-09-03)
+
+
+### Features
+
+* **ui:** ability to clone test ([#357](https://github.com/Zooz/predator/issues/357)) ([c839f97](https://github.com/Zooz/predator/commit/c839f975bf24b75514c90b1f31f37cecb930e9f7)), closes [#350](https://github.com/Zooz/predator/issues/350) [#352](https://github.com/Zooz/predator/issues/352)
+
+
+### Bug Fixes
+
+* **ui:** fixing missing required lodash ([#365](https://github.com/Zooz/predator/issues/365)) ([fb82301](https://github.com/Zooz/predator/commit/fb82301e6f411a39b6910467afd7cccf3d5c7074))
+
 ## [1.4.0](https://github.com/Zooz/predator/compare/v1.3.1...v1.4.0) (2020-07-23)
 
 

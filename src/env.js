@@ -1,4 +1,4 @@
-let log = require('../src/common/logger');
+let logger = require('../src/common/logger');
 let env = {};
 const BY_PLATFORM_MANDATORY_VARS = {
     METRONOME: ['METRONOME_URL'],
@@ -19,12 +19,12 @@ const SUPPORTED_DATABASES = Object.keys(BY_DATABASE_MANDATORY_VARS);
 
 env.init = function () {
     if (!SUPPORTED_PLATFORMS.includes(String(process.env.JOB_PLATFORM).toUpperCase())) {
-        log.error(`JOB_PLATFORM should be one of: ${SUPPORTED_PLATFORMS}`);
+        logger.error(`JOB_PLATFORM should be one of: ${SUPPORTED_PLATFORMS}`);
         process.exit(1);
     }
 
     if (process.env.DATABASE_TYPE && !SUPPORTED_DATABASES.includes(String(process.env.DATABASE_TYPE).toUpperCase())) {
-        log.error(`DATABASE_TYPE should be one of: ${SUPPORTED_DATABASES}`);
+        logger.error(`DATABASE_TYPE should be one of: ${SUPPORTED_DATABASES}`);
         process.exit(1);
     }
 
@@ -44,7 +44,7 @@ env.init = function () {
     });
 
     if (missingFields.length > 0) {
-        log.error('Missing mandatory environment variables', missingFields);
+        logger.error(missingFields, 'Missing mandatory environment variables');
         process.exit(1);
     }
 };

@@ -21,6 +21,7 @@ describe('Sequelize client tests', function () {
     let sequelizeGetStub;
     let sequelizeDestroyStub;
     let sequelizeTransactionStub;
+    let setWebhooksStub;
     const transaction = {};
 
     before(() => {
@@ -44,6 +45,7 @@ describe('Sequelize client tests', function () {
         sequelizeStub = sandbox.stub();
         sequelizeCloseStub = sandbox.stub();
         sequelizeTransactionStub = sandbox.stub();
+        setWebhooksStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
             hasMany: () => {
@@ -104,6 +106,7 @@ describe('Sequelize client tests', function () {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
+                type: 'load_test',
                 cron_expression: '* * * *',
                 emails: ['hello@zooz.com', 'hello@payu.com'],
                 environment: 'test',
@@ -158,6 +161,7 @@ describe('Sequelize client tests', function () {
             const job = {
                 test_id: testId,
                 arrival_rate: 1,
+                type: 'load_test',
                 duration: 1,
                 cron_expression: '* * * *',
                 environment: 'test',
@@ -492,21 +496,25 @@ describe('Sequelize client tests', function () {
     });
 
     describe('Update new jobs', () => {
-        it('should succeed updating job', async () => {
-            await sequelizeConnector.init(sequelizeStub());
-
-            let id = uuid.v4();
-            let testId = uuid.v4();
+        let id, testId;
+        beforeEach(async function() {
+            id = uuid.v4();
+            testId = uuid.v4();
+        });
+        it('should succeed updating job with type load_test', async () => {
             const webhookId = uuid.v4();
+            await sequelizeConnector.init(sequelizeStub());
 
             const sequelizeJobResponse = {
                 dataValues: {
+                    type: 'load_test',
                     test_id: testId,
-                    arrival_rate: 1,
+                    arrival_rate: 100,
+                    arrival_count: null,
                     duration: 1,
                     cron_expression: '* * * *',
                     environment: 'test',
-                    ramp_to: '1',
+                    ramp_to: null,
                     max_virtual_users: 500,
                     parallelism: 3,
                     proxy_url: 'http://proxy.com',
@@ -534,14 +542,76 @@ describe('Sequelize client tests', function () {
             should(sequelizeUpdateStub.args[0][1]).eql({ where: { id }, transaction });
         });
 
+        it('should succeed updating load_test job to functional_test job', async () => {
+            const sequelizeJob = {
+                dataValues: {
+                    id,
+                    test_id: testId,
+                    type: 'load_test',
+                    environment: 'test',
+                    cron_expression: null,
+                    arrival_rate: 100,
+                    duration: 1700,
+                    ramp_to: null,
+                    webhooks: [],
+                    emails: []
+                },
+                setWebhooks: setWebhooksStub
+            };
+            const updatedJob = {
+                test_id: testId,
+                type: 'functional_test',
+                arrival_count: 5,
+                arrival_rate: 1,
+                duration: 1,
+                cron_expression: '* * * *',
+                environment: 'test',
+                ramp_to: '1',
+                max_virtual_users: 500,
+                parallelism: 3,
+                proxy_url: 'http://proxy.com',
+                debug: '*',
+                enabled: false
+            };
+            const updatedJobRes = {
+                test_id: testId,
+                type: 'functional_test',
+                arrival_count: 5,
+                arrival_rate: null,
+                cron_expression: '* * * *',
+                duration: 1,
+                environment: 'test',
+                ramp_to: null,
+                max_virtual_users: 500,
+                parallelism: 3,
+                proxy_url: 'http://proxy.com',
+                debug: '*',
+                enabled: false,
+                webhooks: [],
+                emails: []
+            };
+            const transaction = {};
+            sequelizeGetStub.resolves(sequelizeJob);
+            sequelizeTransactionStub.resolves(updatedJob);
+            setWebhooksStub.resolves();
+            await sequelizeConnector.init(sequelizeStub());
+
+            await sequelizeConnector.updateJob(id, updatedJob);
+            await sequelizeTransactionStub.yield(transaction);
+
+            should(sequelizeUpdateStub.args[0][0]).eql(updatedJobRes);
+
+            should(sequelizeUpdateStub.args[0][1]).eql({ where: { id }, transaction });
+        });
+
         it('should log error for failing updating  test', async () => {
-            sequelizeTransactionStub.rejects(new Error('Sequelize Error'));
+            sequelizeGetStub.rejects(new Error('Sequelize Error'));
 
             await sequelizeConnector.init(sequelizeStub());
 
             try {
-                await sequelizeConnector.updateJob(uuid.v4(), {
-                    test_id: uuid.v4(),
+                await sequelizeConnector.updateJob(id, {
+                    test_id: testId,
                     arrival_rate: 1,
                     duration: 1,
                     cron_expression: '* * * *',

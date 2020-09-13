@@ -178,7 +178,6 @@ describe('Manager tests', function () {
                         internal_address: 'localhost:80',
                         delay_runner_ms: 0
                     };
-
                 },
                 getConfigValue: getConfigValueStub
             });
@@ -205,10 +204,11 @@ describe('Manager tests', function () {
                 arrival_rate: 1,
                 duration: 1,
                 run_immediately: true,
+                type: 'load_test',
                 emails: ['dina@niv.eli'],
                 environment: 'test',
                 webhooks: webhooks.map(({ id }) => id),
-                custom_env_vars: { 'KEY1': 'A', 'KEY2': 'B' },
+                custom_env_vars: { KEY1: 'A', KEY2: 'B' },
                 max_virtual_users: 100
             };
             jobConnectorRunJobStub.resolves({ id: 'run_id' });
@@ -223,7 +223,7 @@ describe('Manager tests', function () {
                 duration: 1,
                 max_virtual_users: 100,
                 enabled: true,
-                'custom_env_vars': {
+                custom_env_vars: {
                     KEY1: 'A',
                     KEY2: 'B'
                 }
@@ -238,6 +238,7 @@ describe('Manager tests', function () {
                 ENVIRONMENT: 'test',
                 TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 PREDATOR_URL: 'localhost:80',
+                JOB_TYPE: 'load_test',
                 ARRIVAL_RATE: '1',
                 DURATION: '1',
                 EMAILS: 'dina@niv.eli',
@@ -998,6 +999,7 @@ describe('Manager tests', function () {
         it('Get a list of all jobs - also one time jobs', async function () {
             databaseConnectorGetStub.resolves([{
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 environment: 'test',
                 arrival_rate: 1,
@@ -1013,6 +1015,7 @@ describe('Manager tests', function () {
             },
             {
                 id: 'id2',
+                type: 'load_test',
                 test_id: 'test_id2',
                 arrival_rate: 1,
                 duration: 1,
@@ -1029,10 +1032,12 @@ describe('Manager tests', function () {
 
             let expectedResult = [{
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
                 ramp_to: '1',
+                arrival_count: undefined,
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',
@@ -1046,9 +1051,11 @@ describe('Manager tests', function () {
                 enabled: false
             }, {
                 id: 'id2',
+                type: 'load_test',
                 test_id: 'test_id2',
                 emails: ['eli@eli.eli'],
                 ramp_to: '1',
+                arrival_count: undefined,
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',
@@ -1069,18 +1076,19 @@ describe('Manager tests', function () {
         it('Get a list of jobs - only scheduled jobs', async function () {
             databaseConnectorGetStub.resolves([{
                 id: 'id',
+                type: 'functional_test',
                 test_id: 'test_id',
                 environment: 'test',
-                arrival_rate: 1,
+                arrival_count: 1,
                 duration: 1,
                 cron_expression: '* * * * *',
                 emails: null,
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1',
                 enabled: false
             },
             {
                 id: 'id2',
+                type: 'load_test',
                 test_id: 'test_id2',
                 arrival_rate: 1,
                 duration: 1,
@@ -1094,11 +1102,13 @@ describe('Manager tests', function () {
 
             let expectedResult = [{
                 id: 'id',
+                type: 'functional_test',
                 test_id: 'test_id',
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
-                ramp_to: '1',
-                arrival_rate: 1,
+                ramp_to: undefined,
+                arrival_count: 1,
+                arrival_rate: undefined,
                 duration: 1,
                 environment: 'test',
                 custom_env_vars: undefined,
@@ -1141,6 +1151,7 @@ describe('Manager tests', function () {
         it('Get a list of jobs', async function () {
             databaseConnectorGetSingleJobStub.resolves([{
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 environment: 'test',
                 arrival_rate: 1,
@@ -1156,10 +1167,12 @@ describe('Manager tests', function () {
 
             let expectedResult = {
                 id: 'id',
+                type: 'load_test',
                 test_id: 'test_id',
                 cron_expression: '* * * * *',
                 webhooks: ['dina', 'niv'],
                 ramp_to: '1',
+                arrival_count: undefined,
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',

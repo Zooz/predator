@@ -62,13 +62,14 @@ export const clearErrorOnDeleteTest = () => (
     {type: Types.CLEAR_ERROR_DELETE_TEST}
 );
 
-export const clearDeleteTestSuccess = () => (
-    {type: Types.CLEAR_DELETE_TEST_SUCCESS}
+export const clearAllSuccessOperationsState = () => (
+    {type: Types.CLEAR_ALL_SUCCESS_OPERATIONS_STATE}
 );
 
 export const createTest = (body, file) => (
     {type: Types.CREATE_TEST, body, file}
 );
+
 export const createTestSuccess = () => (
     {type: Types.CREATE_TEST_SUCCESS}
 );

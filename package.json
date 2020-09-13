@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package",
   "name": "predator",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Framework that manages the entire lifecycle of load testing a server, from creating test files, running scheduled and on-demand tests, and viewing test results.",
   "main": "server.js",
   "directories": {
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "unit-tests": "nyc --check-coverage --lines 95 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
+    "unit-tests": "nyc --check-coverage --lines 94 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh",
     "lint": "eslint src/**",
@@ -44,12 +44,12 @@
     "express": "^4.17.1",
     "express-ajv-swagger-validation": "^1.1.1",
     "express-easy-zip": "^1.1.4",
-    "express-fileupload": "^1.1.6",
-    "express-requests-logger": "^1.0.18",
+    "express-fileupload": "^1.1.10",
+    "express-requests-logger": "^3.0.2",
     "fs-extra": "^5.0.0",
     "graceful-shutdown-express": "^2.0.1",
     "jsck": "^0.3.2",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.20",
     "mathjs": "^5.10.3",
     "mysql2": "^2.1.0",
     "node-cmd": "^3.0.0",
@@ -67,12 +67,12 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^9.1.2",
-    "@commitlint/config-conventional": "^9.0.1",
+    "@commitlint/cli": "^10.0.0",
+    "@commitlint/config-conventional": "^10.0.0",
     "chai": "^4.2.0",
-    "commitlint": "^9.0.1",
-    "cz-conventional-changelog": "^2.1.0",
-    "eslint": "^7.2.0",
+    "commitlint": "^10.0.0",
+    "cz-conventional-changelog": "^3.2.0",
+    "eslint": "^6.2.2",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^9.1.0",
@@ -86,7 +86,7 @@
     "rewire": "^5.0.0",
     "should": "^13.2.1",
     "sinon": "^4.5.0",
-    "standard-version": "^8.0.1",
+    "standard-version": "^9.0.0",
     "supertest": "^3.4.2"
   },
   "husky": {

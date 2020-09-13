@@ -116,6 +116,7 @@ class Report extends React.Component {
                     <h3>Status Codes</h3>
                     <LineChartPredator data={aggregateReport.errorsCodeGraph} keys={aggregateReport.errorsCodeGraphKeys}
                                        graphType={'status_codes'}
+                                       connectNulls={false}
                                        onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                                        filteredKeys={filteredKeys}/>
                     <h3>RPS</h3>

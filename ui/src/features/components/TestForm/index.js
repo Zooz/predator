@@ -19,6 +19,8 @@ import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import {FileDrop} from 'react-file-drop';
 import env from '../../../App/common/env';
+import {CONTENT_TYPES, CAPTURE_TYPES, CAPTURE_KEY_VALUE_PLACEHOLDER} from './constants'
+
 import {
     faDownload
 } from '@fortawesome/free-solid-svg-icons'
@@ -31,7 +33,7 @@ export class TestForm extends React.Component {
     constructor(props) {
         super(props);
         if (props.data) {
-            this.state = createStateForEditTest(props.data);
+            this.state = createStateForEditTest(props.data, props.cloneMode);
         } else {
             this.state = {
                 scenarios: [],
@@ -92,7 +94,7 @@ export class TestForm extends React.Component {
     componentDidMount() {
         this.props.getProcessors({exclude: 'javascript'});
         this.props.initForm();
-        if (this.state.editMode) {
+        if (this.state.editMode || this.props.cloneMode) {
 
             if (this.props.data.csv_file_id) {
                 this.props.getFileMetadata(this.props.data.csv_file_id);
@@ -106,7 +108,6 @@ export class TestForm extends React.Component {
             }
         } else {
             this.addScenarioHandler();
-
         }
     }
 
@@ -115,52 +116,53 @@ export class TestForm extends React.Component {
         const {name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi} = this.state;
         const error = createTestError || processorsError || maxSupportedScenariosUi;
         return (
-            <Modal style={{paddingTop: '65px'}} height={'93%'} onExit={closeDialog}>
-            <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
-    <div className={style['top']}>
-            <div className={style['top-inputs']}>
-            {/* left */}
+            <Modal style={{paddingTop: '12px', paddingBottom: '12px', paddingLeft: '40px', paddingRight: '40px'}}
+                   height={'100%'} width={'100%'} maxWidth={'1440px'} onExit={closeDialog}>
+                <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
+                    <div className={style['top']}>
+                        <div className={style['top-inputs']}>
+                            {/* left */}
 
-            <div className={style['input-container']}>
-            <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Name'}>
-            <TextArea maxRows={5} value={name} onChange={(evt, value) => {
-            this.setState({name: evt.target.value})
-        }}/>
-        </TitleInput>
-        </div>
-        <div className={style['input-container']}>
-            <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Description'}>
-            <TextArea maxRows={5} value={description} onChange={(evt, value) => {
-            this.setState({description: evt.target.value})
-        }}/>
-        </TitleInput>
-        </div>
-        <div className={style['input-container']}>
-            <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Base url'}>
-            <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
-        onChange={(evt, value) => {
-            this.setState({baseUrl: evt.target.value})
-        }}/>
-        </TitleInput>
-        </div>
+                            <div className={style['input-container']}>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Name'}>
+                                    <TextArea maxRows={5} value={name} onChange={(evt, value) => {
+                                        this.setState({name: evt.target.value})
+                                    }}/>
+                                </TitleInput>
+                            </div>
+                            <div className={style['input-container']}>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Description'}>
+                                    <TextArea maxRows={5} value={description} onChange={(evt, value) => {
+                                        this.setState({description: evt.target.value})
+                                    }}/>
+                                </TitleInput>
+                            </div>
+                            <div className={style['input-container']}>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Base url'}>
+                                    <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
+                                              onChange={(evt, value) => {
+                                                  this.setState({baseUrl: evt.target.value})
+                                              }}/>
+                                </TitleInput>
+                            </div>
 
-        <div className={style['input-container']}>
-            <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Processor'}>
-            <ProcessorsDropDown
-        onChange={this.onProcessorChosen} options={processorsList} value={processorId}
-        loading={processorsLoading}/>
-        </TitleInput>
+                            <div className={style['input-container']}>
+                                <TitleInput style={{flex: '1', marginTop: '2px'}} title={'Processor'}>
+                                    <ProcessorsDropDown
+                                        onChange={this.onProcessorChosen} options={processorsList} value={processorId}
+                                        loading={processorsLoading}/>
+                                </TitleInput>
 
-        </div>
-        </div>
-        </div>
-        {/* bottom */}
+                            </div>
+                        </div>
+                    </div>
+                    {/* bottom */}
 
-        {this.generateScenarioDashBoard()}
-        {this.generateBottomBar()}
-        {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
-        </FormWrapper>
-        </Modal>
+                    {this.generateScenarioDashBoard()}
+                    {this.generateBottomBar()}
+                    {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
+                </FormWrapper>
+            </Modal>
         )
     }
 
@@ -184,12 +186,12 @@ export class TestForm extends React.Component {
         const {isLoading, closeDialog} = this.props;
 
         return (<div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '10px'}}>
-    <div style={{display: 'flex', justifyContent: 'space-between', width: '230px'}}>
-    <Button inverted onClick={closeDialog}>Cancel</Button>
-            <Button spinner={isLoading} hover disabled={!this.state.name}
-        onClick={this.postTest}>Submit</Button>
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '230px'}}>
+                <Button inverted onClick={closeDialog}>Cancel</Button>
+                <Button spinner={isLoading} hover disabled={!this.state.name}
+                        onClick={this.postTest}>Submit</Button>
             </div>
-            </div>)
+        </div>)
     };
     addScenarioHandler = () => {
         const {scenarios} = this.state;
@@ -241,7 +243,19 @@ export class TestForm extends React.Component {
         if (type === SLEEP) {
             return {id: uuid(), sleep: 10, type};
         }
-        return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: '', forever: true}
+        return {
+            id: uuid(),
+            method: 'POST',
+            headers: [{}],
+            captures: [{
+                type: CAPTURE_TYPES.JSON_PATH,
+                keyPlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].key,
+                valuePlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].value
+            }],
+            url: '',
+            forever: true,
+            contentType: CONTENT_TYPES.APPLICATION_JSON
+        }
     }
 
     onChooseScenario = (key) => {
@@ -357,70 +371,70 @@ export class TestForm extends React.Component {
         const activeTabKey = currentScenarioIndex === null ? before.id : scenarios[currentScenarioIndex] && scenarios[currentScenarioIndex].id;
         return (
             <div className={style['bottom']}>
-            {/* bottom */}
-            <div style={{
-            marginLeft: 'auto',
-                marginRight: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-            // width: '313px'
-        }}>
+                {/* bottom */}
+                <div style={{
+                    marginLeft: 'auto',
+                    marginRight: '12px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    // width: '313px'
+                }}>
 
-    <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
-        <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
-        <div className={style['actions-style']} onClick={() => this.addStepHandler(SLEEP)}>+Add Sleep</div>
-        <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
-        <div className={style['actions-style']}
-        onClick={() => this.setState({csvMode: true})}>{(csvFile || csvMetadata) ? 'Modify' : '+Add'} CSV
-        </div>
-        </div>
-        {csvMode &&
-        <DragAndDrop csvMetadata={csvMetadata} csvFile={currentCsvFile}
-            onDropFile={(file) => this.setState({csvFile: file})}/>}
-        <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey}
-            className={style.tabs}>
-                {
-                    tabsData.map((tabData, index) => {
-                        return (
-                            <Tabs.TabPane style={{
-                            padding: '10px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                flexDirection: 'column',
-                                flex: 1
-                        }} tab={tabData.scenario_name || 'Scenario'}
-                        key={tabData.id}>
-                            {
-                        !tabData.isBefore &&
-                        <div style={{width: "80%"}}>
-
-                    <CollapsibleScenarioConfig
-                        allowedWeight={this.calcMaxAllowedWeight()}
-                        scenario={tabData}
-                        onChangeValueOfScenario={this.onChangeValueOfScenario}
-                        processorsExportedFunctions={processorsExportedFunctions}
-                        onDeleteScenario={scenarios.length === 1 ? undefined : this.onDeleteScenario}
-                        onDuplicateScenario={this.onDuplicateScenario}
-                        />
-                        </div>
-
-                    }
-                    <div style={{width: "70%"}}>
-                    <StepsList steps={tabData.steps}
-                        onChangeValueOfStep={this.onChangeValueOfStep}
-                        processorsExportedFunctions={processorsExportedFunctions}
-                        onDeleteStep={this.onDeleteStep}
-                        onDuplicateStep={this.onDuplicateStep}
-                        updateStepOrder={this.updateStepOrder}
-                        />
-                        </div>
-
-                        </Tabs.TabPane>
-                    )
-                    })
-                }
-                </Tabs>
+                    <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
+                    <div className={style['actions-style']} onClick={this.addStepHandler}>+Add Step</div>
+                    <div className={style['actions-style']} onClick={() => this.addStepHandler(SLEEP)}>+Add Sleep</div>
+                    <div className={style['actions-style']} onClick={this.addBeforeHandler}>+Add Before</div>
+                    <div className={style['actions-style']}
+                         onClick={() => this.setState({csvMode: true})}>{(csvFile || csvMetadata) ? 'Modify' : '+Add'} CSV
+                    </div>
                 </div>
+                {csvMode &&
+                <DragAndDrop csvMetadata={csvMetadata} csvFile={currentCsvFile}
+                             onDropFile={(file) => this.setState({csvFile: file})}/>}
+                <Tabs onTabChosen={(key) => this.onChooseScenario(key)} activeTabKey={activeTabKey}
+                      className={style.tabs}>
+                    {
+                        tabsData.map((tabData, index) => {
+                            return (
+                                <Tabs.TabPane style={{
+                                    padding: '10px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    flexDirection: 'column',
+                                    flex: 1
+                                }} tab={tabData.scenario_name || 'Scenario'}
+                                              key={tabData.id}>
+                                    {
+                                        !tabData.isBefore &&
+                                        <div style={{width: "80%"}}>
+
+                                            <CollapsibleScenarioConfig
+                                                allowedWeight={this.calcMaxAllowedWeight()}
+                                                scenario={tabData}
+                                                onChangeValueOfScenario={this.onChangeValueOfScenario}
+                                                processorsExportedFunctions={processorsExportedFunctions}
+                                                onDeleteScenario={scenarios.length === 1 ? undefined : this.onDeleteScenario}
+                                                onDuplicateScenario={this.onDuplicateScenario}
+                                            />
+                                        </div>
+
+                                    }
+                                    <div style={{width: "70%"}}>
+                                        <StepsList steps={tabData.steps}
+                                                   onChangeValueOfStep={this.onChangeValueOfStep}
+                                                   processorsExportedFunctions={processorsExportedFunctions}
+                                                   onDeleteStep={this.onDeleteStep}
+                                                   onDuplicateStep={this.onDuplicateStep}
+                                                   updateStepOrder={this.updateStepOrder}
+                                        />
+                                    </div>
+
+                                </Tabs.TabPane>
+                            )
+                        })
+                    }
+                </Tabs>
+            </div>
         )
     };
 
@@ -450,35 +464,35 @@ export const DragAndDrop = ({csvFile, onDropFile, csvMetadata}) => {
     };
     return (
         <div style={styles}>
-        <FileDrop
-    targetClassName={style.fileDropTarget}
-    className={style.fileDrop}
-    // onFrameDragEnter={(event) => console.log('onFrameDragEnter', event)}
-    // onFrameDragLeave={(event) => console.log('onFrameDragLeave', event)}
-    // o    nFrameDrop={(event) => console.log('onFrameDrop', event)}
-    // onDragOver={(event) => console.log('onDragOver', event)}
-    // onDragLeave={(event) => console.log('onDragLeave', event)}
-    onDrop={(files, event) => {
-        onDropFile(files[0])
-    }}
->
+            <FileDrop
+                targetClassName={style.fileDropTarget}
+                className={style.fileDrop}
+                // onFrameDragEnter={(event) => console.log('onFrameDragEnter', event)}
+                // onFrameDragLeave={(event) => console.log('onFrameDragLeave', event)}
+                // o    nFrameDrop={(event) => console.log('onFrameDrop', event)}
+                // onDragOver={(event) => console.log('onDragOver', event)}
+                // onDragLeave={(event) => console.log('onDragLeave', event)}
+                onDrop={(files, event) => {
+                    onDropFile(files[0])
+                }}
+            >
 
-    {
-        csvFile && csvFile.name
-        ||
-        <span>Drop csv file here</span>
-    }
+                {
+                    csvFile && csvFile.name
+                    ||
+                    <span>Drop csv file here</span>
+                }
 
-    {csvMetadata &&
-    <div className={style['download-button']}
-        onClick={() => window.open(`${env.PREDATOR_URL}/files/${csvMetadata.id}`)}>
-    <FontAwesomeIcon icon={faDownload}/>
-    </div>
-    }
+                {csvMetadata &&
+                <div className={style['download-button']}
+                     onClick={() => window.open(`${env.PREDATOR_URL}/files/${csvMetadata.id}`)}>
+                    <FontAwesomeIcon icon={faDownload}/>
+                </div>
+                }
 
-</FileDrop>
-    </div>
-);
+            </FileDrop>
+        </div>
+    );
 };
 
 function mapStateToProps(state) {

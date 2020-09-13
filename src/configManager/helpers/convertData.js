@@ -5,18 +5,18 @@ module.exports.convertByType = (valueToConvert, type) => {
     try {
         if (valueToConvert && type) {
             switch (type) {
-            case 'json':
-                value = JSON.parse(valueToConvert);
-                break;
-            case 'int':
-                value = isNaN(valueToConvert) ? handleParseError(valueToConvert, type) : parseInt(valueToConvert);
-                break;
-            case 'float':
-                value = isNaN(valueToConvert) ? handleParseError(valueToConvert, type) : parseFloat(valueToConvert);
-                break;
-            case 'boolean':
-                value = valueToConvert === 'true' || valueToConvert === true;
-                break;
+                case 'json':
+                    value = JSON.parse(valueToConvert);
+                    break;
+                case 'int':
+                    value = isNaN(valueToConvert) ? handleParseError(valueToConvert, type) : parseInt(valueToConvert);
+                    break;
+                case 'float':
+                    value = isNaN(valueToConvert) ? handleParseError(valueToConvert, type) : parseFloat(valueToConvert);
+                    break;
+                case 'boolean':
+                    value = valueToConvert === 'true' || valueToConvert === true;
+                    break;
             }
         }
     } catch (err) {
