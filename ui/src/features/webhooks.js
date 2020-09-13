@@ -4,10 +4,8 @@ import WebhooksList from './components/WebhooksList';
 import Button from "../components/Button";
 import style from "./style.scss";
 import {webhooks, webhookError, loading} from "./redux/selectors/webhooksSelector";
-import {createJobSuccess} from "./redux/selectors/jobsSelector";
 import * as Actions from "./redux/action";
 import {connect} from "react-redux";
-import CollapsibleWebhook from './components/WebhooksList/CollapsibleWebhook';
 import ErrorDialog from "./components/ErrorDialog";
 import Loader from "./components/Loader";
 
