@@ -560,7 +560,7 @@ describe('Integration tests for the reports api', function() {
                 validateFinishedReport(report);
             });
 
-            it.only('Post full cycle stats and verify report rps avg and assertions', async function () {
+            it('Post full cycle stats and verify report rps avg and assertions', async function () {
                 const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', runnerId));
                 should(phaseStartedStatsResponse.statusCode).be.eql(204);
 
