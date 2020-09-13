@@ -70,16 +70,18 @@ export const getAggregateReportsForCompare = createSelector(aggregateReport, (re
 });
 
 
+
 function buildAssertionsTable(assertionsTable, data) {
     const rows = Object.entries(data).flatMap((entry) => {
         const testName = entry[0];
         return Object.entries(entry[1]).map((assertEntry) => {
-            const failureResponses = Object.entries(assertEntry[1].failureResponses);
-            return [testName, assertEntry[0], assertEntry[1].fail, assertEntry[1].success, assertEntry[1].success / (assertEntry[1].success + assertEntry[1].fail), `${failureResponses[0][0]} = ${failureResponses[0][1]}`]
+            const successRatio =assertEntry[1].success / (assertEntry[1].success + assertEntry[1].fail);
+            // const failureResponses = Object.entries(assertEntry[1].failureResponses).map((entry)=>`${entry[0]} = ${entry[1]}`);
+            return [testName, assertEntry[0], assertEntry[1].fail, assertEntry[1].success, `${successRatio}%` ,assertEntry[1].failureResponses ]
         })
     });
     assertionsTable.rows = rows;
-    assertionsTable.headers = ['Request Name', 'Assertion', 'Fail', 'Success', 'Success ratio', 'Failure response']
+    assertionsTable.headers = ['Request Name', 'Assertion', 'Fail', 'Success', 'Success Ratio', 'Failure responses']
 }
 
 

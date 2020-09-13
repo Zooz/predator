@@ -170,14 +170,34 @@ const renderLegend = (props) => {
 
 
 export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
+    const columnToWidth = {
+        5: '200px'
+    };
+
+
     const rows = data.rows.map((row) => {
-        return row.map((column) => {
-            return (<div style={{width: '150px'}}>{column}</div>)
+        return row.map((column, index) => {
+            if (index === row.length - 1) {
+                ///its failure response object
+                return failureResponsesTable(column, index);
+            }
+            return (<div style={{width: columnToWidth[index] || '150px'}}>{column}</div>);
         })
     });
-    const headers = data.headers.map(header => <div style={{width: '150px'}}>{header}</div>);
+    const headers = data.headers.map((header, index) => <div
+        style={{width: columnToWidth[index] || '150px'}}>{header}</div>);
+
     return (
         <SimpleTable headers={headers} rows={rows}/>
+    )
+}
+
+function failureResponsesTable(failureResponses) {
+    const propertyWidth = '50px';
+    const rows = Object.entries(failureResponses).map((entry) => [<div style={{width:propertyWidth}}>{entry[0]}</div>, '=', entry[1]]);
+    const headers = [<div style={{width:propertyWidth}}>Property</div>, '', 'Count'];
+    return (
+        <SimpleTable disableSeparator={true} style={{width: '200px'}} rows={rows} headers={headers}/>
     )
 
 
