@@ -2,6 +2,8 @@
 let sinon = require('sinon');
 let rewire = require('rewire');
 let should = require('should');
+const cloneDeep = require('lodash/cloneDeep');
+
 let databaseConfig = require('../../../../src/config/databaseConfig');
 let sequelizeConnector = rewire('../../../../src/jobs/models/database/sequelize/sequelizeConnector');
 
@@ -18,6 +20,9 @@ describe('Sequelize client tests', function () {
     let sequelizeUpdateStub;
     let sequelizeGetStub;
     let sequelizeDestroyStub;
+    let sequelizeTransactionStub;
+    let setWebhooksStub;
+    const transaction = {};
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -39,29 +44,34 @@ describe('Sequelize client tests', function () {
         sequelizeCloseStub = sandbox.stub();
         sequelizeStub = sandbox.stub();
         sequelizeCloseStub = sandbox.stub();
-        sequelizeStub = sandbox.stub();
+        sequelizeTransactionStub = sandbox.stub();
+        setWebhooksStub = sandbox.stub();
 
         sequelizeDefineStub.returns({
             hasMany: () => {
             },
             sync: () => {
-            }
+            },
+            belongsToMany: () => {}
         });
 
         sequelizeModelStub.returns({
             email: {},
             webhook: {},
+            belongsToMany: () => {},
             create: sequelizeCreateStub,
             update: sequelizeUpdateStub,
             findAll: sequelizeGetStub,
-            destroy: sequelizeDestroyStub
+            destroy: sequelizeDestroyStub,
+            findByPk: sequelizeGetStub
         });
 
         sequelizeStub.returns({
             authenticate: sequelizeAuthenticateStub,
             model: sequelizeModelStub,
             define: sequelizeDefineStub,
-            close: sequelizeCloseStub
+            close: sequelizeCloseStub,
+            transaction: sequelizeTransactionStub
         });
         sequelizeStub.DataTypes = {};
         sequelizeConnector.__set__('Sequelize', sequelizeStub);
@@ -71,6 +81,7 @@ describe('Sequelize client tests', function () {
     });
     afterEach(() => {
         sandbox.resetHistory();
+        sandbox.resetBehavior();
     });
 
     after(() => {
@@ -80,7 +91,7 @@ describe('Sequelize client tests', function () {
     describe('Init tests', () => {
         it('it should initialize sequelize with mysql client successfully', async () => {
             await sequelizeConnector.init(sequelizeStub());
-            should(sequelizeDefineStub.calledThrice).eql(true);
+            should(sequelizeDefineStub.calledTwice).eql(true);
         });
     });
 
@@ -91,52 +102,54 @@ describe('Sequelize client tests', function () {
             let id = uuid.v4();
             let testId = uuid.v4();
 
-            await sequelizeConnector.insertJob(id, {
+            const job = {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
+                type: 'load_test',
                 cron_expression: '* * * *',
                 emails: ['hello@zooz.com', 'hello@payu.com'],
                 environment: 'test',
                 ramp_to: '1',
-                webhooks: ['http://zooz.com', 'http://payu.com'],
+                webhooks: ['UUIDSTUB'],
                 parallelism: 4,
                 max_virtual_users: 100,
                 notes: 'some nice notes',
                 proxy_url: 'http://proxy.com',
                 debug: '*',
                 enabled: true
-            });
+            };
+            const createdJob = {
+                dataValues: {
+                    ...job,
+                    id,
+                    webhooks: ['UUIDSTUB'],
+                    emails: [{
+                        'id': 'UUIDSTUB',
+                        'address': 'hello@zooz.com'
+                    }, {
+                        'id': 'UUIDSTUB',
+                        'address': 'hello@payu.com'
+                    }]
+                },
+                setWebhooks: sandbox.stub()
+            };
 
-            should(sequelizeCreateStub.args[0][0]).eql({
-                'id': id,
-                'test_id': testId,
-                'arrival_rate': 1,
-                'cron_expression': '* * * *',
-                'duration': 1,
-                'environment': 'test',
-                'ramp_to': '1',
-                'parallelism': 4,
-                'notes': 'some nice notes',
-                'max_virtual_users': 100,
-                'proxy_url': 'http://proxy.com',
-                'debug': '*',
-                'enabled': true,
-                'webhooks': [{
-                    'id': 'UUIDSTUB',
-                    'url': 'http://zooz.com'
-                }, {
-                    'id': 'UUIDSTUB',
-                    'url': 'http://payu.com'
-                }],
-                'emails': [{
-                    'id': 'UUIDSTUB',
-                    'address': 'hello@zooz.com'
-                }, {
-                    'id': 'UUIDSTUB',
-                    'address': 'hello@payu.com'
-                }]
-            });
+            createdJob.setWebhooks.resolves();
+            sequelizeCreateStub.resolves(createdJob);
+            sequelizeTransactionStub.resolves(createdJob);
+
+            await sequelizeConnector.insertJob(id, job);
+            await sequelizeTransactionStub.yield(transaction);
+
+            const jobParams = cloneDeep(job);
+            jobParams.emails = createdJob.dataValues.emails;
+            jobParams.id = createdJob.dataValues.id;
+            delete jobParams.webhooks;
+
+            should(sequelizeCreateStub.args[0][0]).deepEqual(jobParams);
+            should(createdJob.setWebhooks.calledOnce).eql(true);
+            should(createdJob.setWebhooks.args[0][0]).deepEqual(job.webhooks);
         });
 
         it('should succeed insert without webhooks and emails', async () => {
@@ -145,41 +158,48 @@ describe('Sequelize client tests', function () {
             let id = uuid.v4();
             let testId = uuid.v4();
 
-            await sequelizeConnector.insertJob(id, {
+            const job = {
                 test_id: testId,
                 arrival_rate: 1,
+                type: 'load_test',
                 duration: 1,
                 cron_expression: '* * * *',
                 environment: 'test',
                 ramp_to: '1',
+                enabled: true,
                 parallelism: 4,
                 max_virtual_users: 100,
                 notes: 'some notes',
                 proxy_url: 'http://proxy.com',
                 debug: '*'
-            });
+            };
 
-            should(sequelizeCreateStub.args[0][0]).eql({
-                'id': id,
-                'test_id': testId,
-                'arrival_rate': 1,
-                'cron_expression': '* * * *',
-                'duration': 1,
-                'environment': 'test',
-                'ramp_to': '1',
-                'webhooks': undefined,
-                'emails': undefined,
-                'notes': 'some notes',
-                'parallelism': 4,
-                'max_virtual_users': 100,
-                'proxy_url': 'http://proxy.com',
-                'debug': '*',
-                'enabled': undefined
-            });
+            const createdJob = {
+                dataValues: {
+                    ...job,
+                    id
+                },
+                setWebhooks: sandbox.stub()
+            };
+
+            sequelizeCreateStub.resolves(createdJob);
+            createdJob.setWebhooks.resolves();
+            sequelizeTransactionStub.resolves();
+
+            await sequelizeConnector.insertJob(id, job);
+            await sequelizeTransactionStub.yield(transaction);
+
+            const jobParams = cloneDeep(job);
+            jobParams.emails = createdJob.dataValues.emails;
+            jobParams.id = createdJob.dataValues.id;
+
+            should(sequelizeCreateStub.args[0][0]).eql(jobParams);
+            should(createdJob.setWebhooks.calledOnce).eql(true);
+            should(createdJob.setWebhooks.args[0][0]).deepEqual([]);
         });
 
         it('should log error for failing inserting new test', async () => {
-            sequelizeCreateStub.rejects(new Error('Sequelize Error'));
+            sequelizeTransactionStub.rejects(new Error('Sequelize Error'));
 
             await sequelizeConnector.init(sequelizeStub());
 
@@ -205,57 +225,76 @@ describe('Sequelize client tests', function () {
 
             let sequelizeResponse = [{
                 dataValues: {
-                    'id': 'd6b0f076-2efb-48e1-82d2-82250818f59c',
-                    'test_id': 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
-                    'environment': 'test',
-                    'cron_expression': null,
-                    'arrival_rate': 100,
-                    'duration': 1700,
-                    'ramp_to': null,
-                    'webhooks': [{
+                    id: 'd6b0f076-2efb-48e1-82d2-82250818f59c',
+                    test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
+                    environment: 'test',
+                    cron_expression: null,
+                    arrival_rate: 100,
+                    duration: 1700,
+                    ramp_to: null,
+                    webhooks: [
+                        {
+                            dataValues: {
+                                id: '8138e406-0d5f-4caf-a143-a758b9545b75',
+                                name: 'avi3',
+                                url: 'https://1f19d804b781f93bfe92e6dac1b96572.m.pipedream.net',
+                                global: false,
+                                format_type: 'json',
+                                created_at: '2020-08-10T20:37:49.313Z',
+                                updated_at: '2020-08-10T20:37:49.313Z',
+                                webhook_job_mapping: {
+                                    created_at: '2020-08-11T16:12:35.634Z',
+                                    updated_at: '2020-08-11T16:12:35.634Z',
+                                    webhook_id: '04e844d6-c0c4-46e9-a752-ba66035e047c',
+                                    job_id: 'c941ea0f-7b3d-4b05-a01a-7961c7735e04'
+                                }
+                            }
+                        },
+                        {
+                            dataValues: {
+                                id: 'e38b985f-efec-4315-93bf-6f04eb2b7438',
+                                name: 'avi',
+                                url: 'https://1f19d804b781f93bfe92e6dac1b96572.m.pipedream.net',
+                                global: false,
+                                format_type: 'json',
+                                created_at: '2020-08-10T20:10:26.573Z',
+                                updated_at: '2020-08-10T20:10:26.573Z',
+                                webhook_job_mapping: {
+                                    created_at: '2020-08-11T16:12:35.634Z',
+                                    updated_at: '2020-08-11T16:12:35.634Z',
+                                    webhook_id: '5a862394-6e13-45e0-a478-7cd069a2d438',
+                                    job_id: 'c941ea0f-7b3d-4b05-a01a-7961c7735e04'
+                                }
+                            }
+                        }
+                    ],
+                    emails: [{
                         dataValues: {
-                            'id': '8138e406-0d5f-4caf-a143-a758b9545b75',
-                            'url': 'https://hooks.slack.com/services/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',
-                            'created_at': '2019-01-20T12:56:31.000Z',
-                            'updated_at': '2019-01-20T12:56:31.000Z',
-                            'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
+                            id: '8bd6a285-9d9f-4e07-a8e3-387f5936c347',
+                            address: 'eli.nudler@zooz.com',
+                            created_at: '2019-01-20T12:56:31.000Z',
+                            updated_at: '2019-01-20T12:56:31.000Z',
+                            job_id: 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }, {
                         dataValues: {
-                            'id': 'e38b985f-efec-4315-93bf-6f04eb2b7438',
-                            'url': 'http://www.one.com',
-                            'created_at': '2019-01-20T12:56:31.000Z',
-                            'updated_at': '2019-01-20T12:56:31.000Z',
-                            'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
-                        }
-                    }],
-                    'emails': [{
-                        dataValues: {
-                            'id': '8bd6a285-9d9f-4e07-a8e3-387f5936c347',
-                            'address': 'eli.nudler@zooz.com',
-                            'created_at': '2019-01-20T12:56:31.000Z',
-                            'updated_at': '2019-01-20T12:56:31.000Z',
-                            'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
-                        }
-                    }, {
-                        dataValues: {
-                            'id': 'edc77399-ea72-4b0a-97da-c6169e59bb52',
-                            'address': 'xyz@om.ds',
-                            'created_at': '2019-01-20T12:56:31.000Z',
-                            'updated_at': '2019-01-20T12:56:31.000Z',
-                            'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
+                            id: 'edc77399-ea72-4b0a-97da-c6169e59bb52',
+                            address: 'xyz@om.ds',
+                            created_at: '2019-01-20T12:56:31.000Z',
+                            updated_at: '2019-01-20T12:56:31.000Z',
+                            job_id: 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }]
                 }
             }, {
                 dataValues: {
-                    'id': 'd6b0f076-2efb-48e1-82d2-82250818f59d',
-                    'test_id': 'e2340c63-7828-4b69-b79d-6cbea8fec7a7',
-                    'environment': 'test',
-                    'cron_expression': null,
-                    'arrival_rate': 200,
-                    'duration': 2000,
-                    'ramp_to': null
+                    id: 'd6b0f076-2efb-48e1-82d2-82250818f59d',
+                    test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a7',
+                    environment: 'test',
+                    cron_expression: null,
+                    arrival_rate: 200,
+                    duration: 2000,
+                    ramp_to: null
                 }
             }];
 
@@ -264,32 +303,32 @@ describe('Sequelize client tests', function () {
 
             should(jobs.length).eql(2);
             should(jobs[0]).eql({
-                'arrival_rate': 100,
-                'cron_expression': null,
-                'duration': 1700,
-                'emails': [
+                arrival_rate: 100,
+                cron_expression: null,
+                duration: 1700,
+                emails: [
                     'eli.nudler@zooz.com',
                     'xyz@om.ds'
                 ],
-                'environment': 'test',
-                'id': 'd6b0f076-2efb-48e1-82d2-82250818f59c',
-                'ramp_to': null,
-                'test_id': 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
-                'webhooks': [
-                    'https://hooks.slack.com/services/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',
-                    'http://www.one.com'
+                environment: 'test',
+                id: 'd6b0f076-2efb-48e1-82d2-82250818f59c',
+                ramp_to: null,
+                test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
+                webhooks: [
+                    '8138e406-0d5f-4caf-a143-a758b9545b75',
+                    'e38b985f-efec-4315-93bf-6f04eb2b7438'
                 ]
             });
             should(jobs[1]).eql({
-                'arrival_rate': 200,
-                'cron_expression': null,
-                'duration': 2000,
-                'environment': 'test',
-                'id': 'd6b0f076-2efb-48e1-82d2-82250818f59d',
-                'ramp_to': null,
-                'test_id': 'e2340c63-7828-4b69-b79d-6cbea8fec7a7',
-                'webhooks': undefined,
-                'emails': undefined
+                arrival_rate: 200,
+                cron_expression: null,
+                duration: 2000,
+                environment: 'test',
+                id: 'd6b0f076-2efb-48e1-82d2-82250818f59d',
+                ramp_to: null,
+                test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a7',
+                webhooks: undefined,
+                emails: undefined
             });
         });
 
@@ -324,45 +363,45 @@ describe('Sequelize client tests', function () {
 
             let sequelizeResponse = [{
                 dataValues: {
-                    'id': 'd6b0f076-2efb-48e1-82d2-82250818f59c',
-                    'test_id': 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
-                    'environment': 'test',
-                    'cron_expression': null,
-                    'arrival_rate': 100,
-                    'duration': 1700,
-                    'ramp_to': null,
-                    'webhooks': [{
+                    id: 'd6b0f076-2efb-48e1-82d2-82250818f59c',
+                    test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
+                    environment: 'test',
+                    cron_expression: null,
+                    arrival_rate: 100,
+                    duration: 1700,
+                    ramp_to: null,
+                    webhooks: [{
                         dataValues: {
-                            'id': '8138e406-0d5f-4caf-a143-a758b9545b75',
-                            'url': 'https://hooks.slack.com/services/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',
-                            'created_at': '2019-01-20T12:56:31.000Z',
-                            'updated_at': '2019-01-20T12:56:31.000Z',
-                            'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
+                            id: '8138e406-0d5f-4caf-a143-a758b9545b75',
+                            url: 'https://hooks.slack.com/services/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',
+                            created_at: '2019-01-20T12:56:31.000Z',
+                            updated_at: '2019-01-20T12:56:31.000Z',
+                            job_id: 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }, {
                         dataValues: {
-                            'id': 'e38b985f-efec-4315-93bf-6f04eb2b7438',
-                            'url': 'http://www.one.com',
-                            'created_at': '2019-01-20T12:56:31.000Z',
-                            'updated_at': '2019-01-20T12:56:31.000Z',
-                            'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
+                            id: 'e38b985f-efec-4315-93bf-6f04eb2b7438',
+                            url: 'http://www.one.com',
+                            created_at: '2019-01-20T12:56:31.000Z',
+                            updated_at: '2019-01-20T12:56:31.000Z',
+                            job_id: 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }],
-                    'emails': [{
+                    emails: [{
                         dataValues: {
-                            'id': '8bd6a285-9d9f-4e07-a8e3-387f5936c347',
-                            'address': 'eli.nudler@zooz.com',
-                            'created_at': '2019-01-20T12:56:31.000Z',
-                            'updated_at': '2019-01-20T12:56:31.000Z',
-                            'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
+                            id: '8bd6a285-9d9f-4e07-a8e3-387f5936c347',
+                            address: 'eli.nudler@zooz.com',
+                            created_at: '2019-01-20T12:56:31.000Z',
+                            updated_at: '2019-01-20T12:56:31.000Z',
+                            job_id: 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }, {
                         dataValues: {
-                            'id': 'edc77399-ea72-4b0a-97da-c6169e59bb52',
-                            'address': 'xyz@om.ds',
-                            'created_at': '2019-01-20T12:56:31.000Z',
-                            'updated_at': '2019-01-20T12:56:31.000Z',
-                            'job_id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
+                            id: 'edc77399-ea72-4b0a-97da-c6169e59bb52',
+                            address: 'xyz@om.ds',
+                            created_at: '2019-01-20T12:56:31.000Z',
+                            updated_at: '2019-01-20T12:56:31.000Z',
+                            job_id: 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                         }
                     }]
                 }
@@ -372,36 +411,36 @@ describe('Sequelize client tests', function () {
             let jobs = await sequelizeConnector.getJob('d6b0f076-2efb-48e1-82d2-82250818f59c');
 
             should(jobs).eql([{
-                'arrival_rate': 100,
-                'cron_expression': null,
-                'duration': 1700,
-                'emails': [
+                arrival_rate: 100,
+                cron_expression: null,
+                duration: 1700,
+                emails: [
                     'eli.nudler@zooz.com',
                     'xyz@om.ds'
                 ],
-                'environment': 'test',
-                'id': 'd6b0f076-2efb-48e1-82d2-82250818f59c',
-                'ramp_to': null,
-                'test_id': 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
-                'webhooks': [
-                    'https://hooks.slack.com/services/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',
-                    'http://www.one.com'
+                environment: 'test',
+                id: 'd6b0f076-2efb-48e1-82d2-82250818f59c',
+                ramp_to: null,
+                test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
+                webhooks: [
+                    '8138e406-0d5f-4caf-a143-a758b9545b75',
+                    'e38b985f-efec-4315-93bf-6f04eb2b7438'
                 ]
             }]);
 
             should(sequelizeGetStub.args[0][0]).eql({
-                'attributes': {
-                    'exclude': [
+                attributes: {
+                    exclude: [
                         'updated_at',
                         'created_at'
                     ]
                 },
-                'include': [
+                include: [
                     {},
-                    {}
+                    'webhooks'
                 ],
-                'where': {
-                    'id': 'd6b0f076-2efb-48e1-82d2-82250818f59c'
+                where: {
+                    id: 'd6b0f076-2efb-48e1-82d2-82250818f59c'
                 }
             });
         });
@@ -457,14 +496,72 @@ describe('Sequelize client tests', function () {
     });
 
     describe('Update new jobs', () => {
-        it('should succeed updating job', async () => {
+        let id, testId;
+        beforeEach(async function() {
+            id = uuid.v4();
+            testId = uuid.v4();
+        });
+        it('should succeed updating job with type load_test', async () => {
+            const webhookId = uuid.v4();
             await sequelizeConnector.init(sequelizeStub());
 
-            let id = uuid.v4();
-            let testId = uuid.v4();
+            const sequelizeJobResponse = {
+                dataValues: {
+                    type: 'load_test',
+                    test_id: testId,
+                    arrival_rate: 100,
+                    arrival_count: null,
+                    duration: 1,
+                    cron_expression: '* * * *',
+                    environment: 'test',
+                    ramp_to: null,
+                    max_virtual_users: 500,
+                    parallelism: 3,
+                    proxy_url: 'http://proxy.com',
+                    debug: '*',
+                    enabled: false
+                },
+                setWebhooks: sandbox.stub()
+            };
+            const updatedJobInfo = {
+                ...sequelizeJobResponse.dataValues,
+                cron_expression: '5 4 * *',
+                proxy_url: 'http://predator.dev',
+                webhooks: [ webhookId ]
+            };
+            sequelizeGetStub.resolves(sequelizeJobResponse);
+            sequelizeTransactionStub.resolves();
+            sequelizeJobResponse.setWebhooks.resolves();
 
-            await sequelizeConnector.updateJob(id, {
+            await sequelizeConnector.updateJob(id, updatedJobInfo);
+            await sequelizeTransactionStub.yield(transaction);
+
+            const { webhooks, ...updatedJobInfoWithoutWebhooks } = updatedJobInfo;
+
+            should(sequelizeUpdateStub.args[0][0]).eql(updatedJobInfoWithoutWebhooks);
+            should(sequelizeUpdateStub.args[0][1]).eql({ where: { id }, transaction });
+        });
+
+        it('should succeed updating load_test job to functional_test job', async () => {
+            const sequelizeJob = {
+                dataValues: {
+                    id,
+                    test_id: testId,
+                    type: 'load_test',
+                    environment: 'test',
+                    cron_expression: null,
+                    arrival_rate: 100,
+                    duration: 1700,
+                    ramp_to: null,
+                    webhooks: [],
+                    emails: []
+                },
+                setWebhooks: setWebhooksStub
+            };
+            const updatedJob = {
                 test_id: testId,
+                type: 'functional_test',
+                arrival_count: 5,
                 arrival_rate: 1,
                 duration: 1,
                 cron_expression: '* * * *',
@@ -475,37 +572,46 @@ describe('Sequelize client tests', function () {
                 proxy_url: 'http://proxy.com',
                 debug: '*',
                 enabled: false
-            });
+            };
+            const updatedJobRes = {
+                test_id: testId,
+                type: 'functional_test',
+                arrival_count: 5,
+                arrival_rate: null,
+                cron_expression: '* * * *',
+                duration: 1,
+                environment: 'test',
+                ramp_to: null,
+                max_virtual_users: 500,
+                parallelism: 3,
+                proxy_url: 'http://proxy.com',
+                debug: '*',
+                enabled: false,
+                webhooks: [],
+                emails: []
+            };
+            const transaction = {};
+            sequelizeGetStub.resolves(sequelizeJob);
+            sequelizeTransactionStub.resolves(updatedJob);
+            setWebhooksStub.resolves();
+            await sequelizeConnector.init(sequelizeStub());
 
-            should(sequelizeUpdateStub.args[0][0]).eql({
-                'test_id': testId,
-                'arrival_rate': 1,
-                'cron_expression': '* * * *',
-                'duration': 1,
-                'environment': 'test',
-                'ramp_to': '1',
-                'max_virtual_users': 500,
-                'parallelism': 3,
-                'proxy_url': 'http://proxy.com',
-                'debug': '*',
-                'enabled': false
-            });
+            await sequelizeConnector.updateJob(id, updatedJob);
+            await sequelizeTransactionStub.yield(transaction);
 
-            should(sequelizeUpdateStub.args[0][1]).eql({
-                'where': {
-                    'id': id
-                }
-            });
+            should(sequelizeUpdateStub.args[0][0]).eql(updatedJobRes);
+
+            should(sequelizeUpdateStub.args[0][1]).eql({ where: { id }, transaction });
         });
 
         it('should log error for failing updating  test', async () => {
-            sequelizeUpdateStub.rejects(new Error('Sequelize Error'));
+            sequelizeGetStub.rejects(new Error('Sequelize Error'));
 
             await sequelizeConnector.init(sequelizeStub());
 
             try {
-                await sequelizeConnector.updateJob(uuid.v4(), {
-                    test_id: uuid.v4(),
+                await sequelizeConnector.updateJob(id, {
+                    test_id: testId,
                     arrival_rate: 1,
                     duration: 1,
                     cron_expression: '* * * *',

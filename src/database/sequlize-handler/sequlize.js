@@ -10,11 +10,13 @@ const processorsSequlizeConnector = require('../../processors/models/database/se
 const fileSequlizeConnector = require('../../files/models/database/sequelize/sequelizeConnector');
 const logger = require('../../../src/common/logger');
 const databaseConfig = require('../../config/databaseConfig');
+const webhooksSequlizeConnector = require('../../webhooks/models/database/sequelize/sequelizeConnector');
 const Sequelize = require('sequelize');
 let sequlizeClient;
 
 module.exports.init = async () => {
     sequlizeClient = await createClient();
+    await webhooksSequlizeConnector.init(sequlizeClient);
     await schedulerSequlizeConnector.init(sequlizeClient);
     await reportsSequlizeConnector.init(sequlizeClient);
     await testsSequlizeConnector.init(sequlizeClient);
@@ -22,6 +24,7 @@ module.exports.init = async () => {
     await processorsSequlizeConnector.init(sequlizeClient);
     await fileSequlizeConnector.init(sequlizeClient);
     await runSequlizeMigrations();
+    await sequlizeClient.sync();
 };
 
 module.exports.ping = async () => {

@@ -19,6 +19,8 @@ import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import {FileDrop} from 'react-file-drop';
 import env from '../../../App/common/env';
+import {CONTENT_TYPES, CAPTURE_TYPES, CAPTURE_KEY_VALUE_PLACEHOLDER} from './constants'
+
 import {
     faDownload
 } from '@fortawesome/free-solid-svg-icons'
@@ -241,7 +243,19 @@ export class TestForm extends React.Component {
         if (type === SLEEP) {
             return {id: uuid(), sleep: 10, type};
         }
-        return {id: uuid(), method: 'POST', headers: [{}], captures: [{}], url: '', forever: true}
+        return {
+            id: uuid(),
+            method: 'POST',
+            headers: [{}],
+            captures: [{
+                type: CAPTURE_TYPES.JSON_PATH,
+                keyPlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].key,
+                valuePlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].value
+            }],
+            url: '',
+            forever: true,
+            contentType: CONTENT_TYPES.APPLICATION_JSON
+        }
     }
 
     onChooseScenario = (key) => {

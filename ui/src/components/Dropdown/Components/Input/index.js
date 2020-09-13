@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import style from './Input.scss'
 import Arrow from '../Arrow'
 
-const Input = React.forwardRef(({ children, error, disabled, isOpen, onClick, height, isOverflow, ...rest }, ref) => {
+const Input = React.forwardRef(({ children, error, disabled, isOpen, onClick, height,width, isOverflow, ...rest }, ref) => {
   return (
     <div
       {...rest}
@@ -13,7 +13,8 @@ const Input = React.forwardRef(({ children, error, disabled, isOpen, onClick, he
       tabIndex='0'
       data-test='selected-options-input'
       style={{
-        '--height': height
+        '--height': height,
+        width:width
       }}
       className={classnames(style.input, {
         [style['input--error']]: error,

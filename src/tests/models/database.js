@@ -1,5 +1,6 @@
-const sequelizeConnector = require('./database/sequelize/sequelizeConnector'),
-    databaseConnector = sequelizeConnector;
+const sequelizeConnector = require('./database/sequelize/sequelizeConnector');
+
+const databaseConnector = sequelizeConnector;
 
 module.exports = {
     insertTest,

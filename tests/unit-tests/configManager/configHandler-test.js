@@ -5,6 +5,7 @@ process.env.JOB_PLATFORM = 'DOCKER';
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
+
 const databaseConnector = require('../../../src/configManager/models/database/databaseConnector');
 const configConstants = require('../../../src/common/consts').CONFIG;
 
