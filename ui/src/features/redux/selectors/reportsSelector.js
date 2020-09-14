@@ -7,6 +7,7 @@ export const errorOnGetReports = (state) => state.ReportsReducer.get('error_get_
 export const report = (state) => state.ReportsReducer.get('report');
 export const errorOnGetReport = (state) => state.ReportsReducer.get('error_get_report');
 export const processingGetReports = (state) => state.ReportsReducer.get('processing_get_reports');
+export const processingGetReport = (state) => state.ReportsReducer.get('processing_get_report');
 export const createBenchmarkSuccess = (state) => state.ReportsReducer.get('create_benchmark_success');
 export const editNotesSuccess = (state) => state.ReportsReducer.get('edit_notes_success');
 export const deleteReportSuccess = (state) => state.ReportsReducer.get('delete_report_success');

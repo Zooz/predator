@@ -60,11 +60,14 @@ export function* getLastReports() {
 
 export function* getReport({testId, runId}) {
     try {
+        yield put(Actions.processingGetReport(true));
         const report = yield call(getReportFromFramework, testId, runId);
         yield put(Actions.getReportSuccess(report.data));
     } catch (e) {
-        yield put(Actions.getReportFaliure(e))
+        yield put(Actions.getReportFailure(e))
     }
+    yield put(Actions.processingGetReport(false));
+
 }
 
 export function* createBenchmark({testId, body}) {

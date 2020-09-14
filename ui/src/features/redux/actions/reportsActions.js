@@ -32,7 +32,7 @@ export const getReportSuccess = (report) => (
     {type: Types.GET_REPORT_SUCCESS, report}
 );
 
-export const getReportFaliure = (error) => (
+export const getReportFailure = (error) => (
     {type: Types.GET_REPORT_FAILURE, error}
 );
 
@@ -42,6 +42,10 @@ export const clearSelectedReport = () => (
 
 export const processingGetReports = (state) => (
     {type: Types.PROCESSING_GET_REPORTS, state}
+);
+
+export const processingGetReport = (state) => (
+    {type: Types.PROCESSING_GET_REPORT, state}
 );
 
 

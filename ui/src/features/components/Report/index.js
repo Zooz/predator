@@ -13,7 +13,6 @@ import {BarChartPredator, LineChartPredator, AssertionsReport} from "./Charts";
 import _ from "lodash";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Card from "../../../components/Card";
-import style from "../../get-configuration.scss";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -92,12 +91,10 @@ class Report extends React.Component {
 
                     </div>
                 }
-                <div>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
                     <div style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignSelf: 'flex-end',
+                        marginBottom: '15px'
                     }}>
                         <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
                                 onClick={this.createBenchmark}>Set as Benchmark</Button>
@@ -126,88 +123,103 @@ class Report extends React.Component {
                                            onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                                            filteredKeys={filteredKeys}/>
                     </Card>
-                    <Card style={{display: 'flex', marginBottom: '15px', justifyContent: 'space-evenly'}}>
-                        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+                    <Card style={{
+                        display: 'flex',
+                        marginBottom: '15px',
+                        justifyContent: 'space-evenly',
+                        height: '420px'
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            height: '100%',
+                            marginRight: '10px',
+                            flex: 1
+                        }}>
                             <h3>Status Codes And Errors Distribution</h3>
                             <BarChartPredator data={aggregateReport.errorsBar} keys={aggregateReport.errorsBarKeys}
                                               graphType={'status_codes_errors'}
                                               onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                                               filteredKeys={filteredKeys}/>
                         </div>
-                        <div style={{display: 'flex', flexDirection: 'column'}}>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            height: '100%'
+                        }}>
                             <h3>Scenarios</h3>
                             <PieChart data={aggregateReport.scenarios}/>
                         </div>
                     </Card>
-
                     {
-
-                        aggregateReport.assertionsTable && aggregateReport.assertionsTable.rows.length > 0 &&
+                        (aggregateReport.assertionsTable && aggregateReport.assertionsTable.rows.length) > 0 &&
                         <Card style={{display: 'flex', marginBottom: '15px'}}>
                             <h3>Assertions</h3>
                             <AssertionsReport data={aggregateReport.assertionsTable}/>
-                            <Card/>
-                            }
+                        </Card>
+                    }
 
-                        </div>
-                        < Snackbar
-                        open={this.props.createBenchmarkSucceed}
-                        bodyStyle={{backgroundColor: '#2fbb67'}}
-                        message={'create benchmark succeeded'}
-                        autoHideDuration={4000}
-                        onRequestClose={() => {
+                </div>
+                <Snackbar
+                    open={this.props.createBenchmarkSucceed}
+                    bodyStyle={{backgroundColor: '#2fbb67'}}
+                    message={'create benchmark succeeded'}
+                    autoHideDuration={4000}
+                    onRequestClose={() => {
                         this.props.createBenchmarkSuccess(false);
                     }}
-                        />
-                        </div>
-                        );
-                        }
+                />
+            </div>
+        );
+    }
 
-                        loadData = () => {
-                        const {getAggregateReports, getBenchmark, report} = this.props;
-                        getAggregateReports([{testId: report.test_id, reportId: report.report_id}]);
-                        getBenchmark(report.test_id);
-                        };
+    loadData = () => {
+        const {getAggregateReports, getBenchmark, report} = this.props;
+        getAggregateReports([{testId: report.test_id, reportId: report.report_id}]);
+        getBenchmark(report.test_id);
+    };
 
-                        componentDidMount() {
-                        this.loadData();
-                        this.refreshDataInterval = setInterval(this.loadData, REFRESH_DATA_INTERVAL)
-                        }
-
-
-                        componentWillUnmount() {
-                        clearInterval(this.refreshDataInterval);
-                        this.props.clearAggregateReportAndBenchmark();
-                        }
-
-                        };
+    componentDidMount() {
+        this.loadData();
+        this.refreshDataInterval = setInterval(this.loadData, REFRESH_DATA_INTERVAL)
+    }
 
 
-                        function mapStateToProps(state) {
-                        return {
-                        aggregateReport: selectors.getAggregateReport(state),
-                        createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
-                        }
-                        }
+    componentWillUnmount() {
+        clearInterval(this.refreshDataInterval);
+        this.props.clearAggregateReportAndBenchmark();
+    }
 
-                        const mapDispatchToProps = {
-                        getAggregateReports: Actions.getAggregateReports,
-                        createBenchmark: Actions.createBenchmark,
-                        createBenchmarkSuccess: Actions.createBenchmarkSuccess,
-                        getBenchmark: Actions.getBenchmark,
-                        clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
-                        };
+};
 
 
-                        const SummeryTable = ({report = {}}) => {
-                        return (
-                        <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
-                        <Box title={'Test status'} value={report.status}/>
-                        <Box title={'Duration'} value={prettySeconds(Number(report.duration))}/>
-                        <Box title={'Parallelism'} value={report.parallelism}/>
-                        {report.score && <Box title={'Score'} value={Math.floor(report.score)}/>}
-                        </div>
-                        );
-                        }
+function mapStateToProps(state) {
+    return {
+        aggregateReport: selectors.getAggregateReport(state),
+        createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
+    }
+}
 
-                        export default connect(mapStateToProps, mapDispatchToProps)(Report);
+const mapDispatchToProps = {
+    getAggregateReports: Actions.getAggregateReports,
+    createBenchmark: Actions.createBenchmark,
+    createBenchmarkSuccess: Actions.createBenchmarkSuccess,
+    getBenchmark: Actions.getBenchmark,
+    clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
+};
+
+
+const SummeryTable = ({report = {}}) => {
+    return (
+        <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
+            <Box title={'Test status'} value={report.status}/>
+            <Box title={'Duration'} value={prettySeconds(Number(report.duration))}/>
+            <Box title={'Parallelism'} value={report.parallelism}/>
+            {report.score && <Box title={'Score'} value={Math.floor(report.score)}/>}
+        </div>
+    );
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Report);
