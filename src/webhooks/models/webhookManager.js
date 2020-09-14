@@ -70,7 +70,7 @@ function fireWebhooksPromisesArray(webhooks, eventType, jobId, testId, report, a
 }
 
 async function fireWebhookByEvent(job, eventType, report, additionalInfo = {}, options = {}) {
-    const jobWebhooks = await Promise.all(job.webhooks.map(webhookId => getWebhook(webhookId)));
+    const jobWebhooks = job.webhooks ? await Promise.all(job.webhooks.map(webhookId => getWebhook(webhookId))) : [];
     const globalWebhooks = await getAllGlobalWebhooks();
     const webhooks = [...jobWebhooks, ...globalWebhooks];
     const webhooksWithEventType = webhooks.filter(webhook => webhook.events.includes(eventType));

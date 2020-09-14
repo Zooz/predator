@@ -471,7 +471,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                 });
 
-                describe('Create one time job with webhook and run it, assert that webhook was sent for started phase', () => {
+                describe('Create one time job with slack webhook and run it, assert that webhook was sent for started phase', () => {
                     let createJobResponse;
                     let getJobsFromService;
                     let expectedResult;
@@ -583,6 +583,114 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                 });
 
+                describe('Create one time job with global, json webhook and run it, assert that webhook was sent for started phase', () => {
+                    let createJobResponse;
+                    let getJobsFromService;
+                    let expectedResult;
+
+                    it('Create the job', async () => {
+                        const webhookBody = {
+                            "name": "nullys webhook",
+                            "url": "http://www.global.com/nully",
+                            "events": [
+                                "started",
+                                "api_failure",
+                                "aborted",
+                                "failed",
+                                "finished"
+                            ],
+                            "format_type": "json",
+                            "global": true
+                        }
+
+                        const webhook = await webhooksRequestCreator.createWebhook(webhookBody);
+                        should(webhook.status).eql(201);
+
+                        let validBody = {
+                            test_id: testId,
+                            arrival_rate: 100,
+                            ramp_to: 150,
+                            type: 'load_test',
+                            max_virtual_users: 200,
+                            duration: 60,
+                            parallelism: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            webhooks: []
+                        };
+
+                        expectedResult = {
+                            environment: 'test',
+                            test_id: testId,
+                            arrival_rate: 100,
+                            ramp_to: 150,
+                            duration: 60,
+                            parallelism: 1,
+                            type: 'load_test'
+                        };
+
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
+                            return true;
+                        }).reply(200, {
+                            metadata: { name: 'jobName', uid: 'uid' },
+                            namespace: kubernetesConfig.kubernetesNamespace
+                        });
+
+                        createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                        should(createJobResponse.body).containEql(expectedResult);
+                    });
+
+                    it('Get the job', async () => {
+                        jobId = createJobResponse.body.id;
+                        getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(200);
+                        should(getJobsFromService.body).containEql(expectedResult);
+                    });
+
+                    it('Runner posts started stats and webhook is sent', async () => {
+                        const webhookScope = nock('http://www.global.com').post(`/nully`)
+                            .reply(201, 'ok');
+
+                        let reportId = uuid.v4();
+                        let minimalReportBody = {
+                            test_type: 'basic',
+                            report_id: reportId,
+                            job_id: jobId,
+                            revision_id: uuid.v4(),
+                            test_name: 'integration-test',
+                            test_description: 'doing some integration testing',
+                            start_time: Date.now().toString(),
+                            last_updated_at: Date.now().toString(),
+                            test_configuration: {
+                                enviornment: 'test',
+                                duration: 60,
+                                arrival_rate: 20
+                            }
+                        };
+                        let fullReportBody = Object.assign({}, minimalReportBody);
+                        fullReportBody.notes = 'My first performance test';
+                        fullReportBody.runner_id = uuid.v4();
+
+                        const reportResponse = await reportsRequestCreator.createReport(testId, fullReportBody);
+                        should(reportResponse.statusCode).be.eql(201);
+
+                        const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', fullReportBody.runner_id));
+                        should(phaseStartedStatsResponse.statusCode).be.eql(204);
+
+                        // wait for webhook to be sent
+                        await sleep(4000);
+
+                        // assert webhook is sent
+                        webhookScope.done();
+                    });
+                });
                 [true, false].forEach((runImmediately) => {
                     describe.skip('Create a scheduled job, should create job with the right parameters and run_immediately parameter is ' + runImmediately, async () => {
                         let createJobResponse;
