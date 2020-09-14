@@ -178,8 +178,8 @@ describe('Create job specific kubernetes tests', async function () {
                         should(getJobsFromService.body.enabled).eql(false);
                     });
 
-                    it('Wait 4 seconds to let scheduler run the job', (done) => {
-                        setTimeout(done, 4000);
+                    it('Wait 4 seconds to let scheduler run the job', async () => {
+                        await sleep( 4000);
                     });
 
                     it('Verify job did not run', () => {
@@ -202,8 +202,8 @@ describe('Create job specific kubernetes tests', async function () {
                         should(getJobsFromService.body.enabled).eql(true);
                     });
 
-                    it('Wait 4 seconds to let scheduler run the job', (done) => {
-                        setTimeout(done, 4000);
+                    it('Wait 4 seconds to let scheduler run the job', async () => {
+                        await sleep( 4000);
                     });
 
                     it('Verify job did run', () => {
@@ -475,7 +475,6 @@ describe('Create job specific kubernetes tests', async function () {
                     let createJobResponse;
                     let getJobsFromService;
                     let expectedResult;
-                    let webhookScope;
 
                     it('Create the job', async () => {
                         const webhookBody = {
@@ -520,10 +519,8 @@ describe('Create job specific kubernetes tests', async function () {
                             type: 'load_test',
                             webhooks: [webhook.body.id]
                         };
-                        let actualJobEnvVars = {};
 
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
-                            actualJobEnvVars = body.spec.template.spec.containers['0'].env;
                             return true;
                         }).reply(200, {
                             metadata: { name: 'jobName', uid: 'uid' },
@@ -549,7 +546,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Runner posts started stats and webhook is sent', async () => {
-                        webhookScope = nock('http://www.abcde.com').post(`/mickey`)
+                        const webhookScope = nock('http://www.abcde.com').post(`/mickey`)
                             .reply(201, 'ok');
 
                         let reportId = uuid.v4();
@@ -624,8 +621,8 @@ describe('Create job specific kubernetes tests', async function () {
                             should(createJobResponse.status).eql(201);
                         });
 
-                        it('Wait 4 seconds to let scheduler run the job', (done) => {
-                            setTimeout(done, 4000);
+                        it('Wait 4 seconds to let scheduler run the job', async () => {
+                            await sleep( 4000);
                         });
 
                         it('Verify job was deployed as supposed to', () => {
