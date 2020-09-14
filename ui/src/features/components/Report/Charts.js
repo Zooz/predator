@@ -186,9 +186,8 @@ export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
     });
     const headers = data.headers.map((header, index) => <div
         style={{width: columnToWidth[index] || '150px'}}>{header}</div>);
-
     return (
-        <SimpleTable headers={headers} rows={rows}/>
+        <SimpleTable rowStyle={{borderRadius:'5px',backgroundColor: 'white'}} style={{padding:'20px'}} headers={headers} rows={rows}/>
     )
 }
 

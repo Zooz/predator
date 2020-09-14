@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Modal from '../Modal';
 import {prettySeconds} from '../../utils';
 import PieChart from '../PieChart'
 import * as Actions from "../../redux/actions/reportsActions";
@@ -56,17 +55,11 @@ class Report extends React.Component {
         this.setState({filteredKeys: {...newFilteredKeys}});
     };
 
-    onExitReport = () => {
-        const {clearAggregateReportAndBenchmark, onClose} = this.props;
-        clearAggregateReportAndBenchmark();
-        onClose();
-    };
-
     render() {
         const {report, aggregateReport} = this.props;
         const {disabledCreateBenchmark, filteredKeys, enableBenchmark} = this.state;
         return (
-            <Modal onExit={this.onExitReport}>
+            <div>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -146,9 +139,6 @@ class Report extends React.Component {
                     }
 
                 </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <Button inverted onClick={this.onExitReport}>Close</Button>
-                </div>
                 <Snackbar
                     open={this.props.createBenchmarkSucceed}
                     bodyStyle={{backgroundColor: '#2fbb67'}}
@@ -158,7 +148,7 @@ class Report extends React.Component {
                         this.props.createBenchmarkSuccess(false);
                     }}
                 />
-            </Modal>
+            </div>
         );
     }
 

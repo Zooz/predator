@@ -76,8 +76,7 @@ function buildAssertionsTable(assertionsTable, data) {
         const testName = entry[0];
         return Object.entries(entry[1]).map((assertEntry) => {
             const successRatio =assertEntry[1].success / (assertEntry[1].success + assertEntry[1].fail);
-            // const failureResponses = Object.entries(assertEntry[1].failureResponses).map((entry)=>`${entry[0]} = ${entry[1]}`);
-            return [testName, assertEntry[0], assertEntry[1].fail, assertEntry[1].success, `${successRatio}%` ,assertEntry[1].failureResponses ]
+            return [testName, assertEntry[0], assertEntry[1].fail, assertEntry[1].success, `${successRatio * 100}%` ,assertEntry[1].failureResponses ]
         })
     });
     assertionsTable.rows = rows;
