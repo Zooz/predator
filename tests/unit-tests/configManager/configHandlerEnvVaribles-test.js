@@ -11,11 +11,11 @@ const configConstants = require('../../../src/common/consts').CONFIG;
 describe('Manager config with env variables', function () {
     let sandbox;
     let manager;
-    let cassandraGetStub;
+    let databaseConnectorGetStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
-        cassandraGetStub = sandbox.stub(databaseConnector, 'getConfigAsObject');
+        databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getConfigAsObject');
 
         process.env.SMTP_FROM = 'smtp_from_test';
         process.env.SMTP_PORT = 'smtp_port_test';
@@ -50,7 +50,7 @@ describe('Manager config with env variables', function () {
         sandbox.restore();
     });
     it('get config for from env varibles in the right types (json,int,float,string)', async () => {
-        cassandraGetStub.resolves([]);
+        databaseConnectorGetStub.resolves([]);
         let result = await manager.getConfig();
         should(Object.keys(result).length).eql(Object.keys(configConstants).length);
         should(result.grafana_url).eql('url_test');

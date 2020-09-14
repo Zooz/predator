@@ -55,9 +55,9 @@ async function insertJob(jobId, jobInfo) {
         include.push({ association: job.email });
     }
     await client.transaction(async function(transaction) {
-        const createdJobTransaction = await job.create(params, { include, transaction });
-        createdJobTransaction.setWebhooks(jobInfo.webhooks || [], { transaction });
-        return createdJobTransaction;
+        const createdJob = await job.create(params, { include, transaction });
+        await createdJob.setWebhooks(jobInfo.webhooks || [], { transaction });
+        return createdJob;
     });
 }
 
@@ -236,8 +236,3 @@ async function initSchemas() {
         foreignKey: 'job_id'
     });
 }
-
-// async function findJob(jobId) {
-//     let jobAsArray = await getJob(jobId);
-//     return jobAsArray[0];
-// }
