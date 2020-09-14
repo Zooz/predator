@@ -162,7 +162,7 @@
                 </div>
                 <div class="card-box mbr-fonts-style">
                     <h4 class="card-title py-3 display-7">Supports 5 storage backends</h4>
-                    <p class="mbr-text mbr-fonts-style display-7">Predator provides out-of-the box functionality for persisting data in Cassandra, Postgres, MySQL, MSSQL and SQLITE.</p>
+                    <p class="mbr-text mbr-fonts-style display-7">Predator provides out-of-the box functionality for persisting data in Postgres, MySQL, MSSQL and SQLITE.</p>
                 </div>
             </div>
         </div>
