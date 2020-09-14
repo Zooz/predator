@@ -1,10 +1,5 @@
 'use strict';
-
-const databaseConfig = require('../../../config/databaseConfig');
-const cassandraConnector = require('./cassandra/cassandraConnector');
-const sequelizeConnector = require('./sequelize/sequelizeConnector');
-
-const databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
+const databaseConnector = require('./sequelize/sequelizeConnector');
 
 module.exports = {
     init,

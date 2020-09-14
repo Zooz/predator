@@ -1,7 +1,6 @@
-const cassandraConnector = require('./database/cassandra/cassandraConnector'),
-    sequelizeConnector = require('./database/sequelize/sequelizeConnector'),
-    databaseConfig = require('../../config/databaseConfig'),
-    databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
+const sequelizeConnector = require('./database/sequelize/sequelizeConnector');
+
+const databaseConnector = sequelizeConnector;
 
 module.exports = {
     saveFile,

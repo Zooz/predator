@@ -1,8 +1,12 @@
 const should = require('should'),
     uuid = require('uuid'),
+    logger = require('../../../src/common/logger'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
     configManagerRequestCreator = require('../configManager/helpers/requestCreator'),
+    webhooksRequestCreator = require('../webhooks/helpers/requestCreator'),
     testsRequestCreator = require('../tests/helpers/requestCreator'),
+    reportsRequestCreator = require('../reports/helpers/requestCreator'),
+    statsGenerator = require('../reports/helpers/statsGenerator'),
     nock = require('nock'),
     kubernetesConfig = require('../../../src/config/kubernetesConfig');
 
@@ -10,9 +14,10 @@ describe('Create job specific kubernetes tests', async function () {
     this.timeout(20000);
     let testId;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         nock.cleanAll();
-    });
+    })
+
     const jobPlatform = process.env.JOB_PLATFORM;
     if (jobPlatform.toUpperCase() === 'KUBERNETES') {
         describe('Kubernetes', () => {
@@ -21,6 +26,8 @@ describe('Create job specific kubernetes tests', async function () {
                     await configManagerRequestCreator.init();
                     await schedulerRequestCreator.init();
                     await testsRequestCreator.init();
+                    await webhooksRequestCreator.init();
+                    await reportsRequestCreator.init();
 
                     let requestBody = require('../../testExamples/Basic_test');
                     let response = await testsRequestCreator.createTest(requestBody, {});
@@ -171,8 +178,8 @@ describe('Create job specific kubernetes tests', async function () {
                         should(getJobsFromService.body.enabled).eql(false);
                     });
 
-                    it('Wait 4 seconds to let scheduler run the job', (done) => {
-                        setTimeout(done, 4000);
+                    it('Wait 4 seconds to let scheduler run the job', async () => {
+                        await sleep( 4000);
                     });
 
                     it('Verify job did not run', () => {
@@ -195,8 +202,8 @@ describe('Create job specific kubernetes tests', async function () {
                         should(getJobsFromService.body.enabled).eql(true);
                     });
 
-                    it('Wait 4 seconds to let scheduler run the job', (done) => {
-                        setTimeout(done, 4000);
+                    it('Wait 4 seconds to let scheduler run the job', async () => {
+                        await sleep( 4000);
                     });
 
                     it('Verify job did run', () => {
@@ -464,6 +471,226 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                 });
 
+                describe('Create one time job with slack webhook and run it, assert that webhook was sent for started phase', () => {
+                    let createJobResponse;
+                    let getJobsFromService;
+                    let expectedResult;
+
+                    it('Create the job', async () => {
+                        const webhookBody = {
+                            "name": "mickeys webhook",
+                            "url": "http://www.abcde.com/mickey",
+                            "events": [
+                                "started",
+                                "api_failure",
+                                "aborted",
+                                "failed",
+                                "finished",
+                                "benchmark_passed",
+                                "benchmark_failed"
+                            ],
+                            "format_type": "json",
+                            "global": false
+                        }
+
+                        const webhook = await webhooksRequestCreator.createWebhook(webhookBody);
+                        should(webhook.status).eql(201);
+
+                        let validBody = {
+                            test_id: testId,
+                            arrival_rate: 100,
+                            ramp_to: 150,
+                            type: 'load_test',
+                            max_virtual_users: 200,
+                            duration: 60,
+                            parallelism: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            webhooks: [webhook.body.id]
+                        };
+
+                        expectedResult = {
+                            environment: 'test',
+                            test_id: testId,
+                            arrival_rate: 100,
+                            ramp_to: 150,
+                            duration: 60,
+                            parallelism: 1,
+                            type: 'load_test',
+                            webhooks: [webhook.body.id]
+                        };
+
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
+                            return true;
+                        }).reply(200, {
+                            metadata: { name: 'jobName', uid: 'uid' },
+                            namespace: kubernetesConfig.kubernetesNamespace
+                        });
+
+                        createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                        should(createJobResponse.body).containEql(expectedResult);
+                    });
+
+                    it('Get the job', async () => {
+                        jobId = createJobResponse.body.id;
+                        getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(200);
+                        should(getJobsFromService.body).containEql(expectedResult);
+                    });
+
+                    it('Runner posts started stats and webhook is sent', async () => {
+                        const webhookScope = nock('http://www.abcde.com').post(`/mickey`)
+                            .reply(201, 'ok');
+
+                        let reportId = uuid.v4();
+                        let minimalReportBody = {
+                            test_type: 'basic',
+                            report_id: reportId,
+                            job_id: jobId,
+                            revision_id: uuid.v4(),
+                            test_name: 'integration-test',
+                            test_description: 'doing some integration testing',
+                            start_time: Date.now().toString(),
+                            last_updated_at: Date.now().toString(),
+                            test_configuration: {
+                                enviornment: 'test',
+                                duration: 60,
+                                arrival_rate: 20
+                            }
+                        };
+                        let fullReportBody = Object.assign({}, minimalReportBody);
+                        fullReportBody.notes = 'My first performance test';
+                        fullReportBody.runner_id = uuid.v4();
+
+                        const reportResponse = await reportsRequestCreator.createReport(testId, fullReportBody);
+                        should(reportResponse.statusCode).be.eql(201);
+
+                        const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', fullReportBody.runner_id));
+                        should(phaseStartedStatsResponse.statusCode).be.eql(204);
+
+                        // wait for webhook to be sent
+                        await sleep(4000);
+
+                        // assert webhook is sent
+                        webhookScope.done();
+                    });
+                });
+
+                describe('Create one time job with global, json webhook and run it, assert that webhook was sent for started phase', () => {
+                    let createJobResponse;
+                    let getJobsFromService;
+                    let expectedResult;
+
+                    it('Create the job', async () => {
+                        const webhookBody = {
+                            "name": "nullys webhook",
+                            "url": "http://www.global.com/nully",
+                            "events": [
+                                "started",
+                                "api_failure",
+                                "aborted",
+                                "failed",
+                                "finished"
+                            ],
+                            "format_type": "json",
+                            "global": true
+                        }
+
+                        const webhook = await webhooksRequestCreator.createWebhook(webhookBody);
+                        should(webhook.status).eql(201);
+
+                        let validBody = {
+                            test_id: testId,
+                            arrival_rate: 100,
+                            ramp_to: 150,
+                            type: 'load_test',
+                            max_virtual_users: 200,
+                            duration: 60,
+                            parallelism: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            webhooks: []
+                        };
+
+                        expectedResult = {
+                            environment: 'test',
+                            test_id: testId,
+                            arrival_rate: 100,
+                            ramp_to: 150,
+                            duration: 60,
+                            parallelism: 1,
+                            type: 'load_test'
+                        };
+
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
+                            return true;
+                        }).reply(200, {
+                            metadata: { name: 'jobName', uid: 'uid' },
+                            namespace: kubernetesConfig.kubernetesNamespace
+                        });
+
+                        createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                        should(createJobResponse.body).containEql(expectedResult);
+                    });
+
+                    it('Get the job', async () => {
+                        jobId = createJobResponse.body.id;
+                        getJobsFromService = await schedulerRequestCreator.getJob(jobId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(200);
+                        should(getJobsFromService.body).containEql(expectedResult);
+                    });
+
+                    it('Runner posts started stats and webhook is sent', async () => {
+                        const webhookScope = nock('http://www.global.com').post(`/nully`)
+                            .reply(201, 'ok');
+
+                        let reportId = uuid.v4();
+                        let minimalReportBody = {
+                            test_type: 'basic',
+                            report_id: reportId,
+                            job_id: jobId,
+                            revision_id: uuid.v4(),
+                            test_name: 'integration-test',
+                            test_description: 'doing some integration testing',
+                            start_time: Date.now().toString(),
+                            last_updated_at: Date.now().toString(),
+                            test_configuration: {
+                                enviornment: 'test',
+                                duration: 60,
+                                arrival_rate: 20
+                            }
+                        };
+                        let fullReportBody = Object.assign({}, minimalReportBody);
+                        fullReportBody.notes = 'My first performance test';
+                        fullReportBody.runner_id = uuid.v4();
+
+                        const reportResponse = await reportsRequestCreator.createReport(testId, fullReportBody);
+                        should(reportResponse.statusCode).be.eql(201);
+
+                        const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', fullReportBody.runner_id));
+                        should(phaseStartedStatsResponse.statusCode).be.eql(204);
+
+                        // wait for webhook to be sent
+                        await sleep(4000);
+
+                        // assert webhook is sent
+                        webhookScope.done();
+                    });
+                });
                 [true, false].forEach((runImmediately) => {
                     describe.skip('Create a scheduled job, should create job with the right parameters and run_immediately parameter is ' + runImmediately, async () => {
                         let createJobResponse;
@@ -502,8 +729,8 @@ describe('Create job specific kubernetes tests', async function () {
                             should(createJobResponse.status).eql(201);
                         });
 
-                        it('Wait 4 seconds to let scheduler run the job', (done) => {
-                            setTimeout(done, 4000);
+                        it('Wait 4 seconds to let scheduler run the job', async () => {
+                            await sleep( 4000);
                         });
 
                         it('Verify job was deployed as supposed to', () => {
@@ -561,3 +788,10 @@ describe('Create job specific kubernetes tests', async function () {
         });
     }
 });
+
+const sleep = (time) => {
+    logger.info(`sleeping for ${time}ms`);
+    return new Promise((resolve) => {
+        setTimeout(resolve, time)
+    });
+}

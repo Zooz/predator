@@ -22,21 +22,13 @@ Below are variables Predator can be configured with.
 ## Database
 | Environment Variable 	| Description                                                                     	| Configurable from UI/API 	| Default value 	|
 |----------------------	|---------------------------------------------------------------------------------	|--------------------------	|---------------	|
-| DATABASE_TYPE        	| Database to integrate Predator with [Cassandra, Postgres, MySQL, MSSQL, SQLITE] 	| x                        	| SQLITE        	|
+| DATABASE_TYPE        	| Database to integrate Predator with [Postgres, MySQL, MSSQL, SQLITE] 	| x                        	| SQLITE        	|
 | DATABASE_NAME        	| Database/Keyspace name                                                          	| x                        	|               	|
 | DATABASE_ADDRESS     	| Database address                                                                	| x                        	|               	|
 | DATABASE_USERNAME    	| Database username                                                               	| x                        	|               	|
 | DATABASE_PASSWORD    	| Database password                                                               	| x                        	|               	|
 
 Additional parameters for the following chosen databases:
-
-#### Cassandra
-| Environment Variable         	| Configurable from UI/API 	| Default value  	|
-|------------------------------	|--------------------------	|----------------	|
-| CASSANDRA_REPLICATION_FACTOR 	| x                        	| 1              	|
-| CASSANDRA_CONSISTENCY        	| x                        	| localQuorum    	|
-| CASSANDRA_KEY_SPACE_STRATEGY 	| x                        	| SimpleStrategy 	|
-| CASSANDRA_LOCAL_DATA_CENTER  	| x                        	|                	|
 
 #### SQLITE
 | Environment Variable 	| Description      	| Configurable from UI/API 	| Default value 	|
