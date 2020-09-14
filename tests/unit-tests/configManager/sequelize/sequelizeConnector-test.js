@@ -4,7 +4,7 @@ const sinon = require('sinon'),
     databaseConfig = require('../../../../src/config/databaseConfig'),
     sequelizeConnector = require('../../../../src/configManager/models/database/sequelize/sequelizeConnector');
 
-describe('Cassandra client tests', function () {
+describe('Sequelize client tests', function () {
     let sandbox,
         sequelizeModelStub,
         sequelizeUpsertStub,

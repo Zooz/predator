@@ -72,26 +72,6 @@ function postgres() {
     echo "$APP is ready"
 }
 
-function cassandra() {
-    IMAGE_NAME=cassandra:3.11
-    APP=cassandra
-    stop $APP
-    COMMAND="docker run \
-                    -d \
-                    --name $APP \
-                    -p 9042:9042 \
-                    $IMAGE_NAME"
-    echo -e "Starting $APP\n"${COMMAND/\s+/ }
-    $COMMAND
-    COMMAND_EXIT_CODE=$?
-    if [ ${COMMAND_EXIT_CODE} != 0 ]; then
-        printf "Error when executing: '${APP}'\n"
-        exit ${COMMAND_EXIT_CODE}
-    fi
-    waitForApp $APP "Created default superuser role 'cassandra'"
-    echo "$APP is ready"
-}
-
 function mailhog() {
     IMAGE_NAME=mailhog/mailhog
     APP=mailhog
@@ -130,9 +110,6 @@ for option in ${@}; do
     postgres)
         postgres
         ;;
-    cassandra)
-        cassandra
-        ;;
     reporter)
         reporter
         ;;
@@ -146,7 +123,7 @@ for option in ${@}; do
         stop
         ;;
     *)
-        echo "Usage: ./dockerRun.sh <cassandra|postgres|mailhog|mysql>"
+        echo "Usage: ./dockerRun.sh <postgres|mailhog|mysql>"
         ;;
     esac
 done

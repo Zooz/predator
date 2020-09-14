@@ -1,9 +1,8 @@
 'use strict';
 
-let databaseConfig = require('../config/databaseConfig');
-let cassandraConnector = require('./cassandra-handler/cassandra');
 let sequelizeConnector = require('./sequlize-handler/sequlize');
-let databaseConnector = databaseConfig.type.toLowerCase() === 'cassandra' ? cassandraConnector : sequelizeConnector;
+let databaseConnector = sequelizeConnector;
+
 module.exports.init = () => {
     return databaseConnector.init();
 };
