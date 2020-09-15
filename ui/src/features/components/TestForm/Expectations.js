@@ -1,4 +1,5 @@
-import {EXPECTATIONS_SPEC, EXPECTATIONS_TYPE, EXPECTATIONS_SPEC_BY_PROP, SUPPORTED_CAPTURE_TYPES} from './constants'
+import {EXPECTATIONS_SPEC, EXPECTATIONS_SPEC_BY_PROP} from './constants'
+import {createDefaultExpectation} from './utils';
 import DynamicKeyValueInput from "./DynamicKeyValueInput";
 import React from "react";
 
@@ -20,7 +21,7 @@ const Expectations = ({step, stepIndex, onChangeStep}) => {
     };
     const onAddExpectation = () => {
         const newStep = {...step};
-        newStep.expectations.push({type: EXPECTATIONS_TYPE.STATUS_CODE, onlyValue: true});
+        newStep.expectations.push(createDefaultExpectation());
         onChangeStep(newStep, stepIndex);
 
     };

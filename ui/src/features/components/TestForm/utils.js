@@ -1,10 +1,10 @@
-import {cloneDeep} from 'lodash';
+import {cloneDeep, isUndefined} from 'lodash';
 import {v4 as uuid} from 'uuid';
 import {
     CONTENT_TYPES,
     CAPTURE_TYPE_TO_REQUEST,
     CAPTURE_RES_TYPE_TO_CAPTURE_TYPE,
-    EXPECTATIONS_SPEC_BY_PROP
+    EXPECTATIONS_SPEC_BY_PROP, EXPECTATIONS_TYPE, CAPTURE_TYPES, CAPTURE_KEY_VALUE_PLACEHOLDER
 } from './constants';
 
 const SLEEP = 'sleep';
@@ -33,6 +33,16 @@ export const createTestRequest = (data) => {
             scenarios: scenariosRequest
         },
         csv_file_id: csvFileId
+    }
+};
+export const createDefaultExpectation = () => {
+    return {type: EXPECTATIONS_TYPE.STATUS_CODE, ...EXPECTATIONS_SPEC_BY_PROP[EXPECTATIONS_TYPE.STATUS_CODE]}
+};
+export const createDefaultCapture = () => {
+    return {
+        type: CAPTURE_TYPES.JSON_PATH,
+        keyPlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].key,
+        valuePlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].value
     }
 };
 
@@ -132,7 +142,7 @@ function buildHeadersState(headers) {
 
 function buildCaptureState(captures) {
     if (!captures || captures.length === 0) {
-        return [{}];
+        return [createDefaultCapture()];
     }
     return captures.map((cur) => {
         return {
@@ -148,7 +158,7 @@ function buildCaptureState(captures) {
 
 function buildExpectationState(expectations) {
     if (!expectations || expectations.length === 0) {
-        return [{}];//todo understand how it effect , also in capture.
+        return [createDefaultExpectation()];
     }
     return expectations.map((cur) => {
         const action = Object.keys(cur)[0];
@@ -217,11 +227,11 @@ function prepareCapture(captures) {
 function prepareExpec(expectations) {
     const result = [];
     expectations.forEach((expectObject) => {
-        if (expectObject.key && expectObject.hasOwnProperty("value")) {
+        if (expectObject.key && !isUndefined(expectObject.value)) {
             result.push({
                 [expectObject.type]: [expectObject.key, expectObject.value]
             });
-        } else if (expectObject.hasOwnProperty('value')) {
+        } else if (!isUndefined(expectObject.value)) {
             result.push({
                 [expectObject.type]: expectObject.value,
             });
@@ -230,3 +240,5 @@ function prepareExpec(expectations) {
 
     return result;
 }
+
+

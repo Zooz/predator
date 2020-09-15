@@ -127,7 +127,7 @@ class Report extends React.Component {
                         display: 'flex',
                         marginBottom: '15px',
                         justifyContent: 'space-evenly',
-                        height: '420px'
+                        height: '470px'
                     }}>
                         <div style={{
                             display: 'flex',
@@ -155,7 +155,7 @@ class Report extends React.Component {
                     </Card>
                     {
                         (aggregateReport.assertionsTable && aggregateReport.assertionsTable.rows.length) > 0 &&
-                        <Card style={{display: 'flex', marginBottom: '15px'}}>
+                        <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
                             <h3>Assertions</h3>
                             <AssertionsReport data={aggregateReport.assertionsTable}/>
                         </Card>

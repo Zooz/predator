@@ -14,6 +14,8 @@ import SimpleTable from '../SimpleTable';
 import React from "react";
 import _ from "lodash";
 import Checkbox from "../../../components/Checkbox/Checkbox";
+import {ReactTableComponent, TableHeader} from "../../../components/ReactTable";
+import PieChart from "../PieChart";
 
 const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
     {stroke: "#82ca9d", fill: "#82ca9d"},
@@ -170,9 +172,85 @@ const renderLegend = (props) => {
 
 
 export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
-    const columnToWidth = {
-        5: '200px'
-    };
+    const columnNumberSize = 100;
+
+
+    const columns = [
+        {
+            id: 'requestName',
+            Header: () => (
+                <TableHeader padding={'8px'} sortable={false}>
+                    Request Name
+                </TableHeader>
+            ),
+            accessor: data => data.assert_name,
+            // width: mediumSize
+        }, {
+            id: 'assertion',
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Assertion
+                </TableHeader>
+            ),
+            accessor: data => data.assertion,
+            // width: mediumSize
+        },
+        {
+            id: 'fail',
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Fail
+                </TableHeader>
+            ),
+            accessor: data => data.fail,
+            width: columnNumberSize
+        }, {
+            id: 'success',
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Success
+                </TableHeader>
+            ),
+            accessor: data => data.success,
+            width: columnNumberSize
+        }, {
+            id: 'successRatio',
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Success Ratio
+                </TableHeader>
+            ),
+            accessor: data => data.success_ratio,
+            width: columnNumberSize
+        }, {
+            id: 'failureResponses',
+
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Failure responses
+                </TableHeader>
+            ),
+            accessor: data => (
+                    <PieChart width={300} height={100} data={data.failure_responses}/>
+            ),
+            width: 300,
+        },
+    ]
+
+
+    return (
+        <ReactTableComponent
+            style={{width: '100%'}}
+            tdStyle={{display:'flex',alignItems:'center'}}
+            manual={false}
+            data={data.rows}
+            columns={columns}
+            noDataText={'noDataText'}
+            showPagination={false}
+            resizable={false}
+            cursor={'default'}
+        />
+    )
 
 
     const rows = data.rows.map((row) => {
@@ -187,14 +265,16 @@ export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
     const headers = data.headers.map((header, index) => <div
         style={{width: columnToWidth[index] || '150px'}}>{header}</div>);
     return (
-        <SimpleTable rowStyle={{borderRadius:'5px',backgroundColor: 'white'}} style={{padding:'20px'}} headers={headers} rows={rows}/>
+        <SimpleTable rowStyle={{borderRadius: '5px', backgroundColor: 'white'}} style={{padding: '20px'}}
+                     headers={headers} rows={rows}/>
     )
 }
 
 function failureResponsesTable(failureResponses) {
     const propertyWidth = '50px';
-    const rows = Object.entries(failureResponses).map((entry) => [<div style={{width:propertyWidth}}>{entry[0]}</div>, '=', entry[1]]);
-    const headers = [<div style={{width:propertyWidth}}>Property</div>, '', 'Count'];
+    const rows = Object.entries(failureResponses).map((entry) => [<div
+        style={{width: propertyWidth}}>{entry[0]}</div>, '=', entry[1]]);
+    const headers = [<div style={{width: propertyWidth}}>Property</div>, '', 'Count'];
     return (
         <SimpleTable disableSeparator={true} style={{width: '200px'}} rows={rows} headers={headers}/>
     )
