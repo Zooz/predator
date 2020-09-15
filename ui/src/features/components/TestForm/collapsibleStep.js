@@ -20,20 +20,18 @@ export default class CollapsibleStep extends React.Component {
             onDeleteStep, index
         } = this.props;
         const sections = [
-            <Section key={1} onClick={(evt) => {
-                evt.stopPropagation();
-                onDuplicateStep(index)
-            }} borderLeft>
-                <Input style={{marginRight: '5px'}} value={this.props.step.name} placeholder={'Name'} onClick={(evt) => {
-                    evt.stopPropagation();
+            <Section key={1} borderLeft>
+                <Input style={{marginRight: '5px'}} value={this.props.step.name} placeholder={'Name'}
+                       onClick={(evt) => {
+                           evt.stopPropagation();
 
-                }} onChange={this.onStepNameChange}/>
-            </Section>   ,
-            <Section key={1} onClick={(evt) => {
+                       }} onChange={this.onStepNameChange}/>
+            </Section>,
+            <Section key={2} onClick={(evt) => {
                 evt.stopPropagation();
                 onDuplicateStep(index)
             }} icon='fa-copy' tooltip='Duplicate step' borderLeft/>,
-            <Section key={2} onClick={(evt) => {
+            <Section key={3} onClick={(evt) => {
                 evt.stopPropagation();
                 onDeleteStep(index)
             }} icon='fa-trash' tooltip='Delete step' borderLeft/>,
@@ -96,11 +94,7 @@ export default class CollapsibleStep extends React.Component {
                     />
 
                 }
-
-
             </div>
-
-
         )
     }
 

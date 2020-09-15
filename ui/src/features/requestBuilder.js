@@ -1,7 +1,8 @@
 export const createJobRequest = (opts) => {
+    //job_type is for rerun
     let body = {
         test_id: opts.test_id,
-        type: opts.type,
+        type: opts.type || opts.job_type,
         debug: opts.debug ? opts.debug : undefined,
         duration: parseInt(opts.duration),
         environment: opts.environment,
@@ -13,12 +14,12 @@ export const createJobRequest = (opts) => {
         max_virtual_users: opts.max_virtual_users ? parseInt(opts.max_virtual_users) : undefined
     };
 
-    if (opts.type === 'load_test') {
+    if (body.type === 'load_test') {
         body.ramp_to = opts.ramp_to ? parseInt(opts.ramp_to) : undefined;
         body.arrival_rate = parseInt(opts.arrival_rate);
     }
 
-    if (opts.type === 'functional_test') {
+    if (body.type === 'functional_test') {
         body.arrival_count = parseInt(opts.arrival_count);
     }
 

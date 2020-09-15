@@ -5,7 +5,7 @@ import * as Selectors from '../../redux/selectors/testsSelector';
 import * as ProcessorsSelector from '../../redux/selectors/processorsSelector';
 import {connect} from 'react-redux';
 import Modal from '../Modal';
-import {createTestRequest, createStateForEditTest} from './utils';
+import {createTestRequest, createStateForEditTest, createDefaultExpectation, createDefaultCapture} from './utils';
 import {v4 as uuid} from 'uuid';
 import {cloneDeep, reduce, isNumber} from 'lodash';
 import Button from '../../../components/Button';
@@ -19,7 +19,13 @@ import FormWrapper from "../../../components/FormWrapper";
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import {FileDrop} from 'react-file-drop';
 import env from '../../../App/common/env';
-import {CONTENT_TYPES, CAPTURE_TYPES, CAPTURE_KEY_VALUE_PLACEHOLDER} from './constants'
+import {
+    CONTENT_TYPES,
+    CAPTURE_TYPES,
+    CAPTURE_KEY_VALUE_PLACEHOLDER,
+    EXPECTATIONS_TYPE,
+    EXPECTATIONS_SPEC_BY_PROP
+} from './constants'
 
 import {
     faDownload
@@ -247,14 +253,11 @@ export class TestForm extends React.Component {
             id: uuid(),
             method: 'POST',
             headers: [{}],
-            captures: [{
-                type: CAPTURE_TYPES.JSON_PATH,
-                keyPlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].key,
-                valuePlaceholder: CAPTURE_KEY_VALUE_PLACEHOLDER[CAPTURE_TYPES.JSON_PATH].value
-            }],
+            captures: [createDefaultCapture()],
             url: '',
             forever: true,
-            contentType: CONTENT_TYPES.APPLICATION_JSON
+            contentType: CONTENT_TYPES.APPLICATION_JSON,
+            expectations: [createDefaultExpectation()]
         }
     }
 

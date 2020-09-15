@@ -93,8 +93,9 @@ class getTests extends React.Component {
         this.props.cleanAllReportsErrors();
     };
 
-    onReportView = (data) => {
-        this.setState({showReport: data})
+    onReportView = (report) => {
+        this.props.history.push(`/tests/${report.test_id}/reports/${report.report_id}`)
+
     };
     onRawView = (data) => {
         this.setState({openViewReport: data});

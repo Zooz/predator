@@ -5,6 +5,7 @@ import GetJobs from '../features/get-jobs';
 import GetReports from '../features/get-last-reports';
 import GetTestReports from '../features/get-test-reports';
 import Configuration from '../features/get-configuration';
+import ReportPage from '../features/report-page';
 import { Route, Redirect } from 'react-router';
 import { connect } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
@@ -50,6 +51,9 @@ class App extends React.Component {
             <Route exact path='/settings' render={props => (
                 <Configuration {...props} />
              )} />
+                <Route exact path='/tests/:testId/reports/:reportId' render={props => (
+                    <ReportPage {...props} />
+                )} />
             </DrawerE>
           </ConnectedRouter>
       )

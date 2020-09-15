@@ -17,7 +17,7 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, va
                 }} key={index}>
                     {dropdownOptions &&
                     <CustomDropdown
-                        width={'100px'}
+                        width={'125px'}
                         style={{marginRight: '10px'}}
                         list={dropdownOptions}
                         value={keyValuePair.type}
@@ -25,26 +25,22 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, va
                         placeHolder={dropDownPlaceHolder}
                     />
                     }
-                    <Input style={{marginRight: '10px'}} value={keyValuePair.key} onChange={(evt) => {
-                        onChange('key', evt.target.value, index)
-                    }} placeholder={keyValuePair.keyPlaceholder || keyHintText || 'key'}/>
+                    {
+                        (!keyValuePair.onlyValue) &&
+                        <Input style={{marginRight: '10px'}} value={keyValuePair.key} onChange={(evt) => {
+                            onChange('key', evt.target.value, index)
+                        }} placeholder={keyValuePair.keyPlaceholder || keyHintText || 'key'}/>
+
+                    }
 
                     <Input value={keyValuePair.value} onChange={(evt) => {
                         onChange('value', evt.target.value, index)
                     }} placeholder={keyValuePair.valuePlaceholder || valueHintText || 'value'}/>
 
-                    {
-                        value.length - 1 === index &&
-                        <FontAwesomeIcon
-                            style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
-                            onClick={() => onAdd(index)}
-                            icon={faPlus}/>
-                        ||
-                        (index < value.length - 1 && <FontAwesomeIcon
-                            style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
-                            onClick={() => onDelete(index)}
-                            icon={faMinus}/>)
-                    }
+                    <FontAwesomeIcon
+                        style={{alignSelf: 'center', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
+                        onClick={() => onDelete(index)}
+                        icon={faMinus}/>
                 </div>
             )
         });
@@ -52,6 +48,10 @@ const DynamicKeyValueInput = ({value, onChange, onAdd, onDelete, keyHintText, va
     return (
         <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '10px'}}>
             {headersList}
+            <FontAwesomeIcon
+                style={{alignSelf: 'flex-end', color: '#557EFF', cursor: 'pointer', marginLeft: '10px'}}
+                onClick={() => onAdd()}
+                icon={faPlus}/>
         </div>
     )
 }

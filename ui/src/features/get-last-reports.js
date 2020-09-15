@@ -76,7 +76,7 @@ class getReports extends React.Component {
     };
 
     onReportView = (report) => {
-        this.setState({showReport: report})
+        this.props.history.push(`/tests/${report.test_id}/reports/${report.report_id}`)
     };
 
 

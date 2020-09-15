@@ -19,6 +19,7 @@ import Input from "../../../components/Input";
 import TitleInput from "../../../components/TitleInput";
 import DynamicKeyValueInput from './DynamicKeyValueInput';
 import CustomDropdown from './CustomDropdown';
+import Expectations from './Expectations';
 
 export default (props) => {
 
@@ -44,7 +45,7 @@ export default (props) => {
     const onAddCapture = () => {
         const {onChangeValue} = props;
         const step = cloneDeep(props.step);
-        const newCapture = {type: step.captures[step.captures.length - 1].type || CAPTURE_TYPES.JSON_PATH};
+        const newCapture = {type: step.captures.length - 1>=0 ?  step.captures[step.captures.length - 1].type : CAPTURE_TYPES.JSON_PATH};
         newCapture.keyPlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[newCapture.type].key;
         newCapture.valuePlaceholder = CAPTURE_KEY_VALUE_PLACEHOLDER[newCapture.type].value;
         step.captures.push(newCapture);
@@ -174,6 +175,8 @@ export default (props) => {
                                  onChange={onChangeContentType}/>
             </RectangleAlignChildrenLeft>
             <BodyEditor type={step.contentType} content={step.body} key={jsonObjectKey} onChange={onBodyChange}/>
+            <Header style={{marginTop:'11px'}} text={'Expectations'}/>
+            <Expectations step={step} stepIndex={props.index} onChangeStep={props.onChangeValue}/>
         </div>
 
     )

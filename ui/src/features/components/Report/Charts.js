@@ -13,6 +13,8 @@ import {
 import React from "react";
 import _ from "lodash";
 import Checkbox from "../../../components/Checkbox/Checkbox";
+import {ReactTableComponent, TableHeader} from "../../../components/ReactTable";
+import PieChart from "../PieChart";
 
 const COLORS = [{stroke: "#8884d8", fill: "#8884d8"},
     {stroke: "#82ca9d", fill: "#82ca9d"},
@@ -164,5 +166,85 @@ const renderLegend = (props) => {
                 ))
             }
         </div>
+    );
+}
+
+
+export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
+    const columnNumberSize = 100;
+
+    const columns = [
+        {
+            id: 'requestName',
+            Header: () => (
+                <TableHeader padding={'8px'} sortable={false}>
+                    Request Name
+                </TableHeader>
+            ),
+            accessor: data => data.assert_name,
+        }, {
+            id: 'assertion',
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Assertion
+                </TableHeader>
+            ),
+            accessor: data => data.assertion,
+        },
+        {
+            id: 'fail',
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Fail
+                </TableHeader>
+            ),
+            accessor: data => data.fail,
+            width: columnNumberSize
+        }, {
+            id: 'success',
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Success
+                </TableHeader>
+            ),
+            accessor: data => data.success,
+            width: columnNumberSize
+        }, {
+            id: 'successRatio',
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Success Ratio
+                </TableHeader>
+            ),
+            accessor: data => data.success_ratio,
+            width: columnNumberSize
+        }, {
+            id: 'failureResponses',
+
+            Header: () => (
+                <TableHeader padding={'8px'}  sortable={false}>
+                    Failure responses
+                </TableHeader>
+            ),
+            accessor: data => (
+                    <PieChart width={300} height={100} data={data.failure_responses}/>
+            ),
+            width: 300,
+        },
+    ]
+
+
+    return (
+        <ReactTableComponent
+            style={{width: '100%'}}
+            tdStyle={{display:'flex',alignItems:'center'}}
+            manual={false}
+            data={data.rows}
+            columns={columns}
+            noDataText={'noDataText'}
+            showPagination={false}
+            resizable={false}
+            cursor={'default'}
+        />
     );
 }

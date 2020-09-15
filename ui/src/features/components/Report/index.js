@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Modal from '../Modal';
 import {prettySeconds} from '../../utils';
 import PieChart from '../PieChart'
 import * as Actions from "../../redux/actions/reportsActions";
@@ -10,9 +9,10 @@ import Box from '../Box';
 import dateFormat from 'dateformat';
 import Button from '../../../components/Button';
 import Snackbar from "material-ui/Snackbar";
-import {BarChartPredator, LineChartPredator} from "./Charts";
+import {BarChartPredator, LineChartPredator, AssertionsReport} from "./Charts";
 import _ from "lodash";
 import Checkbox from "../../../components/Checkbox/Checkbox";
+import Card from "../../../components/Card";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -56,17 +56,11 @@ class Report extends React.Component {
         this.setState({filteredKeys: {...newFilteredKeys}});
     };
 
-    onExitReport = () => {
-        const {clearAggregateReportAndBenchmark, onClose} = this.props;
-        clearAggregateReportAndBenchmark();
-        onClose();
-    };
-
     render() {
         const {report, aggregateReport} = this.props;
         const {disabledCreateBenchmark, filteredKeys, enableBenchmark} = this.state;
         return (
-            <Modal onExit={this.onExitReport}>
+            <div>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -97,49 +91,76 @@ class Report extends React.Component {
 
                     </div>
                 }
-                <div>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
                     <div style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignSelf: 'flex-end',
+                        marginBottom: '15px'
                     }}>
-                        <h3>Overall Latency</h3>
                         <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
                                 onClick={this.createBenchmark}>Set as Benchmark</Button>
                     </div>
-                    <LineChartPredator data={aggregateReport.latencyGraph} keys={aggregateReport.latencyGraphKeys}
-                                       labelY={'ms'} graphType={'latency'}
-                                       onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                                       filteredKeys={filteredKeys}/>
+                    <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
+                        <h3>Overall Latency</h3>
+                        <LineChartPredator data={aggregateReport.latencyGraph} keys={aggregateReport.latencyGraphKeys}
+                                           labelY={'ms'} graphType={'latency'}
+                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                           filteredKeys={filteredKeys}/>
+                    </Card>
+                    <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
+                        <h3>Status Codes</h3>
+                        <LineChartPredator data={aggregateReport.errorsCodeGraph}
+                                           keys={aggregateReport.errorsCodeGraphKeys}
+                                           graphType={'status_codes'}
+                                           connectNulls={false}
+                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                           filteredKeys={filteredKeys}/>
+                    </Card>
 
-                    <h3>Status Codes</h3>
-                    <LineChartPredator data={aggregateReport.errorsCodeGraph} keys={aggregateReport.errorsCodeGraphKeys}
-                                       graphType={'status_codes'}
-                                       connectNulls={false}
-                                       onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                                       filteredKeys={filteredKeys}/>
-                    <h3>RPS</h3>
-                    <LineChartPredator data={aggregateReport.rps} keys={aggregateReport.rpsKeys} labelY={'rps'}
-                                       graphType={'rps'}
-                                       onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                                       filteredKeys={filteredKeys}/>
-                    <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                        <div style={{width: '50%'}}>
+                    <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
+                        <h3>RPS</h3>
+                        <LineChartPredator data={aggregateReport.rps} keys={aggregateReport.rpsKeys} labelY={'rps'}
+                                           graphType={'rps'}
+                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                           filteredKeys={filteredKeys}/>
+                    </Card>
+                    <Card style={{
+                        display: 'flex',
+                        marginBottom: '15px',
+                        justifyContent: 'space-evenly',
+                        height: '470px'
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            height: '100%',
+                            marginRight: '10px',
+                            flex: 1
+                        }}>
                             <h3>Status Codes And Errors Distribution</h3>
                             <BarChartPredator data={aggregateReport.errorsBar} keys={aggregateReport.errorsBarKeys}
                                               graphType={'status_codes_errors'}
                                               onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                                               filteredKeys={filteredKeys}/>
                         </div>
-                        <div>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            height: '100%'
+                        }}>
                             <h3>Scenarios</h3>
                             <PieChart data={aggregateReport.scenarios}/>
                         </div>
-                    </div>
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <Button inverted onClick={this.onExitReport}>Close</Button>
+                    </Card>
+                    {
+                        (aggregateReport.assertionsTable && aggregateReport.assertionsTable.rows.length) > 0 &&
+                        <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
+                            <h3>Assertions</h3>
+                            <AssertionsReport data={aggregateReport.assertionsTable}/>
+                        </Card>
+                    }
+
                 </div>
                 <Snackbar
                     open={this.props.createBenchmarkSucceed}
@@ -150,7 +171,7 @@ class Report extends React.Component {
                         this.props.createBenchmarkSuccess(false);
                     }}
                 />
-            </Modal>
+            </div>
         );
     }
 
