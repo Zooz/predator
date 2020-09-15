@@ -10,7 +10,6 @@ import {
     XAxis,
     YAxis
 } from "recharts";
-import SimpleTable from '../SimpleTable';
 import React from "react";
 import _ from "lodash";
 import Checkbox from "../../../components/Checkbox/Checkbox";
@@ -174,7 +173,6 @@ const renderLegend = (props) => {
 export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
     const columnNumberSize = 100;
 
-
     const columns = [
         {
             id: 'requestName',
@@ -184,7 +182,6 @@ export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
                 </TableHeader>
             ),
             accessor: data => data.assert_name,
-            // width: mediumSize
         }, {
             id: 'assertion',
             Header: () => (
@@ -193,7 +190,6 @@ export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
                 </TableHeader>
             ),
             accessor: data => data.assertion,
-            // width: mediumSize
         },
         {
             id: 'fail',
@@ -250,34 +246,5 @@ export const AssertionsReport = ({data = {rows: [], headers: []}}) => {
             resizable={false}
             cursor={'default'}
         />
-    )
-
-
-    const rows = data.rows.map((row) => {
-        return row.map((column, index) => {
-            if (index === row.length - 1) {
-                ///its failure response object
-                return failureResponsesTable(column, index);
-            }
-            return (<div style={{width: columnToWidth[index] || '150px'}}>{column}</div>);
-        })
-    });
-    const headers = data.headers.map((header, index) => <div
-        style={{width: columnToWidth[index] || '150px'}}>{header}</div>);
-    return (
-        <SimpleTable rowStyle={{borderRadius: '5px', backgroundColor: 'white'}} style={{padding: '20px'}}
-                     headers={headers} rows={rows}/>
-    )
-}
-
-function failureResponsesTable(failureResponses) {
-    const propertyWidth = '50px';
-    const rows = Object.entries(failureResponses).map((entry) => [<div
-        style={{width: propertyWidth}}>{entry[0]}</div>, '=', entry[1]]);
-    const headers = [<div style={{width: propertyWidth}}>Property</div>, '', 'Count'];
-    return (
-        <SimpleTable disableSeparator={true} style={{width: '200px'}} rows={rows} headers={headers}/>
-    )
-
-
+    );
 }
