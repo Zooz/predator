@@ -45,7 +45,6 @@ const updateBodyWithTypes = {
     },
     runner_memory: 256,
     benchmark_threshold: 20,
-    benchmark_threshold_webhook_url: 'http://slack.com',
     benchmark_weights: {
         percentile_ninety_five: { percentage: 20 },
         percentile_fifty: { percentage: 30 },
@@ -68,7 +67,6 @@ const requestBody =
         runner_memory: 256,
         metrics_plugin_name: 'prometheus',
         default_email_address: 'string_value_default_email_address',
-        default_webhook_url: 'string_value_default_webhook_url',
         influx_metrics: {
             host: 'string_value_influx_metrics',
             username: 'string_value_username',
@@ -90,7 +88,6 @@ const requestBody =
         },
         minimum_wait_for_delayed_report_status_update_in_ms: 30000,
         benchmark_threshold: 20,
-        benchmark_threshold_webhook_url: 'http://slack.com',
         benchmark_weights: {
             percentile_ninety_five: { percentage: 20 },
             percentile_fifty: { percentage: 30 },
@@ -149,7 +146,6 @@ describe('update and get config', () => {
             should(response.body['smtp_server'] instanceof Object);
             should(response.body['smtp_server'] instanceof Number);
             should(response.body['benchmark_threshold'] instanceof Number);
-            should(response.body['benchmark_threshold_webhook_url'] instanceof String);
             should(response.body['benchmark_weights'] instanceof Object);
         });
     });
@@ -209,7 +205,6 @@ describe('update and get config', () => {
         it('params below minimum', async () => {
             let response = await configRequestCreator.updateConfig({
                 benchmark_threshold: 20,
-                benchmark_threshold_webhook_url: 'http://slack.com',
                 benchmark_weights: {
                     percentile_ninety_five: { percentage: 50 },
                     percentile_fifty: { percentage: 30 },
@@ -227,7 +222,6 @@ describe('update and get config', () => {
         it('update config fail with validation type', async () => {
             let response = await configRequestCreator.updateConfig({
                 benchmark_threshold: 20,
-                benchmark_threshold_webhook_url: 'http://slack.com',
                 benchmark_weights: { 'tps': '10' }
             });
             should(response.statusCode).eql(400);

@@ -1,6 +1,6 @@
 'use strict';
 
-const databaseConnector = require('./database/databaseConnector');
+const databaseConnector = require('./database/sequelize/sequelizeConnector');
 const { ERROR_MESSAGES } = require('../../common/consts');
 const generateError = require('../../common/generateError');
 const requestSender = require('../../common/requestSender');

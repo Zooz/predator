@@ -19,13 +19,11 @@ const expectedTypes = {
     minimum_wait_for_delayed_report_status_update_in_ms: 'int',
     metrics_plugin_name: 'string',
     default_email_address: undefined,
-    default_webhook_url: undefined,
     influx_metrics: 'json',
     prometheus_metrics: 'json',
     smtp_server: 'json',
     delay_runner_ms: 'int',
     benchmark_threshold: 'int',
-    benchmark_threshold_webhook_url: 'string',
     custom_runner_definition: 'json',
     benchmark_weights: 'json'
 };

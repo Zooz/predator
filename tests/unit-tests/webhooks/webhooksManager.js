@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 const uuid = require('uuid');
 
-const databaseConnector = require('../../../src/webhooks/models/database/databaseConnector');
+const databaseConnector = require('../../../src/webhooks/models/database/sequelize/sequelizeConnector');
 const webhooksManager = require('../../../src/webhooks/models/webhookManager');
 const webhooksFormatter = require('../../../src/webhooks/models/webhooksFormatter');
 const { ERROR_MESSAGES, WEBHOOK_EVENT_TYPE_FINISHED, WEBHOOK_EVENT_TYPE_STARTED, WEBHOOK_EVENT_TYPE_FAILED } = require('../../../src/common/consts');
