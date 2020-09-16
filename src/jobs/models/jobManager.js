@@ -50,7 +50,7 @@ module.exports.scheduleFinishedContainersCleanup = async () => {
 module.exports.createJob = async (job) => {
     let jobId = uuid.v4();
     const configData = await configHandler.getConfig();
-    await globalWebhookAssignmentGuard(job.webhooks);
+    await validateWebhooksAssignment(job.webhooks);
     try {
         await databaseConnector.insertJob(jobId, job);
         logger.info('Job saved successfully to database');
@@ -141,7 +141,7 @@ module.exports.getJob = async (jobId) => {
 
 module.exports.updateJob = async (jobId, jobConfig) => {
     const configData = await configHandler.getConfig();
-    await globalWebhookAssignmentGuard(jobConfig.webhooks);
+    await validateWebhooksAssignment(jobConfig.webhooks);
     let [job] = await databaseConnector.getJob(jobId);
     if (!job || job.length === 0) {
         let error = new Error('Not found');
@@ -296,7 +296,7 @@ function addCron(jobId, job, cronExpression, configData) {
     cronJobs[jobId] = scheduledJob;
 }
 
-async function globalWebhookAssignmentGuard(webhookIds) {
+async function validateWebhooksAssignment(webhookIds) {
     let webhooks = [];
     if (webhookIds && webhookIds.length > 0) {
         try {
