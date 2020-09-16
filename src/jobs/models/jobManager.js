@@ -8,7 +8,8 @@ const logger = require('../../common/logger'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
-    { CONFIG, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts');
+    { CONFIG, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
+    generateError = require('../../common/generateError');
 
 let jobConnector;
 let cronJobs = {};
@@ -298,11 +299,21 @@ function addCron(jobId, job, cronExpression, configData) {
 async function globalWebhookAssignmentGuard(webhookIds) {
     let webhooks = [];
     if (webhookIds && webhookIds.length > 0) {
-        webhooks = await Promise.all(webhookIds.map(webhookId => webhooksManager.getWebhook(webhookId)));
+        try {
+            webhooks = await Promise.all(webhookIds.map(webhookId => webhooksManager.getWebhook(webhookId)));
+        } catch (err) {
+            let error;
+            if (err.statusCode === 404) {
+                error = generateError(400, 'At least one of the webhooks does not exist');
+                throw error;
+            } else {
+                error = generateError(500);
+            }
+            throw error;
+        }
     }
     if (webhooks.some(webhook => webhook.global)) {
-        const error = new Error('Assigning a global webhook to a job is not allowed');
-        error.statusCode = 422;
+        const error = generateError(422, 'Assigning a global webhook to a job is not allowed');
         throw error;
     }
 }
