@@ -25,7 +25,6 @@ describe('webhooksFormatter', function () {
         sandbox = sinon.sandbox.create();
         statsFormatterStub = sandbox.stub();
         webhooksFormatter.__set__('statsFormatter.getStatsFormatted', statsFormatterStub);
-        // statsFormatterStub = sandbox.stub(webhooksFormatter, 'statsFormatter.getStatsFormatted');
     });
     afterEach(() => {
         sandbox.resetHistory();
@@ -35,7 +34,7 @@ describe('webhooksFormatter', function () {
         sandbox.restore();
     });
     describe(EVENT_FORMAT_TYPE_SLACK, function() {
-        it(WEBHOOK_EVENT_TYPE_STARTED, function() {
+        it(WEBHOOK_EVENT_TYPE_STARTED + ' - load test', function() {
             const testId = uuid.v4();
             const jobId = uuid.v4();
             const report = {
@@ -47,7 +46,24 @@ describe('webhooksFormatter', function () {
                 parallelism: 10
             };
             const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${report.parallelism}, ramp to: ${report.ramp_to} scenarios per second`;
+            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
+
+            const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
+
+            expect(payload.text).to.be.equal(expectedResult);
+        });
+        it(WEBHOOK_EVENT_TYPE_STARTED + ' - functional test', function() {
+            const testId = uuid.v4();
+            const jobId = uuid.v4();
+            const report = {
+                test_name: 'some test name',
+                arrival_count: 5,
+                duration: 120,
+                environment: 'test',
+                parallelism: 10
+            };
+            const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
+            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`;
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
@@ -171,7 +187,7 @@ describe('webhooksFormatter', function () {
             const report = {
                 test_name: 'some name'
             };
-            const expectedResult = `::boom:: *Test ${report.test_name} with id: ${testId} has encountered an API failure!* :skull:`;
+            const expectedResult = `:boom: *Test ${report.test_name} with id: ${testId} has encountered an API failure!* :skull:`;
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_API_FAILURE, uuid.v4(), testId, report);
 
@@ -195,8 +211,7 @@ describe('webhooksFormatter', function () {
                 grafana_report: 'http://local.grafana.io/predator'
             };
             let expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, number of runners: ${report.parallelism}, ramp to: ${report.ramp_to} scenarios per second`;
-            expectedResult += `<${report.grafana_report} | View final grafana dashboard report>`;
+            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
             expect(payload.text).to.be.equal(expectedResult);

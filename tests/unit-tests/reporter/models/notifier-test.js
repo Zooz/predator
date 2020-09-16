@@ -199,7 +199,7 @@ describe('Webhook/email notifier test ', () => {
         await notifier.notifyIfNeeded(report, stats);
 
         webhooksManagerFireWebhookStub.callCount.should.equal(1);
-        webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, report, { aggregatedReport }]);
+        webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, report]);
         loggerInfoStub.callCount.should.equal(1);
     });
 
@@ -300,7 +300,7 @@ describe('Webhook/email notifier test ', () => {
             await notifier.notifyIfNeeded(report, stats, { score });
 
             webhooksManagerFireWebhookStub.callCount.should.equal(1);
-            webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport, score }, { icon: ':rocket:' }]);
+            webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_FINISHED, report, { score }, { icon: ':rocket:' }]);
 
             reportEmailSenderStub.callCount.should.equal(0);
         });
@@ -344,8 +344,8 @@ describe('Webhook/email notifier test ', () => {
             await notifier.notifyIfNeeded(report, stats, reportBenchmark);
 
             webhooksManagerFireWebhookStub.callCount.should.equal(2);
-            webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, report, { aggregatedReport, score, lastScores: ['90.0', '95.0', '95.4'], benchmarkThreshold }, { icon: ':grin:' }]);
-            webhooksManagerFireWebhookStub.args[1].should.containDeep([job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport, score }, { icon: ':rocket:' }]);
+            webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, report, { score, lastScores: ['90.0', '95.0', '95.4'], benchmarkThreshold }, { icon: ':grin:' }]);
+            webhooksManagerFireWebhookStub.args[1].should.containDeep([job, WEBHOOK_EVENT_TYPE_FINISHED, report, { score }, { icon: ':rocket:' }]);
 
             reportEmailSenderStub.callCount.should.equal(1);
             reportEmailSenderStub.args[0].should.containDeep([aggregatedReport, job, job.emails, reportBenchmark]);
@@ -390,8 +390,8 @@ describe('Webhook/email notifier test ', () => {
             await notifier.notifyIfNeeded(report, stats, reportBenchmark);
 
             webhooksManagerFireWebhookStub.callCount.should.equal(2);
-            webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, report, { aggregatedReport, score, lastScores: ['20.0', '20.0', '20.6'], benchmarkThreshold }, { icon: ':cry:' }]);
-            webhooksManagerFireWebhookStub.args[1].should.containDeep([job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport, score }, { icon: ':rocket:' }]);
+            webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, report, { score, lastScores: ['20.0', '20.0', '20.6'], benchmarkThreshold }, { icon: ':cry:' }]);
+            webhooksManagerFireWebhookStub.args[1].should.containDeep([job, WEBHOOK_EVENT_TYPE_FINISHED, report, { score }, { icon: ':rocket:' }]);
 
             reportEmailSenderStub.callCount.should.equal(1);
             reportEmailSenderStub.args[0].should.containDeep([aggregatedReport, job, job.emails, reportBenchmark]);
@@ -436,8 +436,8 @@ describe('Webhook/email notifier test ', () => {
             await notifier.notifyIfNeeded(report, stats, reportBenchmark);
 
             webhooksManagerFireWebhookStub.callCount.should.equal(2);
-            webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, report, { aggregatedReport, score, lastScores: [], benchmarkThreshold }, { icon: ':cry:' }]);
-            webhooksManagerFireWebhookStub.args[1].should.containDeep([job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport, score }, { icon: ':rocket:' }]);
+            webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, report, { score, lastScores: [], benchmarkThreshold }, { icon: ':cry:' }]);
+            webhooksManagerFireWebhookStub.args[1].should.containDeep([job, WEBHOOK_EVENT_TYPE_FINISHED, report, { score }, { icon: ':rocket:' }]);
 
             reportEmailSenderStub.callCount.should.equal(1);
             reportEmailSenderStub.args[0].should.containDeep([aggregatedReport, job, job.emails, reportBenchmark]);

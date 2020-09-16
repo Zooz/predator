@@ -100,7 +100,10 @@
     }
   },
   "nyc": {
-    "exclude": "**/databaseConnector.js",
+    "exclude": [
+      "**/databaseConnector.js",
+      "**/database.js"
+    ],
     "include": "src"
   }
 }

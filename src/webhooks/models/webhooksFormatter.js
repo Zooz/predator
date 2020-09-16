@@ -69,7 +69,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
             const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
-            let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate}` : `arrival count: ${arrivalCount}`;
+            let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
             requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
 
             message = `🤓 *Test ${testName} with id: ${testId} has started*.\n
