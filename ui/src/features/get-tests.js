@@ -232,7 +232,6 @@ class getTests extends React.Component {
                     pageSize={10}
                     columns={columns}
                     noDataText={noDataText}
-                    showPagination
                     resizable={false}
                     cursor={'default'}
                     // className={style.table}

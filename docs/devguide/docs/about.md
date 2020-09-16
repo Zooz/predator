@@ -18,7 +18,7 @@ Predator is a performance platform that can be configured to automatically load 
 
 - **One click installation**:  Predator can be installed with just one click in Kubernetes and DC/OS, or on any other machine running Docker.
 
-- **Supports 5 Different databases**: Predator provides out-of-the box functionality for persisting data in Cassandra, Postgres, MySQL, MSSQL and SQLITE.
+- **Supports 5 Different databases**: Predator provides out-of-the box functionality for persisting data in Postgres, MySQL, MSSQL and SQLITE.
 
 - **Scheduled jobs**: Predator can run recurring tests using cron expressions.
 
@@ -37,5 +37,3 @@ load engine to fire the requests. The schema for creating tests via the Predator
 
 ## Feature Comparison
 ![Screenshot](images/features.png)
-
-

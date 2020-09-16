@@ -8,8 +8,8 @@ class Page extends React.Component {
         return (
             <div className={classnames(className, style.page)}>
                 <div className={style.content}>
-                    <div className={style.title}>{title}</div>
-                    <div className={style.description}>{description}</div>
+                    {title && <div className={style.title}>{title}</div>}
+                    {description && <div className={style.description}>{description}</div>}
                     {children}
                 </div>
             </div>

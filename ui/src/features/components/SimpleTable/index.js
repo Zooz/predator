@@ -6,8 +6,7 @@ const headerFontStyle = {
 };
 
 
-const SimpleTable = ({style, headers = [], rows = []}) => {
-
+const SimpleTable = ({rowStyle, style, headers = [], rows = [], disableSeparator}) => {
     return (
         <div style={{borderRadius: '25px', ...style}}>
             <div style={{
@@ -22,19 +21,33 @@ const SimpleTable = ({style, headers = [], rows = []}) => {
             </div>
             {
                 rows.map((rowContent, index) => {
-                    return (<Row key={index} rowContent={rowContent}/>)
+
+                    return (
+                        <Row style={rowStyle} disableSeparator={disableSeparator} key={index} rowContent={rowContent}/>)
                 })
             }
         </div>
     )
 };
 
-const Row = ({rowContent = []}) => {
+const Row = ({style = {}, disableSeparator, rowContent = []}) => {
+    const rowStyle = {
+        minHeight: '25px', display: 'flex',
+        flexDirection: 'column',
+        borderBottom: !disableSeparator && '1px solid #E9E9E9',
+        color: '#778294',
+        fontFamily: 'poppins, sans-serif',
+        paddingTop: '5px',
+        // padding: '5px',
+        ...style
+    };
+
     return (
         <div style={rowStyle}>
             <div style={{...rowContentStyle}}>
                 {
-                    rowContent.map((content,index) => <div key={index}>{content}</div>)
+
+                    rowContent.map((content, index) => <div key={index}>{content}</div>)
                 }
             </div>
         </div>
@@ -44,15 +57,7 @@ const Row = ({rowContent = []}) => {
 const rowContentStyle = {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1
 };
-const rowStyle = {
-    minHeight: '25px', display: 'flex',
-    flexDirection: 'column',
-    borderBottom: '1px solid #E9E9E9',
-    color: '#778294',
-    fontFamily: 'poppins, sans-serif',
-    paddingTop: '5px',
-    paddingBottom: '5px',
-};
+
 
 const tdStyle = {
     width: '70px',

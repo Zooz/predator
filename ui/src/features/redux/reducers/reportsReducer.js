@@ -33,6 +33,8 @@ export default function reduce(state = initialState, action = {}) {
             return state.set('report', action.report);
         case Types.PROCESSING_GET_REPORTS:
             return state.set('processing_get_reports', action.state);
+        case Types.PROCESSING_GET_REPORT:
+            return state.set('processing_get_report', action.state);
         case Types.CLEAR_SELECTED_REPORT:
             return state.set('report', undefined);
         case Types.GET_AGGREGATE_REPORTS_SUCCESS:
