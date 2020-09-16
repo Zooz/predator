@@ -57,15 +57,14 @@ describe('Manager config with env variables', function () {
         should(result.runner_memory).eql(20);
         should(result.runner_cpu).eql(0.35);
         should(result.smtp_server).eql({
-            'from': 'smtp_from_test',
-            'port': 'smtp_port_test',
-            'username': 'smtp_username_test',
-            'password': 'smtp_password_test',
-            'timeout': '500',
-            'rejectUnauthCerts': 'true',
-            'secure': 'true'
+            from: 'smtp_from_test',
+            port: 'smtp_port_test',
+            username: 'smtp_username_test',
+            password: 'smtp_password_test',
+            timeout: '500',
+            rejectUnauthCerts: 'true',
+            secure: 'true'
         });
         should(result.benchmark_threshold).eql(10);
-        should(result.benchmark_threshold_webhook_url).eql('url_test');
     });
 });

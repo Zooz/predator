@@ -75,7 +75,7 @@ function isPositiveFloatNumberIfExist(value) {
     }
 
     if (!Number(value)) {
-        return 'Must be positive float'
+        return 'Must be positive float';
     }
 
 }
@@ -86,6 +86,6 @@ function isIntegerIfExist(value) {
     }
 
     if (!Number.isInteger(Number(value))) {
-        return 'Must be a integer number'
+        return 'Must be a integer number';
     }
 }

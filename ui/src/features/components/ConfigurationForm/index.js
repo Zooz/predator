@@ -72,12 +72,6 @@ class Form extends React.Component {
                 valueType: 'int'
             },
             {
-                name: 'default_webhook_url',
-                key: 'default_webhook_url',
-                floatingLabelText: 'Default webhook url',
-                info: 'Default webhook url to send live report statistics to'
-            },
-            {
                 name: 'interval_cleanup_finished_containers_ms',
                 key: 'interval_cleanup_finished_containers_ms',
                 floatingLabelText: 'Interval for clearing finished containers (ms)',
@@ -100,12 +94,6 @@ class Form extends React.Component {
                         floatingLabelText: 'Threshold score',
                         info: 'Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url',
                         valueType: 'int'
-                    },
-                    {
-                        name: 'benchmark_threshold_webhook_url',
-                        key: 'benchmark_threshold_webhook_url',
-                        floatingLabelText: 'Threshold webhook url',
-                        info: 'Url to send webhooks to incase a test receives a score less than the benchmark threshold'
                     },
                 ]
             },
