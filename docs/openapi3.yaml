@@ -1534,6 +1534,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook'
     delete:
       operationId: delete-webhook
       tags:
