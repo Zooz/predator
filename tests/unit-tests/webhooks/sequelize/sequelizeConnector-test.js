@@ -103,10 +103,10 @@ describe('Sequelize client tests', function () {
                 expect(sequelizeGetStub.calledOnce).to.be.equal(true);
                 expect(sequelizeGetStub.args[0][0]).to.be.deep.equal({
                     include: ['events'],
-                    order: [
+                    order: [[
                         'updated_at',
                         'DESC'
-                    ]
+                    ]]
                 });
 
                 expect(webhooks).to.be.an('array').and.have.lengthOf(1);
