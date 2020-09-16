@@ -26,8 +26,8 @@ module.exports.getReport = async (testId, reportId) => {
     return report;
 };
 
-module.exports.getReports = async (testId) => {
-    let reportSummaries = await databaseConnector.getReports(testId);
+module.exports.getReports = async (testId, orderBy) => {
+    let reportSummaries = await databaseConnector.getReports(testId, orderBy);
     let config = await configHandler.getConfig();
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
@@ -36,8 +36,8 @@ module.exports.getReports = async (testId) => {
     return reports;
 };
 
-module.exports.getLastReports = async (limit) => {
-    let reportSummaries = await databaseConnector.getLastReports(limit);
+module.exports.getLastReports = async (limit, orderBy) => {
+    let reportSummaries = await databaseConnector.getLastReports(limit, orderBy);
     let config = await configHandler.getConfig();
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);

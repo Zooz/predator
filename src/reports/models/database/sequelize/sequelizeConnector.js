@@ -186,13 +186,15 @@ async function getReportsAndParse(query) {
     return allReports;
 }
 
-async function getLastReports(limit) {
-    const lastReports = getReportsAndParse({ limit, order: Sequelize.literal('start_time DESC') });
+async function getLastReports(limit, orderBy) {
+    const order = orderBy === 'favorite' ? [['is_favorite', 'DESC'], ['start_time', 'DESC']] : ['start_time', 'DESC'];
+    const lastReports = getReportsAndParse({ limit, order });
     return lastReports;
 }
 
-async function getReports(testId) {
-    const query = { where: { test_id: testId } };
+async function getReports(testId, orderBy) {
+    const order = orderBy === 'favorite' ? [['is_favorite', 'DESC'], ['start_time', 'DESC']] : ['start_time', 'DESC'];
+    const query = { where: { test_id: testId }, order };
     const allReports = await getReportsAndParse(query);
     return allReports;
 }
@@ -309,6 +311,9 @@ async function initSchemas() {
         },
         score: {
             type: Sequelize.DataTypes.FLOAT
+        },
+        is_favorite: {
+            type: Sequelize.DataTypes.BOOLEAN
         }
     });
 

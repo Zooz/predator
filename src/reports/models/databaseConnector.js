@@ -39,12 +39,12 @@ function updateReportBenchmark(testId, reportId, score, benchmarkData) {
     return databaseConnector.updateReportBenchmark(testId, reportId, score, benchmarkData);
 }
 
-function getLastReports(limit) {
-    return databaseConnector.getLastReports(limit);
+function getLastReports(limit, orderBy) {
+    return databaseConnector.getLastReports(limit, orderBy);
 }
 
-function getReports(testId) {
-    return databaseConnector.getReports(testId);
+function getReports(testId, orderBy) {
+    return databaseConnector.getReports(testId, orderBy);
 }
 
 function getReport(testId, reportId) {

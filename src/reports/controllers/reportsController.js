@@ -48,7 +48,7 @@ module.exports.deleteReport = async (req, res, next) => {
 module.exports.getReports = async (req, res, next) => {
     let reportSummaries;
     try {
-        reportSummaries = await reports.getReports(req.params.test_id);
+        reportSummaries = await reports.getReports(req.params.test_id, req.query.order_by);
     } catch (err) {
         return next(err);
     }
@@ -59,7 +59,7 @@ module.exports.getReports = async (req, res, next) => {
 module.exports.getLastReports = async (req, res, next) => {
     let reportSummaries;
     try {
-        reportSummaries = await reports.getLastReports(req.query.limit);
+        reportSummaries = await reports.getLastReports(req.query.limit, req.query.order_by);
     } catch (err) {
         return next(err);
     }

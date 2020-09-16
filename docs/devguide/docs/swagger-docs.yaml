@@ -761,6 +761,14 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: order_by
+          description: by what column field the response
+          required: false
+          schema:
+            type: string
+            enum:
+              - is_favorite
       responses:
         '200':
           description: Success
@@ -967,6 +975,14 @@ paths:
           minimum: 1
           maximum: 250
           type: integer
+        - in: query
+          name: order_by
+          description: by what column field the response
+          required: false
+          schema:
+            type: string
+            enum:
+              - is_favorite
       responses:
         '200':
           description: Success
@@ -2291,6 +2307,9 @@ components:
         notes:
           type: string
           description: notes for specific report
+        is_favorite:
+          type: boolean
+          description: wether this report should be marked as favorite
     post_report:
       required:
         - report_id
