@@ -34,7 +34,7 @@ async function init(sequelizeClient) {
 
 async function getAllWebhooks() {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
-    const webhooks = await webhooksModel.findAll({ include: ['events'] });
+    const webhooks = await webhooksModel.findAll({ include: ['events'], order: ['updated_at', 'DESC'] });
     return webhooks.map(parseWebhook);
 }
 
