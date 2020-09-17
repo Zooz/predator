@@ -161,8 +161,8 @@ describe('Create job global tests', function () {
                 .then(function (res) {
                     res.statusCode.should.eql(400);
                     res.body.should.eql({
-                        'message': 'Input validation error',
-                        'validation_errors': [
+                        message: 'Input validation error',
+                        validation_errors: [
                             'body/arrival_rate should be >= 1',
                             'body/ramp_to should be >= 1',
                             'body/duration should be >= 1',
@@ -209,7 +209,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing arrival_rate', () => {
-            let bodyWithoutTestId = { test_id: uuid.v4(), duration: 1, environment: 'test', type: 'load_test'};
+            let bodyWithoutTestId = { test_id: uuid.v4(), duration: 1, environment: 'test', type: 'load_test' };
             return schedulerRequestCreator.createJob(bodyWithoutTestId, {
                 'Content-Type': 'application/json'
             })
@@ -223,7 +223,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing duration', () => {
-            let illegalBody = { test_id: uuid.v4(), arrival_rate: 1, environment: 'test', type: 'load_test'};
+            let illegalBody = { test_id: uuid.v4(), arrival_rate: 1, environment: 'test', type: 'load_test' };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
             })
@@ -271,6 +271,33 @@ describe('Create job global tests', function () {
             should(response.body.message).eql('Not found');
         });
 
+        describe('Create a job with not existing webhook', () => {
+            it('should return 400', async () => {
+                const job = {
+                    type: 'load_test',
+                    arrival_rate: 1,
+                    duration: 120,
+                    environment: 'test',
+                    run_immediately: true,
+                    emails: [],
+                    parallelism: 1,
+                    max_virtual_users: 500
+                };
+                const headers = { 'Content-Type': 'application/json' };
+
+                const createTestResponse = await testsRequestSender.createTest(basicTest, headers);
+                expect(createTestResponse.status).to.be.equal(201);
+                const testId = createTestResponse.body.id;
+
+                job.webhooks = ['eec96da0-f9b6-4282-a7cf-d8d9a444b0da'];
+                job.test_id = testId;
+
+                const createJobResponse = await schedulerRequestCreator.createJob(job, headers);
+                expect(createJobResponse.status).to.be.equal(400);
+                expect(createJobResponse.body.message).to.be.equal('At least one of the webhooks does not exist');
+            });
+        });
+
         describe('Create a job with a global webhook', () => {
             it('should return 422', async () => {
                 const globalWebhook = {
@@ -309,6 +336,7 @@ describe('Create job global tests', function () {
                 expect(createJobResponse.body.message).to.be.equal('Assigning a global webhook to a job is not allowed');
             });
         });
+
         describe('Update a job with a global webhook', () => {
             it('should return 422', async () => {
                 const globalWebhook = {
