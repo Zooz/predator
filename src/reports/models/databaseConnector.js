@@ -19,8 +19,8 @@ module.exports = {
 
 };
 
-function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
-    return databaseConnector.insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt);
+function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite) {
+    return databaseConnector.insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite);
 }
 
 function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
@@ -39,12 +39,12 @@ function updateReportBenchmark(testId, reportId, score, benchmarkData) {
     return databaseConnector.updateReportBenchmark(testId, reportId, score, benchmarkData);
 }
 
-function getLastReports(limit, orderBy) {
-    return databaseConnector.getLastReports(limit, orderBy);
+function getLastReports(limit, filter) {
+    return databaseConnector.getLastReports(limit, filter);
 }
 
-function getReports(testId, orderBy) {
-    return databaseConnector.getReports(testId, orderBy);
+function getReports(testId, filter) {
+    return databaseConnector.getReports(testId, filter);
 }
 
 function getReport(testId, reportId) {

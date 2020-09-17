@@ -1,9 +1,9 @@
 const Sequelize = require('sequelize');
 
 module.exports.up = async (query, DataTypes) => {
-    let jobsTable = await query.describeTable('tests');
+    let testsTable = await query.describeTable('tests');
 
-    if (!jobsTable.enabled) {
+    if (!testsTable.is_favorite) {
         await query.addColumn(
             'tests', 'is_favorite',
             Sequelize.DataTypes.BOOLEAN);

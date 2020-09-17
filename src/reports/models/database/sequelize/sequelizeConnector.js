@@ -27,7 +27,7 @@ async function init(sequlizeClient) {
     await initSchemas();
 }
 
-async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite) {
     const report = client.model('report');
     const params = {
         test_id: testId,
@@ -41,7 +41,8 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, phase
         notes: notes || '',
         phase: phase,
         test_configuration: testConfiguration,
-        runners_subscribed: []
+        runners_subscribed: [],
+        is_favorite: isFavorite
     };
 
     return report.findOrCreate({ where: { report_id: reportId }, defaults: params });
@@ -186,16 +187,18 @@ async function getReportsAndParse(query) {
     return allReports;
 }
 
-async function getLastReports(limit, orderBy) {
-    const order = orderBy === 'favorite' ? [['is_favorite', 'DESC'], ['start_time', 'DESC']] : ['start_time', 'DESC'];
-    const lastReports = getReportsAndParse({ limit, order });
+async function getLastReports(limit, filter) {
+    const queryOptions = filter === 'is_favorite' ? { where: { is_favorite: true }, limit, order: Sequelize.literal('start_time DESC') } : { limit, order: Sequelize.literal('start_time DESC') };
+    const lastReports = getReportsAndParse(queryOptions);
     return lastReports;
 }
 
-async function getReports(testId, orderBy) {
-    const order = orderBy === 'favorite' ? [['is_favorite', 'DESC'], ['start_time', 'DESC']] : ['start_time', 'DESC'];
-    const query = { where: { test_id: testId }, order };
-    const allReports = await getReportsAndParse(query);
+async function getReports(testId, filter) {
+    const queryOptions = filter === 'is_favorite' ? {
+        where: { is_favorite: true, test_id: testId },
+        order: [['start_time', 'DESC']]
+    } : { where: { test_id: testId }, order: [['start_time', 'DESC']] };
+    const allReports = await getReportsAndParse(queryOptions);
     return allReports;
 }
 
