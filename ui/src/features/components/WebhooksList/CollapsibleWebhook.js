@@ -5,6 +5,7 @@ import {buildStateFromWebhook, createWebhookRequest} from './utils'
 import {webhooks, loading, webhookSuccess} from "../../redux/selectors/webhooksSelector";
 import * as Actions from "../../redux/action";
 import {connect} from "react-redux";
+import DeleteDialog from "../DeleteDialog";
 
 const Section = CollapsibleItem.Section;
 
@@ -13,9 +14,13 @@ export class CollapsibleWebhook extends React.Component {
     constructor(props) {
         super(props);
         if (props.webhook) {
-            this.state = {webhook: buildStateFromWebhook(props.webhook)}
+            this.state = {
+                showDeleteReportWarning: false,
+                webhook: buildStateFromWebhook(props.webhook)
+            }
         } else {
             this.state = {
+                showDeleteReportWarning: false,
                 webhook: {
                     events: {},
                     format_type: 'slack'
@@ -48,13 +53,13 @@ export class CollapsibleWebhook extends React.Component {
     }
 
     render() {
-        const {expanded} = this.state;
+        const {expanded, showDeleteReportWarning, webhook} = this.state;
         const {createMode} = this.props;
 
         const sections = createMode ? undefined : [
             <Section key={1} onClick={(evt) => {
                 evt.stopPropagation();
-                this.props.deleteWebhook(this.state.webhook.id)
+                this.setState({showDeleteReportWarning: true})
             }} icon='fa-trash' tooltip='Delete webhook' borderLeft/>,
 
         ]
@@ -71,10 +76,20 @@ export class CollapsibleWebhook extends React.Component {
                     type={createMode ? CollapsibleItem.TYPES.DEFAULT : CollapsibleItem.TYPES.CLICKER}
                     disabled={false}
                     icon={this.generateIcon()}
+                    // iconWrapperStyle={{width:'65px'}}
                     title={this.generateTitle()}
                     body={this.generateBody()}
                     sections={sections}
                 />
+                {showDeleteReportWarning && <DeleteDialog
+                    display={`${webhook.name} webhook`}
+                    onSubmit={() => {
+                        this.props.deleteWebhook(this.state.webhook.id)
+                    }}
+                    onCancel={() => {
+                        this.setState({showDeleteReportWarning: false})
+                    }}/>}
+
             </div>
 
         )
@@ -87,8 +102,20 @@ export class CollapsibleWebhook extends React.Component {
         if (createMode) {
             return null;
         }
+        const icons = [];
+        if (webhook.global === true) {
+            icons.push('fa-globe');
+        } else {
+            icons.push('fa-map-pin');
+        }
+        if (webhook.format_type === 'slack') {
+            icons.push('fa-slack');
+        } else {
+            icons.push(<div style={{fontSize: '20px'}}>{'{ }'}</div>)
+        }
 
-        return webhook.global === true ? 'fa-globe' : 'fa-map-pin'
+
+        return icons;
     };
 
     generateTitle = () => {
