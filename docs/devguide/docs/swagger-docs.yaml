@@ -762,8 +762,8 @@ paths:
           schema:
             type: string
         - in: query
-          name: order_by
-          description: by what column field the response
+          name: filter
+          description: is filter and by what property
           required: false
           schema:
             type: string
@@ -976,8 +976,8 @@ paths:
           maximum: 250
           type: integer
         - in: query
-          name: order_by
-          description: by what column field the response
+          name: filter
+          description: is filter and by what property
           required: false
           schema:
             type: string
