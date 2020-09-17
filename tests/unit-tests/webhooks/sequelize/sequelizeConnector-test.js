@@ -9,7 +9,7 @@ const sequelizeConnector = require('../../../../src/webhooks/models/database/seq
 const { WEBHOOK_EVENT_TYPES, WEBHOOK_EVENT_TYPE_STARTED } = require('../../../../src/common/consts');
 
 describe('Sequelize client tests', function () {
-    const uuidStubValue = '3e10d10e-2ae0-418e-aa91-0fd659dd86fb'; 
+    const uuidStubValue = '3e10d10e-2ae0-418e-aa91-0fd659dd86fb';
     const webhookRaw = {
         dataValues: {
             id: uuidStubValue,
@@ -94,14 +94,20 @@ describe('Sequelize client tests', function () {
         sandbox.restore();
     });
 
-    describe('getAllWebhooks', function() {
-        describe('Happy flow', function() {
-            it('expect return an array with 1 webhook', async function() {
+    describe('getAllWebhooks', function () {
+        describe('Happy flow', function () {
+            it('expect return an array with 1 webhook', async function () {
                 sequelizeGetStub.resolves([webhookRaw]);
                 const webhooks = await sequelizeConnector.getAllWebhooks();
 
                 expect(sequelizeGetStub.calledOnce).to.be.equal(true);
-                expect(sequelizeGetStub.args[0][0]).to.be.deep.equal({ include: ['events'] });
+                expect(sequelizeGetStub.args[0][0]).to.be.deep.equal({
+                    include: ['events'],
+                    order: [[
+                        'updated_at',
+                        'DESC'
+                    ]]
+                });
 
                 expect(webhooks).to.be.an('array').and.have.lengthOf(1);
                 expect(webhooks[0]).to.be.deep.contain(webhookRaw.dataValues);
@@ -110,9 +116,9 @@ describe('Sequelize client tests', function () {
         });
     });
 
-    describe('createWebhook', function() {
-        describe('Happy flow', function() {
-            it('expect to return a webhook with a valid uuid', async function() {
+    describe('createWebhook', function () {
+        describe('Happy flow', function () {
+            it('expect to return a webhook with a valid uuid', async function () {
                 const events = [WEBHOOK_EVENT_TYPES[0], WEBHOOK_EVENT_TYPES[1]];
                 const eventRecords = events.map(event => {
                     const id = uuid.v4();
@@ -156,9 +162,9 @@ describe('Sequelize client tests', function () {
             });
         });
     });
-    describe('deleteWebhook', function() {
-        describe('Happy flow', function() {
-            it('expect to delete by query with proper webhook_id', async function() {
+    describe('deleteWebhook', function () {
+        describe('Happy flow', function () {
+            it('expect to delete by query with proper webhook_id', async function () {
                 const id = uuid.v4();
                 const queryOptions = { where: { id } };
 
@@ -173,8 +179,8 @@ describe('Sequelize client tests', function () {
         });
     });
 
-    describe('updateWebhook', function() {
-        it('update webhook name', async function() {
+    describe('updateWebhook', function () {
+        it('update webhook name', async function () {
             const id = uuid.v4();
             const eventId = uuid.v4();
             const eventsDataValues = {
@@ -245,8 +251,8 @@ describe('Sequelize client tests', function () {
             expect(sequelizeUpdateStub.args[0]).to.be.deep.equal([updatedWebhook, { where: { id }, transaction }]);
         });
     });
-    describe('getAllGlobalWebhooks', function() {
-        it('should have global: true where statement', async function() {
+    describe('getAllGlobalWebhooks', function () {
+        it('should have global: true where statement', async function () {
             const globalWebhooks = [
                 {
                     name: 'niv',
@@ -263,7 +269,10 @@ describe('Sequelize client tests', function () {
                     format: 'json'
                 }
             ];
-            const globalWebhooksFromDB = globalWebhooks.map(globWebhook => ({ ...globWebhook, dataValues: { ...globWebhook } }))
+            const globalWebhooksFromDB = globalWebhooks.map(globWebhook => ({
+                ...globWebhook,
+                dataValues: { ...globWebhook }
+            }));
             sequelizeGetStub.resolves(globalWebhooksFromDB);
 
             const resultWebhooks = await sequelizeConnector.getAllGlobalWebhooks();
