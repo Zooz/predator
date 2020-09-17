@@ -3,7 +3,8 @@ export const createWebhookRequest = (webhook) => {
         name: webhook.name,
         url: webhook.url,
         events: Object.entries(webhook.events || {}).filter((entry) => entry[1] === true).map(entry => entry[0]),
-        format_type: webhook.format_type
+        format_type: webhook.format_type,
+        global: webhook.global
     }
 };
 
@@ -14,7 +15,8 @@ export const buildStateFromWebhook = (webhook) => {
         id: webhook.id,
         url: webhook.url,
         events: buildEventsObjectFromArray(webhook.events),
-        format_type: webhook.format_type
+        format_type: webhook.format_type,
+        global: !!webhook.global
     }
 
 };

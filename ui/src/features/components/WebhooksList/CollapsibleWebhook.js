@@ -48,6 +48,8 @@ export class CollapsibleWebhook extends React.Component {
     }
 
     render() {
+        const {expanded} = this.state;
+        const {createMode} = this.props;
 
         const sections = createMode ? undefined : [
             <Section key={1} onClick={(evt) => {
@@ -56,8 +58,7 @@ export class CollapsibleWebhook extends React.Component {
             }} icon='fa-trash' tooltip='Delete webhook' borderLeft/>,
 
         ]
-        const {expanded} = this.state;
-        const {createMode} = this.props;
+
         return (
             <div style={{width: '756px'}}>
                 <CollapsibleItem
@@ -81,7 +82,13 @@ export class CollapsibleWebhook extends React.Component {
     }
 
     generateIcon = () => {
-        return 'fa-slack'
+        const {webhook, createMode} = this.props;
+
+        if (createMode) {
+            return null;
+        }
+
+        return webhook.global === true ? 'fa-globe' : 'fa-map-pin'
     };
 
     generateTitle = () => {

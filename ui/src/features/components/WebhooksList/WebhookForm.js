@@ -48,13 +48,27 @@ const WebhookForm = ({loading, onSubmit, onCancel, onChangeWebhook, webhook}) =>
                 </TitleInput>
 
             </RectangleAlignChildrenLeft>
-            <SimpleTable style={{paddingLeft: '40px', paddingRight: '40px'}} headers={['Event', 'On/Off']} rows={rows}/>
-            <TitleInput style={{marginRight: '10px', flexGrow: 1}} title={'Type'}>
+            <SimpleTable style={{paddingLeft: '40px', paddingRight: '40px', marginBottom: '5px'}}
+                         headers={['Event', 'On/Off']} rows={rows}/>
+            <TitleInput style={{marginRight: '10px', marginBottom: '5px', flexGrow: 1}} title={'Type'}>
                 <RadioOptions value={webhook.format_type} list={WEBHOOK_TYPES}
                               onChange={(value) => {
                                   onChangeProps({format_type: value})
                               }}/>
             </TitleInput>
+            <TitleInput labelStyle={{marginBottom: 0}} style={{marginRight: '10px'}} width={'78px'} title={'Global'}
+                        rightComponent={<UiSwitcher
+                            onChange={(value) => {
+                                const newWebhook = {...webhook};
+                                newWebhook.global = value;
+                                onChangeWebhook(newWebhook)
+                            }}
+                            disabledInp={loading}
+                            activeState={webhook.global}
+                            height={12}
+                            width={22}
+                        />}
+            />
             <SubmitBar onCancel={onCancel} onSubmit={onSubmit} loading={loading}/>
         </div>
     )

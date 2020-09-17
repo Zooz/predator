@@ -1,0 +1,58 @@
+@import "../../styles/colors";
+
+$list-side-padding: 20px;
+
+.wrapper {
+  width: 100%;
+  position: relative;
+  line-height: 18px;
+
+  &[data-disabled="true"] {
+    pointer-events: none;
+  }
+}
+.overflow-icon {
+  padding-top: 2px;
+  font-size: 17px;
+  padding-right: 8px;
+  color: $default-turquoise;
+}
+
+.selection-input {
+  width: 53px;
+  font-size: 12px;
+  padding: 3px 5px 0px;
+  height: 27px;
+}
+
+.input-item {
+  font-size: 12px;
+  height: 25px;
+  margin-right: 4px;
+  margin-bottom: calc((var(--multiple-select-height) - 27px) / 2);
+}
+
+.list {
+  transform: translateY(1px);
+  z-index: 99999;
+  width: 100%;
+  min-height: 93px;
+  background-color: $white;
+  box-shadow: 0 7px 40px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  position: absolute;
+  padding-bottom: 9px;
+  animation: fadein 0.1s;
+  @keyframes fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.ellipsis {
+  height: var(--multiple-select-height);
+}

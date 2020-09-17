@@ -14,6 +14,8 @@ export default function reduce(state = initialState, action = {}) {
     switch (action.type) {
         case Types.CREATE_WEBHOOK_SUCCESS:
             return state.set('create_webhook_success', action.value);
+        case Types.DELETE_WEBHOOK_SUCCESS:
+            return state.set('delete_webhook_success', action.value);
         case Types.EDIT_WEBHOOK_SUCCESS:
             return state.set('edit_webhook_success', action.value);
         case Types.GET_WEBHOOKS_SUCCESS:

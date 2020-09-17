@@ -2,6 +2,7 @@ import React, {Fragment} from 'react';
 import style from './style.scss';
 import {connect} from 'react-redux';
 import {processingCreateJob, createJobSuccess, createJobFailure} from '../../redux/selectors/jobsSelector';
+import {webhooksForDropdown} from '../../redux/selectors/webhooksSelector';
 import * as Actions from '../../redux/action';
 import ErrorDialog from '../ErrorDialog';
 import TooltipWrapper from '../../../components/TooltipWrapper';
@@ -23,6 +24,7 @@ import {filter} from 'lodash';
 import {createJobRequest} from '../../requestBuilder';
 import RadioOptions from '../../../components/RadioOptions';
 import {inputTypes, testTypes} from './constants';
+import MultiSelect from '../../../components/MultiSelect/MultiSelect.export';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 
@@ -63,6 +65,15 @@ class Form extends React.Component {
                 element: 'notes',
                 info: 'Add notes about the test.',
                 type: inputTypes.TEXT_FIELD
+            },
+            {
+                name: 'webhooks',
+                key: 'webhooks',
+                floatingLabelText: 'Webhooks',
+                info: 'Send test reports to Slack.',
+                element: 'Webhook',
+                type: inputTypes.MULTI_SELECT,
+                options: (props) => props.webhooks
             },
             {
                 name: 'arrival_rate',
@@ -139,14 +150,6 @@ class Form extends React.Component {
                 element: 'Email',
                 type: inputTypes.INPUT_LIST
             },
-            {
-                name: 'webhooks',
-                key: 'webhooks',
-                floatingLabelText: 'Webhooks',
-                info: 'Send test reports to Slack.',
-                element: 'Webhook',
-                type: inputTypes.INPUT_LIST
-            }
 
         ];
         this.state = {
@@ -192,6 +195,10 @@ class Form extends React.Component {
 
     componentWillUnmount() {
         this.props.clearErrorOnCreateJob();
+    }
+
+    componentDidMount() {
+        this.props.getWebhooks();
     }
 
     onChangeProperty = (name, value) => {
@@ -242,6 +249,8 @@ class Form extends React.Component {
     }
 
     render() {
+
+
         const {closeDialog, processingAction, serverError, clearErrorOnCreateJob} = this.props;
         return (
             <Modal style={{paddingTop: '64px'}} width={'50%'} onExit={closeDialog}>
@@ -274,6 +283,22 @@ class Form extends React.Component {
     }
 
     generateInput = (oneItem) => {
+        // const options = [
+        //     { key: 'key_1', value: 'value_1' },
+        //     { key: 'key_2', value: 'value_2' },
+        //     { key: 'key_3', value: 'value_3' }
+        // ];
+
+        const startsWithStrategy = ({array = [], propName, value}) => {
+            const lowerCaseValue = value.toLowerCase();
+            return array.filter(object => object[propName].toLowerCase().startsWith(lowerCaseValue))
+        };
+
+        const onSelectedOptionsChange = (options) => {
+            console.log(options); // OUTPUT: [{ key: 'key_1', value: 'value_1' }]
+        };
+
+
         const {cron_expression} = this.state;
         switch (oneItem.type) {
             case inputTypes.SWITCHER:
@@ -331,6 +356,29 @@ class Form extends React.Component {
                         </ErrorWrapper>
                     </TitleInput>
                 );
+            case inputTypes.MULTI_SELECT:
+                return (
+                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+                                rightComponent={this.showInfo(oneItem)}>
+                        <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
+                            <MultiSelect
+                                options={oneItem.options(this.props)}
+                                selectedOptions={this.state[oneItem.name]}
+                                onChange={(values) => this.onChangeProperty(oneItem.name, values)}
+                                placeholder={"Please select an option"}
+                                height={'35px'}
+                                disabled={false}
+                                maxSize={50}
+                                validationErrorText=''
+                                enableFilter={true}
+                                filteringStrategy={startsWithStrategy}
+                                enableSelectAll={true}
+                                selectAllText={'Check All'}
+                                enableEllipsis={true}
+                            />
+                        </ErrorWrapper>
+                    </TitleInput>
+                );
             default:
                 return (
                     <div>
@@ -358,6 +406,11 @@ class Form extends React.Component {
         if (this.state.debug) {
             convertedArgs.debug = '*';
         }
+
+        if (this.state.webhooks) {
+            convertedArgs.webhooks = this.state.webhooks.map((webhook)=>webhook.key);
+        }
+
         this.props.createJob(createJobRequest(Object.assign({}, this.state, convertedArgs)));
     };
 }
@@ -366,13 +419,15 @@ function mapStateToProps(state) {
     return {
         processingAction: processingCreateJob(state),
         serverError: createJobFailure(state),
-        createJobSuccess: createJobSuccess(state)
+        createJobSuccess: createJobSuccess(state),
+        webhooks: webhooksForDropdown(state)
     };
 }
 
 const mapDispatchToProps = {
     clearErrorOnCreateJob: Actions.clearErrorOnCreateJob,
     createJob: Actions.createJob,
+    getWebhooks: Actions.getWebhooks,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Form);

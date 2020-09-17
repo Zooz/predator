@@ -10,4 +10,5 @@ export const inputTypes = {
     SWITCHER: 'SWITCHER',
     TEXT_FIELD: 'TEXT_FIELD',
     RADIO: 'RADIO',
+    MULTI_SELECT: 'MULTI_SELECT',
 };
