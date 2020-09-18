@@ -7,6 +7,7 @@ import SimpleTable from "../SimpleTable";
 import RadioOptions from "../../../components/RadioOptions";
 import UiSwitcher from "../../../components/UiSwitcher";
 import SubmitBar from '../SubmitBar'
+import InfoToolTip from '../InfoToolTip';
 
 const WebhookForm = ({loading, onSubmit, onCancel, onChangeWebhook, webhook}) => {
 
@@ -56,18 +57,26 @@ const WebhookForm = ({loading, onSubmit, onCancel, onChangeWebhook, webhook}) =>
                                   onChangeProps({format_type: value})
                               }}/>
             </TitleInput>
-            <TitleInput labelStyle={{marginBottom: 0}} style={{marginRight: '10px'}} width={'78px'} title={'Global'}
-                        rightComponent={<UiSwitcher
-                            onChange={(value) => {
-                                const newWebhook = {...webhook};
-                                newWebhook.global = value;
-                                onChangeWebhook(newWebhook)
-                            }}
-                            disabledInp={loading}
-                            activeState={webhook.global}
-                            height={12}
-                            width={22}
-                        />}
+            <TitleInput labelStyle={{marginBottom: 0}} style={{marginRight: '10px'}} width={'96px'} title={'Global'}
+                        rightComponent={
+                            <div style={{
+                                display: 'flex', width: '45px',
+                                justifyContent: 'space-between'
+                            }}>
+                                <UiSwitcher
+                                    onChange={(value) => {
+                                        const newWebhook = {...webhook};
+                                        newWebhook.global = value;
+                                        onChangeWebhook(newWebhook)
+                                    }}
+                                    disabledInp={loading}
+                                    activeState={webhook.global}
+                                    height={12}
+                                    width={22}
+                                />
+                                <InfoToolTip data={{key: 'global_info', info: 'make it global'}}/>
+                            </div>
+                        }
             />
             <SubmitBar onCancel={onCancel} onSubmit={onSubmit} loading={loading}/>
         </div>
