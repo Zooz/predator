@@ -22,6 +22,7 @@ const defaultBody = {
         client_errors_ratio: { percentage: 20 },
         rps: { percentage: 20 }
     }
+
 };
 const updateBodyWithTypes = {
     influx_metrics: {
@@ -160,6 +161,45 @@ describe('update and get config', () => {
         });
     });
 
+    describe('Update config with large json for custom runner definition', () => {
+        it('params below minimum', async () => {
+            let response = await configRequestCreator.updateConfig({
+                custom_runner_definition: {
+                    spec: {
+                        template: {
+                            spec: {
+                                containers: [{
+                                    resources: {
+                                        limits: {
+                                            memory: '512Mi',
+                                            cpu: '1'
+                                        },
+                                        requests: {
+                                            memory: '192Mi',
+                                            cpu: '1'
+                                        }
+                                    }
+                                }],
+                                nodeSelector: {
+                                    lifecycle: 'C5nSpot'
+                                },
+                                tolerations: [
+                                    {
+                                        key: 'instances',
+                                        operator: 'Equal',
+                                        value: 'c5n',
+                                        effect: 'NoSchedule'
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            });
+            should(response.statusCode).eql(200);
+        });
+    });
+
     describe('Update config validation', () => {
         it('update config fail with validation require fields', async () => {
             let response = await configRequestCreator.updateConfig(requestBodyNotValidRequire);
@@ -222,7 +262,7 @@ describe('update and get config', () => {
         it('update config fail with validation type', async () => {
             let response = await configRequestCreator.updateConfig({
                 benchmark_threshold: 20,
-                benchmark_weights: { 'tps': '10' }
+                benchmark_weights: { tps: '10' }
             });
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);

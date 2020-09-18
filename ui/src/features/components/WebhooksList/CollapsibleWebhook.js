@@ -41,7 +41,6 @@ export class CollapsibleWebhook extends React.Component {
             this.props.createWebhook(createWebhookRequest(webhook));
         } else {
             this.props.editWebhook(createWebhookRequest(webhook), webhook.id);
-            // this.setState({expanded: false});
         }
     };
 
@@ -55,8 +54,6 @@ export class CollapsibleWebhook extends React.Component {
             this.setState({expanded: false});
             this.props.getWebhooks();
         }
-
-
     }
 
     render() {
