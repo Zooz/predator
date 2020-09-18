@@ -11,7 +11,9 @@ import Loader from "./components/Loader";
 import Snackbar from "material-ui/Snackbar";
 
 
-const DESCRIPTION = 'Here  you can configure webhooks';
+const DESCRIPTION = 'Webhooks are events that notify you on test progress.\n' +
+    'Webhooks are supported in Slack or JSON format for an easy server to server integration.\n' +
+    'You can define a global webhook which will be enabled for system-wide tests or an adhoc webhook which will be optional on a specific test run.';
 
 const Webhhooks = ({setDeleteWebHookSuccess, deleteWebhookSuccess, loading, cleanErrors, webhookError, webhooks, getWebhooks}) => {
     const [showCreateWebhook, setShowCreateWebhook] = useState(false);
@@ -26,7 +28,7 @@ const Webhhooks = ({setDeleteWebHookSuccess, deleteWebhookSuccess, loading, clea
     const handleSnackbarClose = () => {
         setDeleteWebHookSuccess(false);
     };
-    const feedbackMsg = deleteWebhookSuccess ? 'webhook deleted successfully' : undefined;
+    const feedbackMsg = deleteWebhookSuccess ? 'Webhook deleted successfully' : undefined;
     return (
         <Page title={'Webhooks'} description={DESCRIPTION}>
             <div style={{display: 'flex', flexDirection: 'column'}}>

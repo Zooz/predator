@@ -74,7 +74,7 @@ const WebhookForm = ({loading, onSubmit, onCancel, onChangeWebhook, webhook}) =>
                                     height={12}
                                     width={22}
                                 />
-                                <InfoToolTip data={{key: 'global_info', info: 'make it global'}}/>
+                                <InfoToolTip data={{key: 'global_info', info: 'Is this webhook configured on all system tests'}}/>
                             </div>
                         }
             />
