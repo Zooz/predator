@@ -171,7 +171,7 @@ describe('webhooksFormatter', function () {
             const report = {
                 test_name: 'some name'
             };
-            const expectedResult = `::boom:: *Test ${report.test_name} with id: ${testId} has encountered an API failure!* :skull:`;
+            const expectedResult = `:boom: *Test ${report.test_name} with id: ${testId} has encountered an API failure!* :skull:`;
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_API_FAILURE, uuid.v4(), testId, report);
 
