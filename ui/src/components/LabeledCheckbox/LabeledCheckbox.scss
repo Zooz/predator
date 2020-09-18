@@ -1,0 +1,25 @@
+@import "../styles/colors";
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  &.disabled {
+    cursor: default;
+  }
+
+  .label_wrapper {
+    font-size: 13px;
+    color: $text-black;
+    cursor: pointer;
+    position: relative;
+    bottom: 1px;
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.input_wrapper {
+  margin-right: 10px;
+}

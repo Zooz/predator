@@ -65,7 +65,7 @@ async function initSchemas() {
             primaryKey: true
         },
         value: {
-            type: Sequelize.DataTypes.STRING
+            type: Sequelize.DataTypes.TEXT
         }
     });
     await config.sync();
