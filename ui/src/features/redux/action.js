@@ -30,6 +30,7 @@ import {
     editWebhook,
     deleteWebHook,
     deleteWebHookSuccess,
+    editWebHookSuccess,
 } from './actions/webhooksActions';
 import {
     clearStopJobSuccess,
@@ -195,7 +196,8 @@ export {
     cleanErrors,
     editWebhook,
     deleteWebHook,
-    deleteWebHookSuccess
+    deleteWebHookSuccess,
+    editWebHookSuccess
 
 };
 //processors
