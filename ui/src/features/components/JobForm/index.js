@@ -2,9 +2,9 @@ import React, {Fragment} from 'react';
 import style from './style.scss';
 import {connect} from 'react-redux';
 import {processingCreateJob, createJobSuccess, createJobFailure} from '../../redux/selectors/jobsSelector';
+import {webhooksForDropdown} from '../../redux/selectors/webhooksSelector';
 import * as Actions from '../../redux/action';
 import ErrorDialog from '../ErrorDialog';
-import TooltipWrapper from '../../../components/TooltipWrapper';
 import RactangleAlignChildrenLeft from '../../../components/RectangleAlign/RectangleAlignChildrenLeft';
 import {validate} from './validator';
 import CronViewer from './cronViewer';
@@ -14,8 +14,6 @@ import TitleInput from '../../../components/TitleInput'
 import Input from '../../../components/Input'
 import FormWrapper from "../../../components/FormWrapper";
 import ErrorWrapper from "../../../components/ErrorWrapper";
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons'
 import TextArea from '../../../components/TextArea';
 import MultiValueInput from '../../../components/MultiValueInput';
 import UiSwitcher from '../../../components/UiSwitcher';
@@ -23,7 +21,8 @@ import {filter} from 'lodash';
 import {createJobRequest} from '../../requestBuilder';
 import RadioOptions from '../../../components/RadioOptions';
 import {inputTypes, testTypes} from './constants';
-
+import MultiSelect from '../../../components/MultiSelect/MultiSelect.export';
+import InfoToolTip from '../InfoToolTip';
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 
 
@@ -63,6 +62,15 @@ class Form extends React.Component {
                 element: 'notes',
                 info: 'Add notes about the test.',
                 type: inputTypes.TEXT_FIELD
+            },
+            {
+                name: 'webhooks',
+                key: 'webhooks',
+                floatingLabelText: 'Webhooks',
+                info: 'Send test reports to Slack.',
+                element: 'Webhook',
+                type: inputTypes.MULTI_SELECT,
+                options: (props) => props.webhooks
             },
             {
                 name: 'arrival_rate',
@@ -139,14 +147,6 @@ class Form extends React.Component {
                 element: 'Email',
                 type: inputTypes.INPUT_LIST
             },
-            {
-                name: 'webhooks',
-                key: 'webhooks',
-                floatingLabelText: 'Webhooks',
-                info: 'Send test reports to Slack.',
-                element: 'Webhook',
-                type: inputTypes.INPUT_LIST
-            }
 
         ];
         this.state = {
@@ -194,6 +194,10 @@ class Form extends React.Component {
         this.props.clearErrorOnCreateJob();
     }
 
+    componentDidMount() {
+        this.props.getWebhooks();
+    }
+
     onChangeProperty = (name, value) => {
         const newState = Object.assign({}, this.state, {[name]: value});
         newState.errors = validate(newState);
@@ -221,27 +225,10 @@ class Form extends React.Component {
         }));
     }
 
-    showInfo(item) {
-        if (!item || !item.info) {
-            return null;
-        }
-        return (<TooltipWrapper
-            content={
-                <div>
-                    {item.info}
-                </div>}
-            dataId={`tooltipKey_${item.key}`}
-            place='top'
-            offset={{top: 1}}
-        >
-            <div data-tip data-for={`tooltipKey_${item.info}`} style={{cursor: 'pointer'}}>
-                <FontAwesomeIcon style={{color: '#557eff', fontSize: '13px'}} icon={faQuestionCircle}/>
-            </div>
-
-        </TooltipWrapper>);
-    }
 
     render() {
+
+
         const {closeDialog, processingAction, serverError, clearErrorOnCreateJob} = this.props;
         return (
             <Modal style={{paddingTop: '64px'}} width={'50%'} onExit={closeDialog}>
@@ -274,12 +261,28 @@ class Form extends React.Component {
     }
 
     generateInput = (oneItem) => {
+        // const options = [
+        //     { key: 'key_1', value: 'value_1' },
+        //     { key: 'key_2', value: 'value_2' },
+        //     { key: 'key_3', value: 'value_3' }
+        // ];
+
+        const startsWithStrategy = ({array = [], propName, value}) => {
+            const lowerCaseValue = value.toLowerCase();
+            return array.filter(object => object[propName].toLowerCase().startsWith(lowerCaseValue))
+        };
+
+        const onSelectedOptionsChange = (options) => {
+            console.log(options); // OUTPUT: [{ key: 'key_1', value: 'value_1' }]
+        };
+
+
         const {cron_expression} = this.state;
         switch (oneItem.type) {
             case inputTypes.SWITCHER:
                 return (
                     <TitleInput style={{flex: '1'}} key={oneItem.key} title={oneItem.floatingLabelText}
-                                rightComponent={this.showInfo(oneItem)}>
+                                rightComponent={<InfoToolTip data={oneItem}/>}>
                         <RactangleAlignChildrenLeft>
                             <UiSwitcher
                                 onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
@@ -296,7 +299,7 @@ class Form extends React.Component {
             case inputTypes.INPUT_LIST:
                 return (
                     <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
-                                rightComponent={this.showInfo(oneItem)}>
+                                rightComponent={<InfoToolTip data={oneItem}/>}>
                         <MultiValueInput
                             values={this.state[oneItem.name].map((value) => ({value, label: value}))}
                             onAddItem={(evt) => this.handleInputListAdd(oneItem.name, evt)}
@@ -310,7 +313,7 @@ class Form extends React.Component {
             case inputTypes.TEXT_FIELD:
                 return (
                     <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
-                                rightComponent={this.showInfo(oneItem)}>
+                                rightComponent={<InfoToolTip data={oneItem}/>}>
                         <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
                             <TextArea
                                 disabled={oneItem.disabled}
@@ -324,10 +327,33 @@ class Form extends React.Component {
             case inputTypes.RADIO:
                 return (
                     <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
-                                rightComponent={this.showInfo(oneItem)}>
+                                rightComponent={<InfoToolTip data={oneItem}/>}>
                         <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
                             <RadioOptions value={oneItem.valueToOption[this.state[oneItem.name]]} list={oneItem.options}
                                           onChange={(value) => this.onChangeProperty(oneItem.name, oneItem.optionToValue[value])}/>
+                        </ErrorWrapper>
+                    </TitleInput>
+                );
+            case inputTypes.MULTI_SELECT:
+                return (
+                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+                                rightComponent={<InfoToolTip data={oneItem}/>}>
+                        <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
+                            <MultiSelect
+                                options={oneItem.options(this.props)}
+                                selectedOptions={this.state[oneItem.name]}
+                                onChange={(values) => this.onChangeProperty(oneItem.name, values)}
+                                placeholder={"Please select an option"}
+                                height={'35px'}
+                                disabled={false}
+                                maxSize={50}
+                                validationErrorText=''
+                                enableFilter={true}
+                                filteringStrategy={startsWithStrategy}
+                                enableSelectAll={true}
+                                selectAllText={'Check All'}
+                                enableEllipsis={true}
+                            />
                         </ErrorWrapper>
                     </TitleInput>
                 );
@@ -335,7 +361,7 @@ class Form extends React.Component {
                 return (
                     <div>
                         <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
-                                    rightComponent={this.showInfo(oneItem)}>
+                                    rightComponent={<InfoToolTip data={oneItem}/>}>
                             <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
                                 <Input
                                     disabled={oneItem.disabled}
@@ -358,6 +384,11 @@ class Form extends React.Component {
         if (this.state.debug) {
             convertedArgs.debug = '*';
         }
+
+        if (this.state.webhooks) {
+            convertedArgs.webhooks = this.state.webhooks.map((webhook)=>webhook.key);
+        }
+
         this.props.createJob(createJobRequest(Object.assign({}, this.state, convertedArgs)));
     };
 }
@@ -366,13 +397,15 @@ function mapStateToProps(state) {
     return {
         processingAction: processingCreateJob(state),
         serverError: createJobFailure(state),
-        createJobSuccess: createJobSuccess(state)
+        createJobSuccess: createJobSuccess(state),
+        webhooks: webhooksForDropdown(state)
     };
 }
 
 const mapDispatchToProps = {
     clearErrorOnCreateJob: Actions.clearErrorOnCreateJob,
     createJob: Actions.createJob,
+    getWebhooks: Actions.getWebhooks,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Form);
