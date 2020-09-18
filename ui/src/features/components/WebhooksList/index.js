@@ -13,7 +13,7 @@ const WebhooksList = ({webhooks, onClose, createMode}) => {
                 webhooks.map((webhook, index) => {
                     if (typeof webhook === 'string' && webhook === 'SPACER') {
                         return (<div style={{
-                            width: '100%', borderStyle: 'dashed',
+                            width: '350px', borderStyle: 'dashed',
                             marginBottom: '8px',
                             borderColor: '#79c2db',
                             borderWidth: '1px'
