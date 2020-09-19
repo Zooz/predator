@@ -61,6 +61,7 @@
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
     "sequelize": "^5.22.3",
+    "slack-emojis": "^1.1.1",
     "sqlite3": "^4.2.0",
     "tedious": "^8.3.0",
     "umzug": "^2.3.0",
@@ -100,7 +101,10 @@
     }
   },
   "nyc": {
-    "exclude": "**/databaseConnector.js",
+    "exclude": [
+      "**/databaseConnector.js",
+      "**/database.js"
+    ],
     "include": "src"
   }
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import CollapsibleItem from '../../../components/CollapsibleItem/CollapsibleItem';
 import WebhookForm from './WebhookForm';
 import {buildStateFromWebhook, createWebhookRequest} from './utils'
-import {webhooks, loading, webhookSuccess} from "../../redux/selectors/webhooksSelector";
+import {editWebhookSuccess, loading, webhookSuccess} from "../../redux/selectors/webhooksSelector";
 import * as Actions from "../../redux/action";
 import {connect} from "react-redux";
 import DeleteDialog from "../DeleteDialog";
@@ -41,7 +41,6 @@ export class CollapsibleWebhook extends React.Component {
             this.props.createWebhook(createWebhookRequest(webhook));
         } else {
             this.props.editWebhook(createWebhookRequest(webhook), webhook.id);
-            this.setState({expanded: false});
         }
     };
 
@@ -49,6 +48,11 @@ export class CollapsibleWebhook extends React.Component {
         if (this.props.webhookSuccess === true && prevProps.webhookSuccess === false) {
             this.props.setWebhookSuccess(false);
             this.props.onClose();
+        }
+        if (this.props.editWebhookSuccess === true && prevProps.editWebhookSuccess === false) {
+            this.props.setEditWebhookSuccess(false);
+            this.setState({expanded: false});
+            this.props.getWebhooks();
         }
     }
 
@@ -143,14 +147,17 @@ function mapStateToProps(state) {
     return {
         loading: loading(state),
         webhookSuccess: webhookSuccess(state),
+        editWebhookSuccess: editWebhookSuccess(state),
     }
 }
 
 const mapDispatchToProps = {
     createWebhook: Actions.createWebhook,
+    getWebhooks: Actions.getWebhooks,
     editWebhook: Actions.editWebhook,
     deleteWebhook: Actions.deleteWebHook,
     setWebhookSuccess: Actions.createWebHookSuccess,
+    setEditWebhookSuccess: Actions.editWebHookSuccess,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CollapsibleWebhook);
