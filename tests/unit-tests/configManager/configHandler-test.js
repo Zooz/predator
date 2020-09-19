@@ -10,7 +10,7 @@ const databaseConnector = require('../../../src/configManager/models/database/da
 const configConstants = require('../../../src/common/consts').CONFIG;
 
 let manager;
-const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.length - 1) + 'x';
+const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.length - 2);
 
 const defaultSmtpServerConfig = {
     timeout: 200,

@@ -1,6 +1,6 @@
 const constConfig = require('../../common/consts').CONFIG;
 const packageJson = require('../../../package');
-const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.length - 1) + 'x';
+const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.length - 2);
 
 const BENCHMARK_WEIGHTS_DEFAULT = {
     percentile_ninety_five: { percentage: 20 },
