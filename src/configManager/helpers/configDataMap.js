@@ -1,5 +1,5 @@
 const constConfig = require('../../common/consts').CONFIG;
-const packageJson = require('../../../package');
+const { version: packageJsonVersion } = require('../../../package');
 
 const BENCHMARK_WEIGHTS_DEFAULT = {
     percentile_ninety_five: { percentage: 20 },
@@ -13,7 +13,7 @@ let configDataMap = {
     [constConfig.GRFANA_URL]: { value: process.env.GRAFANA_URL },
     [constConfig.DELAY_RUNNER_MS]: { value: process.env.DELAY_RUNNER_MS || 0, type: 'int' },
     [constConfig.INTERNAL_ADDRESS]: { value: process.env.INTERNAL_ADDRESS },
-    [constConfig.RUNNER_DOCKER_IMAGE]: { value: process.env.RUNNER_DOCKER_IMAGE || getSemverRunner(packageJson.version) },
+    [constConfig.RUNNER_DOCKER_IMAGE]: { value: process.env.RUNNER_DOCKER_IMAGE || getSemverRunner(packageJsonVersion) },
     [constConfig.JOB_PLATFORM]: { value: process.env.JOB_PLATFORM },
     [constConfig.RUNNER_CPU]: { value: process.env.RUNNER_CPU || 1, type: 'float' },
     [constConfig.RUNNER_MEMORY]: { value: process.env.RUNNER_MEMORY || 256, type: 'int' },
@@ -59,7 +59,7 @@ module.exports.getConstDefaultValue = (configValue) => {
     return configDataMap[configValue] ? configDataMap[configValue].value : undefined;
 };
 
-function getSemverRunner(version) {
-    const RUNNER_VERSION = version.substring(0, packageJson.version.length - 2);
+function getSemverRunner(packageJsonVersion) {
+    const RUNNER_VERSION = packageJsonVersion.substring(0, packageJsonVersion.version.length - 2);
     return `zooz/predator-runner:${RUNNER_VERSION}`;
 }
