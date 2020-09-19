@@ -5,11 +5,12 @@ process.env.JOB_PLATFORM = 'DOCKER';
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
-
+const packageJson = require('../../../package');
 const databaseConnector = require('../../../src/configManager/models/database/databaseConnector');
 const configConstants = require('../../../src/common/consts').CONFIG;
 
 let manager;
+const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.length - 1) + 'x';
 
 const defaultSmtpServerConfig = {
     timeout: 200,
@@ -22,7 +23,7 @@ const defaultConfig = {
     interval_cleanup_finished_containers_ms: 0,
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
-    runner_docker_image: 'zooz/predator-runner:latest',
+    runner_docker_image: 'zooz/predator-runner:' + RUNNER_VERSION,
     runner_cpu: 1,
     runner_memory: 256,
     smtp_server: Object.assign({}, defaultSmtpServerConfig),
@@ -41,7 +42,7 @@ const defaultConfigNotEscaped = {
     interval_cleanup_finished_containers_ms: 0,
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
-    runner_docker_image: 'zooz/predator-runner:latest',
+    runner_docker_image: 'zooz/predator-runner:' + RUNNER_VERSION,
     runner_cpu: 1,
     runner_memory: 256,
     smtp_server: Object.assign({}, defaultSmtpServerConfig),
@@ -72,7 +73,7 @@ const configParseExpected = {
     interval_cleanup_finished_containers_ms: 0,
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
-    runner_docker_image: 'zooz/predator-runner:latest',
+    runner_docker_image: 'zooz/predator-runner:' + RUNNER_VERSION,
     runner_cpu: 5,
     runner_memory: 256,
     smtp_server: {
@@ -102,7 +103,7 @@ const resultAfterConvert = {
     interval_cleanup_finished_containers_ms: 0,
     delay_runner_ms: 0,
     job_platform: 'DOCKER',
-    runner_docker_image: 'zooz/predator-runner:latest',
+    runner_docker_image: 'zooz/predator-runner:' + RUNNER_VERSION,
     grafana_url: 'test_grafana_url',
     runner_cpu: 2,
     runner_memory: 256,
