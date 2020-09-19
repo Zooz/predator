@@ -85,11 +85,13 @@ module.exports.postReport = async (testId, reportBody) => {
         testConfiguration.ramp_to = job.ramp_to;
     }
 
-    await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
+    return databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.job_id,
         reportBody.test_type, phase, startTime, reportBody.test_name,
         reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now());
-    await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id, constants.SUBSCRIBER_INITIALIZING_STAGE);
-    return reportBody;
+};
+
+module.exports.subscribeRunnerToReport = async function (testId, reportId, runnerId) {
+    return databaseConnector.subscribeRunner(testId, reportId, runnerId, constants.SUBSCRIBER_INITIALIZING_STAGE);
 };
 
 function getReportResponse(summaryRow, config) {

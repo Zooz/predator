@@ -1,6 +1,7 @@
 'use strict';
 
 const Sequelize = require('sequelize');
+const uuid = require('uuid');
 
 const constants = require('../../../utils/constants');
 
@@ -27,9 +28,10 @@ async function init(sequlizeClient) {
     await initSchemas();
 }
 
-async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+async function insertReport(testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
     const report = client.model('report');
     const params = {
+        report_id: uuid.v4(),
         test_id: testId,
         job_id: jobId,
         revision_id: revisionId,
@@ -43,8 +45,7 @@ async function insertReport(testId, revisionId, reportId, jobId, testType, phase
         test_configuration: testConfiguration,
         runners_subscribed: []
     };
-
-    return report.findOrCreate({ where: { report_id: reportId }, defaults: params });
+    return report.create(params);
 }
 
 async function insertStats(runnerId, testId, reportId, statsId, statsTime, phaseIndex, phaseStatus, data) {

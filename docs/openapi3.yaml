@@ -781,46 +781,97 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-    post:
-      operationId: create-a-report
-      tags:
-        - Reports
-      summary: Create a Report
-      description: Create a new report for the specified test.
-      parameters:
-        - in: path
-          name: test_id
-          required: true
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/post_report_response'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-      requestBody:
-        content:
-          application/json:
+    # post:
+    #   operationId: create-a-report
+    #   tags:
+    #     - Reports
+    #   summary: Create a Report
+    #   description: Create a new report for the specified test.
+    #   parameters:
+    #     - in: path
+    #       name: test_id
+    #       required: true
+    #       schema:
+    #         type: string
+    #   responses:
+    #     '201':
+    #       description: Success
+    #       content:
+    #         application/json:
+    #           schema:
+    #             type: array
+    #             items:
+    #               $ref: '#/components/schemas/post_report_response'
+    #     '400':
+    #       description: Bad request
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/error_response'
+    #     '500':
+    #       description: Internal server error
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/error_response'
+    #   requestBody:
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: '#/components/schemas/post_report'
+    #     description: report data
+    #     required: true
+  '/v1/tests/{test_id}/reports/{report_id}/subscribe':
+      post:
+        operationId: subscribe-runner-to-report
+        tags:
+          - Reports
+        summary: Subscribe runner to a report
+        description: Subscribe a runner to a specific report.
+        parameters:
+          - in: header
+            name: x-runner-id
+            description: id of the predator-runner
+            required: true
             schema:
-              $ref: '#/components/schemas/post_report'
-        description: report data
-        required: true
+              type: string
+              format: uuid
+              example: afbb6b43-fe52-48f2-84f4-1eebdbb2d5de
+          - in: path
+            name: test_id
+            required: true
+            description: The id of the test for which to retrieve the report.
+            schema:
+              type: string
+              example: 81a27853-0db5-4e57-ad63-4b637528398a
+          - in: path
+            name: report_id
+            description: The id of the report to retrieve.
+            required: true
+            schema:
+              type: string
+        responses:
+          '204':
+            description: Success
+
+          '400':
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}':
     get:
       operationId: retrieve-a-report
@@ -929,6 +980,7 @@ paths:
           description: The id of the test for which to delete the report.
           schema:
             type: string
+            format: uuid
             example: 81a27853-0db5-4e57-ad63-4b637528398a
         - in: path
           name: report_id
@@ -936,15 +988,11 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
+            example: ac549577-37ff-49f1-b9e5-208c0db13220
       responses:
         '204':
           description: Success
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:

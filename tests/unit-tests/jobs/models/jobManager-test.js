@@ -9,7 +9,9 @@ const should = require('should'),
     jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector'),
     dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector'),
     jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate'),
+    testsManager = require('../../../../src/tests/models/manager'),
     webhooksManager = require('../../../../src/webhooks/models/webhookManager'),
+    basicTest = require('../../../testExamples/Basic_test.json'),
     config = require('../../../../src/common/consts').CONFIG;
 
 let manager;
@@ -37,6 +39,8 @@ describe('Manager tests', function () {
 
     let webhooksManagerGetWebhook;
 
+    let testsManagerGetStub;
+
     before(() => {
         sandbox = sinon.sandbox.create();
 
@@ -47,6 +51,8 @@ describe('Manager tests', function () {
         databaseConnectorUpdateJobStub = sandbox.stub(databaseConnector, 'updateJob');
 
         webhooksManagerGetWebhook = sandbox.stub(webhooksManager, 'getWebhook');
+
+        testsManagerGetStub = sandbox.stub(testsManager, 'getTest');
 
         jobGetLogsStub = sandbox.stub(jobConnector, 'getLogs');
         jobDeleteContainerStub = sandbox.stub(jobConnector, 'deleteAllContainers');
@@ -104,7 +110,7 @@ describe('Manager tests', function () {
             manager.__get__('cronJobs').should.eql({});
         });
 
-        describe('databaseConnector connector returns an array with job with schedules, and job exist and can be run', function () {
+        describe.only('databaseConnector connector returns an array with job with schedules, and job exist and can be run', function () {
             it('Verify job added', async function () {
                 const jobBodyWithCron = {
                     test_id: TEST_ID,
@@ -124,6 +130,7 @@ describe('Manager tests', function () {
             });
 
             it('Verify cron was invoked more than once', function (done) {
+                testsManagerGetStub.resolves({ ...basicTest, id: TEST_ID });
                 this.timeout(5000);
                 setTimeout(async () => {
                     try {

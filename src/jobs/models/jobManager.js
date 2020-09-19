@@ -5,6 +5,8 @@ const logger = require('../../common/logger'),
     CronJob = require('cron').CronJob,
     configHandler = require('../../configManager/models/configHandler'),
     util = require('util'),
+    testsManager = require('../../tests/models/manager'),
+    reportsManager = require('../../reports/models/reportsManager'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
@@ -56,12 +58,14 @@ module.exports.createJob = async (job) => {
         logger.info('Job saved successfully to database');
         let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
         let runId = Date.now();
-        let jobSpecificPlatformRequest = await createJobRequest(jobId, runId, job, latestDockerImage, configData);
         if (job.run_immediately) {
+            const test = await testsManager.getTest(job.test_id);
+            const report = await createReportForJob(job, test);
+            let jobSpecificPlatformRequest = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
         if (job.cron_expression) {
-            await addCron(jobId, job, job.cron_expression, configData);
+            addCron(jobId, job, job.cron_expression, configData);
         }
         logger.info('Job deployed successfully');
         return createResponse(jobId, job, runId);
@@ -200,7 +204,7 @@ function createResponse(jobId, jobBody, runId) {
     return response;
 }
 
-async function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
+async function createJobRequest(jobId, runId, reportId, jobBody, dockerImage, configData) {
     const jobTemplate = require(`./${configData.job_platform.toLowerCase()}/jobTemplate`);
     let jobName = util.format(JOB_PLATFORM_NAME, jobId);
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
@@ -213,7 +217,8 @@ async function createJobRequest(jobId, runId, jobBody, dockerImage, configData) 
         TEST_ID: jobBody.test_id,
         PREDATOR_URL: configData.internal_address,
         DELAY_RUNNER_MS: configData.delay_runner_ms.toString(),
-        DURATION: jobBody.duration.toString()
+        DURATION: jobBody.duration.toString(),
+        REPORT_ID: reportId
     };
     if (jobBody.type === JOB_TYPE_FUNCTIONAL_TEST) {
         const arrivalCountPerRunner = Math.ceil(jobBody.arrival_count / parallelism);
@@ -284,7 +289,9 @@ function addCron(jobId, job, cronExpression, configData) {
             } else {
                 let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
                 let runId = Date.now();
-                let jobSpecificPlatformConfig = await createJobRequest(jobId, runId, job, latestDockerImage, configData);
+                const test = await testsManager.getTest(job.test_id);
+                const report = await createReportForJob(job, test);
+                let jobSpecificPlatformConfig = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
         } catch (error) {
@@ -316,4 +323,22 @@ async function validateWebhooksAssignment(webhookIds) {
         const error = generateError(422, 'Assigning a global webhook to a job is not allowed');
         throw error;
     }
+}
+
+async function createReportForJob(job, { id: testId, type: testType }) {
+    const reportBody = {
+        report_id: job.runId,
+        revision_id: job.revisionId,
+        job_id: job.jobId,
+        test_type: testType,
+        start_time: Date.now().toString(),
+        notes: job.notes,
+        webhooks: job.webhooks,
+        emails: job.emails,
+        test_name: job.testName,
+        test_description: job.description
+    };
+    const report = await reportsManager.postReport(testId, reportBody);
+    logger.info('Created report successfully');
+    return report;
 }
