@@ -213,17 +213,17 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
                 </TableHeader>
             ),
             accessor: data => statusFormatter(data.status),
-            width: mediumSize
+            width: largeSize
         },
         {
             id: 'arrival_rate',
             Header: () => (
                 <TableHeader sortable={false}>
-                    Arrival Rate
+                    Rate
                 </TableHeader>
             ),
-            accessor: 'arrival_rate',
-            width: largeSize,
+            accessor: data => data.arrival_rate || data.arrival_count,
+            width: mediumSize,
             className: css['center-flex'],
         },
         {

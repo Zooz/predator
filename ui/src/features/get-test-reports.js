@@ -17,6 +17,8 @@ import Snackbar from 'material-ui/Snackbar';
 import ErrorDialog from "./components/ErrorDialog";
 import Button from "../components/Button";
 import DeleteDialog from "./components/DeleteDialog";
+import UiSwitcher from "../components/UiSwitcher";
+import TitleInput from "../components/TitleInput";
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetReports = 'Error occurred while trying to get all reports for test.';
@@ -38,7 +40,8 @@ class getTests extends React.Component {
             sortedReports: [],
             sortHeader: '',
             rerunJob: null,
-            showCompareReports: false
+            showCompareReports: false,
+            onlyFavorites: false,
         };
     }
 
@@ -50,9 +53,18 @@ class getTests extends React.Component {
         this.setState({rerunJob: job});
     };
 
+    filterByFavoriteState = () => {
+        const {onlyFavorites} = this.state;
+        const {reports} = this.props;
+        const filteredReports = reports.filter((report) => (!!report.is_favorite) === onlyFavorites);
+        this.setState({sortedReports: filteredReports, sortHeader: ''});
+    };
+
     componentDidUpdate(prevProps) {
         if (prevProps.reports !== this.props.reports) {
-            this.setState({sortedReports: [...this.props.reports]})
+            this.setState({sortedReports: [...this.props.reports]}, () => {
+                this.filterByFavoriteState()
+            })
         }
         if (prevProps.deleteReportSuccess === false && this.props.deleteReportSuccess) {
             this.props.getReports(this.testId);
@@ -81,7 +93,9 @@ class getTests extends React.Component {
     };
     onSearch = (value) => {
         if (!value) {
-            this.setState({sortedReports: [...this.props.reports]})
+            this.setState({sortedReports: [...this.props.reports]}, () => {
+                this.filterByFavoriteState();
+            })
         }
         const newSorted = _.filter(this.props.reports, (report) => {
             return (String(report.status).toLowerCase().includes(value.toLowerCase()))
@@ -142,7 +156,7 @@ class getTests extends React.Component {
 
     render() {
         const noDataText = this.props.errorOnGetReports ? errorMsgGetReports : this.loader();
-        const {sortHeader, sortedReports} = this.state;
+        const {sortHeader, sortedReports, onlyFavorites} = this.state;
         const {
             errorCreateBenchmark,
             errorEditReport,
@@ -171,12 +185,10 @@ class getTests extends React.Component {
             <Page
                 title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
                 description={DESCRIPTION}>
-                <div>
+                <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
                     <Button
                         disabled={!this.props.isAtLeastOneReportSelected}
-                        style={{
-                            marginBottom: '10px',
-                        }} onClick={() => {
+                        style={{}} onClick={() => {
                         this.setState({
                             showCompareReports: true
                         });
@@ -187,6 +199,22 @@ class getTests extends React.Component {
                             marginLeft: '10px',
                         }} onClick={() => this.setState({showDeleteReportWarning: true})}>Delete Reports</Button>
 
+                    <TitleInput labelStyle={{marginBottom: 0, marginLeft: '10px'}} style={{marginRight: '10px'}}
+                                width={'130px'} title={'Only favorites'}
+                                rightComponent={
+                                    <UiSwitcher
+                                        onChange={(value) => {
+                                            this.setState({onlyFavorites: value}, () => {
+                                                this.filterByFavoriteState();
+                                            });
+                                        }}
+                                        // disabledInp={loading}
+                                        activeState={onlyFavorites}
+                                        height={12}
+                                        width={22}
+                                    />
+                                }
+                    />
                 </div>
 
                 <ReactTableComponent

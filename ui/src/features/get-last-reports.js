@@ -18,6 +18,8 @@ import ErrorDialog from "./components/ErrorDialog";
 import Button from "../components/Button";
 import Loader from "./components/Loader";
 import DeleteDialog from "./components/DeleteDialog";
+import UiSwitcher from "../components/UiSwitcher";
+import TitleInput from "../components/TitleInput";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -35,14 +37,24 @@ class getReports extends React.Component {
             sortHeader: '',
             rerunJob: null,
             showCompareReports: false,
-            showDeleteReportWarning: false
+            showDeleteReportWarning: false,
+            onlyFavorites: false,
 
         };
     }
 
+    filterByFavoriteState = () => {
+        const {onlyFavorites} = this.state;
+        const {reports} = this.props;
+        const filteredReports = reports.filter((report) => (!!report.is_favorite) === onlyFavorites);
+        this.setState({sortedReports: filteredReports, sortHeader: ''});
+    };
+
     componentDidUpdate(prevProps) {
         if (prevProps.reports !== this.props.reports) {
-            this.setState({sortedReports: [...this.props.reports]})
+            this.setState({sortedReports: [...this.props.reports]}, () => {
+                this.filterByFavoriteState()
+            })
         }
 
         if (prevProps.deleteReportSuccess === false && this.props.deleteReportSuccess) {
@@ -121,7 +133,9 @@ class getReports extends React.Component {
     };
     onSearch = (value) => {
         if (!value) {
-            this.setState({sortedReports: [...this.props.reports]})
+            this.setState({sortedReports: [...this.props.reports]}, () => {
+                this.filterByFavoriteState();
+            })
         }
         const newSorted = _.filter(this.props.reports, (report) => {
             return (String(report.test_name).toLowerCase().includes(value.toLowerCase()) || String(report.status).toLowerCase().includes(value.toLowerCase()))
@@ -152,7 +166,7 @@ class getReports extends React.Component {
 
 
     render() {
-        const {showReport, sortHeader, sortedReports, showCompareReports} = this.state;
+        const {showReport, sortHeader, sortedReports, showCompareReports, onlyFavorites} = this.state;
         const {
             errorOnGetReports,
             errorOnGetReport,
@@ -182,12 +196,10 @@ class getReports extends React.Component {
             <Page title={'Last Reports'} description={DESCRIPTION}>
                 <div style={{width: '100%'}}>
                     {showReport && <Report onClose={this.closeReport} key={showReport.report_id} report={showReport}/>}
-                    <div>
+                    <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
                         <Button
                             disabled={!this.props.isAtLeastOneReportSelected}
-                            style={{
-                                marginBottom: '10px',
-                            }} onClick={() => {
+                            style={{}} onClick={() => {
                             this.setState({
                                 showCompareReports: true
                             });
@@ -198,6 +210,22 @@ class getReports extends React.Component {
                                 marginLeft: '10px',
                             }} onClick={() => this.setState({showDeleteReportWarning: true})}>Delete Reports</Button>
 
+                        <TitleInput labelStyle={{marginBottom: 0, marginLeft: '10px'}} style={{marginRight: '10px'}}
+                                    width={'130px'} title={'Only favorites'}
+                                    rightComponent={
+                                        <UiSwitcher
+                                            onChange={(value) => {
+                                                this.setState({onlyFavorites: value}, () => {
+                                                    this.filterByFavoriteState();
+                                                });
+                                            }}
+                                            // disabledInp={loading}
+                                            activeState={onlyFavorites}
+                                            height={12}
+                                            width={22}
+                                        />
+                                    }
+                        />
                     </div>
                     <ReactTableComponent
                         // tableRowId={'report_id'}
