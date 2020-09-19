@@ -1,4 +1,5 @@
 const cloneDeep = require('lodash/cloneDeep');
+const slackEmojis = require('slack-emojis');
 
 const {
     EVENT_FORMAT_TYPE_JSON,
@@ -23,10 +24,10 @@ function unknownWebhookEventTypeError(badWebhookEventTypeValue) {
 
 function getThresholdSlackMessage(state, { testName, benchmarkThreshold, lastScores, aggregatedReport, score }) {
     let resultText = 'above';
-    let icon = ':rocket:';
+    let icon = slackEmojis.ROCKET;
     if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
         resultText = 'below';
-        icon = ':cry:';
+        icon = slackEmojis.CRY;
     }
     return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}` +
         ` this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
@@ -100,11 +101,11 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `:hammer_and_wrench: *Test ${testName} with id: ${testId} is in progress!*`;
+            message = `${slackEmojis.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `:boom: *Test ${testName} with id: ${testId} has encountered an API failure!* :skull:`;
+            message = `${slackEmojis.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${slackEmojis.SKULL}`;
             break;
         }
         default: {

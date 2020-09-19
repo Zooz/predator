@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import css from './TitleInput.scss'
 
-const ParentWrap = ({wrap,style, children}) => {
+const ParentWrap = ({wrap, style, children}) => {
     if (wrap) {
         return (
             <div style={style} className={css.title_wrapper}>
@@ -19,12 +19,18 @@ const ParentWrap = ({wrap,style, children}) => {
     }
 }
 
-const TitleInput = ({title, style,width, disabled, className, children, prefix, suffix, alert, rightComponent, ...rest}) => {
+const TitleInput = ({title, style,labelStyle, width, disabled, className, children, prefix, suffix, alert, rightComponent, ...rest}) => {
     const childrenExist = Boolean(children)
     return (
         <ParentWrap style={style} wrap={childrenExist}>
-            <div style={{display: 'flex', flexDirection: 'row', justifyContent: !title ? 'flex-end' : 'space-between',width}}>
-                <label {...rest} className={classnames(className, css.title, {
+            <div style={{
+                display: 'flex',
+                alignItems: "center",
+                flexDirection: 'row',
+                justifyContent: !title ? 'flex-end' : 'space-between',
+                width
+            }}>
+                <label style={labelStyle} {...rest} className={classnames(className, css.title, {
                     [css['title--disabled']]: disabled,
                     [css['title--alert']]: alert
                 })}>

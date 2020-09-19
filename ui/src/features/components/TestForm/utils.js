@@ -183,7 +183,7 @@ function prepareFlow(steps) {
         return {
             [step.method.toLowerCase()]: {
                 url: step.url,
-                name: step.name,
+                name:step.name,
                 headers: prepareHeadersFromArray(step.headers),
                 json: step.contentType === CONTENT_TYPES.APPLICATION_JSON ? step.body : undefined,
                 body: step.contentType === CONTENT_TYPES.OTHER ? step.body : undefined,

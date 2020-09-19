@@ -6,7 +6,8 @@ import {
     faBook,
     faPassport,
     faWrench,
-    faMicrochip
+    faMicrochip,
+    faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 
 import { PREDATOR_DOCS_URL } from '../App/common/env';
@@ -38,12 +39,18 @@ export default [
     },
     {
         key: 4,
+        primaryText: 'Webhooks',
+        navigateTo: 'webhooks',
+        icon: faExternalLinkAlt
+    },
+    {
+        key: 5,
         primaryText: 'Settings',
         navigateTo: 'settings',
         icon: faWrench,
     },
     {
-        key: 5,
+        key: 6,
         primaryText: 'Docs',
         icon: faFileAlt,
         nestedItems: [
