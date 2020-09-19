@@ -86,8 +86,12 @@ function getReports(testId, filter) {
         });
 }
 
-function getLastReports(limit) {
-    return request(testApp).get(`/v1/tests/last_reports?limit=${limit}`)
+function getLastReports(limit, filter) {
+    let url = `/v1/tests/last_reports?limit=${limit}`;
+    if (filter) {
+        url += `&filter=${filter}`;
+    }
+    return request(testApp).get(url)
         .set(HEADERS)
         .expect(function (res) {
             return res;

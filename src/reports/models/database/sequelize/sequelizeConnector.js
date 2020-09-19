@@ -188,16 +188,21 @@ async function getReportsAndParse(query) {
 }
 
 async function getLastReports(limit, filter) {
-    const queryOptions = filter === 'is_favorite' ? { where: { is_favorite: true }, limit, order: Sequelize.literal('start_time DESC') } : { limit, order: Sequelize.literal('start_time DESC') };
-    const lastReports = getReportsAndParse(queryOptions);
+    const queryOptions = { limit, order: [['start_time', 'DESC']] };
+    if (filter) {
+        queryOptions.where = {};
+        queryOptions.where[filter] = true;
+    }
+    const lastReports = await getReportsAndParse(queryOptions);
     return lastReports;
 }
 
 async function getReports(testId, filter) {
-    const queryOptions = filter === 'is_favorite' ? {
-        where: { is_favorite: true, test_id: testId },
-        order: [['start_time', 'DESC']]
-    } : { where: { test_id: testId }, order: [['start_time', 'DESC']] };
+    const queryOptions = { where: { test_id: testId }, order: [['start_time', 'DESC']] };
+    if (filter) {
+        queryOptions.where[filter] = true;
+    }
+
     const allReports = await getReportsAndParse(queryOptions);
     return allReports;
 }
