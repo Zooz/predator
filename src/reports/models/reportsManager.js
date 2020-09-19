@@ -26,8 +26,8 @@ module.exports.getReport = async (testId, reportId) => {
     return report;
 };
 
-module.exports.getReports = async (testId) => {
-    let reportSummaries = await databaseConnector.getReports(testId);
+module.exports.getReports = async (testId, filter) => {
+    let reportSummaries = await databaseConnector.getReports(testId, filter);
     let config = await configHandler.getConfig();
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
@@ -36,8 +36,8 @@ module.exports.getReports = async (testId) => {
     return reports;
 };
 
-module.exports.getLastReports = async (limit) => {
-    let reportSummaries = await databaseConnector.getLastReports(limit);
+module.exports.getLastReports = async (limit, filter) => {
+    let reportSummaries = await databaseConnector.getLastReports(limit, filter);
     let config = await configHandler.getConfig();
     let reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
@@ -47,8 +47,8 @@ module.exports.getLastReports = async (limit) => {
 
 module.exports.editReport = async (testId, reportId, reportBody) => {
     // currently we support only edit for notes
-    const { notes } = reportBody;
-    await databaseConnector.updateReport(testId, reportId, { notes });
+    const { notes, is_favorite } = reportBody;
+    await databaseConnector.updateReport(testId, reportId, { notes, is_favorite });
 };
 
 module.exports.deleteReport = async (testId, reportId) => {
@@ -87,7 +87,7 @@ module.exports.postReport = async (testId, reportBody) => {
 
     await databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.report_id, reportBody.job_id,
         reportBody.test_type, phase, startTime, reportBody.test_name,
-        reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now());
+        reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now(), false);
     await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id, constants.SUBSCRIBER_INITIALIZING_STAGE);
     return reportBody;
 };
@@ -125,6 +125,7 @@ function getReportResponse(summaryRow, config) {
         report_id: summaryRow.report_id,
         job_id: summaryRow.job_id,
         job_type: testConfiguration.job_type,
+        is_favorite: summaryRow.is_favorite,
         test_type: summaryRow.test_type,
         start_time: summaryRow.start_time,
         end_time: summaryRow.end_time || undefined,

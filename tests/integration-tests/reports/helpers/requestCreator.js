@@ -27,7 +27,7 @@ function createReport(testId, body) {
     return request(testApp).post(`/v1/tests/${testId}/reports`)
         .send(body)
         .set(HEADERS)
-        .expect(function(res){
+        .expect(function (res) {
             return res;
         });
 }
@@ -36,15 +36,16 @@ function postStats(testId, reportId, body) {
     return request(testApp).post(`/v1/tests/${testId}/reports/${reportId}/stats`)
         .send(body)
         .set(HEADERS)
-        .expect(function(res){
+        .expect(function (res) {
             return res;
         });
 }
+
 function editReport(testId, reportId, body) {
     return request(testApp).put(`/v1/tests/${testId}/reports/${reportId}`)
         .send(body)
         .set(HEADERS)
-        .expect(function(res){
+        .expect(function (res) {
             return res;
         });
 }
@@ -52,7 +53,7 @@ function editReport(testId, reportId, body) {
 function getAggregatedReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}/aggregate`)
         .set(HEADERS)
-        .expect(function(res){
+        .expect(function (res) {
             return res;
         });
 }
@@ -60,30 +61,39 @@ function getAggregatedReport(testId, reportId) {
 function getReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}`)
         .set(HEADERS)
-        .expect(function(res){
+        .expect(function (res) {
             return res;
         });
 }
+
 function deleteReport(testId, reportId) {
     return request(testApp).delete(`/v1/tests/${testId}/reports/${reportId}`)
         .set(HEADERS)
-        .expect(function(res){
+        .expect(function (res) {
             return res;
         });
 }
 
-function getReports(testId) {
-    return request(testApp).get(`/v1/tests/${testId}/reports`)
+function getReports(testId, filter) {
+    let url = `/v1/tests/${testId}/reports`;
+    if (filter) {
+        url += `?filter=${filter}`;
+    }
+    return request(testApp).get(url)
         .set(HEADERS)
-        .expect(function(res){
+        .expect(function (res) {
             return res;
         });
 }
 
-function getLastReports(limit) {
-    return request(testApp).get(`/v1/tests/last_reports?limit=${limit}`)
+function getLastReports(limit, filter) {
+    let url = `/v1/tests/last_reports?limit=${limit}`;
+    if (filter) {
+        url += `&filter=${filter}`;
+    }
+    return request(testApp).get(url)
         .set(HEADERS)
-        .expect(function(res){
+        .expect(function (res) {
             return res;
         });
 }
