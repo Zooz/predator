@@ -231,7 +231,7 @@ class getTests extends React.Component {
                             rerunJob: null
                         });
                         this.props.setDeleteReportSuccess(false);
-                        this.props.editNotesSuccess(false);
+                        this.props.editReportSuccess(false);
                     }}
                 />}
                 {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error}/>}
@@ -262,7 +262,7 @@ function mapStateToProps(state) {
         errorOnGetReports: selectors.errorOnGetReports(state),
         errorOnGetReport: selectors.errorOnGetReport(state),
         jobSuccess: createJobSuccess(state),
-        noteSuccess: selectors.editNotesSuccess(state),
+        noteSuccess: selectors.editReportSuccess(state),
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
         selectedReports: selectors.selectedReports(state),
@@ -282,7 +282,7 @@ const mapDispatchToProps = {
     createJob: Actions.createJob,
     createJobSuccess: Actions.createJobSuccess,
     editReport: Actions.editReport,
-    editNotesSuccess: Actions.editReportSuccess,
+    editReportSuccess: Actions.editReportSuccess,
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
     addReportForCompare: Actions.addReportForCompare,

@@ -4,7 +4,7 @@ import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 
 
-const InfoToolTip = ({data})=> {
+const InfoToolTip = ({data, icon, iconSize}) => {
     if (!data || !data.info) {
         return null;
     }
@@ -17,8 +17,8 @@ const InfoToolTip = ({data})=> {
         place='top'
         offset={{top: 1}}
     >
-            <div data-tip data-for={`tooltipKey_${data.info}`} style={{cursor: 'pointer'}}>
-            <FontAwesomeIcon style={{color: '#557eff', fontSize: '13px'}} icon={faQuestionCircle}/>
+        <div data-tip data-for={`tooltipKey_${data.info}`} style={{cursor: 'pointer'}}>
+            <FontAwesomeIcon style={{color: '#557eff', fontSize: iconSize || '13px'}} icon={icon || faQuestionCircle}/>
         </div>
 
     </TooltipWrapper>);

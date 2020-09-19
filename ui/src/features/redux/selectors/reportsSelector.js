@@ -9,7 +9,7 @@ export const errorOnGetReport = (state) => state.ReportsReducer.get('error_get_r
 export const processingGetReports = (state) => state.ReportsReducer.get('processing_get_reports');
 export const processingGetReport = (state) => state.ReportsReducer.get('processing_get_report');
 export const createBenchmarkSuccess = (state) => state.ReportsReducer.get('create_benchmark_success');
-export const editNotesSuccess = (state) => state.ReportsReducer.get('edit_notes_success');
+export const editReportSuccess = (state) => state.ReportsReducer.get('edit_report_success');
 export const deleteReportSuccess = (state) => state.ReportsReducer.get('delete_report_success');
 export const deleteReportFailure = (state) => state.ReportsReducer.get('delete_report_failure');
 export const createBenchmarkFailure = (state) => state.ReportsReducer.get('create_benchmark_failure');

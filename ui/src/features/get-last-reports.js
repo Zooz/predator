@@ -239,7 +239,7 @@ class getReports extends React.Component {
                         this.props.getLastReports();
                         this.props.clearStopJobSuccess();
                         this.props.createJobSuccess(undefined);
-                        this.props.editNotesSuccess(false);
+                        this.props.editReportSuccess(false);
                         this.props.setDeleteReportSuccess(false);
                         this.setState({
                             rerunJob: null
@@ -282,7 +282,7 @@ function mapStateToProps(state) {
         errorOnStopRunningJob: errorOnStopRunningJob(state),
         stopRunningJobSuccess: stopRunningJobSuccess(state),
         jobSuccess: createJobSuccess(state),
-        noteSuccess: selectors.editNotesSuccess(state),
+        noteSuccess: selectors.editReportSuccess(state),
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
         selectedReports: selectors.selectedReports(state),
@@ -302,7 +302,7 @@ const mapDispatchToProps = {
     createJob: Actions.createJob,
     createJobSuccess: Actions.createJobSuccess,
     editReport: Actions.editReport,
-    editNotesSuccess: Actions.editReportSuccess,
+    editReportSuccess: Actions.editReportSuccess,
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
     addReportForCompare: Actions.addReportForCompare,
