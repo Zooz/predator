@@ -60,6 +60,6 @@ module.exports.getConstDefaultValue = (configValue) => {
 };
 
 function getSemverRunner(packageJsonVersion) {
-    const RUNNER_VERSION = packageJsonVersion.substring(0, packageJsonVersion.version.length - 2);
+    const RUNNER_VERSION = packageJsonVersion.substring(0, packageJsonVersion.length - 2);
     return `zooz/predator-runner:${RUNNER_VERSION}`;
 }
