@@ -4,12 +4,13 @@ const configRequestCreator = require('./helpers/requestCreator');
 const should = require('should');
 const validationError = 'Input validation error';
 const configValues = require('../../../src/common/consts').CONFIG;
-
+const packageJson = require('../../../package');
+const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.length - 2);
 const defaultBody = {
     interval_cleanup_finished_containers_ms: 0,
     allow_insecure_tls: false,
     internal_address: 'http://localhost:80',
-    runner_docker_image: 'zooz/predator-runner:latest',
+    runner_docker_image: `zooz/predator-runner:${RUNNER_VERSION}`,
     job_platform: process.env.JOB_PLATFORM || 'DOCKER',
     runner_cpu: 1,
     runner_memory: 256,
