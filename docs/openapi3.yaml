@@ -760,6 +760,14 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: filter
+          description: is filter and by what property
+          required: false
+          schema:
+            type: string
+            enum:
+              - is_favorite
       responses:
         '200':
           description: Success
@@ -870,23 +878,23 @@ paths:
     put:
       operationId: edit-a-report
       tags:
-      - Reports
+        - Reports
       summary: edit a Report
       description: edit a specific report for the specified test.
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        description: The id of the test for which to retrieve the report.
-        schema:
-          type: string
-          example: 81a27853-0db5-4e57-ad63-4b637528398a
-      - in: path
-        name: report_id
-        description: The id of the report to retrieve.
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: test_id
+          required: true
+          description: The id of the test for which to retrieve the report.
+          schema:
+            type: string
+            example: 81a27853-0db5-4e57-ad63-4b637528398a
+        - in: path
+          name: report_id
+          description: The id of the report to retrieve.
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: Success
@@ -966,6 +974,14 @@ paths:
           minimum: 1
           maximum: 250
           type: integer
+        - in: query
+          name: filter
+          description: is filter and by what property
+          required: false
+          schema:
+            type: string
+            enum:
+              - is_favorite
       responses:
         '200':
           description: Success
@@ -1411,7 +1427,7 @@ paths:
           description: Success
           content:
             application/json:
-               schema:
+              schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/webhook'
@@ -1480,8 +1496,8 @@ paths:
           description: Success
           content:
             application/json:
-               schema:
-                  $ref: '#/components/schemas/webhook'
+              schema:
+                $ref: '#/components/schemas/webhook'
         '404':
           description: Not found
           content:
@@ -1514,8 +1530,8 @@ paths:
           description: Success
           content:
             application/json:
-               schema:
-                  $ref: '#/components/schemas/webhook'
+              schema:
+                $ref: '#/components/schemas/webhook'
         '400':
           description: Bad request
           content:
@@ -2102,8 +2118,8 @@ components:
       discriminator:
         propertyName: type
       oneOf:
-          - $ref: '#/components/schemas/load_test'
-          - $ref: '#/components/schemas/functional_test'
+        - $ref: '#/components/schemas/load_test'
+        - $ref: '#/components/schemas/functional_test'
       required:
         - type
         - test_id
@@ -2253,6 +2269,9 @@ components:
         notes:
           type: string
           description: notes for specific report
+        is_favorite:
+          type: boolean
+          description: wether this report should be marked as favorite
     post_report:
       required:
         - report_id
@@ -2548,7 +2567,7 @@ components:
     benchmark_weights:
       type: object
       required:
-         - percentage
+        - percentage
       properties:
         percentage:
           type: number

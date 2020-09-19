@@ -123,25 +123,26 @@ describe('Sequelize client tests', function () {
     describe('Insert new report', () => {
         it('should succeed full insert', async () => {
             const lastUpdateAt = Date.now();
-            await sequelizeConnector.insertReport(testId, revisionId, reportId, jobId, testType, '0', startTime, testName, testDescription, testConfiguration, notes, lastUpdateAt);
+            await sequelizeConnector.insertReport(testId, revisionId, reportId, jobId, testType, '0', startTime, testName, testDescription, testConfiguration, notes, lastUpdateAt, false);
 
             should(sequelizeFindOrCreateStub.args[0][0]).eql({
-                'defaults': {
-                    'job_id': jobId,
-                    'last_updated_at': lastUpdateAt,
-                    'notes': 'some notes',
-                    'phase': '0',
-                    'revision_id': revisionId,
-                    'start_time': startTime,
-                    'test_configuration': testConfiguration,
-                    'test_description': 'desc',
-                    'test_id': testId,
-                    'test_name': 'unit-test',
-                    'test_type': 'basic',
-                    'runners_subscribed': []
+                defaults: {
+                    job_id: jobId,
+                    last_updated_at: lastUpdateAt,
+                    notes: 'some notes',
+                    phase: '0',
+                    revision_id: revisionId,
+                    start_time: startTime,
+                    test_configuration: testConfiguration,
+                    test_description: 'desc',
+                    test_id: testId,
+                    test_name: 'unit-test',
+                    test_type: 'basic',
+                    runners_subscribed: [],
+                    is_favorite: false
                 },
-                'where': {
-                    'report_id': reportId
+                where: {
+                    report_id: reportId
                 }
             });
         });
@@ -153,13 +154,13 @@ describe('Sequelize client tests', function () {
 
             sequelizeUpdateStub.callCount.should.eql(1); // query last report should not be trig
             sequelizeUpdateStub.args[0][0].should.eql({
-                'score': 5.3,
-                'benchmark_weights_data': 'some data'
+                score: 5.3,
+                benchmark_weights_data: 'some data'
             });
             sequelizeUpdateStub.args[0][1].should.eql({
-                'where': {
-                    'test_id': testId,
-                    'report_id': reportId
+                where: {
+                    test_id: testId,
+                    report_id: reportId
                 }
             });
         });
@@ -193,20 +194,20 @@ describe('Sequelize client tests', function () {
 
             sequelizeDestroyStub.callCount.should.eql(3); // query last report should not be trig
             sequelizeDestroyStub.args[0][0].should.eql({
-                'where': {
-                    'test_id': 'testId',
-                    'report_id': 'reportId'
+                where: {
+                    test_id: 'testId',
+                    report_id: 'reportId'
                 }
             });
             sequelizeDestroyStub.args[1][0].should.eql({
-                'where': {
-                    'test_id': 'testId',
-                    'report_id': 'reportId'
+                where: {
+                    test_id: 'testId',
+                    report_id: 'reportId'
                 }
             });
             sequelizeDestroyStub.args[2][0].should.eql({
-                'where': {
-                    'runner_id': ['runnerId']
+                where: {
+                    runner_id: ['runnerId']
                 }
             });
         });
@@ -236,15 +237,15 @@ describe('Sequelize client tests', function () {
 
             sequelizeDestroyStub.callCount.should.eql(2); // query last report should not be trig
             sequelizeDestroyStub.args[0][0].should.eql({
-                'where': {
-                    'test_id': 'testId',
-                    'report_id': 'reportId'
+                where: {
+                    test_id: 'testId',
+                    report_id: 'reportId'
                 }
             });
             sequelizeDestroyStub.args[1][0].should.eql({
-                'where': {
-                    'test_id': 'testId',
-                    'report_id': 'reportId'
+                where: {
+                    test_id: 'testId',
+                    report_id: 'reportId'
                 }
             });
         });
@@ -377,13 +378,13 @@ describe('Sequelize client tests', function () {
             }]);
 
             should(sequelizeGetStub.args[0][0]).containEql({
-                'attributes': {
-                    'exclude': [
+                attributes: {
+                    exclude: [
                         'updated_at',
                         'created_at'
                     ]
                 },
-                'where': {
+                where: {
                     report_id: reportId,
                     test_id: testId
                 }
@@ -407,12 +408,12 @@ describe('Sequelize client tests', function () {
             await sequelizeConnector.updateReport(testId, reportId, { phase: '0', last_updated_at: lastUpdatedAt });
 
             should(sequelizeUpdateStub.args[0][0]).eql({
-                'last_updated_at': lastUpdatedAt,
-                'phase': '0'
+                last_updated_at: lastUpdatedAt,
+                phase: '0'
             });
 
             should(sequelizeUpdateStub.args[0][1]).eql({
-                'where': {
+                where: {
                     test_id: testId,
                     report_id: reportId
                 }
@@ -432,14 +433,14 @@ describe('Sequelize client tests', function () {
             await sequelizeConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 
             should(sequelizeInsertStatsStub.args[0][0]).eql({
-                'runner_id': runnerId,
-                'data': data,
-                'phase_index': 0,
-                'phase_status': 'initiliazed',
-                'report_id': reportId,
-                'stats_id': statId,
-                'stats_time': statsTime,
-                'test_id': testId
+                runner_id: runnerId,
+                data: data,
+                phase_index: 0,
+                phase_status: 'initiliazed',
+                report_id: reportId,
+                stats_id: statId,
+                stats_time: statsTime,
+                test_id: testId
             });
         });
     });
@@ -464,13 +465,13 @@ describe('Sequelize client tests', function () {
             sequelizeGetStub.resolves(sequelizeResponse);
             await sequelizeConnector.getStats(testId, reportId);
             should(sequelizeGetStub.args[0][0]).eql({
-                'attributes': {
-                    'exclude': [
+                attributes: {
+                    exclude: [
                         'updated_at',
                         'created_at'
                     ]
                 },
-                'where': {
+                where: {
                     report_id: reportId,
                     test_id: testId
                 }
