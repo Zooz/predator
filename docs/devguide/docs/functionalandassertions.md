@@ -19,6 +19,16 @@ The possible expectations that can be created to assert the response received:
 - equals
 - matchesRegexp
 
+### Example
+
+A simlple functional test that sends a GET request to `http://www.google.com/` and asserts that the response received has:
+
+- statusCode: `200`
+- contentType: `application/json`
+- hasProperty: `body`
+ 
+![functional-test](images/expectations.png)
+
 ## Running a Functional Tests 
 In order to run the created test as a functional test and not a load test, the only difference is the actual load we run. 
 For this we need to create a job with type `functional_test` and `arrival_count` as the rate parameter (instead of `arrival_rate` in load_tests).
