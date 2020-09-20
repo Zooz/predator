@@ -19,7 +19,7 @@ const ParentWrap = ({wrap, style, children}) => {
     }
 }
 
-const TitleInput = ({title, style,labelStyle, width, disabled, className, children, prefix, suffix, alert, rightComponent, ...rest}) => {
+const TitleInput = ({title, style, labelStyle, width, height, disabled, className, children, prefix, suffix, alert, rightComponent, ...rest}) => {
     const childrenExist = Boolean(children)
     return (
         <ParentWrap style={style} wrap={childrenExist}>
@@ -28,7 +28,7 @@ const TitleInput = ({title, style,labelStyle, width, disabled, className, childr
                 alignItems: "center",
                 flexDirection: 'row',
                 justifyContent: !title ? 'flex-end' : 'space-between',
-                width
+                width,
             }}>
                 <label style={labelStyle} {...rest} className={classnames(className, css.title, {
                     [css['title--disabled']]: disabled,
@@ -40,7 +40,7 @@ const TitleInput = ({title, style,labelStyle, width, disabled, className, childr
                 </label>
                 {rightComponent}
             </div>
-            {children ? <div style={{width}}>{children}</div> : undefined}
+            {children ? <div style={{width, height, display: 'flex'}}>{children}</div> : undefined}
         </ParentWrap>
     )
 }

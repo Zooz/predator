@@ -54,9 +54,8 @@ class getTests extends React.Component {
     };
 
     filterByFavoriteState = () => {
-        const {onlyFavorites} = this.state;
-        const {reports} = this.props;
-        const filteredReports = reports.filter((report) => (!!report.is_favorite) === onlyFavorites);
+        const {onlyFavorites, sortedReports} = this.state;
+        const filteredReports = sortedReports.filter((report) => (!!report.is_favorite) === onlyFavorites);
         this.setState({sortedReports: filteredReports, sortHeader: ''});
     };
 
@@ -100,7 +99,9 @@ class getTests extends React.Component {
         const newSorted = _.filter(this.props.reports, (report) => {
             return (String(report.status).toLowerCase().includes(value.toLowerCase()))
         });
-        this.setState({sortedReports: newSorted})
+        this.setState({sortedReports: newSorted}, () => {
+            this.filterByFavoriteState();
+        })
     };
 
     onCloseErrorDialog = () => {
@@ -181,6 +182,29 @@ class getTests extends React.Component {
 
         const feedbackMessage = this.generateFeedbackMessage();
         const error = errorCreateBenchmark || errorEditReport || deleteReportFailure;
+
+        const searchSections = [
+            <TitleInput key={1}
+                        style={{flexGrow: 0}}
+                        width={'130px'} height={'33px'} title={'Favorites'}
+            >
+                <UiSwitcher
+                    onChange={(value) => {
+                        this.setState({
+                            onlyFavorites: value,
+                            sortedReports: [...this.props.reports]
+                        }, () => {
+                            this.filterByFavoriteState();
+                        });
+                    }}
+                    // disabledInp={loading}
+                    activeState={onlyFavorites}
+                    height={12}
+                    width={22}
+                    style={{alignSelf: 'center'}}
+                />
+            </TitleInput>
+        ];
         return (
             <Page
                 title={this.props.reports && this.props.reports.length > 0 && `${this.props.reports[0].test_name} Reports`}
@@ -198,23 +222,6 @@ class getTests extends React.Component {
                         style={{
                             marginLeft: '10px',
                         }} onClick={() => this.setState({showDeleteReportWarning: true})}>Delete Reports</Button>
-
-                    <TitleInput labelStyle={{marginBottom: 0, marginLeft: '10px'}} style={{marginRight: '10px'}}
-                                width={'130px'} title={'Only favorites'}
-                                rightComponent={
-                                    <UiSwitcher
-                                        onChange={(value) => {
-                                            this.setState({onlyFavorites: value}, () => {
-                                                this.filterByFavoriteState();
-                                            });
-                                        }}
-                                        // disabledInp={loading}
-                                        activeState={onlyFavorites}
-                                        height={12}
-                                        width={22}
-                                    />
-                                }
-                    />
                 </div>
 
                 <ReactTableComponent
@@ -229,6 +236,7 @@ class getTests extends React.Component {
                     resizable={false}
                     cursor={'default'}
                     // className={style.table}
+                    searchSections={searchSections}
                 />
                 {showReport &&
                 <Report onClose={this.closeReport} key={showReport.report_id + 'reports'} report={showReport}/>}
