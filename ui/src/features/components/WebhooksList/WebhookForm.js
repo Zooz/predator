@@ -2,7 +2,7 @@ import TitleInput from "../../../components/TitleInput";
 import Input from "../../../components/Input";
 import RectangleAlignChildrenLeft from "../../../components/RectangleAlign/RectangleAlignChildrenLeft";
 import React, {useState} from "react";
-import {EVENTS, WEBHOOK_TYPES} from "./constatns";
+import {EVENTS, WEBHOOK_TYPES} from "./constants";
 import SimpleTable from "../SimpleTable";
 import RadioOptions from "../../../components/RadioOptions";
 import UiSwitcher from "../../../components/UiSwitcher";

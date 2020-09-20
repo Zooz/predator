@@ -1,7 +1,6 @@
-
-
 export const EVENTS = [
     "started",
+    "in_progress",
     "api_failure",
     "aborted",
     "failed",
@@ -9,7 +8,6 @@ export const EVENTS = [
     "benchmark_passed",
     "benchmark_failed"
 ];
-
 
 export const WEBHOOK_TYPES = [
     'json','slack'
