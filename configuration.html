@@ -304,6 +304,18 @@
 
 
   <li class="md-nav__item">
+    <a href="functionalandassertions.html" title="Functional Tests and Assertions" class="md-nav__link">
+      Functional Tests and Assertions
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="processors.html" title="Processor Creation" class="md-nav__link">
       Processor Creation
     </a>
@@ -328,8 +340,32 @@
 
 
   <li class="md-nav__item">
+    <a href="webhooks.html" title="Webhooks" class="md-nav__link">
+      Webhooks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="schedulesandreports.html" title="Schedules and Reports" class="md-nav__link">
       Schedules and Reports
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="plugins.html" title="Plugins" class="md-nav__link">
+      Plugins
     </a>
   </li>
 
@@ -380,13 +416,6 @@
   
     <nav class="md-nav">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cassandra" title="Cassandra" class="md-nav__link">
-    Cassandra
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#sqlite" title="SQLITE" class="md-nav__link">
@@ -457,8 +486,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#influx" title="Influx" class="md-nav__link">
-    Influx
+  <a href="#influxdb" title="InfluxDB" class="md-nav__link">
+    InfluxDB
   </a>
   
 </li>
@@ -483,6 +512,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="performance.html" title="Runner's Performance" class="md-nav__link">
+      Runner's Performance
+    </a>
   </li>
 
     
@@ -558,13 +599,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#cassandra" title="Cassandra" class="md-nav__link">
-    Cassandra
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#sqlite" title="SQLITE" class="md-nav__link">
     SQLITE
   </a>
@@ -633,8 +667,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#influx" title="Influx" class="md-nav__link">
-    Influx
+  <a href="#influxdb" title="InfluxDB" class="md-nav__link">
+    InfluxDB
   </a>
   
 </li>
@@ -723,13 +757,6 @@ during runtime with the /config endpoint, please check the API reference for mor
 <td></td>
 </tr>
 <tr>
-<td>DEFAULT_WEBHOOK_URL</td>
-<td>default_webhook_url</td>
-<td>Default webhook url to send live report statistics to</td>
-<td>✓</td>
-<td></td>
-</tr>
-<tr>
 <td>ALLOW_INSECURE_TLS</td>
 <td>allow_insecure_tls</td>
 <td>If true, don't fail requests on unverified server certificate errors</td>
@@ -772,7 +799,7 @@ during runtime with the /config endpoint, please check the API reference for mor
 <tbody>
 <tr>
 <td>DATABASE_TYPE</td>
-<td>Database to integrate Predator with [Cassandra, Postgres, MySQL, MSSQL, SQLITE]</td>
+<td>Database to integrate Predator with [Postgres, MySQL, MSSQL, SQLITE]</td>
 <td>x</td>
 <td>SQLITE</td>
 </tr>
@@ -803,38 +830,6 @@ during runtime with the /config endpoint, please check the API reference for mor
 </tbody>
 </table>
 <p>Additional parameters for the following chosen databases:</p>
-<h4 id="cassandra">Cassandra<a class="headerlink" href="#cassandra" title="Permanent link">#</a></h4>
-<table>
-<thead>
-<tr>
-<th>Environment Variable</th>
-<th>Configurable from UI/API</th>
-<th>Default value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CASSANDRA_REPLICATION_FACTOR</td>
-<td>x</td>
-<td>1</td>
-</tr>
-<tr>
-<td>CASSANDRA_CONSISTENCY</td>
-<td>x</td>
-<td>localQuorum</td>
-</tr>
-<tr>
-<td>CASSANDRA_KEY_SPACE_STRATEGY</td>
-<td>x</td>
-<td>SimpleStrategy</td>
-</tr>
-<tr>
-<td>CASSANDRA_LOCAL_DATA_CENTER</td>
-<td>x</td>
-<td></td>
-</tr>
-</tbody>
-</table>
 <h4 id="sqlite">SQLITE<a class="headerlink" href="#sqlite" title="Permanent link">#</a></h4>
 <table>
 <thead>
@@ -847,7 +842,7 @@ during runtime with the /config endpoint, please check the API reference for mor
 </thead>
 <tbody>
 <tr>
-<td>SQLITE_STORATE</td>
+<td>SQLITE_STORAGE</td>
 <td>SQLITE file name</td>
 <td>x</td>
 <td>predator</td>
@@ -974,13 +969,6 @@ during runtime with the /config endpoint, please check the API reference for mor
 <td></td>
 </tr>
 <tr>
-<td>BENCHMARK_THRESHOLD_WEBHOOK_URL</td>
-<td>benchmark_threshold_webhook_url</td>
-<td>Url to send webhooks to incase a test receives a score less than the benchmark threshold</td>
-<td>✓</td>
-<td></td>
-</tr>
-<tr>
 <td></td>
 <td>benchmark_weights.percentile_ninety_five.percentage</td>
 <td>Percentage of the score affected by p95 results</td>
@@ -1073,7 +1061,7 @@ during runtime with the /config endpoint, please check the API reference for mor
 </tr>
 </tbody>
 </table>
-<h4 id="influx">Influx<a class="headerlink" href="#influx" title="Permanent link">#</a></h4>
+<h4 id="influxdb">InfluxDB<a class="headerlink" href="#influxdb" title="Permanent link">#</a></h4>
 <table>
 <thead>
 <tr>
@@ -1205,7 +1193,7 @@ during runtime with the /config endpoint, please check the API reference for mor
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="schedulesandreports.html" title="Schedules and Reports" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="plugins.html" title="Plugins" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -1214,19 +1202,19 @@ during runtime with the /config endpoint, please check the API reference for mor
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Schedules and Reports
+                Plugins
               </span>
             </div>
           </a>
         
         
-          <a href="faq.html" title="FAQ" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="performance.html" title="Runner's Performance" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                FAQ
+                Runner's Performance
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

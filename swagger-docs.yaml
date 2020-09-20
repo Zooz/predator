@@ -761,6 +761,14 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: filter
+          description: is filter and by what property
+          required: false
+          schema:
+            type: string
+            enum:
+              - is_favorite
       responses:
         '200':
           description: Success
@@ -967,6 +975,14 @@ paths:
           minimum: 1
           maximum: 250
           type: integer
+        - in: query
+          name: filter
+          description: is filter and by what property
+          required: false
+          schema:
+            type: string
+            enum:
+              - is_favorite
       responses:
         '200':
           description: Success
@@ -1535,6 +1551,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook'
     delete:
       operationId: delete-webhook
       tags:
@@ -2291,6 +2312,9 @@ components:
         notes:
           type: string
           description: notes for specific report
+        is_favorite:
+          type: boolean
+          description: wether this report should be marked as favorite
     post_report:
       required:
         - report_id
@@ -2471,10 +2495,6 @@ components:
           type: number
           description: The minimum of time waiting for runner to report before the test considered as finished.
             configured only by using API.
-        default_webhook_url:
-          type: string
-          description: Default webhook url to send live report statistics to, can be
-            configured only by using API.
         delay_runner_ms:
           type: number
           minimum: 0
@@ -2553,10 +2573,6 @@ components:
           description: Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url.
           minimum: 0
           maximum: 100
-        benchmark_threshold_webhook_url:
-          type: string
-          format: uri
-          description: Url to send webhooks to incase a test receives a score less than the benchmark threshold.
         benchmark_weights:
           additionalProperties: false
           type: object

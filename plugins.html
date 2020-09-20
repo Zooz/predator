@@ -304,6 +304,18 @@
 
 
   <li class="md-nav__item">
+    <a href="functionalandassertions.html" title="Functional Tests and Assertions" class="md-nav__link">
+      Functional Tests and Assertions
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="processors.html" title="Processor Creation" class="md-nav__link">
       Processor Creation
     </a>
@@ -328,9 +340,85 @@
 
 
   <li class="md-nav__item">
+    <a href="webhooks.html" title="Webhooks" class="md-nav__link">
+      Webhooks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="schedulesandreports.html" title="Schedules and Reports" class="md-nav__link">
       Schedules and Reports
     </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Plugins
+      </label>
+    
+    <a href="plugins.html" title="Plugins" class="md-nav__link md-nav__link--active">
+      Plugins
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#smtp-server-email-notifier" title="SMTP Server - Email Notifier" class="md-nav__link">
+    SMTP Server - Email Notifier
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prometheus" title="Prometheus" class="md-nav__link">
+    Prometheus
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#influxdb" title="InfluxDB" class="md-nav__link">
+    InfluxDB
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -342,6 +430,18 @@
   <li class="md-nav__item">
     <a href="configuration.html" title="Configuration" class="md-nav__link">
       Configuration
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="performance.html" title="Runner's Performance" class="md-nav__link">
+      Runner's Performance
     </a>
   </li>
 
@@ -448,8 +548,31 @@
 For this, Predator can be integrated to send test metrics to either Prometheus or Influx, 
 and to send final test results straight to your email upon test completion.</p>
 <h2 id="smtp-server-email-notifier">SMTP Server - Email Notifier<a class="headerlink" href="#smtp-server-email-notifier" title="Permanent link">#</a></h2>
+<p>Set up a connection to your SMTP server to receive email notifactions. Please refer to <u><a href="configuration.html#smtp-server">configuration section</a></u> to see required variables.</p>
 <h2 id="prometheus">Prometheus<a class="headerlink" href="#prometheus" title="Permanent link">#</a></h2>
+<p>Set up a connection to your Prometheus Push-Gateway to receive test run metrics. Please refer to <u><a href="configuration.html#prometheus">configuration section</a></u> to see required variables.</p>
+<p>For reference, Predator uses the following <u><a href="https://github.com/enudler/artillery-plugin-prometheus">plugin</a></u> to export Prometheus metrics.</p>
+<p>Default bucket sizes of  <code>[0.01, 0.05, 0.010, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120]</code> are configured but can be changed through Predator's Prometheus metrics configuration.</p>
+<p>Some of the metrics pushed by Predator-Runner to the Prometheus are:</p>
+<ol>
+<li><code>request_with_phases_duration_seconds</code>: Histogram that represents the duration of phases in the request in seconds, and consists of the following label names: <code>['path', 'status_code', 'phase', 'request_name']</code><ul>
+<li><code>path</code>: path of the request</li>
+<li><code>status_code</code>: response status code</li>
+<li><code>phase</code>: phase of the request, can be one of the following<ul>
+<li><code>wait</code>: duration of socket initialization</li>
+<li><code>dns</code>: duration of DNS lookup</li>
+<li><code>tcp</code>: duration of TCP connection</li>
+<li><code>response</code>: duration of HTTP server response</li>
+<li><code>total</code>: duration entire HTTP round-trip</li>
+</ul>
+</li>
+<li><code>request_name</code>: name of the request (if not defined then the name = method + path)</li>
+</ul>
+</li>
+</ol>
 <h2 id="influxdb">InfluxDB<a class="headerlink" href="#influxdb" title="Permanent link">#</a></h2>
+<p>Set up a connection to your InfluxDB to receive test run metrics. Please refer to <u><a href="configuration.html#influxdb">configuration section</a></u> to see required variables.</p>
+<p>For reference, Predator uses the following <u><a href="https://github.com/Nordstrom/artillery-plugin-influxdb">plugin</a></u> to export InfluxDB metrics.</p>
                     
                     
                     
@@ -466,6 +589,41 @@ and to send final test results straight to your email upon test completion.</p>
     
     
 <footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="schedulesandreports.html" title="Schedules and Reports" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Schedules and Reports
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="configuration.html" title="Configuration" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Configuration
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

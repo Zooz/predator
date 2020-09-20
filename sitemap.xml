@@ -2,57 +2,77 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
      <loc>https://predator.dev/about.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/installation.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/myfirsttest.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/tests.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://predator.dev/functionalandassertions.html</loc>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/processors.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/benchmarks.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://predator.dev/webhooks.html</loc>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/schedulesandreports.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://predator.dev/plugins.html</loc>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/configuration.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://predator.dev/performance.html</loc>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/faq.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/contributing.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://predator.dev/apireference.html</loc>
-     <lastmod>2020-09-12</lastmod>
+     <lastmod>2020-09-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>
