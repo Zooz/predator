@@ -32,7 +32,7 @@ Additional parameters for the following chosen databases:
 #### SQLITE
 | Environment Variable 	| Description      	| Configurable from UI/API 	| Default value 	|
 |----------------------	|------------------	|--------------------------	|---------------	|
-| SQLITE_STORATE       	| SQLITE file name 	| x                        	| predator      	|
+| SQLITE_STORAGE       	| SQLITE file name 	| x                        	| predator      	|
 
 ## Deployment
 | Environment Variable 	| Description                                                          	| Configurable from UI/API 	| Default value 	|
@@ -57,7 +57,6 @@ Additional parameters for the following chosen databases:
 |----------------------	|-----------------------------------------------------------	|--------------------------	|---------------	|
 | DOCKER_HOST          	| Docker engine url (host and port number of docker engine) 	| x                        	|               	|
 | DOCKER_CERT_PATH     	| Path to CA certificate directory                          	| x                        	|               	|
-
 
 ## Benchmarks
 | Environment Variable 	| Configuration key    	| Description                                               	| Configurable from UI/API 	| Default value 	|
