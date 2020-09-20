@@ -11,9 +11,12 @@ nav:
   - Installation: installation.md
   - My First Test: myfirsttest.md
   - Advanced Test Setup: tests.md
+  - Functional Tests and Assertions: functionalandassertions.md
   - Processor Creation: processors.md
   - Benchmarks: benchmarks.md
+  - Webhooks: webhooks.md
   - Schedules and Reports: schedulesandreports.md
+  - Plugins: plugins.md
   - Configuration: configuration.md
   - FAQ: faq.md
   - Contributing: contributing.md

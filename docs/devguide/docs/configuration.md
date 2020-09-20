@@ -13,7 +13,6 @@ Below are variables Predator can be configured with.
 | RUNNER_CPU                                      | runner_cpu          	                    | Number of CPU use by the each runner                                                              	                                              | ✓                        	| 1                           	|
 | RUNNER_MEMORY                                   | runner_memory       	                    | Max memory to use by each runner                                                        	                                                          | ✓                        	| 256                      	    |
 | DEFAULT_EMAIL_ADDRESS                           | default_email_address                       | Default email to send final report to, address can be configured                        	                                                          | ✓                        	|                             	|
-| DEFAULT_WEBHOOK_URL                             | default_webhook_url    	                    | Default webhook url to send live report statistics to                                   	                                                          | ✓                        	|                             	|
 | ALLOW_INSECURE_TLS                              | allow_insecure_tls    	                    | If true, don't fail requests on unverified server certificate errors                                                                                | ✓                        	| false                         |
 | DELAY_RUNNER_MS                                 | delay_runner_ms    	                        | Delay the predator runner from sending http requests (ms)                                                                                           | ✓                        	|                               |
 | INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS         | interval_cleanup_finished_containers_ms    	| Interval (in ms) to search and delete finished tests containers. Value of 0 means no auto clearing enabled                                          | ✓                        	| 0                             |
@@ -64,7 +63,6 @@ Additional parameters for the following chosen databases:
 | Environment Variable 	| Configuration key    	| Description                                               	| Configurable from UI/API 	| Default value 	|
 |----------------------	|----------------------	|-----------------------------------------------------------	|--------------------------	|---------------	|
 | BENCHMARK_THRESHOLD            	| benchmark_threshold     	| Minimum acceptable score of tests, if a score is less than this value, a webhook will be sent to the threshold webhook url 	| ✓                        	|               	|
-| BENCHMARK_THRESHOLD_WEBHOOK_URL  	| benchmark_threshold_webhook_url     	| Url to send webhooks to incase a test receives a score less than the benchmark threshold                      	| ✓                        	|               	|
 |         	| benchmark_weights.percentile_ninety_five.percentage     	| Percentage of the score affected by p95 results                	| ✓                        	| 20              	|
 |         	| benchmark_weights.percentile_fifty.percentage 	| Percentage of the score affected by median results                       	| ✓                        	| 20              	|
 |         	| benchmark_weights.server_errors_ratio.percentage 	| Percentage of the score affected by server errors ratio                  	| ✓                        	| 20              	|
@@ -83,7 +81,7 @@ Additional parameters for the following chosen databases:
 |                      	| prometheus_metrics.buckets_sizes    	| Bucket sizes to configure prometheus 	            | ✓                        	|               	|
 |                      	| prometheus_metrics.labels    	        | Labels will be passed to the push gateway       	| ✓                        	|               	|
 
-#### Influx
+#### InfluxDB
 | Environment Variable 	| Configuration key       	| Description        	| Configurable from UI/API 	| Default value 	|
 |----------------------	|-------------------------	|--------------------	|--------------------------	|---------------	|
 |                      	| influx_metrics.host     	| Influx db host     	| ✓                        	|               	|
