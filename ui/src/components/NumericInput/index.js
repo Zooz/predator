@@ -8,12 +8,13 @@ import style from './NumericInput.scss'
 export default class NumericInput extends Component {
   constructor (props) {
     super(props)
-    this.state = {value: 0}
+    this.state = { value: 0 }
 
     if (this.isValid(props.value)) {
       this.state.value = Number(props.value)
     }
   }
+
   componentDidUpdate (prevProps, prevState) {
     const { value } = this.props
     if (prevProps.value !== value && prevState.value !== value) {
@@ -25,12 +26,12 @@ export default class NumericInput extends Component {
     }
   }
 
-  onBlur = () => {
+  handleBlur = () => {
     this.props.onChange(this.state.value)
   }
 
-  onKeyDown = (event) => {
-    const {onChange} = this.props
+  handleKeyDown = (event) => {
+    const { onChange } = this.props
 
     if (event.key === 'Enter') {
       onChange(this.state.value)
@@ -60,11 +61,7 @@ export default class NumericInput extends Component {
     }
   }
 
-  onChangeInnerHandler = (event) => {
-    event.preventDefault()
-  }
-
-  onValuesChangeInnerHandler = ({value}) => {
+  handleValueChange = ({ value }) => {
     if (!this.isValid(value)) {
       this.updateValue(this.state.value)
     }
@@ -78,7 +75,7 @@ export default class NumericInput extends Component {
 
   updateValue = (newValue) => {
     if (this.isValid(newValue)) {
-      this.setState({value: Number(newValue)})
+      this.setState({ value: Number(newValue) })
     }
   }
 
@@ -86,39 +83,44 @@ export default class NumericInput extends Component {
     const { disabled } = this.props
     return !disabled && (value < this.props.maxValue)
   }
+
   isDownEnabled (value) {
     const { disabled } = this.props
     return !disabled && (value > this.props.minValue)
   }
+
   render () {
     const { value } = this.state
     const { disabled, hideNumber, width, height, formatter, error, className } = this.props
 
     return (
-      <div
-        style={{
-          '--number-input-width': width,
-          '--number-input-height': height
-        }}
-        data-error={error}
-        data-disabled={disabled}
-        className={classnames(style['input-counter-wrapper'], className)} >
-        <NumberFormat
-          disabled={disabled}
-          className={style['input-counter']}
-          onKeyDown={this.onKeyDown}
-          format={formatter}
-          onBlur={this.onBlur}
-          value={hideNumber ? null : value}
-          onValueChange={this.onValuesChangeInnerHandler}
-          onChange={this.onChangeInnerHandler} />
-        <Arrows
-          onUpPress={this.props.onUpPress || this.onUpPress}
-          onDownPress={this.props.onDownPress || this.onDownPress}
-          isUpEnabled={this.isUpEnabled(value)}
-          isDownEnabled={this.isDownEnabled(value)}
-        />
-      </div>
+        <div
+            style={{
+              '--number-input-width': width,
+              '--number-input-height': height
+            }}
+            data-error={error}
+            data-disabled={disabled}
+            className={classnames(style['input-counter-wrapper'], className)}
+        >
+          <NumberFormat
+              disabled={disabled}
+              className={style['input-counter']}
+              onKeyDown={this.handleKeyDown}
+              format={formatter}
+              onBlur={this.handleBlur}
+              value={hideNumber ? null : value}
+              onValueChange={this.handleValueChange}
+              onChange={(event) => event.preventDefault()}
+          />
+          <Arrows
+              disabled={disabled}
+              onUpPress={this.props.onUpPress || this.onUpPress}
+              onDownPress={this.props.onDownPress || this.onDownPress}
+              isUpEnabled={this.isUpEnabled(value)}
+              isDownEnabled={this.isDownEnabled(value)}
+          />
+        </div>
     )
   }
 }
@@ -135,7 +137,8 @@ NumericInput.propTypes = {
   error: PropTypes.bool,
   hideNumber: PropTypes.bool,
   width: PropTypes.string,
-  height: PropTypes.string
+  height: PropTypes.string,
+  className: PropTypes.string
 }
 
 NumericInput.defaultProps = {

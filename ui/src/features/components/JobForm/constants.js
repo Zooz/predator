@@ -7,6 +7,7 @@ export const testTypes = {
 
 export const inputTypes = {
     INPUT_LIST: 'INPUT_LIST',
+    NUMERIC_INPUT: 'NUMERIC_INPUT',
     SWITCHER: 'SWITCHER',
     TEXT_FIELD: 'TEXT_FIELD',
     RADIO: 'RADIO',

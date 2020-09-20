@@ -22,7 +22,9 @@ import {createJobRequest} from '../../requestBuilder';
 import RadioOptions from '../../../components/RadioOptions';
 import {inputTypes, testTypes} from './constants';
 import MultiSelect from '../../../components/MultiSelect/MultiSelect.export';
+import NumericInput from '../../../components/NumericInput';
 import InfoToolTip from '../InfoToolTip';
+
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 
 
@@ -77,42 +79,49 @@ class Form extends React.Component {
                 key: 'arrival_rate',
                 floatingLabelText: 'Arrival rate',
                 info: 'Number of scenarios per second that the test fires.',
+                // type: inputTypes.NUMERIC_INPUT,
                 hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST
             },
-            {
-                name: 'arrival_count',
-                key: 'arrival_count',
-                floatingLabelText: 'Arrival count',
-                info: 'Fixed count of arrivals in the tests duration. Resembles the number of scenarios that will be run by the end of the test.',
-                hiddenCondition: (state) => state.type === testTypes.LOAD_TEST
-            },
-            {
-                name: 'duration',
-                key: 'duration',
-                floatingLabelText: 'Duration (Minutes)',
-                info: 'The duration of the test in minutes.'
-            },
-            {
-                name: 'ramp_to',
-                key: 'ramp_to',
-                floatingLabelText: 'Ramp to',
-                info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.',
-                hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST
-            },
-            {
-                name: 'parallelism',
-                key: 'parallelism',
-                floatingLabelText: 'Parallelism',
-                info: 'The amount of runners predator will start, arrival rate, ramp to and max virtual users will split between them.',
-                defaultValue: '1'
-            },
-            {
-                name: 'max_virtual_users',
-                key: 'max_virtual_users',
-                floatingLabelText: 'Max virtual users',
-                info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
-                defaultValue: '500'
-            },
+            // {
+            //     name: 'arrival_count',
+            //     key: 'arrival_count',
+            //     floatingLabelText: 'Arrival count',
+            //     info: 'Fixed count of arrivals in the tests duration. Resembles the number of scenarios that will be run by the end of the test.',
+            //     type: inputTypes.NUMERIC_INPUT,
+            //     hiddenCondition: (state) => state.type === testTypes.LOAD_TEST
+            // },
+            // {
+            //     name: 'duration',
+            //     key: 'duration',
+            //     floatingLabelText: 'Duration (Minutes)',
+            //     info: 'The duration of the test in minutes.',
+            //     type: inputTypes.NUMERIC_INPUT,
+            //
+            // },
+            // {
+            //     name: 'ramp_to',
+            //     key: 'ramp_to',
+            //     floatingLabelText: 'Ramp to',
+            //     info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.',
+            //     type: inputTypes.NUMERIC_INPUT,
+            //     hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST
+            // },
+            // {
+            //     name: 'parallelism',
+            //     key: 'parallelism',
+            //     floatingLabelText: 'Parallelism',
+            //     info: 'The amount of runners predator will start, arrival rate, ramp to and max virtual users will split between them.',
+            //     type: inputTypes.NUMERIC_INPUT,
+            //     defaultValue: '1'
+            // },
+            // {
+            //     name: 'max_virtual_users',
+            //     key: 'max_virtual_users',
+            //     floatingLabelText: 'Max virtual users',
+            //     info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
+            //     type: inputTypes.NUMERIC_INPUT,
+            //     defaultValue: '500'
+            // },
             {
                 name: 'environment',
                 key: 'environment',
@@ -182,6 +191,16 @@ class Form extends React.Component {
                 this.state[item.name] = item.defaultValue;
             }
         });
+
+        this.fieldsByGroup = this.FormList.reduce((acc, fieldData) => {
+            if (fieldData.group) {
+                acc[fieldData.group] = acc[fieldData.group] ? acc[fieldData.group].push(fieldData) : [fieldData];
+            } else {
+                acc.default.push(fieldData);
+            }
+
+            return acc;
+        }, {default: []})
     }
 
     handleChangeForCheckBox = (name, value) => {
@@ -357,6 +376,24 @@ class Form extends React.Component {
                         </ErrorWrapper>
                     </TitleInput>
                 );
+            case inputTypes.NUMERIC_INPUT:
+                console.log('this.state[oneItem.name] ', oneItem)
+                console.log('this.state[oneItem.name] ', this.state[oneItem.name])
+                return (
+                    <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+                                rightComponent={<InfoToolTip data={oneItem}/>}>
+                        <ErrorWrapper errorText={' ' || this.state.errors[oneItem.name]}>
+                            <NumericInput
+                                minValue={0}
+                                maxValue={10}
+                                value={5}
+                                // value={5 ||this.state[oneItem.name] || 0}
+                                onChange={(value) => console.log(value)}/>
+                            {/*onChange={(value) => this.onChangeProperty(oneItem.name,value)}/>*/}
+                            />
+                        </ErrorWrapper>
+                    </TitleInput>
+                );
             default:
                 return (
                     <div>
@@ -386,7 +423,7 @@ class Form extends React.Component {
         }
 
         if (this.state.webhooks) {
-            convertedArgs.webhooks = this.state.webhooks.map((webhook)=>webhook.key);
+            convertedArgs.webhooks = this.state.webhooks.map((webhook) => webhook.key);
         }
 
         this.props.createJob(createJobRequest(Object.assign({}, this.state, convertedArgs)));
