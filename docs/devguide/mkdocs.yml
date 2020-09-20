@@ -18,6 +18,7 @@ nav:
   - Schedules and Reports: schedulesandreports.md
   - Plugins: plugins.md
   - Configuration: configuration.md
+  - Runner's Performance: performance.md
   - FAQ: faq.md
   - Contributing: contributing.md
   - API Reference: apireference.md
