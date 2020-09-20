@@ -79,8 +79,7 @@ async function handleFirstIntermediate(report, job) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE)) {
         return;
     }
-    let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, report, { aggregatedReport });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, report);
 }
 
 async function handleDone(report, job, reportBenchmark) {
@@ -100,9 +99,9 @@ async function handleDone(report, job, reportBenchmark) {
         const lastReports = await reportsManager.getReports(aggregatedReport.test_id);
         const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
         const { event, icon } = reportBenchmark.score < benchmarkThreshold ? { event: WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, icon: slackEmojis.CRY } : { event: WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, icon: slackEmojis.GRIN };
-        await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon });
+        await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon });
     }
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET });
 }
 
 async function handleAbort(report, job) {
