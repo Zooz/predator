@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/Zooz/predator/compare/v1.5.0...v1.5.1) (2020-09-21)
+
+
+### Bug Fixes
+
+* **db:** jobs arrival_count migration ([#399](https://github.com/Zooz/predator/issues/399)) ([34322ca](https://github.com/Zooz/predator/commit/34322ca65faf862f96f829f2f8723043c04166fc))
+
 ## [1.5.0](https://github.com/Zooz/predator/compare/v1.4.1...v1.5.0) (2020-09-20)
 
 
