@@ -87,14 +87,12 @@
   &:not([data-selected="true"]) {
     &[data-hoverable="true"] {
       &:hover {
-        z-index: 4;
         @content;
         box-shadow: $box-shadow;
       }
     }
 
     &[data-hovering="true"] {
-      z-index: 4;
       @content;
       box-shadow: $box-shadow;
     }
