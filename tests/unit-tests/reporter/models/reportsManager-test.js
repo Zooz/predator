@@ -146,7 +146,7 @@ describe('Reports manager tests', function () {
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
-            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=now');
+            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&var-TestRunId=report_id&from=1527533459591&to=now');
         });
 
         it('Database connector returns an array with one report and score ', async () => {
