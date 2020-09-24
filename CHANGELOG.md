@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* **ui-fix collapse z index level:** ui-fix collapse z index level ([#400](https://github.com/Zooz/predator/issues/400)) ([7a04895](https://github.com/Zooz/predator/commit/7a048953d4032e6432d919e241ff6e4032002356))
+* **ui:** fix collapse z index level ([#400](https://github.com/Zooz/predator/issues/400)) ([7a04895](https://github.com/Zooz/predator/commit/7a048953d4032e6432d919e241ff6e4032002356))
 
 ### [1.5.1](https://github.com/Zooz/predator/compare/v1.5.0...v1.5.1) (2020-09-21)
 
@@ -21,38 +21,25 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **reports:** favorite reports ([a00f10a](https://github.com/Zooz/predator/commit/a00f10a8647b3cc40506adcfd57cade7889d80d1))
-* **ui:** support xml and forms in the ui ([#368](https://github.com/Zooz/predator/issues/368)) ([8057c1a](https://github.com/Zooz/predator/commit/8057c1a423dc99b99e7147aa7cc03374c8d78f93))
-* **ui-assertions:** ui-assertions ([6a61bc0](https://github.com/Zooz/predator/commit/6a61bc07e78b7ea5209742ae3612460a601d919e))
-* **ui:** ui-assertions ([cbd9e62](https://github.com/Zooz/predator/commit/cbd9e62a1047af812c5337d0ac5065f0ca8fc3b1))
+* **reports:** add favorite reports support ([a00f10a](https://github.com/Zooz/predator/commit/a00f10a8647b3cc40506adcfd57cade7889d80d1))
+* **ui:** support xml and forms content-type when creating tests ([#368](https://github.com/Zooz/predator/issues/368)) ([8057c1a](https://github.com/Zooz/predator/commit/8057c1a423dc99b99e7147aa7cc03374c8d78f93))
+* **ui:** add assertions ([cbd9e62](https://github.com/Zooz/predator/commit/cbd9e62a1047af812c5337d0ac5065f0ca8fc3b1))
 * **ui:** add step name to requests ([5f055cd](https://github.com/Zooz/predator/commit/5f055cd30dd15dd83ce152ed2deda061218bbed4))
-* **ui:** support webhooks in ui ([2104c41](https://github.com/Zooz/predator/commit/2104c41ec3d7ca633f9edd7856d4829a44fd1ad1))
-* **webhooks:** implement DELETE /webhooks/:webhook_id ([#325](https://github.com/Zooz/predator/issues/325)) ([85f4a9a](https://github.com/Zooz/predator/commit/85f4a9a70dd1fbd7a321f87fcbbf1a3f920892c1))
-* **webhooks:** implement POST /webhooks ([#319](https://github.com/Zooz/predator/issues/319)) ([97559b4](https://github.com/Zooz/predator/commit/97559b4662b8e59336299a0ce1241ba0849c6b54))
-* **webhooks:** implement PUT /webhooks/:webhook_id ([6a1ec1b](https://github.com/Zooz/predator/commit/6a1ec1ba0689e64d974fb6d5af4154c5cdef185d))
-* **webhooks:** integrate webhooks to running jobs ([#349](https://github.com/Zooz/predator/issues/349)) ([0b1006f](https://github.com/Zooz/predator/commit/0b1006f3d9576858932be5cc3fd5b1270d429213))
-* **webhooks:** webhooks ([9db2c66](https://github.com/Zooz/predator/commit/9db2c6600fbeb9cecf527cd3b9500450d9649409))
+* **ui:** add webhooks support ([2104c41](https://github.com/Zooz/predator/commit/2104c41ec3d7ca633f9edd7856d4829a44fd1ad1))
+* **webhooks:** add new webhooks API ([9db2c66](https://github.com/Zooz/predator/commit/9db2c6600fbeb9cecf527cd3b9500450d9649409))
 * **functional tests:** support functional tests and assertions ([#360](https://github.com/Zooz/predator/issues/360)) ([c129d2a](https://github.com/Zooz/predator/commit/c129d2a07a4f88a224edee732123838a8289b0c3))
 
 
 ### Bug Fixes
 
-* reduce payload size by removing aggregated report from json webh… ([#380](https://github.com/Zooz/predator/issues/380)) ([bc77c4a](https://github.com/Zooz/predator/commit/bc77c4a8094104413c888bf27003d4092eb445fe))
-* **config:** allow unlimuted text for config values ([#394](https://github.com/Zooz/predator/issues/394)) ([80703f7](https://github.com/Zooz/predator/commit/80703f78cdce1fd60eaff1ea0344ac6533ece4e8)), closes [#393](https://github.com/Zooz/predator/issues/393)
+* **webhooks**: reduce payload size by removing aggregated report from json webh… ([#380](https://github.com/Zooz/predator/issues/380)) ([bc77c4a](https://github.com/Zooz/predator/commit/bc77c4a8094104413c888bf27003d4092eb445fe))
+* **config:** allow unlimited text for config values ([#394](https://github.com/Zooz/predator/issues/394)) ([80703f7](https://github.com/Zooz/predator/commit/80703f78cdce1fd60eaff1ea0344ac6533ece4e8)), closes [#393](https://github.com/Zooz/predator/issues/393)
 * **configuration:** remove webhooks from configuration ([#386](https://github.com/Zooz/predator/issues/386)) ([28ce997](https://github.com/Zooz/predator/commit/28ce997452f13bba097d202e5ea4c2f513f4741f))
 * **db:** drop Cassandra support ([#361](https://github.com/Zooz/predator/issues/361)) ([7ac4f59](https://github.com/Zooz/predator/commit/7ac4f59f048dc99d4527f6fd1974b03df3bf9a06))
 * **runner:** use semver of runner as predator ([#395](https://github.com/Zooz/predator/issues/395)) ([670d0d6](https://github.com/Zooz/predator/commit/670d0d6abe06fb27e52a3672dc7b52626115b966))
-* **webhooks:** order webhooks by updated_at desc ([8bdc1e7](https://github.com/Zooz/predator/commit/8bdc1e73fc7c647313b4fd658d65078cd339a231))
-* **webhooks:** order webhooks by updated_at desc ([37a6cbd](https://github.com/Zooz/predator/commit/37a6cbdeb3d4613dca1fe2993ab9583932a07878))
 * **webhooks:** order webhooks by updated_at desc ([a14453a](https://github.com/Zooz/predator/commit/a14453a89926e5645f282966a435f471cccd83dc))
 * **webhooks:** verify put /v1/webhooks receives full body request [#383](https://github.com/Zooz/predator/issues/383) ([#387](https://github.com/Zooz/predator/issues/387)) ([e3b0fd2](https://github.com/Zooz/predator/commit/e3b0fd2fa7a7150eaa82abb6f99cd58f05cb7b53))
 * **webhooks:** when webhook id not exists while creating job return 400 [#382](https://github.com/Zooz/predator/issues/382) ([#388](https://github.com/Zooz/predator/issues/388)) ([bedc452](https://github.com/Zooz/predator/commit/bedc452f695588cfe86f2ef31a13d302dfb5c720))
-* global webhooks ([#379](https://github.com/Zooz/predator/issues/379)) ([5a7460e](https://github.com/Zooz/predator/commit/5a7460e44fcb9b175698bc8e3e4e8d0e8bd202a5))
-* package.json & package-lock.json to reduce vulnerabilities ([#375](https://github.com/Zooz/predator/issues/375)) ([dc40824](https://github.com/Zooz/predator/commit/dc40824239b81cb67bcd19b85e62e5af38850d5f))
-* return job type and arrival_count in reports response ([#373](https://github.com/Zooz/predator/issues/373)) ([f755381](https://github.com/Zooz/predator/commit/f755381eedce1694b09d2a998f2cfcbdd0ce615c))
-* send proper env vars to runner on functional-tests ([#369](https://github.com/Zooz/predator/issues/369)) ([a944f7c](https://github.com/Zooz/predator/commit/a944f7c4d42096b94cfdb154b603f8b1f867177d))
-* set webhooks on new job ([#378](https://github.com/Zooz/predator/issues/378)) ([d4310fb](https://github.com/Zooz/predator/commit/d4310fbcc956e1d2f0c428d91855db7fc1722e2a))
-* webhooks migration script file ([655c0bf](https://github.com/Zooz/predator/commit/655c0bf0625378a8f275dca4b30fcba5202bb393))
 
 ### [1.4.1](https://github.com/Zooz/predator/compare/v1.4.0...v1.4.1) (2020-09-03)
 
