@@ -68,6 +68,7 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
+    "@apidevtools/swagger-parser": "^10.0.2",
     "@commitlint/cli": "^10.0.0",
     "@commitlint/config-conventional": "^10.0.0",
     "chai": "^4.2.0",
@@ -88,7 +89,8 @@
     "should": "^13.2.1",
     "sinon": "^4.5.0",
     "standard-version": "^9.0.0",
-    "supertest": "^3.4.2"
+    "supertest": "^3.4.2",
+    "yaml": "^1.10.0"
   },
   "husky": {
     "hooks": {

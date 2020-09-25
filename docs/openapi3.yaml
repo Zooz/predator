@@ -729,6 +729,7 @@ paths:
   '/v1/jobs/containers/':
     delete:
       operationId: delete-all-job-containers
+      summary: Delete all finished containers/pods
       tags:
         - Jobs
       description: delete all containers/pods of predator-runner
@@ -971,9 +972,10 @@ paths:
           name: limit
           description: The number of most recent reports to retrieve.
           required: true
-          minimum: 1
-          maximum: 250
-          type: integer
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 250
         - in: query
           name: filter
           description: is filter and by what property
