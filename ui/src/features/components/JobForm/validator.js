@@ -33,7 +33,7 @@ const skipValidation = {
     return state.type === testTypes.LOAD_TEST
   },
   ramp_to: (state) => {
-    return state.type === testTypes.FUNCTIONAL_TEST
+    return state.type === testTypes.FUNCTIONAL_TEST || (state.enable_ramp_to === false)
   }
 };
 
@@ -62,19 +62,18 @@ function isPositiveIntegerNumberIfExist (value, allState) {
   if (isUndefined(value)) {
     return;
   }
+  return isPositiveNumber(value);
+}
 
+function isPositiveNumber (value) {
   if (!Number.isInteger(Number(value)) || Number(value) <= 0) {
     return 'Must be positive number'
   }
 }
-
 function rampToValidator (value, allState) {
-  if (isUndefined(value)) {
-    return;
-  }
-  const isPositiveNumber = isPositiveIntegerNumberIfExist(value);
-  if (isPositiveNumber) {
-    return isPositiveNumber;
+  const isPositiveNumberResult = isPositiveNumber(value);
+  if (isPositiveNumberResult) {
+    return isPositiveNumberResult;
   }
   if (Number.isInteger(Number(allState.arrival_rate)) && Number(value) < Number(allState.arrival_rate)) {
     return 'Must be bigger than arrival rate'

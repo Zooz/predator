@@ -122,7 +122,27 @@ class Form extends React.Component {
             floatingLabelText: 'Ramp to',
             info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.',
             hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST,
-            type: inputTypes.NUMERIC_INPUT
+            type: inputTypes.NUMERIC_WITH_SWITCH,
+            switcherName: 'enable_ramp_to',
+            onChangeSwitcher: (value) => {
+              const { disabled } = this.state;
+              if (value) {
+                this.setState({
+                  disabled: {
+                    ...disabled,
+                    ramp_to: false
+                  }
+                })
+              } else {
+                this.setState({
+                  ramp_to: undefined,
+                  disabled: {
+                    ...disabled,
+                    ramp_to: true
+                  }
+                })
+              }
+            }
 
           },
           {
@@ -139,7 +159,7 @@ class Form extends React.Component {
             floatingLabelText: 'Max VUsers',
             info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
             type: inputTypes.NUMERIC_INPUT,
-              defaultValue: '250'
+            defaultValue: '250'
           }
         ]
       },
@@ -215,6 +235,7 @@ class Form extends React.Component {
       parallelism: undefined,
       max_virtual_users: undefined,
       type: 'load_test',
+      enable_ramp_to: true,
       errors: {
         name: undefined,
         retries: undefined,
@@ -254,7 +275,8 @@ class Form extends React.Component {
     }
 
     componentDidUpdate (prevProps, prevState, snapshot) {
-      if ((prevState.mode === 'Expert' && this.state.mode === 'Simple') ||
+      if ((prevState.type !== this.state.type) ||
+          (prevState.mode === 'Expert' && this.state.mode === 'Simple') ||
             (this.state.mode === 'Simple' &&
                 (prevState.arrival_count !== this.state.arrival_count || prevState.arrival_rate !== this.state.arrival_rate || prevState.ramp_to !== this.state.ramp_to))) {
         let parallel;
@@ -323,7 +345,7 @@ class Form extends React.Component {
                           </Fragment>
                         )
                       })}
-                      {oneItem.bottom && <div style={{ marginBottom: '10px', flexBasis: '100%' }}>
+                      {oneItem.bottom && <div style={{ marginTop: '13px', flexBasis: '100%' }}>
                         {oneItem.bottom.map(childItem => {
                           return (
                             <Fragment key={index}>
@@ -491,6 +513,37 @@ class Form extends React.Component {
             </ErrorWrapper>
           </TitleInput>
         );
+      case inputTypes.NUMERIC_WITH_SWITCH:
+        return (
+          <TitleInput labelStyle={{ marginLeft: '5px', marginRight: '5px' }} key={oneItem.key} title={oneItem.floatingLabelText}
+            leftComponent={<UiSwitcher
+              onChange={(value) => {
+                this.handleChangeForCheckBox(oneItem.switcherName, value)
+                oneItem.onChangeSwitcher && oneItem.onChangeSwitcher(value);
+              }}
+              disabledInp={false}
+              activeState={this.state[oneItem.switcherName]}
+              height={10}
+              width={18} />
+            }
+            rightComponent={<InfoToolTip data={oneItem} />}>
+            <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
+              <NumericInput
+                minValue={0}
+                maxValue={10000000}
+                hideNumber={Number.isNaN(this.state[oneItem.name])}
+                value={this.state[oneItem.name]}
+                onChange={(value) => {
+                  this.onChangeProperty(oneItem.name, value)
+                  const newState = oneItem.newState && oneItem.newState(value);
+                  this.setState(newState);
+                }}
+                disabled={this.state.disabled[oneItem.name]}
+                width={'80px'}
+              />
+            </ErrorWrapper>
+          </TitleInput>
+        );
       default:
         return (
           <div>
@@ -514,7 +567,8 @@ class Form extends React.Component {
       const convertedArgs = {
         test_id: this.props.data.id,
         duration: parseInt(this.state.duration) * 60,
-        run_immediately: runImmediate
+        run_immediately: runImmediate,
+        ramp_to: this.state.enable_ramp_to ? this.state.ramp_to : undefined
       };
       if (this.state.debug) {
         convertedArgs.debug = '*';
