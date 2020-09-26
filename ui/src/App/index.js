@@ -6,7 +6,6 @@ import GetReports from '../features/get-last-reports';
 import GetTestReports from '../features/get-test-reports';
 import Configuration from '../features/get-configuration';
 import ReportPage from '../features/report-page';
-import TestPage from '../features/test-page';
 import Webhooks from '../features/webhooks';
 import { Route, Redirect } from 'react-router';
 import { connect } from 'react-redux';
@@ -43,9 +42,6 @@ class App extends React.Component {
               )} />
               <Route exact path='/tests/:testId/reports' render={props => (
                 <GetTestReports {...props} />
-              )} />
-              <Route exact path='/tests/create' render={props => (
-                <TestPage {...props} />
               )} />
               <Route exact path='/last_reports' render={props => (
                 <GetReports {...props} />

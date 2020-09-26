@@ -27,19 +27,10 @@ import InfoToolTip from '../InfoToolTip';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 
-const sectionA = 'sectionA';
-
 class Form extends React.Component {
   constructor (props) {
     super(props);
     this.FormList = [
-      {
-        name: 'test_id',
-        key: 'id',
-        disabled: true,
-        floatingLabelText: 'Test Id',
-        info: 'The test id used to find the test in the API.'
-      },
       {
         name: 'test_name',
         key: 'test_name',
@@ -58,57 +49,44 @@ class Form extends React.Component {
         optionToValue: { 'Load test': 'load_test', 'Functional test': 'functional_test' },
         valueToOption: { load_test: 'Load test', functional_test: 'Functional test' }
       },
-      {
-        name: 'notes',
-        key: 'notes',
-        floatingLabelText: 'Notes',
-        element: 'notes',
-        info: 'Add notes about the test.',
-        type: inputTypes.TEXT_FIELD
-      },
-      {
-        name: 'webhooks',
-        key: 'webhooks',
-        floatingLabelText: 'Webhooks',
-        info: 'Send test reports to Slack.',
-        element: 'Webhook',
-        type: inputTypes.MULTI_SELECT,
-        options: (props) => props.webhooks
-      },
-      {
-        name: 'mode',
-        key: 'mode',
-        floatingLabelText: 'Mode',
-        info: 'choose mode',
-        type: inputTypes.RADIO,
-        options: ['Simple', 'Expert'],
-        optionToValue: { Simple: 'Simple', Expert: 'Expert' },
-        valueToOption: { Simple: 'Simple', Expert: 'Expert' },
-        onChange: (value) => {
-          const { disabled } = this.state;
 
-          if (value === 'Expert') {
-            this.setState({
-              disabled: {
-                ...disabled,
-                parallelism: false,
-                max_virtual_users: false
-              }
-            })
-          } else {
-            this.setState({
-              disabled: {
-                ...disabled,
-                parallelism: true,
-                max_virtual_users: true
-              }
-            })
-          }
-        }
-      },
       {
-        group: sectionA,
+        group: 'section_a',
+        bottom: [
+          {
+            name: 'mode',
+            key: 'mode',
+            floatingLabelText: 'Mode',
+            info: 'Override calculated parallelism and max virtual users',
+            type: inputTypes.SWITCHER_TWO_SIDES,
+            justifyContent: 'flex-end',
+            leftOption: 'Simple',
+            rightOption: 'Expert',
+            onChange: (value) => {
+              const { disabled } = this.state;
+
+              if (value === 'Expert') {
+                this.setState({
+                  disabled: {
+                    ...disabled,
+                    parallelism: false,
+                    max_virtual_users: false
+                  }
+                })
+              } else {
+                this.setState({
+                  disabled: {
+                    ...disabled,
+                    parallelism: true,
+                    max_virtual_users: true
+                  }
+                })
+              }
+            }
+          }
+        ],
         children: [
+
           {
             name: 'arrival_rate',
             key: 'arrival_rate',
@@ -158,7 +136,7 @@ class Form extends React.Component {
           {
             name: 'max_virtual_users',
             key: 'max_virtual_users',
-            floatingLabelText: 'Max virtual users',
+            floatingLabelText: 'Max VUsers',
             info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
             type: inputTypes.NUMERIC_INPUT,
               defaultValue: '250'
@@ -166,38 +144,58 @@ class Form extends React.Component {
         ]
       },
       {
-        name: 'environment',
-        key: 'environment',
-        floatingLabelText: 'Environment',
-        info: 'The chosen environment to test. Free text used to logically separate between tests runs'
+        group: 'section_b',
+        children: [
+          {
+            name: 'emails',
+            key: 'emails',
+            floatingLabelText: 'Emails',
+            info: 'When the test finishes, a report will be sent to the emails included.',
+            element: 'Email',
+            type: inputTypes.INPUT_LIST,
+            flexBasis: '49%'
+          },
+          {
+            name: 'webhooks',
+            key: 'webhooks',
+            floatingLabelText: 'Webhooks',
+            info: 'Send test reports to Slack.',
+            element: 'Webhook',
+            type: inputTypes.MULTI_SELECT,
+            options: (props) => props.webhooks,
+            flexBasis: '49%'
+
+          }
+
+        ]
       },
       {
-        name: 'cron_expression',
-        key: 'cron_expression',
-        floatingLabelText: 'Cron expression',
-        info: 'Schedule a reoccurring job using this. For example, cron expression: "0 0 22 * * *" runs the test every day at 22:00 UTC.'
-      },
-      {
-        name: 'run_immediately',
-        key: 'run_immediately',
-        label: 'Run immediately',
-        // info: 'Schedule a one time job, which will run the test now.',
-        type: inputTypes.SWITCHER
-      },
-      {
-        name: 'debug',
-        key: 'debug',
-        label: 'Debug',
-        info: 'Turn on debug to log request and response in the load generators',
-        type: inputTypes.SWITCHER
-      },
-      {
-        name: 'emails',
-        key: 'emails',
-        floatingLabelText: 'Emails',
-        info: 'When the test finishes, a report will be sent to the emails included.',
-        element: 'Email',
-        type: inputTypes.INPUT_LIST
+        group: 'section_c',
+        flexDirection: 'column',
+        children: [
+          {
+            name: 'debug',
+            key: 'debug',
+            label: 'Debug',
+            info: 'Turn on debug to log request and response in the load generators',
+            type: inputTypes.SWITCHER
+          },
+          {
+            name: 'cron_expression',
+            key: 'cron_expression',
+            floatingLabelText: 'Cron expression',
+            info: 'Schedule a reoccurring job using this. For example, cron expression: "0 0 22 * * *" runs the test every day at 22:00 UTC.'
+          },
+
+          {
+            name: 'notes',
+            key: 'notes',
+            floatingLabelText: 'Notes',
+            element: 'notes',
+            info: 'Add notes about the test.',
+            type: inputTypes.TEXT_FIELD
+          }
+        ]
       }
 
     ];
@@ -239,16 +237,6 @@ class Form extends React.Component {
         this.state[item.name] = item.defaultValue;
       }
     });
-
-    // this.groups = this.FormList.reduce((acc, fieldData) => {
-    //     if (fieldData.group) {
-    //         acc[fieldData.group] = acc[fieldData.group] ? acc[fieldData.group].push(fieldData) : [fieldData];
-    //     } else {
-    //         acc.default.push(fieldData);
-    //     }
-    //
-    //     return acc;
-    // }, [])
   }
 
     handleChangeForCheckBox = (name, value) => {
@@ -266,8 +254,9 @@ class Form extends React.Component {
     }
 
     componentDidUpdate (prevProps, prevState, snapshot) {
-      if (this.state.mode === 'Simple' &&
-          (prevState.arrival_count !== this.state.arrival_count || prevState.arrival_rate !== this.state.arrival_rate || prevState.ramp_to !== this.state.ramp_to)) {
+      if ((prevState.mode === 'Expert' && this.state.mode === 'Simple') ||
+            (this.state.mode === 'Simple' &&
+                (prevState.arrival_count !== this.state.arrival_count || prevState.arrival_rate !== this.state.arrival_rate || prevState.ramp_to !== this.state.ramp_to))) {
         let parallel;
         if (this.state.type === 'load_test') {
           parallel = this.state.ramp_to > this.state.arrival_rate ? Math.ceil(this.state.ramp_to / 1000) : Math.ceil(this.state.arrival_rate / 1000)
@@ -308,7 +297,7 @@ class Form extends React.Component {
     render () {
       const { closeDialog, processingAction, serverError, clearErrorOnCreateJob } = this.props;
       return (
-        <Modal style={{ paddingTop: '64px' }} width={'50%'} onExit={closeDialog}>
+        <Modal maxWidth={'760px'} onExit={closeDialog}>
           <FormWrapper style={{ height: null }} title={'Create a new job'} description={DESCRIPTION}>
             <div style={{ width: '100%' }}>
               {this.FormList.map((oneItem, index) => {
@@ -318,14 +307,15 @@ class Form extends React.Component {
                       display: 'flex',
                       flexWrap: 'wrap',
                       border: '1px solid rgb(85, 126, 255)',
-                      padding: '10px',
-                      justifyContent: 'space-between'
+                      padding: '12px',
+                      justifyContent: 'space-between',
+                      flexDirection: oneItem.flexDirection
                     }}>
                       {oneItem.children.map((childItem, index) => {
                         return (
                           <Fragment key={index}>
                             {!(childItem.hiddenCondition && childItem.hiddenCondition(this.state)) &&
-                            <div style={{ marginBottom: '10px' }}>
+                            <div style={{ marginBottom: '10px', flexBasis: childItem.flexBasis }}>
                               {this.generateInput(childItem)}
                             </div>
 
@@ -333,6 +323,16 @@ class Form extends React.Component {
                           </Fragment>
                         )
                       })}
+                      {oneItem.bottom && <div style={{ marginBottom: '10px', flexBasis: '100%' }}>
+                        {oneItem.bottom.map(childItem => {
+                          return (
+                            <Fragment key={index}>
+                              {this.generateInput(childItem)}
+                            </Fragment>
+                          )
+                        })}
+                      </div>
+                      }
                     </div>
                   )
                 }
@@ -347,9 +347,11 @@ class Form extends React.Component {
                 </Fragment>);
               }, this)}
               <div className={style.buttons}>
-                <Button inverted onClick={closeDialog}>Cancel</Button>
+                <Button style={{ marginRight: '5px' }} inverted onClick={closeDialog}>Cancel</Button>
+                <Button style={{ marginRight: '5px' }} spinner={processingAction} hover disabled={!this.state.cron_expression}
+                  onClick={this.whenSubmit}>Schedule</Button>
                 <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
-                  onClick={this.whenSubmit}>Submit</Button>
+                  onClick={() => this.whenSubmit(true)}>{this.state.cron_expression ? 'Schedule & Run' : 'Run'}</Button>
               </div>
               {serverError &&
               <ErrorDialog closeDialog={() => {
@@ -372,18 +374,36 @@ class Form extends React.Component {
       switch (oneItem.type) {
       case inputTypes.SWITCHER:
         return (
-          <TitleInput style={{ flex: '1' }} key={oneItem.key} title={oneItem.floatingLabelText}
-            rightComponent={<InfoToolTip data={oneItem} />}>
-            <RactangleAlignChildrenLeft>
-              <UiSwitcher
-                onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
-                disabledInp={false}
-                activeState={this.state[oneItem.name]}
-                height={12}
-                width={22} />
-              <div className={style['run-immediately']}>{oneItem.label}</div>
-            </RactangleAlignChildrenLeft>
-          </TitleInput>
+          <RactangleAlignChildrenLeft>
+            <UiSwitcher
+              onChange={(value) => this.handleChangeForCheckBox(oneItem.name, value)}
+              disabledInp={false}
+              activeState={this.state[oneItem.name]}
+              height={12}
+              width={22} />
+            <div className={style['run-immediately']}>{oneItem.label}</div>
+            <InfoToolTip style={{ marginLeft: 'auto' }} data={oneItem} />
+          </RactangleAlignChildrenLeft>
+
+        );
+      case inputTypes.SWITCHER_TWO_SIDES:
+        return (
+
+          <RactangleAlignChildrenLeft style={{ justifyContent: oneItem.justifyContent }}>
+            <div style={{ marginRight: '5px', fontSize: '10px', color: '#557eff' }}>{oneItem.leftOption}</div>
+            <UiSwitcher
+              onChange={(value) => {
+                const actualValue = value ? oneItem.rightOption : oneItem.leftOption;
+                this.handleChangeForCheckBox(oneItem.name, actualValue)
+                oneItem.onChange && oneItem.onChange(actualValue)
+              }}
+              disabledInp={false}
+              activeState={this.state[oneItem.name] === oneItem.rightOption}
+              height={10}
+              width={20} />
+            <div style={{ marginLeft: '5px', fontSize: '10px', color: '#557eff', marginRight: '5px' }}>{oneItem.rightOption}</div>
+            <InfoToolTip data={oneItem} iconSize={'10px'} />
+          </RactangleAlignChildrenLeft>
 
         );
       case inputTypes.INPUT_LIST:
@@ -451,15 +471,14 @@ class Form extends React.Component {
           </TitleInput>
         );
       case inputTypes.NUMERIC_INPUT:
-        //  TODO ADD IS NUMBER FOR HIDE NUMBER
         return (
           <TitleInput labelStyle={{ marginRight: '5px' }} key={oneItem.key} title={oneItem.floatingLabelText}
             rightComponent={<InfoToolTip data={oneItem} />}>
             <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
               <NumericInput
                 minValue={0}
-                maxValue={100000}
-                hideNumber={!this.state[oneItem.name]}
+                maxValue={10000000}
+                hideNumber={Number.isNaN(this.state[oneItem.name])}
                 value={this.state[oneItem.name]}
                 onChange={(value) => {
                   this.onChangeProperty(oneItem.name, value)
@@ -467,7 +486,7 @@ class Form extends React.Component {
                   this.setState(newState);
                 }}
                 disabled={this.state.disabled[oneItem.name]}
-
+                width={'80px'}
               />
             </ErrorWrapper>
           </TitleInput>
@@ -491,10 +510,11 @@ class Form extends React.Component {
       }
     };
 
-    whenSubmit = () => {
+    whenSubmit = (runImmediate) => {
       const convertedArgs = {
         test_id: this.props.data.id,
-        duration: parseInt(this.state.duration) * 60
+        duration: parseInt(this.state.duration) * 60,
+        run_immediately: runImmediate
       };
       if (this.state.debug) {
         convertedArgs.debug = '*';
