@@ -160,8 +160,8 @@ class Form extends React.Component {
             key: 'max_virtual_users',
             floatingLabelText: 'Max virtual users',
             info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
-            type: inputTypes.NUMERIC_INPUT
-
+            type: inputTypes.NUMERIC_INPUT,
+              defaultValue: '250'
           }
         ]
       },
