@@ -31,7 +31,7 @@ class Header extends Component {
         }
 
 
-        return result.map((icon) => {
+        return result.map((icon,index) => {
             const isString = typeof icon === 'string';
             const classes = classnames({
                 [css.headerIcon]: true,
@@ -41,7 +41,7 @@ class Header extends Component {
             const result = isString ? <div className={classes}/> : <div className={classes}>{icon}</div>;
 
             return (
-                <div style={{width: '28px', display: 'flex'}}>{result}</div>
+                <div key={index} style={{width: '28px', display: 'flex'}}>{result}</div>
             )
 
         })
