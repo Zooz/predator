@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 cat << "EOF"
  ____               _       _                ____       _
  |  _ \ _ __ ___  __| | __ _| |_ ___  _ __   / ___|  ___| |_ _   _ _ __
@@ -6,10 +8,6 @@ cat << "EOF"
  |_|   |_|  \___|\__,_|\__,_|\__\___/|_|     |____/ \___|\__|\__,_| .__/
                                                                   |_|
 EOF
-
-NODE_VERSION=$(node -v)
-echo "current Node.js version ${NODE_VERSION}, pleae make sure to use Node.js 12 or higher"
-
 
 rm -fr ./node_modules
 npm install
