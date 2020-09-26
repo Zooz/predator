@@ -37,6 +37,9 @@ class App extends React.Component {
               <Route exact path='/tests' render={props => (
                 <GetTests {...props} />
               )} />
+              <Route exact path='/tests/:testId/run' render={props => (
+                <GetTests {...props} />
+              )} />
               <Route exact path='/jobs' render={props => (
                 <GetJobs {...props} />
               )} />
