@@ -30,6 +30,8 @@ Some of the metrics pushed by Predator-Runner to the Prometheus are:
     - `request_name`: name of the request (if not defined then the name = method + path)
 
 
+A dashboard for Grafana can be found [here](https://grafana.com/grafana/dashboards/11651)
+
 ## InfluxDB
 
 Set up a connection to your InfluxDB to receive test run metrics. Please refer to <u>[configuration section](configuration.md#influxdb)</u> to see required variables.

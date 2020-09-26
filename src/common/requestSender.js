@@ -1,7 +1,7 @@
-let logger = require('./logger');
-let request = require('request-promise-native');
+const logger = require('./logger');
+const request = require('request-promise-native');
 
-let defaultOptions = {
+const defaultOptions = {
     timeout: 15 * 1000,
     json: true,
     rejectUnauthorized: false
@@ -10,7 +10,7 @@ let defaultOptions = {
 module.exports.send = async (options) => {
     Object.assign(options, defaultOptions);
     try {
-        let response = await request(options);
+        const response = await request(options);
         logger.info({ method: options.method, url: options.url, response }, 'Successful request');
         return response;
     } catch (error) {

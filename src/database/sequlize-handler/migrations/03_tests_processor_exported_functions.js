@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 module.exports.up = async (query, DataTypes) => {
-    let testsTable = await query.describeTable('processors');
+    const testsTable = await query.describeTable('processors');
 
     if (!testsTable.exported_functions) {
         await query.addColumn(

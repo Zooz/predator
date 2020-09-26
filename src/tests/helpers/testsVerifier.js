@@ -5,11 +5,11 @@ const consts = require('../../common/consts');
 module.exports.verifyProcessorIsValid = async (req, res, next) => {
     let errorToThrow;
     let processor;
-    let usedFunctions = [];
+    const usedFunctions = [];
 
     getUsedFunctions(req.body.artillery_test, usedFunctions);
 
-    let testBody = req.body;
+    const testBody = req.body;
     if (testBody.processor_id) {
         try {
             processor = await processorsManager.getProcessor(testBody.processor_id);
@@ -24,7 +24,7 @@ module.exports.verifyProcessorIsValid = async (req, res, next) => {
         }
 
         if (!errorToThrow) {
-            let usedFunctionsWhichNotExists = usedFunctions.filter(uf => !processor.exported_functions.includes(uf));
+            const usedFunctionsWhichNotExists = usedFunctions.filter(uf => !processor.exported_functions.includes(uf));
             if (usedFunctionsWhichNotExists.length > 0) {
                 errorToThrow = new Error(`Functions: ${usedFunctionsWhichNotExists.join(', ')} does not exist in the processor file`);
                 errorToThrow.statusCode = 400;
@@ -38,7 +38,7 @@ module.exports.verifyProcessorIsValid = async (req, res, next) => {
 };
 module.exports.verifyTestExist = async (req, res, next) => {
     let errorToThrow;
-    let testId = req.params.test_id;
+    const testId = req.params.test_id;
     try {
         await testMannager.getTest(testId);
     } catch (error) {
@@ -53,7 +53,7 @@ module.exports.verifyTestExist = async (req, res, next) => {
 };
 
 function getUsedFunctions(obj, functions) {
-    for (let key in obj) {
+    for (const key in obj) {
         if (typeof obj[key] === 'object' && obj[key] !== null) {
             getUsedFunctions(obj[key], functions);
         } else if (consts.PROCESSOR_FUNCTIONS_KEYS.includes(key) && !functions.includes(obj[key])) {

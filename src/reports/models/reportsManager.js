@@ -14,22 +14,22 @@ const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, c
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
 
 module.exports.getReport = async (testId, reportId) => {
-    let reportSummary = await databaseConnector.getReport(testId, reportId);
+    const reportSummary = await databaseConnector.getReport(testId, reportId);
 
     if (reportSummary.length !== 1) {
-        let error = new Error('Report not found');
+        const error = new Error('Report not found');
         error.statusCode = 404;
         throw error;
     }
-    let config = await configHandler.getConfig();
-    let report = await getReportResponse(reportSummary[0], config);
+    const config = await configHandler.getConfig();
+    const report = await getReportResponse(reportSummary[0], config);
     return report;
 };
 
 module.exports.getReports = async (testId, filter) => {
-    let reportSummaries = await databaseConnector.getReports(testId, filter);
-    let config = await configHandler.getConfig();
-    let reports = reportSummaries.map((summaryRow) => {
+    const reportSummaries = await databaseConnector.getReports(testId, filter);
+    const config = await configHandler.getConfig();
+    const reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
     reports.sort((a, b) => b.start_time - a.start_time);
@@ -37,9 +37,9 @@ module.exports.getReports = async (testId, filter) => {
 };
 
 module.exports.getLastReports = async (limit, filter) => {
-    let reportSummaries = await databaseConnector.getLastReports(limit, filter);
-    let config = await configHandler.getConfig();
-    let reports = reportSummaries.map((summaryRow) => {
+    const reportSummaries = await databaseConnector.getLastReports(limit, filter);
+    const config = await configHandler.getConfig();
+    const reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
     return reports;
@@ -52,12 +52,12 @@ module.exports.editReport = async (testId, reportId, reportBody) => {
 };
 
 module.exports.deleteReport = async (testId, reportId) => {
-    let reportSummary = await databaseConnector.getReport(testId, reportId);
-    let config = await configHandler.getConfig();
-    let report = await getReportResponse(reportSummary[0], config);
+    const reportSummary = await databaseConnector.getReport(testId, reportId);
+    const config = await configHandler.getConfig();
+    const report = await getReportResponse(reportSummary[0], config);
 
     if (!FINAL_REPORT_STATUSES_WITH_END_TIME.includes(report.status)) {
-        let error = new Error(`Can't delete running test with status ${report.status}`);
+        const error = new Error(`Can't delete running test with status ${report.status}`);
         error.statusCode = 409;
         throw error;
     }
@@ -93,9 +93,9 @@ module.exports.postReport = async (testId, reportBody) => {
 };
 
 function getReportResponse(summaryRow, config) {
-    let lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;
+    const lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;
 
-    let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
+    const testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     const reportDurationSeconds = (new Date(lastUpdateTime).getTime() - new Date(summaryRow.start_time).getTime()) / 1000;
 
     let rps = 0;
@@ -116,9 +116,9 @@ function getReportResponse(summaryRow, config) {
         }
     });
 
-    let successRate = successRequests / completedRequests * 100;
+    const successRate = successRequests / completedRequests * 100;
 
-    let report = {
+    const report = {
         test_id: summaryRow.test_id,
         test_name: summaryRow.test_name,
         revision_id: summaryRow.revision_id,

@@ -1,8 +1,8 @@
 
 'use strict';
-let aggregateReportGenerator = require('../models/aggregateReportGenerator');
-let reports = require('../models/reportsManager');
-let stats = require('../models/statsManager');
+const aggregateReportGenerator = require('../models/aggregateReportGenerator');
+const reports = require('../models/reportsManager');
+const stats = require('../models/statsManager');
 
 module.exports.getAggregateReport = async function (req, res, next) {
     let reportInput;

@@ -23,7 +23,7 @@ async function deleteConfig(key) {
 
 async function getConfigAsObject() {
     const results = await databaseConnector.getConfig();
-    let dbDataMap = {};
+    const dbDataMap = {};
     results.forEach(row => {
         dbDataMap[row.key] = row.value;
     });

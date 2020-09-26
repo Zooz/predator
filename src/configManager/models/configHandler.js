@@ -12,22 +12,22 @@ module.exports.getConfigValue = async (configPath) => {
 };
 
 module.exports.getConfig = async () => {
-    let configAsObject = await dbConnector.getConfigAsObject();
+    const configAsObject = await dbConnector.getConfigAsObject();
     return createConfigObject(configAsObject);
 };
 
 module.exports.updateConfig = async (config) => {
-    let response = await dbConnector.updateConfig(config);
+    const response = await dbConnector.updateConfig(config);
     return response;
 };
 
 module.exports.deleteConfig = async (key) => {
-    let response = await dbConnector.deleteConfig(key);
+    const response = await dbConnector.deleteConfig(key);
     return response;
 };
 
 function createConfigObject(configAsObject) {
-    let config = {};
+    const config = {};
     Object.values(configTemplate).forEach(configTemplateKey => {
         const value = configAsObject[configTemplateKey] !== (undefined) ? configAsObject[configTemplateKey] : configDataMap.getConstDefaultValue(configTemplateKey);
         const type = configDataMap.getConstType(configTemplateKey);

@@ -1,5 +1,5 @@
-let logger = require('../src/common/logger');
-let env = {};
+const logger = require('../src/common/logger');
+const env = {};
 const BY_PLATFORM_MANDATORY_VARS = {
     METRONOME: ['METRONOME_URL'],
     KUBERNETES: ['KUBERNETES_URL', 'KUBERNETES_NAMESPACE'],
@@ -39,7 +39,7 @@ env.init = function () {
         mandatoryVars = mandatoryVars.concat(BY_DATABASE_MANDATORY_VARS[String(process.env.DATABASE_TYPE).toUpperCase()]);
     }
 
-    let missingFields = mandatoryVars.filter((currVar) => {
+    const missingFields = mandatoryVars.filter((currVar) => {
         return !process.env[currVar];
     });
 

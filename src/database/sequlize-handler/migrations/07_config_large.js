@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 module.exports.up = async (query, DataTypes) => {
-    let configTable = await query.describeTable('configs');
+    const configTable = await query.describeTable('configs');
 
     if (configTable.value) {
         await query.changeColumn(

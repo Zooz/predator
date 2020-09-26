@@ -1,8 +1,8 @@
 'use strict';
-let URL = require('url').URL;
-let fs = require('fs');
-let Docker = require('dockerode');
-let dockerConfig = require('../../../config/dockerConfig');
+const URL = require('url').URL;
+const fs = require('fs');
+const Docker = require('dockerode');
+const dockerConfig = require('../../../config/dockerConfig');
 let dockerConnection;
 if (dockerConfig.host) {
     const dockerUrl = new URL(dockerConfig.host);
@@ -16,10 +16,10 @@ if (dockerConfig.host) {
 } else {
     dockerConnection = ({ socketPath: '/var/run/docker.sock' });
 }
-let docker = new Docker(dockerConnection);
+const docker = new Docker(dockerConnection);
 
 const pullImage = async (dockerImage) => {
-    let dockerImageStream = await docker.pull(dockerImage);
+    const dockerImageStream = await docker.pull(dockerImage);
     return new Promise((resolve, reject) => {
         docker.modem.followProgress(dockerImageStream, (err) => {
             if (!err) {
@@ -34,18 +34,18 @@ const pullImage = async (dockerImage) => {
 module.exports.runJob = async (dockerJobConfig) => {
     await pullImage(dockerJobConfig.dockerImage);
 
-    let envVarArray = Object.keys(dockerJobConfig.environmentVariables).map((envVar) => {
+    const envVarArray = Object.keys(dockerJobConfig.environmentVariables).map((envVar) => {
         return `${envVar}=${dockerJobConfig.environmentVariables[envVar]}`;
     });
 
-    let promises = [];
+    const promises = [];
     for (let i = 0; i < (dockerJobConfig.parallelism || 1); i++) {
         promises.push(startContainer(dockerJobConfig.dockerImage, dockerJobConfig.jobName, dockerJobConfig.runId, i, envVarArray));
     }
 
     await Promise.all(promises);
 
-    let genericJobResponse = {
+    const genericJobResponse = {
         jobName: dockerJobConfig.jobName,
         id: dockerJobConfig.runId
     };
@@ -53,8 +53,7 @@ module.exports.runJob = async (dockerJobConfig) => {
 };
 
 const startContainer = async (dockerImage, jobName, runId, parallelIndex, envVarArray) => {
-    let container;
-    container = await docker.createContainer({
+    const container = await docker.createContainer({
         name: `${jobName}-${runId}-${parallelIndex}`,
         Image: dockerImage,
         Env: envVarArray
@@ -71,16 +70,16 @@ module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) 
         container.Names[0].includes(platformSpecificInternalRunId));
 
     containers.forEach(async container => {
-        let containerToStop = await docker.getContainer(container.Id);
+        const containerToStop = await docker.getContainer(container.Id);
         await containerToStop.stop();
     }
     );
 };
 
 module.exports.deleteAllContainers = async (jobPlatformName) => {
-    let containers = await docker.listContainers({ all: true, filters: JSON.stringify({ name: [jobPlatformName], status: ['exited', 'dead'] }) });
+    const containers = await docker.listContainers({ all: true, filters: JSON.stringify({ name: [jobPlatformName], status: ['exited', 'dead'] }) });
     containers.forEach(async container => {
-        let containerToRemove = await docker.getContainer(container.Id);
+        const containerToRemove = await docker.getContainer(container.Id);
         await containerToRemove.remove();
     });
 
@@ -96,12 +95,12 @@ module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId) 
         container.Names[0] && container.Names[0].includes(jobPlatformName) &&
         container.Names[0].includes(platformSpecificInternalRunId));
 
-    let logs = [];
+    const logs = [];
 
     for (let i = 0; i < containers.length; i++) {
-        let containerToGetLogsFrom = await docker.getContainer(containers[i].Id);
-        let logBuffer = await containerToGetLogsFrom.logs({ stdout: true, stderr: true });
-        let logString = logBuffer.toString('utf-8');
+        const containerToGetLogsFrom = await docker.getContainer(containers[i].Id);
+        const logBuffer = await containerToGetLogsFrom.logs({ stdout: true, stderr: true });
+        const logString = logBuffer.toString('utf-8');
         logs.push({ type: 'file', name: containers[i].Id + '.txt', content: logString });
     }
     return logs;
