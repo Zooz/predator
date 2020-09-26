@@ -39,7 +39,7 @@ export default function reduce(state = initialState, action = {}) {
         case Types.DELETE_TEST_SUCCESS:
             return state.set('delete_test_success', true);
         case Types.CREATE_TEST_SUCCESS:
-            return state.set('create_test_success', true);
+            return state.set('create_test_success', action.data);
         case Types.CLEAR_ALL_SUCCESS_OPERATIONS_STATE:
             return state.set('delete_test_success', false)
                 .set('create_test_success',false);

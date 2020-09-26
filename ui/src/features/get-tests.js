@@ -57,6 +57,9 @@ class getTests extends React.Component {
       if (path === '/tests/:testId/run') {
         const data = this.props.tests.find((test) => test.id === params.testId);
         data && this.onRunTest(data);
+      } else if (path === '/tests/:testId/edit') {
+        const data = this.props.tests.find((test) => test.id === params.testId);
+        data && this.onEdit(data);
       }
     }
   }
@@ -116,8 +119,12 @@ class getTests extends React.Component {
     };
 
     onEdit = (data) => {
+      const { match: { params, path }, history } = this.props;
+      if (path !== '/tests/:testId/edit') {
+        history.replace(`/tests/${data.id}/edit`)
+      }
       this.setState({ createTest: true, testForEdit: data });
-      this.props.chooseTest(data);
+      // this.props.chooseTest(data);
     };
 
     onReportView = (data) => {
@@ -141,6 +148,7 @@ class getTests extends React.Component {
       this.props.clearSelectedTest();
     };
     closeCreateTest = () => {
+      history.replace('/tests')
       this.setState({
         createTest: false,
         testForEdit: null,
@@ -149,10 +157,8 @@ class getTests extends React.Component {
     };
 
     closeViewCreateJobDialog = () => {
-      const { match: { params, path }, history } = this.props;
-      if (path === '/tests/:testId/run') {
-        history.replace('/tests')
-      }
+      const { history } = this.props;
+      history.replace('/tests')
       this.setState({
         openViewCreateJob: false
       });
@@ -206,10 +212,8 @@ class getTests extends React.Component {
     };
 
     render () {
-      console.log('this.props', this.props);
-      global.manor = this.props;
       const { sortedTests, sortHeader, testForEdit, testForClone } = this.state;
-      const { errorOnDeleteTest } = this.props;
+      const { errorOnDeleteTest, history } = this.props;
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
       const columns = getColumns({
         columnsNames,
@@ -248,7 +252,7 @@ class getTests extends React.Component {
             ? <Dialog title_key={'id'} data={this.state.openViewTest}
               closeDialog={this.closeViewTestDialog} /> : null}
           {this.state.createTest &&
-          <TestForm data={testForEdit || testForClone} closeDialog={this.closeCreateTest}
+          <TestForm history={history} data={testForEdit || testForClone} closeDialog={this.closeCreateTest}
             cloneMode={!!testForClone} />}
           {(this.state.openViewCreateJob && !this.props.createJobSuccess)
             ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog} /> : null}
@@ -291,7 +295,7 @@ const mapDispatchToProps = {
   clearSelectedJob: Actions.clearSelectedJob,
   clearErrorOnGetTests: Actions.clearErrorOnGetTests,
   getAllTests: Actions.getTests,
-  chooseTest: Actions.chooseTest,
+  // chooseTest: Actions.chooseTest,
   deleteTest: Actions.deleteTest,
   clearAllSuccessOperationsState: Actions.clearAllSuccessOperationsState,
   cleanAllErrors: Actions.cleanAllErrors
