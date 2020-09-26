@@ -6,7 +6,7 @@ const requestSender = require('../../common/requestSender'),
 module.exports.getMostRecentRunnerTag = async () => {
     let dockerImageToUse = await configHandler.getConfigValue(configConstants.RUNNER_DOCKER_IMAGE);
     if (!dockerImageToUse.includes(':')) {
-        let dockerHubInfo = await requestSender.send({
+        const dockerHubInfo = await requestSender.send({
             method: 'GET',
             url: `https://hub.docker.com/v2/repositories/${dockerImageToUse}/tags`,
             json: true
@@ -30,10 +30,10 @@ module.exports.getMostRecentRunnerTag = async () => {
 
 function sortByTags(a, b) {
     let i, diff;
-    let regExStrip0 = /(\.0+)+$/;
-    let segmentsA = a.replace(regExStrip0, '').split('.');
-    let segmentsB = b.replace(regExStrip0, '').split('.');
-    let l = Math.min(segmentsA.length, segmentsB.length);
+    const regExStrip0 = /(\.0+)+$/;
+    const segmentsA = a.replace(regExStrip0, '').split('.');
+    const segmentsB = b.replace(regExStrip0, '').split('.');
+    const l = Math.min(segmentsA.length, segmentsB.length);
 
     for (i = 0; i < l; i++) {
         diff = parseInt(segmentsA[i], 10) - parseInt(segmentsB[i], 10);

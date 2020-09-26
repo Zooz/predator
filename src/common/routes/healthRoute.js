@@ -1,5 +1,5 @@
 'use strict';
-let express = require('express'),
+const express = require('express'),
     router = express.Router(),
     health = require('../controllers/healthController');
 

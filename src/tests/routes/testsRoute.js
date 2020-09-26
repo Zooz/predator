@@ -1,11 +1,11 @@
 'use strict';
 
-let express = require('express');
-let router = express.Router();
-let tests = require('../controllers/testsController');
-let swaggerValidator = require('express-ajv-swagger-validation');
-let artilleryValidator = require('../helpers/artilleryValidator');
-let testsVerifier = require('../helpers/testsVerifier');
+const express = require('express');
+const router = express.Router();
+const tests = require('../controllers/testsController');
+const swaggerValidator = require('express-ajv-swagger-validation');
+const artilleryValidator = require('../helpers/artilleryValidator');
+const testsVerifier = require('../helpers/testsVerifier');
 
 router.post('/', swaggerValidator.validate, testsVerifier.verifyProcessorIsValid, artilleryValidator.verifyArtillery, tests.upsertTest);
 router.get('/', swaggerValidator.validate, tests.getTests);

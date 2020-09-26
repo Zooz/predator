@@ -12,19 +12,19 @@ const logger = require('../../common/logger'),
     generateError = require('../../common/generateError');
 
 let jobConnector;
-let cronJobs = {};
+const cronJobs = {};
 const PREDATOR_RUNNER_PREFIX = 'predator';
 const JOB_PLATFORM_NAME = PREDATOR_RUNNER_PREFIX + '.%s';
 
 module.exports.init = async () => {
-    let jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
+    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     jobConnector = require(`./${jobPlatform.toLowerCase()}/jobConnector`);
 };
 
 module.exports.reloadCronJobs = async () => {
     const configData = await configHandler.getConfig();
     try {
-        let jobs = await databaseConnector.getJobs();
+        const jobs = await databaseConnector.getJobs();
         jobs.forEach(async function (job) {
             if (job.cron_expression !== null) {
                 addCron(job.id.toString(), job, job.cron_expression, configData);
@@ -36,7 +36,7 @@ module.exports.reloadCronJobs = async () => {
 };
 
 module.exports.scheduleFinishedContainersCleanup = async () => {
-    let interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
+    const interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
     if (interval > 0) {
         logger.info(`Setting containers clean up with interval of ${interval}`);
         return setInterval(async () => {
@@ -48,15 +48,15 @@ module.exports.scheduleFinishedContainersCleanup = async () => {
 };
 
 module.exports.createJob = async (job) => {
-    let jobId = uuid.v4();
+    const jobId = uuid.v4();
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(job.webhooks);
     try {
         await databaseConnector.insertJob(jobId, job);
         logger.info('Job saved successfully to database');
-        let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
-        let runId = Date.now();
-        let jobSpecificPlatformRequest = await createJobRequest(jobId, runId, job, latestDockerImage, configData);
+        const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
+        const runId = Date.now();
+        const jobSpecificPlatformRequest = await createJobRequest(jobId, runId, job, latestDockerImage, configData);
         if (job.run_immediately) {
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
@@ -84,13 +84,13 @@ module.exports.stopRun = async (jobId, runId) => {
 };
 
 module.exports.deleteAllContainers = async () => {
-    let result = await jobConnector.deleteAllContainers(PREDATOR_RUNNER_PREFIX);
+    const result = await jobConnector.deleteAllContainers(PREDATOR_RUNNER_PREFIX);
     return result;
 };
 
 module.exports.getLogs = async function (jobId, runId) {
-    let logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), runId, PREDATOR_RUNNER_PREFIX);
-    let response = {
+    const logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), runId, PREDATOR_RUNNER_PREFIX);
+    const response = {
         files: logs,
         filename: `${jobId}-${runId}.zip`
     };
@@ -105,7 +105,7 @@ module.exports.getJobs = async (getOneTimeJobs) => {
         if (!getOneTimeJobs) {
             jobs = jobs.filter((job) => job.cron_expression);
         }
-        let jobsResponse = jobs.map((job) => {
+        const jobsResponse = jobs.map((job) => {
             return createResponse(job.id, job);
         });
 
@@ -119,7 +119,7 @@ module.exports.getJobs = async (getOneTimeJobs) => {
 module.exports.getJob = async (jobId) => {
     try {
         let error;
-        let job = await databaseConnector.getJob(jobId);
+        const job = await databaseConnector.getJob(jobId);
         logger.info('Got job from database successfully');
         if (job.length > 1) {
             logger.error('database returned ' + job.length + ' rows, expected only one.');
@@ -144,12 +144,12 @@ module.exports.updateJob = async (jobId, jobConfig) => {
     await validateWebhooksAssignment(jobConfig.webhooks);
     let [job] = await databaseConnector.getJob(jobId);
     if (!job || job.length === 0) {
-        let error = new Error('Not found');
+        const error = new Error('Not found');
         error.statusCode = 404;
         throw error;
     }
     if (!job.cron_expression) {
-        let error = new Error('Can not update jobs from type run_immediately: true');
+        const error = new Error('Can not update jobs from type run_immediately: true');
         error.statusCode = 422;
         throw error;
     }
@@ -169,7 +169,7 @@ module.exports.updateJob = async (jobId, jobConfig) => {
 };
 
 function createResponse(jobId, jobBody, runId) {
-    let response = {
+    const response = {
         id: jobId,
         test_id: jobBody.test_id,
         type: jobBody.type,
@@ -202,9 +202,9 @@ function createResponse(jobId, jobBody, runId) {
 
 async function createJobRequest(jobId, runId, jobBody, dockerImage, configData) {
     const jobTemplate = require(`./${configData.job_platform.toLowerCase()}/jobTemplate`);
-    let jobName = util.format(JOB_PLATFORM_NAME, jobId);
+    const jobName = util.format(JOB_PLATFORM_NAME, jobId);
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
-    let parallelism = jobBody.parallelism || 1;
+    const parallelism = jobBody.parallelism || 1;
     const environmentVariables = {
         JOB_ID: jobId,
         RUN_ID: runId.toString(),
@@ -271,20 +271,20 @@ async function createJobRequest(jobId, runId, jobBody, dockerImage, configData) 
     }
 
     const customRunnerDefinition = configData.custom_runner_definition;
-    let jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
+    const jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
 
     return jobRequest;
 }
 
 function addCron(jobId, job, cronExpression, configData) {
-    let scheduledJob = new CronJob(cronExpression, async function () {
+    const scheduledJob = new CronJob(cronExpression, async function () {
         try {
             if (job.enabled === false) {
                 logger.info(`Skipping job with id: ${jobId} as it's currently disabled`);
             } else {
-                let latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
-                let runId = Date.now();
-                let jobSpecificPlatformConfig = await createJobRequest(jobId, runId, job, latestDockerImage, configData);
+                const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
+                const runId = Date.now();
+                const jobSpecificPlatformConfig = await createJobRequest(jobId, runId, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
         } catch (error) {

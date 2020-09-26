@@ -1,6 +1,6 @@
 'use strict';
 
-let _ = require('lodash');
+const _ = require('lodash');
 
 module.exports.getStatsFormatted = (stage, report, reportBenchmark = {}) => {
     let beautyReport = '';

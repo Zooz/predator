@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Predator UI",
   "main": "index.js",
+  "engines": {
+    "node": ">=12.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "NODE_ENV=production node --max_old_space_size=2000 ./node_modules/webpack/bin/webpack.js --env --config ./config/webpack.config.js",

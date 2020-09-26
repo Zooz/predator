@@ -1,32 +1,32 @@
 'use strict';
 require('./env').init();
-let express = require('express');
-let logger = require('./common/logger');
-let healthRouter = require('./common/routes/healthRoute.js');
-let jobsRouter = require('./jobs/routes/jobsRoute.js');
-let reportsRouter = require('./reports/routes/reportsRoute.js');
-let configRouter = require('./configManager/routes/configRoute.js');
-let dslRouter = require('./tests/routes/dslRoute.js');
-let testsRouter = require('./tests/routes/testsRoute.js');
-let processorsRouter = require('./processors/routes/processorsRoute.js');
-let filesRouter = require('./files/routes/filesRoute.js');
-let webhooksRouter = require('./webhooks/routes/webhooksRouter');
+const express = require('express');
+const logger = require('./common/logger');
+const healthRouter = require('./common/routes/healthRoute.js');
+const jobsRouter = require('./jobs/routes/jobsRoute.js');
+const reportsRouter = require('./reports/routes/reportsRoute.js');
+const configRouter = require('./configManager/routes/configRoute.js');
+const dslRouter = require('./tests/routes/dslRoute.js');
+const testsRouter = require('./tests/routes/testsRoute.js');
+const processorsRouter = require('./processors/routes/processorsRoute.js');
+const filesRouter = require('./files/routes/filesRoute.js');
+const webhooksRouter = require('./webhooks/routes/webhooksRouter');
 
-let swaggerValidator = require('express-ajv-swagger-validation');
-let audit = require('express-requests-logger');
-let bodyParser = require('body-parser');
-let database = require('./database/database');
-let jobsManager = require('./jobs/models/jobManager');
-let path = require('path');
-let zip = require('express-easy-zip');
-let fileUpload = require('express-fileupload');
+const swaggerValidator = require('express-ajv-swagger-validation');
+const audit = require('express-requests-logger');
+const bodyParser = require('body-parser');
+const database = require('./database/database');
+const jobsManager = require('./jobs/models/jobManager');
+const path = require('path');
+const zip = require('express-easy-zip');
+const fileUpload = require('express-fileupload');
 module.exports = async () => {
     swaggerValidator.init('./docs/openapi3.yaml', { beautifyErrors: true });
     await database.init();
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
     await jobsManager.scheduleFinishedContainersCleanup();
-    let app = express();
+    const app = express();
 
     app.use(fileUpload({
         createParentPath: true,

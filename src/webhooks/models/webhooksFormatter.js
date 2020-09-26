@@ -43,7 +43,7 @@ function slackWebhookFormat(message, options) {
 }
 
 function json(event, testId, jobId, report, additionalInfo, options) {
-    let payload = {
+    const payload = {
         test_id: testId,
         job_id: jobId,
         event: event,

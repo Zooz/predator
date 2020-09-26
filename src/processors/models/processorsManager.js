@@ -13,9 +13,9 @@ module.exports.createProcessor = async function (processor) {
     if (processorWithTheSameName) {
         throw generateError(400, ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST);
     }
-    let processorId = uuid.v4();
+    const processorId = uuid.v4();
     try {
-        let exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
+        const exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
         processor.exported_functions = exportedFunctions;
         await databaseConnector.insertProcessor(processorId, processor);
         processor.id = processorId;
@@ -28,7 +28,7 @@ module.exports.createProcessor = async function (processor) {
 };
 
 module.exports.getAllProcessors = async function (from, limit, exclude) {
-    let allProcessors = await databaseConnector.getAllProcessors(from, limit, exclude);
+    const allProcessors = await databaseConnector.getAllProcessors(from, limit, exclude);
     return allProcessors;
 };
 
@@ -45,8 +45,8 @@ module.exports.getProcessor = async function (processorId) {
 module.exports.deleteProcessor = async function (processorId) {
     const tests = await testsManager.getTestsByProcessorId(processorId);
     if (tests.length > 0) {
-        let testNames = tests.map(test => test.name);
-        let message = `${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`;
+        const testNames = tests.map(test => test.name);
+        const message = `${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`;
         throw generateError(409, message);
     }
     return databaseConnector.deleteProcessor(processorId);
@@ -65,7 +65,7 @@ module.exports.updateProcessor = async function (processorId, processor) {
     }
 
     processor.created_at = oldProcessor.created_at;
-    let exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
+    const exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
     processor.exported_functions = exportedFunctions;
     await databaseConnector.updateProcessor(processorId, processor);
     return processor;
@@ -74,18 +74,18 @@ module.exports.updateProcessor = async function (processorId, processor) {
 function verifyJSAndGetExportedFunctions(src) {
     let exportedFunctions;
     try {
-        let m = new module.constructor();
+        const m = new module.constructor();
         m.paths = module.paths;
         m._compile(src, 'none');
-        let exports = m.exports;
+        const exports = m.exports;
         exportedFunctions = Object.keys(exports);
     } catch (err) {
-        let error = generateError(422, 'javascript syntax validation failed with error: ' + err.message);
+        const error = generateError(422, 'javascript syntax validation failed with error: ' + err.message);
         throw error;
     }
 
     if (exportedFunctions.length === 0) {
-        let error = generateError(422, 'javascript has 0 exported functions');
+        const error = generateError(422, 'javascript has 0 exported functions');
         throw error;
     }
     return exportedFunctions;

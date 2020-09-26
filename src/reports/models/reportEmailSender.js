@@ -8,12 +8,12 @@ const fs = require('fs'),
     configConsts = require('../../common/consts').CONFIG,
     logger = require('../../common/logger');
 module.exports.sendAggregateReport = async (aggregatedResults, job, emails, reportBenchmark = {}) => {
-    let testName = aggregatedResults.test_name;
-    let endTime = aggregatedResults.end_time;
-    let startTime = aggregatedResults.start_time;
-    let testRunTime = timeConversion(endTime - startTime);
+    const testName = aggregatedResults.test_name;
+    const endTime = aggregatedResults.end_time;
+    const startTime = aggregatedResults.start_time;
+    const testRunTime = timeConversion(endTime - startTime);
 
-    let testInfo = {
+    const testInfo = {
         runTime: testRunTime,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
@@ -23,13 +23,13 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails, repo
         parallelism: aggregatedResults.parallelism
     };
     if (reportBenchmark.score) {
-        testInfo['score'] = reportBenchmark.score;
+        testInfo.score = reportBenchmark.score;
     }
     if (reportBenchmark.data) {
-        testInfo['benchmark'] = reportBenchmark.data;
+        testInfo.benchmark = reportBenchmark.data;
     }
 
-    let htmlBody = generateReportFromTemplate(testName, testInfo, aggregatedResults.grafana_url, aggregatedResults.aggregate);
+    const htmlBody = generateReportFromTemplate(testName, testInfo, aggregatedResults.grafana_url, aggregatedResults.aggregate);
 
     async function createMailOptions(configSmtp) {
         return {
@@ -41,10 +41,10 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails, repo
     }
 
     try {
-        let configSmtp = await configHandler.getConfigValue(configConsts.SMTP_SERVER);
+        const configSmtp = await configHandler.getConfigValue(configConsts.SMTP_SERVER);
         const transporter = await createSMTPClient(configSmtp);
         const mailOptions = await createMailOptions(configSmtp);
-        let response = await transporter.sendMail(mailOptions);
+        const response = await transporter.sendMail(mailOptions);
         transporter.close();
         logger.info(response, `Sent email successfully for testId: ${aggregatedResults.test_id}, reportId: ${aggregatedResults.report_id}`);
     } catch (error) {
@@ -71,13 +71,13 @@ async function createSMTPClient(configSmtp) {
 }
 
 function timeConversion(milliseconds) {
-    let seconds = (milliseconds / 1000).toFixed(1);
+    const seconds = (milliseconds / 1000).toFixed(1);
 
-    let minutes = (milliseconds / (1000 * 60)).toFixed(1);
+    const minutes = (milliseconds / (1000 * 60)).toFixed(1);
 
-    let hours = (milliseconds / (1000 * 60 * 60)).toFixed(1);
+    const hours = (milliseconds / (1000 * 60 * 60)).toFixed(1);
 
-    let days = (milliseconds / (1000 * 60 * 60 * 24)).toFixed(1);
+    const days = (milliseconds / (1000 * 60 * 60 * 24)).toFixed(1);
 
     if (seconds < 60) {
         return seconds + ' Sec';
@@ -103,13 +103,13 @@ function generateReportFromTemplate(testName, testInfo, grafanaUrl, aggregatedRe
     });
     errorsSummary = errorsSummary.join(', ');
 
-    let emailVars = { testName, testInfo, grafanaUrl, aggregatedResults, codesSummary, errorsSummary };
+    const emailVars = { testName, testInfo, grafanaUrl, aggregatedResults, codesSummary, errorsSummary };
 
-    let templateFn = path.join(
+    const templateFn = path.join(
         path.dirname(__filename),
         './templates/email_report.html');
-    let template = fs.readFileSync(templateFn, 'utf-8');
-    let compiledTemplate = _.template(template);
-    let html = compiledTemplate(emailVars);
+    const template = fs.readFileSync(templateFn, 'utf-8');
+    const compiledTemplate = _.template(template);
+    const html = compiledTemplate(emailVars);
     return html;
 }

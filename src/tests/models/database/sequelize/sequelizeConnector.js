@@ -100,7 +100,7 @@ async function initSchemas() {
 
 async function insertTestBenchmark(testId, benchmarkData) {
     const benchmark = client.model('benchmark');
-    let params = {
+    const params = {
         test_id: testId,
         data: benchmarkData
     };
@@ -113,13 +113,13 @@ async function getTestBenchmark(test_id) {
     const options = {
         where: { test_id: test_id }
     };
-    let benchmarkRes = await benchmark.findOne(options);
+    const benchmarkRes = await benchmark.findOne(options);
     return benchmarkRes ? benchmarkRes.data : undefined;
 }
 
 async function insertTest(testInfo, testJson, id, revisionId, processorFileId){
     const test = client.model('test');
-    let params = {
+    const params = {
         test_id: id,
         name: testInfo.name,
         type: testInfo.type,
@@ -181,7 +181,7 @@ async function deleteTest(testId){
 
 async function insertDslDefinition(dslName, definitionName, data){
     const dslDefinition = client.model('dsl_definition');
-    let params = {
+    const params = {
         id: uuid.v4(),
         dsl_name: dslName,
         definition_name: definitionName,
@@ -222,7 +222,7 @@ async function getDslDefinitions(dslName){
 
 async function updateDslDefinition(dslName, definitionName, data){
     const dslDefinition = client.model('dsl_definition');
-    let params = {
+    const params = {
         dsl_name: dslName,
         definition_name: definitionName,
         artillery_json: JSON.stringify(data)

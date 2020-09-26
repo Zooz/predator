@@ -9,7 +9,7 @@ const BENCHMARK_WEIGHTS_DEFAULT = {
     rps: { percentage: 20 }
 };
 
-let configDataMap = {
+const configDataMap = {
     [constConfig.GRFANA_URL]: { value: process.env.GRAFANA_URL },
     [constConfig.DELAY_RUNNER_MS]: { value: process.env.DELAY_RUNNER_MS || 0, type: 'int' },
     [constConfig.INTERNAL_ADDRESS]: { value: process.env.INTERNAL_ADDRESS },

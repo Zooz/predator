@@ -12,7 +12,7 @@ module.exports.calculate = (testBenchmark, reportData, configObject) => {
 function calculateObjectScore(benchmarkObject, reportObject, configObject) {
     const allReportKeys = Object.keys(reportObject);
     let score = 0;
-    let data = {};
+    const data = {};
     allReportKeys.forEach(field => {
         const fieldScore = extractFieldScore(benchmarkObject, reportObject, field);
         const percentage = configObject[field].percentage / 100;

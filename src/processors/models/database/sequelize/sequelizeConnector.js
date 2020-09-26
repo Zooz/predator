@@ -21,7 +21,7 @@ async function init(sequelizeClient) {
 
 async function insertProcessor(processorId, processorInfo) {
     const processor = client.model('processor');
-    let params = {
+    const params = {
         id: processorId,
         name: processorInfo.name,
         description: processorInfo.description,
@@ -39,13 +39,13 @@ async function getAllProcessors(from, limit, exclude) {
     if (exclude && (exclude === JAVASCRIPT || exclude.includes(JAVASCRIPT))) {
         attributes.exclude = ['javascript'];
     }
-    let allProcessors = processorsModel.findAll({ attributes, offset: from, limit, order: [['created_at', 'DESC']] });
+    const allProcessors = processorsModel.findAll({ attributes, offset: from, limit, order: [['created_at', 'DESC']] });
     return allProcessors;
 }
 
 async function _getProcessor(options) {
     const processorsModel = client.model('processor');
-    let processors = await processorsModel.findAll(options);
+    const processors = await processorsModel.findAll(options);
     return processors[0];
 }
 

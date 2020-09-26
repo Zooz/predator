@@ -7,15 +7,15 @@ module.exports = {
 
 function addDefaultsToTest(artilleryTest) {
     const scenarios = get(artilleryTest, 'scenarios', []);
-    for (let scenario of scenarios){
+    for (const scenario of scenarios){
         const flow = get(scenario, 'flow', []);
-        for (let step of flow){
+        for (const step of flow){
             addDefaultsToStep(step);
         }
     }
 
     const before = get(artilleryTest, 'before.flow', []);
-    for (let step of before){
+    for (const step of before){
         addDefaultsToStep(step);
     }
     return artilleryTest;
