@@ -78,12 +78,13 @@ With persisted storage:
 where $MACHINE_IP is the local ip address of your machine (not localhost, but actual ip address - it is your local network address).
 
 ### Developers
-Predator runs using Docker. In order to run Predator locally, clone this repository and then run the following command:
+To run and debug Predator locally run setupLocalEnv.sh script.
+It's recommended to run Predator with Node.js 12
+`./setupLocalEnv.sh`
 
-`runPredatorLocal.sh`
+After that you will be able to start Predator with:
 
-or refer to the [Docker](#docker) instructions above.
-
+`npm run start-local`
 ##### Running the tests
 
 Run `npm test` in order to run tests in your local machine. The script runs the following tests:

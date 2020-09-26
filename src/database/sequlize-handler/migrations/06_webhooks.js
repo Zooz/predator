@@ -38,7 +38,7 @@ function createEnumRow(name) {
 }
 
 module.exports.up = async (query, DataTypes) => {
-    let describedWebhooks = await query.describeTable(tableName);
+    const describedWebhooks = await query.describeTable(tableName);
     const webhooksEventTypes = WEBHOOK_EVENT_TYPES.map(createEnumRow);
     const promises = [
         ...columns.map(({ name, dt }) =>

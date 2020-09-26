@@ -8,10 +8,11 @@
     "test": "tests"
   },
   "scripts": {
+    "start-local": "node -r dotenv/config src/server.js",
     "start": "node src/server.js",
     "unit-tests": "nyc --check-coverage --lines 93 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
-    "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh",
+    "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh --timeout=10000",
     "lint": "eslint src/**",
     "release": "standard-version",
     "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
@@ -73,10 +74,11 @@
     "chai": "^4.2.0",
     "commitlint": "^10.0.0",
     "cz-conventional-changelog": "^3.2.0",
-    "eslint": "^6.2.2",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^9.1.0",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.9.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "husky": "^1.3.1",

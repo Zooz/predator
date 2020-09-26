@@ -1,9 +1,9 @@
 'use strict';
 
-let express = require('express');
-let router = express.Router();
-let filesController = require('../controllers/filesController');
-let swaggerValidator = require('express-ajv-swagger-validation');
+const express = require('express');
+const router = express.Router();
+const filesController = require('../controllers/filesController');
+const swaggerValidator = require('express-ajv-swagger-validation');
 
 router.post('/', filesController.saveFile);
 router.get('/:file_id', swaggerValidator.validate, filesController.getFile);

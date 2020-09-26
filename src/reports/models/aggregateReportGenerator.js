@@ -1,7 +1,7 @@
 'use strict';
 
-let reports = require('./reportsManager');
-let aggregateReportManager = require('./aggregateReportManager');
+const reports = require('./reportsManager');
+const aggregateReportManager = require('./aggregateReportManager');
 
 module.exports = {
     createAggregateReport

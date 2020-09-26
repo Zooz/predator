@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 module.exports.up = async (query, DataTypes) => {
-    let reportsTable = await query.describeTable('reports');
+    const reportsTable = await query.describeTable('reports');
 
     if (!reportsTable.is_favorite) {
         await query.addColumn(

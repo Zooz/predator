@@ -25,7 +25,7 @@ async function init(sequelizeClient) {
 
 async function insertJob(jobId, jobInfo) {
     const job = client.model('job');
-    let params = {
+    const params = {
         id: jobId,
         test_id: jobInfo.test_id,
         type: jobInfo.type,
@@ -50,7 +50,7 @@ async function insertJob(jobId, jobInfo) {
         params.ramp_to = jobInfo.ramp_to;
     }
 
-    let include = [];
+    const include = [];
     if (params.emails) {
         include.push({ association: job.email });
     }
@@ -64,7 +64,7 @@ async function insertJob(jobId, jobInfo) {
 async function getJobsAndParse(jobId) {
     const job = client.model('job');
 
-    let options = {
+    const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
         include: [job.email, 'webhooks']
     };
@@ -72,8 +72,8 @@ async function getJobsAndParse(jobId) {
     if (jobId) {
         options.where = { id: jobId };
     }
-    let allJobsSql = await job.findAll(options);
-    let allJobs = allJobsSql.map(sqlJob => sqlJob.dataValues);
+    const allJobsSql = await job.findAll(options);
+    const allJobs = allJobsSql.map(sqlJob => sqlJob.dataValues);
 
     allJobs.forEach(job => {
         job.emails = job.emails && job.emails.length > 0 ? job.emails.map(sqlJob => sqlJob.dataValues.address) : undefined;
@@ -83,12 +83,12 @@ async function getJobsAndParse(jobId) {
 }
 
 async function getJobs() {
-    let allJobs = await getJobsAndParse();
+    const allJobs = await getJobsAndParse();
     return allJobs;
 }
 
 async function getJob(jobId) {
-    let allJobs = await getJobsAndParse(jobId);
+    const allJobs = await getJobsAndParse(jobId);
     return allJobs;
 }
 
@@ -110,7 +110,7 @@ async function updateJob(jobId, jobInfo) {
         debug: jobInfo.debug,
         enabled: jobInfo.enabled
     };
-    let oldJob = await job.findByPk(jobId);
+    const oldJob = await job.findByPk(jobId);
     const mergedParams = _.mergeWith(params, oldJob.dataValues, (newValue, oldJobValue) => {
         return newValue !== undefined ? newValue : oldJobValue;
     });
@@ -142,7 +142,7 @@ async function updateJob(jobId, jobInfo) {
         }
     }
 
-    let options = {
+    const options = {
         where: {
             id: jobId
         }

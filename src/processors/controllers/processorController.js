@@ -1,5 +1,5 @@
 'use strict';
-let processorManager = require('../models/processorsManager');
+const processorManager = require('../models/processorsManager');
 
 module.exports.createProcessor = function (req, res, next) {
     return processorManager.createProcessor(req.body)
@@ -25,8 +25,8 @@ module.exports.getAllProcessors = async function (req, res, next) {
 };
 
 module.exports.getProcessor = async function (req, res, next) {
-    let processor, processorId;
-    processorId = req.params.processor_id;
+    let processor;
+    const processorId = req.params.processor_id;
     try {
         processor = await processorManager.getProcessor(processorId);
         return res.status(200).json(processor);
@@ -36,7 +36,7 @@ module.exports.getProcessor = async function (req, res, next) {
 };
 
 module.exports.deleteProcessor = async function (req, res, next) {
-    let { params: { processor_id: processorId } } = req;
+    const { params: { processor_id: processorId } } = req;
     try {
         await processorManager.deleteProcessor(processorId);
         return res.status(204).json();
@@ -46,7 +46,7 @@ module.exports.deleteProcessor = async function (req, res, next) {
 };
 
 module.exports.updateProcessor = async function (req, res, next) {
-    let { body: updatedProcessor, params: { processor_id: processorId } } = req;
+    const { body: updatedProcessor, params: { processor_id: processorId } } = req;
     try {
         const processor = await processorManager.updateProcessor(processorId, updatedProcessor);
         res.status(200).json(processor);

@@ -35,7 +35,7 @@ async function getFileMetadata(req, res, next) {
 }
 
 async function saveFile(req, res, next) {
-    if (!req.files || Object.keys(req.files).length !== 1 || !req.files['csv']) {
+    if (!req.files || Object.keys(req.files).length !== 1 || !req.files.csv) {
         return res.status(400).json({
             message: 'Please upload exactly one file with key: "csv"'
         });

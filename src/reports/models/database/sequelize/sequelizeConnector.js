@@ -164,7 +164,7 @@ async function updateSubscriber(testId, reportId, runnerId, phaseStatus) {
 async function getReportsAndParse(query) {
     const report = client.model('report');
 
-    let options = {
+    const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
         include: [report.subscriber]
     };
@@ -173,7 +173,7 @@ async function getReportsAndParse(query) {
 
     const allReportsRawResponse = await report.findAll(options);
 
-    let allReports = allReportsRawResponse.map(rawReport => rawReport.dataValues);
+    const allReports = allReportsRawResponse.map(rawReport => rawReport.dataValues);
 
     allReports.forEach(report => {
         report.subscribers = report.subscribers.map((sqlJob) => {
@@ -216,7 +216,7 @@ async function getReport(testId, reportId) {
 async function getStatsAndParse(query) {
     const stats = client.model('stats');
 
-    let options = {
+    const options = {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
 

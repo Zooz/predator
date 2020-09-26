@@ -1,5 +1,5 @@
-let sequelizeConnector = require('./sequelize/sequelizeConnector');
-let databaseConnector = sequelizeConnector;
+const sequelizeConnector = require('./sequelize/sequelizeConnector');
+const databaseConnector = sequelizeConnector;
 module.exports = {
     init,
     getAllProcessors,

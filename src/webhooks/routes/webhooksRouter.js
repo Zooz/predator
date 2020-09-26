@@ -1,10 +1,10 @@
 'use strict';
 
-let swaggerValidator = require('express-ajv-swagger-validation');
-let express = require('express');
-let router = express.Router();
+const swaggerValidator = require('express-ajv-swagger-validation');
+const express = require('express');
+const router = express.Router();
 
-let webhooksController = require('../controllers/webhooksController');
+const webhooksController = require('../controllers/webhooksController');
 
 router.get('/', swaggerValidator.validate, webhooksController.getAllWebhooks);
 router.post('/', swaggerValidator.validate, webhooksController.createWebhook);

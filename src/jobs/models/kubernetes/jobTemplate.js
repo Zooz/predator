@@ -26,7 +26,7 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
                             image: dockerImage,
                             resources: {
                                 requests: {
-                                    cpu: configData['runner_cpu']
+                                    cpu: configData.runner_cpu
                                 }
                             },
                             env: Object.keys(environmentVariables).map(environmentVariable => ({ name: environmentVariable, value: environmentVariables[environmentVariable] }))

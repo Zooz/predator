@@ -86,10 +86,10 @@ async function handleDone(report, job, reportBenchmark) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
-    let emails = await getEmailTargets(job);
+    const emails = await getEmailTargets(job);
     const { benchmarkThreshold } = await getBenchmarkConfig();
 
-    let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
+    const aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
 
     if (emails && emails.length > 0) {
         await reportEmailSender.sendAggregateReport(aggregatedReport, job, emails, reportBenchmark);
@@ -135,7 +135,7 @@ async function handleIntermediate(report, job) {
 
 async function getEmailTargets(job) {
     let targets = [];
-    let defaultEmailAddress = await configHandler.getConfigValue(configConstants.DEFAULT_EMAIL_ADDRESS);
+    const defaultEmailAddress = await configHandler.getConfigValue(configConstants.DEFAULT_EMAIL_ADDRESS);
 
     if (defaultEmailAddress) {
         targets.push(defaultEmailAddress);

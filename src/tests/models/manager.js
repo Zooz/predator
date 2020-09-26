@@ -20,13 +20,13 @@ module.exports = {
 
 async function upsertTest(testRawData, existingTestId) {
     let testArtilleryJson = await testGenerator.createTest(testRawData);
-    let id = existingTestId || uuid();
+    const id = existingTestId || uuid();
     let processorFileId;
-    if (testRawData['processor_file_url']) {
-        let downloadedFile = await downloadManager.downloadFile(testRawData['processor_file_url']);
+    if (testRawData.processor_file_url) {
+        const downloadedFile = await downloadManager.downloadFile(testRawData.processor_file_url);
         processorFileId = await fileManager.saveFile('processor.js', downloadedFile);
     }
-    let revisionId = uuid.v4();
+    const revisionId = uuid.v4();
     if (testRawData.type === consts.TEST_TYPE_DSL) {
         testArtilleryJson = undefined;
     }
@@ -51,7 +51,7 @@ async function getBenchmark(testId) {
 }
 
 async function getTest(testId) {
-    let test = await database.getTest(testId);
+    const test = await database.getTest(testId);
     if (!test) {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
@@ -92,7 +92,7 @@ async function getTests() {
         }
     });
 
-    let latestTestsRevisions = [];
+    const latestTestsRevisions = [];
     Object.keys(testsById).forEach((id) => {
         testsById[id].artillery_test = testsById[id].artillery_json;
         delete testsById[id].artillery_json;

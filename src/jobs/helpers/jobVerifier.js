@@ -3,7 +3,7 @@ const testsManager = require('../../tests/models/manager');
 
 module.exports.verifyJobBody = (req, res, next) => {
     let errorToThrow;
-    let jobBody = req.body;
+    const jobBody = req.body;
     if (!(jobBody.run_immediately || jobBody.cron_expression)) {
         errorToThrow = new Error('Please provide run_immediately or cron_expression in order to schedule a job');
         errorToThrow.statusCode = 400;
@@ -17,7 +17,7 @@ module.exports.verifyJobBody = (req, res, next) => {
 
 module.exports.verifyTestExists = async (req, res, next) => {
     let errorToThrow;
-    let jobBody = req.body;
+    const jobBody = req.body;
     if (jobBody.test_id) {
         try {
             await testsManager.getTest(jobBody.test_id);
