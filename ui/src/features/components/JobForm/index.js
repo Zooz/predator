@@ -235,7 +235,7 @@ class Form extends React.Component {
       parallelism: undefined,
       max_virtual_users: undefined,
       type: 'load_test',
-      enable_ramp_to: true,
+      enable_ramp_to: false,
       errors: {
         name: undefined,
         retries: undefined,
@@ -246,9 +246,9 @@ class Form extends React.Component {
         upstream_connect_timeout: undefined
       },
       disabled: {
+        ramp_to: true,
         parallelism: true,
         max_virtual_users: true
-
       },
       mode: 'Simple'
     };
@@ -370,7 +370,7 @@ class Form extends React.Component {
               }, this)}
               <div className={style.buttons}>
                 <Button style={{ marginRight: '5px' }} inverted onClick={closeDialog}>Cancel</Button>
-                <Button style={{ marginRight: '5px' }} spinner={processingAction} hover disabled={!this.state.cron_expression}
+                <Button style={{ marginRight: '5px' }} spinner={processingAction} hover disabled={!this.state.cron_expression || !!this.isThereErrorOnForm()}
                   onClick={this.whenSubmit}>Schedule</Button>
                 <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
                   onClick={() => this.whenSubmit(true)}>{this.state.cron_expression ? 'Schedule & Run' : 'Run'}</Button>
