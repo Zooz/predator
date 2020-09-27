@@ -21,7 +21,7 @@ cd ..
 
 
 DATABASE_TYPE=SQLITE
-INTERNAL_ADDRESS=http://$(ifconfig en0 | grep 'inet ' | cut -d' ' -f2)
+INTERNAL_ADDRESS=http://$(ifconfig en0 | grep 'inet ' | cut -d' ' -f2)/v1
 JOB_PLATFORM=DOCKER
 
 touch .env
