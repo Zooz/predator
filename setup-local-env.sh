@@ -15,7 +15,7 @@ npm install
 cd ui || exit
 rm -fr dist
 rm -fr ./node_modules
-npm ci
+npm install
 npm run build
 cd ..
 
