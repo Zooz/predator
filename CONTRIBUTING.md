@@ -95,3 +95,22 @@ ui/
     ├── images                  # images to be used can be saved here
     └── store                   # redux store
 ```
+
+## System Resource Folder Structure
+All the resources have the same folder and file strcuture.
+```
+.
+└── src/
+    └── reosuceName/
+        ├── routes/ # Contains the express router and routing.
+        │   └── resourceNameRouter.js 
+        ├── controllers/ # Contains all the middlewares
+        │   └── resourceNameController.js 
+        └── models/
+            └── resourceNameManager.js # Handles the Business Logic of the resource
+                └── databaseConnector # DAL interface
+                    └── seuqelize/
+                        └── sequelizeConnector.js # implementation of DAL over sequelize      
+``` 
+Adding a new system resource? get quickly started by following the folder structure.
+Once setup it will be easier to solve the puzzle :)
