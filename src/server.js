@@ -40,7 +40,7 @@ async function verifyInternalAddressReachable() {
     const response = await request.get(internalConfigAddress, { json: true, simple: false, resolveWithFullResponse: true, timeout: 5000 });
 
     if (response.statusCode !== 200 || !response.body.internal_address) {
-        throw new Error(`Failed to reach successfully INTERNAL_ADDRESS, aborting (to skip this check set SKIP_INTERNAL_ADDRESS_CHECK=true\nError: ${response.body}`);
+        throw new Error(`Failed to reach successfully INTERNAL_ADDRESS at ${internalConfigAddress}, shutting down server (to skip this check set SKIP_INTERNAL_ADDRESS_CHECK=true\nError: ${response.body}`);
     } else {
         logger.info(`${internalConfigAddress} successfully reached`);
     }
