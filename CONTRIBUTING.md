@@ -4,6 +4,9 @@ First off, thanks for taking the time to contribute!
 
 The following is a set of guidelines for contributing to Predator and its packages, which are hosted in the [Predator](https://github.com/Zooz/predator) project on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
+## Where to start?
+If you would like to submit a bug report, feature request, or PR we have some guidelines outlined here. For any questions feel free to contact us on our [Slack workspace](https://join.slack.com/t/predator-dev/shared_invite/enQtNjgwMzE2NjM3MDcyLTg5YTIwMGQyNjZlMjQ4MDNjOTk5YTkwMWYwNzJkOWFmM2QwOGY0ODc3MDU3MWRkYTAwMjRhMjBhOTM1MzFmMjU).
+
 ## Submitting a Bug Report
 Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/). Provide the following information when submitting a bug:
 
