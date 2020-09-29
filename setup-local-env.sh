@@ -19,17 +19,4 @@ npm ci
 npm run build
 cd ..
 
-
-DATABASE_TYPE=SQLITE
-INTERNAL_ADDRESS=http://$(ifconfig en0 | grep 'inet ' | cut -d' ' -f2)/v1
-JOB_PLATFORM=DOCKER
-
-touch .env
-
-echo 'updating .env file'
-sed -i '' '/DATABASE_TYPE/d' .env
-sed -i '' '/INTERNAL_ADDRESS/d' .env
-sed -i '' '/JOB_PLATFORM/d' .env
-echo "DATABASE_TYPE=$DATABASE_TYPE" >> .env
-echo "INTERNAL_ADDRESS=$INTERNAL_ADDRESS" >> .env
-echo "JOB_PLATFORM=$JOB_PLATFORM" >> .env
+node setup-env.js
