@@ -12,6 +12,7 @@ const should = require('should'),
     testsManager = require('../../../../src/tests/models/manager'),
     webhooksManager = require('../../../../src/webhooks/models/webhookManager'),
     basicTest = require('../../../testExamples/Basic_test.json'),
+    reportsManager = require('../../../../src/reports/models/reportsManager'),
     config = require('../../../../src/common/consts').CONFIG;
 
 let manager;
@@ -37,7 +38,9 @@ describe('Manager tests', function () {
     let jobTemplateCreateJobRequestStub;
     let getConfigValueStub;
 
-    let webhooksManagerGetWebhook;
+    let webhooksManagerGetWebhookStub;
+
+    let postReportStub;
 
     let testsManagerGetStub;
 
@@ -50,7 +53,9 @@ describe('Manager tests', function () {
         databaseConnectorDeleteStub = sandbox.stub(databaseConnector, 'deleteJob');
         databaseConnectorUpdateJobStub = sandbox.stub(databaseConnector, 'updateJob');
 
-        webhooksManagerGetWebhook = sandbox.stub(webhooksManager, 'getWebhook');
+        webhooksManagerGetWebhookStub = sandbox.stub(webhooksManager, 'getWebhook');
+
+        postReportStub = sandbox.stub(reportsManager, 'postReport');
 
         testsManagerGetStub = sandbox.stub(testsManager, 'getTest');
 
@@ -110,7 +115,8 @@ describe('Manager tests', function () {
             manager.__get__('cronJobs').should.eql({});
         });
 
-        describe.only('databaseConnector connector returns an array with job with schedules, and job exist and can be run', function () {
+        describe('databaseConnector connector returns an array with job with schedules, and job exist and can be run', function () {
+            const reportId = uuid.v4();
             it('Verify job added', async function () {
                 const jobBodyWithCron = {
                     test_id: TEST_ID,
@@ -125,17 +131,20 @@ describe('Manager tests', function () {
                     webhooks: []
                 };
                 databaseConnectorGetStub.resolves([jobBodyWithCron]);
+                testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+                postReportStub.resolves({ report_id: reportId });
                 await manager.reloadCronJobs();
                 manager.__get__('cronJobs').should.have.key('5a9eee73-cf56-47aa-ac77-fad59e961aaa');
             });
 
             it('Verify cron was invoked more than once', function (done) {
-                testsManagerGetStub.resolves({ ...basicTest, id: TEST_ID });
                 this.timeout(5000);
                 setTimeout(async () => {
                     try {
                         await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaa');
                         loggerErrorStub.callCount.should.eql(0);
+                        postReportStub.callCount.should.be.aboveOrEqual(2);
+                        testsManagerGetStub.callCount.should.be.aboveOrEqual(2);
                         jobConnectorRunJobStub.callCount.should.be.aboveOrEqual(2);
                         done();
                     } catch (error) {
@@ -149,7 +158,7 @@ describe('Manager tests', function () {
     describe('schedule Finished Containers Cleanup', function () {
         it('Interval is set to 0, no automatic cleanup is scheduled', (done) => {
             getConfigValueStub.withArgs(config.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS).returns(0);
-            jobDeleteContainerStub.resolves({deleted: 10});
+            jobDeleteContainerStub.resolves({ deleted: 10 });
             manager.scheduleFinishedContainersCleanup();
 
             setTimeout(() => {
@@ -160,7 +169,7 @@ describe('Manager tests', function () {
 
         it('Interval is set to 100, automatic cleanup is scheduled', (done) => {
             getConfigValueStub.withArgs(config.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS).returns(100);
-            jobDeleteContainerStub.resolves({deleted: 10});
+            jobDeleteContainerStub.resolves({ deleted: 10 });
             let intervalObject;
             manager.scheduleFinishedContainersCleanup()
                 .then((interval) => {
@@ -235,10 +244,17 @@ describe('Manager tests', function () {
                     KEY2: 'B'
                 }
             };
-            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+            const reportId = uuid.v4();
+            testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+            postReportStub.resolves({ report_id: reportId });
+            webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
+
             let jobResponse = await manager.createJob(jobBodyWithCustomEnvVars);
+
             jobResponse.should.containEql(expectedResult);
             databaseConnectorInsertStub.callCount.should.eql(1);
+            testsManagerGetStub.callCount.should.eql(1);
+            postReportStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
             jobTemplateCreateJobRequestStub.args[0][3].should.containEql({
                 JOB_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
@@ -247,6 +263,7 @@ describe('Manager tests', function () {
                 PREDATOR_URL: 'localhost:80',
                 JOB_TYPE: 'load_test',
                 ARRIVAL_RATE: '1',
+                REPORT_ID: reportId,
                 DURATION: '1',
                 EMAILS: 'dina@niv.eli',
                 WEBHOOKS: webhooks.map(({ url }) => url).join(';'),
@@ -294,7 +311,7 @@ describe('Manager tests', function () {
                 arrival_rate: 1,
                 duration: 1
             };
-            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+            webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
 
             let jobResponse = await manager.createJob(jobBodyWithoutCron);
             jobResponse.should.containEql(expectedResult);
@@ -343,7 +360,7 @@ describe('Manager tests', function () {
                 duration: 1,
                 max_virtual_users: 198
             };
-            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+            webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
 
             let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsNicely);
             jobResponse.should.containEql(expectedResult);
@@ -407,7 +424,7 @@ describe('Manager tests', function () {
                 duration: 1,
                 max_virtual_users: 510
             };
-            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+            webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
 
             let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsWithDecimal);
             jobResponse.should.containEql(expectedResult);
@@ -465,7 +482,7 @@ describe('Manager tests', function () {
                 arrival_rate: 1,
                 duration: 1
             };
-            webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+            webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
 
             let jobResponse = await manager.createJob(jobBodyWithoutRampTo);
             jobResponse.should.containEql(expectedResult);
@@ -609,7 +626,7 @@ describe('Manager tests', function () {
                 databaseConnectorInsertStub.resolves({ success: 'success' });
                 databaseConnectorDeleteStub.resolves({});
                 let expectedResult = {
-                    'cron_expression': '* * * * * *',
+                    cron_expression: '* * * * * *',
                     ramp_to: '1',
                     id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                     test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -619,12 +636,16 @@ describe('Manager tests', function () {
                     arrival_rate: 1,
                     duration: 1
                 };
-                webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+                webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
+                testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+                postReportStub.resolves({ report_id: uuid.v4() });
 
                 return manager.createJob(jobBodyWithCron)
                     .then(function (result) {
                         result.should.containEql(expectedResult);
-                        loggerInfoStub.callCount.should.eql(2);
+                        testsManagerGetStub.callCount.should.eql(1);
+                        postReportStub.callCount.should.eql(1);
+                        loggerInfoStub.callCount.should.eql(3);
                     });
             });
 
@@ -677,7 +698,7 @@ describe('Manager tests', function () {
                 databaseConnectorInsertStub.resolves({ success: 'success' });
                 databaseConnectorDeleteStub.resolves({});
                 let expectedResult = {
-                    'cron_expression': '* * * * * *',
+                    cron_expression: '* * * * * *',
                     ramp_to: '1',
                     id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                     test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -687,13 +708,17 @@ describe('Manager tests', function () {
                     arrival_rate: 1,
                     duration: 1
                 };
-                webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+                webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
+                testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+                postReportStub.resolves({ report_id: uuid.v4() });
 
                 let jobBodyWithCronDisabled = { ...jobBodyWithCron, enabled: false };
                 return manager.createJob(jobBodyWithCronDisabled)
                     .then(function (result) {
                         result.should.containEql(expectedResult);
-                        loggerInfoStub.callCount.should.eql(2);
+                        testsManagerGetStub.callCount.should.eql(1);
+                        postReportStub.callCount.should.eql(1);
+                        loggerInfoStub.callCount.should.eql(3);
                     });
             });
 
@@ -758,7 +783,9 @@ describe('Manager tests', function () {
                     arrival_rate: 1,
                     duration: 1
                 };
-                webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+                webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
+                testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+                postReportStub.resolves({ report_id: uuid.v4() });
 
                 return manager.createJob(jobBodyWithCron)
                     .then(function (result) {
@@ -824,7 +851,9 @@ describe('Manager tests', function () {
                     arrival_rate: 1,
                     duration: 1
                 };
-                webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+                webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
+                testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+                postReportStub.resolves({ report_id: uuid.v4() });
 
                 return manager.createJob(jobBodyWithCronNotImmediately)
                     .then(function (result) {
@@ -916,10 +945,14 @@ describe('Manager tests', function () {
                 webhooks: jobBodyWithCron.webhooks,
                 ramp_to: '1'
             }]);
-            webhooks.forEach(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
+            webhooks.forEach(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
+            testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+            postReportStub.resolves({ report_id: uuid.v4() });
+
             await manager.createJob(jobBodyWithCron);
             await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
-            loggerInfoStub.callCount.should.eql(4);
+
+            loggerInfoStub.callCount.should.eql(5);
             manager.__get__('cronJobs')[JOB_ID].cronTime.source.should.eql('20 * * * *');
             await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
         });
@@ -941,11 +974,14 @@ describe('Manager tests', function () {
                 jobConnectorRunJobStub.resolves({});
                 databaseConnectorInsertStub.resolves({ success: 'success' });
                 databaseConnectorUpdateJobStub.rejects({ error: 'error' });
+                testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+                postReportStub.resolves({ report_id: uuid.v4() });
+
                 await manager.createJob(jobBodyWithCron);
                 await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
             } catch (error) {
                 error.should.eql({ error: 'error' });
-                loggerInfoStub.callCount.should.eql(2);
+                loggerInfoStub.callCount.should.eql(3);
                 loggerErrorStub.callCount.should.eql(1);
                 manager.__get__('cronJobs')[JOB_ID].cronTime.source.should.eql('* * * * * *');
                 await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
@@ -983,11 +1019,13 @@ describe('Manager tests', function () {
             jobConnectorRunJobStub.resolves({});
             databaseConnectorInsertStub.resolves({ success: 'success' });
             databaseConnectorDeleteStub.resolves({});
+            testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+            postReportStub.resolves({ report_id: uuid.v4() });
 
             await manager.createJob(jobBodyWithCron);
             await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
             databaseConnectorDeleteStub.callCount.should.eql(1);
-            loggerInfoStub.args[2].should.eql(['Job: 5a9eee73-cf56-47aa-ac77-fad59e961aaf completed.']);
+            loggerInfoStub.args[3].should.eql(['Job: 5a9eee73-cf56-47aa-ac77-fad59e961aaf completed.']);
         });
     });
 
@@ -1103,7 +1141,7 @@ describe('Manager tests', function () {
                 cron_expression: null,
                 emails: ['eli@eli.eli'],
                 webhooks: null,
-                ramp_to: '1',
+                ramp_to: '1'
             }]
             );
 
@@ -1258,7 +1296,7 @@ describe('Manager tests', function () {
 
     describe('Delete containers', function () {
         it('Success deleting jobs from connector', async function () {
-            jobDeleteContainerStub.resolves({deleted: 10});
+            jobDeleteContainerStub.resolves({ deleted: 10 });
             let result = await manager.deleteAllContainers();
             result.should.eql({
                 deleted: 10
@@ -1268,7 +1306,7 @@ describe('Manager tests', function () {
         });
 
         it('Get logs from job fails', async function () {
-            jobDeleteContainerStub.rejects({message: 'Failed to delete containers'});
+            jobDeleteContainerStub.rejects({ message: 'Failed to delete containers' });
             try {
                 await manager.deleteAllContainers();
                 throw new Error('should not get here');
