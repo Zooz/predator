@@ -16,3 +16,10 @@ Predator's test reports give in-depth performance metrics in real-time, while ag
 
 Easily compare two or more test results in one predator report dashboard. This is available under `Last Reports` page 
 and after selecting the desired tests, clicking on `Compare Reports` will display the test results side by side on the same graphs.
+
+### Favorite Reports
+
+!!! TIP "Supported from version zooz/predator:1.5.0"
+
+Want to save a report and then find it easily after? In the report you would like to favorite, click on the star to add it to a favorites list. 
+Under the reports page you can then filter only the favorite reports and find them in one-click. 

@@ -1,13 +1,13 @@
 'use strict';
 
-let util = require('util');
-let fs = require('fs');
-let requestSender = require('../../../common/requestSender');
-let logger = require('../../../common/logger');
-let kubernetesConfig = require('../../../config/kubernetesConfig');
-let kubernetesUrl = kubernetesConfig.kubernetesUrl;
-let kubernetesNamespace = kubernetesConfig.kubernetesNamespace;
-let headers = {};
+const util = require('util');
+const fs = require('fs');
+const requestSender = require('../../../common/requestSender');
+const logger = require('../../../common/logger');
+const kubernetesConfig = require('../../../config/kubernetesConfig');
+const kubernetesUrl = kubernetesConfig.kubernetesUrl;
+const kubernetesNamespace = kubernetesConfig.kubernetesNamespace;
+const headers = {};
 
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 
@@ -17,7 +17,7 @@ if (kubernetesConfig.kubernetesToken) {
 } else {
     try {
         logger.info('kubernetes token from env var was not provided. will use: ' + TOKEN_PATH);
-        let token = fs.readFileSync(TOKEN_PATH);
+        const token = fs.readFileSync(TOKEN_PATH);
         headers.Authorization = 'bearer ' + token.toString();
     } catch (error) {
         logger.warn(error, 'Failed to get kubernetes token from: ' + TOKEN_PATH);
@@ -25,15 +25,15 @@ if (kubernetesConfig.kubernetesToken) {
 }
 
 module.exports.runJob = async (kubernetesJobConfig) => {
-    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs', kubernetesUrl, kubernetesNamespace);
-    let options = {
+    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs', kubernetesUrl, kubernetesNamespace);
+    const options = {
         url,
         method: 'POST',
         body: kubernetesJobConfig,
         headers
     };
-    let jobResponse = await requestSender.send(options);
-    let genericJobResponse = {
+    const jobResponse = await requestSender.send(options);
+    const genericJobResponse = {
         jobName: jobResponse.metadata.name,
         id: jobResponse.metadata.uid,
         namespace: jobResponse.namespace
@@ -41,9 +41,9 @@ module.exports.runJob = async (kubernetesJobConfig) => {
     return genericJobResponse;
 };
 module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) => {
-    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
+    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
 
-    let options = {
+    const options = {
         url,
         method: 'DELETE',
         headers
@@ -53,17 +53,17 @@ module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) 
 };
 
 module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId, predatorRunnerPrefix) => {
-    let jobControllerUid = await getJobControllerUid(jobPlatformName, platformSpecificInternalRunId);
+    const jobControllerUid = await getJobControllerUid(jobPlatformName, platformSpecificInternalRunId);
 
-    let podsNames = await getPodsByLabel(jobControllerUid);
+    const podsNames = await getPodsByLabel(jobControllerUid);
 
-    let logs = await getLogsByPodsNames(podsNames, predatorRunnerPrefix);
+    const logs = await getLogsByPodsNames(podsNames, predatorRunnerPrefix);
 
     return logs;
 };
 
 module.exports.deleteAllContainers = async (jobPlatformName) => {
-    let jobs = await getAllPredatorRunnerJobs(jobPlatformName);
+    const jobs = await getAllPredatorRunnerJobs(jobPlatformName);
     let allPredatorRunnersPods = [];
     for (let i = 0; i < jobs.length; i++) {
         const pods = await getPodsByLabel(jobs[i].metadata.uid);
@@ -72,7 +72,7 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
 
     let deleted = 0;
     for (let i = 0; i < allPredatorRunnersPods.length; i++) {
-        let pod = await getPodByName(allPredatorRunnersPods[i]);
+        const pod = await getPodByName(allPredatorRunnersPods[i]);
 
         let containers = pod.status.containerStatuses;
         containers = containers.find(o => o.name === 'predator-runner');
@@ -85,9 +85,9 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
 };
 
 async function getAllPredatorRunnerJobs(jobPlatformName) {
-    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs?labelSelector=app=%s', kubernetesUrl, kubernetesNamespace, jobPlatformName);
+    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs?labelSelector=app=%s', kubernetesUrl, kubernetesNamespace, jobPlatformName);
 
-    let options = {
+    const options = {
         url,
         method: 'GET',
         headers
@@ -99,29 +99,29 @@ async function getAllPredatorRunnerJobs(jobPlatformName) {
 }
 
 async function getJobControllerUid(jobPlatformName, platformSpecificInternalRunId) {
-    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
-    let options = {
+    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
+    const options = {
         url,
         method: 'GET',
         headers
     };
 
-    let job = await requestSender.send(options);
+    const job = await requestSender.send(options);
 
-    let controllerUid = job.spec.selector.matchLabels['controller-uid'];
+    const controllerUid = job.spec.selector.matchLabels['controller-uid'];
     return controllerUid;
 }
 
 async function getLogsByPodsNames(podsNames, predatorRunnerPrefix) {
-    let logs = [];
+    const logs = [];
     podsNames.forEach((podName) => {
-        let url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=%s', kubernetesUrl, kubernetesNamespace, podName, 'predator-runner');
-        let options = {
+        const url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=%s', kubernetesUrl, kubernetesNamespace, podName, 'predator-runner');
+        const options = {
             url,
             method: 'GET',
             headers
         };
-        let getLogsPromise = requestSender.send(options);
+        const getLogsPromise = requestSender.send(options);
         logs.push({ type: 'file', name: podName + '.txt', content: getLogsPromise });
     });
 
@@ -132,36 +132,36 @@ async function getLogsByPodsNames(podsNames, predatorRunnerPrefix) {
 }
 
 async function getPodsByLabel(jobControllerUid) {
-    let url = util.format('%s/api/v1/namespaces/%s/pods?labelSelector=controller-uid=%s', kubernetesUrl, kubernetesNamespace, jobControllerUid);
-    let options = {
+    const url = util.format('%s/api/v1/namespaces/%s/pods?labelSelector=controller-uid=%s', kubernetesUrl, kubernetesNamespace, jobControllerUid);
+    const options = {
         url,
         method: 'GET',
         headers
     };
 
-    let pods = await requestSender.send(options);
+    const pods = await requestSender.send(options);
 
-    let podsNames = pods.items.map((pod) => {
+    const podsNames = pods.items.map((pod) => {
         return pod.metadata.name;
     });
     return podsNames;
 }
 
 async function getPodByName(podName) {
-    let url = util.format('%s/api/v1/namespaces/%s/pods/%s', kubernetesUrl, kubernetesNamespace, podName);
-    let options = {
+    const url = util.format('%s/api/v1/namespaces/%s/pods/%s', kubernetesUrl, kubernetesNamespace, podName);
+    const options = {
         url,
         method: 'GET',
         headers
     };
-    let pod = await requestSender.send(options);
+    const pod = await requestSender.send(options);
     return pod;
 }
 
 async function deleteContainer(pod) {
-    let url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, pod.metadata.labels['job-name']);
+    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, pod.metadata.labels['job-name']);
 
-    let options = {
+    const options = {
         url,
         method: 'DELETE',
         headers

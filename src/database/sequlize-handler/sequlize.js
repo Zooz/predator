@@ -40,7 +40,7 @@ module.exports.closeConnection = () => {
 };
 
 async function createClient() {
-    let options = {
+    const options = {
         dialect: databaseConfig.type.toLowerCase(),
         logging: false,
         host: databaseConfig.address,
@@ -55,7 +55,7 @@ async function createClient() {
         options.storage = databaseConfig.sqliteStorage;
     }
 
-    let client = new Sequelize(databaseConfig.name.toLowerCase(), databaseConfig.username, databaseConfig.password, options);
+    const client = new Sequelize(databaseConfig.name.toLowerCase(), databaseConfig.username, databaseConfig.password, options);
     await client.authenticate();
     return client;
 }

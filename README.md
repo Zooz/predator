@@ -1,5 +1,5 @@
 # Predator
-## Most powerful open-source platform for load testing APIs.
+## Powerful open-source platform for load testing APIs.
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786)
 [![Join Slack](https://img.shields.io/badge/slack-join-green.svg)](https://join.slack.com/t/predator-dev/shared_invite/enQtNjgwMzE2NjM3MDcyLTg5YTIwMGQyNjZlMjQ4MDNjOTk5YTkwMWYwNzJkOWFmM2QwOGY0ODc3MDU3MWRkYTAwMjRhMjBhOTM1MzFmMjU)
 
@@ -21,20 +21,18 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 |                                 |                    |          |
 |-------------------------------- |:------------------:|:---------|
 | Distributed Load                | :sparkle:          |Predator supports an unlimited number of load generators that produce multiple load runners concurrently.
+| Functional Testing              | :new:              |Run functional tests with various types of assertions and later on see the results in the report page.
 | Rich UI                         | :sparkle:          |Predator offers a rich UI where you can write tests, run them and compare results.
 | Reports && Tests Persistence    | :sparkle:          |Predator provides out-of-the box functionality for persisting data in Postgres, MySQL, MSSQL and SQLITE.
 | Real time reports               | :sparkle:          |Predator aggregates all concurrent runs into a single beautiful report in real time (latency, rps, status codes and more).
 | CSV Datasets                    | :sparkle:          |Predator support uploading files like csv to provide dataset for test inputs
 | Scheduled runs                  | :sparkle:          |Predator can run recurring tests using cron expressions.
 | REST API                        | :sparkle:          |Full REST API to integrate Predator with CI/CD frameworks
-| Slack notifications             | :sparkle:          |Predator support notification to slack upon important test events.
 | Benchmarks                      | :sparkle:          |Set benchmarks to compare test runs to ensure performance degradation is discovered early in development. Allows to measure every build and release against specified baseline results guaranteeing safer releases to production.|
 | Cloud Native                    | :sparkle:          |Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
 | Prometheus/Influx integration   | :sparkle:          |Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
 | Compare Multiple tests results  | :sparkle:          |Built-in dashboard to compare multiple test runs at once.
-| Webhooks API                    | :soon:             |Coming soon in v1.5
-| Functional Testing              | :soon:             |Coming soon in v1.5
-
+| Webhooks API                    | :new:              |supported in Slack or JSON format for an easy server to server integration.
 
 -----------------------------------------------------
 
@@ -80,12 +78,15 @@ With persisted storage:
 where $MACHINE_IP is the local ip address of your machine (not localhost, but actual ip address - it is your local network address).
 
 ### Developers
-Predator runs using Docker. In order to run Predator locally, clone this repository and then run the following command:
+To run and debug Predator locally run setup-local-env.sh script.
+`./setup-local-env.sh`
 
-`runPredatorLocal.sh`
+This script will clean your node_modules, run npm install and set .env file with minimal required params.   
+After that you will be able to start Predator with:
 
-or refer to the [Docker](#docker) instructions above.
+`npm run start-local`
 
+In case your IP changes, you will need to change it in .env file.
 ##### Running the tests
 
 Run `npm test` in order to run tests in your local machine. The script runs the following tests:

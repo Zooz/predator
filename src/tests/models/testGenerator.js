@@ -1,30 +1,30 @@
 'use strict';
-let _ = require('lodash');
-let consts = require('./../../common/consts');
+const _ = require('lodash');
+const consts = require('./../../common/consts');
 const database = require('./database');
 const utils = require('../helpers/utils');
 const { get, cloneDeep } = require('lodash');
 
 module.exports.createTest = async function(testDetails) {
     if (testDetails.type === consts.TEST_TYPE_BASIC) {
-        let artillery = utils.addDefaultsToTest(testDetails.artillery_test);
+        const artillery = utils.addDefaultsToTest(testDetails.artillery_test);
         delete testDetails.artillery_test;
         return artillery;
     } else {
         const dslCached = {};
-        let scenarios = [];
+        const scenarios = [];
         let weightsSum = 0;
         let missingWeightCount = 0;
-        let variables = {};
+        const variables = {};
         let before;
         if (testDetails.before && testDetails.before.steps){
             before = {};
             before.flow = await createSteps('before', testDetails.before.steps, variables, dslCached);
         }
         for (let i = 0; i < testDetails.scenarios.length; i++) {
-            let scenario = testDetails.scenarios[i];
-            let scenarioIndex = i;
-            let artilleryTestJson = {};
+            const scenario = testDetails.scenarios[i];
+            const scenarioIndex = i;
+            const artilleryTestJson = {};
             artilleryTestJson.name = scenario.scenario_name;
             artilleryTestJson.flow = await createSteps(scenarioIndex, scenario.steps, variables, dslCached);
 
@@ -58,7 +58,7 @@ module.exports.createTest = async function(testDetails) {
 };
 
 function addTestWrapper(scenarios, before, variables) {
-    let test = JSON.parse(JSON.stringify(require('./steps/testBase.json')));
+    const test = JSON.parse(JSON.stringify(require('./steps/testBase.json')));
     test.before = before;
     test.scenarios = scenarios;
     test.config.variables = Object.assign(test.config.variables, variables);
@@ -66,7 +66,7 @@ function addTestWrapper(scenarios, before, variables) {
 }
 
 function calculateWeights(scenarios, weightsSum, missingWeightCount) {
-    let weight = (100 - weightsSum) / missingWeightCount;
+    const weight = (100 - weightsSum) / missingWeightCount;
     scenarios.forEach(function(scenario) {
         if (!scenario.weight) {
             scenario.weight = weight;
@@ -88,11 +88,11 @@ async function getDslDefinitionsAsMap(dslName) {
 }
 
 async function createSteps(majorPrefix, steps, variables, dslCached) {
-    let stepsJsons = [];
-    let previousSteps = [];
+    const stepsJsons = [];
+    const previousSteps = [];
     for (let i = 0; i < steps.length; i++) {
-        let step = steps[i];
-        let stepIndex = i;
+        const step = steps[i];
+        const stepIndex = i;
         const parsedAction = step.action.split('.');
         if (parsedAction.length !== 2){
             const error = new Error('action must be this pattern: {dsl_name}.{definition_name}.');
@@ -113,12 +113,14 @@ async function createSteps(majorPrefix, steps, variables, dslCached) {
         }
         stepDefinition = cloneDeep(stepDefinition);
         if (step.wait) {
-            stepDefinition = { loop: [ {
-                think: step.wait
-            },
-            stepDefinition
-            ],
-            count: 1 };
+            stepDefinition = {
+                loop: [{
+                    think: step.wait
+                },
+                stepDefinition
+                ],
+                count: 1
+            };
         }
 
         if (step.properties && Object.keys(step.properties).length > 0) {
@@ -133,19 +135,19 @@ async function createSteps(majorPrefix, steps, variables, dslCached) {
 }
 
 function insertPropertiesAsVars(majorPrefix, minorPrefix, stepName, stepDefinition, properties){
-    let firstKey = Object.keys(stepDefinition)[0];
+    const firstKey = Object.keys(stepDefinition)[0];
     properties.forEach(function(property) {
-        let jsonBody = stepDefinition[firstKey]['json'];
-        let propertyVariable = property.split('.').join('_');
-        let newValue = '{{ ' + majorPrefix + '_' + minorPrefix + '_' + stepName + '_' + propertyVariable + ' }}';
-        let updatedJsonBody = replaceValueInJsonBody(jsonBody, property, newValue);
-        stepDefinition[firstKey]['json'] = updatedJsonBody;
+        const jsonBody = stepDefinition[firstKey].json;
+        const propertyVariable = property.split('.').join('_');
+        const newValue = '{{ ' + majorPrefix + '_' + minorPrefix + '_' + stepName + '_' + propertyVariable + ' }}';
+        const updatedJsonBody = replaceValueInJsonBody(jsonBody, property, newValue);
+        stepDefinition[firstKey].json = updatedJsonBody;
     });
 }
 
 function modifyVariablesArray(majorPrefix, minorPrefix, stepName, variables, properties) {
     Object.keys(properties).forEach(function(property) {
-        let propertyAsVariableInFile = property.split('.').join('_');
+        const propertyAsVariableInFile = property.split('.').join('_');
         variables[majorPrefix + '_' + minorPrefix + '_' + stepName + '_' + propertyAsVariableInFile] = properties[property];
     });
 }

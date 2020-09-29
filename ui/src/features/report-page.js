@@ -7,20 +7,20 @@ import {connect} from "react-redux";
 import Loader from "./components/Loader";
 import ErrorDialog from "./components/ErrorDialog";
 
-const ReportPage = ({setGetReportFailure, error, loading, report, getReport, match: {params}}) => {
+const ReportPage = ({cleanAllReportsErrors, errorGetReport, errorEditReport, loading, report, getReport, match: {params}}) => {
     const {testId, reportId} = params;
+    const error = errorGetReport || errorEditReport;
     useEffect(() => {
         getReport(testId, reportId);
 
     }, []);
     const onCloseErrorDialog = () => {
-
-        setGetReportFailure(false);
+        cleanAllReportsErrors();
     };
 
     return (
         <Page>
-            {loading && <Loader/>}
+            {loading && !report && <Loader/>}
             {report && <Report report={report}/>}
             {error && <ErrorDialog closeDialog={onCloseErrorDialog} showMessage={error}/>}
         </Page>
@@ -32,13 +32,14 @@ function mapStateToProps(state) {
     return {
         loading: selectors.processingGetReport(state),
         report: selectors.report(state),
-        error: selectors.errorOnGetReport(state),
+        errorGetReport: selectors.errorOnGetReport(state),
+        errorEditReport: selectors.editReportFailure(state),
     }
 }
 
 const mapDispatchToProps = {
     getReport: Actions.getReport,
-    setGetReportFailure: Actions.getReportFailure,
+    cleanAllReportsErrors: Actions.cleanAllReportsErrors,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReportPage);

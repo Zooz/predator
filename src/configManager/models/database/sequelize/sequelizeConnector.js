@@ -21,7 +21,7 @@ async function updateConfig(updateValues) {
     const configClient = client.model('config');
     const records = [];
     Object.keys(updateValues).forEach(key => {
-        let value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key] + '';
+        const value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key] + '';
         records.push(configClient.upsert({ key: key, value: value }));
     });
     const results = await Promise.all(records);
@@ -43,7 +43,7 @@ async function getConfig() {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     const dbResults = await configClient.findAll(options);
-    let resultArr = dbResults.map(result => (result.dataValues));
+    const resultArr = dbResults.map(result => (result.dataValues));
     return resultArr;
 }
 
@@ -53,8 +53,8 @@ async function getConfigValue(configValue) {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     options.where = { key: configValue };
-    let value = await configClient.findOne(options);
-    let response = value ? [value] : [];
+    const value = await configClient.findOne(options);
+    const response = value ? [value] : [];
     return response;
 }
 

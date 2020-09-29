@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 module.exports.up = async (query, DataTypes) => {
-    let jobsTable = await query.describeTable('jobs');
+    const jobsTable = await query.describeTable('jobs');
 
     if (!jobsTable.proxy_url) {
         await query.addColumn(

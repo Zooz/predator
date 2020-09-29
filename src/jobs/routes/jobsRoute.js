@@ -1,11 +1,11 @@
 'use strict';
 
-let swaggerValidator = require('express-ajv-swagger-validation');
-let express = require('express');
-let router = express.Router();
+const swaggerValidator = require('express-ajv-swagger-validation');
+const express = require('express');
+const router = express.Router();
 
-let jobs = require('../controllers/jobsController');
-let jobVerifier = require('../helpers/jobVerifier');
+const jobs = require('../controllers/jobsController');
+const jobVerifier = require('../helpers/jobVerifier');
 
 router.post('/', swaggerValidator.validate, jobVerifier.verifyJobBody, jobVerifier.verifyTestExists, jobs.createJob);
 router.get('/', swaggerValidator.validate, jobs.getJobs);

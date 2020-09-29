@@ -1,5 +1,7 @@
 'use strict';
 
+const slackEmojis = require('slack-emojis');
+
 const reportEmailSender = require('./reportEmailSender'),
     jobsManager = require('../../jobs/models/jobManager'),
     aggregateReportGenerator = require('./aggregateReportGenerator'),
@@ -77,18 +79,17 @@ async function handleFirstIntermediate(report, job) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE)) {
         return;
     }
-    let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, report, { aggregatedReport });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, report);
 }
 
 async function handleDone(report, job, reportBenchmark) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
-    let emails = await getEmailTargets(job);
+    const emails = await getEmailTargets(job);
     const { benchmarkThreshold } = await getBenchmarkConfig();
 
-    let aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
+    const aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
 
     if (emails && emails.length > 0) {
         await reportEmailSender.sendAggregateReport(aggregatedReport, job, emails, reportBenchmark);
@@ -97,10 +98,10 @@ async function handleDone(report, job, reportBenchmark) {
     if (reportBenchmark.score && benchmarkThreshold) {
         const lastReports = await reportsManager.getReports(aggregatedReport.test_id);
         const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
-        const { event, icon } = reportBenchmark.score < benchmarkThreshold ? { event: WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, icon: ':cry:' } : { event: WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, icon: ':grin:' };
-        await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon });
+        const { event, icon } = reportBenchmark.score < benchmarkThreshold ? { event: WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, icon: slackEmojis.CRY } : { event: WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, icon: slackEmojis.GRIN };
+        await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon });
     }
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport, score: reportBenchmark.score }, { icon: ':rocket:' });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET });
 }
 
 async function handleAbort(report, job) {
@@ -129,12 +130,12 @@ async function handleIntermediate(report, job) {
     if (Object.keys(accumulatedStatusCodesCounter).every(statusCode => statusCode < 500)) {
         return;
     }
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_API_FAILURE, report, { accumulatedStatusCodesCounter }, { icon: ':skull:' });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_API_FAILURE, report, { accumulatedStatusCodesCounter }, { icon: slackEmojis.SKULL });
 }
 
 async function getEmailTargets(job) {
     let targets = [];
-    let defaultEmailAddress = await configHandler.getConfigValue(configConstants.DEFAULT_EMAIL_ADDRESS);
+    const defaultEmailAddress = await configHandler.getConfigValue(configConstants.DEFAULT_EMAIL_ADDRESS);
 
     if (defaultEmailAddress) {
         targets.push(defaultEmailAddress);

@@ -8,7 +8,7 @@ const initialState = Immutable.Map({
     error_get_reports: undefined,
     error_get_report: undefined,
     create_benchmark_success: false,
-    edit_notes_success: false,
+    edit_report_success: false,
     edit_report_failure: undefined,
     create_benchmark_failure: undefined,
     selected_reports: {},
@@ -42,7 +42,7 @@ export default function reduce(state = initialState, action = {}) {
         case Types.CREATE_BENCHMARK_SUCCESS:
             return state.set('create_benchmark_success', action.value);
         case Types.EDIT_REPORT_SUCCESS:
-            return state.set('edit_notes_success', action.value);
+            return state.set('edit_report_success', action.value);
         case Types.EDIT_REPORT_FAILURE:
             return state.set('edit_report_failure', action.error);
         case Types.DELETE_REPORT_SUCCESS:

@@ -14,32 +14,32 @@ const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, c
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
 
 module.exports.getReport = async (testId, reportId) => {
-    let reportSummary = await databaseConnector.getReport(testId, reportId);
+    const reportSummary = await databaseConnector.getReport(testId, reportId);
 
     if (reportSummary.length !== 1) {
-        let error = new Error('Report not found');
+        const error = new Error('Report not found');
         error.statusCode = 404;
         throw error;
     }
-    let config = await configHandler.getConfig();
-    let report = await getReportResponse(reportSummary[0], config);
+    const config = await configHandler.getConfig();
+    const report = await getReportResponse(reportSummary[0], config);
     return report;
 };
 
-module.exports.getReports = async (testId) => {
-    let reportSummaries = await databaseConnector.getReports(testId);
-    let config = await configHandler.getConfig();
-    let reports = reportSummaries.map((summaryRow) => {
+module.exports.getReports = async (testId, filter) => {
+    const reportSummaries = await databaseConnector.getReports(testId, filter);
+    const config = await configHandler.getConfig();
+    const reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
     reports.sort((a, b) => b.start_time - a.start_time);
     return reports;
 };
 
-module.exports.getLastReports = async (limit) => {
-    let reportSummaries = await databaseConnector.getLastReports(limit);
-    let config = await configHandler.getConfig();
-    let reports = reportSummaries.map((summaryRow) => {
+module.exports.getLastReports = async (limit, filter) => {
+    const reportSummaries = await databaseConnector.getLastReports(limit, filter);
+    const config = await configHandler.getConfig();
+    const reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
     return reports;
@@ -47,17 +47,17 @@ module.exports.getLastReports = async (limit) => {
 
 module.exports.editReport = async (testId, reportId, reportBody) => {
     // currently we support only edit for notes
-    const { notes } = reportBody;
-    await databaseConnector.updateReport(testId, reportId, { notes });
+    const { notes, is_favorite } = reportBody;
+    await databaseConnector.updateReport(testId, reportId, { notes, is_favorite });
 };
 
 module.exports.deleteReport = async (testId, reportId) => {
-    let reportSummary = await databaseConnector.getReport(testId, reportId);
-    let config = await configHandler.getConfig();
-    let report = await getReportResponse(reportSummary[0], config);
+    const reportSummary = await databaseConnector.getReport(testId, reportId);
+    const config = await configHandler.getConfig();
+    const report = await getReportResponse(reportSummary[0], config);
 
     if (!FINAL_REPORT_STATUSES_WITH_END_TIME.includes(report.status)) {
-        let error = new Error(`Can't delete running test with status ${report.status}`);
+        const error = new Error(`Can't delete running test with status ${report.status}`);
         error.statusCode = 409;
         throw error;
     }
@@ -87,7 +87,7 @@ module.exports.postReport = async (testId, reportBody) => {
 
     return databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.job_id,
         reportBody.test_type, phase, startTime, reportBody.test_name,
-        reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now());
+        reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now(), false);
 };
 
 module.exports.subscribeRunnerToReport = async function (testId, reportId, runnerId) {
@@ -95,9 +95,9 @@ module.exports.subscribeRunnerToReport = async function (testId, reportId, runne
 };
 
 function getReportResponse(summaryRow, config) {
-    let lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;
+    const lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;
 
-    let testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
+    const testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
     const reportDurationSeconds = (new Date(lastUpdateTime).getTime() - new Date(summaryRow.start_time).getTime()) / 1000;
 
     let rps = 0;
@@ -118,15 +118,16 @@ function getReportResponse(summaryRow, config) {
         }
     });
 
-    let successRate = successRequests / completedRequests * 100;
+    const successRate = successRequests / completedRequests * 100;
 
-    let report = {
+    const report = {
         test_id: summaryRow.test_id,
         test_name: summaryRow.test_name,
         revision_id: summaryRow.revision_id,
         report_id: summaryRow.report_id,
         job_id: summaryRow.job_id,
         job_type: testConfiguration.job_type,
+        is_favorite: summaryRow.is_favorite,
         test_type: summaryRow.test_type,
         start_time: summaryRow.start_time,
         end_time: summaryRow.end_time || undefined,
@@ -163,7 +164,7 @@ function getReportResponse(summaryRow, config) {
 function generateGrafanaUrl(report, grafanaUrl) {
     if (grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '&to=now';
-        const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
+        const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&var-TestRunId=${report.report_id}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
         return grafanaReportUrl;
     }
 }

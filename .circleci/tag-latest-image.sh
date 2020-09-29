@@ -11,6 +11,5 @@ CONTAINER_IMAGE=zooz/predator:$TAG
 
 echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
-docker pull $CONTAINER_IMAGE
-docker tag $CONTAINER_IMAGE $LATEST_MINOR_TAG_IMAGE
+docker build . -t $LATEST_MINOR_TAG_IMAGE
 docker push $LATEST_MINOR_TAG_IMAGE

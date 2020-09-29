@@ -1,8 +1,8 @@
 
 'use strict';
-let aggregateReportGenerator = require('../models/aggregateReportGenerator');
-let reports = require('../models/reportsManager');
-let stats = require('../models/statsManager');
+const aggregateReportGenerator = require('../models/aggregateReportGenerator');
+const reports = require('../models/reportsManager');
+const stats = require('../models/statsManager');
 
 module.exports.getAggregateReport = async function (req, res, next) {
     let reportInput;
@@ -48,7 +48,7 @@ module.exports.deleteReport = async (req, res, next) => {
 module.exports.getReports = async (req, res, next) => {
     let reportSummaries;
     try {
-        reportSummaries = await reports.getReports(req.params.test_id);
+        reportSummaries = await reports.getReports(req.params.test_id, req.query.filter);
     } catch (err) {
         return next(err);
     }
@@ -59,7 +59,7 @@ module.exports.getReports = async (req, res, next) => {
 module.exports.getLastReports = async (req, res, next) => {
     let reportSummaries;
     try {
-        reportSummaries = await reports.getLastReports(req.query.limit);
+        reportSummaries = await reports.getLastReports(req.query.limit, req.query.filter);
     } catch (err) {
         return next(err);
     }

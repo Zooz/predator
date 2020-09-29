@@ -11,12 +11,18 @@ $pressed-button-color: #dce0e0;
   flex: 1;
   width: 18px;
   text-align: center;
-  font-size: 12px !important;;
+  font-size: 12px !important;
   border-left: none;
   cursor: not-allowed;
+  color: $disabled-light-grey-button;
 
   &:active {
     background-color: $pressed-button-color;
+  }
+
+  &--disabled {
+    background: $greyout;
+    color: $disabled-light-grey-button;
   }
 }
 

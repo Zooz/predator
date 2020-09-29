@@ -12,7 +12,7 @@ const webhookDefaultValues = {
 };
 
 async function getAllWebhooks() {
-    let getAllWebhooks = await databaseConnector.getAllWebhooks();
+    const getAllWebhooks = await databaseConnector.getAllWebhooks();
     return getAllWebhooks;
 };
 

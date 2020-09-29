@@ -1,0 +1,36 @@
+
+@import "../../styles/colors";
+
+$list-side-padding: 20px;
+$hover-background-color: $default-blue;
+$hover-color: $white;
+$hover-outline-space: -1px;
+
+.option-item {
+  padding: 3px $list-side-padding;
+  margin: 0;
+
+  .option-item__checkbox {
+    position: relative;
+  }
+
+  &:hover {
+    background-color: $hover-background-color;
+
+    .option-item__option {
+      color: $hover-color;
+    }
+
+    .option-item__checkbox:after {
+      content: " ";
+      position: absolute;
+      display: block;
+      top: $hover-outline-space;
+      right: $hover-outline-space;
+      bottom: $hover-outline-space;
+      left: $hover-outline-space;
+      border-radius: 2px;
+      border: 1px solid $white;
+    }
+  }
+}

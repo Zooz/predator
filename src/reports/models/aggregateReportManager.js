@@ -1,11 +1,11 @@
 'use strict';
 
-let _ = require('lodash');
-let math = require('mathjs');
+const _ = require('lodash');
+const math = require('mathjs');
 
-let logger = require('../../common/logger');
-let databaseConnector = require('./databaseConnector');
-let constants = require('../utils/constants');
+const logger = require('../../common/logger');
+const databaseConnector = require('./databaseConnector');
+const constants = require('../utils/constants');
 
 const STATS_INTERVAL = 30;
 
@@ -17,14 +17,14 @@ async function aggregateReport(report) {
     let stats = await databaseConnector.getStats(report.test_id, report.report_id);
 
     if (stats.length === 0) {
-        let errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${report.test_id} and reportId: ${report.report_id}`;
+        const errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${report.test_id} and reportId: ${report.report_id}`;
         logger.error(errorMessage);
-        let error = new Error(errorMessage);
+        const error = new Error(errorMessage);
         error.statusCode = 404;
         return Promise.reject(error);
     }
 
-    let reportInput = { intermediates: [] };
+    const reportInput = { intermediates: [] };
     reportInput.duration = math.min(report.duration, Math.floor(report.duration_seconds));
     reportInput.start_time = report.start_time;
     reportInput.end_time = report.end_time;
@@ -64,9 +64,9 @@ async function aggregateReport(report) {
 }
 
 function createAggregateManually(listOfStats) {
-    let requestMedians = [], requestMaxs = [], requestMins = [], scenario95 = [], scenario99 = [], request95 = [],
+    const requestMedians = [], requestMaxs = [], requestMins = [], scenario95 = [], scenario99 = [], request95 = [],
         request99 = [], scenarioMins = [], scenarioMaxs = [], scenarioMedians = [];
-    let result = {
+    const result = {
         bucket: 0,
         requestsCompleted: 0,
         scenariosCreated: 0,

@@ -3,6 +3,7 @@ process.env.JOB_PLATFORM = 'KUBERNETES';
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
+const uuid = require('uuid');
 
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
 const testManager = require('../../../../src/tests/models/manager');
@@ -18,51 +19,51 @@ let manager;
 let statsManager;
 
 const REPORT = {
-    'test_id': 'test_id',
-    'revision_id': 'revision_id',
-    'report_id': 'report_id',
-    'test_name': 'test name',
-    'report_url': 'http://www.zooz.com',
-    'status': constants.REPORT_INITIALIZING_STATUS,
-    'start_time': 1527533459591,
-    'grafana_report': 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
-    'subscribers': [
+    test_id: 'test_id',
+    revision_id: 'revision_id',
+    report_id: 'report_id',
+    test_name: 'test name',
+    report_url: 'http://www.zooz.com',
+    status: constants.REPORT_INITIALIZING_STATUS,
+    start_time: 1527533459591,
+    grafana_report: 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
+    subscribers: [
         {
-            'runner_id': '1234',
-            'phase_status': constants.SUBSCRIBER_STARTED_STAGE,
-            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+            runner_id: '1234',
+            phase_status: constants.SUBSCRIBER_STARTED_STAGE,
+            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
         }
     ],
-    'test_configuration': JSON.stringify({
+    test_configuration: JSON.stringify({
         duration: 10
     }),
     last_updated_at: Date.now()
 };
 
 const REPORT_DONE = {
-    'test_id': 'test_id',
-    'revision_id': 'revision_id',
-    'report_id': 'report_id',
-    'test_name': 'test name',
-    'report_url': 'http://www.zooz.com',
-    'status': constants.REPORT_INITIALIZING_STATUS,
-    'start_time': 1527533459591,
-    'grafana_report': 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
-    'subscribers': [
+    test_id: 'test_id',
+    revision_id: 'revision_id',
+    report_id: 'report_id',
+    test_name: 'test name',
+    report_url: 'http://www.zooz.com',
+    status: constants.REPORT_INITIALIZING_STATUS,
+    start_time: 1527533459591,
+    grafana_report: 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
+    subscribers: [
         {
-            'runner_id': '1234',
-            'phase_status': constants.SUBSCRIBER_DONE_STAGE,
-            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+            runner_id: '1234',
+            phase_status: constants.SUBSCRIBER_DONE_STAGE,
+            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
         }
     ],
-    'test_configuration': JSON.stringify({
+    test_configuration: JSON.stringify({
         duration: 10
     }),
     last_updated_at: Date.now()
 };
 
 const JOB = {
-    'emails': 'eli@zooz.com',
+    emails: 'eli@zooz.com',
     arrival_rate: 1,
     duration: 1,
     ramp_to: 2,
@@ -146,7 +147,7 @@ describe('Reports manager tests', function () {
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
-            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=now');
+            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&var-TestRunId=report_id&from=1527533459591&to=now');
         });
 
         it('Database connector returns an array with one report and score ', async () => {
@@ -385,7 +386,7 @@ describe('Reports manager tests', function () {
         it('get last report with avg rsp when test running', async () => {
             const now = new Date();
             const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
-            const subscriber = { last_stats: { rps: { total_count: 200 }, codes: { '200': 10 } } };
+            const subscriber = { last_stats: { rps: { total_count: 200 }, codes: { 200: 10 } } };
             const report = Object.assign({}, REPORT, { last_updated_at: now, start_time: tenSecBefore, subscribers: [subscriber] });
             databaseGetLastReportsStub.resolves([report]);
             const reports = await manager.getLastReports();
@@ -395,7 +396,7 @@ describe('Reports manager tests', function () {
         it('get last report with avg rsp when test finished', async () => {
             const now = new Date();
             const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
-            const subscriber = { last_stats: { rps: { total_count: 300 }, codes: { '200': 10 } } };
+            const subscriber = { last_stats: { rps: { total_count: 300 }, codes: { 200: 10 } } };
             const report = Object.assign({}, REPORT, {
                 end_time: now,
                 start_time: tenSecBefore,
@@ -409,7 +410,7 @@ describe('Reports manager tests', function () {
         it('get last report with avg rsp when total_count not exist ', async () => {
             const now = new Date();
             const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
-            const subscriber = { last_stats: { rps: { test: 'test' }, codes: { '200': 10 } } };
+            const subscriber = { last_stats: { rps: { test: 'test' }, codes: { 200: 10 } } };
             const report = Object.assign({}, REPORT, {
                 end_time: now,
                 start_time: tenSecBefore,
@@ -424,11 +425,28 @@ describe('Reports manager tests', function () {
 
     describe('Create new report', function () {
         it('Successfully insert report', async () => {
+            const reportFromDBConnector = {
+                report_id: uuid.v4(),
+                job_id: uuid.v4(),
+                test_id: REPORT.test_id,
+                revision_id: REPORT.revision_id,
+                test_type: 'load_test',
+                test_name: 'avi',
+                test_description: 'avi requesting requests',
+                last_updated_at: new Date(),
+                start_time: new Date(),
+                notes: '',
+                phase: 0,
+                test_configuration: '{}',
+                runners_subscribed: [],
+                is_favorite: false
+            };
             getJobStub.resolves(JOB);
-            databasePostReportStub.resolves();
+            databasePostReportStub.resolves(reportFromDBConnector);
             databaseSubscribeRunnerStub.resolves();
             const reportBody = await manager.postReport('test_id', REPORT);
             should.exist(reportBody);
+            reportBody.should.deepEqual(reportFromDBConnector);
         });
 
         it('Fail to retrieve job', async () => {
@@ -460,9 +478,9 @@ describe('Reports manager tests', function () {
                     finishedReport.start_time = new Date();
                     finishedReport.subscribers = [
                         {
-                            'runner_id': '1234',
-                            'phase_status': subscriberStatus,
-                            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+                            runner_id: '1234',
+                            phase_status: subscriberStatus,
+                            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
                         }
                     ];
                     databaseGetReportStub.resolves([finishedReport]);
@@ -477,9 +495,9 @@ describe('Reports manager tests', function () {
                     inProgressReport.start_time = new Date();
                     inProgressReport.subscribers = [
                         {
-                            'runner_id': '1234',
-                            'phase_status': subscriberStatus,
-                            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+                            runner_id: '1234',
+                            phase_status: subscriberStatus,
+                            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
                         }
                     ];
                     databaseGetReportStub.resolves([inProgressReport]);
@@ -644,13 +662,13 @@ describe('Reports manager tests', function () {
             updateReportBenchmarkStub.callCount.should.eql(1);
 
             should(getBenchmarkStub.args).eql([['test_id']]);
-            should(benchmarkCalculatorStub.args).eql([[{ 'test': 'some  benchmark data' }, { 'test': 'some aggregate data' }, {
+            should(benchmarkCalculatorStub.args).eql([[{ test: 'some  benchmark data' }, { test: 'some aggregate data' }, {
                 config: 'some value'
             }]]);
             should(updateReportBenchmarkStub.args[0][0]).eql('test_id');
             should(updateReportBenchmarkStub.args[0][1]).eql('report_id');
             should(updateReportBenchmarkStub.args[0][2]).eql(5.5);
-            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data', 'benchmark_threshold': 99 }));
+            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data', benchmark_threshold: 99 }));
         });
         it('when report done and dont have benchmark data ', async () => {
             databaseGetReportStub.resolves([REPORT_DONE]);

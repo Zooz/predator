@@ -28,7 +28,7 @@ async function init(sequlizeClient) {
     await initSchemas();
 }
 
-async function insertReport(testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt) {
+async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite) {
     const report = client.model('report');
     const params = {
         report_id: uuid.v4(),
@@ -43,7 +43,8 @@ async function insertReport(testId, revisionId, jobId, testType, phase, startTim
         notes: notes || '',
         phase: phase,
         test_configuration: testConfiguration,
-        runners_subscribed: []
+        runners_subscribed: [],
+        is_favorite: isFavorite
     };
     return report.create(params);
 }
@@ -164,7 +165,7 @@ async function updateSubscriber(testId, reportId, runnerId, phaseStatus) {
 async function getReportsAndParse(query) {
     const report = client.model('report');
 
-    let options = {
+    const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
         include: [report.subscriber]
     };
@@ -173,7 +174,7 @@ async function getReportsAndParse(query) {
 
     const allReportsRawResponse = await report.findAll(options);
 
-    let allReports = allReportsRawResponse.map(rawReport => rawReport.dataValues);
+    const allReports = allReportsRawResponse.map(rawReport => rawReport.dataValues);
 
     allReports.forEach(report => {
         report.subscribers = report.subscribers.map((sqlJob) => {
@@ -187,14 +188,23 @@ async function getReportsAndParse(query) {
     return allReports;
 }
 
-async function getLastReports(limit) {
-    const lastReports = getReportsAndParse({ limit, order: Sequelize.literal('start_time DESC') });
+async function getLastReports(limit, filter) {
+    const queryOptions = { limit, order: [['start_time', 'DESC']] };
+    if (filter) {
+        queryOptions.where = {};
+        queryOptions.where[filter] = true;
+    }
+    const lastReports = await getReportsAndParse(queryOptions);
     return lastReports;
 }
 
-async function getReports(testId) {
-    const query = { where: { test_id: testId } };
-    const allReports = await getReportsAndParse(query);
+async function getReports(testId, filter) {
+    const queryOptions = { where: { test_id: testId }, order: [['start_time', 'DESC']] };
+    if (filter) {
+        queryOptions.where[filter] = true;
+    }
+
+    const allReports = await getReportsAndParse(queryOptions);
     return allReports;
 }
 
@@ -207,7 +217,7 @@ async function getReport(testId, reportId) {
 async function getStatsAndParse(query) {
     const stats = client.model('stats');
 
-    let options = {
+    const options = {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
 
@@ -310,6 +320,9 @@ async function initSchemas() {
         },
         score: {
             type: Sequelize.DataTypes.FLOAT
+        },
+        is_favorite: {
+            type: Sequelize.DataTypes.BOOLEAN
         }
     });
 

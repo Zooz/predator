@@ -6,121 +6,101 @@ import Arrows from './components/Arrows'
 import style from './NumericInput.scss'
 
 export default class NumericInput extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {value: 0}
 
-    if (this.isValid(props.value)) {
-      this.state.value = Number(props.value)
-    }
-  }
   componentDidUpdate (prevProps, prevState) {
-    const { value } = this.props
-    if (prevProps.value !== value && prevState.value !== value) {
-      if (!this.isValid(value)) {
-        console.error(`value ${value} is not in range of ${this.props.minValue} to ${this.props.maxValue}`)
-        return
+
+  }
+
+    handleBlur = () => {
+    }
+
+    handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+      } else if (event.key === 'ArrowUp') {
+        this.onUpPress()
+        event.preventDefault()
+      } else if (event.key === 'ArrowDown') {
+        this.onDownPress()
+        event.preventDefault()
       }
-      this.updateValue(value)
-    }
-  }
-
-  onBlur = () => {
-    this.props.onChange(this.state.value)
-  }
-
-  onKeyDown = (event) => {
-    const {onChange} = this.props
-
-    if (event.key === 'Enter') {
-      onChange(this.state.value)
-    } else if (event.key === 'ArrowUp') {
-      this.onUpPress()
-      event.preventDefault()
-    } else if (event.key === 'ArrowDown') {
-      this.onDownPress()
-      event.preventDefault()
-    }
-  }
-
-  onUpPress = () => {
-    const newValue = this.state.value + 1
-    if (this.isValid(newValue)) {
-      this.updateValue(newValue)
-      this.props.onChange(newValue)
-    }
-  }
-
-  onDownPress = () => {
-    const newValue = this.state.value - 1
-
-    if (this.isValid(newValue)) {
-      this.updateValue(newValue)
-      this.props.onChange(newValue)
-    }
-  }
-
-  onChangeInnerHandler = (event) => {
-    event.preventDefault()
-  }
-
-  onValuesChangeInnerHandler = ({value}) => {
-    if (!this.isValid(value)) {
-      this.updateValue(this.state.value)
     }
 
-    this.updateValue(value)
-  }
-
-  isValid = (value) => {
-    return !isNaN(value) && (value >= this.props.minValue) && (value <= this.props.maxValue)
-  }
-
-  updateValue = (newValue) => {
-    if (this.isValid(newValue)) {
-      this.setState({value: Number(newValue)})
+    onUpPress = () => {
+      const newValue = (this.props.value || 0) + 1
+      if (this.isValid(newValue)) {
+        this.props.onChange(newValue)
+      }
     }
-  }
 
-  isUpEnabled (value) {
-    const { disabled } = this.props
-    return !disabled && (value < this.props.maxValue)
-  }
-  isDownEnabled (value) {
-    const { disabled } = this.props
-    return !disabled && (value > this.props.minValue)
-  }
-  render () {
-    const { value } = this.state
-    const { disabled, hideNumber, width, height, formatter, error, className } = this.props
+    onDownPress = () => {
+      const newValue = (this.props.value || 0) - 1
 
-    return (
-      <div
-        style={{
-          '--number-input-width': width,
-          '--number-input-height': height
-        }}
-        data-error={error}
-        data-disabled={disabled}
-        className={classnames(style['input-counter-wrapper'], className)} >
-        <NumberFormat
-          disabled={disabled}
-          className={style['input-counter']}
-          onKeyDown={this.onKeyDown}
-          format={formatter}
-          onBlur={this.onBlur}
-          value={hideNumber ? null : value}
-          onValueChange={this.onValuesChangeInnerHandler}
-          onChange={this.onChangeInnerHandler} />
-        <Arrows
-          onUpPress={this.props.onUpPress || this.onUpPress}
-          onDownPress={this.props.onDownPress || this.onDownPress}
-          isUpEnabled={this.isUpEnabled(value)}
-          isDownEnabled={this.isDownEnabled(value)}
-        />
-      </div>
-    )
-  }
+      if (this.isValid(newValue)) {
+        this.props.onChange(newValue)
+      }
+    }
+
+    handleValueChange = ({ value }) => {
+      if (this.isValid(value)) {
+        this.props.onChange(value);
+      }
+    }
+
+    isValid = (value) => {
+      return !isNaN(value) && (value >= this.props.minValue) && (value <= this.props.maxValue)
+    }
+
+    isUpEnabled (value) {
+      const { disabled } = this.props
+      return !disabled && (value < this.props.maxValue)
+    }
+
+    isDownEnabled (value) {
+      const { disabled } = this.props
+      return !disabled && (value > this.props.minValue)
+    }
+
+    render () {
+      const { value = 0 } = this.props
+      const { disabled, hideNumber, width, height, formatter, error, className } = this.props
+
+      return (
+        <div
+          style={{
+            '--number-input-width': width,
+            '--number-input-height': height
+          }}
+          data-error={error}
+          data-disabled={disabled}
+          className={classnames(style['input-counter-wrapper'], className)}
+        >
+          <NumberFormat
+            disabled={disabled}
+            className={style['input-counter']}
+            onKeyDown={this.handleKeyDown}
+            format={formatter}
+            onBlur={this.handleBlur}
+            value={hideNumber ? null : value}
+            onChange={(event) => {
+              const value = Number(event.target.value);
+              if (this.isValid(value)) {
+                this.props.onChange(Number(value));
+              } else {
+                this.props.onChange(this.props.value);
+              }
+              event.preventDefault()
+            }}
+          />
+          <Arrows
+            disabled={disabled}
+            onUpPress={this.props.onUpPress || this.onUpPress}
+            onDownPress={this.props.onDownPress || this.onDownPress}
+            isUpEnabled={this.isUpEnabled(value)}
+            isDownEnabled={this.isDownEnabled(value)}
+          />
+        </div>
+      )
+    }
 }
 
 NumericInput.propTypes = {
@@ -135,7 +115,8 @@ NumericInput.propTypes = {
   error: PropTypes.bool,
   hideNumber: PropTypes.bool,
   width: PropTypes.string,
-  height: PropTypes.string
+  height: PropTypes.string,
+  className: PropTypes.string
 }
 
 NumericInput.defaultProps = {

@@ -18,6 +18,8 @@ import ErrorDialog from "./components/ErrorDialog";
 import Button from "../components/Button";
 import Loader from "./components/Loader";
 import DeleteDialog from "./components/DeleteDialog";
+import UiSwitcher from "../components/UiSwitcher";
+import TitleInput from "../components/TitleInput";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -35,14 +37,23 @@ class getReports extends React.Component {
             sortHeader: '',
             rerunJob: null,
             showCompareReports: false,
-            showDeleteReportWarning: false
+            showDeleteReportWarning: false,
+            onlyFavorites: false,
 
         };
     }
 
+    filterByFavoriteState = () => {
+        const {onlyFavorites, sortedReports} = this.state;
+        const filteredReports = sortedReports.filter((report) => (!!report.is_favorite) === onlyFavorites);
+        this.setState({sortedReports: filteredReports, sortHeader: ''});
+    };
+
     componentDidUpdate(prevProps) {
         if (prevProps.reports !== this.props.reports) {
-            this.setState({sortedReports: [...this.props.reports]})
+            this.setState({sortedReports: [...this.props.reports]}, () => {
+                this.filterByFavoriteState()
+            })
         }
 
         if (prevProps.deleteReportSuccess === false && this.props.deleteReportSuccess) {
@@ -121,12 +132,16 @@ class getReports extends React.Component {
     };
     onSearch = (value) => {
         if (!value) {
-            this.setState({sortedReports: [...this.props.reports]})
+            this.setState({sortedReports: [...this.props.reports]}, () => {
+                this.filterByFavoriteState();
+            })
         }
         const newSorted = _.filter(this.props.reports, (report) => {
             return (String(report.test_name).toLowerCase().includes(value.toLowerCase()) || String(report.status).toLowerCase().includes(value.toLowerCase()))
         });
-        this.setState({sortedReports: newSorted})
+        this.setState({sortedReports: newSorted}, () => {
+            this.filterByFavoriteState();
+        })
     };
     onCloseErrorDialog = () => {
         this.props.cleanAllReportsErrors();
@@ -152,7 +167,7 @@ class getReports extends React.Component {
 
 
     render() {
-        const {showReport, sortHeader, sortedReports, showCompareReports} = this.state;
+        const {showReport, sortHeader, sortedReports, showCompareReports, onlyFavorites} = this.state;
         const {
             errorOnGetReports,
             errorOnGetReport,
@@ -178,16 +193,37 @@ class getReports extends React.Component {
         const feedbackMessage = this.generateFeedbackMessage();
         const error = errorOnGetReports || errorOnGetReport || errorOnStopRunningJob || errorCreateBenchmark || errorEditReport || deleteReportFailure;
 
+        const searchSections = [
+            <TitleInput key={1}
+                        style={{flexGrow: 0}}
+                        width={'130px'} height={'33px'} title={'Favorites'}
+            >
+                <UiSwitcher
+                    onChange={(value) => {
+                        this.setState({
+                            onlyFavorites: value,
+                            sortedReports: [...this.props.reports]
+                        }, () => {
+                            this.filterByFavoriteState();
+                        });
+                    }}
+                    // disabledInp={loading}
+                    activeState={onlyFavorites}
+                    height={12}
+                    width={22}
+                    style={{alignSelf: 'center'}}
+                />
+            </TitleInput>
+        ];
+
         return (
             <Page title={'Last Reports'} description={DESCRIPTION}>
                 <div style={{width: '100%'}}>
                     {showReport && <Report onClose={this.closeReport} key={showReport.report_id} report={showReport}/>}
-                    <div>
+                    <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
                         <Button
                             disabled={!this.props.isAtLeastOneReportSelected}
-                            style={{
-                                marginBottom: '10px',
-                            }} onClick={() => {
+                            style={{}} onClick={() => {
                             this.setState({
                                 showCompareReports: true
                             });
@@ -197,7 +233,6 @@ class getReports extends React.Component {
                             style={{
                                 marginLeft: '10px',
                             }} onClick={() => this.setState({showDeleteReportWarning: true})}>Delete Reports</Button>
-
                     </div>
                     <ReactTableComponent
                         // tableRowId={'report_id'}
@@ -212,6 +247,7 @@ class getReports extends React.Component {
                         resizable={false}
                         cursor={'default'}
                         className={style.table}
+                        searchSections={searchSections}
                     />
                 </div>
                 {this.state.openViewReport
@@ -239,7 +275,7 @@ class getReports extends React.Component {
                         this.props.getLastReports();
                         this.props.clearStopJobSuccess();
                         this.props.createJobSuccess(undefined);
-                        this.props.editNotesSuccess(false);
+                        this.props.editReportSuccess(false);
                         this.props.setDeleteReportSuccess(false);
                         this.setState({
                             rerunJob: null
@@ -282,7 +318,7 @@ function mapStateToProps(state) {
         errorOnStopRunningJob: errorOnStopRunningJob(state),
         stopRunningJobSuccess: stopRunningJobSuccess(state),
         jobSuccess: createJobSuccess(state),
-        noteSuccess: selectors.editNotesSuccess(state),
+        noteSuccess: selectors.editReportSuccess(state),
         errorEditReport: selectors.editReportFailure(state),
         errorCreateBenchmark: selectors.createBenchmarkFailure(state),
         selectedReports: selectors.selectedReports(state),
@@ -302,7 +338,7 @@ const mapDispatchToProps = {
     createJob: Actions.createJob,
     createJobSuccess: Actions.createJobSuccess,
     editReport: Actions.editReport,
-    editNotesSuccess: Actions.editReportSuccess,
+    editReportSuccess: Actions.editReportSuccess,
     cleanAllReportsErrors: Actions.cleanAllReportsErrors,
     clearErrorOnStopJob: Actions.clearErrorOnStopJob,
     addReportForCompare: Actions.addReportForCompare,

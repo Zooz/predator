@@ -23,6 +23,16 @@ import {
     getFileMetadataSuccess,
 } from './actions/testsActions';
 import {
+    getWebhooks,
+    createWebhook,
+    createWebHookSuccess,
+    cleanErrors,
+    editWebhook,
+    deleteWebHook,
+    deleteWebHookSuccess,
+    editWebHookSuccess,
+} from './actions/webhooksActions';
+import {
     clearStopJobSuccess,
     clearDeleteJobSuccess,
     deleteJob,
@@ -178,7 +188,16 @@ export {
     cleanUpdateConfigSuccess,
     cleanFinishedContainers,
     cleanFinishedContainersSuccess,
-    cleanFinishedContainersFailure
+    cleanFinishedContainersFailure,
+    //webhooks
+    getWebhooks,
+    createWebhook,
+    createWebHookSuccess,
+    cleanErrors,
+    editWebhook,
+    deleteWebHook,
+    deleteWebHookSuccess,
+    editWebHookSuccess
 
 };
 //processors

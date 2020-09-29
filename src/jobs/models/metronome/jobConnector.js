@@ -1,49 +1,49 @@
 'use strict';
 
-let util = require('util');
-let metronomeConfig = require('../../../config/metronomeConfig');
-let requestSender = require('../../../common/requestSender');
+const util = require('util');
+const metronomeConfig = require('../../../config/metronomeConfig');
+const requestSender = require('../../../common/requestSender');
 
-let metronomeUrl = metronomeConfig.metronomeUrl;
+const metronomeUrl = metronomeConfig.metronomeUrl;
 
-let headers = {};
+const headers = {};
 if (metronomeConfig.metronomeToken) {
     headers.Authorization = 'token=' + metronomeConfig.metronomeToken;
 }
 
 module.exports.runJob = async (metronomeJobConfig) => {
-    let parallelism = metronomeJobConfig.parallelism || 1;
+    const parallelism = metronomeJobConfig.parallelism || 1;
     delete metronomeJobConfig.parallelism;
-    let deployJobMethod = await chooseDeployJobMethod(metronomeJobConfig);
-    let deployJobResponse = await deployJob(deployJobMethod, metronomeJobConfig);
+    const deployJobMethod = await chooseDeployJobMethod(metronomeJobConfig);
+    const deployJobResponse = await deployJob(deployJobMethod, metronomeJobConfig);
 
-    let runJobPromises = [];
+    const runJobPromises = [];
     for (let i = 0; i < parallelism; i++) {
         runJobPromises.push(runJob(metronomeJobConfig.id));
     }
     await Promise.all(runJobPromises);
 
-    let genericJobResponse = {
+    const genericJobResponse = {
         jobName: deployJobResponse.id
     };
     return genericJobResponse;
 };
 
 module.exports.stopRun = async (jobPlatformName) => {
-    let url = util.format('%s/v1/jobs/%s/runs', metronomeUrl, jobPlatformName);
-    let options = {
+    const url = util.format('%s/v1/jobs/%s/runs', metronomeUrl, jobPlatformName);
+    const options = {
         method: 'GET',
         url: url,
         headers
     };
 
-    let currentJobRuns = await requestSender.send(options);
+    const currentJobRuns = await requestSender.send(options);
 
-    let stopJobPromises = [];
+    const stopJobPromises = [];
     currentJobRuns.forEach((jobRun) => {
         stopJobPromises.push(async () => {
-            let url = util.format('%s/v1/jobs/%s/runs/%s/actions/stop', metronomeUrl, jobPlatformName, jobRun.id);
-            let options = {
+            const url = util.format('%s/v1/jobs/%s/runs/%s/actions/stop', metronomeUrl, jobPlatformName, jobRun.id);
+            const options = {
                 method: 'POST',
                 url: url,
                 headers
@@ -57,21 +57,21 @@ module.exports.stopRun = async (jobPlatformName) => {
 };
 
 async function deployJob(method, metronomeJobConfig) {
-    let url = method === 'POST' ? util.format('%s/v1/jobs', metronomeUrl) : util.format('%s/v1/jobs/%s', metronomeUrl, metronomeJobConfig.id);
-    let options = {
+    const url = method === 'POST' ? util.format('%s/v1/jobs', metronomeUrl) : util.format('%s/v1/jobs/%s', metronomeUrl, metronomeJobConfig.id);
+    const options = {
         url,
         body: metronomeJobConfig,
         method,
         headers
     };
 
-    let deployJobResponse = await requestSender.send(options);
+    const deployJobResponse = await requestSender.send(options);
     return deployJobResponse;
 }
 
 async function chooseDeployJobMethod(metronomeJobConfig) {
-    let url = util.format('%s/v1/jobs/%s', metronomeUrl, metronomeJobConfig.id);
-    let options = {
+    const url = util.format('%s/v1/jobs/%s', metronomeUrl, metronomeJobConfig.id);
+    const options = {
         url,
         headers,
         method: 'GET'
@@ -89,26 +89,26 @@ async function chooseDeployJobMethod(metronomeJobConfig) {
 }
 
 async function runJob(jobId) {
-    let url = util.format('%s/v1/jobs/%s/runs', metronomeUrl, jobId);
+    const url = util.format('%s/v1/jobs/%s/runs', metronomeUrl, jobId);
 
-    let options = {
+    const options = {
         url: url,
         headers,
         method: 'POST'
     };
 
-    let response = await requestSender.send(options);
+    const response = await requestSender.send(options);
     return response;
 }
 
 module.exports.getLogs = () => {
-    let error = new Error('Getting logs not supported in metronome');
+    const error = new Error('Getting logs not supported in metronome');
     error.statusCode = 501;
     throw error;
 };
 
 module.exports.deleteAllContainers = async function () {
-    let error = new Error('Deleting containers not supported in metronome');
+    const error = new Error('Deleting containers not supported in metronome');
     error.statusCode = 501;
     throw error;
 };

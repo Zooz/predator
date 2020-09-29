@@ -70,8 +70,8 @@ export const createTest = (body, file) => (
     {type: Types.CREATE_TEST, body, file}
 );
 
-export const createTestSuccess = () => (
-    {type: Types.CREATE_TEST_SUCCESS}
+export const createTestSuccess = (data) => (
+    {type: Types.CREATE_TEST_SUCCESS,data}
 );
 export const createTestFailure = (error) => (
     {type: Types.CREATE_TEST_FAILURE, error}

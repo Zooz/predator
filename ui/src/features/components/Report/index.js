@@ -13,6 +13,9 @@ import {BarChartPredator, LineChartPredator, AssertionsReport} from "./Charts";
 import _ from "lodash";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Card from "../../../components/Card";
+import {faStar as emptyStar} from "@fortawesome/free-regular-svg-icons";
+import {faStar as fullStar} from "@fortawesome/free-solid-svg-icons";
+import InfoToolTip from "../InfoToolTip";
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -22,6 +25,7 @@ class Report extends React.Component {
         super(props);
         this.state = {
             disabledCreateBenchmark: false,
+            isFavorite: props.report.is_favorite,
             filteredKeys: {
                 latency: {benchmark_p99: true, benchmark_p95: true, benchmark_median: true},
                 rps: {
@@ -41,6 +45,15 @@ class Report extends React.Component {
         this.setState({disabledCreateBenchmark: true})
     };
 
+    onStar = () => {
+        const {report, editReport} = this.props;
+        const newValue = !report.is_favorite;
+        const body = {
+            is_favorite: newValue
+        };
+        editReport(report.test_id, report.report_id, body);
+        this.setState({isFavorite: newValue});
+    };
 
     onSelectedGraphPropertyFilter = (graphType, keys, value) => {
         const {filteredKeys = {}} = this.state;
@@ -58,7 +71,7 @@ class Report extends React.Component {
 
     render() {
         const {report, aggregateReport} = this.props;
-        const {disabledCreateBenchmark, filteredKeys, enableBenchmark} = this.state;
+        const {disabledCreateBenchmark, filteredKeys, enableBenchmark, isFavorite} = this.state;
         return (
             <div>
                 <div style={{
@@ -93,9 +106,18 @@ class Report extends React.Component {
                 }
                 <div style={{display: 'flex', flexDirection: 'column'}}>
                     <div style={{
-                        alignSelf: 'flex-end',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: '5px',
                         marginBottom: '15px'
                     }}>
+                        <div onClick={this.onStar}>
+                            <InfoToolTip data={{
+                                key: 'star-info',
+                                info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                            }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'}/>
+                        </div>
                         <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
                                 onClick={this.createBenchmark}>Set as Benchmark</Button>
                     </div>
@@ -186,6 +208,13 @@ class Report extends React.Component {
         this.refreshDataInterval = setInterval(this.loadData, REFRESH_DATA_INTERVAL)
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.editReportSuccess === false && this.props.editReportSuccess === true) {
+            this.props.setEditReportSuccess(false);
+            this.props.getReport(this.props.report.test_id, this.props.report.report_id);
+        }
+
+    }
 
     componentWillUnmount() {
         clearInterval(this.refreshDataInterval);
@@ -199,6 +228,7 @@ function mapStateToProps(state) {
     return {
         aggregateReport: selectors.getAggregateReport(state),
         createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
+        editReportSuccess: selectors.editReportSuccess(state),
     }
 }
 
@@ -208,6 +238,9 @@ const mapDispatchToProps = {
     createBenchmarkSuccess: Actions.createBenchmarkSuccess,
     getBenchmark: Actions.getBenchmark,
     clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
+    editReport: Actions.editReport,
+    getReport: Actions.getReport,
+    setEditReportSuccess: Actions.editReportSuccess,
 };
 
 

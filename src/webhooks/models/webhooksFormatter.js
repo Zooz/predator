@@ -1,4 +1,5 @@
 const cloneDeep = require('lodash/cloneDeep');
+const slackEmojis = require('slack-emojis');
 
 const {
     EVENT_FORMAT_TYPE_JSON,
@@ -23,14 +24,14 @@ function unknownWebhookEventTypeError(badWebhookEventTypeValue) {
 
 function getThresholdSlackMessage(state, { testName, benchmarkThreshold, lastScores, aggregatedReport, score }) {
     let resultText = 'above';
-    let icon = ':rocket:';
+    let icon = slackEmojis.ROCKET;
     if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
         resultText = 'below';
-        icon = ':cry:';
+        icon = slackEmojis.CRY;
     }
     return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}` +
         ` this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
-        `.*\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, { score })}\n`;
+        `.*\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, { score })}\n`;
 }
 
 function slackWebhookFormat(message, options) {
@@ -42,7 +43,7 @@ function slackWebhookFormat(message, options) {
 }
 
 function json(event, testId, jobId, report, additionalInfo, options) {
-    let payload = {
+    const payload = {
         test_id: testId,
         job_id: jobId,
         event: event,
@@ -61,19 +62,26 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
         parallelism = 1,
         ramp_to: rampTo,
         arrival_rate: arrivalRate,
+        arrival_count: arrivalCount,
         test_name: testName,
         grafana_report: grafanaReport
     } = report;
     const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
-            let rampToMessage = rampTo ? `ramp to: ${rampTo} scenarios per second` : '';
+            const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
+            let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
+            requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
+
             message = `🤓 *Test ${testName} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${environment} duration: ${duration} seconds, arrival rate: ${arrivalRate} scenarios per second, number of runners: ${parallelism}, ${rampToMessage}`;
+            *test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_FINISHED: {
-            message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFormatter.getStatsFormatted('aggregate', aggregatedReport.aggregate, reportBenchmark)}\n`;
+            message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
+            if (grafanaReport) {
+                message += `<${grafanaReport} | View final grafana dashboard report>`;
+            }
             break;
         }
         case WEBHOOK_EVENT_TYPE_FAILED: {
@@ -93,19 +101,16 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `:hammer_and_wrench: *Test ${testName} with id: ${testId} is in progress!*`;
+            message = `${slackEmojis.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `::boom:: *Test ${testName} with id: ${testId} has encountered an API failure!* :skull:`;
+            message = `${slackEmojis.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${slackEmojis.SKULL}`;
             break;
         }
         default: {
             throw unknownWebhookEventTypeError();
         }
-    }
-    if (grafanaReport) {
-        message += `<${grafanaReport} | View final grafana dashboard report>`;
     }
     return slackWebhookFormat(message, options);
 }

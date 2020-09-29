@@ -1,6 +1,38 @@
 @import "../styles/inputs";
 
+@mixin inputDefault {
+  font-weight: 400;
+  font-size: 1rem;
+  color: $text-black;
+  letter-spacing: normal;
+}
+
+@mixin inputPlaceholder {
+  @include inputDefault;
+  color: $disabled-grey-text;
+}
+
+@mixin inputView {
+  @include inputDefault;
+  color: $text-grey;
+}
+
+.InputText {
+  @include inputDefault;
+  line-height: 1.6183rem;
+
+  &--placeholder {
+    @include inputPlaceholder;
+  }
+
+  &--view {
+    @include inputView;
+  }
+}
+
+
 .input-counter {
+  @include inputDefault;
   flex: 1;
   width: 0;
   height: 100%;
@@ -17,6 +49,7 @@
 
 .input-counter-wrapper {
   display: flex;
+  overflow: hidden;
   width: var(--number-input-width);
   height: var(--number-input-height);
   background: white;
@@ -39,6 +72,7 @@
 
     .input-counter {
       background: $greyout;
+      color: $disabled-light-grey-button;
     }
   }
 }

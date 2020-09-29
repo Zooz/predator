@@ -69,6 +69,7 @@ export default class ReactTableComponent extends React.Component {
             onSearch,
             tdStyle,
             style: customStyle,
+            searchSections,
         } = this.props
         const backgroundColors = Object.assign({}, ReactTableComponent.defaultProps.colors.background, colors.background)
         const textColors = Object.assign({}, ReactTableComponent.defaultProps.colors.text, colors.text)
@@ -76,7 +77,7 @@ export default class ReactTableComponent extends React.Component {
 
         return (
             <div style={customStyle}>
-                {onSearch && <SearchBar onSearch={onSearch}/>}
+                {onSearch && <SearchBar searchSections={searchSections} onSearch={onSearch}/>}
                 <ReactTable
                     data={data}
                     className={classnames(css['table'], className)}

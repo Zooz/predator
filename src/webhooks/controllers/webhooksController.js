@@ -1,5 +1,5 @@
 'use strict';
-let webhookManager = require('../models/webhookManager');
+const webhookManager = require('../models/webhookManager');
 
 module.exports.getAllWebhooks = async function (req, res, next) {
     let webhooks;
@@ -13,7 +13,7 @@ module.exports.getAllWebhooks = async function (req, res, next) {
 
 module.exports.getWebhook = async function (req, res, next) {
     let webhook;
-    let webhookId = req.params.webhook_id;
+    const webhookId = req.params.webhook_id;
     try {
         webhook = await webhookManager.getWebhook(webhookId);
         return res.status(200).json(webhook);
@@ -33,7 +33,7 @@ module.exports.createWebhook = async function (req, res, next) {
 };
 
 module.exports.deleteWebhook = async function (req, res, next) {
-    let webhookId = req.params.webhook_id;
+    const webhookId = req.params.webhook_id;
     try {
         await webhookManager.deleteWebhook(webhookId);
         return res.status(204).json();
@@ -43,7 +43,7 @@ module.exports.deleteWebhook = async function (req, res, next) {
 };
 
 module.exports.updateWebhook = async function (req, res, next) {
-    let { body: updatedWebhook, params: { webhook_id: webhookId } } = req;
+    const { body: updatedWebhook, params: { webhook_id: webhookId } } = req;
     try {
         const webhook = await webhookManager.updateWebhook(webhookId, updatedWebhook);
         return res.status(200).json(webhook);

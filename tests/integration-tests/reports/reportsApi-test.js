@@ -15,7 +15,7 @@ const mailhogHelper = require('./mailhog/mailhogHelper');
 
 let testId, reportId, jobId, runnerId, firstRunner, secondRunner, jobBody, minimalReportBody;
 
-describe('Integration tests for the reports api', function() {
+describe('Integration tests for the reports api', function () {
     this.timeout(10000);
     before(async () => {
         await reportsRequestCreator.init();
@@ -165,15 +165,15 @@ describe('Integration tests for the reports api', function() {
                 let editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { notes: 'dfdsf' });
                 should(editReportResponse.statusCode).eql(404);
                 should(editReportResponse.body).eql({
-                    'message': 'Report not found'
+                    message: 'Report not found'
                 });
             });
             it('when edit additional properties that not include in the swagger', async function () {
                 let editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { additional: 'add' });
                 should(editReportResponse.statusCode).eql(400);
                 should(editReportResponse.body).eql({
-                    'message': 'Input validation error',
-                    'validation_errors': [
+                    message: 'Input validation error',
+                    validation_errors: [
                         "body should NOT have additional properties 'additional'"
                     ]
                 });
@@ -254,12 +254,16 @@ describe('Integration tests for the reports api', function() {
                 reportBody.runner_id = uuid();
                 createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
+                let updateResult = await reportsRequestCreator.editReport(getReportsTestId, reportId, { is_favorite: true });
+                should(updateResult.statusCode).eql(204);
 
                 reportId = uuid();
                 reportBody.report_id = reportId;
                 reportBody.runner_id = uuid();
                 createReportResponse = await reportsRequestCreator.createReport(getReportsTestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
+                updateResult = await reportsRequestCreator.editReport(getReportsTestId, reportId, { is_favorite: true });
+                should(updateResult.statusCode).eql(204);
             });
             it('Get all reports for specific testId', async function () {
                 let getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId);
@@ -279,6 +283,28 @@ describe('Integration tests for the reports api', function() {
                     should.not.exist(report.end_time);
                 });
             });
+
+            it('Get only favorite reports for specific testId', async function () {
+                let getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId, 'is_favorite');
+                const reports = getReportsResponse.body;
+
+                should(reports.length).eql(2);
+                should(reports[0].is_favorite).eql(true);
+                should(reports[1].is_favorite).eql(true);
+
+                reports.forEach((report) => {
+                    const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
+                        'phase', 'status'];
+
+                    REPORT_KEYS.forEach((key) => {
+                        should(report).hasOwnProperty(key);
+                    });
+
+                    should(report.status).eql('initializing');
+                    should.not.exist(report.end_time);
+                });
+            });
+
             it('Get last reports', async function () {
                 let lastReportsIdtestId = uuid();
                 reportId = uuid();
@@ -305,6 +331,7 @@ describe('Integration tests for the reports api', function() {
                     });
                 });
             });
+
             it('Get last reports in right order', async function () {
                 let lastReportsIdtestId = uuid();
                 const lastReportId = uuid();
@@ -342,6 +369,18 @@ describe('Integration tests for the reports api', function() {
                 should(allRelvntResults[1].report_id).eql(secondReportId);
                 should(allRelvntResults[2].report_id).eql(lastReportId);
             });
+
+            it('Get only last favorite reports in right order', async function () {
+                let getLastReportsResponse = await reportsRequestCreator.getLastReports(10, 'is_favorite');
+                const lastReports = getLastReportsResponse.body;
+                const sortReports = Object.assign([], lastReports);
+                sortReports.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+
+                should(lastReports).eql(sortReports);
+                lastReports.forEach(lastReport => {
+                    should(lastReport.is_favorite).eql(true, `report: ${JSON.stringify(lastReport)} is_favorite=false`);
+                });
+            });
         });
         describe('Get report', function () {
             const getReportTestId = uuid();
@@ -352,7 +391,7 @@ describe('Integration tests for the reports api', function() {
                 test_name: 'integration-test',
                 test_description: 'doing some integration testing',
                 start_time: Date.now().toString(),
-                last_updated_at: Date.now().toString(),
+                last_updated_at: Date.now().toString()
             };
             describe('report of load_test', function () {
                 before(async () => {
@@ -476,7 +515,7 @@ describe('Integration tests for the reports api', function() {
                 should(deleteResponse.statusCode).eql(404);
             });
 
-            it('Delete report which is in progress', async function() {
+            it('Delete report which is in progress', async function () {
                 let testId = uuid();
                 const reportId = uuid();
                 reportBody.report_id = reportId;
@@ -489,7 +528,7 @@ describe('Integration tests for the reports api', function() {
                 const deleteRunningTestResponse = await reportsRequestCreator.deleteReport(testId, reportId);
                 deleteRunningTestResponse.statusCode.should.eql(409);
                 deleteRunningTestResponse.body.should.eql({
-                    'message': "Can't delete running test with status initializing"
+                    message: "Can't delete running test with status initializing"
                 });
             });
         });
@@ -594,37 +633,37 @@ describe('Integration tests for the reports api', function() {
                 should(getAggregatedReportResponse.body.aggregate.assertions).eql({
                     '/users': {
                         'statusCode 201': {
-                            'success': 0,
-                            'fail': 594,
-                            'failureResponses': {
-                                '200': 594
+                            success: 0,
+                            fail: 594,
+                            failureResponses: {
+                                200: 594
                             }
                         },
                         'header content-type values equals json': {
-                            'success': 100,
-                            'fail': 494,
-                            'failureResponses': {
+                            success: 100,
+                            fail: 494,
+                            failureResponses: {
                                 'application/json; charset=utf-8': 494
                             }
                         },
                         'hasHeader proxy-id': {
-                            'success': 0,
-                            'fail': 594,
-                            'failureResponses': {
+                            success: 0,
+                            fail: 594,
+                            failureResponses: {
                                 'response has no proxy-id header': 594
                             }
                         }
                     },
                     '/accounts': {
                         'statusCode 201': {
-                            'success': 80,
-                            'fail': 0,
-                            'failureResponses': {}
+                            success: 80,
+                            fail: 0,
+                            failureResponses: {}
                         },
                         'hasHeader proxy-id': {
-                            'success': 0,
-                            'fail': 80,
-                            'failureResponses': {
+                            success: 0,
+                            fail: 80,
+                            failureResponses: {
                                 'response has no proxy-id header': 80
                             }
                         }
@@ -643,13 +682,13 @@ describe('Integration tests for the reports api', function() {
 
             it('Post done phase stats with benchmark data config for test', async () => {
                 const benchmarkRequest = {
-                    'rps': {
-                        'count': 100,
-                        'mean': 90.99
+                    rps: {
+                        count: 100,
+                        mean: 90.99
                     },
-                    'latency': { median: 357.2, p95: 1042 },
-                    'errors': { errorTest: 1 },
-                    'codes': { codeTest: 1 }
+                    latency: { median: 357.2, p95: 1042 },
+                    errors: { errorTest: 1 },
+                    codes: { codeTest: 1 }
                 };
                 const config = {
                     benchmark_threshold: 55,
@@ -683,36 +722,36 @@ describe('Integration tests for the reports api', function() {
                 should(lastReport.score).eql(100);
                 should(lastReport.benchmark_weights_data).eql(report.benchmark_weights_data);
                 should(report.benchmark_weights_data).eql({
-                    'benchmark_threshold': 55,
-                    'rps': {
-                        'benchmark_value': 90.99,
-                        'report_value': 90.99,
-                        'percentage': 0.1,
-                        'score': 10
+                    benchmark_threshold: 55,
+                    rps: {
+                        benchmark_value: 90.99,
+                        report_value: 90.99,
+                        percentage: 0.1,
+                        score: 10
                     },
-                    'percentile_ninety_five': {
-                        'benchmark_value': 1042,
-                        'report_value': 1042,
-                        'percentage': 0.2,
-                        'score': 20
+                    percentile_ninety_five: {
+                        benchmark_value: 1042,
+                        report_value: 1042,
+                        percentage: 0.2,
+                        score: 20
                     },
-                    'percentile_fifty': {
-                        'benchmark_value': 357.2,
-                        'report_value': 357.2,
-                        'percentage': 0.3,
-                        'score': 30
+                    percentile_fifty: {
+                        benchmark_value: 357.2,
+                        report_value: 357.2,
+                        percentage: 0.3,
+                        score: 30
                     },
-                    'client_errors_ratio': {
-                        'benchmark_value': 0,
-                        'report_value': 0,
-                        'percentage': 0.2,
-                        'score': 20
+                    client_errors_ratio: {
+                        benchmark_value: 0,
+                        report_value: 0,
+                        percentage: 0.2,
+                        score: 20
                     },
-                    'server_errors_ratio': {
-                        'benchmark_value': 0.01,
-                        'report_value': 0,
-                        'percentage': 0.2,
-                        'score': 20
+                    server_errors_ratio: {
+                        benchmark_value: 0.01,
+                        report_value: 0,
+                        percentage: 0.2,
+                        score: 20
                     }
                 });
             });
@@ -1016,9 +1055,9 @@ describe('Integration tests for the reports api', function() {
         });
     });
 
-    describe('Sad flow', function(){
+    describe('Sad flow', function () {
         describe('400 error codes', function () {
-            it('POST report with bad request body', async function() {
+            it('POST report with bad request body', async function () {
                 const createReportResponse = await reportsRequestCreator.createReport(uuid(), {});
                 createReportResponse.statusCode.should.eql(400);
                 createReportResponse.body.should.eql({
@@ -1036,7 +1075,7 @@ describe('Integration tests for the reports api', function() {
                 });
             });
 
-            it('POST stats with bad request body', async function() {
+            it('POST stats with bad request body', async function () {
                 const postStatsResponse = await reportsRequestCreator.postStats(uuid(), uuid(), {});
                 postStatsResponse.statusCode.should.eql(400);
                 postStatsResponse.body.should.eql({
@@ -1049,7 +1088,7 @@ describe('Integration tests for the reports api', function() {
                 });
             });
 
-            it('GET last reports without limit query param', async function() {
+            it('GET last reports without limit query param', async function () {
                 const lastReportsResponse = await reportsRequestCreator.getLastReports();
                 lastReportsResponse.statusCode.should.eql(400);
                 lastReportsResponse.body.should.eql({
@@ -1062,7 +1101,7 @@ describe('Integration tests for the reports api', function() {
         });
 
         describe('404 error codes', function () {
-            it('GET not existing report', async function() {
+            it('GET not existing report', async function () {
                 const getReportResponse = await reportsRequestCreator.getReport(testId, uuid());
                 should(getReportResponse.statusCode).be.eql(404);
                 getReportResponse.body.should.eql({
@@ -1070,7 +1109,7 @@ describe('Integration tests for the reports api', function() {
                 });
             });
 
-            it('POST stats on not existing report', async function() {
+            it('POST stats on not existing report', async function () {
                 const postStatsresponse = await reportsRequestCreator.postStats(testId, uuid(), statsGenerator.generateStats('started_phase', uuid()));
                 postStatsresponse.statusCode.should.eql(404);
                 postStatsresponse.body.should.eql({

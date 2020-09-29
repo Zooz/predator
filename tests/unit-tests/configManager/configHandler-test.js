@@ -5,9 +5,9 @@ process.env.JOB_PLATFORM = 'DOCKER';
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
-
 const databaseConnector = require('../../../src/configManager/models/database/databaseConnector');
 const configConstants = require('../../../src/common/consts').CONFIG;
+const packageJson = require('../../../package');
 
 let manager;
 
@@ -17,107 +17,111 @@ const defaultSmtpServerConfig = {
     secure: false
 };
 
-const defaultConfig = {
-    allow_insecure_tls: false,
-    interval_cleanup_finished_containers_ms: 0,
-    delay_runner_ms: 0,
-    job_platform: 'DOCKER',
-    runner_docker_image: 'zooz/predator-runner:latest',
-    runner_cpu: 1,
-    runner_memory: 256,
-    smtp_server: Object.assign({}, defaultSmtpServerConfig),
-    minimum_wait_for_delayed_report_status_update_in_ms: 30000,
-    benchmark_weights: {
-        percentile_ninety_five: { percentage: 20 },
-        percentile_fifty: { percentage: 20 },
-        server_errors_ratio: { percentage: 20 },
-        client_errors_ratio: { percentage: 20 },
-        rps: { percentage: 20 }
-    }
-};
-
-const defaultConfigNotEscaped = {
-    allow_insecure_tls: false,
-    interval_cleanup_finished_containers_ms: 0,
-    delay_runner_ms: 0,
-    job_platform: 'DOCKER',
-    runner_docker_image: 'zooz/predator-runner:latest',
-    runner_cpu: 1,
-    runner_memory: 256,
-    smtp_server: Object.assign({}, defaultSmtpServerConfig),
-    minimum_wait_for_delayed_report_status_update_in_ms: 30000,
-    benchmark_weights: {
-        percentile_ninety_five: { percentage: 20 },
-        percentile_fifty: { percentage: 20 },
-        server_errors_ratio: { percentage: 20 },
-        client_errors_ratio: { percentage: 20 },
-        rps: { percentage: 20 }
-    }
-};
-
-const configResponseParseObject = {
-    runner_cpu: 5,
-    smtp_server: JSON.stringify({
-        host: 'test',
-        port: 'test',
-        username: 'test',
-        password: 'test',
-        timeout: 'test'
-    }),
-    minimum_wait_for_delayed_report_status_update_in_ms: 30000
-};
-
-const configParseExpected = {
-    allow_insecure_tls: false,
-    interval_cleanup_finished_containers_ms: 0,
-    delay_runner_ms: 0,
-    job_platform: 'DOCKER',
-    runner_docker_image: 'zooz/predator-runner:latest',
-    runner_cpu: 5,
-    runner_memory: 256,
-    smtp_server: {
-        host: 'test',
-        port: 'test',
-        username: 'test',
-        password: 'test',
-        timeout: 'test'
-    },
-    minimum_wait_for_delayed_report_status_update_in_ms: 30000,
-    benchmark_weights: {
-        percentile_ninety_five: { percentage: 20 },
-        percentile_fifty: { percentage: 20 },
-        server_errors_ratio: { percentage: 20 },
-        client_errors_ratio: { percentage: 20 },
-        rps: { percentage: 20 }
-    }
-};
-
-const convertObjectDBData = {
-    grafana_url: 'test_grafana_url',
-    runner_cpu: 2,
-    minimum_wait_for_delayed_report_status_update_in_ms: 30000
-};
-const resultAfterConvert = {
-    allow_insecure_tls: false,
-    interval_cleanup_finished_containers_ms: 0,
-    delay_runner_ms: 0,
-    job_platform: 'DOCKER',
-    runner_docker_image: 'zooz/predator-runner:latest',
-    grafana_url: 'test_grafana_url',
-    runner_cpu: 2,
-    runner_memory: 256,
-    smtp_server: Object.assign({}, defaultSmtpServerConfig),
-    minimum_wait_for_delayed_report_status_update_in_ms: 30000,
-    benchmark_weights: {
-        percentile_ninety_five: { percentage: 20 },
-        percentile_fifty: { percentage: 20 },
-        server_errors_ratio: { percentage: 20 },
-        client_errors_ratio: { percentage: 20 },
-        rps: { percentage: 20 }
-    }
-};
-
 describe('Manager config', function () {
+    const originalPackageJsonVersion = packageJson.version;
+    packageJson.version = '1.5.6';
+    const expectedRunnerVersion = '1.5';
+
+    const defaultConfig = {
+        allow_insecure_tls: false,
+        interval_cleanup_finished_containers_ms: 0,
+        delay_runner_ms: 0,
+        job_platform: 'DOCKER',
+        runner_docker_image: 'zooz/predator-runner:' + expectedRunnerVersion,
+        runner_cpu: 1,
+        runner_memory: 256,
+        smtp_server: Object.assign({}, defaultSmtpServerConfig),
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        benchmark_weights: {
+            percentile_ninety_five: { percentage: 20 },
+            percentile_fifty: { percentage: 20 },
+            server_errors_ratio: { percentage: 20 },
+            client_errors_ratio: { percentage: 20 },
+            rps: { percentage: 20 }
+        }
+    };
+
+    const defaultConfigNotEscaped = {
+        allow_insecure_tls: false,
+        interval_cleanup_finished_containers_ms: 0,
+        delay_runner_ms: 0,
+        job_platform: 'DOCKER',
+        runner_docker_image: 'zooz/predator-runner:' + expectedRunnerVersion,
+        runner_cpu: 1,
+        runner_memory: 256,
+        smtp_server: Object.assign({}, defaultSmtpServerConfig),
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        benchmark_weights: {
+            percentile_ninety_five: { percentage: 20 },
+            percentile_fifty: { percentage: 20 },
+            server_errors_ratio: { percentage: 20 },
+            client_errors_ratio: { percentage: 20 },
+            rps: { percentage: 20 }
+        }
+    };
+
+    const configResponseParseObject = {
+        runner_cpu: 5,
+        smtp_server: JSON.stringify({
+            host: 'test',
+            port: 'test',
+            username: 'test',
+            password: 'test',
+            timeout: 'test'
+        }),
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000
+    };
+
+    const configParseExpected = {
+        allow_insecure_tls: false,
+        interval_cleanup_finished_containers_ms: 0,
+        delay_runner_ms: 0,
+        job_platform: 'DOCKER',
+        runner_docker_image: 'zooz/predator-runner:' + expectedRunnerVersion,
+        runner_cpu: 5,
+        runner_memory: 256,
+        smtp_server: {
+            host: 'test',
+            port: 'test',
+            username: 'test',
+            password: 'test',
+            timeout: 'test'
+        },
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        benchmark_weights: {
+            percentile_ninety_five: { percentage: 20 },
+            percentile_fifty: { percentage: 20 },
+            server_errors_ratio: { percentage: 20 },
+            client_errors_ratio: { percentage: 20 },
+            rps: { percentage: 20 }
+        }
+    };
+
+    const convertObjectDBData = {
+        grafana_url: 'test_grafana_url',
+        runner_cpu: 2,
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000
+    };
+    const resultAfterConvert = {
+        allow_insecure_tls: false,
+        interval_cleanup_finished_containers_ms: 0,
+        delay_runner_ms: 0,
+        job_platform: 'DOCKER',
+        runner_docker_image: 'zooz/predator-runner:' + expectedRunnerVersion,
+        grafana_url: 'test_grafana_url',
+        runner_cpu: 2,
+        runner_memory: 256,
+        smtp_server: Object.assign({}, defaultSmtpServerConfig),
+        minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        benchmark_weights: {
+            percentile_ninety_five: { percentage: 20 },
+            percentile_fifty: { percentage: 20 },
+            server_errors_ratio: { percentage: 20 },
+            client_errors_ratio: { percentage: 20 },
+            rps: { percentage: 20 }
+        }
+    };
+
     let sandbox;
     let databaseConnectorGetStub;
     let databaseConnectorGetValueStub;
@@ -136,6 +140,7 @@ describe('Manager config', function () {
     });
 
     after(() => {
+        packageJson.version = originalPackageJsonVersion;
         sandbox.restore();
     });
 
@@ -153,7 +158,7 @@ describe('Manager config', function () {
 
     describe('get config from default and DB', function () {
         it('get config success', async () => {
-            databaseConnectorGetStub.resolves({ 'runner_cpu': 2 });
+            databaseConnectorGetStub.resolves({ runner_cpu: 2 });
             let result = await manager.getConfig();
             should(Object.keys(result).length).eql(Object.keys(configConstants).length);
             Object.keys(result).forEach(key => {
@@ -167,7 +172,7 @@ describe('Manager config', function () {
 
     describe('get config with corrupted data from DB', function () {
         it('get config success', async () => {
-            databaseConnectorGetStub.resolves({ 'key_not_valid': 2 });
+            databaseConnectorGetStub.resolves({ key_not_valid: 2 });
             let result = await manager.getConfig();
             const resultEscapedUndefined = escapeUndefinedValues(result);
             should(resultEscapedUndefined).eql(defaultConfig);
