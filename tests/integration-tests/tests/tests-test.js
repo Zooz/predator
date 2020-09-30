@@ -1,11 +1,11 @@
-let should = require('should');
-let validHeaders = { 'x-zooz-request-id': 'value', 'Content-Type': 'application/json' };
-let uuid = require('uuid');
-let JSCK = require('jsck');
+const should = require('should');
+const validHeaders = { 'x-zooz-request-id': 'value', 'Content-Type': 'application/json' };
+const uuid = require('uuid');
+const JSCK = require('jsck');
 const nock = require('nock');
 const { cloneDeep } = require('lodash');
 JSCK.Draft4 = JSCK.draft4;
-let artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
+const artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const testsRequestSender = require('./helpers/requestCreator');
 const processorsRequestSender = require('../processors/helpers/requestCreator');
 
@@ -30,7 +30,7 @@ describe('the tests api', function() {
     });
     describe('Bad requests tests (create test)', function(){
         it('Should return error for non existing dsl name ', function(){
-            let requestBody = require('../../testExamples/Simple_test')('not exist').test;
+            const requestBody = require('../../testExamples/Simple_test')('not exist').test;
             return testsRequestSender.createTest(requestBody, validHeaders)
                 .then(function(res){
                     res.statusCode.should.eql(400);
@@ -38,7 +38,7 @@ describe('the tests api', function() {
                 });
         });
         it('Should return error for invalid action name', function(){
-            let requestBody = require('../../testExamples/Simple_test')('invalid.invalid').test;
+            const requestBody = require('../../testExamples/Simple_test')('invalid.invalid').test;
             return testsRequestSender.createTest(requestBody, validHeaders)
                 .then(function(res){
                     res.statusCode.should.eql(400);
@@ -46,13 +46,13 @@ describe('the tests api', function() {
                 });
         });
         it('Should return error for file url not exists ', async () => {
-            let requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
+            const requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
             const res = await testsRequestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(422);
             res.body.message.should.eql('Error to download file: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com');
         });
         it('Should return error for processor id not exists ', async () => {
-            let requestBody = Object.assign({ processor_id: '123e4567-e89b-12d3-a456-426655440000' }, simpleTest.test);
+            const requestBody = Object.assign({ processor_id: '123e4567-e89b-12d3-a456-426655440000' }, simpleTest.test);
             const res = await testsRequestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(400);
             res.body.message.should.eql('processor with id: 123e4567-e89b-12d3-a456-426655440000 does not exist');
@@ -66,25 +66,25 @@ describe('the tests api', function() {
             const processorResponse = await processorsRequestSender.createProcessor(processor, validHeaders);
             processorResponse.statusCode.should.eql(201);
             const processorId = processorResponse.body.id;
-            let requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
+            const requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             createTestResponse.statusCode.should.eql(400);
             createTestResponse.body.message.should.eql('Functions: beforeScenario, afterScenario, afterResponse, beforeRequest does not exist in the processor file');
         });
 
         it('Should return error when using functions without specifying processor id', async () => {
-            let requestBody = testWithFunctions;
+            const requestBody = testWithFunctions;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             createTestResponse.statusCode.should.eql(400);
             createTestResponse.body.message.should.eql('Functions: beforeScenario, afterScenario, afterResponse, beforeRequest are used without specifying processor');
         });
-        let badBodyScenarios = ['Body_with_illegal_artillery', 'Body_with_no_artillery_schema', 'Body_with_no_test_type', 'Body_with_no_description', 'Body_with_no_name', 'Body_with_no_scenarios', 'Body_with_no_step_action',
+        const badBodyScenarios = ['Body_with_illegal_artillery', 'Body_with_no_artillery_schema', 'Body_with_no_test_type', 'Body_with_no_description', 'Body_with_no_name', 'Body_with_no_scenarios', 'Body_with_no_step_action',
             'Body_with_no_steps'];
 
         badBodyScenarios.forEach(function(scenario){
             it('Should return error because ' + scenario, function(){
-                let requestBody = require('../../testExamples/' + scenario + '.json');
-                let expectedResult = require('../../testResults/' + scenario + '.json');
+                const requestBody = require('../../testExamples/' + scenario + '.json');
+                const expectedResult = require('../../testResults/' + scenario + '.json');
                 return testsRequestSender.createTest(requestBody, validHeaders)
                     .then(function(res){
                         res.body.should.eql(expectedResult);
@@ -126,24 +126,24 @@ describe('the tests api', function() {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const benchmarkRequest = {
-                'rps': {
-                    'count': 1270,
-                    'mean': 46.74
+                rps: {
+                    count: 1270,
+                    mean: 46.74
                 },
-                'latency': {
-                    'min': 419.1,
-                    'max': 1295.4,
-                    'median': 553.9,
-                    'p95': 763.8,
-                    'p99': 929.5
+                latency: {
+                    min: 419.1,
+                    max: 1295.4,
+                    median: 553.9,
+                    p95: 763.8,
+                    p99: 929.5
                 },
-                'errors': {
-                    '500': 12
+                errors: {
+                    500: 12
                 },
-                'codes': {
-                    '200': 161,
-                    '201': 1061,
-                    '409': 53
+                codes: {
+                    200: 161,
+                    201: 1061,
+                    409: 53
                 }
             };
             const testId = createTestResponse.body.id;
@@ -154,13 +154,13 @@ describe('the tests api', function() {
         });
         it('try to create benchmark for not existing test', async () => {
             const benchmarkRequest = {
-                'rps': {
-                    'count': 100,
-                    'mean': 46.74
+                rps: {
+                    count: 100,
+                    mean: 46.74
                 },
-                'latency': { median: 1, p95: 1 },
-                'errors': {},
-                'codes': {}
+                latency: { median: 1, p95: 1 },
+                errors: {},
+                codes: {}
             };
             const benchmarkResult = await testsRequestSender.createBenchmark(uuid(), benchmarkRequest, validHeaders);
             should(benchmarkResult.body.message).eql('Not found');
@@ -168,9 +168,9 @@ describe('the tests api', function() {
         });
         it('try to create benchmark with not valid body and fail', async () => {
             const benchmarkRequest = {
-                'not_valid': {
-                    'count': 1270,
-                    'mean': 46.74
+                not_valid: {
+                    count: 1270,
+                    mean: 46.74
                 }
             };
             const benchmarkResult = await testsRequestSender.createBenchmark(uuid(), benchmarkRequest, validHeaders);
@@ -181,13 +181,13 @@ describe('the tests api', function() {
     describe('get benchmark', () => {
         it('get benchmark', async () => {
             const benchmarkRequest = {
-                'rps': {
-                    'count': 100,
-                    'mean': 46.74
+                rps: {
+                    count: 100,
+                    mean: 46.74
                 },
-                'latency': { median: 1, p95: 1 },
-                'errors': { errorTest: 1 },
-                'codes': { codeTest: 1 }
+                latency: { median: 1, p95: 1 },
+                errors: { errorTest: 1 },
+                codes: { codeTest: 1 }
             };
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
@@ -227,34 +227,34 @@ describe('the tests api', function() {
         });
         describe('simple test with dsl', function () {
             it('Create test, update test, delete test, get test', async () => {
-                let requestBody = simpleTest.test;
-                let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+                const requestBody = simpleTest.test;
+                const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
                 createTestResponse.body.should.have.only.keys('id', 'revision_id');
 
-                let updatedRequestBody = require('../../testExamples/Test_with_variables')(dslName);
-                let updatedTestResponse = await testsRequestSender.updateTest(updatedRequestBody, validHeaders, createTestResponse.body.id);
+                const updatedRequestBody = require('../../testExamples/Test_with_variables')(dslName);
+                const updatedTestResponse = await testsRequestSender.updateTest(updatedRequestBody, validHeaders, createTestResponse.body.id);
                 updatedTestResponse.statusCode.should.eql(201, JSON.stringify(updatedTestResponse.body));
                 updatedTestResponse.body.should.have.only.keys('id', 'revision_id');
 
                 let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
-                let expectedResult = require('../../testResults/Test_with_variables')(dslName);
+                const expectedResult = require('../../testResults/Test_with_variables')(dslName);
                 should(getTestResponse.statusCode).eql(200);
                 getTestResponse.body.artillery_test.should.eql(expectedResult);
                 getTestResponse.body.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at');
 
-                let validatedResponse = validate(getTestResponse.body.artillery_test);
+                const validatedResponse = validate(getTestResponse.body.artillery_test);
                 validatedResponse.errors.length.should.eql(0);
                 validatedResponse.valid.should.eql(true);
 
-                let deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, createTestResponse.body.id);
+                const deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, createTestResponse.body.id);
                 deleteTestResponse.statusCode.should.eql(200);
 
                 getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
                 getTestResponse.statusCode.should.eql(404);
             });
             it('Create test, with a file', async () => {
-                let requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
+                const requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
                 const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
                 createTestResponse.statusCode.should.eql(201);
@@ -289,7 +289,7 @@ describe('the tests api', function() {
                 };
                 const processorResponse = await processorsRequestSender.createProcessor(processor, validHeaders);
                 const processorId = processorResponse.body.id;
-                let requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
+                const requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
                 const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
                 createTestResponse.statusCode.should.eql(201);
@@ -299,7 +299,7 @@ describe('the tests api', function() {
             });
             it('create test with before, and get it', async function () {
                 const simpleTestWithBefore = require('../../testExamples/Simple_test_before_feature')(dslName);
-                let createTestResponse = await testsRequestSender.createTest(simpleTestWithBefore.test, validHeaders);
+                const createTestResponse = await testsRequestSender.createTest(simpleTestWithBefore.test, validHeaders);
                 should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
                 createTestResponse.body.should.have.only.keys('id', 'revision_id');
                 const expected = require('../../testResults/Simple_test_before_feature')(dslName, createTestResponse.body.id, createTestResponse.body.revision_id);
@@ -310,29 +310,29 @@ describe('the tests api', function() {
                 should(getTestResponse.body).eql(expected);
             });
             it('Create dsl test, update dsl, get test should return new dsl', async () => {
-                let requestBody = simpleTest.test;
-                let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+                const requestBody = simpleTest.test;
+                const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
                 createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
                 createTestResponse.body.should.have.only.keys('id', 'revision_id');
 
                 const updateTokenRequest = {
-                    'post': {
-                        'url': '/tokens',
-                        'capture': [{
-                            'json': '$.token',
-                            'as': 'tokenId'
+                    post: {
+                        url: '/tokens',
+                        capture: [{
+                            json: '$.token',
+                            as: 'tokenId'
                         }],
-                        'headers': {
+                        headers: {
                             'Content-Type': 'application/json'
                         },
-                        'json': {
-                            'token_type': 'credit_card',
-                            'holder_name': 'new name',
-                            'expiration_date': '11/2020',
-                            'card_number': '1234458045804123',
-                            'identity_document': {
-                                'number': '1234668464654',
-                                'type': 'NEW_ID'
+                        json: {
+                            token_type: 'credit_card',
+                            holder_name: 'new name',
+                            expiration_date: '11/2020',
+                            card_number: '1234458045804123',
+                            identity_document: {
+                                number: '1234668464654',
+                                type: 'NEW_ID'
                             }
                         }
                     }
@@ -340,7 +340,7 @@ describe('the tests api', function() {
                 const updateDSLResponse = await testsRequestSender.updateDsl(dslName, 'createToken', updateTokenRequest);
                 should(updateDSLResponse.statusCode).eql(200, JSON.stringify(updateDSLResponse.body));
 
-                let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+                const getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
                 should(getTestResponse.statusCode).eql(200);
                 const getTestResponseTokenRequest = JSON.parse(getTestResponse.text).artillery_test.scenarios[0].flow[0];
                 should(getTestResponseTokenRequest).eql(updateTokenRequest);
@@ -348,68 +348,68 @@ describe('the tests api', function() {
         });
 
         it('Create basic test, update with illegal test, delete test', async () => {
-            let requestBody = require('../../testExamples/Basic_test.json');
-            let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const requestBody = require('../../testExamples/Basic_test.json');
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             createTestResponse.statusCode.should.eql(201);
             createTestResponse.body.should.have.only.keys('id', 'revision_id');
 
-            let updatedRequestBody = require('../../testExamples/Body_with_illegal_artillery.json');
-            let updatedTestResponse = await testsRequestSender.updateTest(updatedRequestBody, validHeaders, createTestResponse.body.id);
+            const updatedRequestBody = require('../../testExamples/Body_with_illegal_artillery.json');
+            const updatedTestResponse = await testsRequestSender.updateTest(updatedRequestBody, validHeaders, createTestResponse.body.id);
             updatedTestResponse.statusCode.should.eql(400);
 
             let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
-            let expectedResult = require('../../testResults/Basic_test.json');
+            const expectedResult = require('../../testResults/Basic_test.json');
             should(getTestResponse.statusCode).eql(200, JSON.stringify(getTestResponse.body));
             getTestResponse.body.artillery_test.should.eql(expectedResult);
 
-            let deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, createTestResponse.body.id);
+            const deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, createTestResponse.body.id);
             deleteTestResponse.statusCode.should.eql(200);
 
             getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
             getTestResponse.statusCode.should.eql(404);
         });
         it('Create basic test without step url - should add default /', async () => {
-            let requestBody = cloneDeep(require('../../testExamples/Basic_test.json'));
+            const requestBody = cloneDeep(require('../../testExamples/Basic_test.json'));
             requestBody.artillery_test.scenarios[0].flow[0].post.url = undefined;
 
-            let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             createTestResponse.statusCode.should.eql(201);
             createTestResponse.body.should.have.only.keys('id', 'revision_id');
 
-            let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
-            let expectedResult = cloneDeep(require('../../testResults/Basic_test.json'));
+            const getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+            const expectedResult = cloneDeep(require('../../testResults/Basic_test.json'));
             expectedResult.scenarios[0].flow[0].post.url = '/';
             should(getTestResponse.statusCode).eql(200, JSON.stringify(getTestResponse.body));
             getTestResponse.body.artillery_test.should.eql(expectedResult);
         });
         it('update basic test without step url - should add default /', async () => {
-            let requestBody = cloneDeep(require('../../testExamples/Basic_test.json'));
+            const requestBody = cloneDeep(require('../../testExamples/Basic_test.json'));
 
-            let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             createTestResponse.statusCode.should.eql(201);
             createTestResponse.body.should.have.only.keys('id', 'revision_id');
 
             requestBody.artillery_test.scenarios[0].flow[0].post.url = undefined;
 
-            let updatedTestResponse = await testsRequestSender.updateTest(requestBody, validHeaders, createTestResponse.body.id);
+            const updatedTestResponse = await testsRequestSender.updateTest(requestBody, validHeaders, createTestResponse.body.id);
             updatedTestResponse.statusCode.should.eql(201);
 
-            let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
-            let expectedResult = cloneDeep(require('../../testResults/Basic_test.json'));
+            const getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+            const expectedResult = cloneDeep(require('../../testResults/Basic_test.json'));
             expectedResult.scenarios[0].flow[0].post.url = '/';
             should(getTestResponse.statusCode).eql(200, JSON.stringify(getTestResponse.body));
             getTestResponse.body.artillery_test.should.eql(expectedResult);
         });
 
         it('creates two simple tests, get a specific test, and than get list of all tests', async function(){
-            let requestBody = require('../../testExamples/Simple_test')(dslName).test;
-            let expectedResult = require('../../testResults/Simple_test.json');
-            let createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
-            let createSecondTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const requestBody = require('../../testExamples/Simple_test')(dslName).test;
+            const expectedResult = require('../../testResults/Simple_test.json');
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const createSecondTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
             createSecondTestResponse.statusCode.should.eql(201);
-            let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
-            let getTestsResponse = await testsRequestSender.getTests(validHeaders);
+            const getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+            const getTestsResponse = await testsRequestSender.getTests(validHeaders);
             let testsIds = [];
             getTestsResponse.body.forEach(test => {
                 test.should.have.keys('id', 'description', 'name', 'revision_id', 'type', 'updated_at');
@@ -417,7 +417,7 @@ describe('the tests api', function() {
             testsIds = getTestsResponse.body.map(function(test){
                 return test.id;
             });
-            let validatedResponse = validate(getTestResponse.body.artillery_test);
+            const validatedResponse = validate(getTestResponse.body.artillery_test);
 
             validatedResponse.errors.length.should.eql(0);
             validatedResponse.valid.should.eql(true);
@@ -456,19 +456,19 @@ describe('the tests api', function() {
             const getAllRevisionsResponse = await testsRequestSender.getAllRevisions(uuid.v4(), validHeaders);
             should(getAllRevisionsResponse.statusCode).eql(404);
             should(getAllRevisionsResponse.body).eql({
-                'message': 'Not found'
+                message: 'Not found'
             });
         });
 
         describe('Valid json request for creating tests with illegal body (logically)', function() {
-            let invalidLogic = ['Test_with_illegal_too_high_weight',
+            const invalidLogic = ['Test_with_illegal_too_high_weight',
                 'Test_with_illegal_too_low_weight', 'Test_with_several_scenarios_and_weights_sum_up_to_less_than_100',
                 'Test_with_several_scenarios_and_weights_sum_up_to_more_than_100'];
 
             invalidLogic.forEach(function(scenario) {
                 it(scenario, function(){
-                    let requestBody = require('../../testExamples/' + scenario + '.js')(dslName);
-                    let expectedResult = require('../../testResults/' + scenario + '.json');
+                    const requestBody = require('../../testExamples/' + scenario + '.js')(dslName);
+                    const expectedResult = require('../../testResults/' + scenario + '.json');
                     return testsRequestSender.createTest(requestBody, validHeaders)
                         .then(function(res){
                             res.statusCode.should.eql(422, JSON.stringify(res.body));
@@ -481,6 +481,6 @@ describe('the tests api', function() {
 });
 
 function validate(script) {
-    let validation = artilleryCheck.validate(script);
+    const validation = artilleryCheck.validate(script);
     return validation;
 }

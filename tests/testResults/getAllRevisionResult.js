@@ -1,51 +1,51 @@
 module.exports = (dslName) => {
     return [
         {
-            'description': 'test',
-            'name': 'test',
-            'scenarios': [
+            description: 'test',
+            name: 'test',
+            scenarios: [
                 {
-                    'scenario_name': 'Scenario',
-                    'steps': [
+                    scenario_name: 'Scenario',
+                    steps: [
                         {
-                            'action': `${dslName}.createToken`
+                            action: `${dslName}.createToken`
                         },
                         {
-                            'action': `${dslName}.createCustomer`
+                            action: `${dslName}.createCustomer`
                         }
                     ]
                 }
             ],
-            'type': 'dsl'
+            type: 'dsl'
         },
         {
-            'description': 'test',
-            'name': 'test',
-            'scenarios': [
+            description: 'test',
+            name: 'test',
+            scenarios: [
                 {
-                    'scenario_name': 'Scenario',
-                    'steps': [
+                    scenario_name: 'Scenario',
+                    steps: [
                         {
-                            'action': `${dslName}.createToken`
+                            action: `${dslName}.createToken`
                         },
                         {
-                            'action': `${dslName}.createCustomer`
+                            action: `${dslName}.createCustomer`
                         }
                     ]
                 },
                 {
-                    'scenario_name': 'Scenario',
-                    'steps': [
+                    scenario_name: 'Scenario',
+                    steps: [
                         {
-                            'action': `${dslName}.createToken`
+                            action: `${dslName}.createToken`
                         },
                         {
-                            'action': `${dslName}.createCustomer`
+                            action: `${dslName}.createCustomer`
                         }
                     ]
                 }
             ],
-            'type': 'dsl'
+            type: 'dsl'
         }
     ];
 };

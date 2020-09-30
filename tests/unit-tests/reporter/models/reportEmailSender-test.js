@@ -2,60 +2,60 @@
 
 process.env.JOB_PLATFORM = 'DOCKER';
 
-let sinon = require('sinon');
-let should = require('should');
-let logger = require('../../../../src/common/logger');
-let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
-let aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
-let configHandler = require('../../../../src/configManager/models/configHandler');
-let nodemailer = require('nodemailer');
+const sinon = require('sinon');
+const should = require('should');
+const logger = require('../../../../src/common/logger');
+const reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
+const aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
+const configHandler = require('../../../../src/configManager/models/configHandler');
+const nodemailer = require('nodemailer');
 
 const AGGREGATE_REPORT = {
-    'test_name': 'test name',
-    'test_id': 'test_id',
-    'report_id': 'report_id',
+    test_name: 'test name',
+    test_id: 'test_id',
+    report_id: 'report_id',
     aggregate: {
-        'timestamp': '2018-05-28T15:40:10.044Z',
-        'scenariosCreated': 289448,
-        'scenariosCompleted': 289447,
-        'requestsCompleted': 694611,
-        'latency': {
-            'min': 6.3,
-            'max': 3822.8,
-            'median': 58.8,
-            'p95': 115.5,
-            'p99': 189.4
+        timestamp: '2018-05-28T15:40:10.044Z',
+        scenariosCreated: 289448,
+        scenariosCompleted: 289447,
+        requestsCompleted: 694611,
+        latency: {
+            min: 6.3,
+            max: 3822.8,
+            median: 58.8,
+            p95: 115.5,
+            p99: 189.4
         },
-        'rps': {
-            'count': 694611,
-            'mean': 178.61
+        rps: {
+            count: 694611,
+            mean: 178.61
         },
-        'scenarioDuration': {
-            'min': 80.4,
-            'max': 5251.7,
-            'median': 146.8,
-            'p95': 244.4,
-            'p99': 366.6
+        scenarioDuration: {
+            min: 80.4,
+            max: 5251.7,
+            median: 146.8,
+            p95: 244.4,
+            p99: 366.6
         },
-        'scenarioCounts': {
+        scenarioCounts: {
             'Create token and get token': 173732,
             'Create token, create customer and assign token to customer': 115716
         },
-        'errors': { EAI_AGAIN: 112, NOTREACH: 123 },
-        'codes': {
-            '200': 173732,
-            '201': 520878,
-            '503': 1
+        errors: { EAI_AGAIN: 112, NOTREACH: 123 },
+        codes: {
+            200: 173732,
+            201: 520878,
+            503: 1
         },
-        'matches': 0,
-        'customStats': {},
-        'concurrency': 1510,
-        'pendingRequests': 1471
+        matches: 0,
+        customStats: {},
+        concurrency: 1510,
+        pendingRequests: 1471
     }
 };
 
 const JOB = {
-    'emails': 'eli@zooz.com'
+    emails: 'eli@zooz.com'
 };
 
 const CONFIG = {
@@ -124,12 +124,16 @@ describe('Report emails sender test', () => {
         nodemailerCreateTransportStub.returns(transporter);
         aggregateReportGeneratorStub.resolves(AGGREGATE_REPORT);
         getConfig.resolves({ from: 'Predator 💪 <performance@predator.com>' });
-        const benchmarkData = { score: 95,
-            data: { rps: { score: 10, percentage: 0.2 },
+        const benchmarkData = {
+            score: 95,
+            data: {
+                rps: { score: 10, percentage: 0.2 },
                 percentile_ninety_five: { score: 10, percentage: 0.2 },
                 percentile_fifty: { score: 10, percentage: 0.2 },
                 client_errors_ratio: { score: 10, percentage: 0.2 },
-                server_errors_ratio: { score: 10, percentage: 0.2 } } };
+                server_errors_ratio: { score: 10, percentage: 0.2 }
+            }
+        };
         await reportEmailSender.sendAggregateReport(AGGREGATE_REPORT, JOB, ['eli@zooz.com'], benchmarkData);
 
         sendMailStub.callCount.should.equal(1);

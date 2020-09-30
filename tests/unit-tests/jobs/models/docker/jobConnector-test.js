@@ -1,13 +1,13 @@
 'use strict';
-let should = require('should');
-let sinon = require('sinon');
-let rewire = require('rewire');
-let jobConnector = rewire('../../../../../src/jobs/models/docker/jobConnector');
+const should = require('should');
+const sinon = require('sinon');
+const rewire = require('rewire');
+const jobConnector = rewire('../../../../../src/jobs/models/docker/jobConnector');
 describe('Docker job connector tests', function () {
     let sandbox, createContainerStub, listContainersStub, getContainerStub, containerStopStub,
         containerLogsStub, startContainerStub, pullStub, modemStub, followProgressStub;
 
-    let dockerJobConfig = {
+    const dockerJobConfig = {
         environmentVariables: {
             var_a: 'a',
             var_b: 'b'
@@ -64,7 +64,7 @@ describe('Docker job connector tests', function () {
     describe('Run new job', () => {
         it('Success to create a job and running it immediately, parallelism is 3', async () => {
             dockerJobConfig.parallelism = 3;
-            let jobResponse = await jobConnector.runJob(dockerJobConfig);
+            await jobConnector.runJob(dockerJobConfig);
 
             should(pullStub.callCount).eql(1);
             should(pullStub.args[0][0]).eql('image');
@@ -75,37 +75,37 @@ describe('Docker job connector tests', function () {
             startContainerStub.callCount.should.eql(3);
 
             createContainerStub.args[0][0].should.eql({
-                'Env': [
+                Env: [
                     'var_a=a',
                     'var_b=b'
                 ],
-                'Image': 'image',
-                'name': 'jobName-runId-0'
+                Image: 'image',
+                name: 'jobName-runId-0'
             });
             createContainerStub.args[1][0].should.eql({
-                'Env': [
+                Env: [
                     'var_a=a',
                     'var_b=b'
                 ],
-                'Image': 'image',
-                'name': 'jobName-runId-1'
+                Image: 'image',
+                name: 'jobName-runId-1'
             });
             createContainerStub.args[2][0].should.eql({
-                'Env': [
+                Env: [
                     'var_a=a',
                     'var_b=b'
                 ],
-                'Image': 'image',
-                'name': 'jobName-runId-2'
+                Image: 'image',
+                name: 'jobName-runId-2'
             });
         });
 
         it('Success to create a job and running it immediately, parallelism not defined', async () => {
             dockerJobConfig.parallelism = 1;
-            let jobResponse = await jobConnector.runJob(dockerJobConfig);
+            const jobResponse = await jobConnector.runJob(dockerJobConfig);
             jobResponse.should.eql({
-                'id': 'runId',
-                'jobName': 'jobName'
+                id: 'runId',
+                jobName: 'jobName'
             });
 
             createContainerStub.callCount.should.eql(1);
@@ -220,14 +220,14 @@ describe('Docker job connector tests', function () {
                 { Names: ['predator-runner.1'] },
                 { Names: ['predator-runner.2'] }]);
 
-            let result = await jobConnector.deleteAllContainers('predator-runner');
+            const result = await jobConnector.deleteAllContainers('predator-runner');
             should(result).eql({ deleted: 3 });
         });
 
         it('Delete containers does not find anything to delete', async () => {
             listContainersStub.resolves([]);
 
-            let result = await jobConnector.deleteAllContainers('predator-runner');
+            const result = await jobConnector.deleteAllContainers('predator-runner');
 
             should(result).eql({ deleted: 0 });
         });

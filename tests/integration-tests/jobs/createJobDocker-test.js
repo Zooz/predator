@@ -19,7 +19,7 @@ if (dockerConfig.host) {
 } else {
     dockerConnection = ({ socketPath: '/var/run/docker.sock' });
 }
-let docker = new Docker(dockerConnection);
+const docker = new Docker(dockerConnection);
 
 describe('Create job specific docker tests', async function () {
     this.timeout(20000);
@@ -35,8 +35,8 @@ describe('Create job specific docker tests', async function () {
                 await schedulerRequestCreator.init();
                 await testsRequestCreator.init();
 
-                let requestBody = require('../../testExamples/Basic_test');
-                let response = await testsRequestCreator.createTest(requestBody, {});
+                const requestBody = require('../../testExamples/Basic_test');
+                const response = await testsRequestCreator.createTest(requestBody, {});
                 should(response.statusCode).eql(201);
                 should(response.body).have.key('id');
                 testId = response.body.id;
@@ -57,7 +57,7 @@ describe('Create job specific docker tests', async function () {
                     return container.Names && container.Names[0] && container.Names[0].includes('predator.');
                 });
                 containers.forEach(async container => {
-                    let containerToKill = await docker.getContainer(container.Id);
+                    const containerToKill = await docker.getContainer(container.Id);
                     await containerToKill.kill();
                 });
             });
@@ -70,7 +70,7 @@ describe('Create job specific docker tests', async function () {
                     let getJobsFromService;
 
                     it('Create the job', async () => {
-                        let validBody = {
+                        const validBody = {
                             test_id: testId,
                             arrival_rate: 1,
                             parallelism: 2,
@@ -113,13 +113,13 @@ describe('Create job specific docker tests', async function () {
                     });
 
                     it('Get logs', async () => {
-                        let logs = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {});
+                        const logs = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {});
                         should(logs.status).eql(200);
                         should(logs.headers['content-type']).eql('application/zip');
                     });
 
                     it('Stop run', async () => {
-                        let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -127,7 +127,7 @@ describe('Create job specific docker tests', async function () {
                     });
 
                     it('Delete job', async () => {
-                        let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
+                        const deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
                         should(deleteJobResponse.status).eql(204);
 
                         jobId = createJobResponse.body.id;
@@ -152,7 +152,7 @@ describe('Create job specific docker tests', async function () {
                     });
 
                     it('Delete containers', async () => {
-                        let deleteJobResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                        const deleteJobResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
                         should(deleteJobResponse.status).eql(200);
                         should(deleteJobResponse.body.deleted).eql(2);
 

@@ -17,7 +17,7 @@
     "unit-tests": "nyc --check-coverage --lines 93 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh --timeout=10000",
-    "lint": "eslint src/**",
+    "lint": "eslint ./src/**/**.js ./tests/**/**.js",
     "release": "standard-version",
     "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
   },

@@ -1,5 +1,6 @@
 const sinon = require('sinon'),
     rewire = require('rewire'),
+    // eslint-disable-next-line no-unused-vars
     should = require('should'),
     requestSender = require('../../../../src/common/requestSender');
 
@@ -33,7 +34,7 @@ describe('Docker hub connector tests', () => {
                 return 'zooz/predator-runner:1.0.0';
             }
         });
-        let newestTag = await dockerHubConnector.getMostRecentRunnerTag();
+        const newestTag = await dockerHubConnector.getMostRecentRunnerTag();
         newestTag.should.eql('zooz/predator-runner:1.0.0');
     });
 
@@ -48,7 +49,7 @@ describe('Docker hub connector tests', () => {
                 results: testData.results
             });
 
-            let newestTag = await dockerHubConnector.getMostRecentRunnerTag();
+            const newestTag = await dockerHubConnector.getMostRecentRunnerTag();
             newestTag.should.eql(testData.expected);
             return newestTag;
         });

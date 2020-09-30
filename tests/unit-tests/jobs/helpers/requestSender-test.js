@@ -1,9 +1,10 @@
 'use-strict';
-let logger = require('../../../../src/common/logger');
-let sinon = require('sinon');
-let should = require('should');
-let rewire = require('rewire');
-let requestSender = rewire('../../../../src/common/requestSender');
+const logger = require('../../../../src/common/logger');
+const sinon = require('sinon');
+// eslint-disable-next-line no-unused-vars
+const should = require('should');
+const rewire = require('rewire');
+const requestSender = rewire('../../../../src/common/requestSender');
 
 describe('Request sender tests', () => {
     let sandbox, infoStub, errorStub, requestStub;
@@ -29,15 +30,15 @@ describe('Request sender tests', () => {
         await requestSender.send({ method: 'post', body: { pets: [] }, headers: {}, url: 'http://www.walla.com' });
 
         requestStub.args[0][0].should.eql({
-            'body': {
-                'pets': []
+            body: {
+                pets: []
             },
-            'headers': {},
-            'json': true,
-            'method': 'post',
-            'rejectUnauthorized': false,
-            'timeout': 15000,
-            'url': 'http://www.walla.com'
+            headers: {},
+            json: true,
+            method: 'post',
+            rejectUnauthorized: false,
+            timeout: 15000,
+            url: 'http://www.walla.com'
         });
         errorStub.callCount.should.eql(0);
         infoStub.args[0][0].should.eql({ method: 'post', url: 'http://www.walla.com', response: { response: {} } });
@@ -53,11 +54,11 @@ describe('Request sender tests', () => {
             infoStub.callCount.should.eql(0);
             errorStub.callCount.should.eql(1);
             errorStub.args[0][0].should.eql({
-                'error': {
-                    'statusCode': 500
+                error: {
+                    statusCode: 500
                 },
-                'method': 'post',
-                'url': 'http://www.zooz.com'
+                method: 'post',
+                url: 'http://www.zooz.com'
             });
         }
     });

@@ -210,7 +210,7 @@ describe('webhooksFormatter', function () {
                 parallelism: 10,
                 grafana_report: 'http://local.grafana.io/predator'
             };
-            let expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
+            const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
             *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
