@@ -78,8 +78,8 @@ With persisted storage:
 where $MACHINE_IP is the local ip address of your machine (not localhost, but actual ip address - it is your local network address).
 
 ### Developers
-To run and debug Predator locally run setup-local-env.sh script.
-`./setup-local-env.sh`
+To run and debug Predator locally run:
+`npm run setup-local-env`
 
 This script will clean your node_modules, run npm install and set .env file with minimal required params.   
 After that you will be able to start Predator with:
