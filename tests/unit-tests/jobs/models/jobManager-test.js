@@ -142,7 +142,7 @@ describe('Manager tests', function () {
     describe('schedule Finished Containers Cleanup', function () {
         it('Interval is set to 0, no automatic cleanup is scheduled', (done) => {
             getConfigValueStub.withArgs(config.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS).returns(0);
-            jobDeleteContainerStub.resolves({deleted: 10});
+            jobDeleteContainerStub.resolves({ deleted: 10 });
             manager.scheduleFinishedContainersCleanup();
 
             setTimeout(() => {
@@ -153,7 +153,7 @@ describe('Manager tests', function () {
 
         it('Interval is set to 100, automatic cleanup is scheduled', (done) => {
             getConfigValueStub.withArgs(config.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS).returns(100);
-            jobDeleteContainerStub.resolves({deleted: 10});
+            jobDeleteContainerStub.resolves({ deleted: 10 });
             let intervalObject;
             manager.scheduleFinishedContainersCleanup()
                 .then((interval) => {
@@ -213,7 +213,7 @@ describe('Manager tests', function () {
             };
             jobConnectorRunJobStub.resolves({ id: 'run_id' });
             databaseConnectorInsertStub.resolves({ success: 'success' });
-            let expectedResult = {
+            const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 environment: 'test',
@@ -229,7 +229,7 @@ describe('Manager tests', function () {
                 }
             };
             webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
-            let jobResponse = await manager.createJob(jobBodyWithCustomEnvVars);
+            const jobResponse = await manager.createJob(jobBodyWithCustomEnvVars);
             jobResponse.should.containEql(expectedResult);
             databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
@@ -277,7 +277,7 @@ describe('Manager tests', function () {
             };
             jobConnectorRunJobStub.resolves({});
             databaseConnectorInsertStub.resolves({ success: 'success' });
-            let expectedResult = {
+            const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '1',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -289,7 +289,7 @@ describe('Manager tests', function () {
             };
             webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
-            let jobResponse = await manager.createJob(jobBodyWithoutCron);
+            const jobResponse = await manager.createJob(jobBodyWithoutCron);
             jobResponse.should.containEql(expectedResult);
             databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
@@ -324,7 +324,7 @@ describe('Manager tests', function () {
             };
             jobConnectorRunJobStub.resolves({});
             databaseConnectorInsertStub.resolves({ success: 'success' });
-            let expectedResult = {
+            const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '150',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -338,20 +338,20 @@ describe('Manager tests', function () {
             };
             webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
-            let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsNicely);
+            const jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsNicely);
             jobResponse.should.containEql(expectedResult);
             databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
 
             should(jobConnectorRunJobStub.args[0][0].spec.parallelism).eql(3);
 
-            let rampTo = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'RAMP_TO');
+            const rampTo = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'RAMP_TO');
             should.exists(rampTo);
 
-            let arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
+            const arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
             should.exists(arrivalRate);
 
-            let maxVirtualUsers = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'MAX_VIRTUAL_USERS');
+            const maxVirtualUsers = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'MAX_VIRTUAL_USERS');
             should.exists(maxVirtualUsers);
 
             should(rampTo.value).eql('50');
@@ -388,7 +388,7 @@ describe('Manager tests', function () {
             };
             jobConnectorRunJobStub.resolves({});
             databaseConnectorInsertStub.resolves({ success: 'success' });
-            let expectedResult = {
+            const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 ramp_to: '150',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -402,20 +402,20 @@ describe('Manager tests', function () {
             };
             webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
-            let jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsWithDecimal);
+            const jobResponse = await manager.createJob(jobBodyWithParallelismThatSplitsWithDecimal);
             jobResponse.should.containEql(expectedResult);
             databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
 
             should(jobConnectorRunJobStub.args[0][0].spec.parallelism).eql(20);
 
-            let rampTo = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'RAMP_TO');
+            const rampTo = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'RAMP_TO');
             should.exists(rampTo);
 
-            let arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
+            const arrivalRate = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'ARRIVAL_RATE');
             should.exists(arrivalRate);
 
-            let maxVirtualUsers = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'MAX_VIRTUAL_USERS');
+            const maxVirtualUsers = jobConnectorRunJobStub.args[0][0].spec.template.spec.containers[0].env.find(env => env.name === 'MAX_VIRTUAL_USERS');
             should.exists(maxVirtualUsers);
 
             should(rampTo.value).eql('8');
@@ -449,7 +449,7 @@ describe('Manager tests', function () {
             };
             jobConnectorRunJobStub.resolves({ id: 'run_id' });
             databaseConnectorInsertStub.resolves({ success: 'success' });
-            let expectedResult = {
+            const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 environment: 'test',
@@ -460,7 +460,7 @@ describe('Manager tests', function () {
             };
             webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
-            let jobResponse = await manager.createJob(jobBodyWithoutRampTo);
+            const jobResponse = await manager.createJob(jobBodyWithoutRampTo);
             jobResponse.should.containEql(expectedResult);
             databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
@@ -479,7 +479,7 @@ describe('Manager tests', function () {
             };
             jobConnectorRunJobStub.resolves({ id: 'run_id' });
             databaseConnectorInsertStub.resolves({ success: 'success' });
-            let expectedResult = {
+            const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                 test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
                 environment: 'test',
@@ -490,7 +490,7 @@ describe('Manager tests', function () {
                 enabled: false
             };
 
-            let jobResponse = await manager.createJob(jobBodyWithEnabledFalse);
+            const jobResponse = await manager.createJob(jobBodyWithEnabledFalse);
             jobResponse.should.containEql(expectedResult);
             databaseConnectorInsertStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
@@ -601,8 +601,8 @@ describe('Manager tests', function () {
                 };
                 databaseConnectorInsertStub.resolves({ success: 'success' });
                 databaseConnectorDeleteStub.resolves({});
-                let expectedResult = {
-                    'cron_expression': '* * * * * *',
+                const expectedResult = {
+                    cron_expression: '* * * * * *',
                     ramp_to: '1',
                     id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                     test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -669,8 +669,8 @@ describe('Manager tests', function () {
                 };
                 databaseConnectorInsertStub.resolves({ success: 'success' });
                 databaseConnectorDeleteStub.resolves({});
-                let expectedResult = {
-                    'cron_expression': '* * * * * *',
+                const expectedResult = {
+                    cron_expression: '* * * * * *',
                     ramp_to: '1',
                     id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
                     test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
@@ -682,7 +682,7 @@ describe('Manager tests', function () {
                 };
                 webhooks.map(webhook => webhooksManagerGetWebhook.withArgs(webhook.id).resolves(webhook));
 
-                let jobBodyWithCronDisabled = { ...jobBodyWithCron, enabled: false };
+                const jobBodyWithCronDisabled = { ...jobBodyWithCron, enabled: false };
                 return manager.createJob(jobBodyWithCronDisabled)
                     .then(function (result) {
                         result.should.containEql(expectedResult);
@@ -740,7 +740,7 @@ describe('Manager tests', function () {
                 jobConnectorRunJobStub.resolves({});
                 databaseConnectorInsertStub.resolves({ success: 'success' });
                 databaseConnectorDeleteStub.resolves({});
-                let expectedResult = {
+                const expectedResult = {
                     cron_expression: '* * * * * *',
                     ramp_to: '1',
                     id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
@@ -803,10 +803,10 @@ describe('Manager tests', function () {
                 jobConnectorRunJobStub.resolves({});
                 databaseConnectorInsertStub.resolves({ success: 'success' });
                 databaseConnectorDeleteStub.resolves({});
-                let date = new Date();
+                const date = new Date();
                 date.setSeconds(date.getSeconds() + 5);
                 jobBodyWithCronNotImmediately.cron_expression = date.getSeconds() + ' * * * * *';
-                let expectedResult = {
+                const expectedResult = {
                     cron_expression: date.getSeconds() + ' * * * * *',
                     ramp_to: '1',
                     id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
@@ -1030,7 +1030,7 @@ describe('Manager tests', function () {
             }]
             );
 
-            let expectedResult = [{
+            const expectedResult = [{
                 id: 'id',
                 type: 'load_test',
                 test_id: 'test_id',
@@ -1068,7 +1068,7 @@ describe('Manager tests', function () {
                 debug: '*',
                 enabled: true
             }];
-            let jobs = await manager.getJobs(true);
+            const jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
             databaseConnectorGetStub.callCount.should.eql(1);
         });
@@ -1096,11 +1096,11 @@ describe('Manager tests', function () {
                 cron_expression: null,
                 emails: ['eli@eli.eli'],
                 webhooks: null,
-                ramp_to: '1',
+                ramp_to: '1'
             }]
             );
 
-            let expectedResult = [{
+            const expectedResult = [{
                 id: 'id',
                 type: 'functional_test',
                 test_id: 'test_id',
@@ -1120,7 +1120,7 @@ describe('Manager tests', function () {
                 debug: undefined,
                 enabled: false
             }];
-            let jobs = await manager.getJobs();
+            const jobs = await manager.getJobs();
             jobs.should.eql(expectedResult);
             databaseConnectorGetStub.callCount.should.eql(1);
         });
@@ -1128,7 +1128,7 @@ describe('Manager tests', function () {
         it('Get empty list of jobs', async function () {
             databaseConnectorGetStub.resolves([]);
 
-            let jobs = await manager.getJobs();
+            const jobs = await manager.getJobs();
             jobs.should.eql([]);
             databaseConnectorGetStub.callCount.should.eql(1);
             loggerInfoStub.callCount.should.eql(1);
@@ -1165,7 +1165,7 @@ describe('Manager tests', function () {
                 debug: '*'
             }]);
 
-            let expectedResult = {
+            const expectedResult = {
                 id: 'id',
                 type: 'load_test',
                 test_id: 'test_id',
@@ -1186,7 +1186,7 @@ describe('Manager tests', function () {
                 enabled: true
             };
 
-            let job = await manager.getJob('id');
+            const job = await manager.getJob('id');
             job.should.eql(expectedResult);
             databaseConnectorGetSingleJobStub.callCount.should.eql(1);
         });
@@ -1231,7 +1231,7 @@ describe('Manager tests', function () {
     describe('Get logs', function () {
         it('Success getting logs from job', async function () {
             jobGetLogsStub.resolves([{ type: 'file', name: 'log.txt', content: 'this is the log' }]);
-            let logs = await manager.getLogs('jobId', 'runId');
+            const logs = await manager.getLogs('jobId', 'runId');
             logs.should.eql({
                 files: [{ type: 'file', name: 'log.txt', content: 'this is the log' }],
                 filename: 'jobId-runId.zip'
@@ -1251,8 +1251,8 @@ describe('Manager tests', function () {
 
     describe('Delete containers', function () {
         it('Success deleting jobs from connector', async function () {
-            jobDeleteContainerStub.resolves({deleted: 10});
-            let result = await manager.deleteAllContainers();
+            jobDeleteContainerStub.resolves({ deleted: 10 });
+            const result = await manager.deleteAllContainers();
             result.should.eql({
                 deleted: 10
             });
@@ -1261,7 +1261,7 @@ describe('Manager tests', function () {
         });
 
         it('Get logs from job fails', async function () {
-            jobDeleteContainerStub.rejects({message: 'Failed to delete containers'});
+            jobDeleteContainerStub.rejects({ message: 'Failed to delete containers' });
             try {
                 await manager.deleteAllContainers();
                 throw new Error('should not get here');

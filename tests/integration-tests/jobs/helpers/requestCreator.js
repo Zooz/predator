@@ -1,5 +1,5 @@
-let request = require('supertest');
-let app = require('../../../../src/app');
+const request = require('supertest');
+const app = require('../../../../src/app');
 let testApp;
 module.exports = {
     init,

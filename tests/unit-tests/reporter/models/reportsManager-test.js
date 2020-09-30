@@ -18,51 +18,51 @@ let manager;
 let statsManager;
 
 const REPORT = {
-    'test_id': 'test_id',
-    'revision_id': 'revision_id',
-    'report_id': 'report_id',
-    'test_name': 'test name',
-    'report_url': 'http://www.zooz.com',
-    'status': constants.REPORT_INITIALIZING_STATUS,
-    'start_time': 1527533459591,
-    'grafana_report': 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
-    'subscribers': [
+    test_id: 'test_id',
+    revision_id: 'revision_id',
+    report_id: 'report_id',
+    test_name: 'test name',
+    report_url: 'http://www.zooz.com',
+    status: constants.REPORT_INITIALIZING_STATUS,
+    start_time: 1527533459591,
+    grafana_report: 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
+    subscribers: [
         {
-            'runner_id': '1234',
-            'phase_status': constants.SUBSCRIBER_STARTED_STAGE,
-            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+            runner_id: '1234',
+            phase_status: constants.SUBSCRIBER_STARTED_STAGE,
+            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
         }
     ],
-    'test_configuration': JSON.stringify({
+    test_configuration: JSON.stringify({
         duration: 10
     }),
     last_updated_at: Date.now()
 };
 
 const REPORT_DONE = {
-    'test_id': 'test_id',
-    'revision_id': 'revision_id',
-    'report_id': 'report_id',
-    'test_name': 'test name',
-    'report_url': 'http://www.zooz.com',
-    'status': constants.REPORT_INITIALIZING_STATUS,
-    'start_time': 1527533459591,
-    'grafana_report': 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
-    'subscribers': [
+    test_id: 'test_id',
+    revision_id: 'revision_id',
+    report_id: 'report_id',
+    test_name: 'test name',
+    report_url: 'http://www.zooz.com',
+    status: constants.REPORT_INITIALIZING_STATUS,
+    start_time: 1527533459591,
+    grafana_report: 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
+    subscribers: [
         {
-            'runner_id': '1234',
-            'phase_status': constants.SUBSCRIBER_DONE_STAGE,
-            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+            runner_id: '1234',
+            phase_status: constants.SUBSCRIBER_DONE_STAGE,
+            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
         }
     ],
-    'test_configuration': JSON.stringify({
+    test_configuration: JSON.stringify({
         duration: 10
     }),
     last_updated_at: Date.now()
 };
 
 const JOB = {
-    'emails': 'eli@zooz.com',
+    emails: 'eli@zooz.com',
     arrival_rate: 1,
     duration: 1,
     ramp_to: 2,
@@ -73,8 +73,6 @@ const JOB = {
 
 describe('Reports manager tests', function () {
     let sandbox;
-    let loggerErrorStub;
-    let loggerInfoStub;
     let databaseGetReportsStub;
     let databaseGetReportStub;
     let databaseGetLastReportsStub;
@@ -110,8 +108,8 @@ describe('Reports manager tests', function () {
         updateReportBenchmarkStub = sandbox.stub(databaseConnector, 'updateReportBenchmark');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
         databaseDeleteReportStub = sandbox.stub(databaseConnector, 'deleteReport');
-        loggerErrorStub = sandbox.stub(logger, 'error');
-        loggerInfoStub = sandbox.stub(logger, 'info');
+        sandbox.stub(logger, 'error');
+        sandbox.stub(logger, 'info');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
         configStub = sandbox.stub(configHandler, 'getConfig');
         notifierStub = sandbox.stub(notifier, 'notifyIfNeeded');
@@ -247,7 +245,7 @@ describe('Reports manager tests', function () {
             let testReport;
             before(() => {
                 testReport = Object.assign({}, REPORT);
-                let secondSubscriber = Object.assign({}, testReport.subscribers[0]);
+                const secondSubscriber = Object.assign({}, testReport.subscribers[0]);
                 testReport.subscribers.push(secondSubscriber);
                 should(testReport.subscribers.length).eql(2);
             });
@@ -385,7 +383,7 @@ describe('Reports manager tests', function () {
         it('get last report with avg rsp when test running', async () => {
             const now = new Date();
             const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
-            const subscriber = { last_stats: { rps: { total_count: 200 }, codes: { '200': 10 } } };
+            const subscriber = { last_stats: { rps: { total_count: 200 }, codes: { 200: 10 } } };
             const report = Object.assign({}, REPORT, { last_updated_at: now, start_time: tenSecBefore, subscribers: [subscriber] });
             databaseGetLastReportsStub.resolves([report]);
             const reports = await manager.getLastReports();
@@ -395,7 +393,7 @@ describe('Reports manager tests', function () {
         it('get last report with avg rsp when test finished', async () => {
             const now = new Date();
             const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
-            const subscriber = { last_stats: { rps: { total_count: 300 }, codes: { '200': 10 } } };
+            const subscriber = { last_stats: { rps: { total_count: 300 }, codes: { 200: 10 } } };
             const report = Object.assign({}, REPORT, {
                 end_time: now,
                 start_time: tenSecBefore,
@@ -409,7 +407,7 @@ describe('Reports manager tests', function () {
         it('get last report with avg rsp when total_count not exist ', async () => {
             const now = new Date();
             const tenSecBefore = new Date(now).setSeconds(now.getSeconds() - 10);
-            const subscriber = { last_stats: { rps: { test: 'test' }, codes: { '200': 10 } } };
+            const subscriber = { last_stats: { rps: { test: 'test' }, codes: { 200: 10 } } };
             const report = Object.assign({}, REPORT, {
                 end_time: now,
                 start_time: tenSecBefore,
@@ -460,9 +458,9 @@ describe('Reports manager tests', function () {
                     finishedReport.start_time = new Date();
                     finishedReport.subscribers = [
                         {
-                            'runner_id': '1234',
-                            'phase_status': subscriberStatus,
-                            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+                            runner_id: '1234',
+                            phase_status: subscriberStatus,
+                            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
                         }
                     ];
                     databaseGetReportStub.resolves([finishedReport]);
@@ -477,9 +475,9 @@ describe('Reports manager tests', function () {
                     inProgressReport.start_time = new Date();
                     inProgressReport.subscribers = [
                         {
-                            'runner_id': '1234',
-                            'phase_status': subscriberStatus,
-                            'last_stats': { rps: { mean: 500 }, codes: { '200': 10 } }
+                            runner_id: '1234',
+                            phase_status: subscriberStatus,
+                            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
                         }
                     ];
                     databaseGetReportStub.resolves([inProgressReport]);
@@ -644,13 +642,13 @@ describe('Reports manager tests', function () {
             updateReportBenchmarkStub.callCount.should.eql(1);
 
             should(getBenchmarkStub.args).eql([['test_id']]);
-            should(benchmarkCalculatorStub.args).eql([[{ 'test': 'some  benchmark data' }, { 'test': 'some aggregate data' }, {
+            should(benchmarkCalculatorStub.args).eql([[{ test: 'some  benchmark data' }, { test: 'some aggregate data' }, {
                 config: 'some value'
             }]]);
             should(updateReportBenchmarkStub.args[0][0]).eql('test_id');
             should(updateReportBenchmarkStub.args[0][1]).eql('report_id');
             should(updateReportBenchmarkStub.args[0][2]).eql(5.5);
-            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data', 'benchmark_threshold': 99 }));
+            should(updateReportBenchmarkStub.args[0][3]).eql(JSON.stringify({ test: 'some calculate data', benchmark_threshold: 99 }));
         });
         it('when report done and dont have benchmark data ', async () => {
             databaseGetReportStub.resolves([REPORT_DONE]);

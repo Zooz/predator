@@ -51,7 +51,7 @@ describe('Manager config with env variables', function () {
     });
     it('get config for from env varibles in the right types (json,int,float,string)', async () => {
         databaseConnectorGetStub.resolves([]);
-        let result = await manager.getConfig();
+        const result = await manager.getConfig();
         should(Object.keys(result).length).eql(Object.keys(configConstants).length);
         should(result.grafana_url).eql('url_test');
         should(result.runner_memory).eql(20);

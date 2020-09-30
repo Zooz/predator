@@ -47,7 +47,7 @@ describe('configManager data map helper tests', function() {
             changeAllEnvData();
             manager = rewire('../../../../src/configManager/helpers/configDataMap');
             valuesToCheck.forEach(key => {
-                let result = manager.getConstDefaultValue(key);
+                const result = manager.getConstDefaultValue(key);
                 const expectedValue = key + '_test';
                 should(result).eql(expectedValue);
             });
@@ -57,7 +57,7 @@ describe('configManager data map helper tests', function() {
     describe('get all configs type from env data', function () {
         it('get all types success', () => {
             Object.values(configConstants).forEach(key => {
-                let result = manager.getConstType(key);
+                const result = manager.getConstType(key);
                 const expectedType = expectedTypes[key];
                 should(result).eql(expectedType);
             });

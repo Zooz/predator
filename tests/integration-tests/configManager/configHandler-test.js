@@ -118,9 +118,9 @@ describe('update and get config', () => {
 
     describe('get config ', () => {
         it('get default config', async () => {
-            let response = await configRequestCreator.getConfig();
+            const response = await configRequestCreator.getConfig();
             should(response.statusCode).eql(200);
-            delete response.body['smtp_server'];
+            delete response.body.smtp_server;
             should(response.body).eql(defaultBody);
         });
     });
@@ -131,7 +131,7 @@ describe('update and get config', () => {
             const deleteResponse = await configRequestCreator.deleteConfig('grafana_url');
             const getResponse = await configRequestCreator.getConfig();
             should(deleteResponse.statusCode).eql(204);
-            should(getResponse.body['grafana_url']).eql(undefined);
+            should(getResponse.body.grafana_url).eql(undefined);
         });
         it('delete config when value not in db', async () => {
             const deleteResponse = await configRequestCreator.deleteConfig('not_real_key');
@@ -141,14 +141,14 @@ describe('update and get config', () => {
 
     describe('Update config with special types ', () => {
         it('get all config with special types', async () => {
-            let response = await configRequestCreator.updateConfig(updateBodyWithTypes);
+            const response = await configRequestCreator.updateConfig(updateBodyWithTypes);
             should(response.statusCode).eql(200);
-            should(response.body['influx_metrics'] instanceof Object);
-            should(response.body['prometheus_metrics'] instanceof Object);
-            should(response.body['smtp_server'] instanceof Object);
-            should(response.body['smtp_server'] instanceof Number);
-            should(response.body['benchmark_threshold'] instanceof Number);
-            should(response.body['benchmark_weights'] instanceof Object);
+            should(response.body.influx_metrics instanceof Object);
+            should(response.body.prometheus_metrics instanceof Object);
+            should(response.body.smtp_server instanceof Object);
+            should(response.body.smtp_server instanceof Number);
+            should(response.body.benchmark_threshold instanceof Number);
+            should(response.body.benchmark_weights instanceof Object);
         });
     });
     describe('Update config and get config ', () => {
@@ -164,7 +164,7 @@ describe('update and get config', () => {
 
     describe('Update config with large json for custom runner definition', () => {
         it('params below minimum', async () => {
-            let response = await configRequestCreator.updateConfig({
+            const response = await configRequestCreator.updateConfig({
                 custom_runner_definition: {
                     spec: {
                         template: {
@@ -203,21 +203,21 @@ describe('update and get config', () => {
 
     describe('Update config validation', () => {
         it('update config fail with validation require fields', async () => {
-            let response = await configRequestCreator.updateConfig(requestBodyNotValidRequire);
+            const response = await configRequestCreator.updateConfig(requestBodyNotValidRequire);
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);
         });
     });
     describe('Update config validation', () => {
         it('update config fail with validation enum', async () => {
-            let response = await configRequestCreator.updateConfig(requestBodyNotValidEnum);
+            const response = await configRequestCreator.updateConfig(requestBodyNotValidEnum);
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);
         });
     });
     describe('Update config validation', () => {
         it('update config fail with validation type', async () => {
-            let response = await configRequestCreator.updateConfig(requestBodyNotValidType);
+            const response = await configRequestCreator.updateConfig(requestBodyNotValidType);
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);
         });
@@ -225,7 +225,7 @@ describe('update and get config', () => {
 
     describe('Update config with values below minimum', () => {
         it('params below minimum', async () => {
-            let response = await configRequestCreator.updateConfig({
+            const response = await configRequestCreator.updateConfig({
                 runner_memory: 100,
                 runner_cpu: -1,
                 minimum_wait_for_delayed_report_status_update_in_ms: -1,
@@ -244,7 +244,7 @@ describe('update and get config', () => {
 
     describe('Update config with benchmark weights not sum up to 100%', () => {
         it('params below minimum', async () => {
-            let response = await configRequestCreator.updateConfig({
+            const response = await configRequestCreator.updateConfig({
                 benchmark_threshold: 20,
                 benchmark_weights: {
                     percentile_ninety_five: { percentage: 50 },
@@ -261,7 +261,7 @@ describe('update and get config', () => {
 
     describe('Update config benchmark weights with invalid properties', () => {
         it('update config fail with validation type', async () => {
-            let response = await configRequestCreator.updateConfig({
+            const response = await configRequestCreator.updateConfig({
                 benchmark_threshold: 20,
                 benchmark_weights: { tps: '10' }
             });
@@ -279,7 +279,7 @@ describe('update and get config', () => {
 
     describe('Update prometheus configuration with labels which are not key value', () => {
         it('update config fail with validation type', async () => {
-            let response = await configRequestCreator.updateConfig({
+            const response = await configRequestCreator.updateConfig({
                 prometheus_metrics: {
                     push_gateway_url: 'string_value',
                     buckets_sizes: 'string_value',

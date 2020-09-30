@@ -1,7 +1,7 @@
 const should = require('should'),
     uuid = require('uuid/v4');
 
-let validHeaders = { 'Content-Type': 'application/json' };
+const validHeaders = { 'Content-Type': 'application/json' };
 const processorRequestSender = require('./helpers/requestCreator');
 const testsRequestSender = require('../tests/helpers/requestCreator');
 const { ERROR_MESSAGES } = require('../../../src/common/consts');
@@ -15,9 +15,9 @@ describe('Processors api', function () {
 
     describe('Good requests', async function () {
         describe('GET /v1/processors', function () {
-            let numberOfProcessorsToInsert = 101;
-            let jsProcessorsArr = [];
-            let processorsInserted = [];
+            const numberOfProcessorsToInsert = 101;
+            const jsProcessorsArr = [];
+            const processorsInserted = [];
             before(async function () {
                 for (let i = 0; i < numberOfProcessorsToInsert; i++) {
                     const processor = generateRawJSProcessor(i.toString());
@@ -27,7 +27,7 @@ describe('Processors api', function () {
                 }
             });
             it('Check default paging values (from = 0, limit = 100)', async function () {
-                let getProcessorsResponse = await processorRequestSender.getProcessors();
+                const getProcessorsResponse = await processorRequestSender.getProcessors();
 
                 should(getProcessorsResponse.statusCode).equal(200);
 
@@ -37,7 +37,7 @@ describe('Processors api', function () {
 
             it('Get a page', async function () {
                 const from = 25, limit = 50;
-                let getProcessorsResponse = await processorRequestSender.getProcessors(from, limit);
+                const getProcessorsResponse = await processorRequestSender.getProcessors(from, limit);
 
                 should(getProcessorsResponse.statusCode).equal(200);
 
@@ -47,8 +47,8 @@ describe('Processors api', function () {
 
             it('Validate from parameter starts from the correct index', async function () {
                 const from = 0, limit = 50;
-                let page1Response = await processorRequestSender.getProcessors(from, limit);
-                let page2Response = await processorRequestSender.getProcessors(from + 1, limit);
+                const page1Response = await processorRequestSender.getProcessors(from, limit);
+                const page2Response = await processorRequestSender.getProcessors(from + 1, limit);
 
                 should(page1Response.statusCode).equal(200);
                 should(page2Response.statusCode).equal(200);
@@ -60,7 +60,7 @@ describe('Processors api', function () {
 
             it('Get a page with limit > # of processors', async function () {
                 const from = 0, limit = 200;
-                let getProcessorsResponse = await processorRequestSender.getProcessors(from, limit);
+                const getProcessorsResponse = await processorRequestSender.getProcessors(from, limit);
 
                 should(getProcessorsResponse.statusCode).equal(200);
 
@@ -70,7 +70,7 @@ describe('Processors api', function () {
 
             it('Get tests without javascript field', async function () {
                 const from = 0, limit = 10, exclude = 'javascript';
-                let getProcessorsResponse = await processorRequestSender.getProcessors(from, limit, exclude);
+                const getProcessorsResponse = await processorRequestSender.getProcessors(from, limit, exclude);
 
                 should(getProcessorsResponse.statusCode).equal(200);
 
@@ -116,13 +116,13 @@ describe('Processors api', function () {
                 processor = processorResponse.body;
             });
             it('Get processor by id', async () => {
-                let getProcessorResponse = await processorRequestSender.getProcessor(processor.id, validHeaders);
+                const getProcessorResponse = await processorRequestSender.getProcessor(processor.id, validHeaders);
                 getProcessorResponse.statusCode.should.eql(200);
                 should(getProcessorResponse.body).containDeep(processorData);
                 should(getProcessorResponse.body.exported_functions).eql(['simple']);
             });
             it('Get non-existent processor by id', async () => {
-                let getProcessorResponse = await processorRequestSender.getProcessor(uuid(), validHeaders);
+                const getProcessorResponse = await processorRequestSender.getProcessor(uuid(), validHeaders);
                 getProcessorResponse.statusCode.should.eql(404);
             });
             after(async function () {
@@ -148,11 +148,11 @@ describe('Processors api', function () {
                         }
                     }`
                 };
-                let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
+                const createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(201);
                 createProcessorResponse.body.exported_functions.should.eql(['createAuthToken']);
 
-                let deleteResponse = await processorRequestSender.deleteProcessor(createProcessorResponse.body.id);
+                const deleteResponse = await processorRequestSender.deleteProcessor(createProcessorResponse.body.id);
                 should(deleteResponse.statusCode).equal(204);
             });
         });
@@ -184,7 +184,7 @@ describe('Processors api', function () {
                     name: 'mickey',
                     description: 'Processor with no js'
                 };
-                let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
+                const createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(400);
             });
             it('Create processor with no name', async () => {
@@ -192,7 +192,7 @@ describe('Processors api', function () {
                     description: 'Processor with no name',
                     javascript: 'module.exports = 5;'
                 };
-                let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
+                const createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(400);
             });
             it('Create processor with no description', async () => {
@@ -200,7 +200,7 @@ describe('Processors api', function () {
                     name: 'mickey',
                     javascript: 'module.exports = 5;'
                 };
-                let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
+                const createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(400);
             });
             it('Create a processor with name that already exists', async function () {
@@ -255,7 +255,7 @@ describe('Processors api', function () {
                     description: 'Creates authorization token and saves it in the context',
                     javascript: '{ this is not valid javascript }'
                 };
-                let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
+                const createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
             });
 
@@ -275,7 +275,7 @@ describe('Processors api', function () {
                         }
                     }`
                 };
-                let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
+                const createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
                 createProcessorResponse.body.message.should.eql('javascript has 0 exported functions');
             });
@@ -297,7 +297,7 @@ describe('Processors api', function () {
                         }
                     }`
                 };
-                let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
+                const createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
                 createProcessorResponse.body.message.should.eql('javascript syntax validation failed with error: hello is not defined');
             });
@@ -319,7 +319,7 @@ describe('Processors api', function () {
                         }
                     }`
                 };
-                let createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
+                const createProcessorResponse = await processorRequestSender.createProcessor(requestBody, validHeaders);
                 createProcessorResponse.statusCode.should.eql(422);
                 createProcessorResponse.body.message.should.eql("javascript syntax validation failed with error: Unexpected token ')'");
             });
@@ -350,7 +350,7 @@ describe('Processors api', function () {
             });
 
             it('Should return 409 when trying to delete processor which is in use', async () => {
-                let deleteProcessorResponse = await processorRequestSender.deleteProcessor(processorId);
+                const deleteProcessorResponse = await processorRequestSender.deleteProcessor(processorId);
                 should(deleteProcessorResponse.statusCode).equal(409);
                 should(deleteProcessorResponse.body.message).startWith(`${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${test.name}`);
             });

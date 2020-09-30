@@ -1,16 +1,17 @@
 'use strict';
 process.env.JOB_PLATFORM = 'DOCKER';
-let sinon = require('sinon');
-let should = require('should');
+const sinon = require('sinon');
+// eslint-disable-next-line no-unused-vars
+const should = require('should');
 
-let logger = require('../../../../src/common/logger');
-let notifier = require('../../../../src/reports/models/notifier');
-let jobsManager = require('../../../../src/jobs/models/jobManager');
-let webhooksManager = require('../../../../src/webhooks/models/webhookManager');
-let configHandler = require('../../../../src/configManager/models/configHandler');
-let statsFormatter = require('../../../../src/webhooks/models/statsFormatter');
-let aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
-let reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
+const logger = require('../../../../src/common/logger');
+const notifier = require('../../../../src/reports/models/notifier');
+const jobsManager = require('../../../../src/jobs/models/jobManager');
+const webhooksManager = require('../../../../src/webhooks/models/webhookManager');
+const configHandler = require('../../../../src/configManager/models/configHandler');
+const statsFormatter = require('../../../../src/webhooks/models/statsFormatter');
+const aggregateReportGenerator = require('../../../../src/reports/models/aggregateReportGenerator');
+const reportEmailSender = require('../../../../src/reports/models/reportEmailSender');
 const reportsManager = require('../../../../src/reports/models/reportsManager');
 const {
     WEBHOOK_EVENT_TYPE_FAILED,
@@ -25,13 +26,13 @@ const {
 const { SUBSCRIBER_INTERMEDIATE_STAGE, SUBSCRIBER_FAILED_STAGE, SUBSCRIBER_STARTED_STAGE, SUBSCRIBER_FIRST_INTERMEDIATE_STAGE, SUBSCRIBER_DONE_STAGE, SUBSCRIBER_ABORTED_STAGE } = require('../../../../src/reports/utils/constants');
 
 describe('Webhook/email notifier test ', () => {
-    let sandbox, loggerInfoStub, loggerWarnStub, webhooksManagerFireWebhookStub,
+    let sandbox, loggerInfoStub, webhooksManagerFireWebhookStub,
         statsFormatterStub, jobsManagerStub, getConfigStub, aggregateReportGeneratorStub, reportEmailSenderStub,
         getReportsStub;
     before(() => {
         sandbox = sinon.sandbox.create();
         loggerInfoStub = sandbox.stub(logger, 'info');
-        loggerWarnStub = sandbox.stub(logger, 'warn');
+        sandbox.stub(logger, 'warn');
         webhooksManagerFireWebhookStub = sandbox.stub(webhooksManager, 'fireWebhookByEvent');
         statsFormatterStub = sandbox.stub(statsFormatter, 'getStatsFormatted');
         jobsManagerStub = sandbox.stub(jobsManager, 'getJob');
@@ -55,29 +56,29 @@ describe('Webhook/email notifier test ', () => {
             more: 'keys'
         };
         jobsManagerStub.resolves(job);
-        let report = { environment: 'test', report_id: 'report_id', test_id: 'test_id' };
-        let stats = {
+        const report = { environment: 'test', report_id: 'report_id', test_id: 'test_id' };
+        const stats = {
             phase_status: SUBSCRIBER_FAILED_STAGE,
             error: {
-                'code': 500,
-                'message': 'fail to get test'
+                code: 500,
+                message: 'fail to get test'
             },
-            data: JSON.stringify({ 'message': 'fail to get test' })
+            data: JSON.stringify({ message: 'fail to get test' })
         };
         await notifier.notifyIfNeeded(report, stats);
 
         webhooksManagerFireWebhookStub.callCount.should.equal(1);
-        webhooksManagerFireWebhookStub.args[0].should.containDeep([ job, WEBHOOK_EVENT_TYPE_FAILED, report ]);
+        webhooksManagerFireWebhookStub.args[0].should.containDeep([job, WEBHOOK_EVENT_TYPE_FAILED, report]);
         loggerInfoStub.callCount.should.equal(1);
         loggerInfoStub.args.should.deepEqual([
             [
                 {
-                    'testId': 'test_id',
-                    'reportId': 'report_id'
+                    testId: 'test_id',
+                    reportId: 'report_id'
                 },
                 {
-                    'code': 500,
-                    'message': 'fail to get test'
+                    code: 500,
+                    message: 'fail to get test'
                 },
                 'handling error message'
             ]
@@ -90,7 +91,7 @@ describe('Webhook/email notifier test ', () => {
                 some: 'keys'
             };
             jobsManagerStub.resolves(job);
-            let report = {
+            const report = {
                 environment: 'test',
                 report_id: 'report_id',
                 test_id: 'test_id',
@@ -104,9 +105,9 @@ describe('Webhook/email notifier test ', () => {
                 subscribers: [{ phase_status: SUBSCRIBER_STARTED_STAGE }, { phase_status: SUBSCRIBER_STARTED_STAGE }]
 
             };
-            let stats = {
+            const stats = {
                 phase_status: SUBSCRIBER_STARTED_STAGE,
-                data: JSON.stringify({ 'message': 'fail to get test' })
+                data: JSON.stringify({ message: 'fail to get test' })
             };
             await notifier.notifyIfNeeded(report, stats);
 
@@ -120,7 +121,7 @@ describe('Webhook/email notifier test ', () => {
                 some: 'keys'
             };
             jobsManagerStub.resolves(job);
-            let report = {
+            const report = {
                 environment: 'test',
                 report_id: 'report_id',
                 test_id: 'test_id',
@@ -129,9 +130,9 @@ describe('Webhook/email notifier test ', () => {
                 arrival_rate: 10,
                 subscribers: [{ phase_status: SUBSCRIBER_STARTED_STAGE }]
             };
-            let stats = {
+            const stats = {
                 phase_status: SUBSCRIBER_STARTED_STAGE,
-                data: JSON.stringify({ 'message': 'fail to get test' })
+                data: JSON.stringify({ message: 'fail to get test' })
             };
             await notifier.notifyIfNeeded(report, stats);
 
@@ -145,7 +146,7 @@ describe('Webhook/email notifier test ', () => {
         jobsManagerStub.resolves({
             webhooks: ['http://www.zooz.com', 'http://www.zooz2.com']
         });
-        let report = {
+        const report = {
             environment: 'test',
             report_id: 'report_id',
             test_id: 'test_id',
@@ -159,7 +160,7 @@ describe('Webhook/email notifier test ', () => {
             subscribers: [{ phase_status: SUBSCRIBER_STARTED_STAGE }, { phase_status: 'not_started_phase' }]
 
         };
-        let stats = {
+        const stats = {
             phase_status: SUBSCRIBER_STARTED_STAGE
         };
         await notifier.notifyIfNeeded(report, stats);
@@ -175,7 +176,7 @@ describe('Webhook/email notifier test ', () => {
         aggregateReportGeneratorStub.resolves(aggregatedReport);
 
         jobsManagerStub.resolves(job);
-        let report = {
+        const report = {
             environment: 'test',
             report_id: 'report_id',
             test_id: 'test_id',
@@ -189,7 +190,7 @@ describe('Webhook/email notifier test ', () => {
             subscribers: [{ phase_status: SUBSCRIBER_FIRST_INTERMEDIATE_STAGE }, { phase_status: SUBSCRIBER_FIRST_INTERMEDIATE_STAGE }]
 
         };
-        let stats = {
+        const stats = {
             phase_status: SUBSCRIBER_FIRST_INTERMEDIATE_STAGE,
             data: JSON.stringify({})
         };
@@ -208,7 +209,7 @@ describe('Webhook/email notifier test ', () => {
             some: 'keys'
         };
         jobsManagerStub.resolves(job);
-        let report = {
+        const report = {
             environment: 'test',
             report_id: 'report_id',
             test_id: 'test_id',
@@ -222,7 +223,7 @@ describe('Webhook/email notifier test ', () => {
             subscribers: [{ phase_status: SUBSCRIBER_INTERMEDIATE_STAGE, last_stats: { codes: { 200: 15, 301: 13 } } }, { phase_status: SUBSCRIBER_INTERMEDIATE_STAGE, last_stats: { codes: { 200: 15, 301: 13 } } }]
         };
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
-        let stats = {
+        const stats = {
             phase_status: SUBSCRIBER_INTERMEDIATE_STAGE,
             data: JSON.stringify({})
         };
@@ -237,7 +238,7 @@ describe('Webhook/email notifier test ', () => {
             some: 'keys'
         };
         jobsManagerStub.resolves(job);
-        let report = {
+        const report = {
             environment: 'test',
             report_id: 'report_id',
             test_id: 'test_id',
@@ -252,7 +253,7 @@ describe('Webhook/email notifier test ', () => {
         };
         const accumulatedStatusCodesCounter = { 200: 30, 301: 26, 500: 1 };
         statsFormatterStub.returns('max: 1, min: 0.4, median: 0.7');
-        let stats = {
+        const stats = {
             phase_status: SUBSCRIBER_INTERMEDIATE_STAGE,
             data: JSON.stringify({})
         };
@@ -287,7 +288,7 @@ describe('Webhook/email notifier test ', () => {
                 subscribers: [{ phase_status: SUBSCRIBER_DONE_STAGE }, { phase_status: SUBSCRIBER_DONE_STAGE }]
 
             };
-            let stats = {
+            const stats = {
                 phase_status: SUBSCRIBER_DONE_STAGE,
                 data: JSON.stringify({})
             };
@@ -327,7 +328,7 @@ describe('Webhook/email notifier test ', () => {
                 subscribers: [{ phase_status: SUBSCRIBER_DONE_STAGE }, { phase_status: SUBSCRIBER_DONE_STAGE }]
 
             };
-            let stats = {
+            const stats = {
                 phase_status: SUBSCRIBER_DONE_STAGE,
                 data: JSON.stringify({})
             };
@@ -373,7 +374,7 @@ describe('Webhook/email notifier test ', () => {
                 subscribers: [{ phase_status: SUBSCRIBER_DONE_STAGE }, { phase_status: SUBSCRIBER_DONE_STAGE }]
 
             };
-            let stats = {
+            const stats = {
                 phase_status: SUBSCRIBER_DONE_STAGE,
                 data: JSON.stringify({})
             };
@@ -419,7 +420,7 @@ describe('Webhook/email notifier test ', () => {
                 subscribers: [{ phase_status: SUBSCRIBER_DONE_STAGE }, { phase_status: SUBSCRIBER_DONE_STAGE }]
 
             };
-            let stats = {
+            const stats = {
                 phase_status: SUBSCRIBER_DONE_STAGE,
                 data: JSON.stringify({})
             };
@@ -450,10 +451,10 @@ describe('Webhook/email notifier test ', () => {
             key: 'wow'
         };
         jobsManagerStub.resolves(job);
-        let report = { test_name: 'test_name', environment: 'test', report_id: 'report_id', test_id: 'test_id' };
-        let stats = {
+        const report = { test_name: 'test_name', environment: 'test', report_id: 'report_id', test_id: 'test_id' };
+        const stats = {
             phase_status: SUBSCRIBER_ABORTED_STAGE,
-            data: JSON.stringify({ 'message': 'fail to get test' })
+            data: JSON.stringify({ message: 'fail to get test' })
         };
         await notifier.notifyIfNeeded(report, stats);
 
@@ -463,10 +464,10 @@ describe('Webhook/email notifier test ', () => {
     });
 
     it('handling message with unknown phase', async () => {
-        let report = { test_name: 'test_name', environment: 'test', report_id: 'report_id', test_id: 'test_id' };
-        let stats = {
+        const report = { test_name: 'test_name', environment: 'test', report_id: 'report_id', test_id: 'test_id' };
+        const stats = {
             phase_status: 'unknown',
-            data: JSON.stringify({ 'message': 'some unknown phase' })
+            data: JSON.stringify({ message: 'some unknown phase' })
         };
 
         await notifier.notifyIfNeeded(report, stats);

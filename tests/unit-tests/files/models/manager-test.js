@@ -1,8 +1,8 @@
 'use strict';
-let should = require('should');
-let fileManager = require('../../../../src/files/models/fileManager');
-let sinon = require('sinon');
-let database = require('../../../../src/files/models/database');
+const should = require('should');
+const fileManager = require('../../../../src/files/models/fileManager');
+const sinon = require('sinon');
+const database = require('../../../../src/files/models/database');
 const UUID_PATTERN = /^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i;
 describe('Scenario generator tests', function () {
     let sandbox;
@@ -25,7 +25,7 @@ describe('Scenario generator tests', function () {
     describe('Create new file', function () {
         it('Should save new file to database', async () => {
             saveFileStub.resolves();
-            let id = await fileManager.saveFile('mickey.csv', 'mickey the predator');
+            const id = await fileManager.saveFile('mickey.csv', 'mickey the predator');
             saveFileStub.calledOnce.should.eql(true);
             should(saveFileStub.getCall(0).args[0]).match(UUID_PATTERN);
             should(saveFileStub.getCall(0).args[1]).eql('mickey.csv');
@@ -46,7 +46,7 @@ describe('Scenario generator tests', function () {
         it('Should get file from database', async () => {
             getFileStub.resolves({ id: 'someId', name: 'mickey.csv', file: 'mickey the predator' });
 
-            let file = await fileManager.getFile('someId');
+            const file = await fileManager.getFile('someId');
             getFileStub.calledOnce.should.eql(true);
             should(getFileStub.getCall(0).args[0]).eql('someId');
             should(file).eql({

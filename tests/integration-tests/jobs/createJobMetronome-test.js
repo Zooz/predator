@@ -19,8 +19,8 @@ describe('Create job specific metronome tests', async function () {
                 await schedulerRequestCreator.init();
                 await testsRequestCreator.init();
 
-                let requestBody = require('../../testExamples/Basic_test');
-                let response = await testsRequestCreator.createTest(requestBody, {});
+                const requestBody = require('../../testExamples/Basic_test');
+                const response = await testsRequestCreator.createTest(requestBody, {});
                 should(response.statusCode).eql(201);
                 should(response.body).have.key('id');
                 testId = response.body.id;
@@ -42,7 +42,7 @@ describe('Create job specific metronome tests', async function () {
                     let jobResponseBody;
 
                     it('Create the job', async () => {
-                        let validBody = {
+                        const validBody = {
                             test_id: testId,
                             arrival_rate: 1,
                             type: 'load_test',
@@ -97,7 +97,7 @@ describe('Create job specific metronome tests', async function () {
                             .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/1/actions/stop`)
                             .reply(200);
 
-                        let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -105,7 +105,7 @@ describe('Create job specific metronome tests', async function () {
                     });
 
                     it('Delete job', async () => {
-                        let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
+                        const deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
                         should(deleteJobResponse.status).eql(204);
 
                         jobId = createJobResponse.body.id;
@@ -123,7 +123,7 @@ describe('Create job specific metronome tests', async function () {
                     let jobResponseBody;
 
                     it('Create the job', async () => {
-                        let validBody = {
+                        const validBody = {
                             test_id: testId,
                             arrival_rate: 1,
                             duration: 1,
@@ -184,7 +184,7 @@ describe('Create job specific metronome tests', async function () {
                             .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/2/actions/stop`)
                             .reply(200);
 
-                        let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -192,7 +192,7 @@ describe('Create job specific metronome tests', async function () {
                     });
 
                     it('Delete job', async () => {
-                        let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
+                        const deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
                         should(deleteJobResponse.status).eql(204);
 
                         jobId = createJobResponse.body.id;

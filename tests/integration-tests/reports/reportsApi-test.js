@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 'use strict';
 
 const should = require('should');
@@ -23,8 +24,8 @@ describe('Integration tests for the reports api', function () {
         await jobRequestCreator.init();
         await configRequestCreator.init();
 
-        let requestBody = require('../../testExamples/Basic_test');
-        let response = await testsRequestCreator.createTest(requestBody, {});
+        const requestBody = require('../../testExamples/Basic_test');
+        const response = await testsRequestCreator.createTest(requestBody, {});
         should(response.statusCode).eql(201);
         should(response.body).have.key('id');
         testId = response.body.id;
@@ -66,15 +67,15 @@ describe('Integration tests for the reports api', function () {
                 });
 
                 it('should successfully create report', async function () {
-                    let reportBody = minimalReportBody;
+                    const reportBody = minimalReportBody;
 
                     reportBody.job_id = jobId;
                     reportBody.runner_id = uuid();
                     const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                     should(reportResponse.statusCode).be.eql(201);
 
-                    let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                    let report = getReportResponse.body;
+                    const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    const report = getReportResponse.body;
                     should(report.status).eql('initializing');
                     should(report.notes).eql(jobBody.notes);
                     should(report.max_virtual_users).eql(jobBody.max_virtual_users);
@@ -94,15 +95,15 @@ describe('Integration tests for the reports api', function () {
                 });
 
                 it('should successfully create report', async function () {
-                    let reportBody = Object.assign({}, minimalReportBody);
+                    const reportBody = Object.assign({}, minimalReportBody);
 
                     reportBody.job_id = jobId;
                     reportBody.runner_id = uuid();
                     const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                     should(reportResponse.statusCode).be.eql(201);
 
-                    let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                    let report = getReportResponse.body;
+                    const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    const report = getReportResponse.body;
 
                     should(report.status).eql('initializing');
                     should(report.notes).eql(jobBody.notes);
@@ -119,15 +120,15 @@ describe('Integration tests for the reports api', function () {
                 });
 
                 it('should successfully create report', async function () {
-                    let reportBody = Object.assign({}, minimalReportBody);
+                    const reportBody = Object.assign({}, minimalReportBody);
 
                     reportBody.job_id = jobId;
                     reportBody.runner_id = uuid();
                     const reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                     should(reportResponse.statusCode).be.eql(201);
 
-                    let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                    let report = getReportResponse.body;
+                    const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    const report = getReportResponse.body;
 
                     should(report.status).eql('initializing');
                     should(report.notes).eql(jobBody.notes);
@@ -149,11 +150,11 @@ describe('Integration tests for the reports api', function () {
                 const editBody = {
                     notes: 'edited notes'
                 };
-                let editReportResponse = await reportsRequestCreator.editReport(testId, reportId, editBody);
+                const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, editBody);
                 should(editReportResponse.statusCode).eql(204);
 
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                let report = getReportResponse.body;
+                const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                const report = getReportResponse.body;
                 should(report.status).eql('initializing');
                 should(report.notes).eql(editBody.notes);
                 should(report.max_virtual_users).eql(jobBody.max_virtual_users);
@@ -162,14 +163,14 @@ describe('Integration tests for the reports api', function () {
                 should(report.ramp_to).eql(jobBody.ramp_to);
             });
             it('when report id does not exist - should return 404', async function () {
-                let editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { notes: 'dfdsf' });
+                const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { notes: 'dfdsf' });
                 should(editReportResponse.statusCode).eql(404);
                 should(editReportResponse.body).eql({
                     message: 'Report not found'
                 });
             });
             it('when edit additional properties that not include in the swagger', async function () {
-                let editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { additional: 'add' });
+                const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { additional: 'add' });
                 should(editReportResponse.statusCode).eql(400);
                 should(editReportResponse.body).eql({
                     message: 'Input validation error',
@@ -191,7 +192,7 @@ describe('Integration tests for the reports api', function () {
                 });
 
                 it('should successfully create report', async function () {
-                    let fullReportBody = Object.assign({}, minimalReportBody);
+                    const fullReportBody = Object.assign({}, minimalReportBody);
                     fullReportBody.notes = 'My first performance test';
                     fullReportBody.job_id = jobId;
                     fullReportBody.runner_id = uuid();
@@ -227,7 +228,7 @@ describe('Integration tests for the reports api', function () {
         describe('Get reports', function () {
             const getReportsTestId = uuid();
             let reportId = uuid();
-            let reportBody = {
+            const reportBody = {
                 report_id: reportId,
                 revision_id: uuid(),
                 test_type: 'basic',
@@ -266,7 +267,7 @@ describe('Integration tests for the reports api', function () {
                 should(updateResult.statusCode).eql(204);
             });
             it('Get all reports for specific testId', async function () {
-                let getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId);
+                const getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId);
                 const reports = getReportsResponse.body;
 
                 should(reports.length).eql(3);
@@ -285,7 +286,7 @@ describe('Integration tests for the reports api', function () {
             });
 
             it('Get only favorite reports for specific testId', async function () {
-                let getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId, 'is_favorite');
+                const getReportsResponse = await reportsRequestCreator.getReports(getReportsTestId, 'is_favorite');
                 const reports = getReportsResponse.body;
 
                 should(reports.length).eql(2);
@@ -306,7 +307,7 @@ describe('Integration tests for the reports api', function () {
             });
 
             it('Get last reports', async function () {
-                let lastReportsIdtestId = uuid();
+                const lastReportsIdtestId = uuid();
                 reportId = uuid();
                 reportBody.report_id = reportId;
                 reportBody.runner_id = uuid();
@@ -317,7 +318,7 @@ describe('Integration tests for the reports api', function () {
                 reportBody.runner_id = uuid();
                 await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
 
-                let getLastReportsResponse = await reportsRequestCreator.getLastReports(5);
+                const getLastReportsResponse = await reportsRequestCreator.getLastReports(5);
                 const lastReports = getLastReportsResponse.body;
 
                 should(lastReports.length).eql(5);
@@ -333,7 +334,7 @@ describe('Integration tests for the reports api', function () {
             });
 
             it('Get last reports in right order', async function () {
-                let lastReportsIdtestId = uuid();
+                const lastReportsIdtestId = uuid();
                 const lastReportId = uuid();
                 reportBody.report_id = lastReportId;
                 reportBody.runner_id = uuid();
@@ -358,7 +359,7 @@ describe('Integration tests for the reports api', function () {
                 createReportResponse = await reportsRequestCreator.createReport(lastReportsIdtestId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
-                let getLastReportsResponse = await reportsRequestCreator.getLastReports(10);
+                const getLastReportsResponse = await reportsRequestCreator.getLastReports(10);
                 const lastReports = getLastReportsResponse.body;
                 const sortReports = Object.assign([], lastReports);
                 sortReports.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
@@ -371,7 +372,7 @@ describe('Integration tests for the reports api', function () {
             });
 
             it('Get only last favorite reports in right order', async function () {
-                let getLastReportsResponse = await reportsRequestCreator.getLastReports(10, 'is_favorite');
+                const getLastReportsResponse = await reportsRequestCreator.getLastReports(10, 'is_favorite');
                 const lastReports = getLastReportsResponse.body;
                 const sortReports = Object.assign([], lastReports);
                 sortReports.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
@@ -385,7 +386,7 @@ describe('Integration tests for the reports api', function () {
         describe('Get report', function () {
             const getReportTestId = uuid();
             let reportId;
-            let reportBody = {
+            const reportBody = {
                 revision_id: uuid(),
                 test_type: 'basic',
                 test_name: 'integration-test',
@@ -406,12 +407,12 @@ describe('Integration tests for the reports api', function () {
                     reportBody.report_id = reportId;
                     reportBody.job_id = jobId;
                     reportBody.runner_id = uuid();
-                    let createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
+                    const createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
                     should(createReportResponse.statusCode).eql(201);
                 });
 
                 it('should return report with arrival_rate in response', async function () {
-                    let getReportResponse = await reportsRequestCreator.getReport(getReportTestId, reportId);
+                    const getReportResponse = await reportsRequestCreator.getReport(getReportTestId, reportId);
                     should(getReportResponse.statusCode).eql(200);
                     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
                         'phase', 'status', 'job_type', 'arrival_rate'];
@@ -437,12 +438,12 @@ describe('Integration tests for the reports api', function () {
                     reportBody.report_id = reportId;
                     reportBody.job_id = jobId;
                     reportBody.runner_id = uuid();
-                    let createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
+                    const createReportResponse = await reportsRequestCreator.createReport(getReportTestId, reportBody);
                     should(createReportResponse.statusCode).eql(201);
                 });
 
                 it('should return report with arrival_count in response', async function () {
-                    let getReportResponse = await reportsRequestCreator.getReport(getReportTestId, reportId);
+                    const getReportResponse = await reportsRequestCreator.getReport(getReportTestId, reportId);
                     should(getReportResponse.statusCode).eql(200);
                     const REPORT_KEYS = ['test_id', 'test_name', 'revision_id', 'report_id', 'job_id', 'test_type', 'start_time',
                         'phase', 'status', 'job_type', 'arrival_count'];
@@ -456,9 +457,8 @@ describe('Integration tests for the reports api', function () {
             });
         });
         describe('Delete reports', function () {
-            const getReportsTestId = uuid();
-            let reportId = uuid();
-            let reportBody = {
+            const reportId = uuid();
+            const reportBody = {
                 report_id: reportId,
                 revision_id: uuid(),
                 test_type: 'basic',
@@ -473,7 +473,7 @@ describe('Integration tests for the reports api', function () {
                 }
             };
             it('Delete report successfully', async function () {
-                let testId = uuid();
+                const testId = uuid();
                 const reportId = uuid();
                 reportBody.report_id = reportId;
                 reportBody.job_id = jobId;
@@ -481,7 +481,7 @@ describe('Integration tests for the reports api', function () {
                 reportBody.runner_id = uuid();
                 const lastDate = new Date();
                 reportBody.start_time = lastDate.setMinutes(lastDate.getMinutes() + 10).toString();
-                let createReportResponse = await reportsRequestCreator.createReport(testId, reportBody);
+                const createReportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
                 await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', reportBody.runner_id));
@@ -516,13 +516,13 @@ describe('Integration tests for the reports api', function () {
             });
 
             it('Delete report which is in progress', async function () {
-                let testId = uuid();
+                const testId = uuid();
                 const reportId = uuid();
                 reportBody.report_id = reportId;
                 reportBody.runner_id = uuid();
                 const lastDate = new Date();
                 reportBody.start_time = lastDate.setMinutes(lastDate.getMinutes() + 10).toString();
-                let createReportResponse = await reportsRequestCreator.createReport(testId, reportBody);
+                const createReportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                 should(createReportResponse.statusCode).eql(201);
 
                 const deleteRunningTestResponse = await reportsRequestCreator.deleteReport(testId, reportId);
@@ -541,8 +541,8 @@ describe('Integration tests for the reports api', function () {
             beforeEach(async function () {
                 reportId = uuid();
                 runnerId = uuid();
-                let requestBody = require('../../testExamples/Basic_test');
-                let response = await testsRequestCreator.createTest(requestBody, {});
+                const requestBody = require('../../testExamples/Basic_test');
+                const response = await testsRequestCreator.createTest(requestBody, {});
                 should(response.statusCode).eql(201);
                 should(response.body).have.key('id');
                 testId = response.body.id;
@@ -674,9 +674,9 @@ describe('Integration tests for the reports api', function () {
             it('Post only "done" phase stats', async function () {
                 const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', runnerId));
                 should(doneStatsResponse.statusCode).be.eql(204);
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 should(getReportResponse.statusCode).be.eql(200);
-                let report = getReportResponse.body;
+                const report = getReportResponse.body;
                 validateFinishedReport(report);
             });
 
@@ -809,7 +809,7 @@ describe('Integration tests for the reports api', function () {
         });
         describe('Create report', function () {
             it('should successfully create report on first call and only subscribe runner on second call', async function () {
-                let reportBody = minimalReportBody;
+                const reportBody = minimalReportBody;
                 firstRunner = uuid();
                 secondRunner = uuid();
 
@@ -822,8 +822,8 @@ describe('Integration tests for the reports api', function () {
                 reportResponse = await reportsRequestCreator.createReport(testId, reportBody);
                 should(reportResponse.statusCode).be.eql(201);
 
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                let report = getReportResponse.body;
+                const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                const report = getReportResponse.body;
                 should(report.status).eql('initializing');
                 should(report.notes).eql(jobBody.notes);
                 should(report.max_virtual_users).eql(jobBody.max_virtual_users);
@@ -853,7 +853,7 @@ describe('Integration tests for the reports api', function () {
         });
         describe('Create report, post stats, and get final report', function () {
             it('should successfully create report', async function () {
-                let reportBody = minimalReportBody;
+                const reportBody = minimalReportBody;
                 firstRunner = uuid();
                 secondRunner = uuid();
 
@@ -959,9 +959,9 @@ describe('Integration tests for the reports api', function () {
                 doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', secondRunner));
                 should(doneStatsResponse.statusCode).be.eql(204);
 
-                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 should(getReportResponse.statusCode).be.eql(200);
-                let report = getReportResponse.body;
+                const report = getReportResponse.body;
                 validateFinishedReport(report);
             });
 
@@ -1003,19 +1003,19 @@ describe('Integration tests for the reports api', function () {
                 report = getReportResponse.body;
                 should(report.status).eql('started');
 
-                let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', firstRunner));
+                const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', firstRunner));
                 should(intermediateStatsResponse.statusCode).be.eql(204);
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                let errorStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('error', secondRunner));
+                const errorStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('error', secondRunner));
                 should(errorStatsResponse.statusCode).be.eql(204);
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                let doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', firstRunner));
+                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', firstRunner));
                 should(doneStatsResponse.statusCode).be.eql(204);
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
@@ -1034,19 +1034,19 @@ describe('Integration tests for the reports api', function () {
                 report = getReportResponse.body;
                 should(report.status).eql('started');
 
-                let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', firstRunner));
+                const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', firstRunner));
                 should(intermediateStatsResponse.statusCode).be.eql(204);
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                let errorStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('aborted', secondRunner));
+                const errorStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('aborted', secondRunner));
                 should(errorStatsResponse.statusCode).be.eql(204);
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
                 should(report.status).eql('in_progress');
 
-                let doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', firstRunner));
+                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', firstRunner));
                 should(doneStatsResponse.statusCode).be.eql(204);
                 getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
                 report = getReportResponse.body;
@@ -1138,14 +1138,14 @@ function validateFinishedReport(report, expectedValues = {}, status) {
     should(report.duration).eql(10);
 
     if (expectedValues) {
-        for (let key in expectedValues) {
+        for (const key in expectedValues) {
             should(report[key]).eql(expectedValues[key]);
         }
     }
 }
 
 function createJob(testId, { emails, webhooks, type = 'load_test', arrival_count, arrival_rate = 10 } = {}) {
-    let jobOptions = {
+    const jobOptions = {
         test_id: testId,
         type,
         arrival_rate,

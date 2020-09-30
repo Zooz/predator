@@ -1,7 +1,7 @@
 'use strict';
-let sinon = require('sinon');
-let should = require('should');
-let dateUtil = require('../../../../src/reports/utils/dateUtil');
+const sinon = require('sinon');
+const should = require('should');
+const dateUtil = require('../../../../src/reports/utils/dateUtil');
 
 describe('Date util helper', function () {
     let sandbox, clock;
@@ -31,5 +31,4 @@ describe('Date util helper', function () {
         should(result.year).eql(fakeDate.getFullYear() - 1);
         should(result.month).eql(12);
     });
-
 });

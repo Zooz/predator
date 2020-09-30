@@ -1,7 +1,7 @@
-let sinon = require('sinon');
-let should = require('should');
-let artilleryValidator = require('../../../../src/tests/helpers/artilleryValidator');
-let consts = require('../../../../src/common/consts');
+const sinon = require('sinon');
+const should = require('should');
+const artilleryValidator = require('../../../../src/tests/helpers/artilleryValidator');
+const consts = require('../../../../src/common/consts');
 
 describe('Artillery validator tests', function () {
     let req, res, sandbox, nextStub, resJsonStub, resStatusStub;
@@ -33,7 +33,7 @@ describe('Artillery validator tests', function () {
 
     describe('Verify artillery valid tests', () => {
         it('The artillery json is a valid json', async () => {
-            let validArtilleryJson = {
+            const validArtilleryJson = {
                 config: {
                     target: '',
                     http: {
@@ -41,7 +41,8 @@ describe('Artillery validator tests', function () {
                     },
                     phases: [{
                         duration: 0,
-                        arrivalRate: 0 }]
+                        arrivalRate: 0
+                    }]
                 },
                 scenarios: [{
                     name: 'Assign token to customer',
@@ -70,7 +71,7 @@ describe('Artillery validator tests', function () {
         });
 
         it('The artillery json is not a valid json', async () => {
-            let invalidArtilleryJson = {};
+            const invalidArtilleryJson = {};
 
             req = { body: { type: consts.TEST_TYPE_BASIC, artillery_test: invalidArtilleryJson } };
             await artilleryValidator.verifyArtillery(req, res, nextStub);

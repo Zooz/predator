@@ -1,9 +1,9 @@
-let sinon = require('sinon'),
+const sinon = require('sinon'),
     should = require('should'),
     logger = require('../../src/common/logger'),
     rewire = require('rewire');
 
-let logErrorStub, processExitStub, stubProcessOn, sandbox;
+let logErrorStub, sandbox;
 
 const MANDATORY_VARS = [
     'MY_ADDRESS',
@@ -23,9 +23,9 @@ const SMTP_MANDATORY_VARS = [
 describe.skip('Env Suite', function () {
     before(() => {
         sandbox = sinon.sandbox.create();
-        processExitStub = sandbox.stub(process, 'exit');
+        sandbox.stub(process, 'exit');
         logErrorStub = sandbox.stub(logger, 'error');
-        stubProcessOn = sandbox.stub(process, 'on');
+        sandbox.stub(process, 'on');
     });
 
     beforeEach(() => {
@@ -39,7 +39,7 @@ describe.skip('Env Suite', function () {
 
     afterEach(() => {
         SMTP_MANDATORY_VARS.forEach((varb) => {
-           delete process.env[varb];
+            delete process.env[varb];
         });
         sandbox.reset();
     });
@@ -50,7 +50,7 @@ describe.skip('Env Suite', function () {
 
     describe('Check when all fields missing', () => {
         before(function () {
-            let env = rewire('../../src/env.js');
+            const env = rewire('../../src/env.js');
             MANDATORY_VARS.forEach(function (varb) {
                 delete process.env[varb];
             });
@@ -67,7 +67,7 @@ describe.skip('Env Suite', function () {
             describe(varb + ' field is missing', () => {
                 before(() => {
                     delete process.env[varb];
-                    let env = rewire('../../src/env.js');
+                    const env = rewire('../../src/env.js');
                     env.init();
                 });
 
@@ -91,7 +91,7 @@ describe.skip('Env Suite', function () {
                         process.env.SMTP_PASSWORD = 'SMTP_PASSWORD';
 
                         delete process.env[varb];
-                        let env = rewire('../../src/env.js');
+                        const env = rewire('../../src/env.js');
                         env.init();
                     });
 
@@ -107,7 +107,7 @@ describe.skip('Env Suite', function () {
 
     describe('Successful Init Success', function () {
         before(function () {
-            let env = rewire('../../src/env.js');
+            const env = rewire('../../src/env.js');
             env.init();
         });
 

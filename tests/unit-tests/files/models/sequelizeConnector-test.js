@@ -11,7 +11,9 @@ describe('Testing sequelize connector', function () {
         createStub,
         destroyStub,
         findStub,
-        authenticateStub;
+        authenticateStub,
+        findAllStub,
+        updateStub;
     before(async function () {
         sandbox = sinon.sandbox.create();
         syncStub = sandbox.stub();
@@ -23,7 +25,8 @@ describe('Testing sequelize connector', function () {
         destroyStub = sandbox.stub();
         sequelizeStub = {
             authenticate: authenticateStub,
-            model: sandbox.stub().returns({ create: createStub,
+            model: sandbox.stub().returns({
+                create: createStub,
                 findAll: findAllStub,
                 destroy: destroyStub,
                 update: updateStub,

@@ -9,7 +9,7 @@ describe('Testing dsl model', function () {
     before(() => {
         sandbox = sinon.sandbox.create();
         getDslDefinitionsStub = sandbox.stub(database, 'getDslDefinitions')
-            .returns([{artillery_json: 'artillery_json', definition_name: 'definition_name'}]);
+            .returns([{ artillery_json: 'artillery_json', definition_name: 'definition_name' }]);
         getDslDefinitionStub = sandbox.stub(database, 'getDslDefinition');
         insertDslDefinitionStub = sandbox.stub(database, 'insertDslDefinition');
         updateDslDefinitionStub = sandbox.stub(database, 'updateDslDefinition');
@@ -17,7 +17,7 @@ describe('Testing dsl model', function () {
     });
 
     beforeEach(() => {
-        getDslDefinitionStub.returns({artillery_json: 'artillery_json', definition_name: 'definition_name'});
+        getDslDefinitionStub.returns({ artillery_json: 'artillery_json', definition_name: 'definition_name' });
         insertDslDefinitionStub.returns(true);
         updateDslDefinitionStub.returns(true);
         deleteDefinitionStub.returns(true);
@@ -54,14 +54,14 @@ describe('Testing dsl model', function () {
 
     describe('createDefinition', function () {
         it('when call createDefinition - should returns definition object', async function () {
-            const result = await dsl.createDefinition('dslName', {name: 'dsl-name', request: 'request'});
+            const result = await dsl.createDefinition('dslName', { name: 'dsl-name', request: 'request' });
             should(insertDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
-            should(result).eql({'name': 'dsl-name', 'request': 'request'});
+            should(result).eql({ name: 'dsl-name', request: 'request' });
         });
         it('when call createDefinition and definition already exist - should throw 404', async function () {
             insertDslDefinitionStub.returns(false);
             try {
-                await dsl.createDefinition('dslName', {name: 'dsl-name', request: 'request'});
+                await dsl.createDefinition('dslName', { name: 'dsl-name', request: 'request' });
                 throw new Error('should not get here');
             } catch (err){
                 should(insertDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
@@ -72,14 +72,14 @@ describe('Testing dsl model', function () {
     });
     describe('updateDefinition', function () {
         it('when call updateDefinition - should returns definition object', async function () {
-            const result = await dsl.updateDefinition('dslName', 'dsl-name', {name: 'dsl-name', request: 'request'});
+            const result = await dsl.updateDefinition('dslName', 'dsl-name', { name: 'dsl-name', request: 'request' });
             should(updateDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
-            should(result).eql({'name': 'dsl-name', 'request': 'request'});
+            should(result).eql({ name: 'dsl-name', request: 'request' });
         });
         it('when call updateDefinition and definition does not exist - should throw 404', async function () {
             updateDslDefinitionStub.returns(false);
             try {
-                await dsl.updateDefinition('dslName', 'dsl-name', {name: 'dsl-name', request: 'request'});
+                await dsl.updateDefinition('dslName', 'dsl-name', { name: 'dsl-name', request: 'request' });
                 throw new Error('should not get here');
             } catch (err){
                 should(updateDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);

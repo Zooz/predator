@@ -31,7 +31,6 @@ describe('Sequelize client tests', function () {
         sequelizeGetStub,
         sequelizeCreateStub,
         sequelizeUpdateStub,
-        sequelizeBelongsToMany,
         sequelizeTransactionStub,
         uuidV4Stub;
 
@@ -53,7 +52,6 @@ describe('Sequelize client tests', function () {
         sequelizeGeValueStub = sandbox.stub();
         sequelizeCreateStub = sandbox.stub();
         sequelizeUpdateStub = sandbox.stub();
-        sequelizeBelongsToMany = sandbox.stub();
         sequelizeTransactionStub = sandbox.stub();
 
         uuidV4Stub.returns(uuidStubValue);
