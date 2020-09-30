@@ -1,12 +1,36 @@
 const { readFileSync, writeFileSync } = require('fs');
 const { networkInterfaces } = require('os');
+const shell = require('shelljs');
 const envFileName = '.env';
 const defaultPort = 3000;
 let port, ipAddress;
 
+console.log('\x1b[36m%s\x1b[0m', 'Starting Predator local setup, good luck!'); // cyan
+
+npmInstallAndBuild();
 extractIpAndPort();
 setupEnvFile();
 
+console.log('\x1b[36m%s\x1b[0m', 'Use \'npm run start-local\' to start Predator'); // cyan
+
+function npmInstallAndBuild() {
+    if (shell.exec('npm install').code !== 0) {
+        shell.echo('Error: npm install failed for the backend');
+        shell.exit(1);
+    }
+    shell.cd('ui');
+    shell.rm('-rf', 'dist');
+    shell.rm('-rf', './node_modules');
+    if (shell.exec('npm install').code !== 0) {
+        shell.echo('Error: npm ci failed for the frontend');
+        shell.exit(1);
+    }
+    if (shell.exec('npm run build').code !== 0) {
+        shell.echo('Error: npm build failed for the frontend');
+        shell.exit(1);
+    }
+    shell.cd('..');
+}
 function extractIpAndPort() {
     if (!process.env.IP_ADDRESS) {
         console.log('IP_ADDRESS not provided, going to evaluate network interfaces for first ip which is not localhost');

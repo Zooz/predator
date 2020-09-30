@@ -12,7 +12,7 @@
     "test": "tests"
   },
   "scripts": {
-    "setup-local-env": "bash ./setup-local-env.sh",
+    "setup-local-env": "npm install --no-save shelljs && node setup-env.js",
     "start-local": "node -r dotenv/config src/server.js",
     "start": "node src/server.js",
     "unit-tests": "nyc --check-coverage --lines 93 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
@@ -74,7 +74,6 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
-    "shx": "^0.3.2",
     "@apidevtools/swagger-parser": "^10.0.2",
     "@commitlint/cli": "^10.0.0",
     "@commitlint/config-conventional": "^10.0.0",
