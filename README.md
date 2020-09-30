@@ -95,7 +95,7 @@ Run `npm test` in order to run tests in your local machine. The script runs the 
 * integration-tests
 
 ## Opening the Predator UI
-The path for accessing the Predator UI is: http://localhost/ui (in the case that Predator is running locally under port 80)
+The path for accessing the Predator UI is: http://localhost:3000/ui (in the case that Predator is running locally under port 3000)
 <br>
 
 In case Predator is not running under the root domain, (for example, running under http://your.domain.com/example-path) in order to access the UI follow the below steps:

@@ -1,7 +1,7 @@
 const { readFileSync, writeFileSync } = require('fs');
 const { networkInterfaces } = require('os');
 const envFileName = '.env';
-
+const defaultPort = 3000;
 let port, ipAddress;
 
 extractIpAndPort();
@@ -18,8 +18,8 @@ function extractIpAndPort() {
     }
 
     if (!process.env.PORT) {
-        console.log('PORT not provided, setting default port to 80');
-        port = 80;
+        console.log(`PORT not provided, setting default port to ${defaultPort}`);
+        port = defaultPort;
     } else {
         console.log(`PORT provided ${process.env.PORT}`);
         port = process.env.PORT;
@@ -36,9 +36,12 @@ function setupEnvFile() {
     newEnv = newEnv.replace(/^DATABASE_TYPE.*\n?/m, '');
     newEnv = newEnv.replace(/^INTERNAL_ADDRESS.*\n?/m, '');
     newEnv = newEnv.replace(/^JOB_PLATFORM.*\n?/m, '');
+    newEnv = newEnv.replace(/^PORT.*\n?/m, '');
+
     newEnv += 'JOB_PLATFORM=DOCKER\n';
     newEnv += 'DATABASE_TYPE=SQLITE\n';
-    newEnv += `INTERNAL_ADDRESS=http://${ipAddress}:${port}\n`;
+    newEnv += `INTERNAL_ADDRESS=http://${ipAddress}:${port}/v1\n`;
+    newEnv += `PORT=${port}\n`;
     console.log(`Updating ${envFileName} file with:\n${newEnv}`);
     writeFileSync(envFileName, newEnv);
 }
