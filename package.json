@@ -12,7 +12,7 @@
     "test": "tests"
   },
   "scripts": {
-    "setup-local-env": "./setup-local-env.sh",
+    "setup-local-env": "bash ./setup-local-env.sh",
     "start-local": "node -r dotenv/config src/server.js",
     "start": "node src/server.js",
     "unit-tests": "nyc --check-coverage --lines 93 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
@@ -67,7 +67,6 @@
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
     "sequelize": "^5.22.3",
-    "shx": "^0.3.2",
     "slack-emojis": "^1.1.1",
     "sqlite3": "^4.2.0",
     "tedious": "^8.3.0",
@@ -75,6 +74,7 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
+    "shx": "^0.3.2",
     "@apidevtools/swagger-parser": "^10.0.2",
     "@commitlint/cli": "^10.0.0",
     "@commitlint/config-conventional": "^10.0.0",
