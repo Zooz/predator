@@ -34,7 +34,7 @@ describe('Webhooks api', function () {
         describe('GET /v1/webhooks/:webhook_id', function () {
             it('should retrieve the webhook that was created', async function() {
                 const webhook = generateWebhook();
-                let createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(createWebhookResponse.statusCode).to.equal(201);
 
                 const webhookId = createWebhookResponse.body.id;
@@ -47,7 +47,7 @@ describe('Webhooks api', function () {
         describe('POST /v1/webhooks', function () {
             it('Create webhook and response 201 status code', async function() {
                 const webhook = generateWebhook();
-                let createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(createWebhookResponse.statusCode).to.equal(201);
                 assertDeepWebhookEquality(webhook, createWebhookResponse.body);
             });
@@ -55,7 +55,7 @@ describe('Webhooks api', function () {
                 const webhook = generateWebhook();
                 webhook.global = true;
 
-                let createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
 
                 expect(createWebhookResponse.statusCode).to.equal(201);
                 assertDeepWebhookEquality(webhook, createWebhookResponse.body);
@@ -64,7 +64,7 @@ describe('Webhooks api', function () {
                 const webhook = generateWebhook();
                 const { global, ...webhookWithoutGlobal } = webhook;
 
-                let createWebhookResponse = await webhookRequestSender.createWebhook(webhookWithoutGlobal);
+                const createWebhookResponse = await webhookRequestSender.createWebhook(webhookWithoutGlobal);
 
                 expect(createWebhookResponse.statusCode).to.equal(201);
                 assertDeepWebhookEquality(webhook, createWebhookResponse.body);

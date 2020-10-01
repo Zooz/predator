@@ -1,6 +1,6 @@
 
-module.exports = function(stautsCode, message) {
+module.exports = function(statusCode, message) {
     const error = new Error(message);
-    error.statusCode = stautsCode;
+    error.statusCode = statusCode;
     return error;
 };

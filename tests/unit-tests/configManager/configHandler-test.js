@@ -148,7 +148,7 @@ describe('Manager config', function () {
         it('get default config success', async () => {
             databaseConnectorGetStub.resolves([]);
 
-            let result = await manager.getConfig();
+            const result = await manager.getConfig();
 
             should(Object.keys(result).length).eql(Object.keys(configConstants).length);
             const resultEscapedUndefined = escapeUndefinedValues(result);
@@ -159,21 +159,21 @@ describe('Manager config', function () {
     describe('get config from default and DB', function () {
         it('get config success', async () => {
             databaseConnectorGetStub.resolves({ runner_cpu: 2 });
-            let result = await manager.getConfig();
+            const result = await manager.getConfig();
             should(Object.keys(result).length).eql(Object.keys(configConstants).length);
             Object.keys(result).forEach(key => {
                 if (key !== 'runner_cpu') {
                     should(result[key]).eql(defaultConfigNotEscaped[key]);
                 }
             });
-            should(result['runner_cpu']).eql(2);
+            should(result.runner_cpu).eql(2);
         });
     });
 
     describe('get config with corrupted data from DB', function () {
         it('get config success', async () => {
             databaseConnectorGetStub.resolves({ key_not_valid: 2 });
-            let result = await manager.getConfig();
+            const result = await manager.getConfig();
             const resultEscapedUndefined = escapeUndefinedValues(result);
             should(resultEscapedUndefined).eql(defaultConfig);
         });
@@ -183,7 +183,7 @@ describe('Manager config', function () {
         it('get config success', async () => {
             databaseConnectorGetStub.resolves(configResponseParseObject);
 
-            let result = await manager.getConfig();
+            const result = await manager.getConfig();
 
             const resultEscapedUndefined = escapeUndefinedValues(result);
             should(resultEscapedUndefined).eql(configParseExpected);
@@ -194,7 +194,7 @@ describe('Manager config', function () {
         it('get config  value success', async () => {
             databaseConnectorGetValueStub.resolves(undefined);
 
-            let result = await manager.getConfigValue('runner_cpu');
+            const result = await manager.getConfigValue('runner_cpu');
             should(result).eql(1);
         });
     });
@@ -203,7 +203,7 @@ describe('Manager config', function () {
         it('update config success', async () => {
             databaseConnectorUpdateStub.resolves([]);
 
-            let result = await manager.updateConfig({ runner_cpu: 'test_runner_cpu' });
+            const result = await manager.updateConfig({ runner_cpu: 'test_runner_cpu' });
             should(result).eql([]);
         });
     });

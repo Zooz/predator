@@ -1,14 +1,13 @@
 'use strict';
-let should = require('should');
-let manager = require('../../../../src/tests/models/manager');
-let downloadManager = require('../../../../src/tests/models/downloadManager');
-let fileManager = require('../../../../src/files/models/fileManager');
+const should = require('should');
+const manager = require('../../../../src/tests/models/manager');
+const fileManager = require('../../../../src/files/models/fileManager');
 
-let sinon = require('sinon');
-let database = require('../../../../src/tests/models/database');
-let testGenerator = require('../../../../src/tests/models/testGenerator');
-let request = require('request-promise-native');
-let uuid = require('uuid');
+const sinon = require('sinon');
+const database = require('../../../../src/tests/models/database');
+const testGenerator = require('../../../../src/tests/models/testGenerator');
+const request = require('request-promise-native');
+const uuid = require('uuid');
 
 describe('Scenario generator tests', function () {
     let sandbox;
@@ -19,7 +18,6 @@ describe('Scenario generator tests', function () {
     let testGeneratorStub;
     let getTestRevisionsStub;
     let saveFileStub;
-    let getFileStub;
     let getRequestStub;
     let insertBenchmarkStub;
     let getTestBenchmarkStub;
@@ -34,7 +32,6 @@ describe('Scenario generator tests', function () {
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
         deleteStub = sandbox.stub(database, 'deleteTest');
         getRequestStub = sandbox.stub(request, 'get');
-        getFileStub = sandbox.stub(fileManager, 'getFile');
         saveFileStub = sandbox.stub(fileManager, 'saveFile');
         testGeneratorStub = sandbox.stub(testGenerator, 'createTest');
     });
@@ -53,8 +50,7 @@ describe('Scenario generator tests', function () {
             });
             insertStub.resolves();
 
-            return manager.upsertTest({
-                testInfo: 'info' })
+            return manager.upsertTest({ testInfo: 'info' })
                 .then(function (result) {
                     insertStub.calledOnce.should.eql(true);
                     result.should.have.keys('id', 'revision_id');
@@ -70,7 +66,7 @@ describe('Scenario generator tests', function () {
             result.should.have.keys('benchmark_data');
             Object.keys(result).length.should.eql(1);
             should(result).eql({
-                'benchmark_data': { rps: 'some benchmark data' }
+                benchmark_data: { rps: 'some benchmark data' }
             });
         });
         it('Should get benchmark for test with no benchmark and get empty data', async () => {
@@ -99,7 +95,7 @@ describe('Scenario generator tests', function () {
             getRequestStub.resolves('this is js code from dropbox');
             saveFileStub.resolves('id');
 
-            let result = await manager.upsertTest({
+            const result = await manager.upsertTest({
                 testInfo: 'info', processor_file_url: 'path to dropbox'
             });
 
@@ -118,7 +114,7 @@ describe('Scenario generator tests', function () {
             getRequestStub.throws();
             saveFileStub.resolves();
             try {
-                let result = await manager.upsertTest({
+                const result = await manager.upsertTest({
                     testInfo: 'info', processor_file_url: 'path to dropbox'
                 });
                 console.log(result);
@@ -136,9 +132,8 @@ describe('Scenario generator tests', function () {
             });
             insertStub.resolves();
 
-            let existingTestId = uuid();
-            return manager.upsertTest({
-                testInfo: 'info' }, existingTestId)
+            const existingTestId = uuid();
+            return manager.upsertTest({ testInfo: 'info' }, existingTestId)
                 .then(function (result) {
                     insertStub.calledOnce.should.eql(true);
                     result.should.have.keys('id', 'revision_id');
@@ -152,7 +147,7 @@ describe('Scenario generator tests', function () {
         it('Should delete test', function () {
             deleteStub.resolves();
 
-            let existingTestId = uuid();
+            const existingTestId = uuid();
             return manager.deleteTest(existingTestId)
                 .then(function () {
                     deleteStub.calledOnce.should.eql(true);
@@ -192,9 +187,9 @@ describe('Scenario generator tests', function () {
         });
 
         it('Database returns two rows array, should return two tests', function () {
-            let firstId = uuid.v4();
-            let secondId = uuid.v4();
-            let expectedResult = [{
+            const firstId = uuid.v4();
+            const secondId = uuid.v4();
+            const expectedResult = [{
                 artillery_test: {
                     id: 1,
                     name: 1
@@ -240,9 +235,9 @@ describe('Scenario generator tests', function () {
         });
 
         it('Database returns three rows array, two with the same id, should return two tests', function () {
-            let firstId = uuid.v4();
-            let secondId = uuid.v4();
-            let expectedResult = [{
+            const firstId = uuid.v4();
+            const secondId = uuid.v4();
+            const expectedResult = [{
                 artillery_test: {
                     id: 1,
                     name: 1
@@ -296,7 +291,7 @@ describe('Scenario generator tests', function () {
         });
 
         it('Database returns one row, should return the test', function () {
-            let expectedResult = [{
+            const expectedResult = [{
                 artillery_test: {
                     id: 1,
                     name: 1
@@ -325,7 +320,7 @@ describe('Scenario generator tests', function () {
 
     describe('getTestsByProcessorId', function() {
         it('should return the rows from the database', async function() {
-            let processorId = uuid();
+            const processorId = uuid();
             const rows = [{ name: 'firewall', processor_id: processorId }, { name: 'Generic', id: uuid() }];
             getTestsStub.resolves(rows);
             const result = await manager.getTestsByProcessorId(processorId);

@@ -21,7 +21,6 @@ const startsWithStrategy = ({ array = [], propName, value }) => {
 };
 
 const onSelectedOptionsChange = (options) => {
-  console.log(options); // OUTPUT: [{ key: 'key_1', value: 'value_1' }]
 };
 
 <MultiSelect

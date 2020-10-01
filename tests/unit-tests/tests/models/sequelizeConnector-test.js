@@ -26,7 +26,8 @@ describe('Testing sequelize connector', function () {
         destroyStub = sandbox.stub();
         sequelizeStub = {
             authenticate: authenticateStub,
-            model: sandbox.stub().returns({ create: createStub,
+            model: sandbox.stub().returns({
+                create: createStub,
                 findAll: findAllStub,
                 destroy: destroyStub,
                 update: updateStub,
@@ -57,17 +58,17 @@ describe('Testing sequelize connector', function () {
             should(createStub.args).eql([
                 [
                     {
-                        'artillery_json': '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"}}',
-                        'name': 'name',
-                        'description': 'desc',
-                        'csv_file_id': '5678',
-                        'file_id': '1234',
-                        'processor_id': '1234',
-                        'raw_data': '{"name":"name","description":"desc","type":"type","processor_id":"1234","csv_file_id":"5678","scenarios":{"s":"1"}}',
-                        'revision_id': 'revisionId',
-                        'test_id': 'id',
-                        'type': 'type',
-                        'updated_at': 123456789
+                        artillery_json: '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"}}',
+                        name: 'name',
+                        description: 'desc',
+                        csv_file_id: '5678',
+                        file_id: '1234',
+                        processor_id: '1234',
+                        raw_data: '{"name":"name","description":"desc","type":"type","processor_id":"1234","csv_file_id":"5678","scenarios":{"s":"1"}}',
+                        revision_id: 'revisionId',
+                        test_id: 'id',
+                        type: 'type',
+                        updated_at: 123456789
                     }
                 ]
             ]);
@@ -137,12 +138,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'created_at'
                             ]
                         },
-                        'order': [
+                        order: [
                             [
                                 'updated_at',
                                 'DESC'
@@ -152,18 +153,18 @@ describe('Testing sequelize connector', function () {
                                 'DESC'
                             ]
                         ],
-                        'where': {
-                            'test_id': 'id'
+                        where: {
+                            test_id: 'id'
                         }
                     }
                 ]
             ]);
             should(result).match({
-                'artillery_json': {
-                    'art': '1'
+                artillery_json: {
+                    art: '1'
                 },
-                'id': 'test_id1',
-                'file_id': 'test_file_id'
+                id: 'test_id1',
+                file_id: 'test_file_id'
 
             });
         });
@@ -175,12 +176,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'created_at'
                             ]
                         },
-                        'order': [
+                        order: [
                             [
                                 'updated_at',
                                 'DESC'
@@ -190,8 +191,8 @@ describe('Testing sequelize connector', function () {
                                 'DESC'
                             ]
                         ],
-                        'where': {
-                            'test_id': 'id'
+                        where: {
+                            test_id: 'id'
                         }
                     }
                 ]
@@ -210,12 +211,12 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
-                            'attributes': {
-                                'exclude': [
+                            attributes: {
+                                exclude: [
                                     'created_at'
                                 ]
                             },
-                            'order': [
+                            order: [
                                 [
                                     'updated_at',
                                     'DESC'
@@ -225,8 +226,8 @@ describe('Testing sequelize connector', function () {
                                     'DESC'
                                 ]
                             ],
-                            'where': {
-                                'test_id': 'id'
+                            where: {
+                                test_id: 'id'
                             }
                         }
                     ]
@@ -259,12 +260,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'created_at'
                             ]
                         },
-                        'order': [
+                        order: [
                             [
                                 'updated_at',
                                 'ASC'
@@ -274,8 +275,8 @@ describe('Testing sequelize connector', function () {
                                 'ASC'
                             ]
                         ],
-                        'where': {
-                            'test_id': 'id'
+                        where: {
+                            test_id: 'id'
                         }
                     }
                 ]
@@ -283,16 +284,16 @@ describe('Testing sequelize connector', function () {
             result.forEach(value => delete value.file_id);
             should(result).match([
                 {
-                    'artillery_json': {
-                        'art': '1'
+                    artillery_json: {
+                        art: '1'
                     },
-                    'id': 'test_id1'
+                    id: 'test_id1'
                 },
                 {
-                    'artillery_json': {
-                        'art': '2'
+                    artillery_json: {
+                        art: '2'
                     },
-                    'id': 'test_id1'
+                    id: 'test_id1'
                 }
             ]);
         });
@@ -304,12 +305,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'created_at'
                             ]
                         },
-                        'order': [
+                        order: [
                             [
                                 'updated_at',
                                 'ASC'
@@ -319,8 +320,8 @@ describe('Testing sequelize connector', function () {
                                 'ASC'
                             ]
                         ],
-                        'where': {
-                            'test_id': 'id'
+                        where: {
+                            test_id: 'id'
                         }
                     }
                 ]
@@ -339,12 +340,12 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
-                            'attributes': {
-                                'exclude': [
+                            attributes: {
+                                exclude: [
                                     'created_at'
                                 ]
                             },
-                            'order': [
+                            order: [
                                 [
                                     'updated_at',
                                     'ASC'
@@ -354,8 +355,8 @@ describe('Testing sequelize connector', function () {
                                     'ASC'
                                 ]
                             ],
-                            'where': {
-                                'test_id': 'id'
+                            where: {
+                                test_id: 'id'
                             }
                         }
                     ]
@@ -388,12 +389,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'created_at'
                             ]
                         },
-                        'order': [
+                        order: [
                             [
                                 'updated_at',
                                 'DESC'
@@ -409,16 +410,16 @@ describe('Testing sequelize connector', function () {
             result.forEach(value => delete value.file_id);
             should(result).match([
                 {
-                    'artillery_json': {
-                        'art': '1'
+                    artillery_json: {
+                        art: '1'
                     },
-                    'id': 'test_id1'
+                    id: 'test_id1'
                 },
                 {
-                    'artillery_json': {
-                        'art': '2'
+                    artillery_json: {
+                        art: '2'
                     },
-                    'id': 'test_id2'
+                    id: 'test_id2'
                 }
             ]);
         });
@@ -430,12 +431,12 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'created_at'
                             ]
                         },
-                        'order': [
+                        order: [
                             [
                                 'updated_at',
                                 'DESC'
@@ -462,12 +463,12 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
-                            'attributes': {
-                                'exclude': [
+                            attributes: {
+                                exclude: [
                                     'created_at'
                                 ]
                             },
-                            'order': [
+                            order: [
                                 [
                                     'updated_at',
                                     'DESC'
@@ -493,8 +494,8 @@ describe('Testing sequelize connector', function () {
             should(destroyStub.args).eql([
                 [
                     {
-                        'where': {
-                            'test_id': 'id'
+                        where: {
+                            test_id: 'id'
                         }
                     }
                 ]
@@ -513,8 +514,8 @@ describe('Testing sequelize connector', function () {
                 should(destroyStub.args).eql([
                     [
                         {
-                            'where': {
-                                'test_id': 'id'
+                            where: {
+                                test_id: 'id'
                             }
                         }
                     ]
@@ -531,10 +532,10 @@ describe('Testing sequelize connector', function () {
             should(createStub.args).eql([
                 [
                     {
-                        'artillery_json': '{"data":"data"}',
-                        'definition_name': 'definitionName',
-                        'dsl_name': 'dslName',
-                        'id': 'uuid'
+                        artillery_json: '{"data":"data"}',
+                        definition_name: 'definitionName',
+                        dsl_name: 'dslName',
+                        id: 'uuid'
                     }
                 ]
             ]);
@@ -548,10 +549,10 @@ describe('Testing sequelize connector', function () {
             should(createStub.args).eql([
                 [
                     {
-                        'artillery_json': '{"data":"data"}',
-                        'definition_name': 'definitionName',
-                        'dsl_name': 'dslName',
-                        'id': 'uuid'
+                        artillery_json: '{"data":"data"}',
+                        definition_name: 'definitionName',
+                        dsl_name: 'dslName',
+                        id: 'uuid'
                     }
                 ]
             ]);
@@ -569,10 +570,10 @@ describe('Testing sequelize connector', function () {
                 should(createStub.args).eql([
                     [
                         {
-                            'artillery_json': '{"data":"data"}',
-                            'definition_name': 'definitionName',
-                            'dsl_name': 'dslName',
-                            'id': 'uuid'
+                            artillery_json: '{"data":"data"}',
+                            definition_name: 'definitionName',
+                            dsl_name: 'dslName',
+                            id: 'uuid'
                         }
                     ]
                 ]);
@@ -589,15 +590,15 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'updated_at',
                                 'created_at'
                             ]
                         },
-                        'where': {
-                            'definition_name': 'definitionName',
-                            'dsl_name': 'dslName'
+                        where: {
+                            definition_name: 'definitionName',
+                            dsl_name: 'dslName'
                         }
                     }
                 ]
@@ -612,15 +613,15 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'updated_at',
                                 'created_at'
                             ]
                         },
-                        'where': {
-                            'definition_name': 'definitionName',
-                            'dsl_name': 'dslName'
+                        where: {
+                            definition_name: 'definitionName',
+                            dsl_name: 'dslName'
                         }
                     }
                 ]
@@ -639,15 +640,15 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
-                            'attributes': {
-                                'exclude': [
+                            attributes: {
+                                exclude: [
                                     'updated_at',
                                     'created_at'
                                 ]
                             },
-                            'where': {
-                                'definition_name': 'definitionName',
-                                'dsl_name': 'dslName'
+                            where: {
+                                definition_name: 'definitionName',
+                                dsl_name: 'dslName'
                             }
                         }
                     ]
@@ -665,27 +666,27 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'updated_at',
                                 'created_at'
                             ]
                         },
-                        'where': {
-                            'dsl_name': 'dslName'
+                        where: {
+                            dsl_name: 'dslName'
                         }
                     }
                 ]
             ]);
             should(result).eql([
                 {
-                    'artillery_json': {
-                        'data': 'data1'
+                    artillery_json: {
+                        data: 'data1'
                     }
                 },
                 {
-                    'artillery_json': {
-                        'data': 'data2'
+                    artillery_json: {
+                        data: 'data2'
                     }
                 }
             ]);
@@ -698,14 +699,14 @@ describe('Testing sequelize connector', function () {
             should(findAllStub.args).eql([
                 [
                     {
-                        'attributes': {
-                            'exclude': [
+                        attributes: {
+                            exclude: [
                                 'updated_at',
                                 'created_at'
                             ]
                         },
-                        'where': {
-                            'dsl_name': 'dslName'
+                        where: {
+                            dsl_name: 'dslName'
                         }
                     }
                 ]
@@ -724,14 +725,14 @@ describe('Testing sequelize connector', function () {
                 should(findAllStub.args).eql([
                     [
                         {
-                            'attributes': {
-                                'exclude': [
+                            attributes: {
+                                exclude: [
                                     'updated_at',
                                     'created_at'
                                 ]
                             },
-                            'where': {
-                                'dsl_name': 'dslName'
+                            where: {
+                                dsl_name: 'dslName'
                             }
                         }
                     ]
@@ -749,14 +750,14 @@ describe('Testing sequelize connector', function () {
             should(updateStub.args).eql([
                 [
                     {
-                        'artillery_json': '{"data":"data"}',
-                        'definition_name': 'definitionName',
-                        'dsl_name': 'dslName'
+                        artillery_json: '{"data":"data"}',
+                        definition_name: 'definitionName',
+                        dsl_name: 'dslName'
                     },
                     {
-                        'where': {
-                            'definition_name': 'definitionName',
-                            'dsl_name': 'dslName'
+                        where: {
+                            definition_name: 'definitionName',
+                            dsl_name: 'dslName'
                         }
                     }
                 ]
@@ -771,14 +772,14 @@ describe('Testing sequelize connector', function () {
             should(updateStub.args).eql([
                 [
                     {
-                        'artillery_json': '{"data":"data"}',
-                        'definition_name': 'definitionName',
-                        'dsl_name': 'dslName'
+                        artillery_json: '{"data":"data"}',
+                        definition_name: 'definitionName',
+                        dsl_name: 'dslName'
                     },
                     {
-                        'where': {
-                            'definition_name': 'definitionName',
-                            'dsl_name': 'dslName'
+                        where: {
+                            definition_name: 'definitionName',
+                            dsl_name: 'dslName'
                         }
                     }
                 ]
@@ -797,14 +798,14 @@ describe('Testing sequelize connector', function () {
                 should(updateStub.args).eql([
                     [
                         {
-                            'artillery_json': '{"data":"data"}',
-                            'definition_name': 'definitionName',
-                            'dsl_name': 'dslName'
+                            artillery_json: '{"data":"data"}',
+                            definition_name: 'definitionName',
+                            dsl_name: 'dslName'
                         },
                         {
-                            'where': {
-                                'definition_name': 'definitionName',
-                                'dsl_name': 'dslName'
+                            where: {
+                                definition_name: 'definitionName',
+                                dsl_name: 'dslName'
                             }
                         }
                     ]
@@ -822,9 +823,9 @@ describe('Testing sequelize connector', function () {
             should(destroyStub.args).eql([
                 [
                     {
-                        'where': {
-                            'definition_name': 'definitionName',
-                            'dsl_name': 'dslName'
+                        where: {
+                            definition_name: 'definitionName',
+                            dsl_name: 'dslName'
                         }
                     }
                 ]
@@ -843,9 +844,9 @@ describe('Testing sequelize connector', function () {
                 should(destroyStub.args).eql([
                     [
                         {
-                            'where': {
-                                'definition_name': 'definitionName',
-                                'dsl_name': 'dslName'
+                            where: {
+                                definition_name: 'definitionName',
+                                dsl_name: 'dslName'
                             }
                         }
                     ]

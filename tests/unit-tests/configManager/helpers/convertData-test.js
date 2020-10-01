@@ -1,7 +1,7 @@
 'use strict';
 
 const should = require('should');
-let manager = require('../../../../src/configManager/helpers/convertData');
+const manager = require('../../../../src/configManager/helpers/convertData');
 
 const valuesSuccess = [
     { value: '0.25', type: 'float', result: 0.25 },
@@ -18,7 +18,7 @@ describe('convert data  helper tests', function () {
     describe('validate convert data of all types ', function () {
         valuesSuccess.forEach(object => {
             it('convert  value success for type:' + object.type, () => {
-                let result = manager.convertByType(object.value, object.type);
+                const result = manager.convertByType(object.value, object.type);
                 should(result).eql(object.result);
             });
         });
@@ -27,7 +27,7 @@ describe('convert data  helper tests', function () {
     describe('validate convert data of all types ', function () {
         valuesError.forEach(object => {
             it('convert value with error type: ' + object.type, () => {
-                let result = manager.convertByType(object.value, object.type);
+                const result = manager.convertByType(object.value, object.type);
                 should(result).eql(undefined);
             });
         });

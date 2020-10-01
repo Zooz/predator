@@ -48,7 +48,6 @@ export function * getFileMetadata ({ fileId }) {
     const result = yield call(getFileMetadataInFramework, fileId);
     yield put(Actions.getFileMetadataSuccess(result.data))
   } catch (e) {
-    console.log('error', e)
   }
 }
 

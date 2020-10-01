@@ -77,25 +77,40 @@ With persisted storage:
 
 where $MACHINE_IP is the local ip address of your machine (not localhost, but actual ip address - it is your local network address).
 
-### Developers
-To run and debug Predator locally run setup-local-env.sh script.
-`./setup-local-env.sh`
+## Developers
+To run and debug Predator locally run: 
 
-This script will clean your node_modules, run npm install and set .env file with minimal required params.   
+```sh
+npm run setup-local-env
+```
+
+This script will clean your node_modules, run npm install, build the ui (webpack) and set .env file with minimal required params.   
 After that you will be able to start Predator with:
 
-`npm run start-local`
+```sh
+npm run start-local
+```
 
 In case your IP changes, you will need to change it in .env file.
-##### Running the tests
 
-Run `npm test` in order to run tests in your local machine. The script runs the following tests:
+#### Developing frontend with hot reload
+```sh
+cd ui
+PREDATOR_URL=http://localhost:3000/v1 npm start
+```
+#### Running the tests
+
+```sh
+npm test
+```
+The script runs the following tests:
+
 * lint
 * unit-tests
 * integration-tests
 
 ## Opening the Predator UI
-The path for accessing the Predator UI is: http://localhost/ui (in the case that Predator is running locally under port 80)
+The path for accessing the Predator UI is: http://localhost:3000/ui (in the case that Predator is running locally under port 3000)
 <br>
 
 In case Predator is not running under the root domain, (for example, running under http://your.domain.com/example-path) in order to access the UI follow the below steps:

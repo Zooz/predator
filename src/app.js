@@ -11,8 +11,8 @@ const testsRouter = require('./tests/routes/testsRoute.js');
 const processorsRouter = require('./processors/routes/processorsRoute.js');
 const filesRouter = require('./files/routes/filesRoute.js');
 const webhooksRouter = require('./webhooks/routes/webhooksRouter');
-
 const swaggerValidator = require('express-ajv-swagger-validation');
+
 const audit = require('express-requests-logger');
 const bodyParser = require('body-parser');
 const database = require('./database/database');

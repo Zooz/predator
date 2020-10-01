@@ -56,11 +56,9 @@ reactTableStories
   })
 
 const selectRow = (selected) => {
-  console.log(selected)
 }
 
 const sortEvent = (column) => {
-  console.log(column)
 }
 
 const columns = (sortHeader) => ([

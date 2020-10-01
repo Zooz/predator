@@ -163,7 +163,6 @@ describe('webhooksManager', () => {
                 expect(error.statusCode).to.be.equal(404);
                 expect(error.message).to.be.equal(ERROR_MESSAGES.NOT_FOUND);
             }
-
         });
     });
     describe('#fireWebhookByEvent', function() {
@@ -211,7 +210,7 @@ describe('webhooksManager', () => {
             await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report);
 
             expect(databaseConnectorGetStub.callCount).to.be.equal(2);
-            expect(databaseConnectorGetStub.args).to.be.deep.equal([ [webhooks[0].id], [webhooks[1].id] ]);
+            expect(databaseConnectorGetStub.args).to.be.deep.equal([[webhooks[0].id], [webhooks[1].id]]);
 
             expect(requestSenderSendStub.callCount).to.be.equal(2);
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({

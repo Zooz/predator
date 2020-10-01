@@ -16,7 +16,7 @@ describe('Create job specific kubernetes tests', async function () {
 
     beforeEach(() => {
         nock.cleanAll();
-    })
+    });
 
     const jobPlatform = process.env.JOB_PLATFORM;
     if (jobPlatform.toUpperCase() === 'KUBERNETES') {
@@ -29,8 +29,8 @@ describe('Create job specific kubernetes tests', async function () {
                     await webhooksRequestCreator.init();
                     await reportsRequestCreator.init();
 
-                    let requestBody = require('../../testExamples/Basic_test');
-                    let response = await testsRequestCreator.createTest(requestBody, {});
+                    const requestBody = require('../../testExamples/Basic_test');
+                    const response = await testsRequestCreator.createTest(requestBody, {});
                     should(response.statusCode).eql(201);
                     should(response.body).have.key('id');
                     testId = response.body.id;
@@ -49,7 +49,7 @@ describe('Create job specific kubernetes tests', async function () {
                                 namespace: kubernetesConfig.kubernetesNamespace
                             });
 
-                        let jobBody = {
+                        const jobBody = {
                             test_id: testId,
                             arrival_rate: 1,
                             duration: 1,
@@ -67,7 +67,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Create second job which is cron functional_test', async () => {
-                        let jobBody = {
+                        const jobBody = {
                             test_id: testId,
                             arrival_count: 1,
                             duration: 1,
@@ -92,7 +92,7 @@ describe('Create job specific kubernetes tests', async function () {
 
                         should(getJobsFromService.status).eql(200);
 
-                        let relevantJobs = getJobsFromService = getJobsFromService.body.filter(job => job.id === cronJobId || job.id === oneTimeJobId);
+                        const relevantJobs = getJobsFromService = getJobsFromService.body.filter(job => job.id === cronJobId || job.id === oneTimeJobId);
                         should(relevantJobs.length).eql(1);
                         should(relevantJobs[0].id).eql(cronJobId);
                     });
@@ -104,7 +104,7 @@ describe('Create job specific kubernetes tests', async function () {
 
                         should(getJobsFromService.status).eql(200);
 
-                        let relevantJobs = getJobsFromService = getJobsFromService.body.filter(job => job.id === cronJobId || job.id === oneTimeJobId);
+                        const relevantJobs = getJobsFromService = getJobsFromService.body.filter(job => job.id === cronJobId || job.id === oneTimeJobId);
                         should(relevantJobs.length).eql(2);
                         should(relevantJobs).containEql({
                             id: oneTimeJobId,
@@ -150,7 +150,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Create job which is disabled', async () => {
-                        let jobBody = {
+                        const jobBody = {
                             test_id: testId,
                             arrival_rate: 1,
                             duration: 1,
@@ -179,7 +179,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Wait 4 seconds to let scheduler run the job', async () => {
-                        await sleep( 4000);
+                        await sleep(4000);
                     });
 
                     it('Verify job did not run', () => {
@@ -203,7 +203,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Wait 4 seconds to let scheduler run the job', async () => {
-                        await sleep( 4000);
+                        await sleep(4000);
                     });
 
                     it('Verify job did run', () => {
@@ -216,14 +216,14 @@ describe('Create job specific kubernetes tests', async function () {
                     let getJobsFromService;
                     let expectedResult;
                     it('Create the job', async () => {
-                        let validBody = {
+                        const validBody = {
                             test_id: testId,
                             arrival_rate: 1,
                             type: 'load_test',
                             duration: 1,
                             environment: 'test',
                             run_immediately: true,
-                            max_virtual_users: 500,
+                            max_virtual_users: 500
                         };
 
                         expectedResult = {
@@ -232,7 +232,7 @@ describe('Create job specific kubernetes tests', async function () {
                             duration: 1,
                             arrival_rate: 1,
                             max_virtual_users: 500,
-                            type: 'load_test',
+                            type: 'load_test'
                         };
 
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
@@ -280,7 +280,7 @@ describe('Create job specific kubernetes tests', async function () {
                                 items: [{ content: 'log' }]
                             });
 
-                        let getLogsResponse = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const getLogsResponse = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -292,7 +292,7 @@ describe('Create job specific kubernetes tests', async function () {
                         nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}?propagationPolicy=Foreground`)
                             .reply(200);
 
-                        let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -300,7 +300,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Delete job', async () => {
-                        let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
+                        const deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
                         should(deleteJobResponse.status).eql(204);
 
                         jobId = createJobResponse.body.id;
@@ -317,19 +317,21 @@ describe('Create job specific kubernetes tests', async function () {
                     let getJobsFromService;
                     let expectedResult;
                     it('Create the job', async () => {
-                        await configManagerRequestCreator.updateConfig({ custom_runner_definition: {
-                            'spec': {
-                                'template': {
-                                    'metadata': {
-                                        'annotations': {
-                                            'traffic.sidecar.istio.io/excludeOutboundPorts': '8060'
+                        await configManagerRequestCreator.updateConfig({
+                            custom_runner_definition: {
+                                spec: {
+                                    template: {
+                                        metadata: {
+                                            annotations: {
+                                                'traffic.sidecar.istio.io/excludeOutboundPorts': '8060'
+                                            }
                                         }
                                     }
                                 }
                             }
-                        } });
+                        });
 
-                        let validBody = {
+                        const validBody = {
                             test_id: testId,
                             arrival_rate: 100,
                             ramp_to: 150,
@@ -338,7 +340,7 @@ describe('Create job specific kubernetes tests', async function () {
                             duration: 1,
                             parallelism: 7,
                             environment: 'test',
-                            run_immediately: true,
+                            run_immediately: true
                         };
 
                         expectedResult = {
@@ -368,13 +370,13 @@ describe('Create job specific kubernetes tests', async function () {
                         should(createJobResponse.status).eql(201);
                         should(createJobResponse.body).containEql(expectedResult);
 
-                        let rampTo = actualJobEnvVars.find(env => env.name === 'RAMP_TO');
+                        const rampTo = actualJobEnvVars.find(env => env.name === 'RAMP_TO');
                         should.exists(rampTo);
 
-                        let arrivalRate = actualJobEnvVars.find(env => env.name === 'ARRIVAL_RATE');
+                        const arrivalRate = actualJobEnvVars.find(env => env.name === 'ARRIVAL_RATE');
                         should.exists(arrivalRate);
 
-                        let maxVirtualUsers = actualJobEnvVars.find(env => env.name === 'MAX_VIRTUAL_USERS');
+                        const maxVirtualUsers = actualJobEnvVars.find(env => env.name === 'MAX_VIRTUAL_USERS');
                         should.exists(maxVirtualUsers);
 
                         should(rampTo.value).eql('22');
@@ -397,7 +399,7 @@ describe('Create job specific kubernetes tests', async function () {
                         nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}?propagationPolicy=Foreground`)
                             .reply(200);
 
-                        let stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -405,7 +407,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Delete job', async () => {
-                        let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
+                        const deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
                         should(deleteJobResponse.status).eql(204);
 
                         jobId = createJobResponse.body.id;
@@ -465,7 +467,7 @@ describe('Create job specific kubernetes tests', async function () {
                         nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job?propagationPolicy=Foreground`)
                             .reply(200);
 
-                        let deleteJobResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                        const deleteJobResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
                         should(deleteJobResponse.status).eql(200);
                         should(deleteJobResponse.body.deleted).eql(1);
                     });
@@ -478,25 +480,25 @@ describe('Create job specific kubernetes tests', async function () {
 
                     it('Create the job', async () => {
                         const webhookBody = {
-                            "name": "mickeys webhook",
-                            "url": "http://www.abcde.com/mickey",
-                            "events": [
-                                "started",
-                                "api_failure",
-                                "aborted",
-                                "failed",
-                                "finished",
-                                "benchmark_passed",
-                                "benchmark_failed"
+                            name: 'mickeys webhook',
+                            url: 'http://www.abcde.com/mickey',
+                            events: [
+                                'started',
+                                'api_failure',
+                                'aborted',
+                                'failed',
+                                'finished',
+                                'benchmark_passed',
+                                'benchmark_failed'
                             ],
-                            "format_type": "json",
-                            "global": false
-                        }
+                            format_type: 'json',
+                            global: false
+                        };
 
                         const webhook = await webhooksRequestCreator.createWebhook(webhookBody);
                         should(webhook.status).eql(201);
 
-                        let validBody = {
+                        const validBody = {
                             test_id: testId,
                             arrival_rate: 100,
                             ramp_to: 150,
@@ -546,11 +548,11 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Runner posts started stats and webhook is sent', async () => {
-                        const webhookScope = nock('http://www.abcde.com').post(`/mickey`)
+                        const webhookScope = nock('http://www.abcde.com').post('/mickey')
                             .reply(201, 'ok');
 
-                        let reportId = uuid.v4();
-                        let minimalReportBody = {
+                        const reportId = uuid.v4();
+                        const minimalReportBody = {
                             test_type: 'basic',
                             report_id: reportId,
                             job_id: jobId,
@@ -565,7 +567,7 @@ describe('Create job specific kubernetes tests', async function () {
                                 arrival_rate: 20
                             }
                         };
-                        let fullReportBody = Object.assign({}, minimalReportBody);
+                        const fullReportBody = Object.assign({}, minimalReportBody);
                         fullReportBody.notes = 'My first performance test';
                         fullReportBody.runner_id = uuid.v4();
 
@@ -590,23 +592,23 @@ describe('Create job specific kubernetes tests', async function () {
 
                     it('Create the job', async () => {
                         const webhookBody = {
-                            "name": "nullys webhook",
-                            "url": "http://www.global.com/nully",
-                            "events": [
-                                "started",
-                                "api_failure",
-                                "aborted",
-                                "failed",
-                                "finished"
+                            name: 'nullys webhook',
+                            url: 'http://www.global.com/nully',
+                            events: [
+                                'started',
+                                'api_failure',
+                                'aborted',
+                                'failed',
+                                'finished'
                             ],
-                            "format_type": "json",
-                            "global": true
-                        }
+                            format_type: 'json',
+                            global: true
+                        };
 
                         const webhook = await webhooksRequestCreator.createWebhook(webhookBody);
                         should(webhook.status).eql(201);
 
-                        let validBody = {
+                        const validBody = {
                             test_id: testId,
                             arrival_rate: 100,
                             ramp_to: 150,
@@ -655,11 +657,11 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Runner posts started stats and webhook is sent', async () => {
-                        const webhookScope = nock('http://www.global.com').post(`/nully`)
+                        const webhookScope = nock('http://www.global.com').post('/nully')
                             .reply(201, 'ok');
 
-                        let reportId = uuid.v4();
-                        let minimalReportBody = {
+                        const reportId = uuid.v4();
+                        const minimalReportBody = {
                             test_type: 'basic',
                             report_id: reportId,
                             job_id: jobId,
@@ -674,7 +676,7 @@ describe('Create job specific kubernetes tests', async function () {
                                 arrival_rate: 20
                             }
                         };
-                        let fullReportBody = Object.assign({}, minimalReportBody);
+                        const fullReportBody = Object.assign({}, minimalReportBody);
                         fullReportBody.notes = 'My first performance test';
                         fullReportBody.runner_id = uuid.v4();
 
@@ -712,7 +714,7 @@ describe('Create job specific kubernetes tests', async function () {
                         it('Create the job, then get the runs, then get the job from kubernetes and service', async () => {
                             date = new Date();
                             date.setSeconds(date.getSeconds() + 2);
-                            let validBody = {
+                            const validBody = {
                                 test_id: testId,
                                 arrival_rate: 1,
                                 type: 'load_test',
@@ -730,16 +732,16 @@ describe('Create job specific kubernetes tests', async function () {
                         });
 
                         it('Wait 4 seconds to let scheduler run the job', async () => {
-                            await sleep( 4000);
+                            await sleep(4000);
                         });
 
                         it('Verify job was deployed as supposed to', () => {
-                            let expectedRunJobsCalls = runImmediately ? 2 : 1;
+                            const expectedRunJobsCalls = runImmediately ? 2 : 1;
                             should(numberOfCallsToRunTest).eql(expectedRunJobsCalls);
                         });
 
                         it('Delete job', async () => {
-                            let deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
+                            const deleteJobResponse = await schedulerRequestCreator.deleteJobFromScheduler(jobId);
                             should(deleteJobResponse.status).eql(200);
                         });
                     });
@@ -747,7 +749,7 @@ describe('Create job specific kubernetes tests', async function () {
 
                 describe('Failures on get - when jobs not exist', () => {
                     it('Get on single job that not exist', async () => {
-                        let getJobsFromService = await schedulerRequestCreator.getJob(uuid.v4(), {
+                        const getJobsFromService = await schedulerRequestCreator.getJob(uuid.v4(), {
                             'Content-Type': 'application/json'
                         });
                         getJobsFromService.statusCode.should.eql(404);
@@ -757,12 +759,12 @@ describe('Create job specific kubernetes tests', async function () {
 
                 describe('Failures on stopRun - when run not exist', () => {
                     it('Stop a run of a job that not exist', async () => {
-                        let jobId = uuid.v4();
-                        let runId = uuid.v4();
+                        const jobId = uuid.v4();
+                        const runId = uuid.v4();
                         nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${jobId}-${runId}?propagationPolicy=Foreground`)
                             .reply(404);
 
-                        let stopRunResponse = await schedulerRequestCreator.stopRun(jobId, runId, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(jobId, runId, {
                             'Content-Type': 'application/json'
                         });
                         should(stopRunResponse.statusCode).eql(404);
@@ -776,7 +778,7 @@ describe('Create job specific kubernetes tests', async function () {
                                 error: 'error '
                             });
 
-                        let getLogsResponse = await schedulerRequestCreator.getLogs('job_id', 'run_id', {
+                        const getLogsResponse = await schedulerRequestCreator.getLogs('job_id', 'run_id', {
                             'Content-Type': 'application/json'
                         });
 
@@ -792,6 +794,6 @@ describe('Create job specific kubernetes tests', async function () {
 const sleep = (time) => {
     logger.info(`sleeping for ${time}ms`);
     return new Promise((resolve) => {
-        setTimeout(resolve, time)
+        setTimeout(resolve, time);
     });
-}
+};
