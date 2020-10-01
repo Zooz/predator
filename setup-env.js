@@ -11,7 +11,9 @@ npmInstallAndBuild();
 extractIpAndPort();
 setupEnvFile();
 
-console.log('\x1b[36m%s\x1b[0m', 'Use \'npm run start-local\' to start Predator'); // cyan
+console.log('\x1b[36m%s\x1b[0m', 'To start predator backend + frontend:\nnpm run start-local');
+console.log();
+console.log('\x1b[36m%s\x1b[0m', `To develop frontend with hot reload:\ncd ui\nPREDATOR_URL=http//${ipAddress}:${port}/v1 npm start`);
 
 function npmInstallAndBuild() {
     if (shell.exec('npm install').code !== 0) {
