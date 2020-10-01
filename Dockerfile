@@ -24,7 +24,7 @@ ARG PREDATOR_DOCS_URL
 # Build UI from sources
 WORKDIR /usr/ui
 RUN npm ci --silent
-RUN VERSION=$(node -p -e "require('/usr/package.json').version") && BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL VERSION=$VERSION npm run build
+RUN VERSION=$(node -p -e "require('/usr/package.json').version") && BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL VERSION=$VERSION NODE_ENV=production npm run build
 # Clean up
 RUN mv /usr/ui/dist /tmp/dist && rm -rf /usr/ui/* && mv /tmp/dist /usr/ui/dist
 
