@@ -471,6 +471,9 @@ describe('Sequelize client tests', function () {
                         'created_at'
                     ]
                 },
+                order: [
+                    ['stats_time', 'ASC']
+                ],
                 where: {
                     report_id: reportId,
                     test_id: testId
