@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "NODE_ENV=production node --max_old_space_size=2000 ./node_modules/webpack/bin/webpack.js --env --config ./config/webpack.config.js",
+    "build": "node -r dotenv/config --max_old_space_size=2000 ./node_modules/webpack/bin/webpack.js --env --config ./config/webpack.config.js",
     "start": "webpack-dev-server  --open --history-api-fallback --config ./config/webpack.config.js --devtool eval --hot"
   },
   "repository": {
@@ -42,6 +42,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^2.1.1",
+    "dotenv": "^8.2.0",
     "eslint": "^5.13.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-config-standard-react": "^7.0.2",

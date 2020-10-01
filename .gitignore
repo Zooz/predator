@@ -16,3 +16,4 @@ docs/.idea/workspace.xml
 predator
 .env
 *.sqlite
+ui/.env

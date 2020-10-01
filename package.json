@@ -12,6 +12,7 @@
     "test": "tests"
   },
   "scripts": {
+    "setup-local-env": "npm install --no-save shelljs && node setup-env.js",
     "start-local": "node -r dotenv/config src/server.js",
     "start": "node src/server.js",
     "unit-tests": "nyc --check-coverage --lines 93 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
