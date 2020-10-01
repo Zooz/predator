@@ -7,8 +7,7 @@ const should = require('should'),
     basicTest = require('../../testExamples/Basic_test.json'),
     nock = require('nock');
 
-const { expect } = require('chai');
-const { createJob } = require('../../../src/jobs/models/jobManager');
+const { expect } = require('chai'); ;
 
 describe('Create job global tests', function () {
     this.timeout(20000);
@@ -24,7 +23,7 @@ describe('Create job global tests', function () {
 
     describe('Bad requests', () => {
         it('Create a job without type should return error', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: uuid.v4(),
                 arrival_rate: 1,
                 duration: 1,
@@ -43,7 +42,7 @@ describe('Create job global tests', function () {
         });
 
         it('Create a job with a wrong type should return error', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: uuid.v4(),
                 arrival_rate: 1,
                 duration: 1,
@@ -65,7 +64,7 @@ describe('Create job global tests', function () {
         });
 
         it('Create a job with type load_test and arrival_count should return error', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: uuid.v4(),
                 arrival_count: 1,
                 duration: 1,
@@ -87,7 +86,7 @@ describe('Create job global tests', function () {
         });
 
         it('Create a job with type functional_test and arrival_rate should return error', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: uuid.v4(),
                 arrival_rate: 1,
                 duration: 1,
@@ -109,7 +108,7 @@ describe('Create job global tests', function () {
         });
 
         it('Create a job without run_immediately or cron_expression parameters, should return error', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: uuid.v4(),
                 arrival_rate: 1,
                 duration: 1,
@@ -126,7 +125,7 @@ describe('Create job global tests', function () {
         });
 
         it('Create a job without cron_expression with enable=false parameters, should return error', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: uuid.v4(),
                 arrival_rate: 1,
                 duration: 1,
@@ -145,7 +144,7 @@ describe('Create job global tests', function () {
         });
 
         it('Create a job with 0 duration, arrival_rate, max_virtual_users, ramp_to and parallelism should return error', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: uuid.v4(),
                 arrival_rate: 0,
                 duration: 0,
@@ -174,7 +173,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing test_id', () => {
-            let illegalBody = { arrival_rate: 1, duration: 1, environment: 'test', type: 'load_test' };
+            const illegalBody = { arrival_rate: 1, duration: 1, environment: 'test', type: 'load_test' };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
             })
@@ -188,7 +187,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for illegal test_id', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: 'string',
                 arrival_rate: 1,
                 run_immediately: true,
@@ -209,7 +208,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing arrival_rate', () => {
-            let bodyWithoutTestId = { test_id: uuid.v4(), duration: 1, environment: 'test', type: 'load_test' };
+            const bodyWithoutTestId = { test_id: uuid.v4(), duration: 1, environment: 'test', type: 'load_test' };
             return schedulerRequestCreator.createJob(bodyWithoutTestId, {
                 'Content-Type': 'application/json'
             })
@@ -223,7 +222,7 @@ describe('Create job global tests', function () {
         });
 
         it('Should return error for missing duration', () => {
-            let illegalBody = { test_id: uuid.v4(), arrival_rate: 1, environment: 'test', type: 'load_test' };
+            const illegalBody = { test_id: uuid.v4(), arrival_rate: 1, environment: 'test', type: 'load_test' };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
             })
@@ -237,7 +236,7 @@ describe('Create job global tests', function () {
         });
 
         it('Create a job with non existing test_id', () => {
-            let illegalBody = {
+            const illegalBody = {
                 test_id: '56ccc314-8c92-4002-839d-8424909ff475',
                 arrival_rate: 1,
                 duration: 1,
@@ -255,7 +254,7 @@ describe('Create job global tests', function () {
         });
 
         it('Get non existing job', async () => {
-            let response = await schedulerRequestCreator.getJob(uuid.v4(), {
+            const response = await schedulerRequestCreator.getJob(uuid.v4(), {
                 'Content-Type': 'application/json'
             });
             should(response.statusCode).eql(404);
@@ -263,7 +262,7 @@ describe('Create job global tests', function () {
         });
 
         it('Update non existing job', async () => {
-            let response = await schedulerRequestCreator.updateJob(uuid.v4(), { arrival_rate: 100 }, {
+            const response = await schedulerRequestCreator.updateJob(uuid.v4(), { arrival_rate: 100 }, {
                 'Content-Type': 'application/json',
                 'x-zooz-request-id': 1
             });

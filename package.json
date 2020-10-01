@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package",
   "name": "predator",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Framework that manages the entire lifecycle of load testing a server, from creating test files, running scheduled and on-demand tests, and viewing test results.",
   "main": "server.js",
   "engines": {
@@ -12,12 +12,13 @@
     "test": "tests"
   },
   "scripts": {
+    "setup-local-env": "npm install --no-save shelljs && node setup-env.js",
     "start-local": "node -r dotenv/config src/server.js",
     "start": "node src/server.js",
     "unit-tests": "nyc --check-coverage --lines 93 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh --timeout=10000",
-    "lint": "eslint src/**",
+    "lint": "eslint ./src/**/**.js ./tests/**/**.js",
     "release": "standard-version",
     "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
   },

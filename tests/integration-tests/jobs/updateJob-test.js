@@ -15,7 +15,7 @@ describe('Update scheduled job', function () {
         await schedulerRequestCreator.init();
         await testsRequestCreator.init();
 
-        let requestBody = require('../../testExamples/Basic_test');
+        const requestBody = require('../../testExamples/Basic_test');
         let response = await testsRequestCreator.createTest(requestBody, {});
         should(response.statusCode).eql(201);
         should(response.body).have.key('id');
@@ -35,7 +35,7 @@ describe('Update scheduled job', function () {
             nock.cleanAll();
 
             nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
-                let isMatch = body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === updatedTestId;
+                const isMatch = body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === updatedTestId;
                 return isMatch;
             }).reply(200,
                 () => {
@@ -48,9 +48,9 @@ describe('Update scheduled job', function () {
         });
 
         it('Create a job then update it', async () => {
-            let date = new Date();
+            const date = new Date();
             date.setSeconds(date.getSeconds() + 2);
-            let validBody = {
+            const validBody = {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
@@ -61,26 +61,26 @@ describe('Update scheduled job', function () {
                 webhooks: ['http://www.hello.com', 'https://www.zooz.com'],
                 emails: ['email@me.com', 'hello@zooz']
             };
-            let createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+            const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
             });
             jobId = createJobResponse.body.id;
 
-            let getJobResponseBeforeUpdate = await schedulerRequestCreator.getJob(jobId, {
+            const getJobResponseBeforeUpdate = await schedulerRequestCreator.getJob(jobId, {
                 'Content-Type': 'application/json'
             });
             getJobResponseBeforeUpdate.body.test_id.should.eql(testId);
 
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { test_id: updatedTestId }, {
+            const updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { test_id: updatedTestId }, {
                 'Content-Type': 'application/json'
             });
             should(updateJobResponse.statusCode).eql(200);
 
-            let getJobResponseAfterUpdate = await schedulerRequestCreator.getJob(jobId, {
+            const getJobResponseAfterUpdate = await schedulerRequestCreator.getJob(jobId, {
                 'Content-Type': 'application/json'
             });
 
-            let expectedResponseBodyAfterUpdate = JSON.parse(JSON.stringify(getJobResponseBeforeUpdate.body));
+            const expectedResponseBodyAfterUpdate = JSON.parse(JSON.stringify(getJobResponseBeforeUpdate.body));
             expectedResponseBodyAfterUpdate.test_id = updatedTestId;
             getJobResponseAfterUpdate.body.should.eql(expectedResponseBodyAfterUpdate);
         });
@@ -108,7 +108,7 @@ describe('Update scheduled job', function () {
 
         before(async () => {
             nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`, body => {
-                let isMatch = body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === testId;
+                const isMatch = body.spec.template.spec.containers['0'].env.find(o => o.name === 'TEST_ID').value === testId;
                 return isMatch;
             }).reply(200,
                 () => {
@@ -123,7 +123,7 @@ describe('Update scheduled job', function () {
         it('Create a job then update it\'s cron', async () => {
             let date = new Date();
             date.setHours(date.getHours() + 2);
-            let validBody = {
+            const validBody = {
                 test_id: testId,
                 arrival_rate: 1,
                 type: 'load_test',
@@ -132,13 +132,13 @@ describe('Update scheduled job', function () {
                 run_immediately: false,
                 cron_expression: '* ' + date.getHours() + ' * * * *'
             };
-            let createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+            const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
             });
             jobId = createJobResponse.body.id;
             date = new Date();
             date.setSeconds(date.getSeconds() + 2);
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { cron_expression: date.getSeconds() + ' * * * * *' }, {
+            const updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { cron_expression: date.getSeconds() + ' * * * * *' }, {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(200);
@@ -165,9 +165,9 @@ describe('Update scheduled job', function () {
         let updatedCronExpression;
 
         it('Create a job', async () => {
-            let date = new Date();
+            const date = new Date();
             date.setHours(date.getHours() + 2);
-            let validBody = {
+            const validBody = {
                 test_id: testId,
                 arrival_rate: 1,
                 duration: 1,
@@ -178,19 +178,19 @@ describe('Update scheduled job', function () {
                 webhooks: [],
                 emails: ['b@emails.com']
             };
-            let createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+            const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
             });
             jobId = createJobResponse.body.id;
         });
 
         it('Update the job', async () => {
-            let date = new Date();
+            const date = new Date();
 
             date.setHours(date.getHours() + 3);
             updatedCronExpression = `* ${date.getHours()} * * * * *`;
 
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId,
+            const updateJobResponse = await schedulerRequestCreator.updateJob(jobId,
                 {
                     cron_expression: updatedCronExpression,
                     arrival_count: 5,
@@ -206,7 +206,7 @@ describe('Update scheduled job', function () {
         });
 
         it('Verify job updated as expected', async () => {
-            let getJobResponseAfterUpdate = await schedulerRequestCreator.getJob(jobId, {
+            const getJobResponseAfterUpdate = await schedulerRequestCreator.getJob(jobId, {
                 'Content-Type': 'application/json'
             });
 
@@ -265,32 +265,32 @@ describe('Update scheduled job', function () {
         });
 
         it('Update job with wrong type', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { type: 'mickey' }, {
+            const updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { type: 'mickey' }, {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(400);
-            updateJobResponse.body.should.eql({ message: 'job type is in an unsupported value: mickey' }  );
+            updateJobResponse.body.should.eql({ message: 'job type is in an unsupported value: mickey' });
         });
 
         it('Update load_test job to functional_test with arrival_rate', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { type: 'functional_test', arrival_rate: 5 }, {
+            const updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { type: 'functional_test', arrival_rate: 5 }, {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(400);
-            updateJobResponse.body.should.eql({ message: 'arrival_count is mandatory when updating job to functional_test' }  );
+            updateJobResponse.body.should.eql({ message: 'arrival_count is mandatory when updating job to functional_test' });
         });
 
         it('Update functional_test job to load_test with arrival_count', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(functionalJobId, { type: 'load_test', arrival_count: 5 }, {
+            const updateJobResponse = await schedulerRequestCreator.updateJob(functionalJobId, { type: 'load_test', arrival_count: 5 }, {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(400);
-            updateJobResponse.body.should.eql({ message: 'arrival_rate is mandatory when updating job to load_test' }  );
+            updateJobResponse.body.should.eql({ message: 'arrival_rate is mandatory when updating job to load_test' });
         });
 
         it('Update job with non existing test id', async () => {
-            let nonExistingTestId = '56ccc314-8c92-4002-839d-8424909ff475';
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { test_id: nonExistingTestId }, {
+            const nonExistingTestId = '56ccc314-8c92-4002-839d-8424909ff475';
+            const updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { test_id: nonExistingTestId }, {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(400);
@@ -298,12 +298,14 @@ describe('Update scheduled job', function () {
         });
 
         it('Try to update enabled to not boolean', async () => {
-            let updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { enabled: 'NOT_BOOLEAN' }, {
+            const updateJobResponse = await schedulerRequestCreator.updateJob(jobId, { enabled: 'NOT_BOOLEAN' }, {
                 'Content-Type': 'application/json'
             });
             updateJobResponse.statusCode.should.eql(400);
-            updateJobResponse.body.should.eql({ message: 'Input validation error',
-                validation_errors: [ 'body/enabled should be boolean' ] });
+            updateJobResponse.body.should.eql({
+                message: 'Input validation error',
+                validation_errors: ['body/enabled should be boolean']
+            });
         });
 
         it('Delete job', async () => {

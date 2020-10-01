@@ -1,13 +1,13 @@
 'use strict';
-let sinon = require('sinon');
-let rewire = require('rewire');
-let should = require('should');
+const sinon = require('sinon');
+const rewire = require('rewire');
+const should = require('should');
 const cloneDeep = require('lodash/cloneDeep');
 
-let databaseConfig = require('../../../../src/config/databaseConfig');
-let sequelizeConnector = rewire('../../../../src/jobs/models/database/sequelize/sequelizeConnector');
+const databaseConfig = require('../../../../src/config/databaseConfig');
+const sequelizeConnector = rewire('../../../../src/jobs/models/database/sequelize/sequelizeConnector');
 
-let uuid = require('uuid');
+const uuid = require('uuid');
 
 describe('Sequelize client tests', function () {
     let sandbox;
@@ -99,8 +99,8 @@ describe('Sequelize client tests', function () {
         it('should succeed full insert', async () => {
             await sequelizeConnector.init(sequelizeStub());
 
-            let id = uuid.v4();
-            let testId = uuid.v4();
+            const id = uuid.v4();
+            const testId = uuid.v4();
 
             const job = {
                 test_id: testId,
@@ -125,11 +125,11 @@ describe('Sequelize client tests', function () {
                     id,
                     webhooks: ['UUIDSTUB'],
                     emails: [{
-                        'id': 'UUIDSTUB',
-                        'address': 'hello@zooz.com'
+                        id: 'UUIDSTUB',
+                        address: 'hello@zooz.com'
                     }, {
-                        'id': 'UUIDSTUB',
-                        'address': 'hello@payu.com'
+                        id: 'UUIDSTUB',
+                        address: 'hello@payu.com'
                     }]
                 },
                 setWebhooks: sandbox.stub()
@@ -155,8 +155,8 @@ describe('Sequelize client tests', function () {
         it('should succeed insert without webhooks and emails', async () => {
             await sequelizeConnector.init(sequelizeStub());
 
-            let id = uuid.v4();
-            let testId = uuid.v4();
+            const id = uuid.v4();
+            const testId = uuid.v4();
 
             const job = {
                 test_id: testId,
@@ -223,7 +223,7 @@ describe('Sequelize client tests', function () {
         it('should get multiple jobs', async () => {
             await sequelizeConnector.init(sequelizeStub());
 
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {
                     id: 'd6b0f076-2efb-48e1-82d2-82250818f59c',
                     test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
@@ -299,7 +299,7 @@ describe('Sequelize client tests', function () {
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            let jobs = await sequelizeConnector.getJobs();
+            const jobs = await sequelizeConnector.getJobs();
 
             should(jobs.length).eql(2);
             should(jobs[0]).eql({
@@ -335,10 +335,10 @@ describe('Sequelize client tests', function () {
         it('should get multiple jobs - no jobs exists', async () => {
             await sequelizeConnector.init(sequelizeStub());
 
-            let sequelizeResponse = [];
+            const sequelizeResponse = [];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            let jobs = await sequelizeConnector.getJobs();
+            const jobs = await sequelizeConnector.getJobs();
 
             should(jobs.length).eql(0);
         });
@@ -361,7 +361,7 @@ describe('Sequelize client tests', function () {
         it('should get single job', async () => {
             await sequelizeConnector.init(sequelizeStub());
 
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {
                     id: 'd6b0f076-2efb-48e1-82d2-82250818f59c',
                     test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
@@ -408,7 +408,7 @@ describe('Sequelize client tests', function () {
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            let jobs = await sequelizeConnector.getJob('d6b0f076-2efb-48e1-82d2-82250818f59c');
+            const jobs = await sequelizeConnector.getJob('d6b0f076-2efb-48e1-82d2-82250818f59c');
 
             should(jobs).eql([{
                 arrival_rate: 100,
@@ -448,10 +448,10 @@ describe('Sequelize client tests', function () {
         it('should return empty response as no such job id exists', async () => {
             await sequelizeConnector.init(sequelizeStub());
 
-            let sequelizeResponse = [];
+            const sequelizeResponse = [];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            let jobs = await sequelizeConnector.getJob('d6b0f076-2efb-48e1-82d2-82250818f59c');
+            const jobs = await sequelizeConnector.getJob('d6b0f076-2efb-48e1-82d2-82250818f59c');
 
             should(jobs).eql([]);
         });
@@ -477,8 +477,8 @@ describe('Sequelize client tests', function () {
             await sequelizeConnector.deleteJob('jobId');
 
             should(sequelizeDestroyStub.args[0][0]).eql({
-                'where': {
-                    'id': 'jobId'
+                where: {
+                    id: 'jobId'
                 }
             });
         });
@@ -527,7 +527,7 @@ describe('Sequelize client tests', function () {
                 ...sequelizeJobResponse.dataValues,
                 cron_expression: '5 4 * *',
                 proxy_url: 'http://predator.dev',
-                webhooks: [ webhookId ]
+                webhooks: [webhookId]
             };
             sequelizeGetStub.resolves(sequelizeJobResponse);
             sequelizeTransactionStub.resolves();

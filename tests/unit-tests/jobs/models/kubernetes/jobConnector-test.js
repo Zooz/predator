@@ -1,11 +1,11 @@
 'use strict';
-let should = require('should');
-let sinon = require('sinon');
-let rewire = require('rewire');
-let requestSender = require('../../../../../src/common/requestSender');
-let config = require('../../../../../src/config/kubernetesConfig');
+const should = require('should');
+const sinon = require('sinon');
+const rewire = require('rewire');
+const requestSender = require('../../../../../src/common/requestSender');
+const config = require('../../../../../src/config/kubernetesConfig');
 config.kubernetesNamespace = 'default';
-let jobConnector = rewire('../../../../../src/jobs/models/kubernetes/jobConnector');
+const jobConnector = rewire('../../../../../src/jobs/models/kubernetes/jobConnector');
 
 describe('Kubernetes job connector tests', function () {
     let sandbox;
@@ -28,11 +28,11 @@ describe('Kubernetes job connector tests', function () {
     describe('Run new job', () => {
         it('Success to create a job and running it immediately', async () => {
             requestSenderSendStub.resolves({ metadata: { name: 'Predator', uid: 'some_uuid' }, namespace: 'default' });
-            let jobResponse = await jobConnector.runJob({ metadata: { name: 'predator' } });
+            const jobResponse = await jobConnector.runJob({ metadata: { name: 'predator' } });
             jobResponse.should.eql({
-                'id': 'some_uuid',
-                'jobName': 'Predator',
-                'namespace': 'default'
+                id: 'some_uuid',
+                jobName: 'Predator',
+                namespace: 'default'
             });
             requestSenderSendStub.callCount.should.eql(1);
             requestSenderSendStub.args[0][0].should.eql({
@@ -90,7 +90,7 @@ describe('Kubernetes job connector tests', function () {
 
             requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podB/log?container=predator-runner' })).resolves('bLog');
 
-            let logs = await jobConnector.getLogs('jobPlatformName', 'runId', 'predator-runner');
+            const logs = await jobConnector.getLogs('jobPlatformName', 'runId', 'predator-runner');
 
             logs.should.eql([{ type: 'file', name: 'podA.txt', content: 'aLog' },
                 { type: 'file', name: 'podB.txt', content: 'bLog' }]);
@@ -112,7 +112,7 @@ describe('Kubernetes job connector tests', function () {
     describe('Delete all containers', () => {
         it('Should success delete job', async () => {
             requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs?labelSelector=app=predator-runner' })).resolves({
-                items: [ { metadata: { uid: 'x' } } ]
+                items: [{ metadata: { uid: 'x' } }]
             });
 
             requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods?labelSelector=controller-uid=x' })).resolves({
@@ -121,13 +121,19 @@ describe('Kubernetes job connector tests', function () {
 
             requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podA' })).resolves({
                 metadata: { labels: { 'job-name': 'predator.job' } },
-                status: { containerStatuses: [{ name: 'predator-runner',
-                    state: { terminated: { finishedAt: '2020' } } }, { name: 'podB',
-                    state: {} }] }
+                status: {
+                    containerStatuses: [{
+                        name: 'predator-runner',
+                        state: { terminated: { finishedAt: '2020' } }
+                    }, {
+                        name: 'podB',
+                        state: {}
+                    }]
+                }
 
             });
 
-            let result = await jobConnector.deleteAllContainers('predator-runner');
+            const result = await jobConnector.deleteAllContainers('predator-runner');
 
             requestSenderSendStub.args[3][0].should.eql({
                 url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/predator.job?propagationPolicy=Foreground',

@@ -1,10 +1,10 @@
 'use strict';
-let sinon = require('sinon');
-let rewire = require('rewire');
-let should = require('should');
-let databaseConfig = require('../../../../src/config/databaseConfig');
-let sequelizeConnector = rewire('../../../../src/reports/models/database/sequelize/sequelizeConnector');
-let uuid = require('uuid');
+const sinon = require('sinon');
+const rewire = require('rewire');
+const should = require('should');
+const databaseConfig = require('../../../../src/config/databaseConfig');
+const sequelizeConnector = rewire('../../../../src/reports/models/database/sequelize/sequelizeConnector');
+const uuid = require('uuid');
 
 describe('Sequelize client tests', function () {
     let sandbox;
@@ -30,8 +30,8 @@ describe('Sequelize client tests', function () {
     let testDescription;
     let testConfiguration;
     let notes;
-    let lastStats = JSON.stringify({});
-    let subscribers = [{
+    const lastStats = JSON.stringify({});
+    const subscribers = [{
         dataValues: {
             runner_id: '12345',
             phase_status: 'done',
@@ -121,7 +121,7 @@ describe('Sequelize client tests', function () {
     describe('Insert new report', () => {
         it('should succeed full insert', async () => {
             const lastUpdateAt = Date.now();
-            let params = {
+            const params = {
                 test_id: testId,
                 job_id: jobId,
                 last_updated_at: lastUpdateAt,
@@ -163,7 +163,7 @@ describe('Sequelize client tests', function () {
 
     describe('Delete report', async () => {
         it('should delete report with subscribers successfully', async () => {
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {
                     reportId,
                     testId,
@@ -208,7 +208,7 @@ describe('Sequelize client tests', function () {
         });
 
         it('should delete report without subscribers successfully', async () => {
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {
                     reportId,
                     testId,
@@ -248,7 +248,7 @@ describe('Sequelize client tests', function () {
 
     describe('Get reports', () => {
         it('should get multiple reports', async () => {
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {
                     reportId,
                     testId,
@@ -278,7 +278,7 @@ describe('Sequelize client tests', function () {
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            let reports = await sequelizeConnector.getReports();
+            const reports = await sequelizeConnector.getReports();
 
             should(reports.length).eql(2);
             should(reports[0]).eql({
@@ -322,10 +322,10 @@ describe('Sequelize client tests', function () {
         });
 
         it('should get multiple reports - no reports exists', async () => {
-            let sequelizeResponse = [];
+            const sequelizeResponse = [];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            let reports = await sequelizeConnector.getReports();
+            const reports = await sequelizeConnector.getReports();
 
             should(reports.length).eql(0);
         });
@@ -333,7 +333,7 @@ describe('Sequelize client tests', function () {
 
     describe('Get single report', () => {
         it('should get single report', async () => {
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {
                     reportId,
                     testId,
@@ -350,7 +350,7 @@ describe('Sequelize client tests', function () {
             }];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            let reports = await sequelizeConnector.getReport(testId, reportId);
+            const reports = await sequelizeConnector.getReport(testId, reportId);
 
             should(reports).eql([{
                 reportId,
@@ -387,10 +387,10 @@ describe('Sequelize client tests', function () {
         });
 
         it('should return empty response as no such report id exists', async () => {
-            let sequelizeResponse = [];
+            const sequelizeResponse = [];
 
             sequelizeGetStub.resolves(sequelizeResponse);
-            let reports = await sequelizeConnector.getReport(testId, reportId);
+            const reports = await sequelizeConnector.getReport(testId, reportId);
 
             should(reports).eql([]);
         });
@@ -444,7 +444,7 @@ describe('Sequelize client tests', function () {
         it('should succeed getting stats', async () => {
             const statsTime = Date.now();
             const statId = uuid();
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {
                     stats_id: statId,
                     test_id: testId,
@@ -466,6 +466,9 @@ describe('Sequelize client tests', function () {
                         'created_at'
                     ]
                 },
+                order: [
+                    ['stats_time', 'ASC']
+                ],
                 where: {
                     report_id: reportId,
                     test_id: testId
@@ -476,7 +479,7 @@ describe('Sequelize client tests', function () {
 
     describe('Subscribe runner', () => {
         it('Should successfully subscribe runner', async () => {
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {
                     reportId,
                     testId,
@@ -511,7 +514,7 @@ describe('Sequelize client tests', function () {
                 }
             }]);
 
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {},
                 getSubscribers: sequelizeGetSubscribersStatsStub
             }];
@@ -534,7 +537,7 @@ describe('Sequelize client tests', function () {
                 }
             }]);
 
-            let sequelizeResponse = [{
+            const sequelizeResponse = [{
                 dataValues: {},
                 getSubscribers: sequelizeGetSubscribersStatsStub
             }];

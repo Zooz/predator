@@ -1,29 +1,29 @@
 
 module.exports = function (dslName) {
     return {
-        'test': {
-            'name': 'test',
-            'description': 'test',
-            'type': 'dsl',
-            'before': {
-                'steps': [
+        test: {
+            name: 'test',
+            description: 'test',
+            type: 'dsl',
+            before: {
+                steps: [
                     {
-                        'action': `${dslName}.createAuthorize`,
-                        'properties': {
-                            'credit_card_cvv': ['123', '568']
+                        action: `${dslName}.createAuthorize`,
+                        properties: {
+                            credit_card_cvv: ['123', '568']
                         }
                     }
                 ]
             },
-            'scenarios': [
+            scenarios: [
                 {
-                    'scenario_name': 'Scenario',
-                    'steps': [
+                    scenario_name: 'Scenario',
+                    steps: [
                         {
-                            'action': `${dslName}.createToken`
+                            action: `${dslName}.createToken`
                         },
                         {
-                            'action': `${dslName}.createCustomer`
+                            action: `${dslName}.createCustomer`
                         }
                     ]
                 }

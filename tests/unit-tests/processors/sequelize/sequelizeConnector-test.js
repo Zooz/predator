@@ -90,7 +90,7 @@ describe('Sequelize client tests', function () {
         it('Validate sequelize passed arguments with excluding javascript', async () => {
             const limit = 25;
             const offset = 10;
-            await sequelizeConnector.getAllProcessors(offset, limit, 'javascript' );
+            await sequelizeConnector.getAllProcessors(offset, limit, 'javascript');
             should(sequelizeGetStub.calledOnce).eql(true);
             should(sequelizeGetStub.args[0][0]).containDeep({ offset, limit, attributes: { exclude: ['javascript'] } });
         });

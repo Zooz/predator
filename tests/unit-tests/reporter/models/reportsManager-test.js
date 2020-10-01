@@ -74,8 +74,6 @@ const JOB = {
 
 describe('Reports manager tests', function () {
     let sandbox;
-    let loggerErrorStub;
-    let loggerInfoStub;
     let databaseGetReportsStub;
     let databaseGetReportStub;
     let databaseGetLastReportsStub;
@@ -111,8 +109,8 @@ describe('Reports manager tests', function () {
         updateReportBenchmarkStub = sandbox.stub(databaseConnector, 'updateReportBenchmark');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
         databaseDeleteReportStub = sandbox.stub(databaseConnector, 'deleteReport');
-        loggerErrorStub = sandbox.stub(logger, 'error');
-        loggerInfoStub = sandbox.stub(logger, 'info');
+        sandbox.stub(logger, 'error');
+        sandbox.stub(logger, 'info');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
         configStub = sandbox.stub(configHandler, 'getConfig');
         notifierStub = sandbox.stub(notifier, 'notifyIfNeeded');
@@ -248,7 +246,7 @@ describe('Reports manager tests', function () {
             let testReport;
             before(() => {
                 testReport = Object.assign({}, REPORT);
-                let secondSubscriber = Object.assign({}, testReport.subscribers[0]);
+                const secondSubscriber = Object.assign({}, testReport.subscribers[0]);
                 testReport.subscribers.push(secondSubscriber);
                 should(testReport.subscribers.length).eql(2);
             });

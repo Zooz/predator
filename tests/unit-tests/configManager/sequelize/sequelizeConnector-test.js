@@ -69,7 +69,7 @@ describe('Sequelize client tests', function () {
 
     describe('Update new config record object as value', () => {
         it('should succeed object value update', async () => {
-            let jsonToSave = { jsonTest: 'test_value' };
+            const jsonToSave = { jsonTest: 'test_value' };
             await sequelizeConnector.updateConfig({ test_key_json: jsonToSave });
             should(sequelizeUpsertStub.args[0][0]).eql({ key: 'test_key_json', value: JSON.stringify(jsonToSave) });
         });
@@ -77,7 +77,7 @@ describe('Sequelize client tests', function () {
 
     describe('Update new config multiple records object and strings as value', () => {
         it('should succeed object value update', async () => {
-            let jsonToSave = { jsonTest: 'test_value' };
+            const jsonToSave = { jsonTest: 'test_value' };
             await sequelizeConnector.updateConfig({ test_key: 'test_value', test_key_json: jsonToSave });
             should(sequelizeUpsertStub.args[0][0]).eql({ key: 'test_key', value: 'test_value' });
             should(sequelizeUpsertStub.args[1][0]).eql({ key: 'test_key_json', value: JSON.stringify(jsonToSave) });
@@ -94,12 +94,12 @@ describe('Sequelize client tests', function () {
 
     describe('Get all config with data', () => {
         it('should succeed to get  multiple configs', async () => {
-            let sequelizeResponse = [
+            const sequelizeResponse = [
                 { dataValues: { key: 'firstKey', value: 'firstValue' } },
                 { dataValues: { key: 'secondKey', value: 'secondValue' } }
             ];
             sequelizeGetStub.resolves(sequelizeResponse);
-            let config = await sequelizeConnector.getConfig();
+            const config = await sequelizeConnector.getConfig();
             should(config.length).eql(2);
             should(config[0]).eql({ key: 'firstKey', value: 'firstValue' });
             should(config[1]).eql({ key: 'secondKey', value: 'secondValue' });

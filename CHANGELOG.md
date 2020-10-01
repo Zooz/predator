@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.4](https://github.com/Zooz/predator/compare/v1.5.3...v1.5.4) (2020-10-01)
+
+
+### Features
+
+* **server:** verify INTERNAL_ADDRESS is reachable and correct ([#430](https://github.com/Zooz/predator/issues/430)) ([64e0b04](https://github.com/Zooz/predator/commit/64e0b0490842e6a614a6e7fd7c822a73a20cde8e))
+
+
+### Bug Fixes
+
+* **delete all console logs:** delete all console logs ([454c62e](https://github.com/Zooz/predator/commit/454c62e4623798fc7df5205c370f2d6ae784cdf4))
+* **deps:** upgrade ui deps ([#435](https://github.com/Zooz/predator/issues/435)) ([bbc4041](https://github.com/Zooz/predator/commit/bbc40416a81fbb6159e8f77ce7da7c4a290b65f3))
+* **local-run:** add /v1/ to INTERNAL_ADDRESS ([26bd534](https://github.com/Zooz/predator/commit/26bd5346217b59d8c8d564d6a872e773274e8f0a))
+* **openapi:** fixed missing schema key ([#414](https://github.com/Zooz/predator/issues/414)) ([f39d7f8](https://github.com/Zooz/predator/commit/f39d7f8571797fab4b3f30627b9ed1cbf28a24ea))
+* **reports:** return report stats sorted by timestamp ([#443](https://github.com/Zooz/predator/issues/443)) ([34d30c0](https://github.com/Zooz/predator/commit/34d30c04ae7dd69f7afa439f82387f86a5e35993))
+* **ui-fix-schedule-button:** ui-fix-schedule-button ([dc11d86](https://github.com/Zooz/predator/commit/dc11d8682bbd3b464633a24e28507031d0f5d8e8))
+
 ### [1.5.3](https://github.com/Zooz/predator/compare/v1.5.2...v1.5.3) (2020-09-25)
 
 ### [1.5.2](https://github.com/Zooz/predator/compare/v1.5.1...v1.5.2) (2020-09-23)

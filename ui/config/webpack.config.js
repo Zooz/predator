@@ -2,7 +2,6 @@ const webpack = require('webpack');
 const HtmlPlugin = require('html-webpack-plugin');
 const rules = require('./rules');
 const entries = require('./entries');
-const ip = require('ip');
 const env = require('../src/App/common/env');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 

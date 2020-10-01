@@ -218,7 +218,10 @@ async function getStatsAndParse(query) {
     const stats = client.model('stats');
 
     const options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: { exclude: ['updated_at', 'created_at'] },
+        order: [
+            ['stats_time', 'ASC']
+        ]
     };
 
     Object.assign(options, query);

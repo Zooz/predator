@@ -1,15 +1,14 @@
 'use strict';
-let should = require('should');
-let sinon = require('sinon');
-let uuid = require('uuid');
-let rewire = require('rewire');
+const should = require('should');
+const sinon = require('sinon');
+const uuid = require('uuid');
+const rewire = require('rewire');
 
-let database = require('../../../../src/processors/models/database/databaseConnector');
-let manager = rewire('../../../../src/processors/models/processorsManager');
+const database = require('../../../../src/processors/models/database/databaseConnector');
+const manager = rewire('../../../../src/processors/models/processorsManager');
 
 describe('Processor manager tests', function () {
     let sandbox;
-    let insertStub;
     let deleteStub;
     let getProcessorByIdStub;
     let getProcessorByNameStub;
@@ -17,6 +16,7 @@ describe('Processor manager tests', function () {
     let updatedProcessorStub;
     let testsManagerStub;
     let originalTestManager;
+    let insertStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -48,6 +48,7 @@ describe('Processor manager tests', function () {
                 name: 'mickey',
                 javascript: "module.exports.mickey = 'king'"
             };
+            insertStub.resolves();
             getProcessorByNameStub.resolves(null);
             const processor = await manager.createProcessor(firstProcessor);
             should(processor.id).not.be.empty();

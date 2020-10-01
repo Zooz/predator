@@ -5,7 +5,7 @@ const sinon = require('sinon'),
     testManager = require('../../../../src/tests/models/manager');
 
 describe('tests verifier tests', function () {
-    let req, res, sandbox, nextStub, resJsonStub, resStatusStub, processorsManagerStub,testManagerStub;
+    let req, res, sandbox, nextStub, resJsonStub, resStatusStub, processorsManagerStub, testManagerStub;
 
     before(() => {
         sandbox = sinon.createSandbox();

@@ -24,7 +24,7 @@ describe('Testing dsl tests api', function () {
             delete request.post.url;
             const createDslResponse = await requestSender.createDsl(dslName, 'create_payment', request);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(request.body));
-            const expected = {...expectedCreatePaymentBody,request:{post:{...expectedCreatePaymentBody.request.post,url:'/'}}};
+            const expected = { ...expectedCreatePaymentBody, request: { post: { ...expectedCreatePaymentBody.request.post, url: '/' } } };
             should(createDslResponse.body).eql(expected);
             const getResponse = await requestSender.getDsl(dslName, 'create_payment');
             should(getResponse.statusCode).eql(200, JSON.stringify(getResponse.body));
@@ -38,7 +38,7 @@ describe('Testing dsl tests api', function () {
             createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(400, JSON.stringify(createDslResponse.body));
             should(createDslResponse.body).eql({
-                'message': 'Definition already exists'
+                message: 'Definition already exists'
             });
         });
 
@@ -74,14 +74,14 @@ describe('Testing dsl tests api', function () {
         it('succeed update definition - without step url - should add default /', async function () {
             const createDslResponse = await requestSender.createDsl(dslName, 'create_payment', createPaymentRequest);
             should(createDslResponse.statusCode).eql(201, JSON.stringify(createDslResponse.body));
-            const request = {post:{...registerRequest.post,url: undefined}};
+            const request = { post: { ...registerRequest.post, url: undefined } };
 
             const updateResponse = await requestSender.updateDsl(dslName, 'create_payment', request);
             should(updateResponse.statusCode).eql(200, JSON.stringify(updateResponse.body));
 
             const getResponse = await requestSender.getDsl(dslName, 'create_payment');
             should(getResponse.statusCode).eql(200, JSON.stringify(getResponse.body));
-            const expected = {post:{...registerRequest.post,url: '/'}};
+            const expected = { post: { ...registerRequest.post, url: '/' } };
             should(getResponse.body.request).eql(expected);
         });
 
@@ -111,15 +111,15 @@ describe('Testing dsl tests api', function () {
 
             getDefinition = await requestSender.getDsl(otherDsl, 'create_payment');
             should(getDefinition.statusCode).eql(200, JSON.stringify(getDefinition.body));
-            should(getDefinition.body).eql({...expectedRegisterBody, name: 'create_payment'});
+            should(getDefinition.body).eql({ ...expectedRegisterBody, name: 'create_payment' });
         });
     });
 
     describe('validations', function () {
         it('when delete non exist definition - should return 404', async function () {
-            let deleteResponse = await requestSender.deleteDsl(dslName, 'create_payment');
+            const deleteResponse = await requestSender.deleteDsl(dslName, 'create_payment');
             should(deleteResponse.statusCode).eql(404, JSON.stringify(deleteResponse.body));
-            should(deleteResponse.body).eql({'message': 'Not found'}, JSON.stringify(deleteResponse.body));
+            should(deleteResponse.body).eql({ message: 'Not found' }, JSON.stringify(deleteResponse.body));
         });
 
         it('when update non exist definition  - should return 404', async function () {
@@ -132,8 +132,8 @@ describe('Testing dsl tests api', function () {
             should(updateResponse.statusCode).eql(404, JSON.stringify(updateResponse.body));
         });
 
-        [{name: 'create', func: requestSender.createDsl},
-            {name: 'put', func: requestSender.updateDsl}]
+        [{ name: 'create', func: requestSender.createDsl },
+            { name: 'put', func: requestSender.updateDsl }]
             .forEach(function (scenario) {
                 describe(`${scenario.name} definition`, function () {
                     if (scenario.name === 'create'){
@@ -141,8 +141,8 @@ describe('Testing dsl tests api', function () {
                             const createDslResponse = await scenario.func(dslName, undefined, createPaymentRequest);
                             should(createDslResponse.statusCode).eql(400, JSON.stringify(createDslResponse.body));
                             should(createDslResponse.body).eql({
-                                'message': 'Input validation error',
-                                'validation_errors': [
+                                message: 'Input validation error',
+                                validation_errors: [
                                     "body should have required property 'name'"
                                 ]
                             });
@@ -152,8 +152,8 @@ describe('Testing dsl tests api', function () {
                         const createDslResponse = await scenario.func(dslName, 'create_payment');
                         should(createDslResponse.statusCode).eql(400, JSON.stringify(createDslResponse.body));
                         should(createDslResponse.body).eql({
-                            'message': 'Input validation error',
-                            'validation_errors': [
+                            message: 'Input validation error',
+                            validation_errors: [
                                 "body should have required property 'request'"
                             ]
                         });
@@ -164,17 +164,17 @@ describe('Testing dsl tests api', function () {
                         const createDslResponse = await scenario.func(dslName, 'create_payment', createPaymentRequest);
                         should(createDslResponse.statusCode).eql(400, JSON.stringify(createDslResponse.body));
                         should(createDslResponse.body).eql({
-                            'message': 'Input validation error',
-                            'validation_errors': [
+                            message: 'Input validation error',
+                            validation_errors: [
                                 'body request should have only one of properties: get,head,post,put,delete,connect,options,trace'
                             ]
                         });
                     });
                     it('request contains one key which is no http method', async function () {
-                        const createDslResponse = await scenario.func(dslName, 'create_payment', {zoozMethod: createPaymentRequest.post});
+                        const createDslResponse = await scenario.func(dslName, 'create_payment', { zoozMethod: createPaymentRequest.post });
                         should(createDslResponse.body).eql({
-                            'message': 'Input validation error',
-                            'validation_errors': [
+                            message: 'Input validation error',
+                            validation_errors: [
                                 'body request should have only one of properties: get,head,post,put,delete,connect,options,trace'
                             ]
                         });
@@ -182,8 +182,8 @@ describe('Testing dsl tests api', function () {
                     it('request is empty object', async function () {
                         const createDslResponse = await scenario.func(dslName, 'create_payment', {});
                         should(createDslResponse.body).eql({
-                            'message': 'Input validation error',
-                            'validation_errors': [
+                            message: 'Input validation error',
+                            validation_errors: [
                                 'body request should have only one of properties: get,head,post,put,delete,connect,options,trace'
                             ]
                         });
@@ -197,11 +197,11 @@ describe('Testing dsl tests api', function () {
                                 key: '1'
                             }
                         };
-                        let createDslResponse = await scenario.func(dslName, 'create_payment', createPaymentRequest);
+                        const createDslResponse = await scenario.func(dslName, 'create_payment', createPaymentRequest);
                         should(createDslResponse.statusCode).eql(400, JSON.stringify(createDslResponse.body));
                         should(createDslResponse.body).eql({
-                            'message': 'Input validation error',
-                            'validation_errors': [
+                            message: 'Input validation error',
+                            validation_errors: [
                                 "body/request['post'].headers['key2'] should be string"
                             ]
                         });
@@ -214,113 +214,113 @@ describe('Testing dsl tests api', function () {
 const createPaymentRequest = generateCreatePaymentRequest();
 function generateCreatePaymentRequest() {
     return {
-        'post': {
-            'url': '/payments',
-            'capture': [{
-                'json': '$.id',
-                'as': 'paymentId'
+        post: {
+            url: '/payments',
+            capture: [{
+                json: '$.id',
+                as: 'paymentId'
             }],
-            'headers': {
+            headers: {
                 'Content-Type': 'application/json'
             },
-            'json': {
-                'currency': 'USD',
-                'amount': 5
+            json: {
+                currency: 'USD',
+                amount: 5
             }
         }
     };
 }
 const registerRequest = {
-    'post': {
-        'url': '/register',
-        'capture': [{
-            'json': '$.id',
-            'as': 'userId'
+    post: {
+        url: '/register',
+        capture: [{
+            json: '$.id',
+            as: 'userId'
         }],
-        'headers': {
+        headers: {
             'Content-Type': 'application/json'
         },
-        'json': {
-            'username': 'user-123',
-            'password': 'gggggg'
+        json: {
+            username: 'user-123',
+            password: 'gggggg'
         }
     }
 };
 
 const expectedRegisterBody = {
-    'name': 'register',
-    'request': {
-        'post': {
-            'capture': [{
-                'as': 'userId',
-                'json': '$.id'
+    name: 'register',
+    request: {
+        post: {
+            capture: [{
+                as: 'userId',
+                json: '$.id'
             }],
-            'headers': {
+            headers: {
                 'Content-Type': 'application/json'
             },
-            'json': {
-                'password': 'gggggg',
-                'username': 'user-123'
+            json: {
+                password: 'gggggg',
+                username: 'user-123'
             },
-            'url': '/register'
+            url: '/register'
         }
     }
 };
 const expectedCreatePaymentBody = {
-    'name': 'create_payment',
-    'request': {
-        'post': {
-            'capture': [{
-                'as': 'paymentId',
-                'json': '$.id'
+    name: 'create_payment',
+    request: {
+        post: {
+            capture: [{
+                as: 'paymentId',
+                json: '$.id'
             }],
-            'headers': {
+            headers: {
                 'Content-Type': 'application/json'
             },
-            'json': {
-                'amount': 5,
-                'currency': 'USD'
+            json: {
+                amount: 5,
+                currency: 'USD'
             },
-            'url': '/payments'
+            url: '/payments'
         }
     }
 };
 const expectedGetDefinitionsResponse = [
     {
-        'name': 'create_payment',
-        'request': {
-            'post': {
-                'capture': [{
-                    'as': 'paymentId',
-                    'json': '$.id'
+        name: 'create_payment',
+        request: {
+            post: {
+                capture: [{
+                    as: 'paymentId',
+                    json: '$.id'
                 }],
-                'headers': {
+                headers: {
                     'Content-Type': 'application/json'
                 },
-                'json': {
-                    'amount': 5,
-                    'currency': 'USD'
+                json: {
+                    amount: 5,
+                    currency: 'USD'
                 },
-                'url': '/payments'
+                url: '/payments'
             }
         }
     },
     {
-        'name': 'register',
-        'request': {
-            'post': {
-                'capture': [{
-                    'as': 'userId',
-                    'json': '$.id'
+        name: 'register',
+        request: {
+            post: {
+                capture: [{
+                    as: 'userId',
+                    json: '$.id'
                 }],
-                'headers': {
+                headers: {
                     'Content-Type': 'application/json'
                 },
-                'json': {
-                    'password': 'gggggg',
-                    'username': 'user-123'
+                json: {
+                    password: 'gggggg',
+                    username: 'user-123'
                 },
-                'url': '/register'
+                url: '/register'
             }
         }
     }

@@ -3,7 +3,7 @@
 module.exports.generateStats = (phaseStatus, runnerId, statsTime, rpsCount) => {
     let stats;
     switch (phaseStatus) {
-        case 'error':
+        case 'error': {
             const error = new Error('Error thrown');
             stats = {
                 runner_id: runnerId,
@@ -13,7 +13,8 @@ module.exports.generateStats = (phaseStatus, runnerId, statsTime, rpsCount) => {
                 error
             };
             break;
-        case 'started_phase':
+        }
+        case 'started_phase': {
             const startedPhaseInfo = {
                 timestamp: statsTime || Date.now(),
                 duration: 120,
@@ -29,7 +30,8 @@ module.exports.generateStats = (phaseStatus, runnerId, statsTime, rpsCount) => {
                 data: JSON.stringify(startedPhaseInfo)
             };
             break;
-        case 'intermediate':
+        }
+        case 'intermediate': {
             const intermediatePhaseInfo = {
                 timestamp: statsTime || Date.now(),
                 scenariosCreated: 101,
@@ -114,7 +116,8 @@ module.exports.generateStats = (phaseStatus, runnerId, statsTime, rpsCount) => {
                 data: JSON.stringify(intermediatePhaseInfo)
             };
             break;
-        case 'done':
+        }
+        case 'done': {
             const donePhaseInfo = {
                 timestamp: statsTime || Date.now(),
                 scenariosCreated: 150,
@@ -159,7 +162,8 @@ module.exports.generateStats = (phaseStatus, runnerId, statsTime, rpsCount) => {
                 data: JSON.stringify(donePhaseInfo)
             };
             break;
-        case 'aborted':
+        }
+        case 'aborted': {
             const abortedPhaseInfo = {
                 timestamp: statsTime || Date.now()
             };
@@ -170,8 +174,10 @@ module.exports.generateStats = (phaseStatus, runnerId, statsTime, rpsCount) => {
                 data: JSON.stringify(abortedPhaseInfo)
             };
             break;
-        default:
+        }
+        default: {
             break;
+        }
     }
 
     return stats;

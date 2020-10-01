@@ -61,7 +61,7 @@ module.exports.createJob = async (job) => {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
             const report = await createReportForJob(job, test);
-            let jobSpecificPlatformRequest = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
+            const jobSpecificPlatformRequest = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
         if (job.cron_expression) {
@@ -291,7 +291,7 @@ function addCron(jobId, job, cronExpression, configData) {
                 const runId = Date.now();
                 const test = await testsManager.getTest(job.test_id);
                 const report = await createReportForJob(job, test);
-                let jobSpecificPlatformConfig = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
+                const jobSpecificPlatformConfig = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
         } catch (error) {

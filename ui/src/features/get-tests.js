@@ -212,7 +212,6 @@ class getTests extends React.Component {
     };
 
     render () {
-      console.log('this.props', this.props);
       global.manor = this.props;
       const { sortedTests, sortHeader, testForEdit, testForClone } = this.state;
       const { errorOnDeleteTest, history } = this.props;

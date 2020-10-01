@@ -371,7 +371,7 @@ class Form extends React.Component {
               <div className={style.buttons}>
                 <Button style={{ marginRight: '5px' }} inverted onClick={closeDialog}>Cancel</Button>
                 <Button style={{ marginRight: '5px' }} spinner={processingAction} hover disabled={!this.state.cron_expression || !!this.isThereErrorOnForm()}
-                  onClick={this.whenSubmit}>Schedule</Button>
+                  onClick={() => { this.whenSubmit(false) }}>Schedule</Button>
                 <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
                   onClick={() => this.whenSubmit(true)}>{this.state.cron_expression ? 'Schedule & Run' : 'Run'}</Button>
               </div>
