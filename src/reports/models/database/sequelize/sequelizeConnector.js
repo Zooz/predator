@@ -28,10 +28,10 @@ async function init(sequlizeClient) {
     await initSchemas();
 }
 
-async function insertReport(testId, revisionId, reportId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite) {
+async function insertReport(reportId, testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite) {
     const report = client.model('report');
     const params = {
-        report_id: uuid.v4(),
+        report_id: reportId,
         test_id: testId,
         job_id: jobId,
         revision_id: revisionId,

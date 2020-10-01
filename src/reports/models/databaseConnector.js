@@ -19,8 +19,8 @@ module.exports = {
 
 };
 
-function insertReport(testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite) {
-    return databaseConnector.insertReport(testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite);
+function insertReport(reportId, testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite) {
+    return databaseConnector.insertReport(reportId, testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite);
 }
 
 function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {

@@ -60,7 +60,7 @@ module.exports.createJob = async (job) => {
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
-            const report = await createReportForJob(job, test);
+            const report = await createReportForJob(jobId, job, test);
             const jobSpecificPlatformRequest = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
@@ -290,7 +290,7 @@ function addCron(jobId, job, cronExpression, configData) {
                 const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
                 const runId = Date.now();
                 const test = await testsManager.getTest(job.test_id);
-                const report = await createReportForJob(job, test);
+                const report = await createReportForJob(jobId, job, test);
                 const jobSpecificPlatformConfig = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
@@ -325,11 +325,11 @@ async function validateWebhooksAssignment(webhookIds) {
     }
 }
 
-async function createReportForJob(job, { id: testId, type: testType }) {
+async function createReportForJob(jobId, job, { id: testId, type: testType }) {
     const reportBody = {
         report_id: job.runId,
         revision_id: job.revisionId,
-        job_id: job.jobId,
+        job_id: jobId,
         test_type: testType,
         start_time: Date.now().toString(),
         notes: job.notes,

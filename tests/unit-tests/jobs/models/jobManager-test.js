@@ -92,6 +92,7 @@ describe('Manager tests', function () {
     beforeEach(async () => {
         await manager.init();
         sandbox.resetHistory();
+        dockerHubConnectorGetMostRecentTagStub.resolves();
     });
 
     after(() => {

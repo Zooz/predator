@@ -121,6 +121,7 @@ describe('Sequelize client tests', function () {
     describe('Insert new report', () => {
         it('should succeed full insert', async () => {
             const lastUpdateAt = Date.now();
+            const reportId = uuid.v4();
             const params = {
                 test_id: testId,
                 job_id: jobId,
@@ -137,7 +138,7 @@ describe('Sequelize client tests', function () {
                 is_favorite: false
             };
 
-            await sequelizeConnector.insertReport(testId, revisionId, reportId, jobId, testType, '0', startTime, testName, testDescription, testConfiguration, notes, lastUpdateAt, false);
+            await sequelizeConnector.insertReport(reportId, testId, revisionId, jobId, testType, '0', startTime, testName, testDescription, testConfiguration, notes, lastUpdateAt, false);
 
             should(sequelizeInsertStub.args[0][0]).containDeep(params);
         });

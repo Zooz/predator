@@ -1,5 +1,7 @@
 'use strict';
 
+const uuid = require('uuid');
+
 const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
@@ -63,6 +65,7 @@ module.exports.deleteReport = async (testId, reportId) => {
 };
 
 module.exports.postReport = async (testId, reportBody) => {
+    const reportId = uuid.v4();
     const startTime = new Date(Number(reportBody.start_time));
     const job = await jobConnector.getJob(reportBody.job_id);
     const phase = '0';
@@ -82,7 +85,7 @@ module.exports.postReport = async (testId, reportBody) => {
         testConfiguration.ramp_to = job.ramp_to;
     }
 
-    return databaseConnector.insertReport(testId, reportBody.revision_id, reportBody.job_id,
+    return databaseConnector.insertReport(reportId, testId, reportBody.revision_id, reportBody.job_id,
         reportBody.test_type, phase, startTime, reportBody.test_name,
         reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now(), false);
 };
