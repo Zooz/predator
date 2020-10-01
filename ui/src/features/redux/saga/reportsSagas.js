@@ -95,7 +95,6 @@ export function* deleteReports({selectedReports}) {
             try {
                 yield call(deleteReportFromFramework, testId, reportId)
             } catch (err) {
-                console.log('err', err);
                 failedDeletedReportsList.push(`(test id: ${testId}, report id: ${reportId})`);
             }
 
@@ -121,9 +120,6 @@ export function* getAggregateReports({reportsData}) {
         const data = results.map((result) => result.data);
         yield put(Actions.getAggregateReportSuccess(data));
     } catch (e) {
-        console.log('error', e);
-        //TODO
-        // yield put(Actions.getReportFaliure(e))
     }
 }
 
@@ -133,7 +129,6 @@ export function* getBenchmark({testId}) {
         const result = yield call(getBenchmarkFromFramework, testId);
         yield put(Actions.getBenchmarkSuccess(result.data));
     } catch (e) {
-        console.log('error', e);
     }
 }
 
