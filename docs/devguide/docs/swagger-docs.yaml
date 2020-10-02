@@ -1124,6 +1124,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Report Export
+  '/v1/{test_id}/reports/{report_id}/export/{file_format}':
+    get:
+      operationId: export-report
+      tags:
+        - Reports
+      summary: Exports a report to a file in the required format
+      description: Exports a report to a file in the required format.
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Unsupported File Format
+  # Export Comparison Report
+  '/v1/tests/reports/compare/export/{file_format}':
+    get:
+      operationId: export-comparison-report
+      tags:
+        - Reports
+      summary: Exports a comparison report.
+      description: Exports a comparison report from multiple tests.
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Unsupported File Format
   # Config
   /v1/config:
     get:
