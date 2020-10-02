@@ -108,8 +108,15 @@ module.exports.getExportedCompareReport = async(req,res,next) => {
     let exportedCompareReport;
     let aggregateReportArray =[];
     try{
-        let reportIds = req.query['reportIds'].split(",");
-        let testIds = req.query['testIds'].split(",");
+        let reportIds = req.query.report_ids[0].split(",");
+        let testIds = req.query.test_ids[0].split(",");
+        //Validate length of arrays
+        if (reportIds.length != testIds.length){
+            let error = new Error("Test and Report IDs length mismatch");
+            error.statusCode = 400;
+            throw error;
+        }
+
         for (let index in reportIds){
             let result = await aggregateReportGenerator.createAggregateReport(testIds[index],reportIds[index]);
             aggregateReportArray.push(result);
@@ -118,6 +125,7 @@ module.exports.getExportedCompareReport = async(req,res,next) => {
     } catch (err) {
         return next(err);
     }
+
     let fileName = "";
     for (let index in aggregateReportArray){
         if (index == aggregateReportArray.length-1){
