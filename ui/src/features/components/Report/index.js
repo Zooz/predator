@@ -257,7 +257,6 @@ const mapDispatchToProps = {
     editReport: Actions.editReport,
     getReport: Actions.getReport,
     setEditReportSuccess: Actions.editReportSuccess,
-    getExportedReport: Actions.getExportedReport,
 };
 
 
