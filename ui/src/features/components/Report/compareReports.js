@@ -12,10 +12,6 @@ import {connect} from "react-redux";
 import Snackbar from "material-ui/Snackbar";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Button from "../../../components/Button";
-import {fs} from 'fs';
-import { test } from '../../redux/selectors/testsSelector';
-var download = require("downloadjs");
-const axios = require('axios');
 
 class CompareReports extends React.Component {
     constructor(props) {
@@ -104,30 +100,7 @@ class CompareReports extends React.Component {
             }
         }
         request_string = "reportIds="+reportIdsAsCSV+"&testIds="+testIdsAsCSV;
-        axios.get(`${process.env.PREDATOR_URL}/tests/reports/compare/export/csv?`+request_string)
-        .then(response => {
-            let exportString = response.data;
-            let fileName = "";
-            for (let index in reportsList){
-                if (index == reportsList.length-1){
-                    fileName+=reportsList[index]["testName"];
-                }else{
-                    fileName+=reportsList[index]["testName"]+"_";
-                }
-            }
-            fileName+="_comparison_";
-            for (let index in selectedReports){
-                if (index == reportsList.length-1){
-                    fileName+=selectedReports[index]["reportId"];
-                }else{
-                    fileName+=selectedReports[index]["reportId"]+"_";
-                }
-            }
-            fileName+=".csv";
-            download(exportString,fileName,"text/csv");
-        }).catch(err =>{
-            console.log(err);
-        })
+        window.open(`${process.env.PREDATOR_URL}/tests/reports/compare/export/csv?`+request_string,"_blank");
     };
 
     render() {

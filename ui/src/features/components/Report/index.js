@@ -16,8 +16,6 @@ import Card from "../../../components/Card";
 import {faStar as emptyStar} from "@fortawesome/free-regular-svg-icons";
 import {faStar as fullStar} from "@fortawesome/free-solid-svg-icons";
 import InfoToolTip from "../InfoToolTip";
-const axios = require('axios');
-var download = require("downloadjs");
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -49,14 +47,7 @@ class Report extends React.Component {
 
     exportCSV = () => {
         const {report} = this.props;
-        axios.get(`${process.env.PREDATOR_URL}/tests/${report.test_id}/reports/${report.report_id}/export/csv`)
-        .then(response => {
-            let filename = report.test_name+"_"+report.report_id+"_"+report.start_time+".csv";
-            download(response.data,filename,"text/csv");
-        })
-        .catch(error => {
-            console.log(error);
-        });
+        window.open(`${process.env.PREDATOR_URL}/tests/${report.test_id}/reports/${report.report_id}/export/csv`,'_blank');
     };
 
     onStar = () => {

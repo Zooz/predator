@@ -3,8 +3,6 @@
 const aggregateReportGenerator = require('../models/aggregateReportGenerator');
 const reports = require('../models/reportsManager');
 const stats = require('../models/statsManager');
-const { re } = require('mathjs');
-const { aggregateReport } = require('../models/aggregateReportManager');
 
 module.exports.getAggregateReport = async function (req, res, next) {
     let reportInput;
@@ -92,37 +90,51 @@ module.exports.postStats = async (req, res, next) => {
 
 module.exports.getExportedReport = async(req, res, next) => {
     let exportedReport;
+    let reportInput;
     try{
-        let reportInput;
-        try {
-            reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
-        } catch (err) {
-            return next(err);
-        }
+        reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
         exportedReport = await reports.exportReport(reportInput,req.params.file_format);
     } catch (err){
         return next(err);
     }
+    let fileName = reportInput.test_name+"_"+reportInput.report_id+"_"+reportInput.start_time.toISOString()+".csv";
+    res.setHeader('Content-disposition', 'attachment; filename='+fileName);
+    res.set('Content-Type', 'text/csv');
     return res.send(exportedReport);
 }
 
 module.exports.getExportedCompareReport = async(req,res,next) => {
     let exportedCompareReport;
+    let aggregateReportArray =[];
     try{
-        let aggregateReportArray =[];
         let reportIds = req.query['reportIds'].split(",");
         let testIds = req.query['testIds'].split(",");
         for (let index in reportIds){
-            try {
-                let result = await aggregateReportGenerator.createAggregateReport(testIds[index],reportIds[index]);
-                aggregateReportArray.push(result);
-            } catch (err){
-                return next(err);
-            }
+            let result = await aggregateReportGenerator.createAggregateReport(testIds[index],reportIds[index]);
+            aggregateReportArray.push(result);
         }
         exportedCompareReport = await reports.exportCompareReport(aggregateReportArray, req.params.file_format);
     } catch (err) {
         return next(err);
     }
-    return res.send(exportedCompareReport);
+    let fileName = "";
+    for (let index in aggregateReportArray){
+        if (index == aggregateReportArray.length-1){
+            fileName+=aggregateReportArray[index].test_name;
+        }else{
+            fileName+=aggregateReportArray[index].test_name+"_";
+        }
+    }
+    fileName+="_comparison_";
+    for (let index in aggregateReportArray){
+        if (index == aggregateReportArray.length-1){
+            fileName+=aggregateReportArray[index].report_id;
+        }else{
+            fileName+=aggregateReportArray[index].report_id+"_";
+        }
+    }
+    fileName+=".csv";
+    res.setHeader('Content-disposition', 'attachment; filename='+fileName);
+    res.set('Content-Type', 'text/csv');
+    res.send(exportedCompareReport);
 }

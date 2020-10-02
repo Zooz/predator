@@ -7,8 +7,6 @@ const databaseConnector = require('./databaseConnector'),
     configHandler = require('../../configManager/models/configHandler'),
     { JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
     constants = require('../utils/constants');
-const { forEach } = require('lodash');
-const { json } = require('express');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
 
@@ -172,7 +170,6 @@ function generateJSONCompareReport(aggregateReports){
                 data["headers"].push(character+"_"+result["headers"][headerIndex]);
             }
         }
-        console.log(data.headers);
         for (let entry in result["data"]){
             if (data["data"][entry] === undefined){
                 //new timestamp
@@ -185,7 +182,6 @@ function generateJSONCompareReport(aggregateReports){
                 data["data"][entry][character+"_"+key] = result["data"][entry][key];
             }
         }
-        console.log(data.data);
         character = nextChar(character);
     }
     return data;
