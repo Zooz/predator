@@ -3,6 +3,8 @@
 const aggregateReportGenerator = require('../models/aggregateReportGenerator');
 const reports = require('../models/reportsManager');
 const stats = require('../models/statsManager');
+const { re } = require('mathjs');
+const { aggregateReport } = require('../models/aggregateReportManager');
 
 module.exports.getAggregateReport = async function (req, res, next) {
     let reportInput;
@@ -87,3 +89,40 @@ module.exports.postStats = async (req, res, next) => {
     }
     return res.status(204).json();
 };
+
+module.exports.getExportedReport = async(req, res, next) => {
+    let exportedReport;
+    try{
+        let reportInput;
+        try {
+            reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
+        } catch (err) {
+            return next(err);
+        }
+        exportedReport = await reports.exportReport(reportInput,req.params.file_format);
+    } catch (err){
+        return next(err);
+    }
+    return res.send(exportedReport);
+}
+
+module.exports.getExportedCompareReport = async(req,res,next) => {
+    let exportedCompareReport;
+    try{
+        let aggregateReportArray =[];
+        let reportIds = req.query['reportIds'].split(",");
+        let testIds = req.query['testIds'].split(",");
+        for (let index in reportIds){
+            try {
+                let result = await aggregateReportGenerator.createAggregateReport(testIds[index],reportIds[index]);
+                aggregateReportArray.push(result);
+            } catch (err){
+                return next(err);
+            }
+        }
+        exportedCompareReport = await reports.exportCompareReport(aggregateReportArray, req.params.file_format);
+    } catch (err) {
+        return next(err);
+    }
+    return res.send(exportedCompareReport);
+}

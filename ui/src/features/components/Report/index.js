@@ -16,6 +16,8 @@ import Card from "../../../components/Card";
 import {faStar as emptyStar} from "@fortawesome/free-regular-svg-icons";
 import {faStar as fullStar} from "@fortawesome/free-solid-svg-icons";
 import InfoToolTip from "../InfoToolTip";
+const axios = require('axios');
+var download = require("downloadjs");
 
 const REFRESH_DATA_INTERVAL = 30000;
 
@@ -43,6 +45,18 @@ class Report extends React.Component {
         const {aggregateReport, report} = this.props;
         this.props.createBenchmark(report.test_id, aggregateReport.benchMark);
         this.setState({disabledCreateBenchmark: true})
+    };
+
+    exportCSV = () => {
+        const {report} = this.props;
+        axios.get(`${process.env.PREDATOR_URL}/tests/${report.test_id}/reports/${report.report_id}/export/csv`)
+        .then(response => {
+            let filename = report.test_name+"_"+report.report_id+"_"+report.start_time+".csv";
+            download(response.data,filename,"text/csv");
+        })
+        .catch(error => {
+            console.log(error);
+        });
     };
 
     onStar = () => {
@@ -118,6 +132,8 @@ class Report extends React.Component {
                                 info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
                             }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'}/>
                         </div>
+                        <Button hover disabled={report.status !== 'finished'}
+                                onClick={this.exportCSV}>Export to CSV</Button>
                         <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
                                 onClick={this.createBenchmark}>Set as Benchmark</Button>
                     </div>
@@ -241,6 +257,7 @@ const mapDispatchToProps = {
     editReport: Actions.editReport,
     getReport: Actions.getReport,
     setEditReportSuccess: Actions.editReportSuccess,
+    getExportedReport: Actions.getExportedReport,
 };
 
 

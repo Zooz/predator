@@ -12,6 +12,10 @@ import {connect} from "react-redux";
 import Snackbar from "material-ui/Snackbar";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Button from "../../../components/Button";
+import {fs} from 'fs';
+import { test } from '../../redux/selectors/testsSelector';
+var download = require("downloadjs");
+const axios = require('axios');
 
 class CompareReports extends React.Component {
     constructor(props) {
@@ -85,6 +89,110 @@ class CompareReports extends React.Component {
         this.setState({filteredKeys: {...newFilteredKeys}});
     };
 
+    generateCSV = (dataList) =>{
+        let dataCSV = "";
+        // //Get Header row
+        let first_key = true;
+        // for (let key in dataList[0]){
+        //     if (first_key){
+        //         dataCSV+= key;
+        //         first_key = false;
+        //     }else{
+        //         dataCSV+= ","+key;
+        //     }  
+        // }
+        // dataCSV+="\n";
+        //Fill data rows
+        for (let index in dataList){
+            first_key = true;
+            for (let key in dataList[index]){
+                if (first_key){
+                    dataCSV+= dataList[index][key];
+                    first_key = false;
+                }else{
+                    dataCSV+= ","+ dataList[index][key];
+                }
+            }
+            dataCSV+="\n";
+        }
+        return dataCSV;
+    }
+
+    generateCombinedJSON = (graphList) => {
+        let json = {"headers":[],"data":{}};
+        let headers={};
+        for (let index in graphList){
+            //Add the header row
+            for (let key in graphList[index][0]){
+                if (headers[key] === undefined){
+                    //entry does not exist
+                    json["headers"].push(key);
+                    headers[key] = true;
+                }
+            }
+            //Add the data
+            for (let innerIndex in graphList[index]){
+                if (json["data"][graphList[index][innerIndex]["name"]] === undefined){
+                    //record hasn't been added yet, so insert it
+                    json["data"][graphList[index][innerIndex]["name"]] = {};
+                }
+                for (let key in graphList[index][innerIndex]){
+                    json["data"][graphList[index][innerIndex]["name"]][key] = graphList[index][innerIndex][key];
+                }
+            }
+        }
+        return json;
+    }
+
+    generateCombinedArray = (json) =>{
+        let data_array = [];
+        data_array.push(json['headers']);
+        for(let index in json["data"]){
+            data_array.push(json['data'][index]);
+        }
+        return data_array;
+    }
+
+    onClickExportCSV = () => {
+        const selectedReports = this.props.selectedReportsAsArray;
+        const reportsList = this.state.reportsList;
+        let request_string = "";
+        let reportIdsAsCSV = "";
+        let testIdsAsCSV = "";
+        for (let index in selectedReports){
+            reportIdsAsCSV+=selectedReports[index]["reportId"];
+            testIdsAsCSV+=selectedReports[index]["testId"];
+            if (index < selectedReports.length -1){
+                reportIdsAsCSV+=",";
+                testIdsAsCSV+=",";
+            }
+        }
+        request_string = "reportIds="+reportIdsAsCSV+"&testIds="+testIdsAsCSV;
+        axios.get(`${process.env.PREDATOR_URL}/tests/reports/compare/export/csv?`+request_string)
+        .then(response => {
+            let exportString = response.data;
+            let fileName = "";
+            for (let index in reportsList){
+                if (index == reportsList.length-1){
+                    fileName+=reportsList[index]["testName"];
+                }else{
+                    fileName+=reportsList[index]["testName"]+"_";
+                }
+            }
+            fileName+="_comparison_";
+            for (let index in selectedReports){
+                if (index == reportsList.length-1){
+                    fileName+=selectedReports[index]["reportId"];
+                }else{
+                    fileName+=selectedReports[index]["reportId"]+"_";
+                }
+            }
+            fileName+=".csv";
+            download(exportString,fileName,"text/csv");
+        }).catch(err =>{
+            console.log(err);
+        })
+    };
 
     render() {
         const {reportsList, mergedReports, filteredKeys, enableBenchmark} = this.state;
@@ -98,6 +206,9 @@ class CompareReports extends React.Component {
                     // alignItems: 'center'
                 }}>
                     <h1>Compare reports</h1>
+                    <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', margin:"1em"}}>
+                        <Button onClick={this.onClickExportCSV}>Export to CSV</Button>
+                    </div>
                     <ReportsList onChange={this.onSelectedReport} list={reportsList}/>
                     {
                         benchmark &&
