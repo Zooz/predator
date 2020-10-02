@@ -99,7 +99,7 @@ class CompareReports extends React.Component {
                 testIdsAsCSV+=",";
             }
         }
-        request_string = "reportIds="+reportIdsAsCSV+"&testIds="+testIdsAsCSV;
+        request_string = "report_ids="+reportIdsAsCSV+"&test_ids="+testIdsAsCSV;
         window.open(`${process.env.PREDATOR_URL}/tests/reports/compare/export/csv?`+request_string,"_blank");
     };
 
