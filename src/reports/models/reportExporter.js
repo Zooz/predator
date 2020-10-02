@@ -82,7 +82,7 @@ module.exports.exportReport = async(aggregateReport, fileFormat) => {
         }
         default:{
             const error = new Error('Unsupported file format');
-            error.statusCode = 406;
+            error.statusCode = 400;
             throw error;
         }
     }
@@ -128,7 +128,7 @@ module.exports.exportCompareReport = async(aggregateReports,fileFormat) => {
         }
         default:{
             const error = new Error('Unsupported file format');
-            error.statusCode = 406;
+            error.statusCode = 400;
             throw error;
         }
     }
