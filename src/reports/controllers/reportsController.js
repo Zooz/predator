@@ -2,6 +2,7 @@
 'use strict';
 const aggregateReportGenerator = require('../models/aggregateReportGenerator');
 const reports = require('../models/reportsManager');
+const reportExporter = require('../models/reportExporter');
 const stats = require('../models/statsManager');
 
 module.exports.getAggregateReport = async function (req, res, next) {
@@ -93,7 +94,7 @@ module.exports.getExportedReport = async(req, res, next) => {
     let reportInput;
     try{
         reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
-        exportedReport = await reports.exportReport(reportInput,req.params.file_format);
+        exportedReport = await reportExporter.exportReport(reportInput,req.params.file_format);
     } catch (err){
         return next(err);
     }
@@ -113,7 +114,7 @@ module.exports.getExportedCompareReport = async(req,res,next) => {
             let result = await aggregateReportGenerator.createAggregateReport(testIds[index],reportIds[index]);
             aggregateReportArray.push(result);
         }
-        exportedCompareReport = await reports.exportCompareReport(aggregateReportArray, req.params.file_format);
+        exportedCompareReport = await reportExporter.exportCompareReport(aggregateReportArray, req.params.file_format);
     } catch (err) {
         return next(err);
     }
