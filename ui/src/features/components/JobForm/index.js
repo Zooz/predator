@@ -226,7 +226,6 @@ class Form extends React.Component {
       arrival_count: undefined,
       duration: undefined,
       ramp_to: undefined,
-      environment: 'test',
       cron_expression: undefined,
       run_immediately: false,
       emails: [],

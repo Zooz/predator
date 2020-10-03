@@ -28,7 +28,7 @@ import {createJobRequest} from './requestBuilder';
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
 const REFRESH_DATA_INTERVAL = 30000;
-const columnsNames = ['test_name', 'environment', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'raw', 'delete', 'enabled_disabled'];
+const columnsNames = ['test_name', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'raw', 'delete', 'enabled_disabled'];
 const DESCRIPTION = 'Scheduled jobs configured with a cron expression.';
 
 class getJobs extends React.Component {
