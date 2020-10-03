@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const HtmlPlugin = require('html-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const path = require('path');
 
 module.exports = (webpackEnv) => {
     Object.assign(process.env, webpackEnv);
@@ -9,16 +10,11 @@ module.exports = (webpackEnv) => {
     const rules = require('./rules');
 
     return {
-    // Tell webpack to start bundling our app at app/get-apis.js
         entry: entries,
-        // Output our app to the dist/ directory
-        output:
-        {
+        output: {
             publicPath: env.BUCKET_PATH,
-            path:
-              __dirname + '/../dist', // or path: path.join(__dirname, "dist/js"),
-            filename:
-              process.env.NODE_ENV === 'production' ? 'bundle.[chunkhash:8].js' : 'bundle.js'
+            path: path.join(__dirname, '/../dist'), // or path: path.join(__dirname, "dist/js"),
+            filename: process.env.NODE_ENV === 'production' ? 'bundle.[chunkhash:8].js' : 'bundle.js'
         },
         resolve: {
             extensions: ['.js', '.jsx', '.ts', '.tsx']
@@ -26,8 +22,7 @@ module.exports = (webpackEnv) => {
         // Emit source maps so we can debug our code in the browser
         devtool: 'source-map',
         // Tell webpack to run our source code through Babel
-        module:
-        {
+        module: {
             rules: rules
         },
         // Since Webpack only understands JavaScript, we need to

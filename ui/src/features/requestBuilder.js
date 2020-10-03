@@ -5,7 +5,6 @@ export const createJobRequest = (opts) => {
         type: opts.type || opts.job_type,
         debug: opts.debug ? opts.debug : undefined,
         duration: parseInt(opts.duration),
-        environment: opts.environment,
         run_immediately: (opts.run_immediately === undefined) ? false : opts.run_immediately,
         emails: opts.emails,
         webhooks: opts.webhooks,

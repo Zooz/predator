@@ -12,11 +12,11 @@ export interface LabelProps extends HTMLAttributes<Element> {
     type?: LabelTypes
 }
 
-export interface LabelComponent<T, P> extends React.RefForwardingComponent<T, P> {
+export interface LabelComponent<T, P> extends React.ForwardRefRenderFunction<T, P> {
     TYPES?: typeof LabelTypes
 }
 
-const Label: LabelComponent<HTMLLabelElement, LabelProps> = React.forwardRef(({
+const Label: React.ForwardRefExoticComponent<React.PropsWithoutRef<LabelProps> & React.RefAttributes<HTMLLabelElement>> = React.forwardRef(({
 
   className,
   type,
@@ -34,6 +34,5 @@ ref: React.Ref<HTMLLabelElement>) => {
   )
 })
 
-Label.TYPES = LabelTypes
-
+export const TYPES = LabelTypes
 export default Label
