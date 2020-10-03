@@ -31,7 +31,7 @@ module.exports.calculateReportStatus = function (report, config) {
     if (isFinishedStatus) {
         return isFinishedStatus;
     }
-    if (now <= subscribeTimeThresholdForRunnersMs) {
+    if (now <= subscribeTimeThresholdForRunnersMs && !areThereAnySubscribers(uniqueSubscribersStages)) {
         return constants.REPORT_INITIALIZING_STATUS;
     }
     if (now >= subscribeTimeThresholdForRunnersMs && !areThereAnySubscribers(uniqueSubscribersStages)) {

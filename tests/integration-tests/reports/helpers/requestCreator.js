@@ -9,27 +9,18 @@ const HEADERS = { 'Content-Type': 'application/json' };
 
 module.exports = {
     init,
-    createReport,
     postStats,
     getReport,
     deleteReport,
     getReports,
     editReport,
     getLastReports,
-    getAggregatedReport
+    getAggregatedReport,
+    subscribeRunnerToReport
 };
 
 async function init() {
     testApp = await app();
-}
-
-function createReport(testId, body) {
-    return request(testApp).post(`/v1/tests/${testId}/reports`)
-        .send(body)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
 }
 
 function postStats(testId, reportId, body) {
@@ -94,6 +85,16 @@ function getLastReports(limit, filter) {
     return request(testApp).get(url)
         .set(HEADERS)
         .expect(function (res) {
+            return res;
+        });
+}
+
+async function subscribeRunnerToReport(testId, reportId, runnerId) {
+    return request(testApp)
+        .post(`/v1/tests/${testId}/reports/${reportId}/subscribe`)
+        .set({ ...HEADERS, 'x-runner-id': runnerId })
+        .send({})
+        .end(function(res) {
             return res;
         });
 }

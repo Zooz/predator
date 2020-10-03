@@ -14,6 +14,7 @@ const logger = require('../../../../src/common/logger');
 const notifier = require('../../../../src/reports/models/notifier');
 const constants = require('../../../../src/reports/utils/constants');
 const configHandler = require('../../../../src/configManager/models/configHandler');
+const basicTest = require('../../../testExamples/Basic_test.json');
 
 let manager;
 let statsManager;
@@ -91,6 +92,7 @@ describe('Reports manager tests', function () {
     let aggregateReportManagerStub;
     let benchmarkCalculatorStub;
     let updateReportBenchmarkStub;
+    let testManagerGetTestStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -109,6 +111,7 @@ describe('Reports manager tests', function () {
         updateReportBenchmarkStub = sandbox.stub(databaseConnector, 'updateReportBenchmark');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
         databaseDeleteReportStub = sandbox.stub(databaseConnector, 'deleteReport');
+        testManagerGetTestStub = sandbox.stub(testManager, 'getTest');
         sandbox.stub(logger, 'error');
         sandbox.stub(logger, 'info');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
@@ -423,6 +426,7 @@ describe('Reports manager tests', function () {
 
     describe('Create new report', function () {
         it('Successfully insert report', async () => {
+            const runId = Date.now();
             const reportFromDBConnector = {
                 report_id: uuid.v4(),
                 job_id: uuid.v4(),
@@ -440,9 +444,10 @@ describe('Reports manager tests', function () {
                 is_favorite: false
             };
             getJobStub.resolves(JOB);
+            testManagerGetTestStub.resolves(basicTest);
             databasePostReportStub.resolves(reportFromDBConnector);
             databaseSubscribeRunnerStub.resolves();
-            const reportBody = await manager.postReport('test_id', REPORT);
+            const reportBody = await manager.postReport(runId, 'test_id', REPORT, reportFromDBConnector.job_id, Date.now());
             should.exist(reportBody);
             reportBody.should.deepEqual(reportFromDBConnector);
         });

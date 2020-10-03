@@ -1,4 +1,5 @@
 const should = require('should'),
+    { expect } = require('chai'),
     uuid = require('uuid'),
     logger = require('../../../src/common/logger'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
@@ -476,6 +477,7 @@ describe('Create job specific kubernetes tests', async function () {
                 describe('Create one time job with slack webhook and run it, assert that webhook was sent for started phase', () => {
                     let createJobResponse;
                     let getJobsFromService;
+                    let reportId;
                     let expectedResult;
 
                     it('Create the job', async () => {
@@ -535,6 +537,8 @@ describe('Create job specific kubernetes tests', async function () {
 
                         should(createJobResponse.status).eql(201);
                         should(createJobResponse.body).containEql(expectedResult);
+
+                        reportId = createJobResponse.body.run_id;
                     });
 
                     it('Get the job', async () => {
@@ -551,30 +555,12 @@ describe('Create job specific kubernetes tests', async function () {
                         const webhookScope = nock('http://www.abcde.com').post('/mickey')
                             .reply(201, 'ok');
 
-                        const reportId = uuid.v4();
-                        const minimalReportBody = {
-                            test_type: 'basic',
-                            report_id: reportId,
-                            job_id: jobId,
-                            revision_id: uuid.v4(),
-                            test_name: 'integration-test',
-                            test_description: 'doing some integration testing',
-                            start_time: Date.now().toString(),
-                            last_updated_at: Date.now().toString(),
-                            test_configuration: {
-                                enviornment: 'test',
-                                duration: 60,
-                                arrival_rate: 20
-                            }
-                        };
-                        const fullReportBody = Object.assign({}, minimalReportBody);
-                        fullReportBody.notes = 'My first performance test';
-                        fullReportBody.runner_id = uuid.v4();
+                        const runnerId = uuid.v4();
 
-                        const reportResponse = await reportsRequestCreator.createReport(testId, fullReportBody);
-                        should(reportResponse.statusCode).be.eql(201);
+                        const runnerSubscriptionResponse = await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
+                        expect(runnerSubscriptionResponse.status).to.be.equal(204);
 
-                        const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', fullReportBody.runner_id));
+                        const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', runnerId));
                         should(phaseStartedStatsResponse.statusCode).be.eql(204);
 
                         // wait for webhook to be sent
@@ -589,6 +575,7 @@ describe('Create job specific kubernetes tests', async function () {
                     let createJobResponse;
                     let getJobsFromService;
                     let expectedResult;
+                    let reportId;
 
                     it('Create the job', async () => {
                         const webhookBody = {
@@ -644,6 +631,8 @@ describe('Create job specific kubernetes tests', async function () {
 
                         should(createJobResponse.status).eql(201);
                         should(createJobResponse.body).containEql(expectedResult);
+
+                        reportId = createJobResponse.body.run_id.toString();
                     });
 
                     it('Get the job', async () => {
@@ -660,30 +649,12 @@ describe('Create job specific kubernetes tests', async function () {
                         const webhookScope = nock('http://www.global.com').post('/nully')
                             .reply(201, 'ok');
 
-                        const reportId = uuid.v4();
-                        const minimalReportBody = {
-                            test_type: 'basic',
-                            report_id: reportId,
-                            job_id: jobId,
-                            revision_id: uuid.v4(),
-                            test_name: 'integration-test',
-                            test_description: 'doing some integration testing',
-                            start_time: Date.now().toString(),
-                            last_updated_at: Date.now().toString(),
-                            test_configuration: {
-                                enviornment: 'test',
-                                duration: 60,
-                                arrival_rate: 20
-                            }
-                        };
-                        const fullReportBody = Object.assign({}, minimalReportBody);
-                        fullReportBody.notes = 'My first performance test';
-                        fullReportBody.runner_id = uuid.v4();
+                        const runnerId = uuid.v4();
 
-                        const reportResponse = await reportsRequestCreator.createReport(testId, fullReportBody);
-                        should(reportResponse.statusCode).be.eql(201);
+                        const runnerSubscriptionResponse = await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
+                        expect(runnerSubscriptionResponse.status).to.be.equal(204);
 
-                        const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', fullReportBody.runner_id));
+                        const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', runnerId));
                         should(phaseStartedStatsResponse.statusCode).be.eql(204);
 
                         // wait for webhook to be sent

@@ -819,6 +819,7 @@ paths:
             required: true
             schema:
               type: string
+              example: '1601759162814'
         responses:
           '204':
             description: Success
@@ -957,8 +958,6 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
-            example: ac549577-37ff-49f1-b9e5-208c0db13220
       responses:
         '204':
           description: Success

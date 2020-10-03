@@ -639,7 +639,7 @@ describe('Manager tests', function () {
                 };
                 webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
                 testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
-                postReportStub.resolves({ report_id: uuid.v4() });
+                postReportStub.resolves({ report_id: Date.now() });
 
                 return manager.createJob(jobBodyWithCron)
                     .then(function (result) {
@@ -711,7 +711,7 @@ describe('Manager tests', function () {
                 };
                 webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
                 testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
-                postReportStub.resolves({ report_id: uuid.v4() });
+                postReportStub.resolves({ report_id: Date.now() });
 
                 const jobBodyWithCronDisabled = { ...jobBodyWithCron, enabled: false };
                 return manager.createJob(jobBodyWithCronDisabled)
@@ -786,7 +786,7 @@ describe('Manager tests', function () {
                 };
                 webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
                 testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
-                postReportStub.resolves({ report_id: uuid.v4() });
+                postReportStub.resolves({ report_id: Date.now() });
 
                 return manager.createJob(jobBodyWithCron)
                     .then(function (result) {
@@ -854,7 +854,7 @@ describe('Manager tests', function () {
                 };
                 webhooks.map(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
                 testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
-                postReportStub.resolves({ report_id: uuid.v4() });
+                postReportStub.resolves({ report_id: Date.now() });
 
                 return manager.createJob(jobBodyWithCronNotImmediately)
                     .then(function (result) {
@@ -948,7 +948,7 @@ describe('Manager tests', function () {
             }]);
             webhooks.forEach(webhook => webhooksManagerGetWebhookStub.withArgs(webhook.id).resolves(webhook));
             testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
-            postReportStub.resolves({ report_id: uuid.v4() });
+            postReportStub.resolves({ report_id: Date.now() });
 
             await manager.createJob(jobBodyWithCron);
             await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
@@ -976,7 +976,7 @@ describe('Manager tests', function () {
                 databaseConnectorInsertStub.resolves({ success: 'success' });
                 databaseConnectorUpdateJobStub.rejects({ error: 'error' });
                 testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
-                postReportStub.resolves({ report_id: uuid.v4() });
+                postReportStub.resolves({ report_id: Date.now() });
 
                 await manager.createJob(jobBodyWithCron);
                 await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
@@ -1021,7 +1021,7 @@ describe('Manager tests', function () {
             databaseConnectorInsertStub.resolves({ success: 'success' });
             databaseConnectorDeleteStub.resolves({});
             testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
-            postReportStub.resolves({ report_id: uuid.v4() });
+            postReportStub.resolves({ report_id: Date.now() });
 
             await manager.createJob(jobBodyWithCron);
             await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');

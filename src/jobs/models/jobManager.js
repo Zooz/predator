@@ -60,7 +60,7 @@ module.exports.createJob = async (job) => {
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
-            const report = await createReportForJob(jobId, job, test);
+            const report = await createReportForJob(runId, test.id, jobId);
             const jobSpecificPlatformRequest = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
@@ -290,7 +290,7 @@ function addCron(jobId, job, cronExpression, configData) {
                 const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
                 const runId = Date.now();
                 const test = await testsManager.getTest(job.test_id);
-                const report = await createReportForJob(jobId, job, test);
+                const report = await createReportForJob(runId, test.id, jobId);
                 const jobSpecificPlatformConfig = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
@@ -325,20 +325,9 @@ async function validateWebhooksAssignment(webhookIds) {
     }
 }
 
-async function createReportForJob(jobId, job, { id: testId, type: testType }) {
-    const reportBody = {
-        report_id: job.runId,
-        revision_id: job.revisionId,
-        job_id: jobId,
-        test_type: testType,
-        start_time: Date.now().toString(),
-        notes: job.notes,
-        webhooks: job.webhooks,
-        emails: job.emails,
-        test_name: job.testName,
-        test_description: job.description
-    };
-    const report = await reportsManager.postReport(testId, reportBody);
+async function createReportForJob(runId, testId, jobId) {
+    const startTimeString = Date.now();
+    const report = await reportsManager.postReport(runId, testId, jobId, startTimeString);
     logger.info('Created report successfully');
     return report;
 }
