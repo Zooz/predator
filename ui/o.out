@@ -1,0 +1,10 @@
+
+> predator@1.0.0 start /Users/manorlahagani/myDev/predator/ui
+> webpack-dev-server  --open --history-api-fallback --config ./config/webpack.config.js --devtool eval --hot
+
+[34mℹ[39m [90m｢wds｣[39m: Project is running at http://localhost:8080/
+[34mℹ[39m [90m｢wds｣[39m: webpack output is served from /
+[34mℹ[39m [90m｢wds｣[39m: Content not from webpack is served from /Users/manorlahagani/myDev/predator/ui
+[34mℹ[39m [90m｢wds｣[39m: 404s will fallback to /index.html
+[34mℹ[39m [90m｢wdm｣[39m: wait until bundle finished: /
+[34mℹ[39m [90m｢wdm｣[39m: Compiled with warnings.
