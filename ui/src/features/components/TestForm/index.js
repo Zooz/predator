@@ -198,9 +198,9 @@ export class TestForm extends React.Component {
       return (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
         <Button style={{ marginRight: '5px' }} inverted onClick={closeDialog}>Cancel</Button>
         <Button style={{ marginRight: '5px' }} spinner={isLoading} hover disabled={!this.state.name}
-          onClick={()=>this.postTest(false)}>Submit</Button>
+          onClick={()=>this.postTest(false)}>Save</Button>
         <Button spinner={isLoading} hover disabled={!this.state.name}
-          onClick={() => this.postTest(true)}>Submit & Run</Button>
+          onClick={() => this.postTest(true)}>Save & Run</Button>
       </div>)
     };
     addScenarioHandler = () => {
