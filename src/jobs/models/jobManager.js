@@ -184,7 +184,7 @@ function createResponse(jobId, jobBody, runId) {
         arrival_rate: jobBody.arrival_rate,
         arrival_count: jobBody.arrival_count,
         duration: jobBody.duration,
-        environment: jobBody.environment,
+        environment: jobBody.environment || 'test',
         notes: jobBody.notes,
         proxy_url: jobBody.proxy_url,
         debug: jobBody.debug,
