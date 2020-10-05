@@ -40,7 +40,7 @@ UiSwitcher.propTypes = {
 
 UiSwitcher.defaultProps = {
     height: 30,
-    activeState: false,
+    activeState: true,
     disabledInp: false
 }
 
