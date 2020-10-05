@@ -13,7 +13,7 @@ const SideLabel = ({label, children}) => {
     )
 }
 export default (props) => {
-    const {gzipValue, foreverValue, onGzipToggleChanged, onForeverToggleChanged} = props;
+    const {gzipValue , foreverValue, onGzipToggleChanged, onForeverToggleChanged} = props;
     return (
         <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'sapce-between', marginLeft: '17px'}}>
             <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
@@ -23,7 +23,7 @@ export default (props) => {
                             onGzipToggleChanged(value)
                         }}
                         disabledInp={false}
-                        activeState={!!gzipValue}
+                        activeState={true}
                         height={12}
                         width={22}
                     />
