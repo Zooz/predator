@@ -65,8 +65,8 @@ function teamsWebhookFormat(title, subtitle, options) {
     return {
         '@type': 'MessageCard',
         '@context': 'http://schema.org/extensions',
+        'summary': 'Predator Notification',
         themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-        title: `${title}`,
         sections: [
             {
                 activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)${title}`,
@@ -153,7 +153,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
 
 function teams(event, testId, jobId, report, additionalInfo, options) {
     let title = null;
-    let subtitle = null;
+    let subtitle = '';
     const {
         environment,
         duration,
@@ -171,27 +171,27 @@ function teams(event, testId, jobId, report, additionalInfo, options) {
             let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
             requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
 
-            title = `🤓 *Test ${testName} with id: ${testId} has started*.';
-            subtitle = '*test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
+            title = `&#x1F603; *Test ${testName} with id: ${testId} has started*.`;
+            subtitle = `*test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_FINISHED: {
-            title = `😎 *Test ${testName} with id: ${testId} is finished.*';
-            subtitle = '${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
+            title = `&#x1F60E; *Test ${testName} with id: ${testId} is finished.*`;
+            subtitle = `${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
             if (grafanaReport) {
                 subtitle += `<${grafanaReport} | View final grafana dashboard report>`;
             }
             break;
         }
         case WEBHOOK_EVENT_TYPE_FAILED: {
-            title = `😞 *Test with id: ${testId} Failed*.`;
+            title = `&#x1F627; *Test with id: ${testId} Failed*.`;
             subtitle = `test configuration:\n
             environment: ${environment}\n
             ${stats.data}`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_ABORTED: {
-            title = `😢 *Test ${testName} with id: ${testId} was aborted.*`;
+            title = `&#x1F622; *Test ${testName} with id: ${testId} was aborted.*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
@@ -201,11 +201,11 @@ function teams(event, testId, jobId, report, additionalInfo, options) {
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            title = `${slackEmojis.HAMMER} *Test ${testName} with id: ${testId} is in progress!*`; // TODO: if we had teamsEmojis, we could use HAMMER_PICK; Teams doesn't have HAMMER_AND_WRENCH nor HAMMER_AND_PICK
+            title = `&#x1F528; *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            title = `${slackEmojis.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${slackEmojis.SKULL}`;
+            title = `&#x1F525; *Test ${testName} with id: ${testId} has encountered an API failure!* &#x1F480;`;
             break;
         }
         default: {
@@ -234,3 +234,4 @@ module.exports.format = function(format, eventType, jobId, testId, report, addit
         }
     }
 };
+
