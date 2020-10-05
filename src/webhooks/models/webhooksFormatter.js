@@ -45,9 +45,9 @@ function slackWebhookFormat(message, options) {
 }
 
 function getThresholdTeamsSummary(state, { testName, score }) {
-    let icon = slackEmojis.ROCKET;
+    let icon = '&#x1F680;';
     if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
-        icon = slackEmojis.CRY;
+        icon = '&#x1F622;';
     }
     return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}`;
 }
