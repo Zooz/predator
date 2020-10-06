@@ -1,0 +1,35 @@
+@import "../styles/colors";
+
+.icon-button {
+  cursor: pointer;
+  color: darken($glowing-blue, 10%);
+  transition: color 0.25s ease-in-out;
+
+  &[data-disabled=true] {
+    pointer-events: none;
+    box-shadow: none;
+    color: $disabled-grey-button;
+    background-color: $white;
+  }
+
+  &:not([data-disabled=true]):hover {
+    color: darken($glowing-blue, 20%);
+  }
+
+  & > svg {
+    filter: unset;
+    transition: filter 0.2s;
+  }
+
+  &:not([data-disabled=true]) > svg:hover {
+    -webkit-filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.5));      
+    filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.5));  
+  }
+}
+
+.spinner-span {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
