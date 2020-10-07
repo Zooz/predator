@@ -124,5 +124,18 @@ describe('Jobs verifier tests', function () {
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
+
+        it('Run immediately is false and cron expression exists, valid cron expression, should pass', async () => {
+            req = { body: { run_immediately: false, cron_expression: '0 20 0 7 OCT * 2020' } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('Run immediately is false and cron expression exists, cron expression w/ unsupported character, should fail', async () => {
+            req = { body: { run_immediately: false, cron_expression: '0 20 0 7 OCT ? 2020' } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0].message).startWith('Unsupported cron_expression. ');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
     });
 });
