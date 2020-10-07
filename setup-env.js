@@ -1,6 +1,7 @@
 const { readFileSync, writeFileSync } = require('fs');
 const { networkInterfaces } = require('os');
 const shell = require('shelljs');
+const path = require('path');
 const envFileName = '.env';
 const defaultPort = 3000;
 let port, ipAddress;
@@ -9,7 +10,8 @@ console.log('\x1b[36m%s\x1b[0m', 'Starting Predator local setup, good luck!'); /
 
 npmInstallAndBuild();
 extractIpAndPort();
-setupEnvFile();
+setupBackendEnvFile();
+setupFrontendEnvFile();
 
 console.log('\x1b[36m%s\x1b[0m', 'To start predator backend + frontend:\nnpm run start-local');
 console.log();
@@ -51,7 +53,22 @@ function extractIpAndPort() {
         port = process.env.PORT;
     }
 }
-function setupEnvFile() {
+function setupFrontendEnvFile() {
+    const envFilePath = path.join('ui', envFileName);
+    let envFile = '';
+    try {
+        envFile = readFileSync(envFilePath, 'utf8');
+    } catch (error) {
+        console.log(`${envFileName} does not exists, will create one`);
+    }
+    let newEnv = envFile;
+    newEnv = newEnv.replace(/^PREDATOR_URL.*\n?/m, '');
+
+    newEnv += `PREDATOR_URL=http://${ipAddress}:${port}/v1\n`;
+    console.log(`Updating ${envFileName} file with:\n${newEnv}`);
+    writeFileSync(envFilePath, newEnv);
+}
+function setupBackendEnvFile() {
     let envFile = '';
     try {
         envFile = readFileSync(envFileName, 'utf8');
