@@ -1,15 +1,22 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import Spinner from '../Spinner';
 import css from './style.scss';
+import TooltipWrapper from '../TooltipWrapper';
 
 const IconButton = (props) => {
-  const { className = '', inverted, disabled, width, spinner, height, color, onClick, style, ...rest } = props
+  const { className = '', inverted, disabled, width, spinner, height, onClick, style, children, title, ...rest } = props
 
   return (
-    <Fragment>
+    <TooltipWrapper
+      content={<div>{title}</div>}
+      place='top'
+      dataId={`tooltipKey_${title}`}
+      offset={{ top: 1 }}
+      shouldShow={!disabled && !spinner}
+    >
       {spinner
         ? <span className={css['spinner-span']} style={{ ...style, width, height }}>
-          <Spinner className={css['icon']} invertedPrimaryColor='#406eff' invertedSecondaryColor='#d9e2ff' inverted={inverted} size={'32px'} thickness={'3px'} />
+          <Spinner className={css['icon']} inverted={inverted} />
         </span>
         : <div
           className={`${css['icon-button']} ${className}`}
@@ -18,9 +25,9 @@ const IconButton = (props) => {
           onClick={(disabled || spinner) ? undefined : onClick}
           {...rest}
         >
-          {rest.children}
+          {children}
         </div>}
-    </Fragment>
+    </TooltipWrapper>
   )
 }
 

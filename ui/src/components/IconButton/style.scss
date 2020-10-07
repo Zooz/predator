@@ -2,7 +2,7 @@
 
 .icon-button {
   cursor: pointer;
-  color: darken($glowing-blue, 10%);
+  color: $glowing-blue;
   transition: color 0.25s ease-in-out;
 
   &[data-disabled=true] {
@@ -13,7 +13,7 @@
   }
 
   &:not([data-disabled=true]):hover {
-    color: darken($glowing-blue, 20%);
+    color: darken($glowing-blue, 10%);
   }
 
   & > svg {
@@ -22,8 +22,8 @@
   }
 
   &:not([data-disabled=true]) > svg:hover {
-    -webkit-filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.5));      
-    filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.5));  
+    -webkit-filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.25));      
+    filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.25));  
   }
 }
 

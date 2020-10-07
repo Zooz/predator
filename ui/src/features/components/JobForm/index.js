@@ -23,8 +23,7 @@ import { inputTypes, testTypes } from './constants';
 import MultiSelect from '../../../components/MultiSelect/MultiSelect.export';
 import NumericInput from '../../../components/NumericInput';
 import InfoToolTip from '../InfoToolTip';
-import { faSave } from '@fortawesome/free-regular-svg-icons';
-import { faPlayCircle } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconButton from '../../../components/IconButton';
 
@@ -372,25 +371,25 @@ class Form extends React.Component {
                 </Fragment>);
               }, this)}
               <div className={style.icons}>
-                <IconButton style={{ marginRight: '12px' }}
+                <IconButton style={{ marginRight: '8px' }}
                   spinner={processingAction}
                   disabled={!this.state.cron_expression || !!this.isThereErrorOnForm()}
                   onClick={() => { this.whenSubmit(false) }}
-                  height='56px'
-                  width='56px'
                   inverted
+                  width='28px'
+                  height='28px'
                   title='Schedule'>
-                  <FontAwesomeIcon icon={faSave} size='4x' />
+                  <FontAwesomeIcon icon={faClock} size='2x' />
                 </IconButton>
-                <IconButton style={{ marginRight: '16px' }}
+                <IconButton
                   spinner={processingAction}
                   disabled={!!this.isThereErrorOnForm()}
                   onClick={() => this.whenSubmit(true)}
-                  height='56px'
-                  width='56px'
                   inverted
+                  width='28px'
+                  height='28px'
                   title={this.state.cron_expression ? 'Schedule & Run' : 'Run'}>
-                  <FontAwesomeIcon icon={faPlayCircle} size='4x' />
+                  <FontAwesomeIcon icon={faPlayCircle} size='2x' />
                 </IconButton>
               </div>
               {serverError &&
