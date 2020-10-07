@@ -1,5 +1,5 @@
 import { isUndefined } from 'lodash'
-import cronstrue from 'cronstrue';
+import cron from 'cron-validator';
 import { testTypes } from './constants';
 
 import React from 'react';
@@ -81,12 +81,8 @@ function rampToValidator (value, allState) {
 }
 
 function cronValidator (value, allState) {
-  if (value) {
-    try {
-      cronstrue.toString(value)
-    } catch (err) {
-      return 'illegal cron input'
-    }
+  if (value && !cron.isValidCron(value, { alias: true, seconds: true })) {
+    return 'illegal cron input'
   }
 }
 
