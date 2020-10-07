@@ -198,7 +198,7 @@ export class TestForm extends React.Component {
       return (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
         <Button style={{ marginRight: '5px' }} inverted onClick={closeDialog}>Cancel</Button>
         <Button style={{ marginRight: '5px' }} spinner={isLoading} hover disabled={!this.state.name}
-          onClick={()=>this.postTest(false)}>Save</Button>
+          onClick={() => this.postTest(false)}>Save</Button>
         <Button spinner={isLoading} hover disabled={!this.state.name}
           onClick={() => this.postTest(true)}>Save & Run</Button>
       </div>)
@@ -361,8 +361,8 @@ export class TestForm extends React.Component {
       const {
         scenarios, before, currentScenarioIndex,
         processorsExportedFunctions, csvMode,
-        csvFile
-
+        csvFile,
+        editMode
       } = this.state;
       const { csvMetadata } = this.props;
 
@@ -428,6 +428,7 @@ export class TestForm extends React.Component {
                     }
                     <div style={{ width: '70%' }}>
                       <StepsList steps={tabData.steps}
+                        editMode={editMode}
                         onChangeValueOfStep={this.onChangeValueOfStep}
                         processorsExportedFunctions={processorsExportedFunctions}
                         onDeleteStep={this.onDeleteStep}
