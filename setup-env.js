@@ -1,5 +1,5 @@
 const { readFileSync, writeFileSync } = require('fs');
-const { networkInterfaces } = require('os');
+const { networkInterfaces, EOL } = require('os');
 const shell = require('shelljs');
 const path = require('path');
 const envFileName = '.env';
@@ -13,9 +13,9 @@ extractIpAndPort();
 setupBackendEnvFile();
 setupFrontendEnvFile();
 
-console.log('\x1b[36m%s\x1b[0m', 'To start predator backend + frontend:\nnpm run start-local');
+console.log('\x1b[36m%s\x1b[0m', `To start predator backend + frontend:${EOL}npm run start-local`);
 console.log();
-console.log('\x1b[36m%s\x1b[0m', 'To develop frontend with hot reload:\ncd ui\nnpm start');
+console.log('\x1b[36m%s\x1b[0m', `To develop frontend with hot reload:${EOL}cd ui${EOL}npm start`);
 
 function npmInstallAndBuild() {
     if (shell.exec('npm install').code !== 0) {
