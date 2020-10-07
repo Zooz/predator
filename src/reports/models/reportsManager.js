@@ -64,7 +64,7 @@ module.exports.deleteReport = async (testId, reportId) => {
 };
 
 module.exports.postReport = async(runId, testId, jobId, startTime) => {
-    const reportId = runId.toString();
+    const reportId = runId;
     const test = await testsManager.getTest(testId);
     const job = await jobConnector.getJob(jobId);
     const phase = '0';

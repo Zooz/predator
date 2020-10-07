@@ -426,7 +426,7 @@ describe('Reports manager tests', function () {
 
     describe('Create new report', function () {
         it('Successfully insert report', async () => {
-            const runId = Date.now();
+            const runId = uuid.v4();
             const reportFromDBConnector = {
                 report_id: uuid.v4(),
                 job_id: uuid.v4(),

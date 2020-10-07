@@ -8,7 +8,7 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
             name: jobName + '-' + runId,
             labels: {
                 app: predatorRunner,
-                runId: runId.toString()
+                runId: runId
             }
         },
         spec: {

@@ -1,10 +1,11 @@
 'use strict';
 
+const uuid = require('uuid');
+const util = require('util');
+const { CronJob } = require('cron');
+
 const logger = require('../../common/logger'),
-    uuid = require('uuid'),
-    CronJob = require('cron').CronJob,
     configHandler = require('../../configManager/models/configHandler'),
-    util = require('util'),
     testsManager = require('../../tests/models/manager'),
     reportsManager = require('../../reports/models/reportsManager'),
     dockerHubConnector = require('./dockerHubConnector'),
@@ -56,7 +57,7 @@ module.exports.createJob = async (job) => {
     try {
         await databaseConnector.insertJob(jobId, job);
         logger.info('Job saved successfully to database');
-        const runId = Date.now();
+        const runId = uuid.v4();
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
@@ -211,7 +212,7 @@ async function createJobRequest(jobId, runId, reportId, jobBody, dockerImage, co
     const parallelism = jobBody.parallelism || 1;
     const environmentVariables = {
         JOB_ID: jobId,
-        RUN_ID: runId.toString(),
+        RUN_ID: runId,
         JOB_TYPE: jobBody.type,
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
@@ -288,7 +289,7 @@ function addCron(jobId, job, cronExpression, configData) {
                 logger.info(`Skipping job with id: ${jobId} as it's currently disabled`);
             } else {
                 const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
-                const runId = Date.now();
+                const runId = uuid.v4();
                 const test = await testsManager.getTest(job.test_id);
                 const report = await createReportForJob(runId, test.id, jobId);
                 const jobSpecificPlatformConfig = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);

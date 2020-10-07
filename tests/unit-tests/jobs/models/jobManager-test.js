@@ -135,14 +135,14 @@ describe('Manager tests', function () {
                 testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
                 postReportStub.resolves({ report_id: reportId });
                 await manager.reloadCronJobs();
-                manager.__get__('cronJobs').should.have.key('5a9eee73-cf56-47aa-ac77-fad59e961aaa');
+                manager.__get__('cronJobs').should.have.key(jobBodyWithCron.id);
             });
 
             it('Verify cron was invoked more than once', function (done) {
                 this.timeout(5000);
                 setTimeout(async () => {
                     try {
-                        await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaa');
+                        await manager.deleteJob(TEST_ID);
                         loggerErrorStub.callCount.should.eql(0);
                         postReportStub.callCount.should.be.aboveOrEqual(2);
                         testsManagerGetStub.callCount.should.be.aboveOrEqual(2);

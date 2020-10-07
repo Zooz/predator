@@ -26,43 +26,28 @@ async function init() {
 function postStats(testId, reportId, body) {
     return request(testApp).post(`/v1/tests/${testId}/reports/${reportId}/stats`)
         .send(body)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function editReport(testId, reportId, body) {
     return request(testApp).put(`/v1/tests/${testId}/reports/${reportId}`)
         .send(body)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getAggregatedReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}/aggregate`)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}`)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function deleteReport(testId, reportId) {
     return request(testApp).delete(`/v1/tests/${testId}/reports/${reportId}`)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getReports(testId, filter) {
@@ -71,10 +56,7 @@ function getReports(testId, filter) {
         url += `?filter=${filter}`;
     }
     return request(testApp).get(url)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getLastReports(limit, filter) {
@@ -83,18 +65,12 @@ function getLastReports(limit, filter) {
         url += `&filter=${filter}`;
     }
     return request(testApp).get(url)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 async function subscribeRunnerToReport(testId, reportId, runnerId) {
     return request(testApp)
         .post(`/v1/tests/${testId}/reports/${reportId}/subscribe`)
         .set({ ...HEADERS, 'x-runner-id': runnerId })
-        .send({})
-        .end(function(res) {
-            return res;
-        });
+        .send({});
 }

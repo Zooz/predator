@@ -1422,7 +1422,8 @@ const jobPlatform = process.env.JOB_PLATFORM;
 });
 
 function nockK8sRunnerCreation(url, name, uid, namespace) {
-    nock(url).post(`/apis/batch/v1/namespaces/${namespace}/jobs`)
+    nock(url).persist()
+        .post(`/apis/batch/v1/namespaces/${namespace}/jobs`)
         .reply(200, {
             metadata: { name, uid },
             namespace: namespace
