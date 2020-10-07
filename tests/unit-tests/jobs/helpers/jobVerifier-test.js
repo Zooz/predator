@@ -75,13 +75,13 @@ describe('Jobs verifier tests', function () {
         });
 
         it('Run immediately is true and cron expression exist and enabled is false, should pass', async () => {
-            req = { body: { run_immediately: true, cron_expression: '* * *', enabled: false } };
+            req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: false } };
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
 
         it('Run immediately is true and cron expression exist and enabled is true, should pass', async () => {
-            req = { body: { run_immediately: true, cron_expression: '* * *', enabled: true } };
+            req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: true } };
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
@@ -94,12 +94,12 @@ describe('Jobs verifier tests', function () {
         });
 
         it('Run immediately is false and cron expression exist, should pass', async () => {
-            req = { body: { run_immediately: false, cron_expression: '* * *' } };
+            req = { body: { run_immediately: false, cron_expression: '* * * * *' } };
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
         it('Run immediately does not exits and cron expression exist, should pass', async () => {
-            req = { body: { cron_expression: '* * *' } };
+            req = { body: { cron_expression: '* * * * *' } };
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
@@ -123,6 +123,33 @@ describe('Jobs verifier tests', function () {
             await jobVerifier.verifyJobBody(req, res, nextStub);
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('Run immediately is false and cron expression exists, valid cron expression, should pass', async () => {
+            req = { body: { run_immediately: false, cron_expression: '0 20 0 7 OCT *' } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('Run immediately is false and cron expression exists, cron expression w/ unsupported character, should fail', async () => {
+            req = { body: { run_immediately: false, cron_expression: '0 20 0 7 OCT ? 2020' } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0].message).startWith('Unsupported cron_expression. ');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+
+        it('Run immediately is false and cron expression exists, cron expression w/ too many fields, should fail', async () => {
+            req = { body: { run_immediately: false, cron_expression: '0 20 0 7 OCT * 2020' } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0].message).startWith('Unsupported cron_expression. ');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+
+        it('Run immediately is false and cron expression exists, cron expression w/ not enough fields, should fail', async () => {
+            req = { body: { run_immediately: false, cron_expression: '* * *' } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0].message).startWith('Unsupported cron_expression. ');
+            should(nextStub.args[0][0].statusCode).eql(400);
         });
     });
 });

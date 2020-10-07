@@ -556,7 +556,7 @@ class Form extends React.Component {
                   onChange={(evt) => this.onChangeProperty(oneItem.name, evt.target.value)} />
               </ErrorWrapper>
             </TitleInput>
-            {oneItem.name === 'cron_expression' && <CronViewer value={cron_expression} />}
+            {oneItem.name === 'cron_expression' && !this.state.errors['cron_expression'] && <CronViewer value={cron_expression} />}
           </div>
 
         );

@@ -1,5 +1,19 @@
 'use strict';
 const testsManager = require('../../tests/models/manager');
+const CronTime = require('cron').CronTime;
+
+/**
+ * Validates a cron expression and returns error message if the expression is invalid
+ * @param {string} exp
+ * @returns {(string|undefined)} Error message if the expression is invalid
+ */
+function verifyCronExpression(exp) {
+    try {
+        const ct = new CronTime(exp);
+    } catch (err) {
+        return err.message;
+    }
+}
 
 module.exports.verifyJobBody = (req, res, next) => {
     let errorToThrow;
@@ -11,6 +25,13 @@ module.exports.verifyJobBody = (req, res, next) => {
     if (jobBody.enabled === false && !jobBody.cron_expression) {
         errorToThrow = new Error('It is impossible to disable job without cron_expression');
         errorToThrow.statusCode = 400;
+    }
+    if (jobBody.cron_expression) {
+        const message = verifyCronExpression(jobBody.cron_expression);
+        if (message) {
+            errorToThrow = new Error(`Unsupported cron_expression. ${message}`);
+            errorToThrow.statusCode = 400;
+        }
     }
     next(errorToThrow);
 };
