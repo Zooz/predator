@@ -1,7 +1,9 @@
 const cloneDeep = require('lodash/cloneDeep');
 const slackEmojis = require('slack-emojis');
+const teamsEmojis = require('../../common/teams-emojis');
 
 const {
+    EVENT_FORMAT_TYPES,
     EVENT_FORMAT_TYPE_JSON,
     EVENT_FORMAT_TYPE_SLACK,
     EVENT_FORMAT_TYPE_TEAMS,
@@ -24,12 +26,12 @@ function unknownWebhookEventTypeError(badWebhookEventTypeValue) {
     return new Error(`Unrecognized webhook event: ${badWebhookEventTypeValue}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`);
 }
 
-function getThresholdSlackMessage(state, { testName, benchmarkThreshold, lastScores, aggregatedReport, score }) {
+function getThresholdMessage(state, { isSlack, testName, benchmarkThreshold, lastScores, aggregatedReport, score }) {
     let resultText = 'above';
-    let icon = slackEmojis.ROCKET;
+    let icon = isSlack ? slackEmojis.ROCKET : teamsEmojis.ROCKET;
     if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
         resultText = 'below';
-        icon = slackEmojis.CRY;
+        icon = isSlack ? slackEmojis.CRY : teamsEmojis.CRYING;
     }
     return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}` +
         ` this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
@@ -44,37 +46,10 @@ function slackWebhookFormat(message, options) {
     };
 }
 
-function getThresholdTeamsSummary(state, { testName, score }) {
-    let icon = '&#x1F680;';
-    if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
-        icon = '&#x1F622;';
-    }
-    return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}`;
-}
-
-function getThresholdTeamsSubtitle(state, { benchmarkThreshold, lastScores, aggregatedReport, score }) {
-    let resultText = 'above';
-    if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
-        resultText = 'below';
-    }
-    return `this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
-        `.*\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, { score })}\n`;
-}
-
-function teamsWebhookFormat(title, subtitle, options) {
+function teamsWebhookFormat(message) {
     return {
-        '@type': 'MessageCard',
-        '@context': 'http://schema.org/extensions',
-        'summary': 'Predator Notification',
         themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-        sections: [
-            {
-                activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)${title}`,
-                text: `${subtitle}`,
-                activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                markdown: true
-            }
-        ]
+        text: message.replace(/\n/g, "   \n")
     };
 }
 
@@ -133,7 +108,8 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
         case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            message = getThresholdSlackMessage(event, { testName, lastScores, aggregatedReport, benchmarkThreshold, score });
+            let isSlack = true;
+            message = getThresholdMessage(event, { isSlack, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
@@ -152,8 +128,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
 }
 
 function teams(event, testId, jobId, report, additionalInfo, options) {
-    let title = null;
-    let subtitle = '';
+    let message = null;
     const {
         environment,
         duration,
@@ -171,48 +146,48 @@ function teams(event, testId, jobId, report, additionalInfo, options) {
             let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
             requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
 
-            title = `&#x1F603; *Test ${testName} with id: ${testId} has started*.`;
-            subtitle = `*test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
+            message = `${teamsEmojis.SMILE} *Test ${testName} with id: ${testId} has started*.`;
+            message += `\n*test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_FINISHED: {
-            title = `&#x1F60E; *Test ${testName} with id: ${testId} is finished.*`;
-            subtitle = `${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
+            message = `${teamsEmojis.SUNGLASSES} *Test ${testName} with id: ${testId} is finished.*`;
+            message += `\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}`;
             if (grafanaReport) {
-                subtitle += `<${grafanaReport} | View final grafana dashboard report>`;
+                message += `\n<${grafanaReport} | View final grafana dashboard report>`;
             }
             break;
         }
         case WEBHOOK_EVENT_TYPE_FAILED: {
-            title = `&#x1F627; *Test with id: ${testId} Failed*.`;
-            subtitle = `test configuration:\n
+            message = `${teamsEmojis.ANGUISHED} *Test with id: ${testId} Failed*.`;
+            message += `\ntest configuration:\n
             environment: ${environment}\n
             ${stats.data}`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_ABORTED: {
-            title = `&#x1F622; *Test ${testName} with id: ${testId} was aborted.*`;
+            message = `${teamsEmojis.ANGUISHED} *Test ${testName} with id: ${testId} was aborted.*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
         case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            title = getThresholdTeamsSummary(event, { testName, score });
-            subtitle = getThresholdTeamsSubtitle(event, { lastScores, aggregatedReport, benchmarkThreshold, score });
+            let isSlack = false;
+            message = getThresholdMessage(event, { isSlack, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            title = `&#x1F528; *Test ${testName} with id: ${testId} is in progress!*`;
+            message = `${teamsEmojis.HAMMER} *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            title = `&#x1F525; *Test ${testName} with id: ${testId} has encountered an API failure!* &#x1F480;`;
+            message = `${teamsEmojis.FIRE} *Test ${testName} with id: ${testId} has encountered an API failure!* ${teamsEmojis.SKULL}`;
             break;
         }
         default: {
             throw unknownWebhookEventTypeError();
         }
     }
-    return teamsWebhookFormat(title, subtitle, options);
+    return teamsWebhookFormat(message);
 }
 
 module.exports.format = function(format, eventType, jobId, testId, report, additionalInfo = {}, options = {}) {
@@ -230,8 +205,7 @@ module.exports.format = function(format, eventType, jobId, testId, report, addit
             return teams(eventType, testId, jobId, report, additionalInfo, options);
         }
         default: {
-            throw new Error(`Unrecognized webhook format: ${format}, available options: ${[EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPE_SLACK, EVENT_FORMAT_TYPE_TEAMS].join()}`);
+            throw new Error(`Unrecognized webhook format: ${format}, available options: ${EVENT_FORMAT_TYPES.join()}`);
         }
     }
 };
-

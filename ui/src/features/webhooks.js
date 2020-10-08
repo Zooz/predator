@@ -12,7 +12,7 @@ import Snackbar from "material-ui/Snackbar";
 
 
 const DESCRIPTION = 'Webhooks are events that notify you on test progress.\n' +
-    'Webhooks are supported in Slack, MS Teams, or JSON format for an easy server to server integration.\n' +
+    'Webhooks are supported in Slack, Microsoft Teams, or JSON format for an easy server to server integration.\n' +
     'You can define a global webhook which will be enabled for system-wide tests or an adhoc webhook which will be optional on a specific test run.';
 
 const Webhhooks = ({setDeleteWebHookSuccess, deleteWebhookSuccess, loading, cleanErrors, webhookError, webhooks, getWebhooks}) => {

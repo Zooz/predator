@@ -4,10 +4,11 @@ const uuid = require('uuid');
 const rewire = require('rewire');
 
 const {
+    EVENT_FORMAT_TYPES,
     EVENT_FORMAT_TYPE_JSON,
     EVENT_FORMAT_TYPE_SLACK,
     EVENT_FORMAT_TYPE_TEAMS,
-	WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
+    WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
     WEBHOOK_EVENT_TYPE_STARTED,
     WEBHOOK_EVENT_TYPE_FINISHED,
     WEBHOOK_EVENT_TYPE_ABORTED,
@@ -232,18 +233,9 @@ describe('webhooksFormatter', function () {
                 parallelism: 10
             };
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.`,
-                        text: `*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`,
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`,
+                themeColor: '957c58'
+                
             };
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
@@ -260,18 +252,8 @@ describe('webhooksFormatter', function () {
                 parallelism: 10
             };
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.`,
-                        text: `*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`,
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
@@ -284,18 +266,8 @@ describe('webhooksFormatter', function () {
                 test_name: 'some name'
             };
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F622; *Test ${report.test_name} with id: ${testId} was aborted.*`,
-                        text: '',
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F627; *Test ${report.test_name} with id: ${testId} was aborted.*`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_ABORTED, uuid.v4(), testId, report);
@@ -318,18 +290,8 @@ describe('webhooksFormatter', function () {
             statsFormatterStub.returns(stats);
 
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F60E; *Test ${report.test_name} with id: ${testId} is finished.*`,
-                        text: `${stats}\n`,
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F60E; *Test ${report.test_name} with id: ${testId} is finished.*   \nsome stats string`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_FINISHED, uuid.v4(), testId, report, additionalInfo);
@@ -354,19 +316,10 @@ describe('webhooksFormatter', function () {
             const statsText = 'some text';
             statsFormatterStub.returns(statsText);
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F622; *Test ${report.test_name} got a score of ${additionalInfo.score.toFixed(1)}`,
-                        text: `this is below the threshold of ${additionalInfo.benchmarkThreshold}. last 3 scores are: ${additionalInfo.lastScores.join()}` +
-                              `.*\n${statsText}\n`,
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F622; *Test ${report.test_name} got a score of ${additionalInfo.score.toFixed(1)}` +
+                ` this is below the threshold of ${additionalInfo.benchmarkThreshold}. last 3 scores are: ${additionalInfo.lastScores.join()}` +
+                `.*   \n${statsText}   \n`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, uuid.v4(), testId, report, additionalInfo);
@@ -391,19 +344,10 @@ describe('webhooksFormatter', function () {
             const statsText = 'some text';
             statsFormatterStub.returns(statsText);
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F680; *Test ${report.test_name} got a score of ${additionalInfo.score.toFixed(1)}`,
-                        text: `this is above the threshold of ${additionalInfo.benchmarkThreshold}. last 3 scores are: ${additionalInfo.lastScores.join()}` +
-                              `.*\n${statsText}\n`,
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F680; *Test some name got a score of ${additionalInfo.score.toFixed(1)}` +
+                ` this is above the threshold of ${additionalInfo.benchmarkThreshold}. last 3 scores are: ${additionalInfo.lastScores.join()}` +
+                `.*   \n${statsText}   \n`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, uuid.v4(), testId, report, additionalInfo);
@@ -422,20 +366,8 @@ describe('webhooksFormatter', function () {
                 }
             };
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F627; *Test with id: ${testId} Failed*.`,
-                        text: `test configuration:\n
-            environment: ${report.environment}\n
-            ${additionalInfo.stats.data}`,
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F627; *Test with id: ${testId} Failed*.   \ntest configuration:   \n   \n            environment: test   \n   \n            ${additionalInfo.stats.data}`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_FAILED, uuid.v4(), testId, report, additionalInfo);
@@ -448,18 +380,8 @@ describe('webhooksFormatter', function () {
                 test_name: 'some name'
             };
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F528; *Test ${report.test_name} with id: ${testId} is in progress!*`,
-                        text: '',
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F528; *Test some name with id: ${testId} is in progress!*`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_IN_PROGRESS, uuid.v4(), testId, report);
@@ -472,18 +394,8 @@ describe('webhooksFormatter', function () {
                 test_name: 'some name'
             };
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F525; *Test ${report.test_name} with id: ${testId} has encountered an API failure!* &#x1F480;`,
-                        text: '',
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F525 *Test ${report.test_name} with id: ${testId} has encountered an API failure!* &#x1F480;`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_API_FAILURE, uuid.v4(), testId, report);
@@ -508,18 +420,8 @@ describe('webhooksFormatter', function () {
                 grafana_report: 'http://local.grafana.io/predator'
             };
             const expectedResult = {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                'summary': 'Predator Notification',
-                themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-                sections: [
-                    {
-                        activityTitle: `![Mikey](https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png)&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.`,
-                        text: `*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`,
-                        activityImage: 'https://assets.website-files.com/5ceb9d8c5d0f4725dca04998/5cf3af2d6e00f5d87f38869e_mickey-clean.png',
-                        markdown: true
-                    }
-                ]
+                text: `&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`,
+                themeColor: '957c58'
             };
 
             const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
@@ -604,7 +506,7 @@ describe('webhooksFormatter', function () {
     describe('Unknown format', function() {
         it('should throw an error', function() {
             const unknownFormat = 'some_random_format';
-            expect(webhooksFormatter.format.bind(null, unknownFormat, WEBHOOK_EVENT_TYPE_STARTED)).to.throw(`Unrecognized webhook format: ${unknownFormat}, available options: ${[EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPE_SLACK].join()}`);
+            expect(webhooksFormatter.format.bind(null, unknownFormat, WEBHOOK_EVENT_TYPE_STARTED)).to.throw(`Unrecognized webhook format: ${unknownFormat}, available options: ${EVENT_FORMAT_TYPES.join()}`);
         });
     });
 });
