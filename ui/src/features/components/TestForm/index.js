@@ -194,7 +194,7 @@ export class TestForm extends React.Component {
       const { isLoading } = this.props;
 
       return (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '5px 32px 5px 0' }}>
           <IconButton style={{ marginRight: '5px' }}
             spinner={isLoading}
             disabled={!this.state.name}
