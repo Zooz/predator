@@ -55,18 +55,18 @@ module.exports.createJob = async (job) => {
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(job.webhooks);
     try {
-        await databaseConnector.insertJob(jobId, job);
+        const insertedJob = await databaseConnector.insertJob(jobId, job);
         logger.info('Job saved successfully to database');
         const reportId = uuid.v4();
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
-            await createReportForJob(reportId, test.id, jobId);
-            const jobSpecificPlatformRequest = await createJobRequest(jobId, reportId, job, latestDockerImage, configData);
+            await createReportForJob(reportId, test, jobId);
+            const jobSpecificPlatformRequest = await createJobRequest(jobId, reportId, insertedJob, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
         if (job.cron_expression) {
-            addCron(jobId, job, job.cron_expression, configData);
+            addCron(jobId, insertedJob, job.cron_expression, configData);
         }
         logger.info('Job deployed successfully');
         return createResponse(jobId, job, reportId);
@@ -255,13 +255,6 @@ async function createJobRequest(jobId, reportId, jobBody, dockerImage, configDat
     if (jobBody.debug) {
         environmentVariables.DEBUG = jobBody.debug;
     }
-    if (jobBody.emails) {
-        environmentVariables.EMAILS = jobBody.emails.join(';');
-    }
-    if (jobBody.webhooks) {
-        const webhooks = await Promise.all(jobBody.webhooks.map(id => webhooksManager.getWebhook(id)));
-        environmentVariables.WEBHOOKS = webhooks.map(({ url }) => url).join(';');
-    }
 
     if (maxVirtualUsersPerRunner) {
         environmentVariables.MAX_VIRTUAL_USERS = maxVirtualUsersPerRunner.toString();
@@ -290,7 +283,7 @@ function addCron(jobId, job, cronExpression, configData) {
                 const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
                 const reportId = uuid.v4();
                 const test = await testsManager.getTest(job.test_id);
-                await createReportForJob(reportId, test.id, jobId);
+                await createReportForJob(reportId, test, job);
                 const jobSpecificPlatformConfig = await createJobRequest(jobId, reportId, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
@@ -325,9 +318,9 @@ async function validateWebhooksAssignment(webhookIds) {
     }
 }
 
-async function createReportForJob(reportId, testId, jobId) {
-    const startTimeString = Date.now();
-    const report = await reportsManager.postReport(reportId, testId, jobId, startTimeString);
-    logger.info('Created report successfully');
+async function createReportForJob(reportId, test, job) {
+    const startTime = Date.now();
+    const report = await reportsManager.postReport(reportId, test, job, startTime);
+    logger.info({ test_id: test.id, report_id: reportId }, 'Created report successfully');
     return report;
 }
