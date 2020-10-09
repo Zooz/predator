@@ -132,15 +132,13 @@ Yes, Predator has integration with both <u>[Prometheus](https://prometheus.io)</
 
 <u>[Prometheus](https://prometheus.io)</u> by its nature is a scraper, while the Predator-Runner is a job without a specific API and finite time life.
 To overcome this:
-<br>
-1. Deploy <u>[Prometheus push gateway](https://github.com/prometheus/pushgateway)</u>
-<br>
-2. <u>[Configure](configuration.md#prometheus)</u> Predator to push metrics to the push gateway.
-<br>
-3. Configure Prometheus to scrape from the push gateway.
+2. Deploy <u>[Prometheus](https://github.com/prometheus/prometheus)</u>  
+2. Deploy <u>[Prometheus push gateway](https://github.com/prometheus/pushgateway)</u>  
+3. <u>[Configure](configuration.md#prometheus)</u> Predator to push metrics to the push gateway.  
+5. Configure Prometheus to scrape from the push gateway.  
 
 ### <b>Is there any dashboard for Grafana I can use?</b>
 
-<u>[This](https://github.com/Zooz/predator/blob/master/resources/grafana_prometheus_dashboard.json)</u> dashboard for example configured to read from Prometheus.
+<u>[This](https://grafana.com/grafana/dashboards/11651)</u> dashboard for example configured to read from Prometheus.
 
 ![Screenshot](images/grafana_dashboard.png)
