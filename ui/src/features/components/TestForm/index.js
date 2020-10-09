@@ -8,7 +8,6 @@ import Modal from '../Modal';
 import { createTestRequest, createStateForEditTest, createDefaultExpectation, createDefaultCapture } from './utils';
 import { v4 as uuid } from 'uuid';
 import { cloneDeep, reduce, isNumber } from 'lodash';
-import Button from '../../../components/Button';
 import ErrorDialog from '../ErrorDialog';
 import ProcessorsDropDown from './ProcessorsDropDown';
 import Tabs from '../../../components/Tabs/Tabs'
@@ -26,10 +25,9 @@ import {
   EXPECTATIONS_TYPE,
   EXPECTATIONS_SPEC_BY_PROP
 } from './constants'
-
-import {
-  faDownload
-} from '@fortawesome/free-solid-svg-icons'
+import IconButton from '../../../components/IconButton';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const SLEEP = 'sleep';
@@ -193,15 +191,32 @@ export class TestForm extends React.Component {
       })
     }
     generateBottomBar = () => {
-      const { isLoading, closeDialog } = this.props;
+      const { isLoading } = this.props;
 
-      return (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
-        <Button style={{ marginRight: '5px' }} inverted onClick={closeDialog}>Cancel</Button>
-        <Button style={{ marginRight: '5px' }} spinner={isLoading} hover disabled={!this.state.name}
-          onClick={() => this.postTest(false)}>Save</Button>
-        <Button spinner={isLoading} hover disabled={!this.state.name}
-          onClick={() => this.postTest(true)}>Save & Run</Button>
-      </div>)
+      return (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '5px 32px 5px 0' }}>
+          <IconButton style={{ marginRight: '5px' }}
+            spinner={isLoading}
+            disabled={!this.state.name}
+            onClick={() => this.postTest(false)}
+            inverted
+            width='28px'
+            height='28px'
+            title='Save'>
+            <FontAwesomeIcon icon={faSave} size='2x' />
+          </IconButton>
+          <IconButton
+            spinner={isLoading}
+            disabled={!this.state.name}
+            onClick={() => this.postTest(true)}
+            inverted
+            width='28px'
+            height='28px'
+            title='Save & Run'>
+            <FontAwesomeIcon icon={faPlayCircle} size='2x' />
+          </IconButton>
+        </div>
+      )
     };
     addScenarioHandler = () => {
       const { scenarios } = this.state;
