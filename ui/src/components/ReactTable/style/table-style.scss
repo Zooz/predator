@@ -55,3 +55,8 @@ $left-spacing: 0.7rem;
 }
 
 .tbody { overflow: visible!important;}
+
+.ReactTable .rt-tr:hover .rt-td {
+  background-color: rgba(247, 247, 247, 0.05)
+}
+
