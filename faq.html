@@ -753,12 +753,12 @@
 <h3 id="i-run-a-test-successfully-but-no-report-is-created-for-the-test"><b>I run a test successfully but no report is created for the test</b><a class="headerlink" href="#i-run-a-test-successfully-but-no-report-is-created-for-the-test" title="Permanent link">#</a></h3>
 <p>The Predator-Runner docker that is reporting the test results back to Predator isn't able to connect to it, 
 which is why the test runs but no report is generated. When installing Predator in Docker, the following command is used:
-<div class="codehilite"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">e</span> <span class="n">JOB_PLATFORM</span><span class="o">=</span><span class="n">DOCKER</span> <span class="o">-</span><span class="n">e</span> <span class="n">INTERNAL_ADDRESS</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="err">$</span><span class="n">MACHINE_IP</span><span class="p">:</span><span class="mi">80</span><span class="o">/</span><span class="n">v1</span> <span class="err">\</span>
-<span class="o">-</span><span class="n">p</span> <span class="mi">80</span><span class="p">:</span><span class="mi">80</span> <span class="c1">--name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator</span>
+<div class="codehilite"><pre><span></span>docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 \
+-p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator
 </pre></div></p>
 <p>The <code>INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1</code> is what the Predator-Runner uses to communicate with Predator, 
 and <code>$MACHINE_IP</code> needs to be your local network address (an IP address). You can get it by running the command: 
-<div class="codehilite"><pre><span></span><span class="n">ifconfig</span> <span class="n">en0</span> <span class="o">|</span> <span class="n">grep</span> <span class="s1">&#39;inet &#39;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="s1">&#39; &#39;</span> <span class="o">-</span><span class="n">f2</span>
+<div class="codehilite"><pre><span></span>ifconfig en0 | grep &#39;inet &#39; | cut -d&#39; &#39; -f2
 </pre></div></p>
 <p>For more information regarding correct installation of Predator using Docker visit the <u><a href="installation.html#docker">Installation</a></u> section.</p>
 <p>It is important to note this is an issue and solution only in Docker installations. 
@@ -802,37 +802,37 @@ In this example, the content-type used in the request is <code>text/html</code> 
 <p>This is possible by configuring Predator with the <code>custom_runner_definition</code> parameter. This is a JSON value that will 
 be merged with the runner job definition when creating new jobs in both Kuberenetes and Metronome platforms. </p>
 <p>Example usage for Predator deployed with Kubernetes and need to change memory/cpu requests and limits while adding security context and image pull secrets:
-<div class="codehilite"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">PUT</span> <span class="err">\</span>
-  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">PREDATOR</span><span class="o">-</span><span class="n">API</span><span class="o">-</span><span class="n">URL</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">config</span> <span class="err">\</span>
-  <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="err">\</span>
-  <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{</span>
-<span class="s1">    &quot;custom_runner_definition&quot;: {</span>
-<span class="s1">        &quot;spec&quot;: {</span>
-<span class="s1">            &quot;template&quot;: {</span>
-<span class="s1">                &quot;spec&quot;: {</span>
-<span class="s1">                    &quot;imagePullSecrets&quot;: [{</span>
-<span class="s1">                        &quot;name&quot;: &quot;****&quot;</span>
-<span class="s1">                    }],</span>
-<span class="s1">                    &quot;securityContext&quot;: {</span>
-<span class="s1">                        &quot;runAsUser&quot;: 1000</span>
-<span class="s1">                    },</span>
-<span class="s1">                    &quot;containers&quot;: [{</span>
-<span class="s1">                        &quot;resources&quot;: {</span>
-<span class="s1">                            &quot;requests&quot;: {</span>
-<span class="s1">                                &quot;memory&quot;: &quot;128Mi&quot;,</span>
-<span class="s1">                                &quot;cpu&quot;: &quot;0.5&quot;</span>
-<span class="s1">                            },</span>
-<span class="s1">                            &quot;limits&quot;: {</span>
-<span class="s1">                                &quot;memory&quot;: &quot;1024Mi&quot;,</span>
-<span class="s1">                                &quot;cpu&quot;: &quot;1&quot;</span>
-<span class="s1">                            }</span>
-<span class="s1">                        }</span>
-<span class="s1">                    }]</span>
-<span class="s1">                }</span>
-<span class="s1">            }</span>
-<span class="s1">        }</span>
-<span class="s1">    }</span>
-<span class="s1">}&#39;</span>
+<div class="codehilite"><pre><span></span>curl -X PUT \
+  http://PREDATOR-API-URL/v1/config \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;custom_runner_definition&quot;: {
+        &quot;spec&quot;: {
+            &quot;template&quot;: {
+                &quot;spec&quot;: {
+                    &quot;imagePullSecrets&quot;: [{
+                        &quot;name&quot;: &quot;****&quot;
+                    }],
+                    &quot;securityContext&quot;: {
+                        &quot;runAsUser&quot;: 1000
+                    },
+                    &quot;containers&quot;: [{
+                        &quot;resources&quot;: {
+                            &quot;requests&quot;: {
+                                &quot;memory&quot;: &quot;128Mi&quot;,
+                                &quot;cpu&quot;: &quot;0.5&quot;
+                            },
+                            &quot;limits&quot;: {
+                                &quot;memory&quot;: &quot;1024Mi&quot;,
+                                &quot;cpu&quot;: &quot;1&quot;
+                            }
+                        }
+                    }]
+                }
+            }
+        }
+    }
+}&#39;
 </pre></div>
 This will spawn each predator-runner with the desired specs. </p>
 <p>Note: this parameter is applied <b>globally</b>, meaning that <b>all</b> runners will be applied the above specs once configured.
@@ -847,14 +847,12 @@ you must restart Predator with the new <u><a href="configuration.html#database">
 <h3 id="how-can-i-export-metrics-to-prometheus"><b>How can I export metrics to Prometheus?</b><a class="headerlink" href="#how-can-i-export-metrics-to-prometheus" title="Permanent link">#</a></h3>
 <p><u><a href="https://prometheus.io">Prometheus</a></u> by its nature is a scraper, while the Predator-Runner is a job without a specific API and finite time life.
 To overcome this:
-<br>
-1. Deploy <u><a href="https://github.com/prometheus/pushgateway">Prometheus push gateway</a></u>
-<br>
-2. <u><a href="configuration.html#prometheus">Configure</a></u> Predator to push metrics to the push gateway.
-<br>
-3. Configure Prometheus to scrape from the push gateway.</p>
+2. Deploy <u><a href="https://github.com/prometheus/prometheus">Prometheus</a></u><br />
+2. Deploy <u><a href="https://github.com/prometheus/pushgateway">Prometheus push gateway</a></u><br />
+3. <u><a href="configuration.html#prometheus">Configure</a></u> Predator to push metrics to the push gateway.<br />
+5. Configure Prometheus to scrape from the push gateway.  </p>
 <h3 id="is-there-any-dashboard-for-grafana-i-can-use"><b>Is there any dashboard for Grafana I can use?</b><a class="headerlink" href="#is-there-any-dashboard-for-grafana-i-can-use" title="Permanent link">#</a></h3>
-<p><u><a href="https://github.com/Zooz/predator/blob/master/resources/grafana_prometheus_dashboard.json">This</a></u> dashboard for example configured to read from Prometheus.</p>
+<p><u><a href="https://grafana.com/grafana/dashboards/11651">This</a></u> dashboard for example configured to read from Prometheus.</p>
 <p><img alt="Screenshot" src="images/grafana_dashboard.png" /></p>
                     
                     

@@ -817,24 +817,24 @@ please refer to the <u><a href="https://artillery.io/docs/http-reference/#advanc
 </div>
 <p><img alt="Screenshot" src="images/createprocessor.png" /></p>
 <h3 id="template">Template<a class="headerlink" href="#template" title="Permanent link">#</a></h3>
-<div class="codehilite"><pre><span></span><span class="nv">module</span>.<span class="nv">exports</span> <span class="o">=</span> {
-    <span class="nv">beforeScenario</span>,
-    <span class="nv">afterScenario</span>,
-    <span class="nv">beforeRequest</span>,
-    <span class="nv">afterResponse</span>
-}<span class="c1">;</span>
-<span class="nv">function</span> <span class="nv">beforeScenario</span><span class="ss">(</span><span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
-<span class="nv">function</span> <span class="nv">afterScenario</span><span class="ss">(</span><span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
-<span class="nv">function</span> <span class="nv">beforeRequest</span><span class="ss">(</span><span class="nv">requestParams</span>, <span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
-<span class="nv">function</span> <span class="nv">afterResponse</span><span class="ss">(</span><span class="nv">requestParams</span>, <span class="nv">response</span>, <span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<div class="codehilite"><pre><span></span><span class="kr">module</span><span class="nx">.exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">beforeScenario</span><span class="p">,</span>
+    <span class="nx">afterScenario</span><span class="p">,</span>
+    <span class="nx">beforeRequest</span><span class="p">,</span>
+    <span class="nx">afterResponse</span>
+<span class="p">};</span>
+<span class="kd">function</span> <span class="nx">beforeScenario</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
+<span class="kd">function</span> <span class="nx">afterScenario</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
+<span class="kd">function</span> <span class="nx">beforeRequest</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
+<span class="kd">function</span> <span class="nx">afterResponse</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 </pre></div>
 
 <h3 id="description">Description<a class="headerlink" href="#description" title="Permanent link">#</a></h3>
@@ -849,42 +849,42 @@ please refer to the <u><a href="https://artillery.io/docs/http-reference/#advanc
 <p>These functions will be executed <strong>once</strong> after a specific request. All after response functions must adhere to the <code>(requestParams, response, context, ee, next)</code> parameters in their function signature.</p>
 <h3 id="use-case-examples">Use case examples:<a class="headerlink" href="#use-case-examples" title="Permanent link">#</a></h3>
 <h4 id="1-prerequistes-for-a-request">1. <strong>Prerequistes for a request</strong><a class="headerlink" href="#1-prerequistes-for-a-request" title="Permanent link">#</a></h4>
-<div class="codehilite"><pre><span></span><span class="nv">const</span> <span class="nv">uuid</span> <span class="o">=</span> <span class="nv">require</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">uuid/v4</span><span class="s1">&#39;</span><span class="ss">)</span><span class="c1">;</span>
-<span class="nv">module</span>.<span class="nv">exports</span> <span class="o">=</span> {
-    <span class="nv">createAuthToken</span>
-}<span class="c1">;</span>
+<div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">uuid</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;uuid/v4&#39;</span><span class="p">);</span>
+<span class="kr">module</span><span class="nx">.exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">createAuthToken</span>
+<span class="p">};</span>
 
-<span class="nv">function</span> <span class="nv">createAuthToken</span><span class="ss">(</span><span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="nv">context</span>.<span class="nv">vars</span>.<span class="nv">token</span> <span class="o">=</span> <span class="nv">uuid</span><span class="ss">()</span><span class="c1">;</span>
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<span class="kd">function</span> <span class="nx">createAuthToken</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">context</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">token</span> <span class="o">=</span> <span class="nx">uuid</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 </pre></div>
 
 <h4 id="2-random-data-generation">2. <strong>Random data generation</strong><a class="headerlink" href="#2-random-data-generation" title="Permanent link">#</a></h4>
-<div class="codehilite"><pre><span></span><span class="nv">module</span>.<span class="nv">exports</span> <span class="o">=</span> {
-    <span class="nv">generateRandomName</span>
-}<span class="c1">;</span>
+<div class="codehilite"><pre><span></span><span class="kr">module</span><span class="nx">.exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">generateRandomName</span>
+<span class="p">};</span>
 
-<span class="nv">function</span> <span class="nv">generateRandomName</span><span class="ss">(</span><span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="nv">context</span>.<span class="nv">vars</span>.<span class="nv">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="s">random_name_</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">Date</span>.<span class="nv">now</span><span class="ss">()</span><span class="c1">;</span>
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<span class="kd">function</span> <span class="nx">generateRandomName</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">context</span><span class="p">.</span><span class="nx">vars</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;random_name_&#39;</span> <span class="o">+</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 </pre></div>
 
 <h4 id="3-response-logging">3. <strong>Response logging</strong><a class="headerlink" href="#3-response-logging" title="Permanent link">#</a></h4>
-<div class="codehilite"><pre><span></span><span class="nv">module</span>.<span class="nv">exports</span> <span class="o">=</span> {
-    <span class="nv">logErrorByStatusCode</span>
-}<span class="c1">;</span>
+<div class="codehilite"><pre><span></span><span class="kr">module</span><span class="nx">.exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">logErrorByStatusCode</span>
+<span class="p">};</span>
 
-<span class="nv">function</span> <span class="nv">logErrorByStatusCode</span><span class="ss">(</span><span class="nv">requestParams</span>, <span class="nv">response</span>, <span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-  <span class="k">if</span> <span class="ss">(</span><span class="nv">response</span>.<span class="nv">statusCode</span> <span class="o">&gt;=</span> <span class="mi">300</span><span class="ss">)</span> {
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span>`<span class="o">****************</span> <span class="nv">fail</span> <span class="nv">with</span> <span class="nv">status</span> <span class="nv">code</span>: ${<span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">statusCode</span><span class="ss">)</span>}`<span class="ss">)</span><span class="c1">;</span>
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span>`<span class="o">****************</span> <span class="nv">response</span> <span class="nv">body</span>: ${<span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">body</span><span class="ss">)</span>}`<span class="ss">)</span><span class="c1">;</span>
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span>`<span class="o">****************</span> <span class="nv">response</span> <span class="nv">headers</span> <span class="nv">is</span>: ${<span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">headers</span><span class="ss">)</span>}`<span class="ss">)</span><span class="c1">;</span>
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span>`<span class="o">****************</span> <span class="nv">request</span> <span class="nv">body</span>: ${<span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">requestParams</span>.<span class="nv">body</span><span class="ss">)</span>}`<span class="ss">)</span><span class="c1">;</span>
-  }
-  <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<span class="kd">function</span> <span class="nx">logErrorByStatusCode</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">&gt;=</span> <span class="mi">300</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`**************** fail with status code: </span><span class="si">${</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`**************** response body: </span><span class="si">${</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`**************** response headers is: </span><span class="si">${</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`**************** request body: </span><span class="si">${</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">.</span><span class="nx">body</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 </pre></div>
 
 <h2 id="using-in-a-test">Using in a test<a class="headerlink" href="#using-in-a-test" title="Permanent link">#</a></h2>
@@ -893,48 +893,48 @@ The exported functions from the processor will dynamically load into the <code>B
 dropdown menus.</p>
 <h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">#</a></h3>
 <p>In this example, we loaded a handleErrors processor with the following JavaScript:</p>
-<div class="codehilite"><pre><span></span><span class="nv">const</span> <span class="nv">uuid</span> <span class="o">=</span> <span class="nv">require</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">uuid/v4</span><span class="s1">&#39;</span><span class="ss">)</span><span class="c1">;</span>
-<span class="nv">module</span>.<span class="nv">exports</span> <span class="o">=</span> {
-    <span class="nv">throwErrorOnError</span>, <span class="nv">logResponseOnError</span>, <span class="nv">beforeRequest</span>, <span class="nv">afterResponse</span>, <span class="nv">afterScenario</span>, <span class="nv">beforeScenario</span>
-}<span class="c1">;</span>
+<div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">uuid</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;uuid/v4&#39;</span><span class="p">);</span>
+<span class="kr">module</span><span class="nx">.exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">throwErrorOnError</span><span class="p">,</span> <span class="nx">logResponseOnError</span><span class="p">,</span> <span class="nx">beforeRequest</span><span class="p">,</span> <span class="nx">afterResponse</span><span class="p">,</span> <span class="nx">afterScenario</span><span class="p">,</span> <span class="nx">beforeScenario</span>
+<span class="p">};</span>
 
-<span class="nv">function</span> <span class="nv">beforeRequest</span><span class="ss">(</span><span class="nv">requestParams</span>, <span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">before request</span><span class="s1">&#39;</span><span class="ss">)</span>
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<span class="kd">function</span> <span class="nx">beforeRequest</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;before request&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 
-<span class="nv">function</span> <span class="nv">afterResponse</span><span class="ss">(</span><span class="nv">requestParams</span>, <span class="nv">response</span>, <span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">after response</span><span class="s1">&#39;</span><span class="ss">)</span>
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<span class="kd">function</span> <span class="nx">afterResponse</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;after response&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 
-<span class="nv">function</span> <span class="nv">afterScenario</span><span class="ss">(</span><span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">after scenario</span><span class="s1">&#39;</span><span class="ss">)</span>
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<span class="kd">function</span> <span class="nx">afterScenario</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;after scenario&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 
-<span class="nv">function</span> <span class="nv">beforeScenario</span><span class="ss">(</span><span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">before scenario</span><span class="s1">&#39;</span><span class="ss">)</span>
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<span class="kd">function</span> <span class="nx">beforeScenario</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;before scenario&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 
-<span class="nv">function</span> <span class="nv">throwErrorOnError</span><span class="ss">(</span><span class="nv">requestParams</span>, <span class="nv">response</span>, <span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">**************** fail with status code: </span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">statusCode</span><span class="ss">))</span><span class="c1">;</span>
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">**************** host is: </span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">request</span>.<span class="nv">uri</span>.<span class="nv">host</span><span class="ss">))</span><span class="c1">;</span>
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">**************** path is: </span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">request</span>.<span class="nv">uri</span>.<span class="nv">pathname</span><span class="ss">))</span><span class="c1">;</span>
-    <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">**************** response headers is: </span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">headers</span><span class="ss">))</span><span class="c1">;</span>
-    <span class="nv">throw</span> <span class="nv">new</span> <span class="nv">Error</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">Stopping test</span><span class="s1">&#39;</span><span class="ss">)</span><span class="c1">;</span>
-}
+<span class="kd">function</span> <span class="nx">throwErrorOnError</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** fail with status code: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">));</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** host is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">host</span><span class="p">));</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** path is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">pathname</span><span class="p">));</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** response headers is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">));</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Stopping test&#39;</span><span class="p">);</span>
+<span class="p">}</span>
 
-<span class="nv">function</span> <span class="nv">logResponseOnError</span><span class="ss">(</span><span class="nv">requestParams</span>, <span class="nv">response</span>, <span class="nv">context</span>, <span class="nv">ee</span>, <span class="k">next</span><span class="ss">)</span> {
-    <span class="k">if</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">statusCode</span> <span class="o">!==</span> <span class="mi">200</span> <span class="o">||</span> <span class="nv">esponse</span>.<span class="nv">statusCode</span> <span class="o">!==</span> <span class="mi">201</span> <span class="o">||</span> <span class="nv">esponse</span>.<span class="nv">statusCode</span> <span class="o">!==</span> <span class="mi">204</span><span class="ss">)</span>{
-        <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">**************** fail with status code: </span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">statusCode</span><span class="ss">))</span><span class="c1">;</span>
-        <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">**************** host is: </span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">request</span>.<span class="nv">uri</span>.<span class="nv">host</span><span class="ss">))</span><span class="c1">;</span>
-        <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">**************** path is: </span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">request</span>.<span class="nv">uri</span>.<span class="nv">pathname</span><span class="ss">))</span><span class="c1">;</span>
-        <span class="nv">console</span>.<span class="nv">log</span><span class="ss">(</span><span class="s1">&#39;</span><span class="s">**************** response headers is: </span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nv">JSON</span>.<span class="nv">stringify</span><span class="ss">(</span><span class="nv">response</span>.<span class="nv">headers</span><span class="ss">))</span><span class="c1">;</span>
-    }
-    <span class="k">return</span> <span class="k">next</span><span class="ss">()</span><span class="c1">; // MUST be called for the scenario to continue</span>
-}
+<span class="kd">function</span> <span class="nx">logResponseOnError</span><span class="p">(</span><span class="nx">requestParams</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">ee</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span> <span class="o">||</span> <span class="nx">esponse</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">201</span> <span class="o">||</span> <span class="nx">esponse</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">204</span><span class="p">){</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** fail with status code: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">));</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** host is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">host</span><span class="p">));</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** path is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">pathname</span><span class="p">));</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;**************** response headers is: &#39;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">();</span> <span class="c1">// MUST be called for the scenario to continue</span>
+<span class="p">}</span>
 </pre></div>
 
 <h4 id="scenario">Scenario<a class="headerlink" href="#scenario" title="Permanent link">#</a></h4>

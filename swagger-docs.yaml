@@ -972,9 +972,10 @@ paths:
           name: limit
           description: The number of most recent reports to retrieve.
           required: true
-          minimum: 1
-          maximum: 250
-          type: integer
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 250
         - in: query
           name: filter
           description: is filter and by what property
@@ -2705,3 +2706,4 @@ components:
       enum:
         - slack
         - json
+        - teams
