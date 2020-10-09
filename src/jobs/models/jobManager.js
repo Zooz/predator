@@ -12,7 +12,8 @@ const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
     { CONFIG, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
-    generateError = require('../../common/generateError');
+    generateError = require('../../common/generateError'),
+    { version: PREDATOR_VERSION } = require('../../../package.json');
 
 let jobConnector;
 const cronJobs = {};
@@ -218,7 +219,8 @@ async function createJobRequest(jobId, reportId, jobBody, dockerImage, configDat
         PREDATOR_URL: configData.internal_address,
         DELAY_RUNNER_MS: configData.delay_runner_ms.toString(),
         DURATION: jobBody.duration.toString(),
-        REPORT_ID: reportId
+        REPORT_ID: reportId,
+        predator_version: PREDATOR_VERSION
     };
     if (jobBody.type === JOB_TYPE_FUNCTIONAL_TEST) {
         const arrivalCountPerRunner = Math.ceil(jobBody.arrival_count / parallelism);

@@ -2,11 +2,12 @@
 
 const should = require('should'),
     rewire = require('rewire'),
-    sinon = require('sinon');
+    sinon = require('sinon'),
+    uuid = require('uuid');
 
-const databaseConnector = require('../../../../src/jobs/models/database/databaseConnector'),
+const { version: PREDATOR_VERSION } = require('../../../../package.json') ,
+    databaseConnector = require('../../../../src/jobs/models/database/databaseConnector'),
     logger = require('../../../../src/common/logger'),
-    uuid = require('uuid'),
     jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector'),
     dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector'),
     jobTemplate = require('../../../../src/jobs/models/kubernetes/jobTemplate'),
@@ -267,6 +268,7 @@ describe('Manager tests', function () {
                 JOB_TYPE: 'load_test',
                 ARRIVAL_RATE: '1',
                 REPORT_ID: reportId,
+                PREDATOR_VERSION,
                 DURATION: '1',
                 CUSTOM_KEY1: 'A',
                 CUSTOM_KEY2: 'B'
