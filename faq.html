@@ -846,8 +846,8 @@ you must restart Predator with the new <u><a href="configuration.html#database">
 <p>Yes, Predator has integration with both <u><a href="https://prometheus.io">Prometheus</a></u> and <u><a href="https://www.influxdata.com/">InfluxDB</a></u>, and can export metrics by test endpoints and status codes, something that is currently is not available to configure in the Predator UI, but is supported through the API.</p>
 <h3 id="how-can-i-export-metrics-to-prometheus"><b>How can I export metrics to Prometheus?</b><a class="headerlink" href="#how-can-i-export-metrics-to-prometheus" title="Permanent link">#</a></h3>
 <p><u><a href="https://prometheus.io">Prometheus</a></u> by its nature is a scraper, while the Predator-Runner is a job without a specific API and finite time life.
-To overcome this:
-2. Deploy <u><a href="https://github.com/prometheus/prometheus">Prometheus</a></u><br />
+To overcome this:<br />
+1. Deploy <u><a href="https://github.com/prometheus/prometheus">Prometheus</a></u><br />
 2. Deploy <u><a href="https://github.com/prometheus/pushgateway">Prometheus push gateway</a></u><br />
 3. <u><a href="configuration.html#prometheus">Configure</a></u> Predator to push metrics to the push gateway.<br />
 4. Configure Prometheus to scrape from the push gateway.  </p>
