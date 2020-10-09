@@ -131,11 +131,11 @@ Yes, Predator has integration with both <u>[Prometheus](https://prometheus.io)</
 ### <b>How can I export metrics to Prometheus?</b>
 
 <u>[Prometheus](https://prometheus.io)</u> by its nature is a scraper, while the Predator-Runner is a job without a specific API and finite time life.
-To overcome this:
-2. Deploy <u>[Prometheus](https://github.com/prometheus/prometheus)</u>  
+To overcome this:  
+1. Deploy <u>[Prometheus](https://github.com/prometheus/prometheus)</u>  
 2. Deploy <u>[Prometheus push gateway](https://github.com/prometheus/pushgateway)</u>  
 3. <u>[Configure](configuration.md#prometheus)</u> Predator to push metrics to the push gateway.  
-5. Configure Prometheus to scrape from the push gateway.  
+4. Configure Prometheus to scrape from the push gateway.  
 
 ### <b>Is there any dashboard for Grafana I can use?</b>
 
