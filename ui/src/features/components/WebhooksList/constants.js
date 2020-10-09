@@ -10,5 +10,5 @@ export const EVENTS = [
 ];
 
 export const WEBHOOK_TYPES = [
-    'json','slack'
+    'json','slack','teams'
 ]
