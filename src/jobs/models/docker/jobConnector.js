@@ -40,21 +40,21 @@ module.exports.runJob = async (dockerJobConfig) => {
 
     const promises = [];
     for (let i = 0; i < (dockerJobConfig.parallelism || 1); i++) {
-        promises.push(startContainer(dockerJobConfig.dockerImage, dockerJobConfig.jobName, dockerJobConfig.runId, i, envVarArray));
+        promises.push(startContainer(dockerJobConfig.dockerImage, dockerJobConfig.jobName, dockerJobConfig.reportId, i, envVarArray));
     }
 
     await Promise.all(promises);
 
     const genericJobResponse = {
         jobName: dockerJobConfig.jobName,
-        id: dockerJobConfig.runId
+        id: dockerJobConfig.reportId
     };
     return genericJobResponse;
 };
 
-const startContainer = async (dockerImage, jobName, runId, parallelIndex, envVarArray) => {
+const startContainer = async (dockerImage, jobName, reportId, parallelIndex, envVarArray) => {
     const container = await docker.createContainer({
-        name: `${jobName}-${runId}-${parallelIndex}`,
+        name: `${jobName}-${reportId}-${parallelIndex}`,
         Image: dockerImage,
         Env: envVarArray
     });

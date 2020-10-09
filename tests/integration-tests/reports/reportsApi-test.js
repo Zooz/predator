@@ -54,7 +54,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
 
-                    const reportId = jobCreateResponse.body.run_id;
+                    const reportId = jobCreateResponse.body.report_id;
                     const jobId = jobCreateResponse.body.id;
 
                     const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
@@ -101,7 +101,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
 
-                    const reportId = jobCreateResponse.body.run_id;
+                    const reportId = jobCreateResponse.body.report_id;
 
                     await sleep(1 * 1000); // 1 seconds
 
@@ -144,7 +144,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
 
-                    const reportId = jobCreateResponse.body.run_id;
+                    const reportId = jobCreateResponse.body.report_id;
 
                     await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
                     await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
@@ -178,7 +178,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
-                    const reportId = jobCreateResponse.body.run_id;
+                    const reportId = jobCreateResponse.body.report_id;
 
                     await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
                     await assertPostStats(testId, reportId, runnerId, constants.REPORT_ABORTED_STATUS);
@@ -208,7 +208,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
-                    const reportId = jobCreateResponse.body.run_id;
+                    const reportId = jobCreateResponse.body.report_id;
 
                     await sleep(1 * 1000); // 1 seconds
                     await runFullSingleRunnerCycle(testId, reportId, runnerId);
@@ -237,7 +237,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
 
-                    const reportId = jobCreateResponse.body.run_id;
+                    const reportId = jobCreateResponse.body.report_id;
                     const jobId = jobCreateResponse.body.id;
 
                     await sleep(1 * 1000);
@@ -286,7 +286,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
-                    const reportId = jobCreateResponse.body.run_id;
+                    const reportId = jobCreateResponse.body.report_id;
 
                     await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
 
@@ -386,7 +386,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
 
                     await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
                     await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
@@ -470,7 +470,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
                     const jobId = jobCreateResponse.body.id;
 
                     await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
@@ -530,7 +530,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
 
                     await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
                     await sleep(1 * 1000);
@@ -575,7 +575,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
                     const jobId = jobCreateResponse.body.id;
 
                     await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
@@ -723,7 +723,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
 
-                    const reportId = jobCreateResponse.body.run_id;
+                    const reportId = jobCreateResponse.body.report_id;
                     await mailhogHelper.clearAllOldMails();
                     await runFullSingleRunnerCycle(testId, reportId, runnerId);
                     await mailhogHelper.validateEmail();
@@ -756,7 +756,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
                     const jobId = jobCreateResponse.body.id;
 
                     await assertRunnerSubscriptionToReport(testId, reportId, firstRunnerId);
@@ -829,7 +829,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
 
                     await assertRunnerSubscriptionToReport(testId, reportId, firstRunnerId);
                     await assertRunnerSubscriptionToReport(testId, reportId, secondRunnerId);
@@ -867,7 +867,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
 
                     await assertRunnerSubscriptionToReport(testId, reportId, firstRunnerId);
                     await assertRunnerSubscriptionToReport(testId, reportId, secondRunnerId);
@@ -904,7 +904,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
 
                     await assertRunnerSubscriptionToReport(testId, reportId, firstRunnerId);
                     await assertRunnerSubscriptionToReport(testId, reportId, secondRunnerId);
@@ -944,7 +944,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
 
                     await assertRunnerSubscriptionToReport(testId, reportId, firstRunnerId);
                     await assertRunnerSubscriptionToReport(testId, reportId, secondRunnerId);
@@ -988,7 +988,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                     expect(jobCreateResponse.status).to.be.equal(201);
                     // casting is not cool
-                    const reportId = jobCreateResponse.body.run_id.toString();
+                    const reportId = jobCreateResponse.body.report_id.toString();
 
                     await assertRunnerSubscriptionToReport(testId, reportId, firstRunnerId);
                     await assertRunnerSubscriptionToReport(testId, reportId, secondRunnerId);
@@ -1031,7 +1031,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                 const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                 expect(jobCreateResponse.status).to.be.equal(201);
 
-                const reportId = jobCreateResponse.body.run_id;
+                const reportId = jobCreateResponse.body.report_id;
 
                 const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { notes: newNote });
                 expect(editReportResponse.status).to.be.equal(204);
@@ -1065,7 +1065,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                 const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                 expect(jobCreateResponse.status).to.be.equal(201);
 
-                const reportId = jobCreateResponse.body.run_id;
+                const reportId = jobCreateResponse.body.report_id;
 
                 const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { is_favorite: true });
                 expect(editReportResponse.status).to.be.equal(204);
@@ -1101,7 +1101,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                 const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                 expect(jobCreateResponse.status).to.be.equal(201);
 
-                const reportId = jobCreateResponse.body.run_id;
+                const reportId = jobCreateResponse.body.report_id;
 
                 const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { is_favorite: true, notes: newNote });
                 expect(editReportResponse.status).to.be.equal(204);
@@ -1137,7 +1137,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                 const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                 expect(jobCreateResponse.status).to.be.equal(201);
-                const reportId = jobCreateResponse.body.run_id;
+                const reportId = jobCreateResponse.body.report_id;
 
                 await runFullSingleRunnerCycle(testId, reportId, runnerId);
 
@@ -1178,12 +1178,12 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                 const firstJobCreateResponse = await jobRequestCreator.createJob(job, headers);
                 expect(firstJobCreateResponse.status).to.be.equal(201);
-                const firstReportId = firstJobCreateResponse.body.run_id.toString();
+                const firstReportId = firstJobCreateResponse.body.report_id.toString();
 
                 nockK8sRunnerCreation(kubernetesConfig.kubernetesUrl, jobName, id, kubernetesConfig.kubernetesNamespace);
                 const secondJobCreateResponse = await jobRequestCreator.createJob(job, headers);
                 expect(secondJobCreateResponse.status).to.be.equal(201);
-                const secondReportId = secondJobCreateResponse.body.run_id.toString();
+                const secondReportId = secondJobCreateResponse.body.report_id.toString();
 
                 await runFullSingleRunnerCycle(testId, firstReportId, firstRunnerId);
                 await runFullSingleRunnerCycle(testId, secondReportId, secondRunnerId);
@@ -1236,7 +1236,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                 const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                 expect(jobCreateResponse.status).to.be.equal(201);
-                const reportId = jobCreateResponse.body.run_id;
+                const reportId = jobCreateResponse.body.report_id;
 
                 await runFullSingleRunnerCycle(testId, reportId, runnerId);
 
@@ -1269,7 +1269,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                 const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
                 expect(jobCreateResponse.status).to.be.equal(201);
-                const reportId = jobCreateResponse.body.run_id;
+                const reportId = jobCreateResponse.body.report_id;
 
                 const deleteRunningTestResponse = await reportsRequestCreator.deleteReport(testId, reportId);
                 expect(deleteRunningTestResponse.status).to.be.equal(409);

@@ -66,7 +66,7 @@ describe('Create job specific metronome tests', async function () {
                             url => {
                                 return url.startsWith('/v1/jobs') && url.endsWith('/runs');
                             }).reply(200, {
-                            id: 'runId'
+                            id: 'reportId'
                         });
 
                         createJobResponse = await schedulerRequestCreator.createJob(validBody, {
@@ -97,7 +97,7 @@ describe('Create job specific metronome tests', async function () {
                             .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/1/actions/stop`)
                             .reply(200);
 
-                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -149,7 +149,7 @@ describe('Create job specific metronome tests', async function () {
                             url => {
                                 return url.startsWith('/v1/jobs') && url.endsWith('/runs');
                             }).times(2).reply(200, {
-                            id: 'runId'
+                            id: '13046d76-1b8c-4b3f-9061-e8dc819d585c'
                         });
 
                         createJobResponse = await schedulerRequestCreator.createJob(validBody, {
@@ -184,7 +184,7 @@ describe('Create job specific metronome tests', async function () {
                             .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/2/actions/stop`)
                             .reply(200);
 
-                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
                             'Content-Type': 'application/json'
                         });
 

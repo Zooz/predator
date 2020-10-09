@@ -63,8 +63,7 @@ module.exports.deleteReport = async (testId, reportId) => {
     await databaseConnector.deleteReport(testId, reportId);
 };
 
-module.exports.postReport = async(runId, testId, jobId, startTime) => {
-    const reportId = runId;
+module.exports.postReport = async (reportId, testId, jobId, startTime) => {
     const test = await testsManager.getTest(testId);
     const job = await jobConnector.getJob(jobId);
     const phase = '0';

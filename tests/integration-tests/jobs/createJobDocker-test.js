@@ -106,20 +106,20 @@ describe('Create job specific docker tests', async function () {
                         containers = containers.filter(container => {
                             return container.Names && container.Names[0] &&
                                 container.Names[0].includes(createJobResponse.body.id) &&
-                                container.Names[0].includes(createJobResponse.body.run_id);
+                                container.Names[0].includes(createJobResponse.body.report_id);
                         });
 
                         should(containers.length).eql(2);
                     });
 
                     it('Get logs', async () => {
-                        const logs = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {});
+                        const logs = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.report_id, {});
                         should(logs.status).eql(200);
                         should(logs.headers['content-type']).eql('application/zip');
                     });
 
                     it('Stop run', async () => {
-                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
                             'Content-Type': 'application/json'
                         });
 

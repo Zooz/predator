@@ -58,10 +58,10 @@ describe('Kubernetes job connector tests', function () {
     describe('Stop running job', () => {
         it('Stop a running run of specific job', async () => {
             requestSenderSendStub.resolves({ statusCode: 200 });
-            await jobConnector.stopRun('jobPlatformName', 'runId');
+            await jobConnector.stopRun('jobPlatformName', 'reportId');
             requestSenderSendStub.calledOnce.should.eql(true);
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId?propagationPolicy=Foreground',
+                url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-reportId?propagationPolicy=Foreground',
                 method: 'DELETE',
                 headers: {}
             });
@@ -80,7 +80,7 @@ describe('Kubernetes job connector tests', function () {
 
     describe('Get logs', () => {
         it('Get logs of specific job', async () => {
-            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId' })).resolves({
+            requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-reportId' })).resolves({
                 spec: { selector: { matchLabels: { 'controller-uid': 'uid' } } }
             });
             requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods?labelSelector=controller-uid=uid' })).resolves({
@@ -90,7 +90,7 @@ describe('Kubernetes job connector tests', function () {
 
             requestSenderSendStub.withArgs(sinon.match({ url: 'localhost:80/api/v1/namespaces/default/pods/podB/log?container=predator-runner' })).resolves('bLog');
 
-            const logs = await jobConnector.getLogs('jobPlatformName', 'runId', 'predator-runner');
+            const logs = await jobConnector.getLogs('jobPlatformName', 'reportId', 'predator-runner');
 
             logs.should.eql([{ type: 'file', name: 'podA.txt', content: 'aLog' },
                 { type: 'file', name: 'podB.txt', content: 'bLog' }]);
@@ -98,10 +98,10 @@ describe('Kubernetes job connector tests', function () {
 
         it('Get logs fails due to error in kubernetes', async () => {
             requestSenderSendStub
-                .withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-runId' }))
+                .withArgs(sinon.match({ url: 'localhost:80/apis/batch/v1/namespaces/default/jobs/jobPlatformName-reportId' }))
                 .rejects(new Error('Error in kubernetes'));
             try {
-                await jobConnector.getLogs('jobPlatformName', 'runId');
+                await jobConnector.getLogs('jobPlatformName', 'reportId');
                 throw new Error('Should not get here');
             } catch (error) {
                 error.message.should.eql('Error in kubernetes');

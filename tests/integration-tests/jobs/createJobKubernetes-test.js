@@ -261,7 +261,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Get logs', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}`)
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.report_id}`)
                             .reply(200, {
                                 spec: { selector: { matchLabels: { 'controller-uid': 'uid' } } }
                             });
@@ -281,7 +281,7 @@ describe('Create job specific kubernetes tests', async function () {
                                 items: [{ content: 'log' }]
                             });
 
-                        const getLogsResponse = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const getLogsResponse = await schedulerRequestCreator.getLogs(createJobResponse.body.id, createJobResponse.body.report_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -290,10 +290,10 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Stop run', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}?propagationPolicy=Foreground`)
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.report_id}?propagationPolicy=Foreground`)
                             .reply(200);
 
-                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -397,10 +397,10 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Stop run', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.run_id}?propagationPolicy=Foreground`)
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.report_id}?propagationPolicy=Foreground`)
                             .reply(200);
 
-                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.run_id, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
                             'Content-Type': 'application/json'
                         });
 
@@ -538,7 +538,7 @@ describe('Create job specific kubernetes tests', async function () {
                         should(createJobResponse.status).eql(201);
                         should(createJobResponse.body).containEql(expectedResult);
 
-                        reportId = createJobResponse.body.run_id;
+                        reportId = createJobResponse.body.report_id;
                     });
 
                     it('Get the job', async () => {
@@ -632,7 +632,7 @@ describe('Create job specific kubernetes tests', async function () {
                         should(createJobResponse.status).eql(201);
                         should(createJobResponse.body).containEql(expectedResult);
 
-                        reportId = createJobResponse.body.run_id.toString();
+                        reportId = createJobResponse.body.report_id.toString();
                     });
 
                     it('Get the job', async () => {
@@ -731,11 +731,11 @@ describe('Create job specific kubernetes tests', async function () {
                 describe('Failures on stopRun - when run not exist', () => {
                     it('Stop a run of a job that not exist', async () => {
                         const jobId = uuid.v4();
-                        const runId = uuid.v4();
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${jobId}-${runId}?propagationPolicy=Foreground`)
+                        const reportId = uuid.v4();
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${jobId}-${reportId}?propagationPolicy=Foreground`)
                             .reply(404);
 
-                        const stopRunResponse = await schedulerRequestCreator.stopRun(jobId, runId, {
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(jobId, reportId, {
                             'Content-Type': 'application/json'
                         });
                         should(stopRunResponse.statusCode).eql(404);
@@ -744,12 +744,12 @@ describe('Create job specific kubernetes tests', async function () {
 
                 describe('Failures on getLogs', () => {
                     it('Gets logs should return 401', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job_id-run_id`)
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job_id-report_id`)
                             .reply(401, {
                                 error: 'error '
                             });
 
-                        const getLogsResponse = await schedulerRequestCreator.getLogs('job_id', 'run_id', {
+                        const getLogsResponse = await schedulerRequestCreator.getLogs('job_id', 'report_id', {
                             'Content-Type': 'application/json'
                         });
 

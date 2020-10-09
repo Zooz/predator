@@ -650,7 +650,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  '/v1/jobs/{job_id}/runs/{run_id}/stop':
+  '/v1/jobs/{job_id}/runs/{report_id}/stop':
     post:
       operationId: terminate-a-job
       tags:
@@ -666,7 +666,7 @@ paths:
             type: string
         - in: path
           description: The id of a specific run in metronome which is also the report id.
-          name: run_id
+          name: report_id
           required: true
           schema:
             type: string
@@ -686,7 +686,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
 
-  /v1/jobs/{job_id}/runs/{run_id}/logs:
+  /v1/jobs/{job_id}/runs/{report_id}/logs:
     get:
       tags:
         - Jobs
@@ -700,7 +700,7 @@ paths:
             type: string
         - in: path
           description: The id of a specific run in metronome which is also the report id.
-          name: run_id
+          name: report_id
           required: true
           schema:
             type: string
@@ -2263,9 +2263,9 @@ components:
       allOf:
         - $ref: '#/components/schemas/job_response'
         - properties:
-            run_id:
+            report_id:
               type: string
-              description: The run id. Only shown if the job is ran immediately.
+              description: The report id. Only shown if the job is ran immediately.
     processor:
       required:
         - name
@@ -2329,7 +2329,7 @@ components:
       properties:
         report_id:
           type: string
-          description: The id of the report/same as run_id
+          description: The id of the report
         test_id:
           type: string
           description: The id of the test we would like to schedule.
@@ -2363,7 +2363,7 @@ components:
       properties:
         report_id:
           type: string
-          description: The id of the report/same as run_id
+          description: The id of the report
     stats:
       required:
         - stats_time

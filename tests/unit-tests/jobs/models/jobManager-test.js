@@ -228,7 +228,7 @@ describe('Manager tests', function () {
                 custom_env_vars: { KEY1: 'A', KEY2: 'B' },
                 max_virtual_users: 100
             };
-            jobConnectorRunJobStub.resolves({ id: 'run_id' });
+            jobConnectorRunJobStub.resolves({ id: 'report_id' });
             databaseConnectorInsertStub.resolves({ success: 'success' });
             const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
@@ -272,7 +272,7 @@ describe('Manager tests', function () {
                 CUSTOM_KEY2: 'B'
             });
 
-            jobTemplateCreateJobRequestStub.args[0][3].should.have.key('RUN_ID');
+            jobTemplateCreateJobRequestStub.args[0][3].should.have.key('REPORT_ID');
         });
 
         it('Simple request, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
@@ -472,7 +472,7 @@ describe('Manager tests', function () {
                 environment: 'test',
                 webhooks: webhooks.map(({ id }) => id)
             };
-            jobConnectorRunJobStub.resolves({ id: 'run_id' });
+            jobConnectorRunJobStub.resolves({ id: 'report_id' });
             databaseConnectorInsertStub.resolves({ success: 'success' });
             const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
@@ -502,7 +502,7 @@ describe('Manager tests', function () {
                 webhooks: ['5a9eee73-cf56-47aa-ac77-fad59e961aaa', '5a9eee73-cf56-47aa-ac77-fad59e961aab'],
                 enabled: false
             };
-            jobConnectorRunJobStub.resolves({ id: 'run_id' });
+            jobConnectorRunJobStub.resolves({ id: 'report_id' });
             databaseConnectorInsertStub.resolves({ success: 'success' });
             const expectedResult = {
                 id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
@@ -1032,11 +1032,11 @@ describe('Manager tests', function () {
 
     describe('Stop run', function () {
         it('Stop an existing run of a job', async function () {
-            await manager.stopRun('jobId', 'runId', 'internalRunId');
+            await manager.stopRun('jobId', 'reportId', 'internalRunId');
             jobStopRunStub.callCount.should.eql(1);
             jobStopRunStub.args[0].should.eql([
                 'predator.jobId',
-                'runId'
+                'reportId'
             ]);
         });
     });
@@ -1090,7 +1090,7 @@ describe('Manager tests', function () {
                 custom_env_vars: undefined,
                 max_virtual_users: undefined,
                 parallelism: undefined,
-                run_id: undefined,
+                report_id: undefined,
                 notes: 'some notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
@@ -1108,7 +1108,7 @@ describe('Manager tests', function () {
                 custom_env_vars: undefined,
                 max_virtual_users: undefined,
                 parallelism: undefined,
-                run_id: undefined,
+                report_id: undefined,
                 notes: 'some other notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
@@ -1160,7 +1160,7 @@ describe('Manager tests', function () {
                 custom_env_vars: undefined,
                 max_virtual_users: undefined,
                 parallelism: undefined,
-                run_id: undefined,
+                report_id: undefined,
                 notes: undefined,
                 proxy_url: undefined,
                 debug: undefined,
@@ -1225,7 +1225,7 @@ describe('Manager tests', function () {
                 custom_env_vars: undefined,
                 max_virtual_users: undefined,
                 parallelism: undefined,
-                run_id: undefined,
+                report_id: undefined,
                 notes: 'some nice notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
@@ -1277,17 +1277,17 @@ describe('Manager tests', function () {
     describe('Get logs', function () {
         it('Success getting logs from job', async function () {
             jobGetLogsStub.resolves([{ type: 'file', name: 'log.txt', content: 'this is the log' }]);
-            const logs = await manager.getLogs('jobId', 'runId');
+            const logs = await manager.getLogs('jobId', '13046d76-1b8c-4b3f-9061-e8dc819d585c');
             logs.should.eql({
                 files: [{ type: 'file', name: 'log.txt', content: 'this is the log' }],
-                filename: 'jobId-runId.zip'
+                filename: 'jobId-13046d76-1b8c-4b3f-9061-e8dc819d585c.zip'
             });
         });
 
         it('Get logs from job fails', async function () {
             jobGetLogsStub.rejects(new Error('error getting logs'));
             try {
-                await manager.getLogs('jobId', 'runId');
+                await manager.getLogs('jobId', '13046d76-1b8c-4b3f-9061-e8dc819d585c');
                 throw new Error('should not get here');
             } catch (error) {
                 error.message.should.eql('error getting logs');

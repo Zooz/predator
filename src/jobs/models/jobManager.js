@@ -57,19 +57,19 @@ module.exports.createJob = async (job) => {
     try {
         await databaseConnector.insertJob(jobId, job);
         logger.info('Job saved successfully to database');
-        const runId = uuid.v4();
+        const reportId = uuid.v4();
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
-            const report = await createReportForJob(runId, test.id, jobId);
-            const jobSpecificPlatformRequest = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
+            await createReportForJob(reportId, test.id, jobId);
+            const jobSpecificPlatformRequest = await createJobRequest(jobId, reportId, job, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
         if (job.cron_expression) {
             addCron(jobId, job, job.cron_expression, configData);
         }
         logger.info('Job deployed successfully');
-        return createResponse(jobId, job, runId);
+        return createResponse(jobId, job, reportId);
     } catch (error) {
         logger.error(error, 'Error occurred trying to create new job');
         return Promise.reject(error);
@@ -84,8 +84,8 @@ module.exports.deleteJob = (jobId) => {
     return databaseConnector.deleteJob(jobId);
 };
 
-module.exports.stopRun = async (jobId, runId) => {
-    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), runId);
+module.exports.stopRun = async (jobId, reportId) => {
+    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), reportId);
 };
 
 module.exports.deleteAllContainers = async () => {
@@ -93,11 +93,11 @@ module.exports.deleteAllContainers = async () => {
     return result;
 };
 
-module.exports.getLogs = async function (jobId, runId) {
-    const logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), runId, PREDATOR_RUNNER_PREFIX);
+module.exports.getLogs = async function (jobId, reportId) {
+    const logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), reportId, PREDATOR_RUNNER_PREFIX);
     const response = {
         files: logs,
-        filename: `${jobId}-${runId}.zip`
+        filename: `${jobId}-${reportId}.zip`
     };
 
     return response;
@@ -173,7 +173,7 @@ module.exports.updateJob = async (jobId, jobConfig) => {
     logger.info('Job updated successfully to database');
 };
 
-function createResponse(jobId, jobBody, runId) {
+function createResponse(jobId, jobBody, reportId) {
     const response = {
         id: jobId,
         test_id: jobBody.test_id,
@@ -185,7 +185,7 @@ function createResponse(jobId, jobBody, runId) {
         parallelism: jobBody.parallelism,
         max_virtual_users: jobBody.max_virtual_users,
         custom_env_vars: jobBody.custom_env_vars,
-        run_id: runId,
+        report_id: reportId,
         arrival_rate: jobBody.arrival_rate,
         arrival_count: jobBody.arrival_count,
         duration: jobBody.duration,
@@ -205,14 +205,13 @@ function createResponse(jobId, jobBody, runId) {
     return response;
 }
 
-async function createJobRequest(jobId, runId, reportId, jobBody, dockerImage, configData) {
+async function createJobRequest(jobId, reportId, jobBody, dockerImage, configData) {
     const jobTemplate = require(`./${configData.job_platform.toLowerCase()}/jobTemplate`);
     const jobName = util.format(JOB_PLATFORM_NAME, jobId);
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
     const parallelism = jobBody.parallelism || 1;
     const environmentVariables = {
         JOB_ID: jobId,
-        RUN_ID: runId,
         JOB_TYPE: jobBody.type,
         ENVIRONMENT: jobBody.environment,
         TEST_ID: jobBody.test_id,
@@ -277,7 +276,7 @@ async function createJobRequest(jobId, runId, reportId, jobBody, dockerImage, co
     }
 
     const customRunnerDefinition = configData.custom_runner_definition;
-    const jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
+    const jobRequest = jobTemplate.createJobRequest(jobName, reportId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
 
     return jobRequest;
 }
@@ -289,10 +288,10 @@ function addCron(jobId, job, cronExpression, configData) {
                 logger.info(`Skipping job with id: ${jobId} as it's currently disabled`);
             } else {
                 const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
-                const runId = uuid.v4();
+                const reportId = uuid.v4();
                 const test = await testsManager.getTest(job.test_id);
-                const report = await createReportForJob(runId, test.id, jobId);
-                const jobSpecificPlatformConfig = await createJobRequest(jobId, runId, report.report_id, job, latestDockerImage, configData);
+                await createReportForJob(reportId, test.id, jobId);
+                const jobSpecificPlatformConfig = await createJobRequest(jobId, reportId, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
         } catch (error) {
@@ -326,9 +325,9 @@ async function validateWebhooksAssignment(webhookIds) {
     }
 }
 
-async function createReportForJob(runId, testId, jobId) {
+async function createReportForJob(reportId, testId, jobId) {
     const startTimeString = Date.now();
-    const report = await reportsManager.postReport(runId, testId, jobId, startTimeString);
+    const report = await reportsManager.postReport(reportId, testId, jobId, startTimeString);
     logger.info('Created report successfully');
     return report;
 }

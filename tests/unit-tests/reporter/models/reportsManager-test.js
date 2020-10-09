@@ -426,7 +426,7 @@ describe('Reports manager tests', function () {
 
     describe('Create new report', function () {
         it('Successfully insert report', async () => {
-            const runId = uuid.v4();
+            const reportId = uuid.v4();
             const reportFromDBConnector = {
                 report_id: uuid.v4(),
                 job_id: uuid.v4(),
@@ -447,7 +447,7 @@ describe('Reports manager tests', function () {
             testManagerGetTestStub.resolves(basicTest);
             databasePostReportStub.resolves(reportFromDBConnector);
             databaseSubscribeRunnerStub.resolves();
-            const reportBody = await manager.postReport(runId, 'test_id', REPORT, reportFromDBConnector.job_id, Date.now());
+            const reportBody = await manager.postReport(reportId, 'test_id', REPORT, reportFromDBConnector.job_id, Date.now());
             should.exist(reportBody);
             reportBody.should.deepEqual(reportFromDBConnector);
         });
