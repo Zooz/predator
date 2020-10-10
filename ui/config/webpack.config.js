@@ -2,9 +2,12 @@ const webpack = require('webpack');
 const HtmlPlugin = require('html-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const path = require('path');
+const dotenv = require('dotenv').config({
+    path: path.join(__dirname, '../.env')
+});
 
 module.exports = (webpackEnv) => {
-    Object.assign(process.env, webpackEnv);
+    Object.assign(process.env, webpackEnv, dotenv.parsed);
     const env = require('../src/App/common/env');
     const entries = require('./entries');
     const rules = require('./rules');
@@ -36,7 +39,7 @@ module.exports = (webpackEnv) => {
             }),
             new webpack.NamedModulesPlugin(),
             new webpack.EnvironmentPlugin(['NODE_ENV', 'BUCKET_PATH', 'PREDATOR_URL', 'PREDATOR_DOCS_URL', 'VERSION']),
-            new MonacoWebpackPlugin()
+            new MonacoWebpackPlugin(),
         ]
     };
 };

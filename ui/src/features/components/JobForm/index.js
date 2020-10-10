@@ -9,7 +9,6 @@ import RactangleAlignChildrenLeft from '../../../components/RectangleAlign/Recta
 import { validate } from './validator';
 import CronViewer from './cronViewer';
 import Modal from '../Modal';
-import Button from '../../../components/Button'
 import TitleInput from '../../../components/TitleInput'
 import Input from '../../../components/Input'
 import FormWrapper from '../../../components/FormWrapper';
@@ -24,6 +23,9 @@ import { inputTypes, testTypes } from './constants';
 import MultiSelect from '../../../components/MultiSelect/MultiSelect.export';
 import NumericInput from '../../../components/NumericInput';
 import InfoToolTip from '../InfoToolTip';
+import { faClock, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import IconButton from '../../../components/IconButton';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 
@@ -226,6 +228,7 @@ class Form extends React.Component {
       arrival_count: undefined,
       duration: undefined,
       ramp_to: undefined,
+      environment: 'test',
       cron_expression: undefined,
       run_immediately: false,
       emails: [],
@@ -367,12 +370,27 @@ class Form extends React.Component {
                   </RactangleAlignChildrenLeft>}
                 </Fragment>);
               }, this)}
-              <div className={style.buttons}>
-                <Button style={{ marginRight: '5px' }} inverted onClick={closeDialog}>Cancel</Button>
-                <Button style={{ marginRight: '5px' }} spinner={processingAction} hover disabled={!this.state.cron_expression || !!this.isThereErrorOnForm()}
-                  onClick={() => { this.whenSubmit(false) }}>Schedule</Button>
-                <Button spinner={processingAction} hover disabled={!!this.isThereErrorOnForm()}
-                  onClick={() => this.whenSubmit(true)}>{this.state.cron_expression ? 'Schedule & Run' : 'Run'}</Button>
+              <div className={style.icons}>
+                <IconButton style={{ marginRight: '8px' }}
+                  spinner={processingAction}
+                  disabled={!this.state.cron_expression || !!this.isThereErrorOnForm()}
+                  onClick={() => { this.whenSubmit(false) }}
+                  inverted
+                  width='28px'
+                  height='28px'
+                  title='Schedule'>
+                  <FontAwesomeIcon icon={faClock} size='2x' />
+                </IconButton>
+                <IconButton
+                  spinner={processingAction}
+                  disabled={!!this.isThereErrorOnForm()}
+                  onClick={() => this.whenSubmit(true)}
+                  inverted
+                  width='28px'
+                  height='28px'
+                  title={this.state.cron_expression ? 'Schedule & Run' : 'Run'}>
+                  <FontAwesomeIcon icon={faPlayCircle} size='2x' />
+                </IconButton>
               </div>
               {serverError &&
               <ErrorDialog closeDialog={() => {
@@ -555,7 +573,7 @@ class Form extends React.Component {
                   onChange={(evt) => this.onChangeProperty(oneItem.name, evt.target.value)} />
               </ErrorWrapper>
             </TitleInput>
-            {oneItem.name === 'cron_expression' && <CronViewer value={cron_expression} />}
+            {oneItem.name === 'cron_expression' && !this.state.errors['cron_expression'] && <CronViewer value={cron_expression} />}
           </div>
 
         );

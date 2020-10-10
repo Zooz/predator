@@ -32,7 +32,7 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 | Cloud Native                    | :sparkle:          |Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
 | Prometheus/Influx integration   | :sparkle:          |Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
 | Compare Multiple tests results  | :sparkle:          |Built-in dashboard to compare multiple test runs at once.
-| Webhooks API                    | :new:              |supported in Slack or JSON format for an easy server to server integration.
+| Webhooks API                    | :new:              |supported in Slack, Microsoft Teams, or JSON format for an easy server to server integration.
 
 -----------------------------------------------------
 

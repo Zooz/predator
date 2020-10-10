@@ -45,7 +45,7 @@
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "copy-dir": "^0.3.0",
-    "cron": "1.7.2",
+    "cron": "^1.8.1",
     "dockerode": "^2.5.8",
     "express": "^4.17.1",
     "express-ajv-swagger-validation": "^1.1.1",

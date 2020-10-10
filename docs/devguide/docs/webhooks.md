@@ -34,6 +34,9 @@ Webhooks can be sent in as a Slack message to any Slack channel with a proper Sl
 ### JSON
 For server to server integration, webhooks can also be sent as an HTTP `POST` request to a configured webhook URL with relevant data in JSON content-type regarding the test's progress and results.
 
+### TEAMS
+Webhooks can be sent in as a Microsoft Teams message to any Teams channel with a proper incoming webhook URL.
+
 ## Example
 A global webhook created in Slack format that will invoke a message to the configured Slack channel's URL on every test run that's in the following phases:
 
