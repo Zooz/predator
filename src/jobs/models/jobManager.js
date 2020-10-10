@@ -220,7 +220,7 @@ async function createJobRequest(jobId, reportId, jobBody, dockerImage, configDat
         DELAY_RUNNER_MS: configData.delay_runner_ms.toString(),
         DURATION: jobBody.duration.toString(),
         REPORT_ID: reportId,
-        predator_version: PREDATOR_VERSION
+        PREDATOR_VERSION
     };
     if (jobBody.type === JOB_TYPE_FUNCTIONAL_TEST) {
         const arrivalCountPerRunner = Math.ceil(jobBody.arrival_count / parallelism);

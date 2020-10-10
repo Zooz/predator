@@ -5,7 +5,7 @@ const should = require('should'),
     sinon = require('sinon'),
     uuid = require('uuid');
 
-const { version: PREDATOR_VERSION } = require('../../../../package.json') ,
+const { version: PREDATOR_VERSION } = require('../../../../package.json'),
     databaseConnector = require('../../../../src/jobs/models/database/databaseConnector'),
     logger = require('../../../../src/common/logger'),
     jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector'),

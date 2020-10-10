@@ -19,7 +19,6 @@ const defaultSmtpServerConfig = {
 
 describe('Manager config', function () {
     const originalPackageJsonVersion = packageJson.version;
-    packageJson.version = '1.5.6';
     const expectedRunnerVersion = '1.5';
 
     const defaultConfig = {
@@ -133,6 +132,7 @@ describe('Manager config', function () {
         databaseConnectorGetValueStub = sandbox.stub(databaseConnector, 'getConfigValue');
         databaseConnectorUpdateStub = sandbox.stub(databaseConnector, 'updateConfig');
         manager = rewire('../../../src/configManager/models/configHandler');
+        packageJson.version = '1.5.6';
     });
 
     beforeEach(() => {
