@@ -5,7 +5,7 @@ module.exports.createJobRequest = (jobName, reportId, parallelism, environmentVa
         apiVersion: 'batch/v1',
         kind: 'Job',
         metadata: {
-            name: jobName + '-' + reportId,
+            name: reportId,
             labels: {
                 app: predatorRunner,
                 reportId: reportId
