@@ -790,46 +790,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-    post:
-      operationId: create-a-report
-      tags:
-        - Reports
-      summary: Create a Report
-      description: Create a new report for the specified test.
-      parameters:
-        - in: path
-          name: test_id
-          required: true
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/post_report_response'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/post_report'
-        description: report data
-        required: true
   '/v1/tests/{test_id}/reports/{report_id}':
     get:
       operationId: retrieve-a-report
