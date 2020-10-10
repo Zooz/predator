@@ -145,5 +145,17 @@ describe('reportStatusCalculator', function() {
             const result = reportStatusCalculator.calculateReportStatus(report, config);
             expect(result).to.be.equal(constants.REPORT_ABORTED_STATUS);
         });
+        it('Should return failed status for 0 subscribers after initialization grace period', function() {
+            const report = {
+                duration: 100,
+                subscribers: [],
+                start_time: Date.now() - 2 * 60 * 60 * 1000 // 2 hours ago
+            };
+            const config = {
+                minimum_wait_for_delayed_report_status_update_in_ms: 100
+            };
+            const result = reportStatusCalculator.calculateReportStatus(report, config);
+            expect(result).to.be.equal(constants.REPORT_FAILED_STATUS);
+        });
     });
 });
