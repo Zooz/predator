@@ -41,7 +41,7 @@ describe('reportStatusCalculator', function() {
             const result = reportStatusCalculator.calculateReportStatus(report, config);
             expect(result).to.be.equal(constants.REPORT_PARTIALLY_FINISHED_STATUS);
         });
-        it('Should return failed status for first subscriber in intermediate and second in aborted', function () {
+        it('Should return failed status for first subscriber in intermediate and second in aborted after grace period is over', function () {
             const report = {
                 duration: 1,
                 subscribers: [{ phase_status: constants.SUBSCRIBER_INTERMEDIATE_STAGE }, { phase_status: constants.SUBSCRIBER_ABORTED_STAGE }],
@@ -129,7 +129,7 @@ describe('reportStatusCalculator', function() {
             const result = reportStatusCalculator.calculateReportStatus(report, config);
             expect(result).to.be.equal(constants.REPORT_INITIALIZING_STATUS);
         });
-        it('Should return failed status for 3 subscribers in aborted stages', function () {
+        it('Should return aborted status for 3 subscribers in aborted stages', function () {
             const report = {
                 duration: 360,
                 subscribers: [
