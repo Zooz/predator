@@ -62,7 +62,7 @@ module.exports.createJob = async (job) => {
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
-            await createReportForJob(reportId, test, jobId);
+            await createReportForJob(reportId, test, insertedJob);
             const jobSpecificPlatformRequest = await createJobRequest(jobId, reportId, insertedJob, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
