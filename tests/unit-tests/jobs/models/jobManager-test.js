@@ -1045,11 +1045,10 @@ describe('Manager tests', function () {
 
     describe('Stop run', function () {
         it('Stop an existing run of a job', async function () {
-            await manager.stopRun('jobId', 'reportId', 'internalRunId');
+            await manager.stopRun('jobId', 'reportId');
             jobStopRunStub.callCount.should.eql(1);
             jobStopRunStub.args[0].should.eql([
-                'predator.jobId',
-                'reportId'
+                'predator.reportId'
             ]);
         });
     });

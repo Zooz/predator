@@ -86,7 +86,7 @@ module.exports.deleteJob = (jobId) => {
 };
 
 module.exports.stopRun = async (jobId, reportId) => {
-    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, jobId), reportId);
+    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, reportId));
 };
 
 module.exports.deleteAllContainers = async () => {
@@ -95,7 +95,7 @@ module.exports.deleteAllContainers = async () => {
 };
 
 module.exports.getLogs = async function (jobId, reportId) {
-    const logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, jobId), reportId, PREDATOR_RUNNER_PREFIX);
+    const logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, reportId), PREDATOR_RUNNER_PREFIX);
     const response = {
         files: logs,
         filename: `${jobId}-${reportId}.zip`
@@ -208,7 +208,7 @@ function createResponse(jobId, jobBody, reportId) {
 
 async function createJobRequest(jobId, reportId, jobBody, dockerImage, configData) {
     const jobTemplate = require(`./${configData.job_platform.toLowerCase()}/jobTemplate`);
-    const jobName = util.format(JOB_PLATFORM_NAME, jobId);
+    const jobPlatformName = util.format(JOB_PLATFORM_NAME, reportId);
     let maxVirtualUsersPerRunner = jobBody.max_virtual_users;
     const parallelism = jobBody.parallelism || 1;
     const environmentVariables = {
@@ -271,7 +271,7 @@ async function createJobRequest(jobId, reportId, jobBody, dockerImage, configDat
     }
 
     const customRunnerDefinition = configData.custom_runner_definition;
-    const jobRequest = jobTemplate.createJobRequest(jobName, reportId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
+    const jobRequest = jobTemplate.createJobRequest(jobPlatformName, reportId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
 
     return jobRequest;
 }

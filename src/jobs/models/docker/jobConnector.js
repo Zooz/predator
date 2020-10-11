@@ -62,12 +62,11 @@ const startContainer = async (dockerImage, jobName, reportId, parallelIndex, env
     await container.start();
 };
 
-module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) => {
+module.exports.stopRun = async (jobPlatformName) => {
     let containers = await docker.listContainers();
 
     containers = containers.filter(container => container.Names &&
-        container.Names[0] && container.Names[0].includes(jobPlatformName) &&
-        container.Names[0].includes(platformSpecificInternalRunId));
+        container.Names[0] && container.Names[0].includes(jobPlatformName));
 
     containers.forEach(async container => {
         const containerToStop = await docker.getContainer(container.Id);
@@ -88,12 +87,11 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
     };
 };
 
-module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId) => {
+module.exports.getLogs = async (jobPlatformName) => {
     let containers = await docker.listContainers({ all: true });
 
     containers = containers.filter(container => container.Names &&
-        container.Names[0] && container.Names[0].includes(jobPlatformName) &&
-        container.Names[0].includes(platformSpecificInternalRunId));
+        container.Names[0] && container.Names[0].includes(jobPlatformName));
 
     const logs = [];
 

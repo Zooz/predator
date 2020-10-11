@@ -1,11 +1,11 @@
 const _ = require('lodash');
 
-module.exports.createJobRequest = (jobName, reportId, parallelism, environmentVariables, dockerImage, configData, predatorRunner, customDefinition) => {
+module.exports.createJobRequest = (jobPlatformName, reportId, parallelism, environmentVariables, dockerImage, configData, predatorRunner, customDefinition) => {
     const jobTemplate = {
         apiVersion: 'batch/v1',
         kind: 'Job',
         metadata: {
-            name: reportId,
+            name: jobPlatformName,
             labels: {
                 app: predatorRunner,
                 reportId: reportId

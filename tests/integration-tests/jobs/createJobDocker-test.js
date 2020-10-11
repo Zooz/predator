@@ -105,7 +105,6 @@ describe('Create job specific docker tests', async function () {
                         let containers = await docker.listContainers();
                         containers = containers.filter(container => {
                             return container.Names && container.Names[0] &&
-                                container.Names[0].includes(createJobResponse.body.id) &&
                                 container.Names[0].includes(createJobResponse.body.report_id);
                         });
 

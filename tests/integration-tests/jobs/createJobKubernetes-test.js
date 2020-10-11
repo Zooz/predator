@@ -261,7 +261,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Get logs', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.report_id}`)
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.report_id}`)
                             .reply(200, {
                                 spec: { selector: { matchLabels: { 'controller-uid': 'uid' } } }
                             });
@@ -290,7 +290,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Stop run', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.report_id}?propagationPolicy=Foreground`)
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.report_id}?propagationPolicy=Foreground`)
                             .reply(200);
 
                         const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
@@ -397,7 +397,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
 
                     it('Stop run', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.id}-${createJobResponse.body.report_id}?propagationPolicy=Foreground`)
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${createJobResponse.body.report_id}?propagationPolicy=Foreground`)
                             .reply(200);
 
                         const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
@@ -732,7 +732,7 @@ describe('Create job specific kubernetes tests', async function () {
                     it('Stop a run of a job that not exist', async () => {
                         const jobId = uuid.v4();
                         const reportId = uuid.v4();
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${jobId}-${reportId}?propagationPolicy=Foreground`)
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${reportId}?propagationPolicy=Foreground`)
                             .reply(404);
 
                         const stopRunResponse = await schedulerRequestCreator.stopRun(jobId, reportId, {
@@ -744,7 +744,7 @@ describe('Create job specific kubernetes tests', async function () {
 
                 describe('Failures on getLogs', () => {
                     it('Gets logs should return 401', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job_id-report_id`)
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.report_id`)
                             .reply(401, {
                                 error: 'error '
                             });
