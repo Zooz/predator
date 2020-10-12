@@ -2415,6 +2415,7 @@ components:
         grafana_url:
           type: string
           description: The url for grafana.
+          pattern: '^https?://'
         internal_address:
           type: string
           description: The local ip address of your machine.
@@ -2444,7 +2445,8 @@ components:
           enum:
             - influx
             - prometheus
-          description: Metrics to use, in case one or both metrics are configured.
+            - grafana
+          description: Metrics to use, in case any of the metrics are configured.
         default_email_address:
           type: string
           description: Default email to send final report to, address can be configured

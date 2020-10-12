@@ -230,7 +230,8 @@ async function createJobRequest(jobId, runId, jobBody, dockerImage, configData) 
         maxVirtualUsersPerRunner = Math.ceil(jobBody.max_virtual_users / parallelism);
     }
 
-    let metricsExport = configData.metrics_plugin_name === 'influx' ? configData.influx_metrics : configData.prometheus_metrics;
+    let metricsExport = configData.metrics_plugin_name === 'influx' ? configData.influx_metrics :
+        (configData.metrics_plugin_name === 'prometheus' ? configData.prometheus_metrics : null);
 
     if (configData.metrics_plugin_name && metricsExport) {
         environmentVariables.METRICS_PLUGIN_NAME = configData.metrics_plugin_name;

@@ -202,8 +202,16 @@ class Form extends React.Component {
                         floatingLabelText: 'Metrics plugin name',
                         info: 'insert info',
                         type: INPUT_TYPES.DROPDOWN,
-                        options: ['influx', 'prometheus'],
+                        options: ['influx', 'prometheus', 'grafana'],
                         default: 'None'
+                    },
+                    {
+                        name: 'grafana_url',
+                        key: 'grafana_url',
+                        floatingLabelText: 'Grafana dashboard url',
+                        info: 'URL of the Grafana dashboard connected to the metrics provider',
+                        inheritFromServerKeyObject: 'grafana_url',
+                        isHidden: (state) => isMetricsDropdownHidden(state, 'grafana')
                     },
                     {
                         name: 'push_gateway_url',
