@@ -149,6 +149,20 @@ export const getColumns = ({columnsNames, sortHeader = '', onSort, onReportView,
             className: css['center-flex'],
         },
         {
+            id: 'job_edit',
+            Header: () => (
+                <TableHeader sortable={false}>
+                    Edit
+                </TableHeader>
+            ),
+            accessor: data => <ViewButton icon={faPen} onClick={(e) => {
+                e.stopPropagation();
+                onEdit(data)
+            }}/>,
+            width: iconsWidth,
+            className: css['center-flex'],
+        },
+        {
             id: 'test_name',
             Header: () => (
                 <TableHeader padding={'8px'} sortable={false}>

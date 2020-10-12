@@ -24,11 +24,12 @@ import { ReactTableComponent } from '../components/ReactTable';
 import { getColumns } from './configurationColumn';
 import _ from 'lodash';
 import {createJobRequest} from './requestBuilder';
+import JobForm from './components/JobForm';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
 const REFRESH_DATA_INTERVAL = 30000;
-const columnsNames = ['test_name', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'raw', 'delete', 'enabled_disabled'];
+const columnsNames = ['test_name', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'job_edit', 'raw', 'delete', 'enabled_disabled'];
 const DESCRIPTION = 'Scheduled jobs configured with a cron expression.';
 
 class getJobs extends React.Component {
@@ -43,12 +44,19 @@ class getJobs extends React.Component {
             sortedJobs: [],
             rerunJob: null,
             editJob: null,
+            openViewEditJob: false,
+            jobForEdit: null
         };
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.jobs !== this.props.jobs) {
             this.setState({ sortedJobs: [...this.props.jobs] });
+            const { match: { params, path } } = this.props;
+            if (path === '/jobs/:jobId/edit') {
+                const data = this.props.jobs.find((job) => job.id === params.jobId);
+                data && this.onEdit(data);
+            }
         }
     }
 
@@ -72,6 +80,14 @@ class getJobs extends React.Component {
 
     onRawView = (job) => {
         this.setState({ openViewJob: job });
+    };
+
+    onEdit = (data) => {
+        const { match: { params, path }, history } = this.props;
+        if (path !== '/jobs/:jobId/edit') {
+          history.replace(`/jobs/${data.id}/edit`)
+        }
+        this.setState({ openViewEditJob: true, jobForEdit: data });
     };
 
     onRunTest = (job) => {
@@ -138,10 +154,16 @@ class getJobs extends React.Component {
         return this.props.processingGetJobs ? <Loader /> : noDataMsg;
     }
 
+    closeViewEditJobDialog = () => {
+        const { history } = this.props;
+        history.replace('/jobs');
+        this.setState({ openViewEditJob: false, jobForEdit: null });
+    }
+
     render() {
         const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
-        const { sortedJobs } = this.state;
+        const { sortedJobs, jobForEdit } = this.state;
         const columns = getColumns({
             columnsNames,
             onSort: this.onSort,
@@ -149,6 +171,7 @@ class getJobs extends React.Component {
             onRunTest: this.onRunTest,
             onDelete: this.onDelete,
             onEnableDisable: this.onEnableDisable,
+            onEdit: this.onEdit
         });
         const feedbackMessage = this.generateFeedbackMessage();
         return (
@@ -170,7 +193,9 @@ class getJobs extends React.Component {
                 {this.state.openViewJob
                     ? <Dialog title_key={'id'} data={this.state.openViewJob}
                       closeDialog={this.closeViewJobDialog} /> : null}
-
+                {this.state.openViewEditJob &&
+                    <JobForm history={history} editMode={true} data={jobForEdit} closeDialog={this.closeViewEditJobDialog}
+                />}
             {this.state.deleteDialog && !this.props.deleteJobSuccess
                     ? <DeleteDialog loader={this.props.processingDeleteJob}
                       display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}

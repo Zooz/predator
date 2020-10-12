@@ -26,6 +26,7 @@ import InfoToolTip from '../InfoToolTip';
 import { faClock, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconButton from '../../../components/IconButton';
+import { createStateForEditJob } from './utils';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 
@@ -254,6 +255,15 @@ class Form extends React.Component {
       },
       mode: 'Simple'
     };
+
+    if (this.props.editMode) {
+      const editProps = createStateForEditJob(this.props.data);
+      this.state = {
+        ...this.state,
+        ...editProps
+      };
+    }
+
     this.state.errors = validate(this.state);
     this.FormList.forEach((item) => {
       if (item.defaultValue) {
@@ -290,6 +300,13 @@ class Form extends React.Component {
         const maxVirtualUsers = parallel * 250;
         this.setState({ parallelism: parallel, max_virtual_users: maxVirtualUsers })
       }
+
+      if (this.props.webhooks.length > 0 && this.state.raw_webhooks && this.state.raw_webhooks.length !== 0 && this.state.webhooks.length === 0 && this.props.editMode) {
+        this.state.raw_webhooks.forEach((webhookId) => {
+          const webhookOption = this.props.webhooks.find((options) => options.key === webhookId);
+          this.setState({ webhooks: [...this.state.webhooks, webhookOption], raw_webhooks: [] });
+        });
+      }
     }
 
     onChangeProperty = (name, value) => {
@@ -319,10 +336,10 @@ class Form extends React.Component {
     }
 
     render () {
-      const { closeDialog, processingAction, serverError, clearErrorOnCreateJob } = this.props;
+      const { closeDialog, processingAction, serverError, clearErrorOnCreateJob, editMode } = this.props;
       return (
         <Modal maxWidth={'760px'} onExit={closeDialog}>
-          <FormWrapper style={{ height: null }} title={'Create a new job'} description={DESCRIPTION}>
+          <FormWrapper style={{ height: null }} title={editMode ? 'Edit job' : 'Create a new job'} description={DESCRIPTION}>
             <div style={{ width: '100%' }}>
               {this.FormList.map((oneItem, index) => {
                 if (oneItem.group) {
@@ -381,7 +398,7 @@ class Form extends React.Component {
                   title='Schedule'>
                   <FontAwesomeIcon icon={faClock} size='2x' />
                 </IconButton>
-                <IconButton
+                {!editMode && <IconButton
                   spinner={processingAction}
                   disabled={!!this.isThereErrorOnForm()}
                   onClick={() => this.whenSubmit(true)}
@@ -390,7 +407,7 @@ class Form extends React.Component {
                   height='28px'
                   title={this.state.cron_expression ? 'Schedule & Run' : 'Run'}>
                   <FontAwesomeIcon icon={faPlayCircle} size='2x' />
-                </IconButton>
+                </IconButton>}
               </div>
               {serverError &&
               <ErrorDialog closeDialog={() => {
@@ -467,7 +484,7 @@ class Form extends React.Component {
               <TextArea
                 disabled={oneItem.disabled}
                 onChange={(evt) => this.onChangeProperty(oneItem.name, evt.target.value)}
-
+                value={this.state[oneItem.name]}
               />
             </ErrorWrapper>
           </TitleInput>
@@ -582,7 +599,7 @@ class Form extends React.Component {
 
     whenSubmit = (runImmediate) => {
       const convertedArgs = {
-        test_id: this.props.data.id,
+        test_id: this.props.editMode ? this.state.test_id : this.props.data.id,
         duration: parseInt(this.state.duration) * 60,
         run_immediately: runImmediate,
         ramp_to: this.state.enable_ramp_to ? this.state.ramp_to : undefined
@@ -595,7 +612,18 @@ class Form extends React.Component {
         convertedArgs.webhooks = this.state.webhooks.map((webhook) => webhook.key);
       }
 
-      this.props.createJob(createJobRequest(Object.assign({}, this.state, convertedArgs)));
+      const jobData = {
+        ...this.state,
+        ...convertedArgs
+      };
+
+      if (this.props.editMode) {
+        this.setState({ editJob: jobData });
+        this.props.editJob(jobData.id, jobData);
+        this.props.closeDialog();
+      } else {
+        this.props.createJob(createJobRequest(jobData));
+      }
     };
 }
 
@@ -611,6 +639,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = {
   clearErrorOnCreateJob: Actions.clearErrorOnCreateJob,
   createJob: Actions.createJob,
+  editJob: Actions.editJob,
   getWebhooks: Actions.getWebhooks
 };
 
