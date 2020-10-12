@@ -1,9 +1,9 @@
 # Configuration
 
-When running Predator, it is possible to retrieve and update some of the service's configuration 
+When running Predator, it is possible to retrieve and update some of the service's configuration
 during runtime with the /config endpoint, please check the API reference for more details.
 
-Below are variables Predator can be configured with. 
+Below are variables Predator can be configured with.
 
 ## General
 | Environment Variable                            | Configuration key      	                    | Description                                                                             	                                                          | Configurable from UI/API  	| Default value               	|
@@ -69,9 +69,14 @@ Additional parameters for the following chosen databases:
 |          	| benchmark_weights.rps.percentage  	|  Percentage of the score affected by requests per second results                   	| ✓                        	| 20           	    |
 
 ## Metrics
-| PROCESS.ENV Variable 	| Configuration key   	| Description                                    	| Configurable from UI/API 	| Default value 	|
-|----------------------	|---------------------	|------------------------------------------------	|--------------------------	|---------------	|
-| METRICS_PLUGIN_NAME  	| metrics_plugin_name 	| Metrics integration to use [prometheus,influx] 	| ✓                        	|               	|
+| PROCESS.ENV Variable 	| Configuration key   	| Description                                           	| Configurable from UI/API 	| Default value 	|
+|----------------------	|---------------------	|-------------------------------------------------------	|--------------------------	|---------------	|
+| METRICS_PLUGIN_NAME  	| metrics_plugin_name 	| Metrics integration to use [prometheus,influx,grafana]	| ✓                        	|               	|
+
+#### Grafana
+| Environment Variable 	| Configuration key  	| Description                                                    | Configurable from UI/API 	| Default value 	|
+|----------------------	|--------------------	|----------------------------------------------------------------|--------------------------	|---------------	|
+| GRAFANA_URL           | grafana_url        	| URL of the Grafana dashboard connected to the metrics provider | ✓                        	|               	|
 
 #### Prometheus
 | Environment Variable 	| Configuration key                   	| Description                          	            | Configurable from UI/API 	| Default value 	|
