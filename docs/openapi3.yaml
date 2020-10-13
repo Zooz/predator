@@ -2665,3 +2665,4 @@ components:
         - slack
         - json
         - teams
+        - discord

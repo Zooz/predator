@@ -37,8 +37,8 @@ For server to server integration, webhooks can also be sent as an HTTP `POST` re
 ### TEAMS
 Webhooks can be sent in as a Microsoft Teams message to any Teams channel with a proper incoming webhook URL.
 
-### TEAMS
-Webhooks can be sent in as a Discord message to any Teams channel with a proper incoming webhook URL.
+### DISCORD
+Webhooks can be sent in as a Discord message to any Discord channel with a proper incoming webhook URL.
 
 ## Example
 A global webhook created in Slack format that will invoke a message to the configured Slack channel's URL on every test run that's in the following phases:
