@@ -6,7 +6,7 @@ const app = require('./app'),
     shutdown = require('graceful-shutdown-express');
 
 app().then(async (app) => {
-    const serverPort = process.env.PORT || '80';
+    const serverPort = process.env.PORT || '8080';
     const server = app.listen(serverPort, function () {
         logger.info('Predator listening on port ' + serverPort);
     });
@@ -25,11 +25,11 @@ app().then(async (app) => {
     process.exit(1);
 });
 
-async function verifyInternalAddressReachable() {
-    if (process.env.SKIP_INTERNAL_ADDRESS_CHECK === 'true') {
-        logger.info('Skipping verify internal address check');
-        return;
-    }
+// async function verifyInternalAddressReachable() {
+//     if (process.env.SKIP_INTERNAL_ADDRESS_CHECK === 'true') {
+//         logger.info('Skipping verify internal address check');
+//         return;
+//     }
 
     const internalConfigAddress = await configHandler.getConfigValue(constConfig.INTERNAL_ADDRESS) + '/config';
     logger.info(`Checking ${internalConfigAddress} to verify predator-runners will be able connect to Predator`);
