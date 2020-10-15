@@ -199,7 +199,7 @@ describe('Update scheduled job', function () {
                     environment: 'updated env',
                     enabled: false,
                     type: 'functional_test',
-                    emails: ['c@emails.com', 'd@emails.com'],
+                    emails: ['d@emails.com'],
                     notes: 'note b'
                 },
                 {
@@ -218,7 +218,7 @@ describe('Update scheduled job', function () {
                 test_id: testId,
                 type: 'functional_test',
                 cron_expression: updatedCronExpression,
-                emails: ['c@emails.com', 'd@emails.com'],
+                emails: ['d@emails.com'],
                 arrival_count: 5,
                 duration: 30,
                 environment: 'updated env',
