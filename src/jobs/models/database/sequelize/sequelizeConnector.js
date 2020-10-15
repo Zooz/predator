@@ -156,8 +156,8 @@ async function updateJob(jobId, jobInfo) {
     const updatedJob = await client.transaction(async function(transaction) {
         await oldJob.setWebhooks(jobInfo.webhooks || [], { transaction });
 
-        const oldEmails = oldJob.emails;
-        const newEmails = params.emails;
+        const oldEmails = oldJob.emails || [];
+        const newEmails = params.emails || [];
 
         for (let i = 0; i < oldEmails.length > 0; i++) {
             if (!newEmails.find(newEmail => newEmail.address === oldEmails[i].address)) {
