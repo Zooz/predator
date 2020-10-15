@@ -302,10 +302,11 @@ class Form extends React.Component {
       }
 
       if (this.props.webhooks.length > 0 && this.state.raw_webhooks && this.state.raw_webhooks.length !== 0 && this.state.webhooks.length === 0 && this.props.editMode) {
+        let webhookOptions = [];
         this.state.raw_webhooks.forEach((webhookId) => {
-          const webhookOption = this.props.webhooks.find((options) => options.key === webhookId);
-          this.setState({ webhooks: [...this.state.webhooks, webhookOption], raw_webhooks: [] });
+          webhookOptions.push(this.props.webhooks.find((options) => options.key === webhookId));
         });
+        this.setState({ webhooks: [...this.state.webhooks, ...webhookOptions], raw_webhooks: [] });
       }
     }
 
