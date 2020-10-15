@@ -300,12 +300,12 @@ class Form extends React.Component {
         this.setState({ parallelism: parallel, max_virtual_users: maxVirtualUsers })
       }
 
-      if (this.props.webhooks.length > 0 && this.state.raw_webhooks && this.state.raw_webhooks.length !== 0 && this.state.webhooks.length === 0 && this.props.editMode) {
+      if (this.props.webhooks.length > 0 && this.state.received_webhooks && this.state.received_webhooks.length !== 0 && this.state.webhooks.length === 0) {
         let webhookOptions = [];
-        this.state.raw_webhooks.forEach((webhookId) => {
+        this.state.received_webhooks.forEach((webhookId) => {
           webhookOptions.push(this.props.webhooks.find((options) => options.key === webhookId));
         });
-        this.setState({ webhooks: [...this.state.webhooks, ...webhookOptions], raw_webhooks: [] });
+        this.setState({ webhooks: [...this.state.webhooks, ...webhookOptions], received_webhooks: [] });
       }
     }
 
@@ -618,7 +618,6 @@ class Form extends React.Component {
       };
 
       if (this.props.editMode) {
-        this.setState({ editJob: jobData });
         this.props.editJob(jobData.id, jobData);
         this.props.closeDialog();
       } else {

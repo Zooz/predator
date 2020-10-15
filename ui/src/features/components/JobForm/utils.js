@@ -15,7 +15,7 @@ export const createStateForEditJob = (job) => {
         cron_expression: job.cron_expression,
         run_immediately: job.run_immediately,
         emails: job.emails ? job.emails : [],
-        raw_webhooks: job.webhooks ? job.webhooks : [],
+        received_webhooks: job.webhooks ? job.webhooks : [],
         helpInfo: job.helpInfo,
         parallelism: job.parallelism,
         max_virtual_users: job.max_virtual_users,
