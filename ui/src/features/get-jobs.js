@@ -55,7 +55,7 @@ class getJobs extends React.Component {
             const { match: { params, path } } = this.props;
             if (path === '/jobs/:jobId/edit') {
                 const data = this.props.jobs.find((job) => job.id === params.jobId);
-                data && this.onEdit(data);
+                data ? this.onEdit(data) : this.props.history.replace('/jobs');
             }
         }
     }
