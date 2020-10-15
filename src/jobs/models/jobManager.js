@@ -271,7 +271,7 @@ async function createJobRequest(jobId, runId, jobBody, dockerImage, configData) 
     }
 
     const customRunnerDefinition = configData.custom_runner_definition;
-    const jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, customRunnerDefinition);
+    const jobRequest = jobTemplate.createJobRequest(jobName, runId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
 
     return jobRequest;
 }
