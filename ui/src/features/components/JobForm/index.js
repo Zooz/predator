@@ -17,7 +17,6 @@ import TextArea from '../../../components/TextArea';
 import MultiValueInput from '../../../components/MultiValueInput';
 import UiSwitcher from '../../../components/UiSwitcher';
 import { filter } from 'lodash';
-import { createJobRequest } from '../../requestBuilder';
 import RadioOptions from '../../../components/RadioOptions';
 import { inputTypes, testTypes } from './constants';
 import MultiSelect from '../../../components/MultiSelect/MultiSelect.export';
@@ -26,7 +25,7 @@ import InfoToolTip from '../InfoToolTip';
 import { faClock, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconButton from '../../../components/IconButton';
-import { createStateForEditJob } from './utils';
+import { createJobRequest, createStateForEditJob } from './utils';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 

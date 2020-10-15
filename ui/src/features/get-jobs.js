@@ -23,7 +23,7 @@ import Page from '../components/Page';
 import { ReactTableComponent } from '../components/ReactTable';
 import { getColumns } from './configurationColumn';
 import _ from 'lodash';
-import {createJobRequest} from './requestBuilder';
+import { createJobRequest } from './components/JobForm/utils';
 import JobForm from './components/JobForm';
 
 const noDataMsg = 'There is no data to display.';
