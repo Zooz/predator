@@ -10,6 +10,7 @@ import {
     getJobsWithTestNameAndLastRun,
     createJobSuccess,
     editJobSuccess,
+    editJobId,
     errorOnJobAction
 } from './redux/selectors/jobsSelector';
 import { tests } from './redux/selectors/testsSelector';
@@ -25,6 +26,7 @@ import { getColumns } from './configurationColumn';
 import _ from 'lodash';
 import { createJobRequest } from './components/JobForm/utils';
 import JobForm from './components/JobForm';
+import ErrorDialog from './components/ErrorDialog';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
@@ -160,10 +162,17 @@ class getJobs extends React.Component {
         this.setState({ openViewEditJob: false, jobForEdit: null });
     }
 
+    onCloseErrorDialog = () => {
+        this.props.clearErrorOnJobAction();
+        this.props.setEditJobId(undefined);
+    }
+
     render() {
         const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
         const { sortedJobs, jobForEdit } = this.state;
+        const { errorOnJobAction } = this.props;
+
         const columns = getColumns({
             columnsNames,
             onSort: this.onSort,
@@ -174,6 +183,8 @@ class getJobs extends React.Component {
             onEdit: this.onEdit
         });
         const feedbackMessage = this.generateFeedbackMessage();
+        const error = errorOnJobAction;
+
         return (
             <Page title={'Scheduled Jobs'} description={DESCRIPTION}>
                 <ReactTableComponent
@@ -211,6 +222,7 @@ class getJobs extends React.Component {
                         this.props.clearDeleteJobSuccess();
                         this.props.createJobSuccess(undefined);
                         this.props.setEditJobSuccess(undefined);
+                        this.props.setEditJobId(undefined);
                         this.setState({
                             jobToDelete: undefined,
                             rerunJob: null,
@@ -218,6 +230,7 @@ class getJobs extends React.Component {
                         });
                     }}
                 />}
+                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error} />}
           </Page>
         );
     }
@@ -229,10 +242,10 @@ class getJobs extends React.Component {
         if(this.props.jobSuccess && this.state.rerunJob){
             return `Job created successfully: ${this.props.jobSuccess.id}`;
         }
-        if(this.props.editJobSuccess  && this.state.editJob){
-            return `Job edited successfully: ${this.state.editJob.id}`;
+        if(this.props.editJobSuccess && this.props.editJobId){
+            return `Job edited successfully: ${this.props.editJobId}`;
         }
-
+        
     }
 }
 
@@ -248,7 +261,8 @@ function mapStateToProps(state) {
         reports: reports(state),
         jobSuccess: createJobSuccess(state),
         editJobSuccess:  editJobSuccess(state),
-        errorOnJobAction:errorOnJobAction(state)
+        editJobId:  editJobId(state),
+        errorOnJobAction: errorOnJobAction(state)
     };
 }
 
@@ -259,6 +273,7 @@ const mapDispatchToProps = {
     getJob: Actions.getJob,
     createJob: Actions.createJob,
     editJob: Actions.editJob,
+    setEditJobId: Actions.editJobId,
     deleteJob: Actions.deleteJob,
     clearDeleteJobSuccess: Actions.clearDeleteJobSuccess,
     clearErrorOnDeleteJob: Actions.clearErrorOnDeleteJob,
@@ -266,6 +281,7 @@ const mapDispatchToProps = {
     getAllReports: Actions.getLastReports,
     createJobSuccess: Actions.createJobSuccess,
     setEditJobSuccess: Actions.editJobSuccess,
+    clearErrorOnJobAction: Actions.clearErrorOnJobAction
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getJobs);
