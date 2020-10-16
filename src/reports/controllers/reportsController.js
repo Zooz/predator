@@ -4,6 +4,7 @@ const aggregateReportGenerator = require('../models/aggregateReportGenerator');
 const reports = require('../models/reportsManager');
 const reportExporter = require('../models/reportExporter');
 const stats = require('../models/statsManager');
+const exportHelper = require('../helpers/exportReportHelper');
 
 module.exports.getAggregateReport = async function (req, res, next) {
     let reportInput;
@@ -98,9 +99,9 @@ module.exports.getExportedReport = async(req, res, next) => {
     } catch (err){
         return next(err);
     }
-    let fileName = reportInput.test_name+"_"+reportInput.report_id+"_"+reportInput.start_time.toISOString()+".csv";
+    let fileName = exportHelper.getExportedReportName(reportInput,req.params.file_format);
     res.setHeader('Content-disposition', 'attachment; filename='+fileName);
-    res.set('Content-Type', 'text/csv');
+    res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
     return res.send(exportedReport);
 }
 
@@ -108,14 +109,7 @@ module.exports.getExportedCompareReport = async(req,res,next) => {
     let exportedCompareReport;
     let aggregateReportArray =[];
     try{
-        let reportIds = req.query.report_ids[0].split(",");
-        let testIds = req.query.test_ids[0].split(",");
-        //Validate length of arrays
-        if (reportIds.length != testIds.length){
-            let error = new Error("Test and Report IDs length mismatch");
-            error.statusCode = 400;
-            throw error;
-        }
+        const {reportIds, testIds} = exportHelper.processCompareReportsInput(req.query);
 
         for (let index in reportIds){
             let result = await aggregateReportGenerator.createAggregateReport(testIds[index],reportIds[index]);
@@ -126,24 +120,8 @@ module.exports.getExportedCompareReport = async(req,res,next) => {
         return next(err);
     }
 
-    let fileName = "";
-    for (let index in aggregateReportArray){
-        if (index == aggregateReportArray.length-1){
-            fileName+=aggregateReportArray[index].test_name;
-        }else{
-            fileName+=aggregateReportArray[index].test_name+"_";
-        }
-    }
-    fileName+="_comparison_";
-    for (let index in aggregateReportArray){
-        if (index == aggregateReportArray.length-1){
-            fileName+=aggregateReportArray[index].report_id;
-        }else{
-            fileName+=aggregateReportArray[index].report_id+"_";
-        }
-    }
-    fileName+=".csv";
+    let fileName = exportHelper.getCompareReportName(aggregateReportArray,req.params.file_format);
     res.setHeader('Content-disposition', 'attachment; filename='+fileName);
-    res.set('Content-Type', 'text/csv');
+    res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
     res.send(exportedCompareReport);
 }
