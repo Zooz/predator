@@ -277,7 +277,8 @@ export class TestForm extends React.Component {
         url: '',
         forever: true,
         contentType: CONTENT_TYPES.APPLICATION_JSON,
-        expectations: [createDefaultExpectation()]
+        expectations: [createDefaultExpectation()],
+        gzip: true
       }
     }
 
