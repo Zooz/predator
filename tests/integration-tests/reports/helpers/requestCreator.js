@@ -97,7 +97,6 @@ function getExportedCompareReport(fileFormat, reportMetaData) {
         }
     }
     let request_string = "report_ids="+reportIdsAsCSV+"&test_ids="+testIdsAsCSV;
-    console.log("REQSTR", request_string);
     return request(testApp).get(url+"?"+request_string)
         .set(HEADERS)
         .expect(function (res) {
