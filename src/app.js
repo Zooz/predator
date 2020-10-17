@@ -11,6 +11,7 @@ const testsRouter = require('./tests/routes/testsRoute.js');
 const processorsRouter = require('./processors/routes/processorsRoute.js');
 const filesRouter = require('./files/routes/filesRoute.js');
 const webhooksRouter = require('./webhooks/routes/webhooksRouter');
+const contextsRouter = require('./contexts/routes/contextsRoute.js');
 const swaggerValidator = require('express-ajv-swagger-validation');
 
 const audit = require('express-requests-logger');
@@ -68,6 +69,7 @@ module.exports = async () => {
     app.use('/v1/processors', processorsRouter);
     app.use('/v1/files', filesRouter);
     app.use('/v1/webhooks', webhooksRouter);
+    app.use('/v1/contexts', contextsRouter);
 
     app.use('/', function (req, res, next) {
         res.redirect('/ui');
