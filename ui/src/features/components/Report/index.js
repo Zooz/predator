@@ -266,7 +266,7 @@ const SummeryTable = ({ report = {} }) => {
     return (
       <div>
         <SimpleTable
-          headers={[<ColumnWrapper>Runner</ColumnWrapper>, <ColumnWrapper>Status</ColumnWrapper>, <ColumnWrapper>RPS/S</ColumnWrapper>]} rows={rows} />
+          headers={[<ColumnWrapper>Runner</ColumnWrapper>, <ColumnWrapper>Status</ColumnWrapper>, <ColumnWrapper>RP/S</ColumnWrapper>]} rows={rows} />
       </div>
     )
   }
