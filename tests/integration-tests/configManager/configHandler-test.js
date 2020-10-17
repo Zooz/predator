@@ -61,7 +61,7 @@ const requestBody = {
     allow_insecure_tls: false,
     grafana_url: 'string_value_grafana_url',
     internal_address: 'string_value_internal_address',
-    runner_docker_image: 'string_value_docker_name',
+    runner_docker_image: 'string_value_docker_name:1.0.0',
     job_platform: 'string_value_job_platform',
     delay_runner_ms: 0,
     runner_cpu: 0,
