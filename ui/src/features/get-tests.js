@@ -238,6 +238,7 @@ class getTests extends React.Component {
           }}>Create Test</Button>
           <ReactTableComponent
             onSearch={this.onSearch}
+            tdStyle={{display:'flex',alignItems:'center'}}
             rowHeight={'46px'}
             manual={false}
             data={sortedTests}

@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import css from './Card.scss'
 import colors from '../styles/_colors.scss'
 
-export enum CardTypes {
+export enum CARD_TYPES {
     DEFAULT = 'DEFAULT',
     CLICKER = 'CLICKER',
     PLACEHOLDER = 'PLACEHOLDER',
@@ -21,7 +21,7 @@ export enum CardTypes {
 }
 
 export interface CardProps extends HTMLAttributes<Element> {
-    type?: CardTypes,
+    type?: CARD_TYPES,
     className?: string,
     selected?: boolean,
     hover?: boolean,
@@ -31,14 +31,14 @@ export interface CardProps extends HTMLAttributes<Element> {
     style?: {}
 }
 
-export interface CardComponent<T, P> extends React.RefForwardingComponent<T, P> {
-    CARD_TYPES?: typeof CardTypes
+export interface CardComponent<T, P> extends React.ForwardRefRenderFunction<T, P> {
+    CARD_TYPES?: typeof CARD_TYPES
 }
 
-const Card: CardComponent<HTMLDivElement, CardProps> = React.forwardRef((
+const Card: React.ForwardRefExoticComponent<React.PropsWithoutRef<CardProps> & React.RefAttributes<HTMLDivElement>> = React.forwardRef((
   {
     children,
-    type = CardTypes.DEFAULT,
+    type = CARD_TYPES.DEFAULT,
     hover = false,
     hovering = false,
     selected = false,
@@ -51,23 +51,23 @@ const Card: CardComponent<HTMLDivElement, CardProps> = React.forwardRef((
   ref: React.Ref<HTMLDivElement>
 ) => {
   const classes = classnames(css.card, className, {
-    [css['card--default']]: type === CardTypes.DEFAULT,
-    [css['card--clicker']]: type === CardTypes.CLICKER,
-    [css['card--placeholder']]: type === CardTypes.PLACEHOLDER,
-    [css['card--active']]: type === CardTypes.ACTIVE,
-    [css['card--disabled']]: type === CardTypes.DISABLED,
-    [css['card--negative']]: type === CardTypes.NEGATIVE,
-    [css['card--positive']]: type === CardTypes.POSITIVE,
-    [css['card--success']]: type === CardTypes.SUCCESS,
-    [css['card--failed']]: type === CardTypes.FAILED,
-    [css['card--error']]: type === CardTypes.ERROR,
-    [css['card--intermediate']]: type === CardTypes.INTERMEDIATE,
-    [css['card--message']]: type === CardTypes.MESSAGE,
-    [css['card--dropdown']]: type === CardTypes.DROPDOWN,
-    [css['card--indicator']]: type === CardTypes.LINE_INDICATOR
+    [css['card--default']]: type === CARD_TYPES.DEFAULT,
+    [css['card--clicker']]: type === CARD_TYPES.CLICKER,
+    [css['card--placeholder']]: type === CARD_TYPES.PLACEHOLDER,
+    [css['card--active']]: type === CARD_TYPES.ACTIVE,
+    [css['card--disabled']]: type === CARD_TYPES.DISABLED,
+    [css['card--negative']]: type === CARD_TYPES.NEGATIVE,
+    [css['card--positive']]: type === CARD_TYPES.POSITIVE,
+    [css['card--success']]: type === CARD_TYPES.SUCCESS,
+    [css['card--failed']]: type === CARD_TYPES.FAILED,
+    [css['card--error']]: type === CARD_TYPES.ERROR,
+    [css['card--intermediate']]: type === CARD_TYPES.INTERMEDIATE,
+    [css['card--message']]: type === CARD_TYPES.MESSAGE,
+    [css['card--dropdown']]: type === CARD_TYPES.DROPDOWN,
+    [css['card--indicator']]: type === CARD_TYPES.LINE_INDICATOR
   })
 
-  const cardStyle = type === CardTypes.LINE_INDICATOR
+  const cardStyle = type === CARD_TYPES.LINE_INDICATOR
     ? {
       ...style,
       '--upper-line-color': indicatorColor
@@ -84,12 +84,10 @@ const Card: CardComponent<HTMLDivElement, CardProps> = React.forwardRef((
       data-selected={selected}
       style={cardStyle}
     >
-      {type === CardTypes.DISABLED && <div className={css.card__disabled} />}
+      {type === CARD_TYPES.DISABLED && <div className={css.card__disabled} />}
       {children}
     </div>
   )
 })
-
-Card.CARD_TYPES = CardTypes
 
 export default Card

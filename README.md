@@ -2,6 +2,7 @@
 ## Powerful open-source platform for load testing APIs.
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786)
 [![Join Slack](https://img.shields.io/badge/slack-join-green.svg)](https://join.slack.com/t/predator-dev/shared_invite/enQtNjgwMzE2NjM3MDcyLTg5YTIwMGQyNjZlMjQ4MDNjOTk5YTkwMWYwNzJkOWFmM2QwOGY0ODc3MDU3MWRkYTAwMjRhMjBhOTM1MzFmMjU)
+[![Docker Pulls](https://badgen.net/docker/pulls/zooz/predator)](https://hub.docker.com/r/zooz/predator)
 
 <h1 align="center">
 <img src="https://zooz.github.io/predator/images/predator-1764x640.png" data-canonical-src="https://zooz.github.io/predator/images/predator-1764x640.png"/>
@@ -32,7 +33,7 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 | Cloud Native                    | :sparkle:          |Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
 | Prometheus/Influx integration   | :sparkle:          |Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
 | Compare Multiple tests results  | :sparkle:          |Built-in dashboard to compare multiple test runs at once.
-| Webhooks API                    | :new:              |supported in Slack or JSON format for an easy server to server integration.
+| Webhooks API                    | :new:              |supported in Slack, Microsoft Teams, or JSON format for an easy server to server integration.
 
 -----------------------------------------------------
 

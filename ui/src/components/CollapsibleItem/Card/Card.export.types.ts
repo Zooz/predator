@@ -1,1 +1,1 @@
-export { CardProps, CardTypes, CardComponent } from './Card.export'
+export { CardProps, CARD_TYPES, CardComponent } from './Card.export'

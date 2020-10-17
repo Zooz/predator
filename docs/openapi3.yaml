@@ -2671,3 +2671,4 @@ components:
       enum:
         - slack
         - json
+        - teams

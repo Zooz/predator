@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactTable from 'react-table'
-import {isEqual} from 'lodash'
+import { isEqual } from 'lodash'
 import classnames from 'classnames'
 import PaginationComponent from './Pagination'
 import css from './style/table-style.scss'
@@ -77,10 +77,10 @@ export default class ReactTableComponent extends React.Component {
 
         return (
             <div style={customStyle}>
-                {onSearch && <SearchBar searchSections={searchSections} onSearch={onSearch}/>}
+                {onSearch && <SearchBar searchSections={searchSections} onSearch={onSearch} />}
                 <ReactTable
                     data={data}
-                    className={classnames(css['table'], className)}
+                    className={classnames(css['table'], className, '-striped', '-highlight')}
                     columns={columns}
                     loading={loading}
                     pages={pages}
@@ -96,13 +96,13 @@ export default class ReactTableComponent extends React.Component {
                     totalDataCount={totalDataCount}
                     noDataText={noDataText || 'There is no data'}
                     getTheadProps={() => ({
-                        style: {'--header-color': headerColors.default},
+                        style: { '--header-color': headerColors.default },
                         className: css['thead']
                     })}
-                    getTbodyProps={() => ({...bodyProps, className: css['tbody']})}
+                    getTbodyProps={() => ({ ...bodyProps, className: css['tbody'] })}
                     getTheadThProps={(state, rowInfo, column, instance) => ({
                         className: css['th'],
-                        style: {'--cursor': cursor},
+                        style: { '--cursor': cursor },
                         onClick: e => {
                             if (sortEvent) {
                                 sortEvent(column.id)
@@ -151,7 +151,7 @@ export default class ReactTableComponent extends React.Component {
                                 '--text-selected': textColors.selected
                             }
                         }
-                    }}/>
+                    }} />
             </div>
         )
     }
