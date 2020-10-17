@@ -45,6 +45,11 @@ class Report extends React.Component {
         this.setState({disabledCreateBenchmark: true})
     };
 
+    exportCSV = () => {
+        const {report} = this.props;
+        window.open(`${process.env.PREDATOR_URL}/tests/${report.test_id}/reports/${report.report_id}/export/csv`,'_blank');
+    };
+
     onStar = () => {
         const {report, editReport} = this.props;
         const newValue = !report.is_favorite;
@@ -118,6 +123,8 @@ class Report extends React.Component {
                                 info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
                             }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'}/>
                         </div>
+                        <Button hover disabled={report.status !== 'finished'}
+                                onClick={this.exportCSV}>Export to CSV</Button>
                         <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
                                 onClick={this.createBenchmark}>Set as Benchmark</Button>
                     </div>

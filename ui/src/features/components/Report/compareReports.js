@@ -85,6 +85,23 @@ class CompareReports extends React.Component {
         this.setState({filteredKeys: {...newFilteredKeys}});
     };
 
+    onClickExportCSV = () => {
+        const selectedReports = this.props.selectedReportsAsArray;
+        const reportsList = this.state.reportsList;
+        let request_string = "";
+        let reportIdsAsCSV = "";
+        let testIdsAsCSV = "";
+        for (let index in selectedReports){
+            reportIdsAsCSV+=selectedReports[index]["reportId"];
+            testIdsAsCSV+=selectedReports[index]["testId"];
+            if (index < selectedReports.length -1){
+                reportIdsAsCSV+=",";
+                testIdsAsCSV+=",";
+            }
+        }
+        request_string = "report_ids="+reportIdsAsCSV+"&test_ids="+testIdsAsCSV;
+        window.open(`${process.env.PREDATOR_URL}/tests/reports/compare/export/csv?`+request_string,"_blank");
+    };
 
     render() {
         const {reportsList, mergedReports, filteredKeys, enableBenchmark} = this.state;
@@ -98,6 +115,9 @@ class CompareReports extends React.Component {
                     // alignItems: 'center'
                 }}>
                     <h1>Compare reports</h1>
+                    <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', margin:"1em"}}>
+                        <Button onClick={this.onClickExportCSV}>Export to CSV</Button>
+                    </div>
                     <ReportsList onChange={this.onSelectedReport} list={reportsList}/>
                     {
                         benchmark &&
