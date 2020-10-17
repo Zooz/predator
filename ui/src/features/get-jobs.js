@@ -27,6 +27,7 @@ import _ from 'lodash';
 import { createJobRequest } from './components/JobForm/utils';
 import JobForm from './components/JobForm';
 import ErrorDialog from './components/ErrorDialog';
+import { webhooksForDropdown } from './redux/selectors/webhooksSelector';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
@@ -137,6 +138,7 @@ class getJobs extends React.Component {
     componentDidMount() {
         this.loadPageData();
         this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL);
+        this.props.getWebhooks();
     }
 
     loadPageData = () => {
@@ -171,7 +173,7 @@ class getJobs extends React.Component {
         const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
         const { sortedJobs, jobForEdit } = this.state;
-        const { errorOnJobAction } = this.props;
+        const { errorOnJobAction, webhooks } = this.props;
 
         const columns = getColumns({
             columnsNames,
@@ -204,8 +206,8 @@ class getJobs extends React.Component {
                 {this.state.openViewJob
                     ? <Dialog title_key={'id'} data={this.state.openViewJob}
                       closeDialog={this.closeViewJobDialog} /> : null}
-                {this.state.openViewEditJob &&
-                    <JobForm history={history} editMode={true} data={jobForEdit} closeDialog={this.closeViewEditJobDialog}
+                {this.state.openViewEditJob && ((webhooks && webhooks.length > 0) || (jobForEdit.webhooks && jobForEdit.webhooks.length === 0)) &&
+                    <JobForm history={history} webhooks={webhooks} editMode={true} data={jobForEdit} closeDialog={this.closeViewEditJobDialog}
                 />}
             {this.state.deleteDialog && !this.props.deleteJobSuccess
                     ? <DeleteDialog loader={this.props.processingDeleteJob}
@@ -262,7 +264,8 @@ function mapStateToProps(state) {
         jobSuccess: createJobSuccess(state),
         editJobSuccess:  editJobSuccess(state),
         editJobId:  editJobId(state),
-        errorOnJobAction: errorOnJobAction(state)
+        errorOnJobAction: errorOnJobAction(state),
+        webhooks: webhooksForDropdown(state)
     };
 }
 
@@ -281,7 +284,8 @@ const mapDispatchToProps = {
     getAllReports: Actions.getLastReports,
     createJobSuccess: Actions.createJobSuccess,
     setEditJobSuccess: Actions.editJobSuccess,
-    clearErrorOnJobAction: Actions.clearErrorOnJobAction
+    clearErrorOnJobAction: Actions.clearErrorOnJobAction,
+    getWebhooks: Actions.getWebhooks,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getJobs);

@@ -1,6 +1,6 @@
 import {cloneDeep} from 'lodash';
 
-export const createStateForEditJob = (job) => {
+export const createStateForEditJob = (job, dropdownWebhooks) => {
     job = cloneDeep(job);
     return {
         id: job.id,
@@ -15,7 +15,9 @@ export const createStateForEditJob = (job) => {
         cron_expression: job.cron_expression,
         run_immediately: job.run_immediately,
         emails: job.emails ? job.emails : [],
-        received_webhooks: job.webhooks ? job.webhooks : [],
+        webhooks: job.webhooks ? job.webhooks.map(webhook => {
+            return dropdownWebhooks.find(webhookDropdown => webhookDropdown.key === webhook)
+        }) : [],
         helpInfo: job.helpInfo,
         parallelism: job.parallelism,
         max_virtual_users: job.max_virtual_users,
