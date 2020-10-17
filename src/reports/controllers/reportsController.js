@@ -93,26 +93,26 @@ module.exports.postStats = async (req, res, next) => {
 module.exports.getExportedReport = async(req, res, next) => {
     let exportedReport;
     let reportInput;
-    try{
+    try {
         reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
-        exportedReport = await reportExporter.exportReport(reportInput,req.params.file_format);
+        exportedReport = await reportExporter.exportReport(reportInput, req.params.file_format);
     } catch (err){
         return next(err);
     }
-    let fileName = exportHelper.getExportedReportName(reportInput,req.params.file_format);
-    res.setHeader('Content-disposition', 'attachment; filename='+fileName);
+    const fileName = exportHelper.getExportedReportName(reportInput, req.params.file_format);
+    res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
     res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
     return res.send(exportedReport);
-}
+};
 
-module.exports.getExportedCompareReport = async(req,res,next) => {
+module.exports.getExportedCompareReport = async(req, res, next) => {
     let exportedCompareReport;
-    let aggregateReportArray =[];
-    try{
-        const {reportIds, testIds} = exportHelper.processCompareReportsInput(req.query);
+    const aggregateReportArray = [];
+    try {
+        const { reportIds, testIds } = exportHelper.processCompareReportsInput(req.query);
 
-        for (let index in reportIds){
-            let result = await aggregateReportGenerator.createAggregateReport(testIds[index],reportIds[index]);
+        for (const index in reportIds){
+            const result = await aggregateReportGenerator.createAggregateReport(testIds[index], reportIds[index]);
             aggregateReportArray.push(result);
         }
         exportedCompareReport = await reportExporter.exportCompareReport(aggregateReportArray, req.params.file_format);
@@ -120,8 +120,8 @@ module.exports.getExportedCompareReport = async(req,res,next) => {
         return next(err);
     }
 
-    let fileName = exportHelper.getCompareReportName(aggregateReportArray,req.params.file_format);
-    res.setHeader('Content-disposition', 'attachment; filename='+fileName);
+    const fileName = exportHelper.getCompareReportName(aggregateReportArray, req.params.file_format);
+    res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
     res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
     res.send(exportedCompareReport);
-}
+};
