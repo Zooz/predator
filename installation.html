@@ -295,6 +295,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#important-deployment-tips" title="Important Deployment Tips" class="md-nav__link">
+    Important Deployment Tips
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#kubernetes" title="Kubernetes" class="md-nav__link">
     Kubernetes
   </a>
@@ -503,6 +510,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#important-deployment-tips" title="Important Deployment Tips" class="md-nav__link">
+    Important Deployment Tips
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#kubernetes" title="Kubernetes" class="md-nav__link">
     Kubernetes
   </a>
@@ -546,6 +560,11 @@
                     <h1 id="installing-predator">Installing Predator<a class="headerlink" href="#installing-predator" title="Permanent link">#</a></h1>
 <p>Before Predator, running two or more tests simultaneously was limited due to third party limitations. Now, you are able to scale tests using our own resources. With support for both Kubernetes and Metronome, all you need to do is provide the platform configuration, sit back, and let Predator deploy runners that load your API from your chosen platform. </p>
 <p>You're probably eager to get your hands dirty, so let's go ahead and install Predator.</p>
+<h2 id="important-deployment-tips">Important Deployment Tips<a class="headerlink" href="#important-deployment-tips" title="Permanent link">#</a></h2>
+<p>Predator is production ready and fully tested and can be deployed in all of the following platforms listed. Please follow these guidelines when deploying Predator:
+1. Deploy Predator using only tagged releases and not <code>latest</code>.
+2. Predator-Runner docker image version (<code>zooz/predator-runner:$TAGGED_VERSION</code>) must match the Predator's <code>major.minor</code> version running in order to be fully compatible with all features. Patched versions don't have to match, but it is recommended to use latest patch version.
+    - For example, Predator version 1.6 (<code>zooz/predator:1.6</code>) should run Predator-Runner version 1.6 as well (<code>zooz/predator-runner:1.6</code>). </p>
 <h2 id="kubernetes">Kubernetes<a class="headerlink" href="#kubernetes" title="Permanent link">#</a></h2>
 <p>Install Predator from the <a href="https://hub.helm.sh/charts/zooz/predator">Helm Hub</a>  </p>
 <h2 id="dcos">DC/OS<a class="headerlink" href="#dcos" title="Permanent link">#</a></h2>
