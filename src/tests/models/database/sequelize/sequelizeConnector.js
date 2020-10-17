@@ -1,7 +1,10 @@
 
 const Sequelize = require('sequelize'),
     uuid = require('uuid');
-const sanitizeHelper = require('../../../helpers/sanitizeHelper');
+const sanitizeHelper = require('../../../helpers/sanitizeHelper'),
+    {
+        CONTEXT_ID
+    } = require('../../../../database/sequlize-handler/consts');
 
 module.exports = {
     init,
@@ -63,6 +66,9 @@ async function initSchemas() {
         revision_id: {
             type: Sequelize.DataTypes.UUID,
             unique: 'compositeIndex'
+        },
+        [CONTEXT_ID]: {
+            type: Sequelize.DataTypes.UUID,
         }
     });
 
@@ -81,6 +87,9 @@ async function initSchemas() {
         },
         artillery_json: {
             type: Sequelize.DataTypes.TEXT('long')
+        },
+        [CONTEXT_ID]: {
+            type: Sequelize.DataTypes.UUID,
         }
     });
 
