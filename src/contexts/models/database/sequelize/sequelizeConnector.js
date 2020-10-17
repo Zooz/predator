@@ -21,7 +21,7 @@ async function initSchemas() {
             primaryKey: true
         },
         name: {
-            type: Sequelize.DataTypes.TEXT(),
+            type: Sequelize.DataTypes.STRING,
             allowNull: false,
             unique: true
         }
