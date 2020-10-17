@@ -16,6 +16,10 @@ describe('validateRunnerVersion', function() {
             const imageName = getImageNameWithTag('latest');
             expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(false);
         });
+        it('Should return false for using no tag', function () {
+            const imageName = 'meow';
+            expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(false);
+        });
         it('Should return false for using runner version with a lower major', function () {
             const imageName = getImageNameWithTag('0.0.1');
             expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(false);
@@ -30,6 +34,10 @@ describe('validateRunnerVersion', function() {
         });
         it('Should return true for using runner version with same version', function () {
             const imageName = getImageNameWithTag('1.5.0');
+            expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(true);
+        });
+        it('Should return true for using runner version  in X.Y format', function () {
+            const imageName = getImageNameWithTag('1.5');
             expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(true);
         });
     });
