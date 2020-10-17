@@ -60,6 +60,11 @@ To see the progress of `v1.5.0` [click here](https://github.com/Zooz/predator/is
 
 ## Getting Started
 
+### Important Deployment Tips
+Predator is production ready and fully tested and can be deployed in all of the following platforms listed. Please follow these guidelines when deploying Predator:
+1. Deploy Predator using only tagged releases and not `latest`.
+2. Predator-Runner docker image version (`zooz/predator-runner:$TAGGED_VERSION`) must match the Predator's version running in order to be fully compatible with all features.
+
 ### Kubernetes
 Predator is designed to seamlessly deploy into your Kubernetes cluster. Install Predator from the [Helm Hub](https://hub.helm.sh/charts/zooz/predator)
 
