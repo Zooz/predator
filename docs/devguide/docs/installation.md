@@ -6,7 +6,9 @@ You're probably eager to get your hands dirty, so let's go ahead and install Pre
 
 ## Important Deployment Tips
 Predator is production ready and fully tested and can be deployed in all of the following platforms listed. Please follow these guidelines when deploying Predator:
+
 1. Deploy Predator using only tagged releases and not `latest`.
+
 2. Predator-Runner docker image version (`zooz/predator-runner:$TAGGED_VERSION`) must match the Predator's `major.minor` version running in order to be fully compatible with all features. Patched versions don't have to match, but it is recommended to use latest patch version.
     - For example, Predator version 1.6 (`zooz/predator:1.6`) should run Predator-Runner version 1.6 as well (`zooz/predator-runner:1.6`). 
 
