@@ -49,6 +49,9 @@ module.exports = {
         PROCESSOR_NAME_ALREADY_EXIST: 'Processor name already exists',
         PROCESSOR_DELETION_FORBIDDEN: 'Processor is used by tests'
     },
+    WARN_MESSAGES: {
+        BAD_RUNNER_IMAGE: 'It is recommended to the same version for both Predator and the Runner'
+    },
     KUBERNETES: 'KUBERNETES',
     METRONOME: 'METRONOME',
     DOCKER: 'DOCKER',

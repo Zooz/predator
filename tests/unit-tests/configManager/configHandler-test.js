@@ -5,11 +5,13 @@ process.env.JOB_PLATFORM = 'DOCKER';
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
-const databaseConnector = require('../../../src/configManager/models/database/databaseConnector');
-const configConstants = require('../../../src/common/consts').CONFIG;
-const packageJson = require('../../../package');
 
-let manager;
+const databaseConnector = require('../../../src/configManager/models/database/databaseConnector');
+const { CONFIG: configConstants, WARN_MESSAGES } = require('../../../src/common/consts');
+const packageJson = require('../../../package');
+const logger = require('../../../src/common/logger');
+
+let manager, warnLoggerStub;
 
 const defaultSmtpServerConfig = {
     timeout: 200,
@@ -131,6 +133,7 @@ describe('Manager config', function () {
         databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getConfigAsObject');
         databaseConnectorGetValueStub = sandbox.stub(databaseConnector, 'getConfigValue');
         databaseConnectorUpdateStub = sandbox.stub(databaseConnector, 'updateConfig');
+        warnLoggerStub = sandbox.stub(logger, 'warn');
         manager = rewire('../../../src/configManager/models/configHandler');
         packageJson.version = '1.5.6';
     });
@@ -205,6 +208,14 @@ describe('Manager config', function () {
 
             const result = await manager.updateConfig({ runner_cpu: 'test_runner_cpu' });
             should(result).eql([]);
+        });
+        it('update config with a bad runner image name, expect for a warning log', async function() {
+            databaseConnectorUpdateStub.resolves([]);
+
+            const result = await manager.updateConfig({ runner_docker_image: 'predator-runner:0.0.1' });
+            should(result).eql([]);
+            should(warnLoggerStub.calledOnce).equal(true);
+            should(warnLoggerStub.args[0][0]).equal(WARN_MESSAGES.BAD_RUNNER_IMAGE);
         });
     });
 
