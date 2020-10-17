@@ -14,7 +14,7 @@ const constants = require('../../../src/reports/utils/constants');
 
 const mailhogHelper = require('./mailhog/mailhogHelper');
 
-let testId, reportId, jobId, runnerId, firstRunner, secondRunner, jobBody, minimalReportBody;
+let testId, testIdA, testIdB, reportId, reportIdA, reportIdB, jobId, jobIdA, jobIdB, runnerId, runnerIdA, runnerIdB, firstRunner, secondRunner, jobBody, minimalReportBody, minimalReportBodyA, minimalReportBodyB;
 
 describe('Integration tests for the reports api', function () {
     this.timeout(10000);
@@ -29,6 +29,16 @@ describe('Integration tests for the reports api', function () {
         should(response.statusCode).eql(201);
         should(response.body).have.key('id');
         testId = response.body.id;
+
+        const responseA = await testsRequestCreator.createTest(requestBody, {});
+        should(responseA.statusCode).eql(201);
+        should(responseA.body).have.key('id');
+        testIdA = responseA.body.id;
+
+        const responseB = await testsRequestCreator.createTest(requestBody, {});
+        should(responseB.statusCode).eql(201);
+        should(responseB.body).have.key('id');
+        testIdB = responseB.body.id;
     });
 
     beforeEach(async function () {
@@ -383,6 +393,7 @@ describe('Integration tests for the reports api', function () {
                 });
             });
         });
+
         describe('Get report', function () {
             const getReportTestId = uuid();
             let reportId;
@@ -532,6 +543,272 @@ describe('Integration tests for the reports api', function () {
                 });
             });
         });
+
+        describe('Get exported reports', function () {
+            before(async function () {
+                const jobResponse = await createJob(testId);
+                jobId = jobResponse.body.id;
+            });
+            beforeEach(async function () {
+                reportId = uuid();
+                runnerId = uuid();
+                const requestBody = require('../../testExamples/Basic_test');
+                const response = await testsRequestCreator.createTest(requestBody, {});
+                should(response.statusCode).be.eql(201);
+                should(response.body).have.key('id');
+                testId = response.body.id;
+
+                minimalReportBody = {
+                    runner_id: runnerId,
+                    test_type: 'basic',
+                    report_id: reportId,
+                    revision_id: uuid(),
+                    job_id: jobId,
+                    test_name: 'integration-test',
+                    test_description: 'doing some integration testing',
+                    start_time: Date.now().toString(),
+                    last_updated_at: Date.now().toString(),
+                    test_configuration: {
+                        enviornment: 'test',
+                        duration: 10,
+                        arrival_rate: 20
+                    }
+                };
+
+                const reportResponse = await reportsRequestCreator.createReport(testId, minimalReportBody);
+                should(reportResponse.statusCode).be.eql(201);
+            });
+
+            it('Post full cycle stats and export report', async function () {
+                const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', runnerId));
+                should(phaseStartedStatsResponse.statusCode).be.eql(204);
+
+                const getReport = await reportsRequestCreator.getReport(testId, reportId);
+                should(getReport.statusCode).be.eql(200);
+                const testStartTime = new Date(getReport.body.start_time);
+                const statDateFirst = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 20);
+                let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateFirst, 600));
+                should(intermediateStatsResponse.statusCode).be.eql(204);
+                let getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                let report = getReportResponse.body;
+                should(report.avg_rps).eql(30);
+
+                const statDateSecond = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 40);
+                intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateSecond, 200));
+                should(intermediateStatsResponse.statusCode).be.eql(204);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                report = getReportResponse.body;
+                should(report.avg_rps).eql(20);
+
+                const statDateThird = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 60);
+                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', runnerId, statDateThird));
+                should(doneStatsResponse.statusCode).be.eql(204);
+                getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                should(getReportResponse.statusCode).be.eql(200);
+                report = getReportResponse.body;
+                should(report.avg_rps).eql(13.33);
+
+                const getExportedReportResponse = await reportsRequestCreator.getExportedReport(testId, reportId, 'csv');
+                should(getExportedReportResponse.statusCode).be.eql(200);
+
+                const contentDisposition = new RegExp('attachment; filename=integration-test_[a-f0-9\-]+_.*\.csv');
+                const contentType = new RegExp('text/csv; charset=utf-8');
+                const receivedDisposition = getExportedReportResponse.header['content-disposition'];
+                const receivedType = getExportedReportResponse.header['content-type'];
+
+                should(contentDisposition.test(receivedDisposition)).be.eql(true);
+                should(contentType.test(receivedType)).be.eql(true);
+                const EXPORTED_REPORT_HEADER = 'timestamp,timemillis,median,p95,p99,rps,status_200';
+                const reportLines = getExportedReportResponse.text.split('\n');
+                const headers = reportLines[0];
+                should(headers).eql(EXPORTED_REPORT_HEADER);
+            });
+
+            describe('export report with no stats', function () {
+                it('should return error 404', async function () {
+                    const getReportResponse = await reportsRequestCreator.getExportedReport(testId, reportId, 'csv');
+                    should(getReportResponse.statusCode).be.eql(404);
+                });
+            });
+
+            describe('export report of non existent report', function () {
+                it('should return error 404', async function () {
+                    const getReportResponse = await reportsRequestCreator.getExportedReport(testId, 'null', 'csv');
+                    should(getReportResponse.statusCode).be.eql(404);
+                });
+            });
+        });
+
+        describe('Get exported comparison report', function () {
+            before(async function () {
+                const jobResponseA = await createJob(testIdA);
+                jobIdA = jobResponseA.body.id;
+
+                const jobResponseB = await createJob(testIdB);
+                jobIdB = jobResponseB.body.id;
+            });
+            beforeEach(async function () {
+                reportIdA = uuid();
+                runnerIdA = uuid();
+                const requestBodyA = require('../../testExamples/Basic_test');
+                const responseA = await testsRequestCreator.createTest(requestBodyA, {});
+                should(responseA.statusCode).be.eql(201);
+                should(responseA.body).have.key('id');
+                testIdA = responseA.body.id;
+
+                minimalReportBodyA = {
+                    runner_id: runnerIdA,
+                    test_type: 'basic',
+                    report_id: reportIdA,
+                    revision_id: uuid(),
+                    job_id: jobIdA,
+                    test_name: 'integration-test',
+                    test_description: 'doing some integration testing',
+                    start_time: Date.now().toString(),
+                    last_updated_at: Date.now().toString(),
+                    test_configuration: {
+                        enviornment: 'test',
+                        duration: 10,
+                        arrival_rate: 200
+                    }
+                };
+
+                const reportResponseA = await reportsRequestCreator.createReport(testIdA, minimalReportBodyA);
+                should(reportResponseA.statusCode).be.eql(201);
+
+                reportIdB = uuid();
+                runnerIdB = uuid();
+                const requestBodyB = require('../../testExamples/Basic_test');
+                const responseB = await testsRequestCreator.createTest(requestBodyB, {});
+                should(responseB.statusCode).be.eql(201);
+                should(responseB.body).have.key('id');
+                testIdB = responseB.body.id;
+
+                minimalReportBodyB = {
+                    runner_id: runnerIdB,
+                    test_type: 'basic',
+                    report_id: reportIdB,
+                    revision_id: uuid(),
+                    job_id: jobIdB,
+                    test_name: 'integration-test',
+                    test_description: 'doing some integration testing',
+                    start_time: Date.now().toString(),
+                    last_updated_at: Date.now().toString(),
+                    test_configuration: {
+                        enviornment: 'test',
+                        duration: 10,
+                        arrival_rate: 200
+                    }
+                };
+
+                const reportResponseB = await reportsRequestCreator.createReport(testIdB, minimalReportBodyB);
+                should(reportResponseB.statusCode).be.eql(201);
+            });
+
+            it('Post full cycle stats for both reports and export report', async function () {
+                const phaseStartedStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('started_phase', runnerIdA));
+                should(phaseStartedStatsResponseA.statusCode).be.eql(204);
+
+                const getReportA = await reportsRequestCreator.getReport(testIdA, reportIdA);
+                should(getReportA.statusCode).be.eql(200);
+                const testStartTimeA = new Date(getReportA.body.start_time);
+                const statDateFirstA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 20);
+                let intermediateStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('intermediate', runnerIdA, statDateFirstA, 600));
+                should(intermediateStatsResponseA.statusCode).be.eql(204);
+
+                const statDateSecondA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 40);
+                intermediateStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('intermediate', runnerIdA, statDateSecondA, 200));
+                should(intermediateStatsResponseA.statusCode).be.eql(204);
+
+                const statDateThirdA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 60);
+                const doneStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('done', runnerIdA, statDateThirdA));
+                should(doneStatsResponseA.statusCode).be.eql(204);
+
+                const phaseStartedStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('started_phase', runnerIdB));
+                should(phaseStartedStatsResponseB.statusCode).be.eql(204);
+
+                const getReportB = await reportsRequestCreator.getReport(testIdB, reportIdB);
+                should(getReportB.statusCode).be.eql(200);
+                const testStartTimeB = new Date(getReportB.body.start_time);
+                const statDateFirstB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 20);
+                let intermediateStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('intermediate', runnerIdB, statDateFirstB, 600));
+                should(intermediateStatsResponseB.statusCode).be.eql(204);
+
+                const statDateSecondB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 40);
+                intermediateStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('intermediate', runnerIdB, statDateSecondB, 200));
+                should(intermediateStatsResponseB.statusCode).be.eql(204);
+
+                const statDateThirdB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 60);
+                const doneStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('done', runnerIdB, statDateThirdB));
+                should(doneStatsResponseB.statusCode).be.eql(204);
+
+                const reportMetaData = {
+                    test_ids: [testIdA, testIdB],
+                    report_ids: [reportIdA, reportIdB]
+                };
+
+                const getExportedCompareResponse = await reportsRequestCreator.getExportedCompareReport('csv', reportMetaData);
+                should(getExportedCompareResponse.statusCode).be.eql(200);
+                const contentDisposition = new RegExp('attachment; filename=integration-test_integration-test_comparison_[a-f0-9\-]+_[a-f0-9\-]+\.csv');
+                const contentType = new RegExp('text/csv; charset=utf-8');
+                const receivedDisposition = getExportedCompareResponse.header['content-disposition'];
+                const receivedType = getExportedCompareResponse.header['content-type'];
+
+                should(contentDisposition.test(receivedDisposition)).be.eql(true);
+                should(contentType.test(receivedType)).be.eql(true);
+                const EXPORTED_REPORT_HEADER = 'timestamp,timemillis,A_median,A_p95,A_p99,A_rps,A_status_200,B_median,B_p95,B_p99,B_rps,B_status_200';
+                const reportLines = getExportedCompareResponse.text.split('\n');
+                const headers = reportLines[0];
+                should(headers).eql(EXPORTED_REPORT_HEADER);
+            });
+
+            it('Post full cycle stats for both reports and give an unknown report', async function () {
+                const phaseStartedStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('started_phase', runnerIdA));
+                should(phaseStartedStatsResponseA.statusCode).be.eql(204);
+
+                const getReportA = await reportsRequestCreator.getReport(testIdA, reportIdA);
+                should(getReportA.statusCode).be.eql(200);
+                const testStartTimeA = new Date(getReportA.body.start_time);
+                const statDateFirstA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 20);
+                let intermediateStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('intermediate', runnerIdA, statDateFirstA, 600));
+                should(intermediateStatsResponseA.statusCode).be.eql(204);
+
+                const statDateSecondA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 40);
+                intermediateStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('intermediate', runnerIdA, statDateSecondA, 200));
+                should(intermediateStatsResponseA.statusCode).be.eql(204);
+
+                const statDateThirdA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 60);
+                const doneStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('done', runnerIdA, statDateThirdA));
+                should(doneStatsResponseA.statusCode).be.eql(204);
+
+                const phaseStartedStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('started_phase', runnerIdB));
+                should(phaseStartedStatsResponseB.statusCode).be.eql(204);
+
+                const getReportB = await reportsRequestCreator.getReport(testIdB, reportIdB);
+                should(getReportB.statusCode).be.eql(200);
+                const testStartTimeB = new Date(getReportB.body.start_time);
+                const statDateFirstB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 20);
+                let intermediateStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('intermediate', runnerIdB, statDateFirstB, 600));
+                should(intermediateStatsResponseB.statusCode).be.eql(204);
+
+                const statDateSecondB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 40);
+                intermediateStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('intermediate', runnerIdB, statDateSecondB, 200));
+                should(intermediateStatsResponseB.statusCode).be.eql(204);
+
+                const statDateThirdB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 60);
+                const doneStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('done', runnerIdB, statDateThirdB));
+                should(doneStatsResponseB.statusCode).be.eql(204);
+
+                const reportMetaData = {
+                    test_ids: [testIdA, testIdB],
+                    report_ids: ['unknown', reportIdB]
+                };
+
+                const getExportedCompareResponse = await reportsRequestCreator.getExportedCompareReport('csv', reportMetaData);
+                should(getExportedCompareResponse.statusCode).be.eql(404);
+            });
+        });
+
         describe('Post stats', function () {
             before(async function () {
                 const jobResponse = await createJob(testId);

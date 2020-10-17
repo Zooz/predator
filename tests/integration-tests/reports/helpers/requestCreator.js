@@ -16,7 +16,9 @@ module.exports = {
     getReports,
     editReport,
     getLastReports,
-    getAggregatedReport
+    getAggregatedReport,
+    getExportedReport,
+    getExportedCompareReport,
 };
 
 async function init() {
@@ -60,6 +62,42 @@ function getAggregatedReport(testId, reportId) {
 
 function getReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}`)
+        .set(HEADERS)
+        .expect(function (res) {
+            return res;
+        });
+}
+
+function getExportedReport(testId, reportId, fileFormat) {
+    return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}/export/${fileFormat}`)
+        .set(HEADERS)
+        .expect(function (res) {
+            return res;
+        });
+}
+
+/*
+    reportMetaData: Data related to a report:
+    Structure:
+        {
+            report_ids:[],
+            test_ids:[],
+        }
+*/
+function getExportedCompareReport(fileFormat, reportMetaData) {
+    let url = `/v1/tests/reports/compare/export/${fileFormat}`;
+    let reportIdsAsCSV = "";
+    let testIdsAsCSV = "";
+    for (let index = 0; index < reportMetaData.report_ids.length; index++){
+        reportIdsAsCSV+=reportMetaData["report_ids"][index];
+        testIdsAsCSV+=reportMetaData["test_ids"][index];
+        if (index < reportMetaData.report_ids.length -1){
+            reportIdsAsCSV+=",";
+            testIdsAsCSV+=",";
+        }
+    }
+    let request_string = "report_ids="+reportIdsAsCSV+"&test_ids="+testIdsAsCSV;
+    return request(testApp).get(url+"?"+request_string)
         .set(HEADERS)
         .expect(function (res) {
             return res;

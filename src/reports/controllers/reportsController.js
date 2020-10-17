@@ -2,7 +2,9 @@
 'use strict';
 const aggregateReportGenerator = require('../models/aggregateReportGenerator');
 const reports = require('../models/reportsManager');
+const reportExporter = require('../models/reportExporter');
 const stats = require('../models/statsManager');
+const exportHelper = require('../helpers/exportReportHelper');
 
 module.exports.getAggregateReport = async function (req, res, next) {
     let reportInput;
@@ -86,4 +88,40 @@ module.exports.postStats = async (req, res, next) => {
         return next(err);
     }
     return res.status(204).json();
+};
+
+module.exports.getExportedReport = async(req, res, next) => {
+    let exportedReport;
+    let reportInput;
+    try {
+        reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
+        exportedReport = await reportExporter.exportReport(reportInput, req.params.file_format);
+    } catch (err){
+        return next(err);
+    }
+    const fileName = exportHelper.getExportedReportName(reportInput, req.params.file_format);
+    res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
+    res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
+    return res.send(exportedReport);
+};
+
+module.exports.getExportedCompareReport = async(req, res, next) => {
+    let exportedCompareReport;
+    const aggregateReportArray = [];
+    try {
+        const { reportIds, testIds } = exportHelper.processCompareReportsInput(req.query);
+
+        for (const index in reportIds){
+            const result = await aggregateReportGenerator.createAggregateReport(testIds[index], reportIds[index]);
+            aggregateReportArray.push(result);
+        }
+        exportedCompareReport = await reportExporter.exportCompareReport(aggregateReportArray, req.params.file_format);
+    } catch (err) {
+        return next(err);
+    }
+
+    const fileName = exportHelper.getCompareReportName(aggregateReportArray, req.params.file_format);
+    res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
+    res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
+    res.send(exportedCompareReport);
 };
