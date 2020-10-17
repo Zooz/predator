@@ -733,7 +733,7 @@ during runtime with the /config endpoint, please check the API reference for mor
 <td>runner_docker_image</td>
 <td>The predator-runner docker image that will run the test</td>
 <td>✓</td>
-<td>zooz/predator-runner:latest</td>
+<td>zooz/predator-runner:$LATEST_TAGGED_VERSION</td>
 </tr>
 <tr>
 <td>RUNNER_CPU</td>
@@ -786,6 +786,10 @@ during runtime with the /config endpoint, please check the API reference for mor
 </tr>
 </tbody>
 </table>
+<div class="admonition tip">
+<p class="admonition-title">Note</p>
+<p>RUNNER_DOCKER_IMAGE (<code>zooz/predator-runner:$TAGGED_VERSION</code>) should match the Predator's version running in order to be fully compatible with all features.</p>
+</div>
 <h2 id="database">Database<a class="headerlink" href="#database" title="Permanent link">#</a></h2>
 <table>
 <thead>
