@@ -256,7 +256,7 @@ class Form extends React.Component {
     };
 
     if (this.props.editMode) {
-      const editProps = createStateForEditJob(this.props.data, this.props.webhooks);
+      const editProps = createStateForEditJob(this.props.data);
       this.state = {
         ...this.state,
         ...editProps
@@ -298,6 +298,10 @@ class Form extends React.Component {
         }
         const maxVirtualUsers = parallel * 250;
         this.setState({ parallelism: parallel, max_virtual_users: maxVirtualUsers })
+      }
+      if (this.props.webhooks !== prevProps.webhooks) {
+        const newState = createStateForEditJob(this.props.data, this.props.webhooks);
+        this.setState({ ...newState });
       }
     }
 
@@ -496,13 +500,14 @@ class Form extends React.Component {
           </TitleInput>
         );
       case inputTypes.MULTI_SELECT:
+        const options = oneItem.options(this.props);
         return (
           <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
             rightComponent={<InfoToolTip data={oneItem} />}>
             <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
               <MultiSelect
-                options={oneItem.options(this.props)}
-                selectedOptions={this.state[oneItem.name]}
+                options={options}
+                selectedOptions={options.length > 0 ? this.state[oneItem.name] : []}
                 onChange={(values) => this.onChangeProperty(oneItem.name, values)}
                 placeholder={'Please select an option'}
                 height={'35px'}
