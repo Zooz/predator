@@ -51,8 +51,17 @@ export const createJobSuccess = (job) => (
 export const editJobSuccess = (value) => (
   { type: Types.EDIT_JOB_SUCCESS, value }
 );
+
+export const editJobId = (value) => (
+  { type: Types.EDIT_JOB_ID, value }
+);
+
 export const errorOnJobAction = (error) => (
   { type: Types.ERROR_ON_JOB_ACTION, error }
+);
+
+export const clearErrorOnJobAction = () => (
+  { type: Types.ERROR_ON_JOB_ACTION }
 );
 
 export const processingCreateJob = (state) => (

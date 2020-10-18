@@ -10,6 +10,7 @@ import {
     getJobsWithTestNameAndLastRun,
     createJobSuccess,
     editJobSuccess,
+    editJobId,
     errorOnJobAction
 } from './redux/selectors/jobsSelector';
 import { tests } from './redux/selectors/testsSelector';
@@ -23,12 +24,15 @@ import Page from '../components/Page';
 import { ReactTableComponent } from '../components/ReactTable';
 import { getColumns } from './configurationColumn';
 import _ from 'lodash';
-import {createJobRequest} from './requestBuilder';
+import { createJobRequest } from './components/JobForm/utils';
+import JobForm from './components/JobForm';
+import ErrorDialog from './components/ErrorDialog';
+import { webhooksForDropdown } from './redux/selectors/webhooksSelector';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
 const REFRESH_DATA_INTERVAL = 30000;
-const columnsNames = ['test_name', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'raw', 'delete', 'enabled_disabled'];
+const columnsNames = ['test_name', 'duration', 'arrival_rate', 'ramp_to', 'parallelism', 'max_virtual_users', 'cron_expression', 'last_run', 'run_now', 'job_edit', 'raw', 'delete', 'enabled_disabled'];
 const DESCRIPTION = 'Scheduled jobs configured with a cron expression.';
 
 class getJobs extends React.Component {
@@ -43,12 +47,19 @@ class getJobs extends React.Component {
             sortedJobs: [],
             rerunJob: null,
             editJob: null,
+            openViewEditJob: false,
+            jobForEdit: null
         };
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.jobs !== this.props.jobs) {
             this.setState({ sortedJobs: [...this.props.jobs] });
+            const { match: { params, path } } = this.props;
+            if (path === '/jobs/:jobId/edit') {
+                const data = this.props.jobs.find((job) => job.id === params.jobId);
+                data ? this.onEdit(data) : this.props.history.replace('/jobs');
+            }
         }
     }
 
@@ -72,6 +83,14 @@ class getJobs extends React.Component {
 
     onRawView = (job) => {
         this.setState({ openViewJob: job });
+    };
+
+    onEdit = (data) => {
+        const { match: { params, path }, history } = this.props;
+        if (path !== '/jobs/:jobId/edit') {
+          history.replace(`/jobs/${data.id}/edit`)
+        }
+        this.setState({ openViewEditJob: true, jobForEdit: data });
     };
 
     onRunTest = (job) => {
@@ -119,6 +138,7 @@ class getJobs extends React.Component {
     componentDidMount() {
         this.loadPageData();
         this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL);
+        this.props.getWebhooks();
     }
 
     loadPageData = () => {
@@ -138,10 +158,23 @@ class getJobs extends React.Component {
         return this.props.processingGetJobs ? <Loader /> : noDataMsg;
     }
 
+    closeViewEditJobDialog = () => {
+        const { history } = this.props;
+        history.replace('/jobs');
+        this.setState({ openViewEditJob: false, jobForEdit: null });
+    }
+
+    onCloseErrorDialog = () => {
+        this.props.clearErrorOnJobAction();
+        this.props.setEditJobId(undefined);
+    }
+
     render() {
         const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
-        const { sortedJobs } = this.state;
+        const { sortedJobs, jobForEdit } = this.state;
+        const { errorOnJobAction, webhooks } = this.props;
+
         const columns = getColumns({
             columnsNames,
             onSort: this.onSort,
@@ -149,8 +182,11 @@ class getJobs extends React.Component {
             onRunTest: this.onRunTest,
             onDelete: this.onDelete,
             onEnableDisable: this.onEnableDisable,
+            onEdit: this.onEdit
         });
         const feedbackMessage = this.generateFeedbackMessage();
+        const error = errorOnJobAction;
+
         return (
             <Page title={'Scheduled Jobs'} description={DESCRIPTION}>
                 <ReactTableComponent
@@ -170,7 +206,9 @@ class getJobs extends React.Component {
                 {this.state.openViewJob
                     ? <Dialog title_key={'id'} data={this.state.openViewJob}
                       closeDialog={this.closeViewJobDialog} /> : null}
-
+                {this.state.openViewEditJob && ((webhooks && webhooks.length > 0) || (jobForEdit.webhooks && jobForEdit.webhooks.length === 0)) &&
+                    <JobForm history={history} webhooks={webhooks} editMode={true} data={jobForEdit} closeDialog={this.closeViewEditJobDialog}
+                />}
             {this.state.deleteDialog && !this.props.deleteJobSuccess
                     ? <DeleteDialog loader={this.props.processingDeleteJob}
                       display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}
@@ -186,6 +224,7 @@ class getJobs extends React.Component {
                         this.props.clearDeleteJobSuccess();
                         this.props.createJobSuccess(undefined);
                         this.props.setEditJobSuccess(undefined);
+                        this.props.setEditJobId(undefined);
                         this.setState({
                             jobToDelete: undefined,
                             rerunJob: null,
@@ -193,6 +232,7 @@ class getJobs extends React.Component {
                         });
                     }}
                 />}
+                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error} />}
           </Page>
         );
     }
@@ -204,10 +244,10 @@ class getJobs extends React.Component {
         if(this.props.jobSuccess && this.state.rerunJob){
             return `Job created successfully: ${this.props.jobSuccess.id}`;
         }
-        if(this.props.editJobSuccess  && this.state.editJob){
-            return `Job edited successfully: ${this.state.editJob.id}`;
+        if(this.props.editJobSuccess && this.props.editJobId){
+            return `Job edited successfully: ${this.props.editJobId}`;
         }
-
+        
     }
 }
 
@@ -223,7 +263,9 @@ function mapStateToProps(state) {
         reports: reports(state),
         jobSuccess: createJobSuccess(state),
         editJobSuccess:  editJobSuccess(state),
-        errorOnJobAction:errorOnJobAction(state)
+        editJobId:  editJobId(state),
+        errorOnJobAction: errorOnJobAction(state),
+        webhooks: webhooksForDropdown(state)
     };
 }
 
@@ -234,6 +276,7 @@ const mapDispatchToProps = {
     getJob: Actions.getJob,
     createJob: Actions.createJob,
     editJob: Actions.editJob,
+    setEditJobId: Actions.editJobId,
     deleteJob: Actions.deleteJob,
     clearDeleteJobSuccess: Actions.clearDeleteJobSuccess,
     clearErrorOnDeleteJob: Actions.clearErrorOnDeleteJob,
@@ -241,6 +284,8 @@ const mapDispatchToProps = {
     getAllReports: Actions.getLastReports,
     createJobSuccess: Actions.createJobSuccess,
     setEditJobSuccess: Actions.editJobSuccess,
+    clearErrorOnJobAction: Actions.clearErrorOnJobAction,
+    getWebhooks: Actions.getWebhooks,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getJobs);

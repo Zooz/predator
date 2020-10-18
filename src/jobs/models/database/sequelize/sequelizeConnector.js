@@ -108,9 +108,13 @@ async function updateJob(jobId, jobInfo) {
         max_virtual_users: jobInfo.max_virtual_users,
         proxy_url: jobInfo.proxy_url,
         debug: jobInfo.debug,
-        enabled: jobInfo.enabled
+        enabled: jobInfo.enabled,
+        notes: jobInfo.notes,
+        emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
+            return { id: uuid(), address: emailAddress };
+        }) : undefined
     };
-    const oldJob = await job.findByPk(jobId);
+    const oldJob = await job.findByPk(jobId, { include: [job.email] });
     const mergedParams = _.mergeWith(params, oldJob.dataValues, (newValue, oldJobValue) => {
         return newValue !== undefined ? newValue : oldJobValue;
     });
@@ -151,6 +155,21 @@ async function updateJob(jobId, jobInfo) {
     delete mergedParams.id;
     const updatedJob = await client.transaction(async function(transaction) {
         await oldJob.setWebhooks(jobInfo.webhooks || [], { transaction });
+
+        const oldEmails = oldJob.emails || [];
+        const newEmails = params.emails || [];
+
+        for (let i = 0; i < oldEmails.length > 0; i++) {
+            if (!newEmails.find(newEmail => newEmail.address === oldEmails[i].address)) {
+                await oldJob.removeEmail(oldEmails[i], { transaction });
+            }
+        }
+        for (let i = 0; i < newEmails.length > 0; i++) {
+            if (!oldJob.emails.find(oldEmail => oldEmail.address === newEmails[i].address)) {
+                await oldJob.createEmail(newEmails[i], { transaction });
+            }
+        }
+
         return job.update(mergedParams, { ...options, transaction });
     });
     return updatedJob;

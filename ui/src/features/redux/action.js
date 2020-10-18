@@ -58,7 +58,9 @@ import {
     clearSelectedJob,
     getJobFaliure,
     getJobSuccess,
-    editJobSuccess
+    editJobSuccess,
+    editJobId,
+    clearErrorOnJobAction
 } from './actions/jobsActions';
 import {
     getLastReports,
@@ -140,6 +142,7 @@ export {
     createJob,
     editJob,
     editJobSuccess,
+    editJobId,
     createJobSuccess,
     stopRunningJob,
     stopRunningJobSuccess,
@@ -151,7 +154,7 @@ export {
     clearErrorOnDeleteJob,
     clearDeleteJobSuccess,
     clearStopJobSuccess,
-
+    clearErrorOnJobAction,
     // reports//
     getReport,
     clearErrorOnGetReports,
