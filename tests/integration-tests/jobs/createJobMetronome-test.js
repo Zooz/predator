@@ -90,11 +90,11 @@ describe('Create job specific metronome tests', async function () {
 
                     it('Stop run', async () => {
                         nock(metronomeConfig.metronomeUrl)
-                            .get(`/v1/jobs/predator.${jobResponseBody.id}/runs`)
+                            .get(`/v1/jobs/predator.${jobResponseBody.report_id}/runs`)
                             .reply(200, [{ id: 1 }]);
 
                         nock(metronomeConfig.metronomeUrl)
-                            .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/1/actions/stop`)
+                            .post(`/v1/jobs/predator.${jobResponseBody.report_id}/runs/1/actions/stop`)
                             .reply(200);
 
                         const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
@@ -173,15 +173,15 @@ describe('Create job specific metronome tests', async function () {
 
                     it('Stop run', async () => {
                         nock(metronomeConfig.metronomeUrl)
-                            .get(`/v1/jobs/predator.${jobResponseBody.id}/runs`)
+                            .get(`/v1/jobs/predator.${jobResponseBody.report_id}/runs`)
                             .reply(200, [{ id: 1 }, { id: 2 }]);
 
                         nock(metronomeConfig.metronomeUrl)
-                            .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/1/actions/stop`)
+                            .post(`/v1/jobs/predator.${jobResponseBody.report_id}/runs/1/actions/stop`)
                             .reply(200);
 
                         nock(metronomeConfig.metronomeUrl)
-                            .post(`/v1/jobs/predator.${jobResponseBody.id}/runs/2/actions/stop`)
+                            .post(`/v1/jobs/predator.${jobResponseBody.report_id}/runs/2/actions/stop`)
                             .reply(200);
 
                         const stopRunResponse = await schedulerRequestCreator.stopRun(createJobResponse.body.id, createJobResponse.body.report_id, {
