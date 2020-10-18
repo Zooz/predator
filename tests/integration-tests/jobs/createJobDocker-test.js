@@ -3,6 +3,7 @@ const should = require('should'),
     fs = require('fs'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
     testsRequestCreator = require('../tests/helpers/requestCreator'),
+    configRequestCreator = require('../configManager/helpers/requestCreator'),
     nock = require('nock'),
     Docker = require('dockerode'),
     dockerConfig = require('../../../src/config/dockerConfig');
@@ -34,6 +35,11 @@ describe('Create job specific docker tests', async function () {
             before(async () => {
                 await schedulerRequestCreator.init();
                 await testsRequestCreator.init();
+                await configRequestCreator.init();
+
+                await configRequestCreator.updateConfig({
+                    runner_docker_image: 'zooz/predator-runner:latest'
+                });
 
                 const requestBody = require('../../testExamples/Basic_test');
                 const response = await testsRequestCreator.createTest(requestBody, {});
