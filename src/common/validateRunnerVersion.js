@@ -8,7 +8,8 @@ module.exports.isBestRunnerVersionToUse = function(runnerImage) {
         return false;
     }
     const predatorXRange = `${semver.major(PREDATOR_VERSION)}.${semver.minor(PREDATOR_VERSION)}.x`;
-    if (!semver.satisfies(semver.coerce(imageTag), predatorXRange)) {
+    const coercedVersion = semver.coerce(imageTag);
+    if (!coercedVersion || !semver.satisfies(coercedVersion, predatorXRange)) {
         return false;
     }
     return true;

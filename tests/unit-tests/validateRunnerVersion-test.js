@@ -40,6 +40,10 @@ describe('validateRunnerVersion', function() {
             const imageName = getImageNameWithTag('1.5');
             expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(true);
         });
+        it('Should return false for using runner version with pure string', function () {
+            const imageName = getImageNameWithTag('meow');
+            expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(false);
+        });
     });
 });
 
