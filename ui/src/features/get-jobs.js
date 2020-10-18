@@ -2,16 +2,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Snackbar from 'material-ui/Snackbar';
 import {
-    job,
-    processingGetJobs,
-    errorOnGetJobs,
-    processingDeleteJob,
-    deleteJobSuccess,
-    getJobsWithTestNameAndLastRun,
-    createJobSuccess,
-    editJobSuccess,
-    editJobId,
-    errorOnJobAction
+  job,
+  processingGetJobs,
+  errorOnGetJobs,
+  processingDeleteJob,
+  deleteJobSuccess,
+  getJobsWithTestNameAndLastRun,
+  createJobSuccess,
+  editJobSuccess,
+  editJobId,
+  errorOnJobAction
 } from './redux/selectors/jobsSelector';
 import { tests } from './redux/selectors/testsSelector';
 import { reports } from './redux/selectors/reportsSelector';
@@ -27,7 +27,6 @@ import _ from 'lodash';
 import { createJobRequest } from './components/JobForm/utils';
 import JobForm from './components/JobForm';
 import ErrorDialog from './components/ErrorDialog';
-import { webhooksForDropdown } from './redux/selectors/webhooksSelector';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all jobs.';
@@ -36,256 +35,256 @@ const columnsNames = ['test_name', 'duration', 'arrival_rate', 'ramp_to', 'paral
 const DESCRIPTION = 'Scheduled jobs configured with a cron expression.';
 
 class getJobs extends React.Component {
-    constructor(props) {
-        super(props);
+  constructor (props) {
+    super(props);
 
-        this.state = {
-            openSnakeBar: false,
-            deleteDialog: false,
-            openViewJob: false,
-            jobToDelete: undefined,
-            sortedJobs: [],
-            rerunJob: null,
-            editJob: null,
-            openViewEditJob: false,
-            jobForEdit: null
-        };
-    }
+    this.state = {
+      openSnakeBar: false,
+      deleteDialog: false,
+      openViewJob: false,
+      jobToDelete: undefined,
+      sortedJobs: [],
+      rerunJob: null,
+      editJob: null,
+      openViewEditJob: false,
+      jobForEdit: null
+    };
+  }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.jobs !== this.props.jobs) {
-            this.setState({ sortedJobs: [...this.props.jobs] });
-            const { match: { params, path } } = this.props;
-            if (path === '/jobs/:jobId/edit') {
-                const data = this.props.jobs.find((job) => job.id === params.jobId);
-                data ? this.onEdit(data) : this.props.history.replace('/jobs');
-            }
-        }
+  componentDidUpdate (prevProps) {
+    if (prevProps.jobs !== this.props.jobs) {
+      this.setState({ sortedJobs: [...this.props.jobs] });
     }
+    if (prevProps.processingGetJobs === true && this.props.processingGetJobs === false) {
+      const { match: { params, path } } = this.props;
+      if (path === '/jobs/:jobId/edit') {
+        const data = this.props.jobs.find((job) => job.id === params.jobId);
+        data ? this.openEditMode(data) : this.props.history.replace('/jobs');
+      }
+    }
+  }
 
     onSearch = (value) => {
-        if (!value) {
-            this.setState({ sortedJobs: [...this.props.jobs] });
-        }
-        const newSorted = _.filter(this.props.jobs, (job) => {
-            return (_.includes(String(job.test_name).toLowerCase(), value.toLowerCase()) ||
+      if (!value) {
+        this.setState({ sortedJobs: [...this.props.jobs] });
+      }
+      const newSorted = _.filter(this.props.jobs, (job) => {
+        return (_.includes(String(job.test_name).toLowerCase(), value.toLowerCase()) ||
                 _.includes(String(job.environment).toLowerCase(), value.toLowerCase()));
-        });
-        this.setState({ sortedJobs: newSorted });
+      });
+      this.setState({ sortedJobs: newSorted });
     };
 
     onDelete = (data) => {
-        this.setState({
-            deleteDialog: true,
-            jobToDelete: data
-        });
+      this.setState({
+        deleteDialog: true,
+        jobToDelete: data
+      });
     };
 
     onRawView = (job) => {
-        this.setState({ openViewJob: job });
+      this.setState({ openViewJob: job });
     };
 
     onEdit = (data) => {
-        const { match: { params, path }, history } = this.props;
-        if (path !== '/jobs/:jobId/edit') {
-          history.replace(`/jobs/${data.id}/edit`)
-        }
-        this.setState({ openViewEditJob: true, jobForEdit: data });
+      const { match: { params, path }, history } = this.props;
+        history.replace(`/jobs/${data.id}/edit`);
+       this.openEditMode(data)
     };
 
+    openEditMode = (data)=>{
+      this.setState({ openViewEditJob: true, jobForEdit: data });
+    }
+
     onRunTest = (job) => {
-        const request = createJobRequest(job);
-        delete request.cron_expression;
-        request.run_immediately = true;
-        this.props.createJob(request);
-        this.setState({rerunJob: job});
+      const request = createJobRequest(job);
+      delete request.cron_expression;
+      request.run_immediately = true;
+      this.props.createJob(request);
+      this.setState({ rerunJob: job });
     };
 
     onEnableDisable = (data, value) => {
-        const request = {enabled: value};
-        this.setState({editJob:data});
-        this.props.editJob(data.id, request);
+      const request = { enabled: value };
+      this.setState({ editJob: data });
+      this.props.editJob(data.id, request);
     };
 
     submitDelete = () => {
-        this.props.deleteJob(this.state.jobToDelete.id);
-        this.props.getAllJobs();
-        this.setState({
-            deleteDialog: false
-        });
+      this.props.deleteJob(this.state.jobToDelete.id);
+      this.props.getAllJobs();
+      this.setState({
+        deleteDialog: false
+      });
     };
 
     clearDeleteError = () => {
-        this.props.getAllJobs();
-        this.props.clearErrorOnDelete();
+      this.props.getAllJobs();
+      this.props.clearErrorOnDelete();
     };
 
     cancelDelete = () => {
-        this.setState({
-            deleteDialog: false
-        });
+      this.setState({
+        deleteDialog: false
+      });
 
-        this.props.deleteError ? this.clearDeleteError() : undefined;
+      this.props.deleteError ? this.clearDeleteError() : undefined;
     };
 
     closeViewJobDialog = () => {
-        this.setState({
-            openViewJob: false
-        });
-        this.props.clearSelectedJob();
+      this.setState({
+        openViewJob: false
+      });
+      this.props.clearSelectedJob();
     };
 
-    componentDidMount() {
-        this.loadPageData();
-        this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL);
-        this.props.getWebhooks();
+    componentDidMount () {
+      this.loadPageData();
+      this.refreshDataInterval = setInterval(this.loadPageData, REFRESH_DATA_INTERVAL);
     }
 
     loadPageData = () => {
-        this.props.getTests();
-        this.props.getAllReports();
-        this.props.clearErrorOnGetJobs();
-        this.props.getAllJobs();
+      this.props.getTests();
+      this.props.getAllReports();
+      this.props.clearErrorOnGetJobs();
+      this.props.getAllJobs();
     };
 
-    componentWillUnmount() {
-        this.props.clearErrorOnGetJobs();
-        this.props.clearSelectedJob();
-        clearInterval(this.refreshDataInterval);
+    componentWillUnmount () {
+      this.props.clearErrorOnGetJobs();
+      this.props.clearSelectedJob();
+      clearInterval(this.refreshDataInterval);
     }
 
-    loader() {
-        return this.props.processingGetJobs ? <Loader /> : noDataMsg;
+    loader () {
+      return this.props.processingGetJobs ? <Loader /> : noDataMsg;
     }
 
     closeViewEditJobDialog = () => {
-        const { history } = this.props;
-        history.replace('/jobs');
-        this.setState({ openViewEditJob: false, jobForEdit: null });
+      const { history } = this.props;
+      history.replace('/jobs');
+      this.setState({ openViewEditJob: false, jobForEdit: null });
     }
 
     onCloseErrorDialog = () => {
-        this.props.clearErrorOnJobAction();
-        this.props.setEditJobId(undefined);
+      this.props.clearErrorOnJobAction();
+      this.props.setEditJobId(undefined);
     }
 
-    render() {
-        const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
+    render () {
+      const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
-        const { sortedJobs, jobForEdit } = this.state;
-        const { errorOnJobAction, webhooks } = this.props;
+      const { sortedJobs, jobForEdit } = this.state;
+      const { errorOnJobAction } = this.props;
 
-        const columns = getColumns({
-            columnsNames,
-            onSort: this.onSort,
-            onRawView: this.onRawView,
-            onRunTest: this.onRunTest,
-            onDelete: this.onDelete,
-            onEnableDisable: this.onEnableDisable,
-            onEdit: this.onEdit
-        });
-        const feedbackMessage = this.generateFeedbackMessage();
-        const error = errorOnJobAction;
+      const columns = getColumns({
+        columnsNames,
+        onSort: this.onSort,
+        onRawView: this.onRawView,
+        onRunTest: this.onRunTest,
+        onDelete: this.onDelete,
+        onEnableDisable: this.onEnableDisable,
+        onEdit: this.onEdit
+      });
+      const feedbackMessage = this.generateFeedbackMessage();
+      const error = errorOnJobAction;
 
-        return (
-            <Page title={'Scheduled Jobs'} description={DESCRIPTION}>
-                <ReactTableComponent
-                    // tableRowId={'report_id'}
-                onSearch={this.onSearch}
-                rowHeight={'46px'}
-                    manual={false}
-                    data={sortedJobs}
-                    pageSize={10}
-                    columns={columns}
-                    noDataText={noDataText}
-                    showPagination
-                    resizable={false}
-                    cursor={'default'}
-                />
+      return (
+        <Page title={'Scheduled Jobs'} description={DESCRIPTION}>
+          <ReactTableComponent
+            // tableRowId={'report_id'}
+            onSearch={this.onSearch}
+            rowHeight={'46px'}
+            manual={false}
+            data={sortedJobs}
+            pageSize={10}
+            columns={columns}
+            noDataText={noDataText}
+            showPagination
+            resizable={false}
+            cursor={'default'}
+          />
 
-                {this.state.openViewJob
-                    ? <Dialog title_key={'id'} data={this.state.openViewJob}
-                      closeDialog={this.closeViewJobDialog} /> : null}
-                {this.state.openViewEditJob && ((webhooks && webhooks.length > 0) || (jobForEdit.webhooks && jobForEdit.webhooks.length === 0)) &&
-                    <JobForm history={history} webhooks={webhooks} editMode={true} data={jobForEdit} closeDialog={this.closeViewEditJobDialog}
-                />}
-            {this.state.deleteDialog && !this.props.deleteJobSuccess
-                    ? <DeleteDialog loader={this.props.processingDeleteJob}
-                      display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}
-                      onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
-                      onCancel={this.cancelDelete} /> : null}
-                {feedbackMessage && <Snackbar
-                    open={!!(this.props.deleteJobSuccess || this.props.jobSuccess || this.props.editJobSuccess)}
-                    bodyStyle={{ backgroundColor: '#2fbb67' }}
-                    message={feedbackMessage}
-                    autoHideDuration={4000}
-                    onRequestClose={() => {
-                        this.props.getAllJobs();
-                        this.props.clearDeleteJobSuccess();
-                        this.props.createJobSuccess(undefined);
-                        this.props.setEditJobSuccess(undefined);
-                        this.props.setEditJobId(undefined);
-                        this.setState({
-                            jobToDelete: undefined,
-                            rerunJob: null,
-                            editJob: null,
-                        });
-                    }}
-                />}
-                {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error} />}
-          </Page>
-        );
+          {this.state.openViewJob
+            ? <Dialog title_key={'id'} data={this.state.openViewJob}
+              closeDialog={this.closeViewJobDialog} /> : null}
+          {this.state.openViewEditJob &&
+          <JobForm history={history} editMode data={jobForEdit} closeDialog={this.closeViewEditJobDialog}
+          />}
+          {this.state.deleteDialog && !this.props.deleteJobSuccess
+            ? <DeleteDialog loader={this.props.processingDeleteJob}
+              display={this.state.jobToDelete ? `job ${this.state.jobToDelete.id}` : ''}
+              onSubmit={this.submitDelete} errorOnDelete={this.props.deleteError}
+              onCancel={this.cancelDelete} /> : null}
+          {feedbackMessage && <Snackbar
+            open={!!(this.props.deleteJobSuccess || this.props.jobSuccess || this.props.editJobSuccess)}
+            bodyStyle={{ backgroundColor: '#2fbb67' }}
+            message={feedbackMessage}
+            autoHideDuration={4000}
+            onRequestClose={() => {
+              this.props.getAllJobs();
+              this.props.clearDeleteJobSuccess();
+              this.props.createJobSuccess(undefined);
+              this.props.setEditJobSuccess(undefined);
+              this.props.setEditJobId(undefined);
+              this.setState({
+                jobToDelete: undefined,
+                rerunJob: null,
+                editJob: null
+              });
+            }}
+          />}
+          {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error} />}
+        </Page>
+      );
     }
 
-    generateFeedbackMessage = ()=>{
-        if(this.state.jobToDelete && this.state.jobToDelete.id){
-            return `Job deleted successfully: ${this.state.jobToDelete.id}`
-        }
-        if(this.props.jobSuccess && this.state.rerunJob){
-            return `Job created successfully: ${this.props.jobSuccess.id}`;
-        }
-        if(this.props.editJobSuccess && this.props.editJobId){
-            return `Job edited successfully: ${this.props.editJobId}`;
-        }
-        
+    generateFeedbackMessage = () => {
+      if (this.state.jobToDelete && this.state.jobToDelete.id) {
+        return `Job deleted successfully: ${this.state.jobToDelete.id}`
+      }
+      if (this.props.jobSuccess && this.state.rerunJob) {
+        return `Job created successfully: ${this.props.jobSuccess.id}`;
+      }
+      if (this.props.editJobSuccess && this.props.editJobId) {
+        return `Job edited successfully: ${this.props.editJobId}`;
+      }
     }
 }
 
-function mapStateToProps(state) {
-    return {
-        jobs: getJobsWithTestNameAndLastRun(state),
-        job: job(state),
-        processingGetJobs: processingGetJobs(state),
-        errorOnGetJobs: errorOnGetJobs(state),
-        processingDeleteJob: processingDeleteJob(state),
-        deleteJobSuccess: deleteJobSuccess(state),
-        tests: tests(state),
-        reports: reports(state),
-        jobSuccess: createJobSuccess(state),
-        editJobSuccess:  editJobSuccess(state),
-        editJobId:  editJobId(state),
-        errorOnJobAction: errorOnJobAction(state),
-        webhooks: webhooksForDropdown(state)
-    };
+function mapStateToProps (state) {
+  return {
+    jobs: getJobsWithTestNameAndLastRun(state),
+    job: job(state),
+    processingGetJobs: processingGetJobs(state),
+    errorOnGetJobs: errorOnGetJobs(state),
+    processingDeleteJob: processingDeleteJob(state),
+    deleteJobSuccess: deleteJobSuccess(state),
+    tests: tests(state),
+    reports: reports(state),
+    jobSuccess: createJobSuccess(state),
+    editJobSuccess: editJobSuccess(state),
+    editJobId: editJobId(state),
+    errorOnJobAction: errorOnJobAction(state)
+  };
 }
 
 const mapDispatchToProps = {
-    clearSelectedJob: Actions.clearSelectedJob,
-    clearErrorOnGetJobs: Actions.clearErrorOnGetJobs,
-    getAllJobs: Actions.getJobs,
-    getJob: Actions.getJob,
-    createJob: Actions.createJob,
-    editJob: Actions.editJob,
-    setEditJobId: Actions.editJobId,
-    deleteJob: Actions.deleteJob,
-    clearDeleteJobSuccess: Actions.clearDeleteJobSuccess,
-    clearErrorOnDeleteJob: Actions.clearErrorOnDeleteJob,
-    getTests: Actions.getTests,
-    getAllReports: Actions.getLastReports,
-    createJobSuccess: Actions.createJobSuccess,
-    setEditJobSuccess: Actions.editJobSuccess,
-    clearErrorOnJobAction: Actions.clearErrorOnJobAction,
-    getWebhooks: Actions.getWebhooks,
+  clearSelectedJob: Actions.clearSelectedJob,
+  clearErrorOnGetJobs: Actions.clearErrorOnGetJobs,
+  getAllJobs: Actions.getJobs,
+  getJob: Actions.getJob,
+  createJob: Actions.createJob,
+  editJob: Actions.editJob,
+  setEditJobId: Actions.editJobId,
+  deleteJob: Actions.deleteJob,
+  clearDeleteJobSuccess: Actions.clearDeleteJobSuccess,
+  clearErrorOnDeleteJob: Actions.clearErrorOnDeleteJob,
+  getTests: Actions.getTests,
+  getAllReports: Actions.getLastReports,
+  createJobSuccess: Actions.createJobSuccess,
+  setEditJobSuccess: Actions.editJobSuccess,
+  clearErrorOnJobAction: Actions.clearErrorOnJobAction
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getJobs);
