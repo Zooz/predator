@@ -3,6 +3,7 @@ import CollapsibleItem from '../../../components/CollapsibleItem/CollapsibleItem
 import StepForm from './StepForm';
 import SleepForm from './SleepForm';
 import Input from '../../../components/Input';
+import JSEditor from './JSEditor';
 
 const Section = CollapsibleItem.Section;
 const SLEEP = 'sleep';
@@ -10,7 +11,8 @@ export default class CollapsibleStep extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      expanded: props.expandedOnStart === undefined ? true : props.expandedOnStart
+      expanded: props.expandedOnStart === undefined ? true : props.expandedOnStart,
+      shouldOpenJSEditor: false
     }
   }
 
@@ -28,30 +30,58 @@ export default class CollapsibleStep extends React.Component {
       </Section>,
       <Section key={2} onClick={(evt) => {
         evt.stopPropagation();
+        this.generateJSEditor(true)
+      }} icon='fa-code' tooltip='JS editor' borderLeft />,
+      <Section key={3} onClick={(evt) => {
+        evt.stopPropagation();
         onDuplicateStep(index)
       }} icon='fa-copy' tooltip='Duplicate step' borderLeft />,
-      <Section key={3} onClick={(evt) => {
+      <Section key={4} onClick={(evt) => {
         evt.stopPropagation();
         onDeleteStep(index)
       }} icon='fa-trash' tooltip='Delete step' borderLeft />
 
     ]
-    const { expanded } = this.state;
-    return (<CollapsibleItem
-      onClick={(evt) => {
-        this.setState({ expanded: !this.state.expanded })
-      }}
-      editable
-      expanded={expanded}
-      toggleable
-      type={CollapsibleItem.TYPES.CLICKER}
-      disabled={false}
-      icon={this.generateIcon()}
-      title={this.generateTitle()}
-      body={this.generateBody()}
-      sections={sections}
-    />)
+    const { expanded, shouldOpenJSEditor } = this.state;
+    return (
+      <>
+        {shouldOpenJSEditor && (
+          <JSEditor javaScript={this.JSContent} closeJSEditor={this.closeJSEditor} />
+        )}
+        <CollapsibleItem
+          onClick={(evt) => {
+            this.setState({ expanded: !this.state.expanded })
+          }}
+          editable
+          expanded={expanded}
+          toggleable
+          type={CollapsibleItem.TYPES.CLICKER}
+          disabled={false}
+          icon={this.generateIcon()}
+          title={this.generateTitle()}
+          body={this.generateBody()}
+          sections={sections}
+        />
+      </>
+    )
   }
+
+    generateJSEditor = (value) => {
+      this.setState({ shouldOpenJSEditor: value })
+    }
+    closeJSEditor = () => {
+      this.generateJSEditor(false)
+    }
+    JSContent = 'module.exports = {\n' +
+    '    beforeRequest,\n' +
+    '    afterResponse\n' +
+    '};\n' +
+    'function beforeRequest(requestParams, context, ee, next) {\n' +
+    '    return next(); // MUST be called for the scenario to continue\n' +
+    '}\n' +
+    'function afterResponse(requestParams, response, context, ee, next) {\n' +
+    '    return next(); // MUST be called for the scenario to continue\n' +
+    '}';
 
     generateIcon = () => {
       const { step } = this.props;
