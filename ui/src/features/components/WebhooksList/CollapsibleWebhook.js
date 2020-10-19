@@ -117,6 +117,9 @@ export class CollapsibleWebhook extends React.Component {
 		}
         else if (webhook.format_type === 'teams') {
             icons.push('fa-windows');
+        } 
+        if (webhook.format_type === 'discord') {
+            icons.push('fa-discord');
         } else {
             icons.push(<div style={{fontSize: '20px'}}>{'{ }'}</div>)	// JSON
         }

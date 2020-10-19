@@ -1,6 +1,5 @@
 const cloneDeep = require('lodash/cloneDeep');
-const slackEmojis = require('slack-emojis');
-const teamsEmojis = require('../../common/teams-emojis');
+const emojiHandler = require('../../common/emojiHandler');
 
 const {
     EVENT_FORMAT_TYPES,
@@ -27,12 +26,13 @@ function unknownWebhookEventTypeError(badWebhookEventTypeValue) {
     return new Error(`Unrecognized webhook event: ${badWebhookEventTypeValue}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`);
 }
 
-function getThresholdMessage(state, { isSlackOrDiscord, testName, benchmarkThreshold, lastScores, aggregatedReport, score }) {
+function getThresholdMessage(state, { emoji, testName, benchmarkThreshold, lastScores, aggregatedReport, score }) {
     let resultText = 'above';
-    let icon = isSlackOrDiscord ? slackEmojis.ROCKET : teamsEmojis.ROCKET;
+    let icon = null;
+    icon = emoji.ROCKET;
     if (state === WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED) {
         resultText = 'below';
-        icon = isSlackOrDiscord ? slackEmojis.CRY : teamsEmojis.CRYING;
+        icon = emoji.CRY;
     }
     return `${icon} *Test ${testName} got a score of ${score.toFixed(1)}` +
         ` this is ${resultText} the threshold of ${benchmarkThreshold}. ${lastScores.length > 0 ? `last 3 scores are: ${lastScores.join()}` : 'no last score to show'}` +
@@ -73,7 +73,7 @@ function json(event, testId, jobId, report, additionalInfo, options) {
     return payload;
 }
 
-function slack(event, testId, jobId, report, additionalInfo, options) {
+function slack(event, format, testId, jobId, report, additionalInfo, options) {
     let message = null;
     const {
         environment,
@@ -86,6 +86,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
         grafana_report: grafanaReport
     } = report;
     const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
+    const emoji = emojiHandler(format);
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
             const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
@@ -116,16 +117,15 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
         case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            const isSlackOrDiscord = true;
-            message = getThresholdMessage(event, { isSlackOrDiscord, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
+            message = getThresholdMessage(event, { emoji, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `${slackEmojis.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
+            message = `${emoji.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `${slackEmojis.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${slackEmojis.SKULL}`;
+            message = `${emoji.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${emoji.SKULL}`;
             break;
         }
         default: {
@@ -135,7 +135,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
     return slackWebhookFormat(message, options);
 }
 
-function teams(event, testId, jobId, report, additionalInfo, options) {
+function teams(event, format, testId, jobId, report, additionalInfo, options) {
     let message = null;
     const {
         environment,
@@ -148,18 +148,19 @@ function teams(event, testId, jobId, report, additionalInfo, options) {
         grafana_report: grafanaReport
     } = report;
     const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
+    const emoji = emojiHandler(format);
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
             const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
             let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
             requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
 
-            message = `${teamsEmojis.SMILE} *Test ${testName} with id: ${testId} has started*.`;
+            message = `${emoji.SMILE} *Test ${testName} with id: ${testId} has started*.`;
             message += `\n*test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_FINISHED: {
-            message = `${teamsEmojis.SUNGLASSES} *Test ${testName} with id: ${testId} is finished.*`;
+            message = `${emoji.SUNGLASSES} *Test ${testName} with id: ${testId} is finished.*`;
             message += `\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}`;
             if (grafanaReport) {
                 message += `\n<${grafanaReport} | View final grafana dashboard report>`;
@@ -167,28 +168,27 @@ function teams(event, testId, jobId, report, additionalInfo, options) {
             break;
         }
         case WEBHOOK_EVENT_TYPE_FAILED: {
-            message = `${teamsEmojis.ANGUISHED} *Test with id: ${testId} Failed*.`;
+            message = `${emoji.ANGUISHED} *Test with id: ${testId} Failed*.`;
             message += `\ntest configuration:\n
             environment: ${environment}\n
             ${stats.data}`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_ABORTED: {
-            message = `${teamsEmojis.ANGUISHED} *Test ${testName} with id: ${testId} was aborted.*`;
+            message = `${emoji.ANGUISHED} *Test ${testName} with id: ${testId} was aborted.*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
         case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            const isSlackOrDiscord = false;
-            message = getThresholdMessage(event, { isSlackOrDiscord, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
+            message = getThresholdMessage(event, { emoji, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `${teamsEmojis.HAMMER} *Test ${testName} with id: ${testId} is in progress!*`;
+            message = `${emoji.HAMMER_AND_WRENCHs} *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `${teamsEmojis.FIRE} *Test ${testName} with id: ${testId} has encountered an API failure!* ${teamsEmojis.SKULL}`;
+            message = `${emoji.FIRE} *Test ${testName} with id: ${testId} has encountered an API failure!* ${emoji.SKULL}`;
             break;
         }
         default: {
@@ -198,7 +198,7 @@ function teams(event, testId, jobId, report, additionalInfo, options) {
     return teamsWebhookFormat(message);
 }
 
-function discord(event, testId, jobId, report, additionalInfo, options) {
+function discord(event, format, testId, jobId, report, additionalInfo, options) {
     let message = null;
     const {
         environment,
@@ -211,6 +211,7 @@ function discord(event, testId, jobId, report, additionalInfo, options) {
         grafana_report: grafanaReport
     } = report;
     const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
+    const emoji = emojiHandler(format);
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
             const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
@@ -241,16 +242,15 @@ function discord(event, testId, jobId, report, additionalInfo, options) {
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
         case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            const isSlackOrDiscord = true;
-            message = getThresholdMessage(event, { isSlackOrDiscord, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
+            message = getThresholdMessage(event, { emoji, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `${slackEmojis.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
+            message = `${emoji.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `${slackEmojis.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${slackEmojis.SKULL}`;
+            message = `${emoji.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${emoji.SKULL}`;
             break;
         }
         default: {
@@ -266,16 +266,16 @@ module.exports.format = function(format, eventType, jobId, testId, report, addit
     }
     switch (format) {
         case EVENT_FORMAT_TYPE_SLACK: {
-            return slack(eventType, testId, jobId, report, additionalInfo, options);
+            return slack(eventType, format, testId, jobId, report, additionalInfo, options);
         }
         case EVENT_FORMAT_TYPE_JSON: {
             return json(eventType, testId, jobId, report, additionalInfo, options);
         }
         case EVENT_FORMAT_TYPE_TEAMS: {
-            return teams(eventType, testId, jobId, report, additionalInfo, options);
+            return teams(eventType, format, testId, jobId, report, additionalInfo, options);
         }
         case EVENT_FORMAT_TYPE_DISCORD:{
-            return discord(eventType, testId, jobId, report, additionalInfo, options);
+            return discord(eventType, format, testId, jobId, report, additionalInfo, options);
         }
         default: {
             throw new Error(`Unrecognized webhook format: ${format}, available options: ${EVENT_FORMAT_TYPES.join()}`);
