@@ -1,12 +1,12 @@
 const slackEmojis = require('slack-emojis');
-const teamsEmojis = require('../../common/teams-emojis');
+const teamsEmojis = require('teams-emojis');
 
 const {
     EVENT_FORMAT_TYPES,
     EVENT_FORMAT_TYPE_SLACK,
     EVENT_FORMAT_TYPE_TEAMS,
     EVENT_FORMAT_TYPE_DISCORD
-} = require('../../common/consts');
+} = require('consts');
 
 module.exports = function(format){
     switch (format) {
