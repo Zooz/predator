@@ -6,7 +6,7 @@ const {
     EVENT_FORMAT_TYPE_SLACK,
     EVENT_FORMAT_TYPE_TEAMS,
     EVENT_FORMAT_TYPE_DISCORD
-} = require('consts');
+} = require('./consts');
 
 module.exports = function(format){
     switch (format) {
