@@ -1,5 +1,5 @@
 const slackEmojis = require('slack-emojis');
-const teamsEmojis = require('teams-emojis');
+const teamsEmojis = require('./teams-emojis');
 
 const {
     EVENT_FORMAT_TYPES,
