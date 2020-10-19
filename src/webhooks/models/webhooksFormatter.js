@@ -184,7 +184,7 @@ function teams(event, format, testId, jobId, report, additionalInfo, options) {
             break;
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `${emoji.HAMMER_AND_WRENCHs} *Test ${testName} with id: ${testId} is in progress!*`;
+            message = `${emoji.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
             break;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
