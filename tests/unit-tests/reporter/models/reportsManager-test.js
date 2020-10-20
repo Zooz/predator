@@ -470,7 +470,7 @@ describe('Reports manager tests', function () {
             databaseSubscribeRunnerStub.resolves();
             const reportBody = await manager.postReport(reportId, test, REPORT, job, Date.now());
             should.exist(reportBody);
-            reportBody.should.deepEqual(reportFromDBConnector);
+            reportBody.should.deepEqual(reportFromDBConnector.dataValues);
         });
 
         it('Fail to create job', async () => {
