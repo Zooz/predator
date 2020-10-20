@@ -38,7 +38,7 @@ describe('Create job specific docker tests', async function () {
                 await configRequestCreator.init();
 
                 await configRequestCreator.updateConfig({
-                    runner_docker_image: 'zooz/predator-builds:predator-runner-create-report-in-predator'
+                    runner_docker_image: 'zooz/predator-runner:latest'
                 });
 
                 const requestBody = require('../../testExamples/Basic_test');
