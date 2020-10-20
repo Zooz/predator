@@ -79,9 +79,10 @@ module.exports.postReport = async (reportId, test, job, startTime) => {
         testConfiguration.ramp_to = job.ramp_to;
     }
 
-    return databaseConnector.insertReport(reportId, test.id, test.revision_id, job.id,
+    const report = await databaseConnector.insertReport(reportId, test.id, test.revision_id, job.id,
         test.type, phase, startTime, test.name,
         test.description, JSON.stringify(testConfiguration), job.notes, Date.now(), false);
+    return report.dataValues;
 };
 
 module.exports.subscribeRunnerToReport = async function (testId, reportId, runnerId) {

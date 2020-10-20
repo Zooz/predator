@@ -52,18 +52,19 @@ module.exports.scheduleFinishedContainersCleanup = async () => {
 };
 
 module.exports.createJob = async (job) => {
+    let reportId;
     const jobId = uuid.v4();
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(job.webhooks);
     try {
         const insertedJob = await databaseConnector.insertJob(jobId, job);
         logger.info('Job saved successfully to database');
-        const reportId = uuid.v4();
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
-            await createReportForJob(reportId, test, insertedJob);
-            const jobSpecificPlatformRequest = await createJobRequest(jobId, reportId, insertedJob, latestDockerImage, configData);
+            const report = await createReportForJob(test, insertedJob);
+            reportId = report.report_id;
+            const jobSpecificPlatformRequest = await createJobRequest(jobId, report.report_id, insertedJob, latestDockerImage, configData);
             await jobConnector.runJob(jobSpecificPlatformRequest);
         }
         if (job.cron_expression) {
@@ -283,10 +284,9 @@ function addCron(jobId, job, cronExpression, configData) {
                 logger.info(`Skipping job with id: ${jobId} as it's currently disabled`);
             } else {
                 const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
-                const reportId = uuid.v4();
                 const test = await testsManager.getTest(job.test_id);
-                await createReportForJob(reportId, test, job);
-                const jobSpecificPlatformConfig = await createJobRequest(jobId, reportId, job, latestDockerImage, configData);
+                const report = await createReportForJob(test, job);
+                const jobSpecificPlatformConfig = await createJobRequest(jobId, report.report_id, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig);
             }
         } catch (error) {
@@ -320,7 +320,8 @@ async function validateWebhooksAssignment(webhookIds) {
     }
 }
 
-async function createReportForJob(reportId, test, job) {
+async function createReportForJob(test, job) {
+    const reportId = uuid.v4();
     const startTime = Date.now();
     const report = await reportsManager.postReport(reportId, test, job, startTime);
     logger.info({ test_id: test.id, report_id: reportId }, 'Created report successfully');
