@@ -22,7 +22,7 @@ if (dockerConfig.host) {
 }
 const docker = new Docker(dockerConnection);
 
-describe('Create job specific docker tests', async function () {
+describe.only('Create job specific docker tests', async function () {
     this.timeout(20000);
     let testId;
     let expectedResult;
@@ -38,7 +38,7 @@ describe('Create job specific docker tests', async function () {
                 await configRequestCreator.init();
 
                 await configRequestCreator.updateConfig({
-                    runner_docker_image: 'zooz/predator-runner:latest'
+                    runner_docker_image: 'zooz/predator-builds:predator-runner-create-report-in-predator'
                 });
 
                 const requestBody = require('../../testExamples/Basic_test');
