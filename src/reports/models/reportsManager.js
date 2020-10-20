@@ -1,6 +1,7 @@
 'use strict';
 
 const databaseConnector = require('./databaseConnector'),
+    jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
     { JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
     constants = require('../utils/constants'),
@@ -88,6 +89,34 @@ module.exports.postReport = async (reportId, test, job, startTime) => {
 module.exports.subscribeRunnerToReport = async function (testId, reportId, runnerId) {
     return databaseConnector.subscribeRunner(testId, reportId, runnerId, constants.SUBSCRIBER_INITIALIZING_STAGE);
 };
+
+module.exports.postReportDeprecated = async function (testId, reportBody) {
+    const startTime = new Date(Number(reportBody.start_time));
+    const job = await jobConnector.getJob(reportBody.job_id);
+    const phase = '0';
+
+    const testConfiguration = {
+        job_type: job.type,
+        duration: job.duration,
+        parallelism: job.parallelism || 1,
+        max_virtual_users: job.max_virtual_users,
+        environment: job.environment
+    };
+
+    if (job.type === JOB_TYPE_FUNCTIONAL_TEST) {
+        testConfiguration.arrival_count = job.arrival_count;
+    } else {
+        testConfiguration.arrival_rate = job.arrival_rate;
+        testConfiguration.ramp_to = job.ramp_to;
+    }
+
+    await databaseConnector.insertReport(reportBody.report_id, testId, reportBody.revision_id, reportBody.job_id,
+        reportBody.test_type, phase, startTime, reportBody.test_name,
+        reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now(), false);
+    await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id, constants.SUBSCRIBER_INITIALIZING_STAGE);
+    return reportBody;
+}
+
 
 function getReportResponse(summaryRow, config) {
     const lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;

@@ -72,7 +72,7 @@ module.exports.getLastReports = async (req, res, next) => {
 module.exports.postReport = async (req, res, next) => {
     let report;
     try {
-        report = await reports.postReport(req.params.test_id, req.body);
+        report = await reports.postReportDeprecated(req.params.test_id, req.body);
     } catch (err) {
         return next(err);
     }
