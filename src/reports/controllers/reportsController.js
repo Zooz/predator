@@ -69,6 +69,17 @@ module.exports.getLastReports = async (req, res, next) => {
     return res.send(reportSummaries);
 };
 
+module.exports.postReport = async (req, res, next) => {
+    let report;
+    try {
+        report = await reports.postReport(req.params.test_id, req.body);
+    } catch (err) {
+        return next(err);
+    }
+
+    return res.status(201).json(report.report_id);
+};
+
 module.exports.postStats = async (req, res, next) => {
     try {
         const report = await reports.getReport(req.params.test_id, req.params.report_id);
