@@ -428,20 +428,22 @@ describe('Reports manager tests', function () {
         it('Successfully insert report', async () => {
             const reportId = uuid.v4();
             const reportFromDBConnector = {
-                report_id: uuid.v4(),
-                job_id: uuid.v4(),
-                test_id: REPORT.test_id,
-                revision_id: REPORT.revision_id,
-                test_type: 'load_test',
-                test_name: 'avi',
-                test_description: 'avi requesting requests',
-                last_updated_at: new Date(),
-                start_time: new Date(),
-                notes: '',
-                phase: 0,
-                test_configuration: '{}',
-                runners_subscribed: [],
-                is_favorite: false
+                dataValues: {
+                    report_id: reportId,
+                    job_id: uuid.v4(),
+                    test_id: REPORT.test_id,
+                    revision_id: REPORT.revision_id,
+                    test_type: 'load_test',
+                    test_name: 'avi',
+                    test_description: 'avi requesting requests',
+                    last_updated_at: new Date(),
+                    start_time: new Date(),
+                    notes: '',
+                    phase: 0,
+                    test_configuration: '{}',
+                    runners_subscribed: [],
+                    is_favorite: false
+                }
             };
             const test = {
                 id: REPORT.test_id,
