@@ -56,48 +56,47 @@ const updateBodyWithTypes = {
     }
 };
 
-const requestBody =
-    {
-        interval_cleanup_finished_containers_ms: 0,
-        allow_insecure_tls: false,
-        grafana_url: 'string_value_grafana_url',
-        internal_address: 'string_value_internal_address',
-        runner_docker_image: 'string_value_docker_name',
-        job_platform: 'string_value_job_platform',
-        delay_runner_ms: 0,
-        runner_cpu: 0,
-        runner_memory: 256,
-        metrics_plugin_name: 'prometheus',
-        default_email_address: 'string_value_default_email_address',
-        influx_metrics: {
-            host: 'string_value_influx_metrics',
-            username: 'string_value_username',
-            password: 'string_value_password',
-            database: 'string_value_database'
-        },
-        prometheus_metrics: {
-            push_gateway_url: 'string_value_push_gateway_url',
-            buckets_sizes: 'string_value_buckets_sizes',
-            labels: { key1: 'value1', key2: 'value2' }
-        },
-        smtp_server: {
-            from: 'test@mail.com',
-            host: 'string_value_smtp_server',
-            port: 2,
-            username: 'string_value_username',
-            password: 'string_value',
-            timeout: 2
-        },
-        minimum_wait_for_delayed_report_status_update_in_ms: 30000,
-        benchmark_threshold: 20,
-        benchmark_weights: {
-            percentile_ninety_five: { percentage: 20 },
-            percentile_fifty: { percentage: 30 },
-            server_errors_ratio: { percentage: 20 },
-            client_errors_ratio: { percentage: 20 },
-            rps: { percentage: 10 }
-        }
-    };
+const requestBody = {
+    interval_cleanup_finished_containers_ms: 0,
+    allow_insecure_tls: false,
+    grafana_url: 'string_value_grafana_url',
+    internal_address: 'string_value_internal_address',
+    runner_docker_image: 'string_value_docker_name:1.0.0',
+    job_platform: 'string_value_job_platform',
+    delay_runner_ms: 0,
+    runner_cpu: 0,
+    runner_memory: 256,
+    metrics_plugin_name: 'prometheus',
+    default_email_address: 'string_value_default_email_address',
+    influx_metrics: {
+        host: 'string_value_influx_metrics',
+        username: 'string_value_username',
+        password: 'string_value_password',
+        database: 'string_value_database'
+    },
+    prometheus_metrics: {
+        push_gateway_url: 'string_value_push_gateway_url',
+        buckets_sizes: 'string_value_buckets_sizes',
+        labels: { key1: 'value1', key2: 'value2' }
+    },
+    smtp_server: {
+        from: 'test@mail.com',
+        host: 'string_value_smtp_server',
+        port: 2,
+        username: 'string_value_username',
+        password: 'string_value',
+        timeout: 2
+    },
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+    benchmark_threshold: 20,
+    benchmark_weights: {
+        percentile_ninety_five: { percentage: 20 },
+        percentile_fifty: { percentage: 30 },
+        server_errors_ratio: { percentage: 20 },
+        client_errors_ratio: { percentage: 20 },
+        rps: { percentage: 10 }
+    }
+};
 const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
 const requestBodyNotValidType = { runner_cpu: 'not_int' };
 const requestBodyNotValidRequire = {

@@ -14,7 +14,7 @@ describe('Docker job connector tests', function () {
         },
         dockerImage: 'image',
         jobName: 'jobName',
-        runId: 'runId'
+        reportId: 'reportId'
     };
 
     before(() => {
@@ -80,7 +80,7 @@ describe('Docker job connector tests', function () {
                     'var_b=b'
                 ],
                 Image: 'image',
-                name: 'jobName-runId-0'
+                name: 'jobName-reportId-0'
             });
             createContainerStub.args[1][0].should.eql({
                 Env: [
@@ -88,7 +88,7 @@ describe('Docker job connector tests', function () {
                     'var_b=b'
                 ],
                 Image: 'image',
-                name: 'jobName-runId-1'
+                name: 'jobName-reportId-1'
             });
             createContainerStub.args[2][0].should.eql({
                 Env: [
@@ -96,7 +96,7 @@ describe('Docker job connector tests', function () {
                     'var_b=b'
                 ],
                 Image: 'image',
-                name: 'jobName-runId-2'
+                name: 'jobName-reportId-2'
             });
         });
 
@@ -104,7 +104,7 @@ describe('Docker job connector tests', function () {
             dockerJobConfig.parallelism = 1;
             const jobResponse = await jobConnector.runJob(dockerJobConfig);
             jobResponse.should.eql({
-                id: 'runId',
+                id: 'reportId',
                 jobName: 'jobName'
             });
 
@@ -172,7 +172,7 @@ describe('Docker job connector tests', function () {
         it('Failure Stopping a running run of specific job', async () => {
             listContainersStub.rejects(new Error('Failure getting jobs'));
             try {
-                await jobConnector.stopRun('jobPlatformName', 'jobRunId');
+                await jobConnector.stopRun('jobPlatformName');
                 throw new Error('Should not get here');
             } catch (error) {
                 error.message.should.eql('Failure getting jobs');
@@ -205,7 +205,7 @@ describe('Docker job connector tests', function () {
         it('Failure getting logs because of docker error', async () => {
             listContainersStub.rejects(new Error('Failure getting jobs'));
             try {
-                await jobConnector.getLogs('jobPlatformName', 'jobRunId');
+                await jobConnector.getLogs('jobPlatformName');
                 throw new Error('Should not get here');
             } catch (error) {
                 error.message.should.eql('Failure getting jobs');

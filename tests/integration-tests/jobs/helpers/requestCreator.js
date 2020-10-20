@@ -72,16 +72,16 @@ function getJobs(headers, oneTime) {
         });
 }
 
-function stopRun(jobId, runId, headers) {
-    return request(testApp).post(`/v1/jobs/${jobId}/runs/${runId}/stop`)
+function stopRun(jobId, reportId, headers) {
+    return request(testApp).post(`/v1/jobs/${jobId}/runs/${reportId}/stop`)
         .set(headers)
         .expect(function (res) {
             return res;
         });
 }
 
-function getLogs(jobId, runId, headers) {
-    return request(testApp).get(`/v1/jobs/${jobId}/runs/${runId}/logs`)
+function getLogs(jobId, reportId, headers) {
+    return request(testApp).get(`/v1/jobs/${jobId}/runs/${reportId}/logs`)
         .set(headers)
         .expect(function (res) {
             return res;
