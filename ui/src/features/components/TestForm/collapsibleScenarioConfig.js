@@ -6,7 +6,6 @@ import style from './scenarioList.scss';
 import CollapsibleItem from '../../../components/CollapsibleItem/CollapsibleItem';
 import StepForm from './StepForm';
 import AddScenarioForm from './addScenarioForm';
-import JSEditor from './JSEditor';
 
 const actions = ['Delete', 'Duplicate'];
 const Section = CollapsibleItem.Section
@@ -37,12 +36,13 @@ export default class CollapsibleScenarioConfig extends React.Component {
     const sections = [
       <Section key={1} onClick={(evt) => {
         evt.stopPropagation();
-        this.generateJSEditor(true)
-      }} icon='fa-code' tooltip='JS editor' />,
+        this.generateJSEditor(!this.state.shouldOpenJSEditor)
+        this.setState({ expanded: true })
+      }} icon='fa-code' tooltip='JS editor' borderLeft />,
       <Section key={2} onClick={(evt) => {
         evt.stopPropagation();
         onDuplicateScenario()
-      }} icon='fa-copy' tooltip='Duplicate scenario' />
+      }} icon='fa-copy' tooltip='Duplicate scenario' borderLeft />
     ]
 
     if (onDeleteScenario) {
@@ -52,12 +52,9 @@ export default class CollapsibleScenarioConfig extends React.Component {
       }} icon='fa-trash' tooltip='Delete scenario' borderLeft />)
     }
 
-    const { expanded, shouldOpenJSEditor } = this.state;
+    const { expanded } = this.state;
     return (
       <>
-        {shouldOpenJSEditor && (
-          <JSEditor javaScript={this.JSContent} closeJSEditor={this.closeJSEditor} />
-        )}
         <CollapsibleItem
           onClick={() => {
             this.setState({ expanded: !this.state.expanded })
@@ -78,20 +75,6 @@ export default class CollapsibleScenarioConfig extends React.Component {
     generateJSEditor = (value) => {
       this.setState({ shouldOpenJSEditor: value })
     }
-    JSContent = 'module.exports = {\n' +
-    '    beforeScenario,\n' +
-    '    afterScenario,\n' +
-    '};\n' +
-    'function beforeScenario(context, ee, next) {\n' +
-    '    return next(); // MUST be called for the scenario to continue\n' +
-    '}\n' +
-    'function afterScenario(context, ee, next) {\n' +
-    '    return next(); // MUST be called for the scenario to continue\n' +
-    '}';
-
-    closeJSEditor = () => {
-      this.generateJSEditor(false)
-    }
 
     generateBody = () => {
       const { processorsExportedFunctions, currentScenarioIndex, scenario, onChangeValueOfScenario, allowedWeight } = this.props;
@@ -101,6 +84,7 @@ export default class CollapsibleScenarioConfig extends React.Component {
             key={currentScenarioIndex}
             scenario={scenario} onChangeValue={onChangeValueOfScenario}
             processorsExportedFunctions={processorsExportedFunctions}
+            shouldOpenJSEditor={this.state.shouldOpenJSEditor}
           />
         </div>
 

@@ -3,7 +3,6 @@ import CollapsibleItem from '../../../components/CollapsibleItem/CollapsibleItem
 import StepForm from './StepForm';
 import SleepForm from './SleepForm';
 import Input from '../../../components/Input';
-import JSEditor from './JSEditor';
 
 const Section = CollapsibleItem.Section;
 const SLEEP = 'sleep';
@@ -30,7 +29,8 @@ export default class CollapsibleStep extends React.Component {
       </Section>,
       <Section key={2} onClick={(evt) => {
         evt.stopPropagation();
-        this.generateJSEditor(true)
+        this.generateJSEditor(!this.state.shouldOpenJSEditor)
+        this.setState({ expanded: true })
       }} icon='fa-code' tooltip='JS editor' borderLeft />,
       <Section key={3} onClick={(evt) => {
         evt.stopPropagation();
@@ -42,12 +42,9 @@ export default class CollapsibleStep extends React.Component {
       }} icon='fa-trash' tooltip='Delete step' borderLeft />
 
     ]
-    const { expanded, shouldOpenJSEditor } = this.state;
+    const { expanded } = this.state;
     return (
       <>
-        {shouldOpenJSEditor && (
-          <JSEditor javaScript={this.JSContent} closeJSEditor={this.closeJSEditor} />
-        )}
         <CollapsibleItem
           onClick={(evt) => {
             this.setState({ expanded: !this.state.expanded })
@@ -69,19 +66,6 @@ export default class CollapsibleStep extends React.Component {
     generateJSEditor = (value) => {
       this.setState({ shouldOpenJSEditor: value })
     }
-    closeJSEditor = () => {
-      this.generateJSEditor(false)
-    }
-    JSContent = 'module.exports = {\n' +
-    '    beforeRequest,\n' +
-    '    afterResponse\n' +
-    '};\n' +
-    'function beforeRequest(requestParams, context, ee, next) {\n' +
-    '    return next(); // MUST be called for the scenario to continue\n' +
-    '}\n' +
-    'function afterResponse(requestParams, response, context, ee, next) {\n' +
-    '    return next(); // MUST be called for the scenario to continue\n' +
-    '}';
 
     generateIcon = () => {
       const { step } = this.props;
@@ -119,6 +103,7 @@ export default class CollapsibleStep extends React.Component {
               onChangeValue={onChangeValueOfStep}
               processorsExportedFunctions={processorsExportedFunctions}
               type
+              shouldOpenJSEditor={this.state.shouldOpenJSEditor}
             />
 
           }
