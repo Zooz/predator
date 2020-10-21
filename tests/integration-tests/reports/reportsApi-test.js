@@ -624,69 +624,6 @@ describe('Integration tests for the reports api', function () {
                 should(headers).eql(EXPORTED_REPORT_HEADER);
             });
 
-            it('Post full cycle stats, export report and check report contents', async function () {
-                const phaseStartedStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('started_phase', runnerId));
-                should(phaseStartedStatsResponse.statusCode).be.eql(204);
-
-                const getReport = await reportsRequestCreator.getReport(testId, reportId);
-                should(getReport.statusCode).be.eql(200);
-                const testStartTime = new Date(getReport.body.start_time);
-
-                const statDateFirst = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 20);
-                let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateFirst, 600));
-                should(intermediateStatsResponse.statusCode).be.eql(204);
-                
-
-                const statDateSecond = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 40);
-                intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateSecond, 200));
-                should(intermediateStatsResponse.statusCode).be.eql(204);
-                
-
-                const statDateThird = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 60);
-                intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateThird, 200));
-                should(intermediateStatsResponse.statusCode).be.eql(204);
-                
-
-                const statDateFourth = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 80);
-                intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateFourth, 200));
-                should(intermediateStatsResponse.statusCode).be.eql(204);
-                
-
-                const statDateFifth = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 100);
-                intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('intermediate', runnerId, statDateFifth, 200));
-                should(intermediateStatsResponse.statusCode).be.eql(204);
-                
-
-                const statDateSixth = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 120);
-                const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats('done', runnerId, statDateSixth));
-                should(doneStatsResponse.statusCode).be.eql(204);
-                
-
-                const getExportedReportResponse = await reportsRequestCreator.getExportedReport(testId, reportId, 'csv');
-                should(getExportedReportResponse.statusCode).be.eql(200);
-
-                const reportLines = getExportedReportResponse.text.split('\n');
-                
-                for (let index = 1; index < reportLines.length; index++){
-                    console.log(reportLines[index].split(","));
-                }
-
-                let splitData = [];
-                for (let i = 1; i < reportLines.length; i++){
-                    splitData.push(reportLines[i].split(","));
-                }
-
-                const DATA_ROW = "357.2,1042,1059,90.99,101";
-                const firstDataLine = splitData[1];
-                const firstTime = parseInt(firstDataLine[1]);
-
-                for (let index = 1; index < splitData.length; index++){
-                    should(parseInt(splitData[index][1])).be.eql(firstTime+30000*(index-1));
-                    should(splitData[index].slice(2).join(",")).be.eql(DATA_ROW);
-                }
-
-            });
-
             describe('export report with no stats', function () {
                 it('should return error 404', async function () {
                     const getReportResponse = await reportsRequestCreator.getExportedReport(testId, reportId, 'csv');
@@ -699,7 +636,7 @@ describe('Integration tests for the reports api', function () {
                     const getReportResponse = await reportsRequestCreator.getExportedReport(testId, 'null', 'csv');
                     should(getReportResponse.statusCode).be.eql(404);
                 });
-            }); 
+            });
         });
 
         describe('Get exported comparison report', function () {
@@ -825,89 +762,6 @@ describe('Integration tests for the reports api', function () {
                 should(headers).eql(EXPORTED_REPORT_HEADER);
             });
 
-            it('Post full cycle stats for both reports, export report and check contents of report', async function () {
-                const phaseStartedStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('started_phase', runnerIdA));
-                should(phaseStartedStatsResponseA.statusCode).be.eql(204);
-
-                const getReportA = await reportsRequestCreator.getReport(testIdA, reportIdA);
-                should(getReportA.statusCode).be.eql(200);
-                const testStartTimeA = new Date(getReportA.body.start_time);
-                const statDateFirstA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 20);
-                let intermediateStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('intermediate', runnerIdA, statDateFirstA, 600));
-                should(intermediateStatsResponseA.statusCode).be.eql(204);
-
-                const statDateSecondA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 40);
-                intermediateStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('intermediate', runnerIdA, statDateSecondA, 200));
-                should(intermediateStatsResponseA.statusCode).be.eql(204);
-
-                const statDateThirdA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 60);
-                intermediateStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('intermediate', runnerIdA, statDateThirdA, 200));
-                should(intermediateStatsResponseA.statusCode).be.eql(204);
-
-                const statDateFourthA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 80);
-                intermediateStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('intermediate', runnerIdA, statDateFourthA, 200));
-                should(intermediateStatsResponseA.statusCode).be.eql(204);
-
-                const statDateFifthA = new Date(testStartTimeA).setSeconds(testStartTimeA.getSeconds() + 100);
-                const doneStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('done', runnerIdA, statDateFifthA));
-                should(doneStatsResponseA.statusCode).be.eql(204);
-
-                const phaseStartedStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('started_phase', runnerIdB));
-                should(phaseStartedStatsResponseB.statusCode).be.eql(204);
-
-                const getReportB = await reportsRequestCreator.getReport(testIdB, reportIdB);
-                should(getReportB.statusCode).be.eql(200);
-
-                const testStartTimeB = new Date(getReportB.body.start_time);
-                const statDateFirstB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 20);
-                let intermediateStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('intermediate', runnerIdB, statDateFirstB, 600));
-                should(intermediateStatsResponseB.statusCode).be.eql(204);
-
-                const statDateSecondB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 40);
-                intermediateStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('intermediate', runnerIdB, statDateSecondB, 200));
-                should(intermediateStatsResponseB.statusCode).be.eql(204);
-
-                const statDateThirdB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 60);
-                intermediateStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('intermediate', runnerIdB, statDateThirdB, 200));
-                should(intermediateStatsResponseB.statusCode).be.eql(204);
-
-                const statDateFourthB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 80);
-                intermediateStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('intermediate', runnerIdB, statDateFourthB, 200));
-                should(intermediateStatsResponseB.statusCode).be.eql(204);
-
-                const statDateFifthB = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 100);
-                const doneStatsResponseB = await reportsRequestCreator.postStats(testIdB, reportIdB, statsGenerator.generateStats('done', runnerIdB, statDateFifthB));
-                should(doneStatsResponseB.statusCode).be.eql(204);
-
-                const reportMetaData = {
-                    test_ids: [testIdA, testIdB],
-                    report_ids: [reportIdA, reportIdB]
-                };
-
-                const getExportedCompareResponse = await reportsRequestCreator.getExportedCompareReport('csv', reportMetaData);
-                should(getExportedCompareResponse.statusCode).be.eql(200);
-                
-                const reportLines = getExportedCompareResponse.text.split('\n');
-                
-                for (let index = 1; index < reportLines.length; index++){
-                    console.log(reportLines[index].split(","));
-                }
-
-                let splitData = [];
-                for (let i = 1; i < reportLines.length; i++){
-                    splitData.push(reportLines[i].split(","));
-                }
-
-                const DATA_ROW = "357.2,1042,1059,90.99,101,357.2,1042,1059,90.99,101";
-                const firstDataLine = splitData[1];
-                const firstTime = parseInt(firstDataLine[1]);
-
-                for (let index = 1; index < splitData.length; index++){
-                    should(parseInt(splitData[index][1])).be.eql(firstTime+30000*(index-1));
-                    should(splitData[index].slice(2).join(",")).be.eql(DATA_ROW);
-                }
-            });
-            
             it('Post full cycle stats for both reports and give an unknown report', async function () {
                 const phaseStartedStatsResponseA = await reportsRequestCreator.postStats(testIdA, reportIdA, statsGenerator.generateStats('started_phase', runnerIdA));
                 should(phaseStartedStatsResponseA.statusCode).be.eql(204);
