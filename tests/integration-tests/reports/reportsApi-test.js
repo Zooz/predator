@@ -389,39 +389,34 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertRunnerSubscriptionToReport(testId2, reportId2, runnerId2);
 
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
-
+                       
+                        const timedStart = 30; //make an entry at 30 seconds in the report
+                        const numEntries = 3;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
                         expect(getReport.statusCode).to.be.equal(200);
                         const testStartTime = new Date(getReport.body.start_time);
-                        const statDateFirst = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 20);
-                        let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDateFirst, 600));
-                        expect(intermediateStatsResponse.statusCode).to.be.equal(204);
+                        for (let timeKey = 1; timeKey <= numEntries; timeKey++){
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            expect(intermediateStatsResponse.statusCode).to.be.equal(204);
+                        }
 
-                        const statDateSecond = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 40);
-                        intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDateSecond, 200));
-                        expect(intermediateStatsResponse.statusCode).to.be.equal(204);
+                        await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_DONE_STAGE);
 
-                        const statDateThird = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + 60);
-                        const doneStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_DONE_STAGE, runnerId, statDateThird));
-                        expect(doneStatsResponse.statusCode).to.be.equal(204);
+                        await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_STARTED_STAGE);
+                       
+                        const timedStart2 = 30; //make an entry at 30 seconds in the report
+                        const numEntries2 = 3;
+                        const getReport2 = await reportsRequestCreator.getReport(testId2, reportId2);
+                        expect(getReport2.statusCode).to.be.equal(200);
+                        const testStartTime2 = new Date(getReport2.body.start_time);
+                        for (let timeKey = 1; timeKey <= numEntries2; timeKey++){
+                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
+                            expect(intermediateStatsResponse.statusCode).to.be.equal(204);
+                        }
 
-                        const phaseStartedStatsResponse2 = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_STARTED_STAGE, runnerId2));
-                        expect(phaseStartedStatsResponse2.statusCode).to.be.equal(204);
-
-                        const getReportB = await reportsRequestCreator.getReport(testId2, reportId2);
-                        expect(getReportB.statusCode).be.eql(200);
-                        const testStartTimeB = new Date(getReportB.body.start_time);
-                        const statDateFirst2 = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 20);
-                        let intermediateStatsResponse2 = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDateFirst2, 600));
-                        expect(intermediateStatsResponse2.statusCode).to.be.equal(204);
-
-                        const statDateSecond2 = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 40);
-                        intermediateStatsResponse2 = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDateSecond2, 200));
-                        expect(intermediateStatsResponse2.statusCode).to.be.equal(204);
-
-                        const statDateThird2 = new Date(testStartTimeB).setSeconds(testStartTimeB.getSeconds() + 60);
-                        const doneStatsResponse2 = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_DONE_STAGE, runnerId2, statDateThird2));
-                        expect(doneStatsResponse2.statusCode).to.be.equal(204);
+                        await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_DONE_STAGE);
 
                         const reportMetaData = {
                             test_ids: [testId, testId2],
