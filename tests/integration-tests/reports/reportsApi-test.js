@@ -250,12 +250,88 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const headers = reportLines[0];
                         expect(headers).to.be.deep.equal(EXPORTED_REPORT_HEADER);
                     });
+                    
+                    it('Create job -> Post full cycle stats -> export report -> check report contents', async function () {
+                        const runnerId = uuid.v4();
+                        const jobName = 'jobName';
+                        const id = uuid.v4();
+
+                        nockK8sRunnerCreation(kubernetesConfig.kubernetesUrl, jobName, id, kubernetesConfig.kubernetesNamespace);
+
+                        const testCreateResponse = await testsRequestCreator.createTest(basicTest, { 'Content-Type': 'application/json' });
+                        expect(testCreateResponse.status).to.be.equal(201);
+
+                        const testId = testCreateResponse.body.id;
+                        const job = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            type: 'load_test',
+                            notes: 'cats',
+                            webhooks: [],
+                            emails: []
+                        };
+
+                        const jobCreateResponse = await jobRequestCreator.createJob(job, { 'Content-Type': 'application/json' });
+                        expect(jobCreateResponse.status).to.be.equal(201);
+
+                        const reportId = jobCreateResponse.body.report_id;
+
+                        await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
+                        await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
+                        await assertReportStatus(testId, reportId, constants.REPORT_STARTED_STATUS);
+
+                        const timedStart = 30; //make an entry at 30 seconds in the report
+                        const numEntries = 5;
+                        const getReport = await reportsRequestCreator.getReport(testId, reportId);
+                        expect(getReport.statusCode).to.be.equal(200);
+                        const testStartTime = new Date(getReport.body.start_time);
+                        for (let timeKey = 1; timeKey <= numEntries; timeKey++){
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            expect(intermediateStatsResponse.statusCode).to.be.equal(204);
+                        }
+
+                        await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_DONE_STAGE);
+                        await assertReportStatus(testId, reportId, constants.REPORT_FINISHED_STATUS);
+
+                        const getExportedReportResponse = await reportsRequestCreator.getExportedReport(testId, reportId, 'csv');
+                        expect(getExportedReportResponse.statusCode).to.be.equal(200);
+                    
+                        const reportLines = getExportedReportResponse.text.split('\n');
+                        console.log(reportLines);
+                        let splitData = [];
+                        for (let i = 1; i < reportLines.length; i++){
+                            splitData.push(reportLines[i].split(","));
+                        }
+                        
+                        const parsedStandardStat = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId).data);
+                        const MEDIAN = parsedStandardStat.latency.median.toString();
+                        const P95 = parsedStandardStat.latency.p95.toString();
+                        const P99 = parsedStandardStat.latency.p99.toString();
+                        const RPS = parsedStandardStat.rps.mean.toString();
+                        const STATUS200 = parsedStandardStat.requestsCompleted.toString();
+
+                        const DATA_ROW = [MEDIAN,P95,P99,RPS,STATUS200];
+                        const STRING_DATA_ROW = DATA_ROW.join(",");
+                        
+                        const firstDataLine = splitData[1];
+                        const firstTime = parseInt(firstDataLine[1]);
+                    
+                        for (let index = 1; index < splitData.length; index++){
+                            expect(parseInt(splitData[index][1])).to.be.equal(firstTime+30000*(index-1));
+                            expect(splitData[index].slice(2).join(",")).to.be.deep.equal(STRING_DATA_ROW);
+                        }
+                    
+                    });
 
                     describe('export report of non existent report', function () {
                         it('should return error 404', async function () {
                             const testId = uuid.v4();
                             const getReportResponse = await reportsRequestCreator.getExportedReport(testId, 'null', 'csv');
-                            expect(getReportResponse.statusCode).be.eql(404);
+                            expect(getReportResponse.statusCode).to.be.eql(404);
                         });
                     });
                 });
@@ -365,6 +441,133 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const reportLines = getExportedCompareResponse.text.split('\n');
                         const headers = reportLines[0];
                         expect(headers).eql(EXPORTED_REPORT_HEADER);
+                    });
+
+                    it('Create 2 jobs -> Post full cycle stats for both reports -> export compared report -> compare report contents', async function () {
+                        const jobName = 'jobName';
+                        const id = uuid.v4();
+                        const runnerId = uuid.v4();
+
+                        nockK8sRunnerCreation(kubernetesConfig.kubernetesUrl, jobName, id, kubernetesConfig.kubernetesNamespace);
+
+                        const testCreateResponse = await testsRequestCreator.createTest(basicTest, { 'Content-Type': 'application/json' });
+                        expect(testCreateResponse.status).to.be.equal(201);
+
+                        const testId = testCreateResponse.body.id;
+                        const job = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            type: 'load_test',
+                            webhooks: [],
+                            emails: []
+                        };
+
+                        const jobCreateResponse = await jobRequestCreator.createJob(job, { 'Content-Type': 'application/json' });
+                        expect(jobCreateResponse.status).to.be.equal(201);
+                        const reportId = jobCreateResponse.body.report_id;
+
+                        const id2 = uuid.v4();
+                        const runnerId2 = uuid.v4();
+
+                        nockK8sRunnerCreation(kubernetesConfig.kubernetesUrl, jobName, id2, kubernetesConfig.kubernetesNamespace);
+
+                        const testCreateResponse2 = await testsRequestCreator.createTest(basicTest, { 'Content-Type': 'application/json' });
+                        expect(testCreateResponse2.status).to.be.equal(201);
+
+                        const testId2 = testCreateResponse2.body.id;
+                        const job2 = {
+                            test_id: testId2,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            type: 'load_test',
+                            webhooks: [],
+                            emails: []
+                        };
+                        const jobCreateResponse2 = await jobRequestCreator.createJob(job2, { 'Content-Type': 'application/json' });
+                        expect(jobCreateResponse2.status).to.be.equal(201);
+                        const reportId2 = jobCreateResponse2.body.report_id;
+
+                        await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
+                        await assertRunnerSubscriptionToReport(testId2, reportId2, runnerId2);
+
+                        await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
+                       
+                        const timedStart = 30; //make an entry at 30 seconds in the report
+                        const numEntries = 5;
+                        const getReport = await reportsRequestCreator.getReport(testId, reportId);
+                        expect(getReport.statusCode).to.be.equal(200);
+                        const testStartTime = new Date(getReport.body.start_time);
+                        for (let timeKey = 1; timeKey <= numEntries; timeKey++){
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            expect(intermediateStatsResponse.statusCode).to.be.equal(204);
+                        }
+
+                        await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_DONE_STAGE);
+
+                        await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_STARTED_STAGE);
+                       
+                        const timedStart2 = 30; //make an entry at 30 seconds in the report
+                        const numEntries2 = 5;
+                        const getReport2 = await reportsRequestCreator.getReport(testId2, reportId2);
+                        expect(getReport2.statusCode).to.be.equal(200);
+                        const testStartTime2 = new Date(getReport2.body.start_time);
+                        for (let timeKey = 1; timeKey <= numEntries2; timeKey++){
+                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
+                            expect(intermediateStatsResponse.statusCode).to.be.equal(204);
+                        }
+
+                        await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_DONE_STAGE);
+
+                        const reportMetaData = {
+                            test_ids: [testId, testId2],
+                            report_ids: [reportId, reportId2]
+                        };
+
+                        const getExportedCompareResponse = await reportsRequestCreator.getExportedCompareReport('csv', reportMetaData);
+                        expect(getExportedCompareResponse.statusCode).to.be.equal(200);
+                        
+                        const reportLines = getExportedCompareResponse.text.split('\n');
+                        
+                        for (let index = 1; index < reportLines.length; index++){
+                            console.log(reportLines[index].split(","));
+                        }
+                    
+                        let splitData = [];
+                        for (let i = 1; i < reportLines.length; i++){
+                            splitData.push(reportLines[i].split(","));
+                        }
+                    
+                        const parsedStandardStat = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId).data);
+                        const MEDIAN = parsedStandardStat.latency.median.toString();
+                        const P95 = parsedStandardStat.latency.p95.toString();
+                        const P99 = parsedStandardStat.latency.p99.toString();
+                        const RPS = parsedStandardStat.rps.mean.toString();
+                        const STATUS200 = parsedStandardStat.requestsCompleted.toString();
+
+                        const parsedStandardStat_2 = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2).data);
+                        const MEDIAN_2 = parsedStandardStat_2.latency.median.toString();
+                        const P95_2 = parsedStandardStat_2.latency.p95.toString();
+                        const P99_2 = parsedStandardStat_2.latency.p99.toString();
+                        const RPS_2 = parsedStandardStat_2.rps.mean.toString();
+                        const STATUS200_2 = parsedStandardStat_2.requestsCompleted.toString();
+
+                        const DATA_ROW = [MEDIAN,P95,P99,RPS,STATUS200,MEDIAN_2,P95_2,P99_2,RPS_2,STATUS200_2];
+                        const STRING_DATA_ROW = DATA_ROW.join(",");
+                        const firstDataLine = splitData[1];
+                        const firstTime = parseInt(firstDataLine[1]);
+                    
+                        for (let index = 1; index < splitData.length; index++){
+                            expect(parseInt(splitData[index][1])).to.be.eql(firstTime+30000*(index-1));
+                            expect(splitData[index].slice(2).join(",")).to.be.deep.eql(STRING_DATA_ROW);
+                        }
+
                     });
 
                     it('Post full cycle stats for both reports and give an unknown report', async function () {
