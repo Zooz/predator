@@ -40,21 +40,21 @@ module.exports.runJob = async (dockerJobConfig) => {
 
     const promises = [];
     for (let i = 0; i < (dockerJobConfig.parallelism || 1); i++) {
-        promises.push(startContainer(dockerJobConfig.dockerImage, dockerJobConfig.jobName, dockerJobConfig.runId, i, envVarArray));
+        promises.push(startContainer(dockerJobConfig.dockerImage, dockerJobConfig.jobName, dockerJobConfig.reportId, i, envVarArray));
     }
 
     await Promise.all(promises);
 
     const genericJobResponse = {
         jobName: dockerJobConfig.jobName,
-        id: dockerJobConfig.runId
+        id: dockerJobConfig.reportId
     };
     return genericJobResponse;
 };
 
-const startContainer = async (dockerImage, jobName, runId, parallelIndex, envVarArray) => {
+const startContainer = async (dockerImage, jobName, reportId, parallelIndex, envVarArray) => {
     const container = await docker.createContainer({
-        name: `${jobName}-${runId}-${parallelIndex}`,
+        name: `${jobName}-${reportId}-${parallelIndex}`,
         Image: dockerImage,
         Env: envVarArray
     });
@@ -62,12 +62,11 @@ const startContainer = async (dockerImage, jobName, runId, parallelIndex, envVar
     await container.start();
 };
 
-module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) => {
+module.exports.stopRun = async (jobPlatformName) => {
     let containers = await docker.listContainers();
 
     containers = containers.filter(container => container.Names &&
-        container.Names[0] && container.Names[0].includes(jobPlatformName) &&
-        container.Names[0].includes(platformSpecificInternalRunId));
+        container.Names[0] && container.Names[0].includes(jobPlatformName));
 
     containers.forEach(async container => {
         const containerToStop = await docker.getContainer(container.Id);
@@ -88,12 +87,11 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
     };
 };
 
-module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId) => {
+module.exports.getLogs = async (jobPlatformName) => {
     let containers = await docker.listContainers({ all: true });
 
     containers = containers.filter(container => container.Names &&
-        container.Names[0] && container.Names[0].includes(jobPlatformName) &&
-        container.Names[0].includes(platformSpecificInternalRunId));
+        container.Names[0] && container.Names[0].includes(jobPlatformName));
 
     const logs = [];
 

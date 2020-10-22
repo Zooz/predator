@@ -13,8 +13,7 @@ describe('Sequelize client tests', function () {
     let sequelizeDefineStub;
     let sequelizeModelStub;
     let sequelizeCloseStub;
-    let sequelizeFindOrCreateStub;
-    let sequelizeInsertStatsStub;
+    let sequelizeInsertStub;
     let sequelizeUpdateStub;
     let sequelizeGetStub;
     let sequelizeDestroyStub;
@@ -52,14 +51,13 @@ describe('Sequelize client tests', function () {
 
         sequelizeAuthenticateStub = sandbox.stub();
         sequelizeDefineStub = sandbox.stub();
-        sequelizeFindOrCreateStub = sandbox.stub();
         sequelizeUpdateStub = sandbox.stub();
         sequelizeGetStub = sandbox.stub();
         sequelizeDestroyStub = sandbox.stub();
         sequelizeModelStub = sandbox.stub();
         sequelizeCloseStub = sandbox.stub();
         sequelizeStub = sandbox.stub();
-        sequelizeInsertStatsStub = sandbox.stub();
+        sequelizeInsertStub = sandbox.stub();
         sequelizeCreateSubscriberStatsStub = sandbox.stub();
         sequelizeGetSubscribersStatsStub = sandbox.stub();
 
@@ -73,8 +71,8 @@ describe('Sequelize client tests', function () {
         });
 
         sequelizeModelStub.returns({
-            findOrCreate: sequelizeFindOrCreateStub,
-            create: sequelizeInsertStatsStub,
+            findOrCreate: sequelizeInsertStub,
+            create: sequelizeInsertStub,
             update: sequelizeUpdateStub,
             findAll: sequelizeGetStub,
             destroy: sequelizeDestroyStub,
@@ -123,28 +121,26 @@ describe('Sequelize client tests', function () {
     describe('Insert new report', () => {
         it('should succeed full insert', async () => {
             const lastUpdateAt = Date.now();
-            await sequelizeConnector.insertReport(testId, revisionId, reportId, jobId, testType, '0', startTime, testName, testDescription, testConfiguration, notes, lastUpdateAt, false);
+            const reportId = uuid.v4();
+            const params = {
+                test_id: testId,
+                job_id: jobId,
+                last_updated_at: lastUpdateAt,
+                notes: 'some notes',
+                phase: '0',
+                revision_id: revisionId,
+                start_time: startTime,
+                test_configuration: testConfiguration,
+                test_description: 'desc',
+                test_name: 'unit-test',
+                test_type: 'basic',
+                runners_subscribed: [],
+                is_favorite: false
+            };
 
-            should(sequelizeFindOrCreateStub.args[0][0]).eql({
-                defaults: {
-                    job_id: jobId,
-                    last_updated_at: lastUpdateAt,
-                    notes: 'some notes',
-                    phase: '0',
-                    revision_id: revisionId,
-                    start_time: startTime,
-                    test_configuration: testConfiguration,
-                    test_description: 'desc',
-                    test_id: testId,
-                    test_name: 'unit-test',
-                    test_type: 'basic',
-                    runners_subscribed: [],
-                    is_favorite: false
-                },
-                where: {
-                    report_id: reportId
-                }
-            });
+            await sequelizeConnector.insertReport(reportId, testId, revisionId, jobId, testType, '0', startTime, testName, testDescription, testConfiguration, notes, lastUpdateAt, false);
+
+            should(sequelizeInsertStub.args[0][0]).containDeep(params);
         });
     });
 
@@ -432,7 +428,7 @@ describe('Sequelize client tests', function () {
 
             await sequelizeConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 
-            should(sequelizeInsertStatsStub.args[0][0]).eql({
+            should(sequelizeInsertStub.args[0][0]).eql({
                 runner_id: runnerId,
                 data: data,
                 phase_index: 0,

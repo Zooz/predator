@@ -10,7 +10,7 @@ import Page from '../components/Page';
 import _ from 'lodash';
 import Report from './components/Report';
 import CompareReports from "./components/Report/compareReports";
-import {createJobRequest} from './requestBuilder';
+import {createJobRequest} from './components/JobForm/utils';
 
 import {ReactTableComponent} from './../components/ReactTable';
 import {getColumns} from './configurationColumn'

@@ -11,7 +11,7 @@ import Report from "./components/Report";
 import CompareReports from "./components/Report/compareReports";
 import {ReactTableComponent} from "../components/ReactTable";
 import {getColumns} from "./configurationColumn";
-import {createJobRequest} from "./requestBuilder";
+import {createJobRequest} from "./components/JobForm/utils";
 import {createJobSuccess} from "./redux/selectors/jobsSelector";
 import Snackbar from 'material-ui/Snackbar';
 import ErrorDialog from "./components/ErrorDialog";

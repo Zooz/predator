@@ -15,7 +15,8 @@ const initialState = Immutable.Map({
   delete_job_success: false,
   is_loading: false,
   error_on_job_action: undefined,
-  edit_job_success:false
+  edit_job_success: false,
+  edit_job_id: undefined
 });
 
 export default function reduce (state = initialState, action = {}) {
@@ -64,6 +65,8 @@ export default function reduce (state = initialState, action = {}) {
       return state.set('is_loading', action.isLoading);
   case Types.EDIT_JOB_SUCCESS:
     return state.set('edit_job_success', action.value);
+  case Types.EDIT_JOB_ID:
+    return state.set('edit_job_id', action.value);
   case Types.ERROR_ON_JOB_ACTION:
     return state.set('error_on_job_action', action.error);
   default:

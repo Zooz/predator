@@ -12,6 +12,7 @@ import {connect} from "react-redux";
 import Snackbar from "material-ui/Snackbar";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Button from "../../../components/Button";
+import env from "../../../App/common/env";
 
 class CompareReports extends React.Component {
     constructor(props) {
@@ -100,7 +101,7 @@ class CompareReports extends React.Component {
             }
         }
         request_string = "report_ids="+reportIdsAsCSV+"&test_ids="+testIdsAsCSV;
-        window.open(`${process.env.PREDATOR_URL}/tests/reports/compare/export/csv?`+request_string,"_blank");
+        window.open(`${env.PREDATOR_URL}/tests/reports/compare/export/csv?`+request_string,"_blank");
     };
 
     render() {

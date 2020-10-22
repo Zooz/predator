@@ -9,7 +9,6 @@ const HEADERS = { 'Content-Type': 'application/json' };
 
 module.exports = {
     init,
-    createReport,
     postStats,
     getReport,
     deleteReport,
@@ -19,53 +18,34 @@ module.exports = {
     getAggregatedReport,
     getExportedReport,
     getExportedCompareReport,
+    getAggregatedReport,
+    subscribeRunnerToReport
 };
 
 async function init() {
     testApp = await app();
 }
 
-function createReport(testId, body) {
-    return request(testApp).post(`/v1/tests/${testId}/reports`)
-        .send(body)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
-}
-
 function postStats(testId, reportId, body) {
     return request(testApp).post(`/v1/tests/${testId}/reports/${reportId}/stats`)
         .send(body)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function editReport(testId, reportId, body) {
     return request(testApp).put(`/v1/tests/${testId}/reports/${reportId}`)
         .send(body)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getAggregatedReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}/aggregate`)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getReport(testId, reportId) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}`)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getExportedReport(testId, reportId, fileFormat) {
@@ -106,10 +86,7 @@ function getExportedCompareReport(fileFormat, reportMetaData) {
 
 function deleteReport(testId, reportId) {
     return request(testApp).delete(`/v1/tests/${testId}/reports/${reportId}`)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getReports(testId, filter) {
@@ -118,10 +95,7 @@ function getReports(testId, filter) {
         url += `?filter=${filter}`;
     }
     return request(testApp).get(url)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
 }
 
 function getLastReports(limit, filter) {
@@ -130,8 +104,12 @@ function getLastReports(limit, filter) {
         url += `&filter=${filter}`;
     }
     return request(testApp).get(url)
-        .set(HEADERS)
-        .expect(function (res) {
-            return res;
-        });
+        .set(HEADERS);
+}
+
+async function subscribeRunnerToReport(testId, reportId, runnerId) {
+    return request(testApp)
+        .post(`/v1/tests/${testId}/reports/${reportId}/subscribe`)
+        .set({ ...HEADERS, 'x-runner-id': runnerId })
+        .send({});
 }
