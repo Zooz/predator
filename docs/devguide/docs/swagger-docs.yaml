@@ -2562,7 +2562,7 @@ components:
               type: string
               description: Prometheus push gateway url.
             buckets_sizes:
-              type: string
+              type: array
               description: Bucket sizes use to configure prometheus.
             labels:
               description: Labels which will be passed to prometheus push gateway.
