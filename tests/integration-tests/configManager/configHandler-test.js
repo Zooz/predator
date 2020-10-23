@@ -34,7 +34,7 @@ const updateBodyWithTypes = {
     },
     prometheus_metrics: {
         push_gateway_url: 'string_value',
-        buckets_sizes: 'string_value',
+        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
         labels: { key1: 'value1', key2: 'value2' }
     },
     smtp_server: {
@@ -76,7 +76,7 @@ const requestBody = {
     },
     prometheus_metrics: {
         push_gateway_url: 'string_value_push_gateway_url',
-        buckets_sizes: 'string_value_buckets_sizes',
+        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
         labels: { key1: 'value1', key2: 'value2' }
     },
     smtp_server: {
@@ -201,20 +201,50 @@ describe('update and get config', () => {
     });
 
     describe('Update config validation', () => {
+        describe('prometheus_metrics', () => {
+            it('should return input validation error if bucket_size is not an array', async () => {
+                const requestWithInvalidBucketSizeType = {
+                    prometheus_metrics: {
+                        push_gateway_url: 'string_value',
+                        buckets_sizes: "invalid_string_type_and_not_an_array",
+                        labels: { key1: 'value1', key2: 'value2' }
+                    },
+                };
+
+                const response = await configRequestCreator.updateConfig(requestWithInvalidBucketSizeType);
+                should(response.statusCode).eql(400);
+                should(response.body.message).eql(validationError);
+                should(response.body.validation_errors).have.lengthOf(1);
+                should(response.body.validation_errors[0]).eql('body/prometheus_metrics.buckets_sizes should be array');
+            });
+
+            it('should return input validation error if value for labels are not strings', async () => {
+                const response = await configRequestCreator.updateConfig({
+                    prometheus_metrics: {
+                        push_gateway_url: 'string_value',
+                        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
+                        labels: { key1: { innerKey1: 'value1' }, key2: 'value2' }
+                    }
+                });
+                should(response.statusCode).eql(400);
+                should(response.body.message).eql(validationError);
+                should(response.body.validation_errors).eql([
+                    "body/prometheus_metrics.labels['key1'] should be string"]);
+            });
+        });
+
         it('update config fail with validation require fields', async () => {
             const response = await configRequestCreator.updateConfig(requestBodyNotValidRequire);
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);
         });
-    });
-    describe('Update config validation', () => {
+
         it('update config fail with validation enum', async () => {
             const response = await configRequestCreator.updateConfig(requestBodyNotValidEnum);
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);
         });
-    });
-    describe('Update config validation', () => {
+
         it('update config fail with validation type', async () => {
             const response = await configRequestCreator.updateConfig(requestBodyNotValidType);
             should(response.statusCode).eql(400);
@@ -273,22 +303,6 @@ describe('update and get config', () => {
                 "body/benchmark_weights should have required property 'server_errors_ratio'",
                 "body/benchmark_weights should have required property 'client_errors_ratio'",
                 "body/benchmark_weights should have required property 'rps'"]);
-        });
-    });
-
-    describe('Update prometheus configuration with labels which are not key value', () => {
-        it('update config fail with validation type', async () => {
-            const response = await configRequestCreator.updateConfig({
-                prometheus_metrics: {
-                    push_gateway_url: 'string_value',
-                    buckets_sizes: 'string_value',
-                    labels: { key1: { innerKey1: 'value1' }, key2: 'value2' }
-                }
-            });
-            should(response.statusCode).eql(400);
-            should(response.body.message).eql(validationError);
-            should(response.body.validation_errors).eql([
-                "body/prometheus_metrics.labels['key1'] should be string"]);
         });
     });
 });
