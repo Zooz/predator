@@ -34,7 +34,7 @@ const updateBodyWithTypes = {
     },
     prometheus_metrics: {
         push_gateway_url: 'string_value',
-        buckets_sizes: [2.1, 1, 10, 17, 19, 0.0],
+        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
         labels: { key1: 'value1', key2: 'value2' }
     },
     smtp_server: {
@@ -76,7 +76,7 @@ const requestBody = {
     },
     prometheus_metrics: {
         push_gateway_url: 'string_value_push_gateway_url',
-        buckets_sizes: [9, 11, 0.1, 12, 78, 1.9],
+        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
         labels: { key1: 'value1', key2: 'value2' }
     },
     smtp_server: {
@@ -222,7 +222,7 @@ describe('update and get config', () => {
                 const response = await configRequestCreator.updateConfig({
                     prometheus_metrics: {
                         push_gateway_url: 'string_value',
-                        buckets_sizes: [11.0, 1, 9, 2.5, 6],
+                        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
                         labels: { key1: { innerKey1: 'value1' }, key2: 'value2' }
                     }
                 });
