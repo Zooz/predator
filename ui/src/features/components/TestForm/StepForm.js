@@ -20,8 +20,21 @@ import TitleInput from "../../../components/TitleInput";
 import DynamicKeyValueInput from './DynamicKeyValueInput';
 import CustomDropdown from './CustomDropdown';
 import Expectations from './Expectations';
+import ErrorWrapper from '../../../components/ErrorWrapper'
+import { isUrlValid, URL_FIELDS } from "../../../validators/validate-urls";
+import { INVALID_URL_MESSAGE } from "../../../../constants/constants";
 
 export default (props) => {
+
+    const validateUrl = ({ url }) => {
+        if (url && !isUrlValid(url)) {
+          props.setValidationError({ fieldName: URL_FIELDS.URL, errorMessage: INVALID_URL_MESSAGE })
+        }
+        else {
+            props.resetValidationError({ fieldName: URL_FIELDS.URL });
+        }
+        onInputChange({ url });
+    };
 
     const onHeaderChange = (key, value, index) => {
         const {onChangeValue} = props;
@@ -108,7 +121,7 @@ export default (props) => {
     };
 
     const {
-        step, processorsExportedFunctions
+        step, processorsExportedFunctions,validationErrors
     } = props;
     const jsonObjectKey = step.method === 'GET' ? 'get' : 'not-get';
 
@@ -127,9 +140,12 @@ export default (props) => {
                         />
                     </TitleInput>
                     <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Url'}>
-                        <Input value={step.url} onChange={(evt) => {
-                            onInputChange({url: evt.target.value})
-                        }}/>
+                        <ErrorWrapper errorText={validationErrors[URL_FIELDS.URL].message}>
+                            <Input value={step.url} onChange={(evt) => {
+                                const url = evt.target.value;
+                                validateUrl({ url: url });
+                            }} />
+                        </ErrorWrapper>
                     </TitleInput>
                     <TitleInput style={{marginRight: '10px'}} title={'Before Request'}>
                         <ProcessorsDropDown options={processorsExportedFunctions}

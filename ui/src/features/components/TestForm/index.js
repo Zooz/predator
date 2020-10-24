@@ -15,6 +15,7 @@ import TitleInput from '../../../components/TitleInput';
 import TextArea from '../../../components/TextArea';
 import StepsList from './stepsList';
 import FormWrapper from '../../../components/FormWrapper';
+import ErrorWrapper from '../../../components/ErrorWrapper'
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import { FileDrop } from 'react-file-drop';
 import env from '../../../App/common/env';
@@ -25,10 +26,12 @@ import {
   EXPECTATIONS_TYPE,
   EXPECTATIONS_SPEC_BY_PROP
 } from './constants'
+import { isUrlValid, URL_FIELDS } from "../../../validators/validate-urls";
 import IconButton from '../../../components/IconButton';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { faSave, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { EMPTY_STRING, INVALID_URL_MESSAGE } from '../../../../constants/constants';
 
 const SLEEP = 'sleep';
 
@@ -51,10 +54,56 @@ export class TestForm extends React.Component {
         processorsExportedFunctions: [],
         csvMode: false,
         csvFile: null,
-        csvFileId: undefined
+        csvFileId: undefined,
+        validationErrors: {
+          [URL_FIELDS.BASE_URL]: {
+            isError: false,
+            message : EMPTY_STRING,
+          },
+          [URL_FIELDS.URL]: {
+            isError: false,
+            message : EMPTY_STRING,
+          },
+        },
       }
     }
   }
+
+    hasValidationErrors = () => {
+      let errors = Object.values(this.state.validationErrors);
+      return errors.some((error) => error.isError);
+    };
+
+    isButtonDisabled = () => {
+      return !this.state.name || this.hasValidationErrors();
+    }
+
+    updatevalidationError = ({ field, isError, errorMessage }) => {
+      const newState = Object.assign({}, this.state);
+      newState.validationErrors[field] = {
+        isError: isError,
+        message: errorMessage,
+      },
+      this.setState(newState);
+    };
+
+    setValidationError = ({ fieldName, errorMessage }) => {
+      this.updatevalidationError({ field: fieldName, isError: true, errorMessage: errorMessage });
+    };
+
+    resetValidationError = ({ fieldName }) => {
+      this.updatevalidationError({ field: fieldName, isError: false, errorMessage: EMPTY_STRING });
+    };
+
+    validateBaseUrl = ({ baseUrl }) => {
+      if (baseUrl && !isUrlValid(baseUrl)) {
+        this.setValidationError({ fieldName: URL_FIELDS.BASE_URL, errorMessage: INVALID_URL_MESSAGE });
+      }
+      else {
+        this.resetValidationError({ fieldName: URL_FIELDS.BASE_URL });
+      }
+      this.setState({ baseUrl });
+    };
 
     postTest = (goToRunJob) => {
       const { editMode, id } = this.state;
@@ -120,9 +169,8 @@ export class TestForm extends React.Component {
 
     render () {
       const { createTestError, processorsError, closeDialog, processorsLoading, processorsList, csvMetadata } = this.props;
-      const { name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi } = this.state;
+      const { name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi, validationErrors } = this.state;
       const error = createTestError || processorsError || maxSupportedScenariosUi;
-
       return (
         <Modal style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '40px', paddingRight: '40px' }}
           height={'100%'} width={'100%'} maxWidth={'1440px'} onExit={closeDialog}>
@@ -148,13 +196,15 @@ export class TestForm extends React.Component {
                   </div>
                   <div className={style['input-container']}>
                     <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Base url'}>
-                      <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
-                        onChange={(evt, value) => {
-                          this.setState({ baseUrl: evt.target.value })
-                        }} />
-                    </TitleInput>
+                      <ErrorWrapper errorText={validationErrors[URL_FIELDS.BASE_URL].message}>
+                        <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
+                          onChange={(evt, value) => {
+                            const url = evt.target.value;
+                            this.validateBaseUrl({ baseUrl: url });
+                          }} />
+                       </ErrorWrapper>
+                      </TitleInput>
                   </div>
-
                   <div className={style['input-container']}>
                     <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Processor'}>
                       <ProcessorsDropDown
@@ -199,7 +249,7 @@ export class TestForm extends React.Component {
         <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '5px 32px 5px 0' }}>
           <IconButton style={{ marginRight: '5px' }}
             spinner={isLoading}
-            disabled={!this.state.name}
+            disabled={this.isButtonDisabled()}
             onClick={() => this.postTest(false)}
             inverted
             width='28px'
@@ -209,7 +259,7 @@ export class TestForm extends React.Component {
           </IconButton>
           <IconButton
             spinner={isLoading}
-            disabled={!this.state.name}
+            disabled={this.isButtonDisabled()}
             onClick={() => this.postTest(true)}
             inverted
             width='28px'
@@ -449,13 +499,17 @@ export class TestForm extends React.Component {
 
                     }
                     <div style={{ width: '70%' }}>
-                      <StepsList steps={tabData.steps}
+                      <StepsList
+                        steps={tabData.steps}
                         editMode={editMode}
                         onChangeValueOfStep={this.onChangeValueOfStep}
                         processorsExportedFunctions={processorsExportedFunctions}
                         onDeleteStep={this.onDeleteStep}
                         onDuplicateStep={this.onDuplicateStep}
                         updateStepOrder={this.updateStepOrder}
+                        validationErrors={this.state.validationErrors}
+                        setValidationError={this.setValidationError}
+                        resetValidationError={this.resetValidationError}
                       />
                     </div>
 
