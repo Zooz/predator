@@ -218,7 +218,6 @@ class getTests extends React.Component {
     };
 
     render () {
-      console.log('manor', this.props.createJobSuccess)
       const { sortedTests, sortHeader, testForEdit, testForClone } = this.state;
       const { errorOnDeleteTest, history } = this.props;
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
