@@ -26,14 +26,9 @@ import { INVALID_URL_MESSAGE } from "../../../../constants/constants";
 
 export default (props) => {
 
-    const validateUrl = ({ url }) => {
-        if (url && !isUrlValid(url)) {
-          props.setValidationError({ fieldName: URL_FIELDS.URL, errorMessage: INVALID_URL_MESSAGE })
-        }
-        else {
-            props.resetValidationError({ fieldName: URL_FIELDS.URL });
-        }
-        onInputChange({ url });
+    const validateUrl = ({ name, value }) => {
+        props.validateUrl({ name, value })
+        onInputChange({ url: value });
     };
 
     const onHeaderChange = (key, value, index) => {
@@ -121,7 +116,9 @@ export default (props) => {
     };
 
     const {
-        step, processorsExportedFunctions,validationErrors
+        step,
+        processorsExportedFunctions,
+        validationError,
     } = props;
     const jsonObjectKey = step.method === 'GET' ? 'get' : 'not-get';
 
@@ -139,11 +136,10 @@ export default (props) => {
                             placeHolder={'Method'}
                         />
                     </TitleInput>
-                    <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Url'}>
-                        <ErrorWrapper errorText={validationErrors[URL_FIELDS.URL].message}>
+                    <TitleInput style={{marginRight: '10px', flexGrow: 2 }} title={'Url'}>
+                        <ErrorWrapper errorText={validationError}>
                             <Input value={step.url} onChange={(evt) => {
-                                const url = evt.target.value;
-                                validateUrl({ url: url });
+                                validateUrl({ name: URL_FIELDS.STEP, value: evt.target.value });
                             }} />
                         </ErrorWrapper>
                     </TitleInput>

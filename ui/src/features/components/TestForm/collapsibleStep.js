@@ -81,9 +81,8 @@ export default class CollapsibleStep extends React.Component {
         onChangeValueOfStep,
         processorsExportedFunctions,
         step,
-        validationErrors,
-        setValidationError,
-        resetValidationError
+        validationError,
+        validateUrl,
       } = this.props;
       return (
         <div style={{ padding: '10px' }}>
@@ -95,9 +94,8 @@ export default class CollapsibleStep extends React.Component {
             /> ||
             <StepForm
               step={step}
-              validationErrors={validationErrors}
-              setValidationError={setValidationError}
-              resetValidationError={resetValidationError}
+              validationError={validationError}
+              validateUrl={validateUrl}
               index={index}
               onChangeValue={onChangeValueOfStep}
               processorsExportedFunctions={processorsExportedFunctions}

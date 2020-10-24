@@ -46,7 +46,6 @@ export class TestForm extends React.Component {
         before: null,
         type: 'basic',
         name: '',
-        baseUrl: '',
         description: '',
         currentScenarioIndex: 0,
         currentStepIndex: null,
@@ -55,54 +54,54 @@ export class TestForm extends React.Component {
         csvMode: false,
         csvFile: null,
         csvFileId: undefined,
-        validationErrors: {
-          [URL_FIELDS.BASE_URL]: {
-            isError: false,
-            message : EMPTY_STRING,
+        urls: {
+          [URL_FIELDS.BASE]: {
+            value: EMPTY_STRING,
+            error: null,
           },
-          [URL_FIELDS.URL]: {
-            isError: false,
-            message : EMPTY_STRING,
+          [URL_FIELDS.STEP]: {
+            value: EMPTY_STRING,
+            error: null,
           },
-        },
+        }
       }
     }
   }
 
     hasValidationErrors = () => {
-      let errors = Object.values(this.state.validationErrors);
-      return errors.some((error) => error.isError);
+      let urlTypes = Object.values(this.state.urls);
+      return !urlTypes.some((url) => isUrlValid(url.value));
     };
 
     isButtonDisabled = () => {
       return !this.state.name || this.hasValidationErrors();
     }
 
-    updatevalidationError = ({ field, isError, errorMessage }) => {
+    updatevalidationError = ({ error }) => {
       const newState = Object.assign({}, this.state);
-      newState.validationErrors[field] = {
-        isError: isError,
-        message: errorMessage,
-      },
+      newState.urls[URL_FIELDS.BASE].error = error;
+      newState.urls[URL_FIELDS.STEP].error = error;
       this.setState(newState);
     };
 
-    setValidationError = ({ fieldName, errorMessage }) => {
-      this.updatevalidationError({ field: fieldName, isError: true, errorMessage: errorMessage });
+    setValidationError = ({ error }) => {
+      this.updatevalidationError({ error });
     };
 
-    resetValidationError = ({ fieldName }) => {
-      this.updatevalidationError({ field: fieldName, isError: false, errorMessage: EMPTY_STRING });
+    resetValidationError = () => {
+      this.updatevalidationError({ error: null });
     };
 
-    validateBaseUrl = ({ baseUrl }) => {
-      if (baseUrl && !isUrlValid(baseUrl)) {
-        this.setValidationError({ fieldName: URL_FIELDS.BASE_URL, errorMessage: INVALID_URL_MESSAGE });
+    validateUrl = ({ name, value }) => {
+      const newState = Object.assign({}, this.state);
+      newState.urls[name].value = value;
+      this.setState(newState);
+      if (this.hasValidationErrors()) {
+        this.setValidationError({ error: INVALID_URL_MESSAGE  });
       }
       else {
-        this.resetValidationError({ fieldName: URL_FIELDS.BASE_URL });
+        this.resetValidationError();
       }
-      this.setState({ baseUrl });
     };
 
     postTest = (goToRunJob) => {
@@ -169,7 +168,7 @@ export class TestForm extends React.Component {
 
     render () {
       const { createTestError, processorsError, closeDialog, processorsLoading, processorsList, csvMetadata } = this.props;
-      const { name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi, validationErrors } = this.state;
+      const { name, description, urls, processorId, editMode, maxSupportedScenariosUi, validationErrors } = this.state;
       const error = createTestError || processorsError || maxSupportedScenariosUi;
       return (
         <Modal style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '40px', paddingRight: '40px' }}
@@ -196,11 +195,10 @@ export class TestForm extends React.Component {
                   </div>
                   <div className={style['input-container']}>
                     <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Base url'}>
-                      <ErrorWrapper errorText={validationErrors[URL_FIELDS.BASE_URL].message}>
-                        <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
+                      <ErrorWrapper errorText={this.state.urls[URL_FIELDS.BASE].error}>
+                        <TextArea maxRows={5} value={this.state.urls[URL_FIELDS.BASE].value} placeholder={'http://my.api.com/'}
                           onChange={(evt, value) => {
-                            const url = evt.target.value;
-                            this.validateBaseUrl({ baseUrl: url });
+                            this.validateUrl({ name: URL_FIELDS.BASE, value: evt.target.value });
                           }} />
                        </ErrorWrapper>
                       </TitleInput>
@@ -507,9 +505,8 @@ export class TestForm extends React.Component {
                         onDeleteStep={this.onDeleteStep}
                         onDuplicateStep={this.onDuplicateStep}
                         updateStepOrder={this.updateStepOrder}
-                        validationErrors={this.state.validationErrors}
-                        setValidationError={this.setValidationError}
-                        resetValidationError={this.resetValidationError}
+                        validationError={this.state.urls[URL_FIELDS.STEP].error}
+                        validateUrl={this.validateUrl}
                       />
                     </div>
 

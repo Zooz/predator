@@ -1,8 +1,8 @@
 import { URL_WITH_PROTOCOL_REGEX } from "../../constants/constants";
 
 const URL_FIELDS = {
-  BASE_URL: "baseUrl",
-  URL: "url",
+  BASE: "base",
+  STEP: "step",
 };
 
 const isUrlValid = (url) => {
