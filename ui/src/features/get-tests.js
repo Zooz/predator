@@ -28,7 +28,7 @@ import ErrorDialog from './components/ErrorDialog';
 import ActionErrorPopup from './components/ActionErrorPopup';
 import _ from 'lodash';
 import { isTestValid } from '../validators/validate-test';
-import { INVALID_TEST_MESSAGE, EMPTY_STRING } from '../../constants/constants'
+import { INVALID_TEST_MESSAGE } from '../../constants/constants'
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
 const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test', 'report', 'edit', 'raw', 'clone', 'delete'];
@@ -45,10 +45,7 @@ class getTests extends React.Component {
       testToDelete: undefined,
       createTest: false,
       testForEdit: null,
-      testActionError: {
-        isError: false,
-        errorMessage: EMPTY_STRING,
-      },
+      testActionError: null,
       sortedTests: [],
       sortHeader: ''
     }
@@ -128,22 +125,18 @@ class getTests extends React.Component {
       this.setState({ openViewTest: data });
     };
 
-    updateTestActionError = ({ isError, errorMessage }) => {
+    updateTestActionError = ({ errorMessage }) => {
       this.setState({
-        ...this.state,
-        testActionError: {
-          isError: isError,
-          errorMessage: errorMessage,
-        }
+        testActionError: errorMessage,
       });
     };
 
     setTestActionError = ({ errorMessage }) => {
-      this.updateTestActionError({ isError: true, errorMessage: errorMessage })
+      this.updateTestActionError({ errorMessage: errorMessage })
     };
 
     resetTestActionError = () => {
-      this.updateTestActionError({ isError: false, errorMessage: EMPTY_STRING })
+      this.updateTestActionError({ errorMessage: null })
     };
 
     onEdit = (data) => {
@@ -230,6 +223,7 @@ class getTests extends React.Component {
     }
 
     onCloseErrorDialog = () => {
+      this.resetTestActionError();
       this.props.cleanAllErrors();
     };
     onClone = (data) => {
@@ -266,7 +260,7 @@ class getTests extends React.Component {
         onClone: this.onClone
       });
       const feedbackMsg = this.generateFeedbackMessage();
-      const error = errorOnDeleteTest;
+      const error = this.state.testActionError || errorOnDeleteTest;
       return (
         <Page title={'Tests'} description={DESCRIPTION}>
           <Button className={style['create-button']} onClick={() => {
@@ -309,9 +303,7 @@ class getTests extends React.Component {
             autoHideDuration={4000}
             onRequestClose={this.handleSnackbarClose}
           />}
-          {this.state.testActionError.isError && <ActionErrorPopup onClose={this.resetTestActionError} message={this.state.testActionError.errorMessage} />}
           {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error} />}
-
         </Page>
       )
     }
