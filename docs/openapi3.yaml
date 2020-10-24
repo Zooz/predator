@@ -1542,6 +1542,14 @@ paths:
         - Webhooks
       summary: Retrieve webhooks
       description: Retrieve all webhooks.
+      parameters:
+        - in: query
+          name: context_id
+          description: The id of the user/organization context
+          required: false
+          schema:
+            type: string
+            example: some-string
       responses:
         '200':
           description: Success
@@ -1569,6 +1577,14 @@ paths:
         - Webhooks
       summary: Create a Webhook
       description: Create a new Webhook.
+      parameters:
+        - in: header
+          name: x-context-id
+          description: The id of the user/organization context
+          required: false
+          schema:
+            type: string
+            example: some-string
       responses:
         '201':
           description: Success
