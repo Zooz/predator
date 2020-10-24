@@ -8,14 +8,14 @@ import { connect } from 'react-redux';
 import Box from '../Box';
 import dateFormat from 'dateformat';
 import Button from '../../../components/Button';
-import Snackbar from "material-ui/Snackbar";
-import {BarChartPredator, LineChartPredator, AssertionsReport} from "./Charts";
-import _ from "lodash";
-import Checkbox from "../../../components/Checkbox/Checkbox";
-import Card from "../../../components/Card";
-import {faStar as emptyStar} from "@fortawesome/free-regular-svg-icons";
-import {faStar as fullStar,faInfo} from "@fortawesome/free-solid-svg-icons";
-import env from "../../../App/common/env";
+import Snackbar from 'material-ui/Snackbar';
+import { BarChartPredator, LineChartPredator, AssertionsReport } from './Charts';
+import _ from 'lodash';
+import Checkbox from '../../../components/Checkbox/Checkbox';
+import Card from '../../../components/Card';
+import { faStar as emptyStar } from '@fortawesome/free-regular-svg-icons';
+import { faStar as fullStar, faInfo } from '@fortawesome/free-solid-svg-icons';
+import env from '../../../App/common/env';
 import InfoToolTip from '../InfoToolTip';
 import SimpleTable from '../SimpleTable';
 import Tooltip from '../../../components/Tooltip/Tooltip.export';
@@ -49,8 +49,8 @@ class Report extends React.Component {
     };
 
     exportCSV = () => {
-        const {report} = this.props;
-        window.open(`${env.PREDATOR_URL}/tests/${report.test_id}/reports/${report.report_id}/export/csv`,'_blank');
+      const { report } = this.props;
+      window.open(`${env.PREDATOR_URL}/tests/${report.test_id}/reports/${report.report_id}/export/csv`, '_blank');
     };
 
     onStar = () => {
@@ -110,43 +110,43 @@ class Report extends React.Component {
                 }}
               />
 
-                    </div>
-                }
-                <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: '5px',
-                        marginBottom: '15px'
-                    }}>
-                        <div onClick={this.onStar}>
-                            <InfoToolTip data={{
-                                key: 'star-info',
-                                info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
-                            }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'}/>
-                        </div>
-                        <Button hover disabled={report.status !== 'finished'}
-                                onClick={this.exportCSV}>Export to CSV</Button>
-                        <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
-                                onClick={this.createBenchmark}>Set as Benchmark</Button>
-                    </div>
-                    <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
-                        <h3>Overall Latency</h3>
-                        <LineChartPredator data={aggregateReport.latencyGraph} keys={aggregateReport.latencyGraphKeys}
-                                           labelY={'ms'} graphType={'latency'}
-                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                                           filteredKeys={filteredKeys}/>
-                    </Card>
-                    <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
-                        <h3>Status Codes</h3>
-                        <LineChartPredator data={aggregateReport.errorsCodeGraph}
-                                           keys={aggregateReport.errorsCodeGraphKeys}
-                                           graphType={'status_codes'}
-                                           connectNulls={false}
-                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                                           filteredKeys={filteredKeys}/>
-                    </Card>
+            </div>
+          }
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '5px',
+              marginBottom: '15px'
+            }}>
+              <div onClick={this.onStar}>
+                <InfoToolTip data={{
+                  key: 'star-info',
+                  info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'} />
+              </div>
+              <Button hover disabled={report.status !== 'finished'}
+                onClick={this.exportCSV}>Export to CSV</Button>
+              <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
+                onClick={this.createBenchmark}>Set as Benchmark</Button>
+            </div>
+            <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
+              <h3>Overall Latency</h3>
+              <LineChartPredator data={aggregateReport.latencyGraph} keys={aggregateReport.latencyGraphKeys}
+                labelY={'ms'} graphType={'latency'}
+                onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                filteredKeys={filteredKeys} />
+            </Card>
+            <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
+              <h3>Status Codes</h3>
+              <LineChartPredator data={aggregateReport.errorsCodeGraph}
+                keys={aggregateReport.errorsCodeGraphKeys}
+                graphType={'status_codes'}
+                connectNulls={false}
+                onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                filteredKeys={filteredKeys} />
+            </Card>
 
             <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
               <h3>RPS</h3>
@@ -259,12 +259,22 @@ const SummeryTable = ({ report = {} }) => {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis' }}>{children}</div>
+
   const rows = report.subscribers.map((runner, index) => {
     const rps = runner.phase_status === 'intermediate' ? runner.last_stats.rps.count : 'N/A';
     return [
       <ColumnWrapper>{index + 1}</ColumnWrapper>, <ColumnWrapper>{prettierStatus(runner.phase_status)}</ColumnWrapper>, <ColumnWrapper>{rps}</ColumnWrapper>
     ]
   })
+  if (report.subscribers.length < report.parallelism) {
+    const notStartedCount = report.parallelism - report.subscribers.length;
+    let index = report.subscribers.length;
+    for (let i = 0; i < notStartedCount; i++) {
+      rows.push(
+        [<ColumnWrapper>{index + 1}</ColumnWrapper>, <ColumnWrapper>Not Started</ColumnWrapper>, <ColumnWrapper>N/A</ColumnWrapper>]
+      )
+    }
+  }
 
   const TooltipContent = () => {
     return (

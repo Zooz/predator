@@ -30,8 +30,14 @@ function quantify (data, unit, value, allowZero) {
 
   return data
 }
+const mappedStatuses = {
+  intermediate: 'In Progress',
+  in_progress: 'In Progress'
+}
+
 export const prettierStatus = (status) => {
-  return (status.charAt(0).toUpperCase() + status.slice(1)).split('_').join(' ');
+  const mappedStatus = mappedStatuses[status] || status;
+  return (mappedStatus.charAt(0).toUpperCase() + mappedStatus.slice(1)).split('_').join(' ');
 }
 export const prettySeconds = (seconds) => {
   function fix10 (number) {
