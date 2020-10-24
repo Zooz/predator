@@ -1,4 +1,7 @@
 const logger = require('../src/common/logger');
+const { WARN_MESSAGES } = require('./common/consts');
+const runnerValidator = require('./common/validateRunnerVersion');
+
 const env = {};
 const BY_PLATFORM_MANDATORY_VARS = {
     METRONOME: ['METRONOME_URL'],
@@ -46,6 +49,10 @@ env.init = function () {
     if (missingFields.length > 0) {
         logger.error(missingFields, 'Missing mandatory environment variables');
         process.exit(1);
+    }
+
+    if (process.env.RUNNER_DOCKER_IMAGE && !runnerValidator.isBestRunnerVersionToUse(process.env.RUNNER_DOCKER_IMAGE)) {
+        logger.warn(WARN_MESSAGES.BAD_RUNNER_IMAGE);
     }
 };
 

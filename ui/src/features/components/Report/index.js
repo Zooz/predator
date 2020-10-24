@@ -8,20 +8,17 @@ import { connect } from 'react-redux';
 import Box from '../Box';
 import dateFormat from 'dateformat';
 import Button from '../../../components/Button';
-import Snackbar from 'material-ui/Snackbar';
-import { BarChartPredator, LineChartPredator, AssertionsReport } from './Charts';
-import _ from 'lodash';
-import Checkbox from '../../../components/Checkbox/Checkbox';
-import Card from '../../../components/Card';
-import { faStar as emptyStar } from '@fortawesome/free-regular-svg-icons';
-import { faStar as fullStar,
-  faInfo
-} from '@fortawesome/free-solid-svg-icons';
+import Snackbar from "material-ui/Snackbar";
+import {BarChartPredator, LineChartPredator, AssertionsReport} from "./Charts";
+import _ from "lodash";
+import Checkbox from "../../../components/Checkbox/Checkbox";
+import Card from "../../../components/Card";
+import {faStar as emptyStar} from "@fortawesome/free-regular-svg-icons";
+import {faStar as fullStar,faInfo} from "@fortawesome/free-solid-svg-icons";
+import env from "../../../App/common/env";
 import InfoToolTip from '../InfoToolTip';
 import SimpleTable from '../SimpleTable';
 import Tooltip from '../../../components/Tooltip/Tooltip.export';
-import css from '../../../components/CollapsibleItem/styles/Section.scss';
-import IconButton from '../../../components/IconButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const REFRESH_DATA_INTERVAL = 30000;
@@ -49,6 +46,11 @@ class Report extends React.Component {
       const { aggregateReport, report } = this.props;
       this.props.createBenchmark(report.test_id, aggregateReport.benchMark);
       this.setState({ disabledCreateBenchmark: true })
+    };
+
+    exportCSV = () => {
+        const {report} = this.props;
+        window.open(`${env.PREDATOR_URL}/tests/${report.test_id}/reports/${report.report_id}/export/csv`,'_blank');
     };
 
     onStar = () => {
@@ -108,41 +110,43 @@ class Report extends React.Component {
                 }}
               />
 
-            </div>
-          }
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '5px',
-              marginBottom: '15px'
-            }}>
-              <div onClick={this.onStar}>
-                <InfoToolTip data={{
-                  key: 'star-info',
-                  info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
-                }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'} />
-              </div>
-              <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
-                onClick={this.createBenchmark}>Set as Benchmark</Button>
-            </div>
-            <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
-              <h3>Overall Latency</h3>
-              <LineChartPredator data={aggregateReport.latencyGraph} keys={aggregateReport.latencyGraphKeys}
-                labelY={'ms'} graphType={'latency'}
-                onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                filteredKeys={filteredKeys} />
-            </Card>
-            <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
-              <h3>Status Codes</h3>
-              <LineChartPredator data={aggregateReport.errorsCodeGraph}
-                keys={aggregateReport.errorsCodeGraphKeys}
-                graphType={'status_codes'}
-                connectNulls={false}
-                onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                filteredKeys={filteredKeys} />
-            </Card>
+                    </div>
+                }
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: '5px',
+                        marginBottom: '15px'
+                    }}>
+                        <div onClick={this.onStar}>
+                            <InfoToolTip data={{
+                                key: 'star-info',
+                                info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                            }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'}/>
+                        </div>
+                        <Button hover disabled={report.status !== 'finished'}
+                                onClick={this.exportCSV}>Export to CSV</Button>
+                        <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
+                                onClick={this.createBenchmark}>Set as Benchmark</Button>
+                    </div>
+                    <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
+                        <h3>Overall Latency</h3>
+                        <LineChartPredator data={aggregateReport.latencyGraph} keys={aggregateReport.latencyGraphKeys}
+                                           labelY={'ms'} graphType={'latency'}
+                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                           filteredKeys={filteredKeys}/>
+                    </Card>
+                    <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '15px'}}>
+                        <h3>Status Codes</h3>
+                        <LineChartPredator data={aggregateReport.errorsCodeGraph}
+                                           keys={aggregateReport.errorsCodeGraphKeys}
+                                           graphType={'status_codes'}
+                                           connectNulls={false}
+                                           onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
+                                           filteredKeys={filteredKeys}/>
+                    </Card>
 
             <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
               <h3>RPS</h3>

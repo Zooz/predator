@@ -176,7 +176,8 @@ describe('Update scheduled job', function () {
                 run_immediately: false,
                 cron_expression: '* ' + date.getHours() + ' * * *',
                 webhooks: [],
-                emails: ['b@emails.com']
+                emails: ['b@emails.com', 'c@emails.com'],
+                notes: 'note a',
             };
             const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
@@ -197,7 +198,9 @@ describe('Update scheduled job', function () {
                     duration: 30,
                     environment: 'updated env',
                     enabled: false,
-                    type: 'functional_test'
+                    type: 'functional_test',
+                    emails: ['d@emails.com'],
+                    notes: 'note b'
                 },
                 {
                     'Content-Type': 'application/json'
@@ -215,11 +218,12 @@ describe('Update scheduled job', function () {
                 test_id: testId,
                 type: 'functional_test',
                 cron_expression: updatedCronExpression,
-                emails: ['b@emails.com'],
+                emails: ['d@emails.com'],
                 arrival_count: 5,
                 duration: 30,
                 environment: 'updated env',
-                enabled: false
+                enabled: false,
+                notes: 'note b'
             });
         });
 

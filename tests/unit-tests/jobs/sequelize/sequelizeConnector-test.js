@@ -519,7 +519,9 @@ describe('Sequelize client tests', function () {
                     parallelism: 3,
                     proxy_url: 'http://proxy.com',
                     debug: '*',
-                    enabled: false
+                    enabled: false,
+                    emails: [],
+                    notes: null
                 },
                 setWebhooks: sandbox.stub()
             };
@@ -554,7 +556,8 @@ describe('Sequelize client tests', function () {
                     duration: 1700,
                     ramp_to: null,
                     webhooks: [],
-                    emails: []
+                    emails: [],
+                    notes: null
                 },
                 setWebhooks: setWebhooksStub
             };
@@ -588,7 +591,8 @@ describe('Sequelize client tests', function () {
                 debug: '*',
                 enabled: false,
                 webhooks: [],
-                emails: []
+                emails: [],
+                notes: null
             };
             const transaction = {};
             sequelizeGetStub.resolves(sequelizeJob);
@@ -601,6 +605,48 @@ describe('Sequelize client tests', function () {
 
             should(sequelizeUpdateStub.args[0][0]).eql(updatedJobRes);
 
+            should(sequelizeUpdateStub.args[0][1]).eql({ where: { id }, transaction });
+        });
+
+        it('should succeed updating emails and notes', async () => {
+            const sequelizeJob = {
+                dataValues: {
+                    type: 'load_test',
+                    test_id: testId,
+                    arrival_rate: 100,
+                    arrival_count: null,
+                    duration: 1,
+                    cron_expression: '* * * *',
+                    environment: 'test',
+                    ramp_to: null,
+                    max_virtual_users: 500,
+                    parallelism: 3,
+                    proxy_url: 'http://proxy.com',
+                    debug: '*',
+                    enabled: false,
+                    notes: null,
+                    emails: [{ id: uuid.v4(), address: 'a@email.com'}],
+                    notes: null
+                },
+                setWebhooks: setWebhooksStub,
+                setEmails: sandbox.stub()
+            };
+            const updatedJob = {
+                ...sequelizeJob.dataValues,
+                emails: [],
+                notes: 'test note'
+            };
+
+            const transaction = {};
+            sequelizeGetStub.resolves(sequelizeJob);
+            sequelizeTransactionStub.resolves(updatedJob);
+            sequelizeJob.setEmails.resolves();
+            await sequelizeConnector.init(sequelizeStub());
+
+            await sequelizeConnector.updateJob(id, updatedJob);
+            await sequelizeTransactionStub.yield(transaction);
+
+            should(sequelizeUpdateStub.args[0][0]).eql(updatedJob);
             should(sequelizeUpdateStub.args[0][1]).eql({ where: { id }, transaction });
         });
 

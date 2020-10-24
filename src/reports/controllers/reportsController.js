@@ -2,7 +2,9 @@
 'use strict';
 const aggregateReportGenerator = require('../models/aggregateReportGenerator');
 const reports = require('../models/reportsManager');
+const reportExporter = require('../models/reportExporter');
 const stats = require('../models/statsManager');
+const exportHelper = require('../helpers/exportReportHelper');
 
 module.exports.getAggregateReport = async function (req, res, next) {
     let reportInput;
@@ -70,7 +72,7 @@ module.exports.getLastReports = async (req, res, next) => {
 module.exports.postReport = async (req, res, next) => {
     let report;
     try {
-        report = await reports.postReport(req.params.test_id, req.body);
+        report = await reports.postReportDeprecated(req.params.test_id, req.body);
     } catch (err) {
         return next(err);
     }
@@ -86,4 +88,56 @@ module.exports.postStats = async (req, res, next) => {
         return next(err);
     }
     return res.status(204).json();
+};
+
+module.exports.subscribeRunnerToReport = async function(req, res, next) {
+    const {
+        params: {
+            report_id: reportId,
+            test_id: testId
+        },
+        headers: { 'x-runner-id': runnerId }
+    } = req;
+    try {
+        await reports.subscribeRunnerToReport(testId, reportId, runnerId);
+        return res.status(204).end();
+    } catch (err) {
+        return next(err);
+    }
+};
+
+module.exports.getExportedReport = async(req, res, next) => {
+    let exportedReport;
+    let reportInput;
+    try {
+        reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
+        exportedReport = await reportExporter.exportReport(reportInput, req.params.file_format);
+    } catch (err){
+        return next(err);
+    }
+    const fileName = exportHelper.getExportedReportName(reportInput, req.params.file_format);
+    res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
+    res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
+    return res.send(exportedReport);
+};
+
+module.exports.getExportedCompareReport = async(req, res, next) => {
+    let exportedCompareReport;
+    const aggregateReportArray = [];
+    try {
+        const { reportIds, testIds } = exportHelper.processCompareReportsInput(req.query);
+
+        for (const index in reportIds){
+            const result = await aggregateReportGenerator.createAggregateReport(testIds[index], reportIds[index]);
+            aggregateReportArray.push(result);
+        }
+        exportedCompareReport = await reportExporter.exportCompareReport(aggregateReportArray, req.params.file_format);
+    } catch (err) {
+        return next(err);
+    }
+
+    const fileName = exportHelper.getCompareReportName(aggregateReportArray, req.params.file_format);
+    res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
+    res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
+    res.send(exportedCompareReport);
 };

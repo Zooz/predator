@@ -71,7 +71,8 @@
     "sqlite3": "^4.2.0",
     "tedious": "^8.3.0",
     "umzug": "^2.3.0",
-    "uuid": "^3.4.0"
+    "uuid": "^3.4.0",
+    "semver": "^7.3.2"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.0.2",

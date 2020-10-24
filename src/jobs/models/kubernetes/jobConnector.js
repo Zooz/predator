@@ -40,8 +40,8 @@ module.exports.runJob = async (kubernetesJobConfig) => {
     };
     return genericJobResponse;
 };
-module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) => {
-    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
+module.exports.stopRun = async (jobPlatformName) => {
+    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, jobPlatformName);
 
     const options = {
         url,
@@ -52,8 +52,8 @@ module.exports.stopRun = async (jobPlatformName, platformSpecificInternalRunId) 
     await requestSender.send(options);
 };
 
-module.exports.getLogs = async (jobPlatformName, platformSpecificInternalRunId, predatorRunnerPrefix) => {
-    const jobControllerUid = await getJobControllerUid(jobPlatformName, platformSpecificInternalRunId);
+module.exports.getLogs = async (jobPlatformName, predatorRunnerPrefix) => {
+    const jobControllerUid = await getJobControllerUid(jobPlatformName);
 
     const podsNames = await getPodsByLabel(jobControllerUid);
 
@@ -98,8 +98,8 @@ async function getAllPredatorRunnerJobs(jobPlatformName) {
     return jobs;
 }
 
-async function getJobControllerUid(jobPlatformName, platformSpecificInternalRunId) {
-    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s', kubernetesUrl, kubernetesNamespace, jobPlatformName + '-' + platformSpecificInternalRunId);
+async function getJobControllerUid(jobPlatformName) {
+    const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s', kubernetesUrl, kubernetesNamespace, jobPlatformName);
     const options = {
         url,
         method: 'GET',
@@ -112,7 +112,7 @@ async function getJobControllerUid(jobPlatformName, platformSpecificInternalRunI
     return controllerUid;
 }
 
-async function getLogsByPodsNames(podsNames, predatorRunnerPrefix) {
+async function getLogsByPodsNames(podsNames) {
     const logs = [];
     podsNames.forEach((podName) => {
         const url = util.format('%s/api/v1/namespaces/%s/pods/%s/log?container=%s', kubernetesUrl, kubernetesNamespace, podName, 'predator-runner');
