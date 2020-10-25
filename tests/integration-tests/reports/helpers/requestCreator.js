@@ -18,7 +18,6 @@ module.exports = {
     getAggregatedReport,
     getExportedReport,
     getExportedCompareReport,
-    getAggregatedReport,
     subscribeRunnerToReport
 };
 
