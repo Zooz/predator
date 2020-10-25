@@ -1543,13 +1543,13 @@ paths:
       summary: Retrieve webhooks
       description: Retrieve all webhooks.
       parameters:
-        - in: query
-          name: context_id
+        - in: header
+          name: x-context-id
           description: The id of the user/organization context
           required: false
           schema:
             type: string
-            example: some-string
+            example: team-mick
       responses:
         '200':
           description: Success
@@ -1584,7 +1584,7 @@ paths:
           required: false
           schema:
             type: string
-            example: some-string
+            example: team-mick
       responses:
         '201':
           description: Success
