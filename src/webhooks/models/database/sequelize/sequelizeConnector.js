@@ -32,9 +32,14 @@ async function init(sequelizeClient) {
     await initSchemas();
 }
 
-async function getAllWebhooks() {
+async function getAllWebhooks(contextId) {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
-    const webhooks = await webhooksModel.findAll({ include: ['events'], order: [['updated_at', 'DESC']] });
+    const options = {
+        include: ['events'],
+        order: [['updated_at', 'DESC']],
+        where: contextId !== null ? { context_id: contextId } : undefined
+    };
+    const webhooks = await webhooksModel.findAll(options);
     return webhooks.map(parseWebhook);
 }
 
@@ -43,13 +48,17 @@ async function getWebhook(webhookId) {
     return parseWebhook(webhook);
 }
 
-async function getAllGlobalWebhooks() {
+async function getAllGlobalWebhooks(contextId) {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
-    const webhooks = await webhooksModel.findAll({ include: ['events'], where: { global: true } });
+    const options = {
+        include: ['events'],
+        where: contextId !== null ? { global: true, context_id: contextId } : { global: true }
+    };
+    const webhooks = await webhooksModel.findAll(options);
     return webhooks.map(parseWebhook);
 }
 
-async function createWebhook(webhook) {
+async function createWebhook(webhook, contextId) {
     const id = uuid.v4();
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooksEvents = client.model(WEBHOOKS_EVENTS_TABLE_NAME);
@@ -57,6 +66,7 @@ async function createWebhook(webhook) {
     const eventsIds = events.map(({ id }) => id);
     const webhookToInsert = {
         id,
+        context_id: contextId,
         name: webhook.name,
         url: webhook.url,
         format_type: webhook.format_type,
@@ -113,6 +123,9 @@ async function initSchemas() {
         },
         format_type: {
             type: Sequelize.DataTypes.STRING
+        },
+        context_id: {
+            type: Sequelize.DataTypes.UUID
         },
         created_at: {
             type: Sequelize.DataTypes.DATE

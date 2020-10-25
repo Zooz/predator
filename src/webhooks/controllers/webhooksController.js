@@ -1,10 +1,12 @@
 'use strict';
 const webhookManager = require('../models/webhookManager');
+const { getContextIdFromHeaders, getContextIdFromQuery } = require('../../common/getContextIdFromRequest');
 
 module.exports.getAllWebhooks = async function (req, res, next) {
     let webhooks;
+    const contextId = getContextIdFromQuery(req.query);
     try {
-        webhooks = await webhookManager.getAllWebhooks();
+        webhooks = await webhookManager.getAllWebhooks(contextId);
         return res.status(200).json(webhooks);
     } catch (err) {
         return next(err);
@@ -24,8 +26,9 @@ module.exports.getWebhook = async function (req, res, next) {
 
 module.exports.createWebhook = async function (req, res, next) {
     let webhook;
+    const contextId = getContextIdFromHeaders(req.headers);
     try {
-        webhook = await webhookManager.createWebhook(req.body);
+        webhook = await webhookManager.createWebhook(req.body, contextId);
         return res.status(201).json(webhook);
     } catch (err) {
         return next(err);

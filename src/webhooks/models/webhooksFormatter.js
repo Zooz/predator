@@ -49,7 +49,7 @@ function slackWebhookFormat(message, options) {
 function teamsWebhookFormat(message) {
     return {
         themeColor: WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
-        text: message.replace(/\n/g, "   \n")
+        text: message.replace(/\n/g, '   \n')
     };
 }
 
@@ -108,7 +108,7 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
         case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            let isSlack = true;
+            const isSlack = true;
             message = getThresholdMessage(event, { isSlack, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
             break;
         }

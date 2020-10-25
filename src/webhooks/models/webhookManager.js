@@ -11,8 +11,8 @@ const webhookDefaultValues = {
     global: false
 };
 
-async function getAllWebhooks() {
-    const getAllWebhooks = await databaseConnector.getAllWebhooks();
+async function getAllWebhooks(contextId) {
+    const getAllWebhooks = await databaseConnector.getAllWebhooks(contextId);
     return getAllWebhooks;
 };
 
@@ -24,12 +24,12 @@ async function getWebhook(webhookId) {
     return webhook;
 };
 
-async function createWebhook(webhookInfo) {
+async function createWebhook(webhookInfo, contextId) {
     const webhook = {
         ...webhookDefaultValues,
         ...webhookInfo
     };
-    return databaseConnector.createWebhook(webhook);
+    return databaseConnector.createWebhook(webhook, contextId);
 };
 
 async function deleteWebhook(webhookId) {
