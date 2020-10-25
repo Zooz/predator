@@ -51,6 +51,7 @@
     "express-ajv-swagger-validation": "^1.1.1",
     "express-easy-zip": "^1.1.4",
     "express-fileupload": "^1.1.10",
+    "express-http-context": "^1.2.4",
     "express-requests-logger": "^3.0.2",
     "fs-extra": "^5.0.0",
     "graceful-shutdown-express": "^2.0.1",
@@ -66,13 +67,13 @@
     "replace-in-file": "^6.1.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
+    "semver": "^7.3.2",
     "sequelize": "^5.22.3",
     "slack-emojis": "^1.1.1",
     "sqlite3": "^4.2.0",
     "tedious": "^8.3.0",
     "umzug": "^2.3.0",
-    "uuid": "^3.4.0",
-    "semver": "^7.3.2"
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.0.2",
