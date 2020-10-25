@@ -17,44 +17,44 @@ module.exports = {
     getTestBenchmark
 };
 
-function insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFileId) {
-    return databaseConnector.insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFileId);
+function insertTest(testInfo, testJson, id, revisionId, processorFileId, contextId) {
+    return databaseConnector.insertTest(testInfo, testJson, id, revisionId, processorFileId, contextId);
 }
 
-async function getTest(id) {
-    return databaseConnector.getTest(id);
+async function getTest(id, contextId) {
+    return databaseConnector.getTest(id, contextId);
 }
-async function getTests() {
-    return databaseConnector.getTests();
-}
-
-async function deleteTest(testId) {
-    return databaseConnector.deleteTest(testId);
+async function getTests(contextId) {
+    return databaseConnector.getTests(contextId);
 }
 
-async function insertTestBenchmark(testId, benchmarkData) {
-    return databaseConnector.insertTestBenchmark(testId, benchmarkData);
+async function deleteTest(testId, contextId) {
+    return databaseConnector.deleteTest(testId, contextId);
 }
 
-async function getTestBenchmark(id) {
-    return databaseConnector.getTestBenchmark(id);
+async function insertTestBenchmark(testId, benchmarkData, contextId) {
+    return databaseConnector.insertTestBenchmark(testId, benchmarkData, contextId);
 }
 
-async function getAllTestRevisions(testId) {
-    return databaseConnector.getAllTestRevisions(testId);
+async function getTestBenchmark(id, contextId) {
+    return databaseConnector.getTestBenchmark(id, contextId);
 }
-async function insertDslDefinition(dslName, definitionName, data) {
-    return databaseConnector.insertDslDefinition(dslName, definitionName, data);
+
+async function getAllTestRevisions(testId, contextId) {
+    return databaseConnector.getAllTestRevisions(testId, contextId);
 }
-async function updateDslDefinition(dslName, definitionName, data) {
-    return databaseConnector.updateDslDefinition(dslName, definitionName, data);
+async function insertDslDefinition(dslName, definitionName, data, contextId) {
+    return databaseConnector.insertDslDefinition(dslName, definitionName, data, contextId);
 }
-async function deleteDefinition(dslName, definitionName) {
-    return databaseConnector.deleteDefinition(dslName, definitionName);
+async function updateDslDefinition(dslName, definitionName, data, contextId) {
+    return databaseConnector.updateDslDefinition(dslName, definitionName, data, contextId);
 }
-async function getDslDefinition(dslName, definitionName) {
-    return databaseConnector.getDslDefinition(dslName, definitionName);
+async function deleteDefinition(dslName, definitionName, contextId) {
+    return databaseConnector.deleteDefinition(dslName, definitionName, contextId);
 }
-async function getDslDefinitions(dslName) {
-    return databaseConnector.getDslDefinitions(dslName);
+async function getDslDefinition(dslName, definitionName, contextId) {
+    return databaseConnector.getDslDefinition(dslName, definitionName, contextId);
+}
+async function getDslDefinitions(dslName, contextId) {
+    return databaseConnector.getDslDefinitions(dslName, contextId);
 }

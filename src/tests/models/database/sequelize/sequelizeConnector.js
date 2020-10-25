@@ -1,11 +1,8 @@
 
 const Sequelize = require('sequelize'),
-    uuid = require('uuid'),
-    httpContext = require('express-http-context');
-const sanitizeHelper = require('../../../helpers/sanitizeHelper'),
-    {
-        CONTEXT_ID
-    } = require('../../../../common/consts');
+    uuid = require('uuid');
+
+const sanitizeHelper = require('../../../helpers/sanitizeHelper');
 
 module.exports = {
     init,
@@ -111,9 +108,7 @@ async function initSchemas() {
     await benchmarkDefinition.sync();
 }
 
-async function insertTestBenchmark(testId, benchmarkData) {
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function insertTestBenchmark(testId, benchmarkData, contextId) {
     const benchmark = client.model('benchmark');
     const params = {
         test_id: testId,
@@ -128,12 +123,10 @@ async function insertTestBenchmark(testId, benchmarkData) {
     return result;
 }
 
-async function getTestBenchmark(test_id) {
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function getTestBenchmark(testId, contextId) {
     const benchmark = client.model('benchmark');
     const options = {
-        where: { test_id: test_id }
+        where: { test_id: testId }
     };
 
     if (contextId) {
@@ -144,12 +137,10 @@ async function getTestBenchmark(test_id) {
     return benchmarkRes ? benchmarkRes.data : undefined;
 }
 
-async function insertTest(testInfo, testJson, id, revisionId, processorFileId){
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function insertTest(testInfo, testJson, testId, revisionId, processorFileId, contextId){
     const test = client.model('test');
     const params = {
-        test_id: id,
+        test_id: testId,
         name: testInfo.name,
         type: testInfo.type,
         file_id: processorFileId,
@@ -170,12 +161,11 @@ async function insertTest(testInfo, testJson, id, revisionId, processorFileId){
     return result;
 }
 
-async function getTest(id) {
-    const contextId = httpContext.get(CONTEXT_ID);
+async function getTest(testId, contextId) {
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
-        where: { test_id: id },
+        where: { test_id: testId },
         order: [['updated_at', 'DESC'], ['id', 'DESC']]
     };
 
@@ -188,9 +178,7 @@ async function getTest(id) {
     return allTests[0];
 }
 
-async function getTests() {
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function getTests(contextId) {
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
@@ -205,13 +193,11 @@ async function getTests() {
     allTests = sanitizeTestResult(allTests);
     return allTests;
 }
-async function getAllTestRevisions(id){
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function getAllTestRevisions(testId, contextId){
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
-        where: { test_id: id },
+        where: { test_id: testId },
         order: [['updated_at', 'ASC'], ['id', 'ASC']]
     };
 
@@ -224,9 +210,7 @@ async function getAllTestRevisions(id){
     return allTests;
 }
 
-async function deleteTest(testId){
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function deleteTest(testId, contextId){
     const test = client.model('test');
     const options = {
         where: { test_id: testId }
@@ -240,9 +224,7 @@ async function deleteTest(testId){
     return result;
 }
 
-async function insertDslDefinition(dslName, definitionName, data){
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function insertDslDefinition(dslName, definitionName, data, contextId){
     const dslDefinition = client.model('dsl_definition');
     const params = {
         id: uuid.v4(),
@@ -266,9 +248,7 @@ async function insertDslDefinition(dslName, definitionName, data){
     }
 }
 
-async function getDslDefinition(dslName, definitionName){
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function getDslDefinition(dslName, definitionName, contextId){
     const dslDefinition = client.model('dsl_definition');
     const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
@@ -284,9 +264,7 @@ async function getDslDefinition(dslName, definitionName){
     return result[0];
 }
 
-async function getDslDefinitions(dslName){
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function getDslDefinitions(dslName, contextId){
     const dslDefinition = client.model('dsl_definition');
     const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
@@ -302,9 +280,7 @@ async function getDslDefinitions(dslName){
     return result;
 }
 
-async function updateDslDefinition(dslName, definitionName, data){
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function updateDslDefinition(dslName, definitionName, data, contextId){
     const dslDefinition = client.model('dsl_definition');
     const params = {
         dsl_name: dslName,
@@ -326,9 +302,7 @@ async function updateDslDefinition(dslName, definitionName, data){
     const result = await dslDefinition.update(params, options);
     return result[0] === 1;
 }
-async function deleteDefinition(dslName, definitionName){
-    const contextId = httpContext.get(CONTEXT_ID);
-
+async function deleteDefinition(dslName, definitionName, contextId){
     const options = {
         where: {
             dsl_name: dslName,

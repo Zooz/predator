@@ -14,6 +14,7 @@ const WEBHOOK_SLACK_DEFAULT_REPORTER_NAME = 'reporter';
 const WEBHOOK_TEAMS_DEFAULT_THEME_COLOR = '957c58';
 
 module.exports = {
+    CONTEXT_ID: 'context_id',
     TEST_TYPE_BASIC: 'basic',
     TEST_TYPE_DSL: 'dsl',
     JOB_TYPE_LOAD_TEST: 'load_test',

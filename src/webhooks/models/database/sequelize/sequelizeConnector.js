@@ -1,7 +1,9 @@
-const Sequelize = require('sequelize');
-const uuid = require('uuid');
+const Sequelize = require('sequelize'),
+    uuid = require('uuid'),
+    httpContext = require('express-http-context');
 
-const { WEBHOOKS_EVENTS_TABLE_NAME, WEBHOOKS_TABLE_NAME, WEBHOOKS_EVENTS_MAPPING_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
+
+const { CONTEXT_ID, WEBHOOKS_EVENTS_TABLE_NAME, WEBHOOKS_TABLE_NAME, WEBHOOKS_EVENTS_MAPPING_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
 
 let client;
 
@@ -20,9 +22,11 @@ function parseWebhook(webhookRecord) {
         ...webhookRecord.dataValues,
         events: webhookRecord.events && webhookRecord.events.map(eventRecord => eventRecord.dataValues.name)
     };
-};
+}
 
 async function _getWebhook(webhookId) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     return webhooksModel.findByPk(webhookId, { include: ['events'] });
 }
@@ -33,6 +37,8 @@ async function init(sequelizeClient) {
 }
 
 async function getAllWebhooks() {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooks = await webhooksModel.findAll({ include: ['events'], order: [['updated_at', 'DESC']] });
     return webhooks.map(parseWebhook);
@@ -44,12 +50,16 @@ async function getWebhook(webhookId) {
 }
 
 async function getAllGlobalWebhooks() {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooks = await webhooksModel.findAll({ include: ['events'], where: { global: true } });
     return webhooks.map(parseWebhook);
 }
 
 async function createWebhook(webhook) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const id = uuid.v4();
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooksEvents = client.model(WEBHOOKS_EVENTS_TABLE_NAME);
@@ -62,6 +72,11 @@ async function createWebhook(webhook) {
         format_type: webhook.format_type,
         global: webhook.global
     };
+
+    if (contextId) {
+        webhookToInsert.context_id = contextId;
+    }
+
     await client.transaction(async function(transaction) {
         const createdWebhook = await webhooksModel.create(webhookToInsert, { transaction });
         await createdWebhook.setEvents(eventsIds, { transaction });
@@ -73,12 +88,20 @@ async function createWebhook(webhook) {
 }
 
 async function deleteWebhook(webhookId) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
-    return webhooksModel.destroy({
+    const options = {
         where: {
             id: webhookId
         }
-    });
+    }
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    return webhooksModel.destroy(options);
 }
 
 async function updateWebhook(webhookId, updatedWebhook) {
@@ -119,6 +142,9 @@ async function initSchemas() {
         },
         updated_at: {
             type: Sequelize.DataTypes.DATE
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
         }
     });
     const webhooksEvents = client.define(WEBHOOKS_EVENTS_TABLE_NAME, {
