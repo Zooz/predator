@@ -261,7 +261,7 @@ const SummeryTable = ({ report = {} }) => {
     textOverflow: 'ellipsis' }}>{children}</div>
 
   const rows = report.subscribers.map((runner, index) => {
-    const rps = runner.phase_status === 'intermediate' ? runner.last_stats.rps.mean : 'N/A';
+    const rps = ['first_intermediate', 'intermediate'].includes(runner.phase_status) ? runner.last_stats.rps.mean : 'N/A';
     return [
       <ColumnWrapper>{index + 1}</ColumnWrapper>, <ColumnWrapper>{prettierStatus(runner.phase_status)}</ColumnWrapper>, <ColumnWrapper>{rps}</ColumnWrapper>
     ]

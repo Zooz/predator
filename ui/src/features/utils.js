@@ -32,7 +32,8 @@ function quantify (data, unit, value, allowZero) {
 }
 const mappedStatuses = {
   intermediate: 'In Progress',
-  in_progress: 'In Progress'
+  in_progress: 'In Progress',
+  first_intermediate: 'In Progress'
 }
 
 export const prettierStatus = (status) => {
