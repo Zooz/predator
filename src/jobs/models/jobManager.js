@@ -178,14 +178,13 @@ module.exports.updateJob = async (jobId, jobConfig) => {
 module.exports.getJobBasedOnTestId = async (testId) => {
     try {
         const jobs = await databaseConnector.getJobBasedOnTestId(testId);
-        logger.info('Got job from database successfully');
         const jobsResponse = jobs.map((job) => {
             return createResponse(job.id, job);
         });
         return jobsResponse
     } catch (error) {
         logger.error(error, 'Error occurred trying to get job based on test id');
-        return Promise.reject(error);
+        throw error;
     }
 };
 

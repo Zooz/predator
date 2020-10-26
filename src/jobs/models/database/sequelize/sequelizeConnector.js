@@ -179,12 +179,10 @@ async function updateJob(jobId, jobInfo) {
 async function getJobBasedOnTestId(testId){
     const job = client.model('job');
     console.log('testid = '+testId)
-    let options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+    const options = {
+        attributes: { exclude: ['updated_at', 'created_at'] },
+        where : { test_id: testId }
     };
-    if (testId) {
-        options.where = { test_id: testId };
-    }
     
     const allJobsSql = await job.findAll(options);
     const allJobs = allJobsSql.map(sqlJob => sqlJob.dataValues);

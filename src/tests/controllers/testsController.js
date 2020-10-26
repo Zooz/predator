@@ -55,8 +55,8 @@ async function deleteTest(req, res, next) {
             await manager.deleteTest(req.params.test_id, req.body);
             return res.status(200).json();
         } else {
-            let error = 'Please delete all scheduled jobs for the test before deleting the test';
-            return res.status(500).json({message:error});
+            const error = 'Please delete all scheduled jobs for the test before deleting the test';
+            return res.status(409).json({message:error});
         }
         
     } catch (err){
