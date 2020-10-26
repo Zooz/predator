@@ -55,7 +55,7 @@ async function insertJob(jobId, jobInfo) {
     if (params.emails) {
         include.push({ association: job.email });
     }
-    await client.transaction(async function(transaction) {
+    return client.transaction(async function(transaction) {
         const createdJob = await job.create(params, { include, transaction });
         await createdJob.setWebhooks(jobInfo.webhooks || [], { transaction });
         return createdJob;

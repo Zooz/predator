@@ -72,7 +72,7 @@ module.exports.getLastReports = async (req, res, next) => {
 module.exports.postReport = async (req, res, next) => {
     let report;
     try {
-        report = await reports.postReport(req.params.test_id, req.body);
+        report = await reports.postReportDeprecated(req.params.test_id, req.body);
     } catch (err) {
         return next(err);
     }
@@ -88,6 +88,22 @@ module.exports.postStats = async (req, res, next) => {
         return next(err);
     }
     return res.status(204).json();
+};
+
+module.exports.subscribeRunnerToReport = async function(req, res, next) {
+    const {
+        params: {
+            report_id: reportId,
+            test_id: testId
+        },
+        headers: { 'x-runner-id': runnerId }
+    } = req;
+    try {
+        await reports.subscribeRunnerToReport(testId, reportId, runnerId);
+        return res.status(204).end();
+    } catch (err) {
+        return next(err);
+    }
 };
 
 module.exports.getExportedReport = async(req, res, next) => {

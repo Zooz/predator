@@ -3,6 +3,7 @@ process.env.JOB_PLATFORM = 'KUBERNETES';
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
+const uuid = require('uuid');
 
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
 const testManager = require('../../../../src/tests/models/manager');
@@ -13,6 +14,7 @@ const logger = require('../../../../src/common/logger');
 const notifier = require('../../../../src/reports/models/notifier');
 const constants = require('../../../../src/reports/utils/constants');
 const configHandler = require('../../../../src/configManager/models/configHandler');
+const basicTest = require('../../../testExamples/Basic_test.json');
 
 let manager;
 let statsManager;
@@ -90,6 +92,7 @@ describe('Reports manager tests', function () {
     let aggregateReportManagerStub;
     let benchmarkCalculatorStub;
     let updateReportBenchmarkStub;
+    let testManagerGetTestStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -108,6 +111,7 @@ describe('Reports manager tests', function () {
         updateReportBenchmarkStub = sandbox.stub(databaseConnector, 'updateReportBenchmark');
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
         databaseDeleteReportStub = sandbox.stub(databaseConnector, 'deleteReport');
+        testManagerGetTestStub = sandbox.stub(testManager, 'getTest');
         sandbox.stub(logger, 'error');
         sandbox.stub(logger, 'info');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
@@ -422,20 +426,94 @@ describe('Reports manager tests', function () {
 
     describe('Create new report', function () {
         it('Successfully insert report', async () => {
+            const reportId = uuid.v4();
+            const reportFromDBConnector = {
+                dataValues: {
+                    report_id: reportId,
+                    job_id: uuid.v4(),
+                    test_id: REPORT.test_id,
+                    revision_id: REPORT.revision_id,
+                    test_type: 'load_test',
+                    test_name: 'avi',
+                    test_description: 'avi requesting requests',
+                    last_updated_at: new Date(),
+                    start_time: new Date(),
+                    notes: '',
+                    phase: 0,
+                    test_configuration: '{}',
+                    runners_subscribed: [],
+                    is_favorite: false
+                }
+            };
+            const test = {
+                id: REPORT.test_id,
+                type: reportFromDBConnector.test_type,
+                name: reportFromDBConnector.test_name,
+                revision_id: reportFromDBConnector.revision_id,
+                description: reportFromDBConnector.test_description
+            };
+            const job = {
+                id: reportFromDBConnector.job_id,
+                type: reportFromDBConnector.test_type,
+                duration: 1,
+                parallelism: 1,
+                max_virtual_users: 100,
+                environment: 'test',
+                arrival_rate: 60,
+                ramp_to: 100,
+                job: reportFromDBConnector.notes
+
+            };
             getJobStub.resolves(JOB);
-            databasePostReportStub.resolves();
+            testManagerGetTestStub.resolves(basicTest);
+            databasePostReportStub.resolves(reportFromDBConnector);
             databaseSubscribeRunnerStub.resolves();
-            const reportBody = await manager.postReport('test_id', REPORT);
+            const reportBody = await manager.postReport(reportId, test, REPORT, job, Date.now());
             should.exist(reportBody);
+            reportBody.should.deepEqual(reportFromDBConnector.dataValues);
         });
 
-        it('Fail to retrieve job', async () => {
-            const expectedError = new Error('Fail to retrieve job');
-            getJobStub.rejects(expectedError);
-            databasePostReportStub.resolves(REPORT);
-            databaseSubscribeRunnerStub.resolves();
+        it('Fail to create job', async () => {
+            const reportId = uuid.v4();
+            const reportFromDBConnector = {
+                report_id: uuid.v4(),
+                job_id: uuid.v4(),
+                test_id: REPORT.test_id,
+                revision_id: REPORT.revision_id,
+                test_type: 'load_test',
+                test_name: 'avi',
+                test_description: 'avi requesting requests',
+                last_updated_at: new Date(),
+                start_time: new Date(),
+                notes: '',
+                phase: 0,
+                test_configuration: '{}',
+                runners_subscribed: [],
+                is_favorite: false
+            };
+            const test = {
+                id: REPORT.test_id,
+                type: reportFromDBConnector.test_type,
+                name: reportFromDBConnector.test_name,
+                revision_id: reportFromDBConnector.revision_id,
+                description: reportFromDBConnector.test_description
+            };
+            const job = {
+                id: reportFromDBConnector.job_id,
+                type: reportFromDBConnector.test_type,
+                duration: 1,
+                parallelism: 1,
+                max_virtual_users: 100,
+                environment: 'test',
+                arrival_rate: 60,
+                ramp_to: 100,
+                job: reportFromDBConnector.notes
+
+            };
+            const expectedError = new Error('Fail to create job');
+            databasePostReportStub.rejects(expectedError);
             try {
-                const reportBody = await manager.postReport('test_id', REPORT);
+                const reportBody = await manager.postReport(reportId, test, REPORT, job, Date.now());
                 should.not.exist(reportBody);
             } catch (error) {
                 error.should.eql(expectedError);

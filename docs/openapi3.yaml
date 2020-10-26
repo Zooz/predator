@@ -650,7 +650,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  '/v1/jobs/{job_id}/runs/{run_id}/stop':
+  '/v1/jobs/{job_id}/runs/{report_id}/stop':
     post:
       operationId: terminate-a-job
       tags:
@@ -666,7 +666,7 @@ paths:
             type: string
         - in: path
           description: The id of a specific run in metronome which is also the report id.
-          name: run_id
+          name: report_id
           required: true
           schema:
             type: string
@@ -686,7 +686,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
 
-  /v1/jobs/{job_id}/runs/{run_id}/logs:
+  /v1/jobs/{job_id}/runs/{report_id}/logs:
     get:
       tags:
         - Jobs
@@ -700,7 +700,7 @@ paths:
             type: string
         - in: path
           description: The id of a specific run in metronome which is also the report id.
-          name: run_id
+          name: report_id
           required: true
           schema:
             type: string
@@ -791,6 +791,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
     post:
+      deprecated: true
       operationId: create-a-report
       tags:
         - Reports
@@ -830,6 +831,58 @@ paths:
               $ref: '#/components/schemas/post_report'
         description: report data
         required: true
+  '/v1/tests/{test_id}/reports/{report_id}/subscribe':
+      post:
+        operationId: subscribe-runner-to-report
+        tags:
+          - Reports
+        summary: Subscribe runner to a report
+        description: Subscribe a runner to a specific report.
+        parameters:
+          - in: header
+            name: x-runner-id
+            description: id of the predator-runner
+            required: true
+            schema:
+              type: string
+              format: uuid
+              example: afbb6b43-fe52-48f2-84f4-1eebdbb2d5de
+          - in: path
+            name: test_id
+            required: true
+            description: The id of the test for which to retrieve the report.
+            schema:
+              type: string
+              example: 81a27853-0db5-4e57-ad63-4b637528398a
+          - in: path
+            name: report_id
+            description: The id of the report to retrieve.
+            required: true
+            schema:
+              type: string
+              example: '1601759162814'
+        responses:
+          '204':
+            description: Success
+
+          '400':
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}':
     get:
       operationId: retrieve-a-report
@@ -938,6 +991,7 @@ paths:
           description: The id of the test for which to delete the report.
           schema:
             type: string
+            format: uuid
             example: 81a27853-0db5-4e57-ad63-4b637528398a
         - in: path
           name: report_id
@@ -948,12 +1002,6 @@ paths:
       responses:
         '204':
           description: Success
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:
@@ -2291,7 +2339,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/job_response'
         - properties:
-            run_id:
+            report_id:
               type: string
               description: The run id. Only shown if the job is ran immediately.
     processor:
@@ -2357,7 +2405,7 @@ components:
       properties:
         report_id:
           type: string
-          description: The id of the report/same as run_id
+          description: The id of the report
         test_id:
           type: string
           description: The id of the test we would like to schedule.
@@ -2391,7 +2439,7 @@ components:
       properties:
         report_id:
           type: string
-          description: The id of the report/same as run_id
+          description: The id of the report
     stats:
       required:
         - stats_time
@@ -2563,7 +2611,7 @@ components:
               type: string
               description: Url of push gateway.
             buckets_sizes:
-              type: string
+              type: array
               description: Bucket sizes use to configure prometheus.
             labels:
               description: Labels which will be passed to prometheus push gateway.
