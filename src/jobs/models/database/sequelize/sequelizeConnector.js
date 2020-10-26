@@ -15,7 +15,8 @@ module.exports = {
     getJobs,
     getJob,
     deleteJob,
-    updateJob
+    updateJob,
+    getJobBasedOnTestId
 };
 
 async function init(sequelizeClient) {
@@ -173,6 +174,22 @@ async function updateJob(jobId, jobInfo) {
         return job.update(mergedParams, { ...options, transaction });
     });
     return updatedJob;
+}
+
+async function getJobBasedOnTestId(testId){
+    const job = client.model('job');
+    console.log('testid = '+testId)
+    let options = {
+        attributes: { exclude: ['updated_at', 'created_at'] }
+    };
+    if (testId) {
+        options.where = { test_id: testId };
+    }
+    
+    const allJobsSql = await job.findAll(options);
+    const allJobs = allJobsSql.map(sqlJob => sqlJob.dataValues);
+
+    return allJobs
 }
 
 async function deleteJob(jobId) {

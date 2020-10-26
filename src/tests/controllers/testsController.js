@@ -1,6 +1,7 @@
 'use strict';
 
 const manager = require('../models/manager');
+const jobManager = require('../../jobs/models/jobManager')
 
 module.exports = {
     upsertTest,
@@ -49,8 +50,15 @@ async function getTest(req, res, next) {
 
 async function deleteTest(req, res, next) {
     try {
-        await manager.deleteTest(req.params.test_id, req.body);
-        return res.status(200).json();
+        const testsJobs = await jobManager.getJobBasedOnTestId(req.params.test_id);
+        if (testsJobs.length === 0) {
+            await manager.deleteTest(req.params.test_id, req.body);
+            return res.status(200).json();
+        } else {
+            let error = 'Please delete all scheduled jobs for the test before deleting the test';
+            return res.status(500).json({message:error});
+        }
+        
     } catch (err){
         return next(err);
     }
