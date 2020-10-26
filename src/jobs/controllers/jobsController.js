@@ -53,7 +53,7 @@ module.exports.deleteJob = function (req, res, next) {
 };
 
 module.exports.stopRun = function (req, res, next) {
-    return jobManager.stopRun(req.params.job_id, req.params.run_id)
+    return jobManager.stopRun(req.params.job_id, req.params.report_id)
         .then(function () {
             return res.status(204).json();
         })
@@ -63,7 +63,7 @@ module.exports.stopRun = function (req, res, next) {
 };
 
 module.exports.getLogs = function (req, res, next) {
-    return jobManager.getLogs(req.params.job_id, req.params.run_id)
+    return jobManager.getLogs(req.params.job_id, req.params.report_id)
         .then(function (result) {
             return res.zip(result);
         }).catch(function (err) {

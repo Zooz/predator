@@ -34,7 +34,7 @@ const updateBodyWithTypes = {
     },
     prometheus_metrics: {
         push_gateway_url: 'string_value',
-        buckets_sizes: 'string_value',
+        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
         labels: { key1: 'value1', key2: 'value2' }
     },
     smtp_server: {
@@ -56,48 +56,47 @@ const updateBodyWithTypes = {
     }
 };
 
-const requestBody =
-    {
-        interval_cleanup_finished_containers_ms: 0,
-        allow_insecure_tls: false,
-        grafana_url: 'string_value_grafana_url',
-        internal_address: 'string_value_internal_address',
-        runner_docker_image: 'string_value_docker_name',
-        job_platform: 'string_value_job_platform',
-        delay_runner_ms: 0,
-        runner_cpu: 0,
-        runner_memory: 256,
-        metrics_plugin_name: 'prometheus',
-        default_email_address: 'string_value_default_email_address',
-        influx_metrics: {
-            host: 'string_value_influx_metrics',
-            username: 'string_value_username',
-            password: 'string_value_password',
-            database: 'string_value_database'
-        },
-        prometheus_metrics: {
-            push_gateway_url: 'string_value_push_gateway_url',
-            buckets_sizes: 'string_value_buckets_sizes',
-            labels: { key1: 'value1', key2: 'value2' }
-        },
-        smtp_server: {
-            from: 'test@mail.com',
-            host: 'string_value_smtp_server',
-            port: 2,
-            username: 'string_value_username',
-            password: 'string_value',
-            timeout: 2
-        },
-        minimum_wait_for_delayed_report_status_update_in_ms: 30000,
-        benchmark_threshold: 20,
-        benchmark_weights: {
-            percentile_ninety_five: { percentage: 20 },
-            percentile_fifty: { percentage: 30 },
-            server_errors_ratio: { percentage: 20 },
-            client_errors_ratio: { percentage: 20 },
-            rps: { percentage: 10 }
-        }
-    };
+const requestBody = {
+    interval_cleanup_finished_containers_ms: 0,
+    allow_insecure_tls: false,
+    grafana_url: 'string_value_grafana_url',
+    internal_address: 'string_value_internal_address',
+    runner_docker_image: 'string_value_docker_name:1.0.0',
+    job_platform: 'string_value_job_platform',
+    delay_runner_ms: 0,
+    runner_cpu: 0,
+    runner_memory: 256,
+    metrics_plugin_name: 'prometheus',
+    default_email_address: 'string_value_default_email_address',
+    influx_metrics: {
+        host: 'string_value_influx_metrics',
+        username: 'string_value_username',
+        password: 'string_value_password',
+        database: 'string_value_database'
+    },
+    prometheus_metrics: {
+        push_gateway_url: 'string_value_push_gateway_url',
+        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
+        labels: { key1: 'value1', key2: 'value2' }
+    },
+    smtp_server: {
+        from: 'test@mail.com',
+        host: 'string_value_smtp_server',
+        port: 2,
+        username: 'string_value_username',
+        password: 'string_value',
+        timeout: 2
+    },
+    minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+    benchmark_threshold: 20,
+    benchmark_weights: {
+        percentile_ninety_five: { percentage: 20 },
+        percentile_fifty: { percentage: 30 },
+        server_errors_ratio: { percentage: 20 },
+        client_errors_ratio: { percentage: 20 },
+        rps: { percentage: 10 }
+    }
+};
 const requestBodyNotValidEnum = { metrics_plugin_name: 'not enum' };
 const requestBodyNotValidType = { runner_cpu: 'not_int' };
 const requestBodyNotValidRequire = {
@@ -202,20 +201,50 @@ describe('update and get config', () => {
     });
 
     describe('Update config validation', () => {
+        describe('prometheus_metrics', () => {
+            it('should return input validation error if bucket_size is not an array', async () => {
+                const requestWithInvalidBucketSizeType = {
+                    prometheus_metrics: {
+                        push_gateway_url: 'string_value',
+                        buckets_sizes: "invalid_string_type_and_not_an_array",
+                        labels: { key1: 'value1', key2: 'value2' }
+                    },
+                };
+
+                const response = await configRequestCreator.updateConfig(requestWithInvalidBucketSizeType);
+                should(response.statusCode).eql(400);
+                should(response.body.message).eql(validationError);
+                should(response.body.validation_errors).have.lengthOf(1);
+                should(response.body.validation_errors[0]).eql('body/prometheus_metrics.buckets_sizes should be array');
+            });
+
+            it('should return input validation error if value for labels are not strings', async () => {
+                const response = await configRequestCreator.updateConfig({
+                    prometheus_metrics: {
+                        push_gateway_url: 'string_value',
+                        buckets_sizes: [0.01, 0.05, 0.10, 0.25, 0.50, 0.100, 0.200, 0.300, 0.400, 0.500, 1, 2, 5, 10, 30, 60, 120],
+                        labels: { key1: { innerKey1: 'value1' }, key2: 'value2' }
+                    }
+                });
+                should(response.statusCode).eql(400);
+                should(response.body.message).eql(validationError);
+                should(response.body.validation_errors).eql([
+                    "body/prometheus_metrics.labels['key1'] should be string"]);
+            });
+        });
+
         it('update config fail with validation require fields', async () => {
             const response = await configRequestCreator.updateConfig(requestBodyNotValidRequire);
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);
         });
-    });
-    describe('Update config validation', () => {
+
         it('update config fail with validation enum', async () => {
             const response = await configRequestCreator.updateConfig(requestBodyNotValidEnum);
             should(response.statusCode).eql(400);
             should(response.body.message).eql(validationError);
         });
-    });
-    describe('Update config validation', () => {
+
         it('update config fail with validation type', async () => {
             const response = await configRequestCreator.updateConfig(requestBodyNotValidType);
             should(response.statusCode).eql(400);
@@ -274,22 +303,6 @@ describe('update and get config', () => {
                 "body/benchmark_weights should have required property 'server_errors_ratio'",
                 "body/benchmark_weights should have required property 'client_errors_ratio'",
                 "body/benchmark_weights should have required property 'rps'"]);
-        });
-    });
-
-    describe('Update prometheus configuration with labels which are not key value', () => {
-        it('update config fail with validation type', async () => {
-            const response = await configRequestCreator.updateConfig({
-                prometheus_metrics: {
-                    push_gateway_url: 'string_value',
-                    buckets_sizes: 'string_value',
-                    labels: { key1: { innerKey1: 'value1' }, key2: 'value2' }
-                }
-            });
-            should(response.statusCode).eql(400);
-            should(response.body.message).eql(validationError);
-            should(response.body.validation_errors).eql([
-                "body/prometheus_metrics.labels['key1'] should be string"]);
         });
     });
 });

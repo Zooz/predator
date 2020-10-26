@@ -299,7 +299,7 @@ class Form extends React.Component {
         const maxVirtualUsers = parallel * 250;
         this.setState({ parallelism: parallel, max_virtual_users: maxVirtualUsers })
       }
-      if (this.props.webhooks !== prevProps.webhooks) {
+      if (this.props.webhooks !== prevProps.webhooks && this.props.editMode) {
         const newState = createStateForEditJob(this.props.data, this.props.webhooks);
         this.setState({ ...newState });
       }
