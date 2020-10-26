@@ -9,6 +9,7 @@ export const processingCreateJob = (state) => state.JobsReducer.get('processing_
 export const errorOnNewJob = (state) => state.JobsReducer.get('error_new_job');
 export const createJobSuccess = (state) => state.JobsReducer.get('job');
 export const editJobSuccess = (state) => state.JobsReducer.get('edit_job_success');
+export const editJobId = (state) => state.JobsReducer.get('edit_job_id');
 export const errorOnJobAction = (state) => state.JobsReducer.get('error_on_job_action');
 export const createJobFailure = (state) => state.JobsReducer.get('error_create_job');
 export const errorOnStopRunningJob = (state) => state.JobsReducer.get('error_stop_job');

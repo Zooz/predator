@@ -126,47 +126,49 @@ export class TestForm extends React.Component {
       return (
         <Modal style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '40px', paddingRight: '40px' }}
           height={'100%'} width={'100%'} maxWidth={'1440px'} onExit={closeDialog}>
-          <FormWrapper title={`${editMode && 'Edit' || 'Create'} Test`}>
-            <div className={style['top']}>
-              <div className={style['top-inputs']}>
-                {/* left */}
+          <FormWrapper title={`${(editMode && 'Edit') || 'Create'} Test`}>
+            <div style={{ flex: 1, overflow: 'scroll' }}>
+              <div className={style['top']}>
+                <div className={style['top-inputs']}>
+                  {/* left */}
 
-                <div className={style['input-container']}>
-                  <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Name'}>
-                    <TextArea maxRows={5} value={name} onChange={(evt, value) => {
-                      this.setState({ name: evt.target.value })
-                    }} />
-                  </TitleInput>
-                </div>
-                <div className={style['input-container']}>
-                  <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Description'}>
-                    <TextArea maxRows={5} value={description} onChange={(evt, value) => {
-                      this.setState({ description: evt.target.value })
-                    }} />
-                  </TitleInput>
-                </div>
-                <div className={style['input-container']}>
-                  <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Base url'}>
-                    <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
-                      onChange={(evt, value) => {
-                        this.setState({ baseUrl: evt.target.value })
+                  <div className={style['input-container']}>
+                    <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Name'}>
+                      <TextArea maxRows={5} value={name} onChange={(evt, value) => {
+                        this.setState({ name: evt.target.value })
                       }} />
-                  </TitleInput>
-                </div>
+                    </TitleInput>
+                  </div>
+                  <div className={style['input-container']}>
+                    <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Description'}>
+                      <TextArea maxRows={5} value={description} onChange={(evt, value) => {
+                        this.setState({ description: evt.target.value })
+                      }} />
+                    </TitleInput>
+                  </div>
+                  <div className={style['input-container']}>
+                    <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Base url'}>
+                      <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
+                        onChange={(evt, value) => {
+                          this.setState({ baseUrl: evt.target.value })
+                        }} />
+                    </TitleInput>
+                  </div>
 
-                <div className={style['input-container']}>
-                  <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Processor'}>
-                    <ProcessorsDropDown
-                      onChange={this.onProcessorChosen} options={processorsList} value={processorId}
-                      loading={processorsLoading} />
-                  </TitleInput>
+                  <div className={style['input-container']}>
+                    <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Processor'}>
+                      <ProcessorsDropDown
+                        onChange={this.onProcessorChosen} options={processorsList} value={processorId}
+                        loading={processorsLoading} />
+                    </TitleInput>
 
+                  </div>
                 </div>
               </div>
-            </div>
-            {/* bottom */}
+              {/* bottom */}
 
-            {this.generateScenarioDashBoard()}
+              {this.generateScenarioDashBoard()}
+            </div>
             {this.generateBottomBar()}
             {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error} />}
           </FormWrapper>
@@ -277,7 +279,8 @@ export class TestForm extends React.Component {
         url: '',
         forever: true,
         contentType: CONTENT_TYPES.APPLICATION_JSON,
-        expectations: [createDefaultExpectation()]
+        expectations: [createDefaultExpectation()],
+        gzip: true
       }
     }
 
@@ -392,14 +395,18 @@ export class TestForm extends React.Component {
 
       const activeTabKey = currentScenarioIndex === null ? before.id : scenarios[currentScenarioIndex] && scenarios[currentScenarioIndex].id;
       return (
-        <div className={style['bottom']}>
+        <>
           {/* bottom */}
           <div style={{
             marginLeft: 'auto',
             marginRight: '12px',
             display: 'flex',
-            justifyContent: 'space-between'
+            justifyContent: 'flex-end',
             // width: '313px'
+            position: 'sticky',
+            top: '0px',
+            zIndex: 22,
+            backgroundColor: 'white'
           }}>
 
             <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
@@ -457,7 +464,7 @@ export class TestForm extends React.Component {
               })
             }
           </Tabs>
-        </div>
+        </>
       )
     };
 

@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, customDefinition) => {
+module.exports.createJobRequest = (jobName, runId, parallelism, environmentVariables, dockerImage, configData, predatorRunnerPrefix, customDefinition) => {
     const jobTemplate = {
         id: jobName,
         description: 'Runs a performance test',

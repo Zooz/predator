@@ -2,6 +2,7 @@
 ## Powerful open-source platform for load testing APIs.
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2786/badge)](https://bestpractices.coreinfrastructure.org/projects/2786)
 [![Join Slack](https://img.shields.io/badge/slack-join-green.svg)](https://join.slack.com/t/predator-dev/shared_invite/enQtNjgwMzE2NjM3MDcyLTg5YTIwMGQyNjZlMjQ4MDNjOTk5YTkwMWYwNzJkOWFmM2QwOGY0ODc3MDU3MWRkYTAwMjRhMjBhOTM1MzFmMjU)
+[![Docker Pulls](https://badgen.net/docker/pulls/zooz/predator)](https://hub.docker.com/r/zooz/predator)
 
 <h1 align="center">
 <img src="https://zooz.github.io/predator/images/predator-1764x640.png" data-canonical-src="https://zooz.github.io/predator/images/predator-1764x640.png"/>
@@ -58,6 +59,13 @@ To see the progress of `v1.5.0` [click here](https://github.com/Zooz/predator/is
 ![](https://zooz.github.io/predator/images/predator-overview.png)
 
 ## Getting Started
+
+### Important Deployment Tips
+Predator is production ready and fully tested and can be deployed in all of the following platforms listed. Please follow these guidelines when deploying Predator:
+1. Deploy Predator using only tagged releases and not `latest`.
+2. Predator-Runner docker image version (`zooz/predator-runner:$TAGGED_VERSION`) must match the Predator's `major.minor` version running in order to be fully compatible with all features. Patched versions don't have to match, but it is recommended to use latest patch version.
+    - For example, Predator version 1.6 (`zooz/predator:1.6`) should run Predator-Runner version 1.6 as well (`zooz/predator-runner:1.6`). 
+3. For notes on which version to deploy, read our [versioning](#versioning) section.
 
 ### Kubernetes
 Predator is designed to seamlessly deploy into your Kubernetes cluster. Install Predator from the [Helm Hub](https://hub.helm.sh/charts/zooz/predator)
@@ -132,6 +140,15 @@ Please read [CONTRIBUTING.md](https://github.com/Zooz/predator/blob/master/CONTR
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For a complete list of Docker images of this project please visit our [docker hub repository](https://hub.docker.com/r/zooz/predator/tags).
+
+Predator tagged images are maintained in two ways:
+
+1. MAJOR.MINOR (for example zooz/predator:1.5)
+2. MAJOR.MINOR.PATCH (for example zooz/predator:1.5.4)
+
+Everytime a certain tag `MAJOR.MINOR.PATCH` is released, the initial `MAJOR.MINOR` version (of the same major and minor versions) will also be updated with the new patched updates.
+
+Therefore to always stay updated to the latest patched version, use tag convention `MAJOR.MINOR`, otherwise use tag convention `MAJOR.MINOR.PATCH`
 
 ## Built With
 
