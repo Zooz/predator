@@ -147,6 +147,42 @@ describe('Create job specific docker tests', async function () {
                     should(getJobsResponse.status).eql(200);
                     should(getJobsResponse.body.id).eql(jobIdContextA);
                 });
+
+                it('Get logs with correct context should return 200', async () => {
+                    const getJobsResponse = await schedulerRequestCreator.getLogs(jobIdContextA, 'some-report', {
+                        'Content-Type': 'application/json',
+                        'x-context-id': contextId
+                    });
+
+                    should(getJobsResponse.status).eql(200);
+                });
+
+                it('Get logs with no matching context should return 404', async () => {
+                    const getJobsResponse = await schedulerRequestCreator.getLogs(jobIdContextA, 'some-report', {
+                        'Content-Type': 'application/json',
+                        'x-context-id': 'some-context'
+                    });
+
+                    should(getJobsResponse.status).eql(404);
+                });
+
+                it('stop job with correct context should return 204', async () => {
+                    const getJobsResponse = await schedulerRequestCreator.stopRun(jobIdContextA, 'some-report', {
+                        'Content-Type': 'application/json',
+                        'x-context-id': contextId
+                    });
+
+                    should(getJobsResponse.status).eql(204);
+                });
+
+                it('stop job with no matching context should return 404', async () => {
+                    const getJobsResponse = await schedulerRequestCreator.getLogs(jobIdContextA, 'some-report', {
+                        'Content-Type': 'application/json',
+                        'x-context-id': 'some-context'
+                    });
+
+                    should(getJobsResponse.status).eql(404);
+                });
             });
         });
     }

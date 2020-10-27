@@ -1288,6 +1288,7 @@ describe('Manager tests', function () {
 
     describe('Get logs', function () {
         it('Success getting logs from job', async function () {
+            databaseConnectorGetSingleJobStub.resolves([{}]);
             jobGetLogsStub.resolves([{ type: 'file', name: 'log.txt', content: 'this is the log' }]);
             const logs = await manager.getLogs('jobId', '13046d76-1b8c-4b3f-9061-e8dc819d585c');
             logs.should.eql({
@@ -1297,6 +1298,7 @@ describe('Manager tests', function () {
         });
 
         it('Get logs from job fails', async function () {
+            databaseConnectorGetSingleJobStub.resolves([{}]);
             jobGetLogsStub.rejects(new Error('error getting logs'));
             try {
                 await manager.getLogs('jobId', '13046d76-1b8c-4b3f-9061-e8dc819d585c');
