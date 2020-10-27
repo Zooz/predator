@@ -27,7 +27,12 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
+    }, {
+        indexes: [{
+            fields: ['context_id']
+        }]
     });
+
     await file.sync();
 }
 
@@ -36,12 +41,9 @@ async function saveFile(id, fileName, fileContent, contextId) {
     const params = {
         id: id,
         name: fileName,
-        file: fileContent
+        file: fileContent,
+        context_id: contextId
     };
-
-    if (contextId) {
-        params.context_id = contextId;
-    }
 
     const result = fileClient.create(params);
     return result;

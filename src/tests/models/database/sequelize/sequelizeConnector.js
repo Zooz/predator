@@ -68,10 +68,11 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    }, { indexes: [
-        {
-            fields: ['context_id']
-        }] });
+    }, {
+        indexes: [{
+                fields: ['context_id']
+            }]
+    });
 
     const dslDefinition = client.define('dsl_definition', {
         id: {
@@ -92,10 +93,11 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    }, { indexes: [
-        {
+    }, {
+        indexes: [{
             fields: ['context_id']
-        }] });
+        }]
+    });
 
     const benchmarkDefinition = client.define('benchmark', {
         test_id: {
@@ -108,10 +110,11 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    }, { indexes: [
-        {
+    }, {
+        indexes: [{
             fields: ['context_id']
-        }] });
+        }]
+    });
     await test.sync();
     await dslDefinition.sync();
     await benchmarkDefinition.sync();
@@ -121,12 +124,9 @@ async function insertTestBenchmark(testId, benchmarkData, contextId) {
     const benchmark = client.model('benchmark');
     const params = {
         test_id: testId,
-        data: benchmarkData
+        data: benchmarkData,
+        context_id: contextId
     };
-
-    if (contextId) {
-        params.context_id = contextId;
-    }
 
     const result = benchmark.create(params);
     return result;
@@ -159,12 +159,9 @@ async function insertTest(testInfo, testJson, testId, revisionId, processorFileI
         updated_at: Date.now(),
         raw_data: JSON.stringify(testInfo),
         artillery_json: JSON.stringify(testJson),
-        revision_id: revisionId
+        revision_id: revisionId,
+        context_id: contextId
     };
-
-    if (contextId) {
-        params.context_id = contextId;
-    }
 
     const result = test.create(params);
     return result;
@@ -239,12 +236,9 @@ async function insertDslDefinition(dslName, definitionName, data, contextId){
         id: uuid.v4(),
         dsl_name: dslName,
         definition_name: definitionName,
-        artillery_json: JSON.stringify(data)
+        artillery_json: JSON.stringify(data),
+        context_id: contextId
     };
-
-    if (contextId) {
-        params.context_id = contextId;
-    }
 
     try {
         await dslDefinition.create(params);

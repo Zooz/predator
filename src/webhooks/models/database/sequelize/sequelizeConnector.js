@@ -78,12 +78,9 @@ async function createWebhook(webhook, contextId) {
         name: webhook.name,
         url: webhook.url,
         format_type: webhook.format_type,
-        global: webhook.global
+        global: webhook.global,
+        context_id: contextId
     };
-
-    if (contextId) {
-        webhookToInsert.context_id = contextId;
-    }
 
     await client.transaction(async function(transaction) {
         const createdWebhook = await webhooksModel.create(webhookToInsert, { transaction });
@@ -152,6 +149,10 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
+    }, {
+        indexes: [{
+            fields: ['context_id']
+        }]
     });
     const webhooksEvents = client.define(WEBHOOKS_EVENTS_TABLE_NAME, {
         id: {
