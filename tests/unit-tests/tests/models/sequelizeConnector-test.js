@@ -68,7 +68,8 @@ describe('Testing sequelize connector', function () {
                         revision_id: 'revisionId',
                         test_id: 'id',
                         type: 'type',
-                        updated_at: 123456789
+                        updated_at: 123456789,
+                        context_id: undefined
                     }
                 ]
             ]);
@@ -535,7 +536,8 @@ describe('Testing sequelize connector', function () {
                         artillery_json: '{"data":"data"}',
                         definition_name: 'definitionName',
                         dsl_name: 'dslName',
-                        id: 'uuid'
+                        id: 'uuid',
+                        context_id: undefined
                     }
                 ]
             ]);
@@ -552,7 +554,8 @@ describe('Testing sequelize connector', function () {
                         artillery_json: '{"data":"data"}',
                         definition_name: 'definitionName',
                         dsl_name: 'dslName',
-                        id: 'uuid'
+                        id: 'uuid',
+                        context_id: undefined
                     }
                 ]
             ]);
@@ -573,7 +576,8 @@ describe('Testing sequelize connector', function () {
                             artillery_json: '{"data":"data"}',
                             definition_name: 'definitionName',
                             dsl_name: 'dslName',
-                            id: 'uuid'
+                            id: 'uuid',
+                            context_id: undefined
                         }
                     ]
                 ]);

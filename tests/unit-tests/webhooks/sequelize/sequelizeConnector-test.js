@@ -125,7 +125,8 @@ describe('Sequelize client tests', function () {
                 });
                 const webhook = {
                     ...webhookRaw.dataValues,
-                    events
+                    events,
+                    context_id: undefined
                 };
                 const webhookWithEvents = {
                     dataValues: {
