@@ -743,13 +743,37 @@ describe('Create job specific kubernetes tests', async function () {
                 });
 
                 describe('Failures on getLogs', () => {
+                    let jobId, createJobResponse;
+                    before(async function() {
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
+                            .reply(200, {
+                                metadata: { name: 'jobName', uid: 'uid' },
+                                namespace: kubernetesConfig.kubernetesNamespace
+                            });
+
+                        const jobBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            type: 'load_test'
+                        };
+
+                        createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                        jobId = createJobResponse.body.id;
+                    });
                     it('Gets logs should return 401', async () => {
                         nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.report_id`)
                             .reply(401, {
                                 error: 'error '
                             });
 
-                        const getLogsResponse = await schedulerRequestCreator.getLogs('job_id', 'report_id', {
+                        const getLogsResponse = await schedulerRequestCreator.getLogs(jobId, 'report_id', {
                             'Content-Type': 'application/json'
                         });
 

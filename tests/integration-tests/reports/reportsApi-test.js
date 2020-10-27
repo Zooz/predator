@@ -1129,8 +1129,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                             subscribers: [
                                 {
                                     runner_id: runnerId,
-                                    phase_status: constants.SUBSCRIBER_DONE_STAGE,
-                                    last_stats: null
+                                    phase_status: constants.SUBSCRIBER_DONE_STAGE
                                 }
                             ],
                             last_rps: 0,
@@ -1429,13 +1428,11 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         // eslint-disable-next-line no-unused-expressions
                         expect(firstSub).to.exist.and.to.be.deep.equal({
                             runner_id: firstRunnerId,
-                            phase_status: constants.SUBSCRIBER_DONE_STAGE,
-                            last_stats: null
+                            phase_status: constants.SUBSCRIBER_DONE_STAGE
                         });
                         expect(secondSub).to.exist.and.to.be.deep.equal({
                             runner_id: secondRunnerId,
-                            phase_status: constants.SUBSCRIBER_DONE_STAGE,
-                            last_stats: null
+                            phase_status: constants.SUBSCRIBER_DONE_STAGE
                         });
                     });
                     it('All runners post "error" stats - report failed', async function () {
