@@ -480,30 +480,31 @@ describe('the tests api', function() {
         });
     });
     describe('Delete tests', () => {
-        it('try to delete test with scheduled jobs and fail', async () => {
+        it('try to delete test with non scheduled jobs and succeeds', async () => {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
 
-            const jobsBody = {
-                test_id: testId,
-                arrival_rate: 1,
-                parallelism: 2,
-                type: 'load_test',
-                duration: 1,
-                environment: 'test',
-                run_immediately: true,
-                max_virtual_users: 100,
-                proxy_url: 'http://proxy.com',
-                debug: '*'
-            };
+            const jobsBody = require('../../testExamples/Test_with_jobs.json')["non-cron-jobs"];
             const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
-            createJobResponse.statusCode.should.eql(201);
+            createJobResponse.statusCode.should.eql(200);
+
+            const expectedResult = require('../../testResults/Delete_test_with_jobs_response.json').test;
+            const deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, testId);
+            deleteTestResponse.statusCode.should.eql(200);
+        });
+        it('try to delete test with cron jobs and fail', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const testId = createTestResponse.body.id;
+
+            const jobsBody = require('../../testExamples/Test_with_jobs.json')["non-cron-jobs"];
+            const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
+            createJobResponse.statusCode.should.eql(200);
 
             const expectedResult = require('../../testResults/Delete_test_with_jobs_response.json').test;
             const deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, testId);
             deleteTestResponse.statusCode.should.eql(409);
-            deleteTestResponse.body.should.eql(expectedResult);
         });
     });
 });
