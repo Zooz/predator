@@ -16,6 +16,7 @@ let sequlizeClient;
 
 module.exports.init = async () => {
     sequlizeClient = await createClient();
+    await runSequlizeMigrations();
     await webhooksSequlizeConnector.init(sequlizeClient);
     await schedulerSequlizeConnector.init(sequlizeClient);
     await reportsSequlizeConnector.init(sequlizeClient);
@@ -23,7 +24,6 @@ module.exports.init = async () => {
     await configSequlizeConnector.init(sequlizeClient);
     await processorsSequlizeConnector.init(sequlizeClient);
     await fileSequlizeConnector.init(sequlizeClient);
-    await runSequlizeMigrations();
     await sequlizeClient.sync();
 };
 
