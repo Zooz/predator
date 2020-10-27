@@ -10,7 +10,8 @@ export default class CollapsibleStep extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      expanded: props.expandedOnStart === undefined ? true : props.expandedOnStart
+      expanded: props.expandedOnStart === undefined ? true : props.expandedOnStart,
+      shouldOpenJSEditor: false
     }
   }
 
@@ -28,30 +29,43 @@ export default class CollapsibleStep extends React.Component {
       </Section>,
       <Section key={2} onClick={(evt) => {
         evt.stopPropagation();
+        this.generateJSEditor(!this.state.shouldOpenJSEditor)
+        this.setState({ expanded: true })
+      }} icon='fa-code' tooltip='JS editor' borderLeft />,
+      <Section key={3} onClick={(evt) => {
+        evt.stopPropagation();
         onDuplicateStep(index)
       }} icon='fa-copy' tooltip='Duplicate step' borderLeft />,
-      <Section key={3} onClick={(evt) => {
+      <Section key={4} onClick={(evt) => {
         evt.stopPropagation();
         onDeleteStep(index)
       }} icon='fa-trash' tooltip='Delete step' borderLeft />
 
     ]
     const { expanded } = this.state;
-    return (<CollapsibleItem
-      onClick={(evt) => {
-        this.setState({ expanded: !this.state.expanded })
-      }}
-      editable
-      expanded={expanded}
-      toggleable
-      type={CollapsibleItem.TYPES.CLICKER}
-      disabled={false}
-      icon={this.generateIcon()}
-      title={this.generateTitle()}
-      body={this.generateBody()}
-      sections={sections}
-    />)
+    return (
+      <>
+        <CollapsibleItem
+          onClick={(evt) => {
+            this.setState({ expanded: !this.state.expanded })
+          }}
+          editable
+          expanded={expanded}
+          toggleable
+          type={CollapsibleItem.TYPES.CLICKER}
+          disabled={false}
+          icon={this.generateIcon()}
+          title={this.generateTitle()}
+          body={this.generateBody()}
+          sections={sections}
+        />
+      </>
+    )
   }
+
+    generateJSEditor = (value) => {
+      this.setState({ shouldOpenJSEditor: value })
+    }
 
     generateIcon = () => {
       const { step } = this.props;
@@ -89,6 +103,7 @@ export default class CollapsibleStep extends React.Component {
               onChangeValue={onChangeValueOfStep}
               processorsExportedFunctions={processorsExportedFunctions}
               type
+              shouldOpenJSEditor={this.state.shouldOpenJSEditor}
             />
 
           }
