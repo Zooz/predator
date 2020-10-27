@@ -181,7 +181,7 @@ module.exports.getJobBasedOnTestId = async (testId) => {
         const jobsResponse = jobs.map((job) => {
             return createResponse(job.id, job);
         });
-        return jobsResponse
+        return jobsResponse;
     } catch (error) {
         logger.error(error, 'Error occurred trying to get job based on test id');
         throw error;
