@@ -1,9 +1,8 @@
 
-
 .box-wrapper {
   padding: 10px 20px;
   border-radius: 3px;
-  background-color: #fafbfc;
+  background-color: white;
   border: 1px solid #e9e9e9;
   margin-left: 6px;
   margin-top: 1px;
@@ -17,7 +16,9 @@
   justify-content: space-between;
 }
 
-.box-label{
+
+
+.box-label {
   font-weight: 500;
   color: #778195;
 }
@@ -30,10 +31,11 @@
   font-size: 14px;
   text-align: left;
 }
+
 .details-text {
   font-size: 21px;
   font-weight: 300;
-  color: #778195;
+  color: black;
   align-items: center;
   display: flex;
   justify-content: center;

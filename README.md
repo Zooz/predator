@@ -101,7 +101,7 @@ npm run start-local
 
 In case your IP changes, you will need to change it in .env file.
 
-#### Developing frontend with hot reload
+#### Developing front-end with hot reload
 ```sh
 cd ui
 PREDATOR_URL=http://localhost:3000/v1 npm start
