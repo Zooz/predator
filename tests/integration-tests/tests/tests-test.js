@@ -8,6 +8,7 @@ JSCK.Draft4 = JSCK.draft4;
 const artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const testsRequestSender = require('./helpers/requestCreator');
 const processorsRequestSender = require('../processors/helpers/requestCreator');
+const jobsRequestSender = require('../jobs/helpers/requestCreator');
 
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
 const fileUrl = 'https://raw.githubusercontent.com/Zooz/predator/master/README.md';
@@ -476,6 +477,33 @@ describe('the tests api', function() {
                         });
                 });
             });
+        });
+    });
+    describe('Delete tests', () => {
+        it('try to delete test with scheduled jobs and fail', async () => {
+            const requestBody = simpleTest.test;
+            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+            const testId = createTestResponse.body.id;
+
+            const jobsBody = {
+                test_id: testId,
+                arrival_rate: 1,
+                parallelism: 2,
+                type: 'load_test',
+                duration: 1,
+                environment: 'test',
+                run_immediately: true,
+                max_virtual_users: 100,
+                proxy_url: 'http://proxy.com',
+                debug: '*'
+            };
+            const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
+            createJobResponse.statusCode.should.eql(201);
+
+            const expectedResult = require('../../testResults/Delete_test_with_jobs_response.json').test;
+            const deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, testId);
+            deleteTestResponse.statusCode.should.eql(409);
+            deleteTestResponse.body.should.eql(expectedResult);
         });
     });
 });
