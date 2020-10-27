@@ -485,7 +485,8 @@ describe('the tests api', function() {
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
 
-            const jobsBody = require('../../testExamples/Test_with_jobs.json').non-cron-jobs;
+            let jobsBody = require('../../testExamples/Test_with_jobs.json')["non-cron-jobs"];
+            jobsBody.test_id = testId
             const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
             createJobResponse.statusCode.should.eql(200);
 
@@ -497,7 +498,8 @@ describe('the tests api', function() {
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
 
-            const jobsBody = require('../../testExamples/Test_with_jobs.json').cron-jobs;
+            let jobsBody = require('../../testExamples/Test_with_jobs.json')['cron-jobs'];
+            jobsBody.test_id = testId
             const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
             createJobResponse.statusCode.should.eql(200);
 
