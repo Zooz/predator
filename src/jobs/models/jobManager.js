@@ -187,12 +187,6 @@ function createResponse(jobId, jobBody, reportId) {
         enabled: jobBody.enabled !== false
     };
 
-    Object.keys(response).forEach(key => {
-        if (response[key] === null) {
-            delete response[key];
-        }
-    });
-
     return response;
 }
 

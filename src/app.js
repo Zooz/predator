@@ -66,6 +66,8 @@ module.exports = async () => {
     app.use(httpContext.middleware);
     app.use(contexts.middleware);
 
+    app.set('null and undefined remover in response', (k, v) => (v === null ? undefined : v))
+
     app.use('/health', healthRouter);
     app.use('/v1/config', configRouter);
     app.use('/v1/jobs', jobsRouter);
