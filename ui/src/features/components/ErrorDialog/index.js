@@ -1,7 +1,7 @@
 import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import { OK_BUTTON_MESSAGE, EMPTY_STRING, ERROR_TITLE } from '../../../../constants/constants';
+import { OK_BUTTON_MESSAGE, EMPTY_STRING, ERROR_TITLE } from '../../../constants';
 
 export default (props) => {
   const { closeDialog, showMessage } = props;

@@ -25,10 +25,9 @@ import { ReactTableComponent } from '../components/ReactTable';
 import { getColumns } from './configurationColumn';
 import Button from '../components/Button';
 import ErrorDialog from './components/ErrorDialog';
-import ActionErrorPopup from './components/ActionErrorPopup';
 import _ from 'lodash';
 import { isTestValid } from '../validators/validate-test';
-import { INVALID_TEST_MESSAGE } from '../../constants/constants'
+import { INVALID_TEST_MESSAGE } from '../constants'
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
 const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test', 'report', 'edit', 'raw', 'clone', 'delete'];
@@ -63,7 +62,7 @@ class getTests extends React.Component {
       } else if (path === '/tests/:testId/edit') {
         const data = this.props.tests.find((test) => test.id === params.testId);
         if (!isTestValid(data)) {
-          this.setTestActionError({errorMessage : INVALID_TEST_MESSAGE });
+          this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
         } else {
           this.onEdit(data);
         }
@@ -127,7 +126,7 @@ class getTests extends React.Component {
 
     updateTestActionError = ({ errorMessage }) => {
       this.setState({
-        testActionError: errorMessage,
+        testActionError: errorMessage
       });
     };
 
@@ -142,9 +141,8 @@ class getTests extends React.Component {
     onEdit = (data) => {
       const { match: { params, path }, history } = this.props;
       if (!isTestValid(data)) {
-        this.setTestActionError({ errorMessage : INVALID_TEST_MESSAGE });
-      }
-      else {
+        this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
+      } else {
         if (path !== '/tests/:testId/edit') {
           history.replace(`/tests/${data.id}/edit`)
         }
@@ -229,8 +227,7 @@ class getTests extends React.Component {
     onClone = (data) => {
       if (!isTestValid(data)) {
         this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
-      }
-      else {
+      } else {
         this.setState({ createTest: true, testForClone: data });
       }
     };
@@ -270,7 +267,7 @@ class getTests extends React.Component {
           }}>Create Test</Button>
           <ReactTableComponent
             onSearch={this.onSearch}
-            tdStyle={{display:'flex',alignItems:'center'}}
+            tdStyle={{ display: 'flex', alignItems: 'center' }}
             rowHeight={'46px'}
             manual={false}
             data={sortedTests}
