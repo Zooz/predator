@@ -1106,7 +1106,8 @@ describe('Manager tests', function () {
                 notes: 'some notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
-                enabled: false
+                enabled: false,
+                emails: null
             }, {
                 id: 'id2',
                 type: 'load_test',
@@ -1124,8 +1125,10 @@ describe('Manager tests', function () {
                 notes: 'some other notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
-                enabled: true
-            }];
+                enabled: true,
+                webhooks: null,
+                cron_expression: null
+        }];
             const jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
             databaseConnectorGetStub.callCount.should.eql(1);
@@ -1176,7 +1179,8 @@ describe('Manager tests', function () {
                 notes: undefined,
                 proxy_url: undefined,
                 debug: undefined,
-                enabled: false
+                enabled: false,
+                emails: null
             }];
             const jobs = await manager.getJobs();
             jobs.should.eql(expectedResult);
@@ -1241,7 +1245,8 @@ describe('Manager tests', function () {
                 notes: 'some nice notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
-                enabled: true
+                enabled: true,
+                emails: null
             };
 
             const job = await manager.getJob('id');
