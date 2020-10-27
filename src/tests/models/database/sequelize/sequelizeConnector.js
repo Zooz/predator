@@ -68,7 +68,10 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    });
+    }, { indexes: [
+        {
+            fields: ['context_id']
+        }] });
 
     const dslDefinition = client.define('dsl_definition', {
         id: {
@@ -89,7 +92,10 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    });
+    }, { indexes: [
+        {
+            fields: ['context_id']
+        }] });
 
     const benchmarkDefinition = client.define('benchmark', {
         test_id: {
@@ -102,7 +108,10 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    });
+    }, { indexes: [
+        {
+            fields: ['context_id']
+        }] });
     await test.sync();
     await dslDefinition.sync();
     await benchmarkDefinition.sync();
@@ -293,7 +302,7 @@ async function updateDslDefinition(dslName, definitionName, data, contextId){
             dsl_name: dslName,
             definition_name: definitionName
         }
-    }
+    };
 
     if (contextId) {
         options.where.context_id = contextId;
@@ -308,7 +317,7 @@ async function deleteDefinition(dslName, definitionName, contextId){
             dsl_name: dslName,
             definition_name: definitionName
         }
-    }
+    };
 
     if (contextId) {
         options.where.context_id = contextId;

@@ -117,7 +117,8 @@ describe('Sequelize client tests', function () {
                 notes: 'some nice notes',
                 proxy_url: 'http://proxy.com',
                 debug: '*',
-                enabled: true
+                enabled: true,
+                context_id: undefined
             };
             const createdJob = {
                 dataValues: {
@@ -171,7 +172,8 @@ describe('Sequelize client tests', function () {
                 max_virtual_users: 100,
                 notes: 'some notes',
                 proxy_url: 'http://proxy.com',
-                debug: '*'
+                debug: '*',
+                context_id: undefined
             };
 
             const createdJob = {
