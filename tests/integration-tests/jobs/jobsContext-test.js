@@ -8,7 +8,7 @@ const should = require('should'),
 
 const docker = new Docker(dockerConnection);
 
-describe('Create job specific docker tests', async function () {
+describe('Create job specific docker tests - contexts', async function () {
     this.timeout(2000);
     let testId, testIdContextB;
     let jobIdContextA, jobIdNoContext;
@@ -47,16 +47,16 @@ describe('Create job specific docker tests', async function () {
                     max_virtual_users: 100
                 };
             });
-            after(async () => {
-                let containers = await docker.listContainers();
-                containers = containers.filter(container => {
-                    return container.Names && container.Names[0] && container.Names[0].includes('predator.');
-                });
-                containers.forEach(async container => {
-                    const containerToKill = await docker.getContainer(container.Id);
-                    await containerToKill.kill();
-                });
-            });
+            // after(async () => {
+            //     let containers = await docker.listContainers();
+            //     containers = containers.filter(container => {
+            //         return container.Names && container.Names[0] && container.Names[0].includes('predator.');
+            //     });
+            //     containers.forEach(async container => {
+            //         const containerToKill = await docker.getContainer(container.Id);
+            //         await containerToKill.kill();
+            //     });
+            // });
 
             describe('Verify context id is used as filter', () => {
                 it('Create job with context', async () => {
