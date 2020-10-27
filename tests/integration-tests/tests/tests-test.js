@@ -485,11 +485,10 @@ describe('the tests api', function() {
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
 
-            const jobsBody = require('../../testExamples/Test_with_jobs.json')["non-cron-jobs"];
+            const jobsBody = require('../../testExamples/Test_with_jobs.json').non-cron-jobs;
             const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
             createJobResponse.statusCode.should.eql(200);
 
-            const expectedResult = require('../../testResults/Delete_test_with_jobs_response.json').test;
             const deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, testId);
             deleteTestResponse.statusCode.should.eql(200);
         });
@@ -498,11 +497,10 @@ describe('the tests api', function() {
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
 
-            const jobsBody = require('../../testExamples/Test_with_jobs.json')["non-cron-jobs"];
+            const jobsBody = require('../../testExamples/Test_with_jobs.json').cron-jobs;
             const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
             createJobResponse.statusCode.should.eql(200);
 
-            const expectedResult = require('../../testResults/Delete_test_with_jobs_response.json').test;
             const deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, testId);
             deleteTestResponse.statusCode.should.eql(409);
         });
