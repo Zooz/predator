@@ -2,13 +2,12 @@
     "non-cron-jobs":{
         "test_id": "",
         "arrival_rate": 1,
-        "parallelism": 2,
-        "type": "load_test",
         "duration": 1,
         "environment": "test",
         "run_immediately": true,
-        "max_virtual_users": 100,
-        "proxy_url": "http://proxy.com"
+        "type": "load_test",
+        "webhooks": [],
+        "emails": []
     },
     "cron-jobs":{
         "test_id": "",
