@@ -1,15 +1,18 @@
 'use strict';
 
-const uuid = require('uuid');
+const httpContext = require('express-http-context'),
+    uuid = require('uuid');
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     testsManager = require('../../tests/models/manager'),
-    { ERROR_MESSAGES } = require('../../common/consts'),
+    { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts'),
     generateError = require('../../common/generateError');
 
 module.exports.createProcessor = async function (processor) {
-    const processorWithTheSameName = await databaseConnector.getProcessorByName(processor.name);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const processorWithTheSameName = await databaseConnector.getProcessorByName(processor.name, contextId);
     if (processorWithTheSameName) {
         throw generateError(400, ERROR_MESSAGES.PROCESSOR_NAME_ALREADY_EXIST);
     }
@@ -28,12 +31,16 @@ module.exports.createProcessor = async function (processor) {
 };
 
 module.exports.getAllProcessors = async function (from, limit, exclude) {
-    const allProcessors = await databaseConnector.getAllProcessors(from, limit, exclude);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const allProcessors = await databaseConnector.getAllProcessors(from, limit, exclude, contextId);
     return allProcessors;
 };
 
 module.exports.getProcessor = async function (processorId) {
-    const processor = await databaseConnector.getProcessorById(processorId);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const processor = await databaseConnector.getProcessorById(processorId, contextId);
     if (processor) {
         return processor;
     } else {
@@ -43,17 +50,21 @@ module.exports.getProcessor = async function (processorId) {
 };
 
 module.exports.deleteProcessor = async function (processorId) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const tests = await testsManager.getTestsByProcessorId(processorId);
     if (tests.length > 0) {
         const testNames = tests.map(test => test.name);
         const message = `${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`;
         throw generateError(409, message);
     }
-    return databaseConnector.deleteProcessor(processorId);
+    return databaseConnector.deleteProcessor(processorId, contextId);
 };
 
 module.exports.updateProcessor = async function (processorId, processor) {
-    const oldProcessor = await databaseConnector.getProcessorById(processorId);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const oldProcessor = await databaseConnector.getProcessorById(processorId, contextId);
     if (!oldProcessor) {
         throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
     }

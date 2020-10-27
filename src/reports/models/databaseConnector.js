@@ -19,16 +19,16 @@ module.exports = {
 
 };
 
-function insertReport(reportId, testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite) {
-    return databaseConnector.insertReport(reportId, testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite);
+function insertReport(reportId, testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite, contextId) {
+    return databaseConnector.insertReport(reportId, testId, revisionId, jobId, testType, phase, startTime, testName, testDescription, testConfiguration, notes, lastUpdatedAt, isFavorite, contextId);
 }
 
 function insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data) {
     return databaseConnector.insertStats(runnerId, testId, reportId, statId, statsTime, phaseIndex, phaseStatus, data);
 }
 
-function updateReport(testId, reportId, reportData) {
-    return databaseConnector.updateReport(testId, reportId, reportData);
+function updateReport(testId, reportId, reportData, contextId) {
+    return databaseConnector.updateReport(testId, reportId, reportData, contextId);
 }
 
 function deleteReport(testId, reportId) {
@@ -39,16 +39,16 @@ function updateReportBenchmark(testId, reportId, score, benchmarkData) {
     return databaseConnector.updateReportBenchmark(testId, reportId, score, benchmarkData);
 }
 
-function getLastReports(limit, filter) {
-    return databaseConnector.getLastReports(limit, filter);
+function getLastReports(limit, filter, contextId) {
+    return databaseConnector.getLastReports(limit, filter, contextId);
 }
 
-function getReports(testId, filter) {
-    return databaseConnector.getReports(testId, filter);
+function getReports(testId, filter, contextId) {
+    return databaseConnector.getReports(testId, filter, contextId);
 }
 
-function getReport(testId, reportId) {
-    return databaseConnector.getReport(testId, reportId);
+function getReport(testId, reportId, contextId) {
+    return databaseConnector.getReport(testId, reportId, contextId);
 }
 
 function getStats(testId, reportId) {

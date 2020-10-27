@@ -19,7 +19,7 @@ async function init(sequelizeClient) {
     await initSchemas();
 }
 
-async function insertProcessor(processorId, processorInfo) {
+async function insertProcessor(processorId, processorInfo, contextId) {
     const processor = client.model('processor');
     const params = {
         id: processorId,
@@ -28,18 +28,24 @@ async function insertProcessor(processorId, processorInfo) {
         javascript: processorInfo.javascript,
         exported_functions: processorInfo.exported_functions,
         created_at: Date.now(),
-        updated_at: Date.now()
+        updated_at: Date.now(),
+        context_id: contextId
     };
     return processor.create(params);
 }
 
-async function getAllProcessors(from, limit, exclude) {
+async function getAllProcessors(from, limit, exclude, contextId) {
     const processorsModel = client.model('processor');
-    const attributes = {};
+    const attributes = {}, where = {};
     if (exclude && (exclude === JAVASCRIPT || exclude.includes(JAVASCRIPT))) {
         attributes.exclude = ['javascript'];
     }
-    const allProcessors = processorsModel.findAll({ attributes, offset: from, limit, order: [['created_at', 'DESC']] });
+
+    if (contextId) {
+        where.context_id = contextId;
+    }
+
+    const allProcessors = processorsModel.findAll({ attributes, offset: from, limit, order: [['created_at', 'DESC']], where });
     return allProcessors;
 }
 
@@ -49,10 +55,15 @@ async function _getProcessor(options) {
     return processors[0];
 }
 
-async function getProcessorById(processorId) {
+async function getProcessorById(processorId, contextId) {
     const options = {
         where: { id: processorId }
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
     let processor = await _getProcessor(options);
     if (processor) {
         processor = processor.get();
@@ -60,10 +71,15 @@ async function getProcessorById(processorId) {
     return processor;
 }
 
-async function getProcessorByName(processorName) {
+async function getProcessorByName(processorName, contextId) {
     const options = {
         where: { name: processorName }
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
     return _getProcessor(options);
 }
 
@@ -111,7 +127,14 @@ async function initSchemas() {
             set: function(val) {
                 return this.setDataValue('exported_functions', JSON.stringify(val));
             }
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
         }
+    }, {
+        indexes: [{
+            fields: ['context_id']
+        }]
     });
     await processorsFiles.sync();
 }
