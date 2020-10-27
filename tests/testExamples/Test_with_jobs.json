@@ -1,14 +1,4 @@
 {
-    "non-cron-jobs":{
-        "test_id": "",
-        "arrival_rate": 1,
-        "duration": 1,
-        "environment": "test",
-        "run_immediately": true,
-        "type": "load_test",
-        "webhooks": [],
-        "emails": []
-    },
     "cron-jobs":{
         "test_id": "",
         "arrival_rate": 1,

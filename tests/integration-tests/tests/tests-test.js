@@ -480,19 +480,6 @@ describe('the tests api', function() {
         });
     });
     describe('Delete tests', () => {
-        it('try to delete test with non scheduled jobs and succeeds', async () => {
-            const requestBody = simpleTest.test;
-            const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
-            const testId = createTestResponse.body.id;
-
-            let jobsBody = require('../../testExamples/Test_with_jobs.json')["non-cron-jobs"];
-            jobsBody.test_id = testId
-            const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
-            createJobResponse.statusCode.should.eql(201);
-
-            const deleteTestResponse = await testsRequestSender.deleteTest(validHeaders, testId);
-            deleteTestResponse.statusCode.should.eql(200);
-        });
         it('try to delete test with cron jobs and fail', async () => {
             const requestBody = simpleTest.test;
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
