@@ -68,10 +68,6 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    }, {
-        indexes: [{
-                fields: ['context_id']
-            }]
     });
 
     const dslDefinition = client.define('dsl_definition', {
@@ -93,10 +89,6 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    }, {
-        indexes: [{
-            fields: ['context_id']
-        }]
     });
 
     const benchmarkDefinition = client.define('benchmark', {
@@ -110,10 +102,6 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    }, {
-        indexes: [{
-            fields: ['context_id']
-        }]
     });
     await test.sync();
     await dslDefinition.sync();

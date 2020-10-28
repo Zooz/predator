@@ -149,10 +149,6 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    }, {
-        indexes: [{
-            fields: ['context_id']
-        }]
     });
     const webhooksEvents = client.define(WEBHOOKS_EVENTS_TABLE_NAME, {
         id: {

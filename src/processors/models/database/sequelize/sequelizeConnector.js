@@ -131,10 +131,6 @@ async function initSchemas() {
         context_id: {
             type: Sequelize.DataTypes.STRING
         }
-    }, {
-        indexes: [{
-            fields: ['context_id']
-        }]
     });
     await processorsFiles.sync();
 }

@@ -14,19 +14,9 @@ const webhooksSequlizeConnector = require('../../webhooks/models/database/sequel
 const Sequelize = require('sequelize');
 let sequlizeClient;
 
-// should run migrations if db is previously initialized
-async function shouldRunMigrations() {
-    const dbSchemas = await sequlizeClient.showAllSchemas();
-    const testSchemaExists = dbSchemas.find((schema) => schema.name === 'tests');
-    const dbInitialized = testSchemaExists !== undefined;
-    return dbInitialized;
-}
 
 module.exports.init = async () => {
     sequlizeClient = await createClient();
-    if (await shouldRunMigrations()) {
-        await runSequlizeMigrations();
-    }
     await webhooksSequlizeConnector.init(sequlizeClient);
     await schedulerSequlizeConnector.init(sequlizeClient);
     await reportsSequlizeConnector.init(sequlizeClient);
@@ -34,6 +24,7 @@ module.exports.init = async () => {
     await configSequlizeConnector.init(sequlizeClient);
     await processorsSequlizeConnector.init(sequlizeClient);
     await fileSequlizeConnector.init(sequlizeClient);
+    await runSequlizeMigrations();
     await sequlizeClient.sync();
 };
 
