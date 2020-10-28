@@ -1,7 +1,7 @@
 import logo from '../../images/logo.png';
 import React, { useEffect, useState, useCallback } from 'react';
 
-const MickeyLoading = ({ style = {}, statuses = [], timeInSec = 45, passedTime = 0, maxValueUntilFastFinish = 90, fastFinish = false, onFinish }) => {
+const MickeyLoading = ({ style = {}, statuses = [], timeInSec = 60, passedTime = 0, maxValueUntilFastFinish = 90, fastFinish = false, onFinish }) => {
   const [stepBase, setStepBase] = useState(0)
   const [value, setValue] = useState(Math.min(Math.round(passedTime * 100 / 45), 100));
   const incValue = useCallback((add) => {

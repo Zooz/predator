@@ -265,26 +265,6 @@ class Report extends React.Component {
       this.props.clearAggregateReportAndBenchmark();
     }
 };
-
-function mapStateToProps (state) {
-  return {
-    aggregateReport: selectors.getAggregateReport(state),
-    createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
-    editReportSuccess: selectors.editReportSuccess(state)
-  }
-}
-
-const mapDispatchToProps = {
-  getAggregateReports: Actions.getAggregateReports,
-  createBenchmark: Actions.createBenchmark,
-  createBenchmarkSuccess: Actions.createBenchmarkSuccess,
-  getBenchmark: Actions.getBenchmark,
-  clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
-  editReport: Actions.editReport,
-  getReport: Actions.getReport,
-  setEditReportSuccess: Actions.editReportSuccess
-};
-
 const SummeryTable = ({ report = {} }) => {
   const columnWidth = '100px';
   const ColumnWrapper = ({ children }) => <div style={{
@@ -341,5 +321,24 @@ const SummeryTable = ({ report = {} }) => {
     </div>
   );
 }
+
+function mapStateToProps (state) {
+  return {
+    aggregateReport: selectors.getAggregateReport(state),
+    createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
+    editReportSuccess: selectors.editReportSuccess(state)
+  }
+}
+
+const mapDispatchToProps = {
+  getAggregateReports: Actions.getAggregateReports,
+  createBenchmark: Actions.createBenchmark,
+  createBenchmarkSuccess: Actions.createBenchmarkSuccess,
+  getBenchmark: Actions.getBenchmark,
+  clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
+  editReport: Actions.editReport,
+  getReport: Actions.getReport,
+  setEditReportSuccess: Actions.editReportSuccess
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Report);

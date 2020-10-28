@@ -7,9 +7,15 @@ import { connect } from 'react-redux';
 import Loader from './components/Loader';
 import ErrorDialog from './components/ErrorDialog';
 
-const ReportPage = ({ cleanAllReportsErrors, errorGetReport, errorEditReport, loading, report, getReport, match: { params } }) => {
+const ReportPage = ({ clearSelectedReport, cleanAllReportsErrors, errorGetReport, errorEditReport, loading, report, getReport, match: { params } }) => {
   const { testId, reportId } = params;
   const error = errorGetReport || errorEditReport;
+  useEffect(() => {
+    return () => {
+      clearSelectedReport();
+    }
+  }, [])
+
   useEffect(() => {
     if (!report) {
       getReport(testId, reportId);
@@ -44,7 +50,8 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = {
   getReport: Actions.getReport,
-  cleanAllReportsErrors: Actions.cleanAllReportsErrors
+  cleanAllReportsErrors: Actions.cleanAllReportsErrors,
+  clearSelectedReport: Actions.clearSelectedReport
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReportPage);
