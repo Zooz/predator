@@ -8,7 +8,7 @@ const MickeyLoading = ({ style = {}, statuses = [], timeInSec = 45, passedTime =
     const newValue = value + add;
     setValue(Math.round(newValue));
   }, [value]);
-  const status = stepBase ? statuses[Math.trunc(value / stepBase) - 1] : undefined;
+  const status = stepBase ? statuses[Math.max(Math.trunc(value / stepBase) - 1, 0)] : undefined;
 
   useEffect(() => {
     if (statuses.length > 0) {
