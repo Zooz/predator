@@ -50,12 +50,14 @@ async function getAllGlobalWebhooks() {
 
 async function fireSingleWebhook(webhook, payload) {
     try {
-        await requestSender.send({
+        const response = await requestSender.send({
             method: 'POST',
             url: webhook.url,
-            body: payload
+            body: payload,
+            resolveWithFullResponse: true
         });
         logger.info(`Webhook fired successfully, url = ${webhook.url}`);
+        return response;
     } catch (requestError) {
         logger.error(`Webhook failed, url = ${webhook.url}`);
         throw requestError;
@@ -81,11 +83,28 @@ async function fireWebhookByEvent(job, eventType, report, additionalInfo = {}, o
     await Promise.allSettled(webhooksPromises);
 }
 
+async function testWebhook(webhookId) {
+    const webhook = await databaseConnector.getWebhook(webhookId);
+    if (!webhook) {
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
+    }
+    const payload = webhooksFormatter.formatSimpleMessage(webhook.format_type);
+    let webhookStatusCode = null;
+    try {
+        const response = await fireSingleWebhook(webhook, payload);
+        webhookStatusCode = response.statusCode;
+    } catch (requestError) {
+        webhookStatusCode = requestError.statusCode;
+    }
+    return webhookStatusCode;
+}
+
 module.exports = {
     getAllWebhooks,
     getWebhook,
     createWebhook,
     deleteWebhook,
     updateWebhook,
+    testWebhook,
     fireWebhookByEvent
 };

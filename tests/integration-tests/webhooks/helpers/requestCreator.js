@@ -11,6 +11,7 @@ module.exports = {
     getWebhooks,
     getWebhook,
     deleteWebhook,
+    testWebhook,
     updateWebhook
 };
 
@@ -68,4 +69,10 @@ function updateWebhook(webhookId, webhook) {
         .expect(function (res) {
             return res;
         });
+}
+
+function testWebhook(webhookId) {
+    return request(app)
+        .get(`${resourceUri}/${webhookId}/test`)
+        .set(headers);
 }
