@@ -23,6 +23,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MickeyLoading from '../../../components/MickeyLoading';
 
 const REFRESH_DATA_INTERVAL = 30000;
+const LOADING_STATUSES = [
+  'Preparing for liftoff',
+  'Igniting engines',
+  'Launching Predator',
+  'Reaching turbo boost',
+  'Entering cruising phase'
+];
+
+const TEST_FAIL_ERROR = 'The test failed, there is no data to present. Please check test logs';
 
 class Report extends React.Component {
   constructor (props) {
@@ -40,7 +49,8 @@ class Report extends React.Component {
           benchmark_count: true
         }
       },
-      enableBenchmark: false
+      enableBenchmark: false,
+      passedTime: (new Date().getTime() - new Date(props.report.start_time).getTime()) / 1000
     }
   }
     isLoadingMode = (reportStatus) => {
@@ -83,7 +93,7 @@ class Report extends React.Component {
 
     render () {
       const { report, aggregateReport } = this.props;
-      const { disabledCreateBenchmark, filteredKeys, enableBenchmark, isFavorite, loadingMode, finishLoadingMode } = this.state;
+      const { disabledCreateBenchmark, filteredKeys, enableBenchmark, isFavorite, loadingMode, finishLoadingMode, passedTime } = this.state;
       return (
         <div>
           <div style={{
@@ -92,7 +102,7 @@ class Report extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <h1 style={{ marginTop: '0px', minWidth: '310px' }}>{report.test_name}</h1>
+            <h1 style={{ marginTop: '0px', minWidth: '310px' }}>{report.test_name.charAt(0).toUpperCase() + report.test_name.slice(1)}</h1>
             <SummeryTable report={report} />
           </div>
           <span>Started at {dateFormat(new Date(report.start_time), 'dddd, mmmm dS, yyyy, h:MM:ss TT')}</span>
@@ -130,14 +140,21 @@ class Report extends React.Component {
                   info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
                 }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'} />
               </div>
-              <Button hover disabled={report.status !== 'finished'}
-                onClick={this.exportCSV}>Export to CSV</Button>
-              <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
-                onClick={this.createBenchmark}>Set as Benchmark</Button>
+              <div>
+                <Button style={{ padding: '0px 5px', marginRight: '5px' }} hover disabled={report.status !== 'finished'}
+                  onClick={this.exportCSV}>Export to CSV</Button>
+                <Button style={{ padding: '0px 5px' }}hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
+                  onClick={this.createBenchmark}>Set as Benchmark</Button>
+              </div>
             </div>
             {
-              (loadingMode && <MickeyLoading fastFinish={finishLoadingMode} onFinish={() => this.setState({ loadingMode: false, finishLoadingMode: false })} />) ||
-              (report.status === 'failed' && <div>The test was failed, there is no data to present. please check logs</div>) ||
+              (loadingMode &&
+                <div style={{ marginTop: '60px', width: '65%', alignSelf: 'center' }}>
+                  <MickeyLoading statuses={LOADING_STATUSES} passedTime={passedTime} fastFinish={finishLoadingMode}
+                    onFinish={() => this.setState({ loadingMode: false, finishLoadingMode: false })} />
+
+                </div>) ||
+              (report.status === 'failed' && <div style={{ marginTop: '10px', alignSelf: 'center' }}>{TEST_FAIL_ERROR}</div>) ||
               <>
                 <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
                   <h3>Overall Latency</h3>
