@@ -845,7 +845,6 @@ paths:
             required: true
             schema:
               type: string
-              format: uuid
               example: afbb6b43-fe52-48f2-84f4-1eebdbb2d5de
           - in: path
             name: test_id

@@ -9,7 +9,8 @@ module.exports = {
     getJobs,
     getJob,
     deleteJob,
-    updateJob
+    updateJob,
+    getJobBasedOnTestId
 };
 
 async function insertJob(jobId, jobInfo) {
@@ -38,4 +39,8 @@ async function init() {
 
 function closeConnection() {
     return databaseConnector.closeConnection();
+}
+
+async function getJobBasedOnTestId(testId){
+    return databaseConnector.getJobBasedOnTestId(testId);
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { prettySeconds } from '../../utils';
+import { prettySeconds, prettierStatus } from '../../utils';
 import PieChart from '../PieChart'
 import * as Actions from '../../redux/actions/reportsActions';
 import * as selectors from '../../redux/selectors/reportsSelector';
@@ -14,9 +14,12 @@ import _ from 'lodash';
 import Checkbox from '../../../components/Checkbox/Checkbox';
 import Card from '../../../components/Card';
 import { faStar as emptyStar } from '@fortawesome/free-regular-svg-icons';
-import { faStar as fullStar } from '@fortawesome/free-solid-svg-icons';
-import InfoToolTip from '../InfoToolTip';
+import { faStar as fullStar, faInfo } from '@fortawesome/free-solid-svg-icons';
 import env from '../../../App/common/env';
+import InfoToolTip from '../InfoToolTip';
+import SimpleTable from '../SimpleTable';
+import Tooltip from '../../../components/Tooltip/Tooltip.export';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MickeyLoading from '../../../components/MickeyLoading';
 
 const REFRESH_DATA_INTERVAL = 30000;
@@ -89,7 +92,7 @@ class Report extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <h1 style={{ minWidth: '310px' }}>{report.test_name}</h1>
+            <h1 style={{ marginTop: '0px', minWidth: '310px' }}>{report.test_name}</h1>
             <SummeryTable report={report} />
           </div>
           <span>Started at {dateFormat(new Date(report.start_time), 'dddd, mmmm dS, yyyy, h:MM:ss TT')}</span>
@@ -266,11 +269,57 @@ const mapDispatchToProps = {
 };
 
 const SummeryTable = ({ report = {} }) => {
+  const columnWidth = '100px';
+  const ColumnWrapper = ({ children }) => <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    width: columnWidth,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis' }}>{children}</div>
+
+  const rows = report.subscribers.map((runner, index) => {
+    const rps = ['first_intermediate', 'intermediate'].includes(runner.phase_status) ? runner.last_stats.rps.mean : 'N/A';
+    return [
+      <ColumnWrapper>{index + 1}</ColumnWrapper>, <ColumnWrapper>{prettierStatus(runner.phase_status)}</ColumnWrapper>, <ColumnWrapper>{rps}</ColumnWrapper>
+    ]
+  })
+  if (report.subscribers.length < report.parallelism) {
+    const notStartedCount = report.parallelism - report.subscribers.length;
+    let index = report.subscribers.length;
+    for (let i = 0; i < notStartedCount; i++) {
+      rows.push(
+        [<ColumnWrapper>{index + 1}</ColumnWrapper>, <ColumnWrapper>Not Started</ColumnWrapper>, <ColumnWrapper>N/A</ColumnWrapper>]
+      )
+    }
+  }
+
+  const TooltipContent = () => {
+    return (
+      <div>
+        <SimpleTable
+          headers={[<ColumnWrapper>Runner</ColumnWrapper>, <ColumnWrapper>Status</ColumnWrapper>, <ColumnWrapper>RP/S</ColumnWrapper>]} rows={rows} />
+      </div>
+    )
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-      <Box title={'Test status'} value={report.status} />
+
+      <Box title={'Parallelism'} value={report.parallelism}
+        rightComponent={
+
+          <div style={{ alignSelf: 'flex-end', marginBottom: '5px' }}>
+            <Tooltip content={TooltipContent()} >
+              <FontAwesomeIcon style={{ cursor: 'pointer', color: '#0d47ff' }} icon={faInfo} size='10px' />
+            </Tooltip>
+
+          </div>
+        }
+
+      />
+      <Box title={'Test status'} value={prettierStatus(report.status)} />
       <Box title={'Duration'} value={prettySeconds(Number(report.duration))} />
-      <Box title={'Parallelism'} value={report.parallelism} />
       {report.score && <Box title={'Score'} value={Math.floor(report.score)} />}
     </div>
   );

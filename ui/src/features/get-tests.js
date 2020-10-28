@@ -26,7 +26,8 @@ import { getColumns } from './configurationColumn';
 import Button from '../components/Button';
 import ErrorDialog from './components/ErrorDialog';
 import _ from 'lodash';
-
+import { isTestValid } from '../validators/validate-test';
+import { INVALID_TEST_MESSAGE } from '../constants'
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
 const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test', 'report', 'edit', 'raw', 'clone', 'delete'];
@@ -43,6 +44,7 @@ class getTests extends React.Component {
       testToDelete: undefined,
       createTest: false,
       testForEdit: null,
+      testActionError: null,
       sortedTests: [],
       sortHeader: ''
     }
@@ -65,7 +67,11 @@ class getTests extends React.Component {
         data && this.onRunTest(data);
       } else if (path === '/tests/:testId/edit') {
         const data = this.props.tests.find((test) => test.id === params.testId);
-        data && this.onEdit(data);
+        if (!isTestValid(data)) {
+          this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
+        } else {
+          this.onEdit(data);
+        }
       }
     }
   }
@@ -124,13 +130,31 @@ class getTests extends React.Component {
       this.setState({ openViewTest: data });
     };
 
+    updateTestActionError = ({ errorMessage }) => {
+      this.setState({
+        testActionError: errorMessage
+      });
+    };
+
+    setTestActionError = ({ errorMessage }) => {
+      this.updateTestActionError({ errorMessage: errorMessage })
+    };
+
+    resetTestActionError = () => {
+      this.updateTestActionError({ errorMessage: null })
+    };
+
     onEdit = (data) => {
       const { match: { params, path }, history } = this.props;
-      if (path !== '/tests/:testId/edit') {
-        history.replace(`/tests/${data.id}/edit`)
+      if (!isTestValid(data)) {
+        this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
+      } else {
+        if (path !== '/tests/:testId/edit') {
+          history.replace(`/tests/${data.id}/edit`)
+        }
+        this.setState({ createTest: true, testForEdit: data });
+        // this.props.chooseTest(data);
       }
-      this.setState({ createTest: true, testForEdit: data });
-      // this.props.chooseTest(data);
     };
 
     onReportView = (data) => {
@@ -203,10 +227,15 @@ class getTests extends React.Component {
     }
 
     onCloseErrorDialog = () => {
+      this.resetTestActionError();
       this.props.cleanAllErrors();
     };
     onClone = (data) => {
-      this.setState({ createTest: true, testForClone: data });
+      if (!isTestValid(data)) {
+        this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
+      } else {
+        this.setState({ createTest: true, testForClone: data });
+      }
     };
     generateFeedbackMessage = () => {
       const { createJobSuccess, deleteTestSuccess } = this.props;
@@ -233,7 +262,7 @@ class getTests extends React.Component {
         onClone: this.onClone
       });
       const feedbackMsg = this.generateFeedbackMessage();
-      const error = errorOnDeleteTest;
+      const error = this.state.testActionError || errorOnDeleteTest;
       return (
         <Page title={'Tests'} description={DESCRIPTION}>
           <Button className={style['create-button']} onClick={() => {
@@ -277,7 +306,6 @@ class getTests extends React.Component {
             onRequestClose={this.handleSnackbarClose}
           />}
           {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error} />}
-
         </Page>
       )
     }

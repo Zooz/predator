@@ -1,12 +1,13 @@
 import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import { OK_BUTTON_MESSAGE, EMPTY_STRING, ERROR_TITLE } from '../../../constants';
 
 export default (props) => {
   const { closeDialog, showMessage } = props;
   const actions = [
     <FlatButton
-      label='OK'
+      label={OK_BUTTON_MESSAGE}
       primary
       onClick={closeDialog}
     />
@@ -16,7 +17,7 @@ export default (props) => {
   }
   return (
     <Dialog
-      title={'Error'}
+      title={ERROR_TITLE}
       actions={actions}
       modal={false}
       open
@@ -30,7 +31,7 @@ export default (props) => {
 }
 
 const displayError = (message) => {
-  return '' + message;
+  return EMPTY_STRING + message;
 };
 
 const displayDescription = (message) => {

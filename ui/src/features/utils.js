@@ -11,8 +11,6 @@ export const sortDates = (a, b, order) => {
   }
 };
 
-
-
 export const getTimeFromCronExpr = (cronValue) => {
   let result;
   try {
@@ -22,9 +20,7 @@ export const getTimeFromCronExpr = (cronValue) => {
   return result || ''
 };
 
-
-
-function quantify(data, unit, value, allowZero) {
+function quantify (data, unit, value, allowZero) {
   if (value || (allowZero && !value)) {
     // if (value > 1 || value < -1 || value === 0)
     //   unit += 's'
@@ -34,31 +30,36 @@ function quantify(data, unit, value, allowZero) {
 
   return data
 }
+const mappedStatuses = {
+  intermediate: 'In Progress',
+  in_progress: 'In Progress',
+  first_intermediate: 'In Progress'
+}
 
-export const prettySeconds =(seconds)=> {
-  function fix10(number) {
+export const prettierStatus = (status) => {
+  const mappedStatus = mappedStatuses[status] || status;
+  return (mappedStatus.charAt(0).toUpperCase() + mappedStatus.slice(1)).split('_').join(' ');
+}
+export const prettySeconds = (seconds) => {
+  function fix10 (number) {
     return number.toFixed(10)
   }
-  var prettyString = '',
-      data = []
+  var prettyString = '';
+  var data = []
 
   if (typeof seconds === 'number') {
-
-    data = quantify(data, 'd',    parseInt(fix10(seconds / 86400)))
-    data = quantify(data, 'h',   parseInt(fix10((seconds % 86400) / 3600)))
+    data = quantify(data, 'd', parseInt(fix10(seconds / 86400)))
+    data = quantify(data, 'h', parseInt(fix10((seconds % 86400) / 3600)))
     data = quantify(data, 'm', parseInt(fix10((seconds % 3600) / 60)))
     data = quantify(data, 's', Math.floor(seconds % 60), data.length < 1)
 
-    var length = data.length,
-        i;
+    var length = data.length;
+    var i;
 
     for (i = 0; i < length; i++) {
-
-      if (prettyString.length > 0)
-        if (i == length - 1)
-          prettyString += ' and '
-        else
-          prettyString += ', '
+      if (prettyString.length > 0) {
+        if (i == length - 1) { prettyString += ' and ' } else { prettyString += ', ' }
+      }
 
       prettyString += data[i]
     }
