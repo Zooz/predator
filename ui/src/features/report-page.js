@@ -8,7 +8,6 @@ import Loader from './components/Loader';
 import ErrorDialog from './components/ErrorDialog';
 
 const ReportPage = ({ clearSelectedReport, cleanAllReportsErrors, errorGetReport, errorEditReport, loading, report, getReport, match: { params } }) => {
-  const { testId, reportId } = params;
   const error = errorGetReport || errorEditReport;
   useEffect(() => {
     return () => {
@@ -17,12 +16,18 @@ const ReportPage = ({ clearSelectedReport, cleanAllReportsErrors, errorGetReport
   }, [])
 
   useEffect(() => {
+    const { testId, reportId } = params;
+    let timeoutId;
     if (!report) {
+      timeoutId = undefined;
       getReport(testId, reportId);
     } else if (!['failed', 'aborted', 'finished'].includes(report.status)) {
-      setTimeout(function () {
+      timeoutId = setTimeout(function () {
         getReport(testId, reportId);
       }, 5000)
+    }
+    return () => {
+      clearTimeout(timeoutId);
     }
   }, [report]);
 

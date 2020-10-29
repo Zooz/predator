@@ -328,7 +328,6 @@ const SummeryTable = ({ report = {} }) => {
 function mapStateToProps (state) {
   return {
     aggregateReport: selectors.getAggregateReport(state),
-    prometheusData: selectors.prometheusData(state),
     createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
     editReportSuccess: selectors.editReportSuccess(state)
   }
