@@ -265,6 +265,9 @@ class Report extends React.Component {
       this.props.clearAggregateReportAndBenchmark();
     }
 };
+
+
+
 const SummeryTable = ({ report = {} }) => {
   const columnWidth = '100px';
   const ColumnWrapper = ({ children }) => <div style={{
@@ -325,6 +328,7 @@ const SummeryTable = ({ report = {} }) => {
 function mapStateToProps (state) {
   return {
     aggregateReport: selectors.getAggregateReport(state),
+    prometheusData: selectors.prometheusData(state),
     createBenchmarkSucceed: selectors.createBenchmarkSuccess(state),
     editReportSuccess: selectors.editReportSuccess(state)
   }
