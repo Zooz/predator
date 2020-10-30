@@ -248,8 +248,10 @@ class Report extends React.Component {
 
     componentDidUpdate (prevProps, prevState, snapshot) {
       if (prevProps.report !== this.props.report) {
-        const loadingMode = this.isLoadingMode(this.props.report.status)
+        const loadingMode = this.isLoadingMode(this.props.report.status);
+
         if (!loadingMode) {
+          this.props.getAggregateReports();
           this.setState({ finishLoadingMode: prevState.loadingMode });
         }
       }
@@ -265,8 +267,6 @@ class Report extends React.Component {
       this.props.clearAggregateReportAndBenchmark();
     }
 };
-
-
 
 const SummeryTable = ({ report = {} }) => {
   const columnWidth = '100px';
