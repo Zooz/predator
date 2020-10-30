@@ -52,19 +52,19 @@ describe('Testing sequelize connector', function () {
     });
     describe('insertTest', function () {
         it('when succeed insert test', async function () {
-            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', processor_id: '1234', csv_file_id: '5678', scenarios: { s: '1' } }, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId', '1234');
+            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', processor_id: '1234', csv_file_id: '5678', scenarios: { s: '1' }, is_favorite: false }, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' }, is_favorite: false}, 'id', 'revisionId', '1234');
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['test']]);
             should(createStub.args).eql([
                 [
                     {
-                        artillery_json: '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"}}',
+                        artillery_json: '{"name":"name","description":"desc","type":"type","scenarios":{"s":"1"},"is_favorite":false}',
                         name: 'name',
                         description: 'desc',
                         csv_file_id: '5678',
                         file_id: '1234',
                         processor_id: '1234',
-                        raw_data: '{"name":"name","description":"desc","type":"type","processor_id":"1234","csv_file_id":"5678","scenarios":{"s":"1"}}',
+                        raw_data: '{"name":"name","description":"desc","type":"type","processor_id":"1234","csv_file_id":"5678","scenarios":{"s":"1"},"is_favorite":false}',
                         revision_id: 'revisionId',
                         test_id: 'id',
                         type: 'type',
