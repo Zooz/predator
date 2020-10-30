@@ -83,8 +83,8 @@ async function getAllTestRevisions(testId) {
     }
 }
 
-async function getTests() {
-    const rows = await database.getTests();
+async function getTests(filter) {
+    const rows = await database.getTests(filter);
     const testsById = {};
     rows.forEach(function (row) {
         if (!testsById[row.id] || row.updated_at > testsById[row.id].updated_at) {

@@ -63,6 +63,9 @@ async function initSchemas() {
         revision_id: {
             type: Sequelize.DataTypes.UUID,
             unique: 'compositeIndex'
+        },
+        is_favorite: {
+            type: Sequelize.DataTypes.BOOLEAN
         }
     });
 
@@ -130,7 +133,8 @@ async function insertTest(testInfo, testJson, id, revisionId, processorFileId){
         updated_at: Date.now(),
         raw_data: JSON.stringify(testInfo),
         artillery_json: JSON.stringify(testJson),
-        revision_id: revisionId
+        revision_id: revisionId,
+        is_favorite: testInfo.is_favorite
     };
 
     const result = test.create(params);
@@ -148,12 +152,15 @@ async function getTest(id) {
     allTests = sanitizeTestResult(allTests);
     return allTests[0];
 }
-async function getTests() {
+async function getTests(filter) {
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
         order: [['updated_at', 'DESC'], ['id', 'DESC']]
     };
+    if (filter) {
+        options.where[filter] = true;
+    }
     let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
     return allTests;

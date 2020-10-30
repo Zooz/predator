@@ -27,8 +27,10 @@ import {
 } from './constants'
 import IconButton from '../../../components/IconButton';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
-import { faSave, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
+import {faStar as fullStar} from "@fortawesome/free-solid-svg-icons";
+import { faSave, faPlayCircle, faStar as emptyStar } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import InfoToolTip from "../InfoToolTip";
 
 const SLEEP = 'sleep';
 
@@ -51,21 +53,22 @@ export class TestForm extends React.Component {
         processorsExportedFunctions: [],
         csvMode: false,
         csvFile: null,
-        csvFileId: undefined
+        csvFileId: undefined,
+        isFavorite: false
       }
     }
   }
 
     postTest = (goToRunJob) => {
-      const { editMode, id } = this.state;
+      const { editMode, id, csvFile } = this.state;
       const { createTest, editTest } = this.props;
       if (editMode) {
         this.setState({ goToRunJob }, () => {
-          editTest(createTestRequest(this.state), id, this.state.csvFile)
+          editTest(createTestRequest(this.state), id, csvFile)
         })
       } else {
         this.setState({ goToRunJob }, () => {
-          createTest(createTestRequest(this.state), this.state.csvFile);
+          createTest(createTestRequest(this.state), csvFile);
         })
       }
     };
@@ -120,7 +123,7 @@ export class TestForm extends React.Component {
 
     render () {
       const { createTestError, processorsError, closeDialog, processorsLoading, processorsList, csvMetadata } = this.props;
-      const { name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi } = this.state;
+      const { name, description, baseUrl, processorId, editMode, maxSupportedScenariosUi, isFavorite } = this.state;
       const error = createTestError || processorsError || maxSupportedScenariosUi;
 
       return (
@@ -131,7 +134,12 @@ export class TestForm extends React.Component {
               <div className={style['top']}>
                 <div className={style['top-inputs']}>
                   {/* left */}
-
+                  <div onClick={this.setFavorite} className={style['favorite-star']}>  
+                  <InfoToolTip data={{
+                      key: 'star-info',
+                      info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                      }} icon={isFavorite ? fullStar : emptyStar} iconSize={'20px'}/>
+                  </div>
                   <div className={style['input-container']}>
                     <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Name'}>
                       <TextArea maxRows={5} value={name} onChange={(evt, value) => {
@@ -175,6 +183,12 @@ export class TestForm extends React.Component {
         </Modal>
       )
     }
+
+    setFavorite = () => {
+      const {isFavorite} = this.state;
+      const newValue = !isFavorite;
+      this.setState({isFavorite: newValue});
+    };
 
     extractExportedFunctions = (processorsList, processorId) => {
       const chosenProcessor = processorsList.find((processor) => processor.id === processorId);

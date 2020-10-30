@@ -24,9 +24,9 @@ function insertTest(testInfo, testJson, id, revisionId, processorFileId, csvFile
 async function getTest(id) {
     return databaseConnector.getTest(id);
 }
-async function getTests() {
-    return databaseConnector.getTests();
-}
+async function getTests(filter) {
+    return databaseConnector.getTests(filter);
+} 
 
 async function deleteTest(testId) {
     return databaseConnector.deleteTest(testId);
