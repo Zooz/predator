@@ -53,16 +53,18 @@ class getTests extends React.Component {
         this.setState({rerunJob: job});
     };
 
-    filterByFavoriteState = () => {
+    filterFavorites = () => {
         const {onlyFavorites, sortedReports} = this.state;
-        const filteredReports = sortedReports.filter((report) => (!!report.is_favorite) === onlyFavorites);
-        this.setState({sortedReports: filteredReports, sortHeader: ''});
+        if (onlyFavorites) {
+            const filteredReports = sortedReports.filter((report) => (!!report.is_favorite) === onlyFavorites);
+            this.setState({sortedReports: filteredReports, sortHeader: ''});
+        }
     };
 
     componentDidUpdate(prevProps) {
         if (prevProps.reports !== this.props.reports) {
             this.setState({sortedReports: [...this.props.reports]}, () => {
-                this.filterByFavoriteState()
+                this.filterFavorites()
             })
         }
         if (prevProps.deleteReportSuccess === false && this.props.deleteReportSuccess) {
@@ -93,14 +95,14 @@ class getTests extends React.Component {
     onSearch = (value) => {
         if (!value) {
             this.setState({sortedReports: [...this.props.reports]}, () => {
-                this.filterByFavoriteState();
+                this.filterFavorites();
             })
         }
         const newSorted = _.filter(this.props.reports, (report) => {
             return (String(report.status).toLowerCase().includes(value.toLowerCase()))
         });
         this.setState({sortedReports: newSorted}, () => {
-            this.filterByFavoriteState();
+            this.filterFavorites();
         })
     };
 
@@ -194,7 +196,7 @@ class getTests extends React.Component {
                             onlyFavorites: value,
                             sortedReports: [...this.props.reports]
                         }, () => {
-                            this.filterByFavoriteState();
+                            this.filterFavorites();
                         });
                     }}
                     // disabledInp={loading}
