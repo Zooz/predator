@@ -15,6 +15,7 @@ module.exports = function (dslName) {
                     }
                 ]
             },
+            is_favorite: false,
             scenarios: [
                 {
                     scenario_name: 'Scenario',

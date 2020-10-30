@@ -233,6 +233,12 @@ describe('the tests api', function() {
                 createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
                 createTestResponse.body.should.have.only.keys('id', 'revision_id');
 
+                const requestFavBody = simpleTest.test;
+                requestFavBody["is_favorite"] = true;
+                const createFavTestResponse = await testsRequestSender.createTest(requestFavBody, validHeaders);
+                createFavTestResponse.statusCode.should.eql(201, JSON.stringify(createFavTestResponse.body));
+                createFavTestResponse.body.should.have.only.keys('id', 'revision_id');
+
                 const updatedRequestBody = require('../../testExamples/Test_with_variables')(dslName);
                 const updatedTestResponse = await testsRequestSender.updateTest(updatedRequestBody, validHeaders, createTestResponse.body.id);
                 updatedTestResponse.statusCode.should.eql(201, JSON.stringify(updatedTestResponse.body));
@@ -243,6 +249,22 @@ describe('the tests api', function() {
                 should(getTestResponse.statusCode).eql(200);
                 getTestResponse.body.artillery_test.should.eql(expectedResult);
                 getTestResponse.body.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at');
+                
+                getTestResponse = await testsRequestSender.getTest(createFavTestResponse.body.id, validHeaders);
+                should(getTestResponse.statusCode).eql(200);
+                getTestResponse.body.artillery_test.should.eql(expectedResult);
+                getTestResponse.body.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at', 'is_favorite');
+                getTestResponse.body.is_favorite.should.eql(false);
+
+                const updatedFavRequestBody = require('../../testExamples/Test_with_variables_favorite')(dslName);
+                const updatedFavTestResponse = await testsRequestSender.updateTest(updatedFavRequestBody, validHeaders, createTestResponse.body.id);
+                updatedFavTestResponse.statusCode.should.eql(201, JSON.stringify(updatedFavTestResponse.body));
+                updatedFavTestResponse.body.should.have.only.keys('id', 'revision_id');
+
+                getTestResponse = await testsRequestSender.getTest(updatedFavTestResponse.body.id, validHeaders);
+                should(getTestResponse.statusCode).eql(200);
+                getTestResponse.body.artillery_test.should.eql(expectedResult);
+                getTestResponse.body.is_favorite.should.eql(true);
 
                 const validatedResponse = validate(getTestResponse.body.artillery_test);
                 validatedResponse.errors.length.should.eql(0);

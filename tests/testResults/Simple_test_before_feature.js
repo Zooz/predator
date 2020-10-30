@@ -116,6 +116,7 @@ module.exports = function (dslName, id, revision_id) {
         id: id,
         revision_id,
         name: 'test',
+        is_favorite: false,
         before: {
             steps: [
                 {

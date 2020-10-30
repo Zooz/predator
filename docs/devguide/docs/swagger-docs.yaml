@@ -1880,6 +1880,9 @@ components:
           description: Unique processor identifier
           type: string
           format: uuid
+        is_favorite: 
+          description: Test has been marked favorite
+          type: boolean
         type:
           $ref: '#/components/schemas/test_type'
     test_type:
@@ -2425,7 +2428,7 @@ components:
           description: notes for specific report
         is_favorite:
           type: boolean
-          description: wether this report should be marked as favorite
+          description: whether this report should be marked as favorite
     post_report:
       required:
         - report_id
