@@ -48,6 +48,7 @@ export function * createJob ({ body }) {
 export function * editJob ({id, body }) {
   try {
     yield put(Actions.setLoading(true));
+    yield put(Actions.editJobId(id));
     let job = yield call(editJobInFramework, id, body);
     yield put(Actions.editJobSuccess(true));
     yield call(getJobs);

@@ -18,7 +18,8 @@ const {
     WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON,
     WEBHOOK_SLACK_DEFAULT_REPORTER_NAME,
     WEBHOOK_EVENT_TYPE_IN_PROGRESS,
-    WEBHOOK_TEAMS_DEFAULT_THEME_COLOR
+    WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
+    WEBHOOK_TEST_MESSAGE
 } = require('../../common/consts');
 const statsFormatter = require('./statsFormatter');
 
@@ -39,7 +40,7 @@ function getThresholdMessage(state, { emoji, testName, benchmarkThreshold, lastS
         `.*\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, { score })}\n`;
 }
 
-function slackWebhookFormat(message, options) {
+function slackWebhookFormat(message, options = {}) {
     return {
         text: message,
         icon_emoji: options.icon || WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON,
@@ -276,6 +277,24 @@ module.exports.format = function(format, eventType, jobId, testId, report, addit
         }
         case EVENT_FORMAT_TYPE_DISCORD:{
             return discord(eventType, format, testId, jobId, report, additionalInfo, options);
+        }
+        default: {
+            throw new Error(`Unrecognized webhook format: ${format}, available options: ${EVENT_FORMAT_TYPES.join()}`);
+        }
+    }
+};
+
+module.exports.formatSimpleMessage = function(format) {
+    const simpleMessage = WEBHOOK_TEST_MESSAGE;
+    switch (format) {
+        case EVENT_FORMAT_TYPE_SLACK: {
+            return slackWebhookFormat(simpleMessage);
+        }
+        case EVENT_FORMAT_TYPE_JSON: {
+            return { greeting: simpleMessage };
+        }
+        case EVENT_FORMAT_TYPE_TEAMS: {
+            return teamsWebhookFormat(simpleMessage);
         }
         default: {
             throw new Error(`Unrecognized webhook format: ${format}, available options: ${EVENT_FORMAT_TYPES.join()}`);

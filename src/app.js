@@ -47,7 +47,7 @@ module.exports = async () => {
         res.sendFile(path.resolve('ui/dist/index.html'));
     });
 
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({ limit: process.env.BODY_PARSER_LIMIT || '512kb' }));
     app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use(audit({
@@ -76,7 +76,7 @@ module.exports = async () => {
     app.use(function (err, req, res, next) {
         if (err instanceof swaggerValidator.InputValidationError) {
             res.status(400).json({ message: 'Input validation error', validation_errors: err.errors });
-        } else if (err.statusCode){
+        } else if (err.statusCode) {
             return res.status(err.statusCode).json({ message: err.message });
         } else {
             logger.error(err, 'Failure');

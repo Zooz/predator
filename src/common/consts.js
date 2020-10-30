@@ -57,9 +57,13 @@ module.exports = {
         PROCESSOR_NAME_ALREADY_EXIST: 'Processor name already exists',
         PROCESSOR_DELETION_FORBIDDEN: 'Processor is used by tests'
     },
+    WARN_MESSAGES: {
+        BAD_RUNNER_IMAGE: 'It is recommended to use the same MAJOR.MINOR version for both Predator and Predator-Runner docker images in order to be fully compatible with all of the features'
+    },
     KUBERNETES: 'KUBERNETES',
     METRONOME: 'METRONOME',
     DOCKER: 'DOCKER',
+    WEBHOOK_TEST_MESSAGE: 'Hello From Predator! Wuff! Wuff!',
     CONFIG: {
         GRFANA_URL: 'grafana_url',
         DELAY_RUNNER_MS: 'delay_runner_ms',

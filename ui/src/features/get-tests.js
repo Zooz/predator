@@ -26,7 +26,8 @@ import { getColumns } from './configurationColumn';
 import Button from '../components/Button';
 import ErrorDialog from './components/ErrorDialog';
 import _ from 'lodash';
-
+import { isTestValid } from '../validators/validate-test';
+import { INVALID_TEST_MESSAGE } from '../constants'
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
 const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test', 'report', 'edit', 'raw', 'clone', 'delete'];
@@ -43,12 +44,19 @@ class getTests extends React.Component {
       testToDelete: undefined,
       createTest: false,
       testForEdit: null,
+      testActionError: null,
       sortedTests: [],
       sortHeader: ''
     }
   }
 
   componentDidUpdate (prevProps) {
+    if (!prevProps.createJobSuccess && this.props.createJobSuccess) {
+      const { report_id, test_id } = this.props.createJobSuccess;
+      this.props.setCreateJobSuccess(undefined);
+      history.replace(`/tests/${test_id}/reports/${report_id}`)
+    }
+
     if (prevProps.tests !== this.props.tests) {
       this.setState({ sortedTests: [...this.props.tests], sortHeader: 'updated_at-' }, () => {
         this.onSort('updated_at');
@@ -59,7 +67,11 @@ class getTests extends React.Component {
         data && this.onRunTest(data);
       } else if (path === '/tests/:testId/edit') {
         const data = this.props.tests.find((test) => test.id === params.testId);
-        data && this.onEdit(data);
+        if (!isTestValid(data)) {
+          this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
+        } else {
+          this.onEdit(data);
+        }
       }
     }
   }
@@ -118,13 +130,31 @@ class getTests extends React.Component {
       this.setState({ openViewTest: data });
     };
 
+    updateTestActionError = ({ errorMessage }) => {
+      this.setState({
+        testActionError: errorMessage
+      });
+    };
+
+    setTestActionError = ({ errorMessage }) => {
+      this.updateTestActionError({ errorMessage: errorMessage })
+    };
+
+    resetTestActionError = () => {
+      this.updateTestActionError({ errorMessage: null })
+    };
+
     onEdit = (data) => {
       const { match: { params, path }, history } = this.props;
-      if (path !== '/tests/:testId/edit') {
-        history.replace(`/tests/${data.id}/edit`)
+      if (!isTestValid(data)) {
+        this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
+      } else {
+        if (path !== '/tests/:testId/edit') {
+          history.replace(`/tests/${data.id}/edit`)
+        }
+        this.setState({ createTest: true, testForEdit: data });
+        // this.props.chooseTest(data);
       }
-      this.setState({ createTest: true, testForEdit: data });
-      // this.props.chooseTest(data);
     };
 
     onReportView = (data) => {
@@ -197,10 +227,15 @@ class getTests extends React.Component {
     }
 
     onCloseErrorDialog = () => {
+      this.resetTestActionError();
       this.props.cleanAllErrors();
     };
     onClone = (data) => {
-      this.setState({ createTest: true, testForClone: data });
+      if (!isTestValid(data)) {
+        this.setTestActionError({ errorMessage: INVALID_TEST_MESSAGE });
+      } else {
+        this.setState({ createTest: true, testForClone: data });
+      }
     };
     generateFeedbackMessage = () => {
       const { createJobSuccess, deleteTestSuccess } = this.props;
@@ -212,7 +247,6 @@ class getTests extends React.Component {
     };
 
     render () {
-      global.manor = this.props;
       const { sortedTests, sortHeader, testForEdit, testForClone } = this.state;
       const { errorOnDeleteTest, history } = this.props;
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
@@ -228,7 +262,7 @@ class getTests extends React.Component {
         onClone: this.onClone
       });
       const feedbackMsg = this.generateFeedbackMessage();
-      const error = errorOnDeleteTest;
+      const error = this.state.testActionError || errorOnDeleteTest;
       return (
         <Page title={'Tests'} description={DESCRIPTION}>
           <Button className={style['create-button']} onClick={() => {
@@ -238,7 +272,7 @@ class getTests extends React.Component {
           }}>Create Test</Button>
           <ReactTableComponent
             onSearch={this.onSearch}
-            tdStyle={{display:'flex',alignItems:'center'}}
+            tdStyle={{ display: 'flex', alignItems: 'center' }}
             rowHeight={'46px'}
             manual={false}
             data={sortedTests}
@@ -256,7 +290,7 @@ class getTests extends React.Component {
           {this.state.createTest &&
           <TestForm history={history} data={testForEdit || testForClone} closeDialog={this.closeCreateTest}
             cloneMode={!!testForClone} />}
-          {(this.state.openViewCreateJob && !this.props.createJobSuccess)
+          {(this.state.openViewCreateJob)
             ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog} /> : null}
 
           {(this.state.deleteDialog && !this.props.deleteTestSuccess)
@@ -272,7 +306,6 @@ class getTests extends React.Component {
             onRequestClose={this.handleSnackbarClose}
           />}
           {error && <ErrorDialog closeDialog={this.onCloseErrorDialog} showMessage={error} />}
-
         </Page>
       )
     }
@@ -300,7 +333,8 @@ const mapDispatchToProps = {
   // chooseTest: Actions.chooseTest,
   deleteTest: Actions.deleteTest,
   clearAllSuccessOperationsState: Actions.clearAllSuccessOperationsState,
-  cleanAllErrors: Actions.cleanAllErrors
+  cleanAllErrors: Actions.cleanAllErrors,
+  setCreateJobSuccess: Actions.createJobSuccess
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);
