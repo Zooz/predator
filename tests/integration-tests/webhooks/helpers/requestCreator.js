@@ -73,6 +73,6 @@ function updateWebhook(webhookId, webhook) {
 
 function testWebhook(webhookId) {
     return request(app)
-        .get(`${resourceUri}/${webhookId}/test`)
+        .post(`${resourceUri}/${webhookId}/test`)
         .set(headers);
 }
