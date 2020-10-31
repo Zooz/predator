@@ -7,8 +7,8 @@ const {
 const predatorTables = ['tests', 'jobs', 'reports', 'dsl_definitions', 'webhooks', 'files', 'processors', 'benchmarks'];
 
 module.exports.up = async (query) => {
-    const transaction = await query.sequelize.transaction();
     for(const table of predatorTables) {
+        const transaction = await query.sequelize.transaction();
         await migrateTable(query, table, transaction);
     }
 };
@@ -28,10 +28,8 @@ async function migrateTable(query, table, transaction) {
             await query.addIndex(
                 table,
                 [CONTEXT_ID], { transaction });
-
-            await transaction.commit();
-            transaction = null;
         }
+        await transaction.commit();
     } catch (err) {
         await transaction.rollback();
         throw err;
