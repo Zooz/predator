@@ -7,6 +7,7 @@ const {
     EVENT_FORMAT_TYPE_SLACK,
     EVENT_FORMAT_TYPE_TEAMS,
     EVENT_FORMAT_TYPE_DISCORD,
+    WEBHOOK_GRAVATAR_URL,
     WEBHOOK_EVENT_TYPES,
     WEBHOOK_EVENT_TYPE_STARTED,
     WEBHOOK_EVENT_TYPE_FINISHED,
@@ -16,12 +17,16 @@ const {
     WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED,
     WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED,
     WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON,
-    WEBHOOK_SLACK_DEFAULT_REPORTER_NAME,
+    WEBHOOK_DEFAULT_REPORTER_NAME,
     WEBHOOK_EVENT_TYPE_IN_PROGRESS,
     WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
     WEBHOOK_TEST_MESSAGE
 } = require('../../common/consts');
 const statsFormatter = require('./statsFormatter');
+
+function getGravatarUrlWithIconSize(size) {
+    return `${WEBHOOK_GRAVATAR_URL}?s=${size}`;
+}
 
 function unknownWebhookEventTypeError(badWebhookEventTypeValue) {
     return new Error(`Unrecognized webhook event: ${badWebhookEventTypeValue}, must be one of the following: ${WEBHOOK_EVENT_TYPES.join(', ')}`);
@@ -44,7 +49,7 @@ function slackWebhookFormat(message, options = {}) {
     return {
         text: message,
         icon_emoji: options.icon || WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON,
-        username: WEBHOOK_SLACK_DEFAULT_REPORTER_NAME
+        username: WEBHOOK_DEFAULT_REPORTER_NAME
     };
 }
 
@@ -55,10 +60,11 @@ function teamsWebhookFormat(message) {
     };
 }
 
-function discordWebhookFormat(message){
+function discordWebhookFormat(message) {
     return {
-        text: message,
-        username: WEBHOOK_SLACK_DEFAULT_REPORTER_NAME
+        content: message,
+        username: WEBHOOK_DEFAULT_REPORTER_NAME,
+        avatar_url: getGravatarUrlWithIconSize(128)
     };
 }
 
@@ -74,7 +80,7 @@ function json(event, testId, jobId, report, additionalInfo, options) {
     return payload;
 }
 
-function slack(event, format, testId, jobId, report, additionalInfo, options) {
+function slack(event, testId, jobId, report, additionalInfo, options) {
     let message = null;
     const {
         environment,
@@ -87,7 +93,7 @@ function slack(event, format, testId, jobId, report, additionalInfo, options) {
         grafana_report: grafanaReport
     } = report;
     const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
-    const emoji = emojiHandler(format);
+    const emoji = emojiHandler(EVENT_FORMAT_TYPE_SLACK);
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
             const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
@@ -136,7 +142,7 @@ function slack(event, format, testId, jobId, report, additionalInfo, options) {
     return slackWebhookFormat(message, options);
 }
 
-function teams(event, format, testId, jobId, report, additionalInfo, options) {
+function teams(event, testId, jobId, report, additionalInfo, options) {
     let message = null;
     const {
         environment,
@@ -149,7 +155,7 @@ function teams(event, format, testId, jobId, report, additionalInfo, options) {
         grafana_report: grafanaReport
     } = report;
     const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
-    const emoji = emojiHandler(format);
+    const emoji = emojiHandler(EVENT_FORMAT_TYPE_TEAMS);
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
             const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
@@ -199,7 +205,7 @@ function teams(event, format, testId, jobId, report, additionalInfo, options) {
     return teamsWebhookFormat(message);
 }
 
-function discord(event, format, testId, jobId, report, additionalInfo, options) {
+function discord(event, testId, jobId, report, additionalInfo, options) {
     let message = null;
     const {
         environment,
@@ -212,7 +218,7 @@ function discord(event, format, testId, jobId, report, additionalInfo, options) 
         grafana_report: grafanaReport
     } = report;
     const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
-    const emoji = emojiHandler(format);
+    const emoji = emojiHandler(EVENT_FORMAT_TYPE_DISCORD);
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
             const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
@@ -267,16 +273,16 @@ module.exports.format = function(format, eventType, jobId, testId, report, addit
     }
     switch (format) {
         case EVENT_FORMAT_TYPE_SLACK: {
-            return slack(eventType, format, testId, jobId, report, additionalInfo, options);
+            return slack(eventType, testId, jobId, report, additionalInfo, options);
         }
         case EVENT_FORMAT_TYPE_JSON: {
             return json(eventType, testId, jobId, report, additionalInfo, options);
         }
         case EVENT_FORMAT_TYPE_TEAMS: {
-            return teams(eventType, format, testId, jobId, report, additionalInfo, options);
+            return teams(eventType, testId, jobId, report, additionalInfo, options);
         }
         case EVENT_FORMAT_TYPE_DISCORD:{
-            return discord(eventType, format, testId, jobId, report, additionalInfo, options);
+            return discord(eventType, testId, jobId, report, additionalInfo, options);
         }
         default: {
             throw new Error(`Unrecognized webhook format: ${format}, available options: ${EVENT_FORMAT_TYPES.join()}`);
@@ -295,6 +301,9 @@ module.exports.formatSimpleMessage = function(format) {
         }
         case EVENT_FORMAT_TYPE_TEAMS: {
             return teamsWebhookFormat(simpleMessage);
+        }
+        case EVENT_FORMAT_TYPE_DISCORD: {
+            return discordWebhookFormat(simpleMessage);
         }
         default: {
             throw new Error(`Unrecognized webhook format: ${format}, available options: ${EVENT_FORMAT_TYPES.join()}`);

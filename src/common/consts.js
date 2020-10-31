@@ -11,7 +11,7 @@ const WEBHOOK_EVENT_TYPE_IN_PROGRESS = 'in_progress';
 const WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED = 'benchmark_passed';
 const WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED = 'benchmark_failed';
 const WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON = ':muscle:';
-const WEBHOOK_SLACK_DEFAULT_REPORTER_NAME = 'reporter';
+const WEBHOOK_DEFAULT_REPORTER_NAME = 'Predator';
 const WEBHOOK_TEAMS_DEFAULT_THEME_COLOR = '957c58';
 
 module.exports = {
@@ -33,7 +33,7 @@ module.exports = {
     EVENT_FORMAT_TYPE_TEAMS,
     EVENT_FORMAT_TYPE_DISCORD,
     WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON,
-    WEBHOOK_SLACK_DEFAULT_REPORTER_NAME,
+    WEBHOOK_DEFAULT_REPORTER_NAME,
     WEBHOOK_TEAMS_DEFAULT_THEME_COLOR,
     EVENT_FORMAT_TYPES: [
         EVENT_FORMAT_TYPE_SLACK,
@@ -64,6 +64,7 @@ module.exports = {
     METRONOME: 'METRONOME',
     DOCKER: 'DOCKER',
     WEBHOOK_TEST_MESSAGE: 'Hello From Predator! Wuff! Wuff!',
+    WEBHOOK_GRAVATAR_URL: 'https://www.gravatar.com/avatar/af577df746d71dfc4a7ab9f76202f9b8',
     CONFIG: {
         GRFANA_URL: 'grafana_url',
         DELAY_RUNNER_MS: 'delay_runner_ms',
