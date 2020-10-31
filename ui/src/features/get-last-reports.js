@@ -46,7 +46,7 @@ class getReports extends React.Component {
     filterFavorites = () => {
       const { onlyFavorites, sortedReports } = this.state;
       if (onlyFavorites) {
-        const filteredReports = sortedReports.filter((report) => (!!report.is_favorite) === onlyFavorites);
+        const filteredReports = sortedReports.filter((report) => (report.is_favorite));
         this.setState({ sortedReports: filteredReports, sortHeader: '' });
       }
     };
