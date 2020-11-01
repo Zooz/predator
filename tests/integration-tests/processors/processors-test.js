@@ -6,7 +6,7 @@ const processorRequestSender = require('./helpers/requestCreator');
 const testsRequestSender = require('../tests/helpers/requestCreator');
 const { ERROR_MESSAGES } = require('../../../src/common/consts');
 const basicTest = require('../../testExamples/Basic_test.json');
-describe.only('Processors api', function () {
+describe('Processors api', function () {
     this.timeout(5000000);
     before(async function () {
         await processorRequestSender.init();
