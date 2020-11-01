@@ -76,26 +76,50 @@ const wrongContextHeaders = { 'Content-Type': 'application/json', 'x-context-id'
                 const getLastReportsResponse = await reportsRequestCreator.getLastReports(10, undefined, headers);
                 expect(getLastReportsResponse.body.length).to.be.greaterThan(0);
             });
-            it('get report with wrong context_id should return 404', async function () {
-                const editReportResponse = await reportsRequestCreator.getReport(testId, reportId, wrongContextHeaders);
-                expect(editReportResponse.status).to.be.equal(404);
+            describe('actions on report with wrong context_id', async function () {
+                it('get report with wrong context_id should return 404', async function () {
+                    const editReportResponse = await reportsRequestCreator.getReport(testId, reportId, wrongContextHeaders);
+                    expect(editReportResponse.status).to.be.equal(404);
+                });
+                it('get aggregate report with wrong context_id should return 404', async function () {
+                    const editReportResponse = await reportsRequestCreator.getAggregatedReport(testId, reportId, wrongContextHeaders);
+                    expect(editReportResponse.status).to.be.equal(404);
+                });
+                it('get last reports with wrong context_id should return no reports', async function () {
+                    const editReportResponse = await reportsRequestCreator.getLastReports(10, undefined, wrongContextHeaders);
+                    expect(editReportResponse.body.length).to.be.equal(0);
+                });
+                it('edit report with wrong context_id should return 404', async function () {
+                    const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { is_favorite: true }, wrongContextHeaders);
+                    expect(editReportResponse.status).to.be.equal(404);
+                });
+                it('delete report with wrong context_id should return 404', async function () {
+                    const editReportResponse = await reportsRequestCreator.deleteReport(testId, reportId, wrongContextHeaders);
+                    expect(editReportResponse.status).to.be.equal(404);
+                });
             });
-            it('get aggregate report with wrong context_id should return 404', async function () {
-                const editReportResponse = await reportsRequestCreator.getAggregatedReport(testId, reportId, wrongContextHeaders);
-                expect(editReportResponse.status).to.be.equal(404);
-            });
-            it('get last reports with wrong context_id should return no reports', async function () {
-                const editReportResponse = await reportsRequestCreator.getLastReports(10, undefined, wrongContextHeaders);
-                expect(editReportResponse.body.length).to.be.equal(0);
-            });
-            it('edit report with wrong context_id should return 404', async function () {
-                const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { is_favorite: true }, wrongContextHeaders);
-                expect(editReportResponse.status).to.be.equal(404);
-            });
-            it('delete report with wrong context_id should return 404', async function () {
-                const editReportResponse = await reportsRequestCreator.deleteReport(testId, reportId, wrongContextHeaders);
-                expect(editReportResponse.status).to.be.equal(404);
-            });
+            describe('actions on report without context_id', async function () {
+                it('get report should return 200', async function () {
+                    const editReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    expect(editReportResponse.status).to.be.equal(200);
+                });
+                it('get aggregate report should return 200', async function () {
+                    const editReportResponse = await reportsRequestCreator.getAggregatedReport(testId, reportId);
+                    expect(editReportResponse.status).to.be.equal(200);
+                });
+                it('get last reports should return reports', async function () {
+                    const editReportResponse = await reportsRequestCreator.getLastReports(10);
+                    expect(editReportResponse.body.length).to.be.greaterThan(0);
+                });
+                it('edit report should return 204', async function () {
+                    const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { is_favorite: true });
+                    expect(editReportResponse.status).to.be.equal(204);
+                });
+                it('delete report should return 204', async function () {
+                    const editReportResponse = await reportsRequestCreator.deleteReport(testId, reportId);
+                    expect(editReportResponse.status).to.be.equal(204);
+                });
+            })
         });
         describe('deleteReport', async function () {
             it('delete report with context_id return 204', async function () {
