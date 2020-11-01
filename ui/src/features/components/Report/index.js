@@ -251,7 +251,8 @@ class Report extends React.Component {
         const loadingMode = this.isLoadingMode(this.props.report.status);
 
         if (!loadingMode) {
-          this.props.getAggregateReports();
+          const {report} = this.props;
+          this.props.getAggregateReports([{ testId: report.test_id, reportId: report.report_id }])
           this.setState({ finishLoadingMode: prevState.loadingMode });
         }
       }
