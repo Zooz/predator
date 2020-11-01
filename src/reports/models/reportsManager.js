@@ -55,6 +55,11 @@ module.exports.editReport = async (testId, reportId, reportBody) => {
     // currently we support only edit for notes
     const contextId = httpContext.get(CONTEXT_ID);
 
+    const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
+    if (!reportSummary) {
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
+    }
+
     const { notes, is_favorite } = reportBody;
     await databaseConnector.updateReport(testId, reportId, { notes, is_favorite }, contextId);
 };

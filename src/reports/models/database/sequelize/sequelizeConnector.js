@@ -66,7 +66,7 @@ async function insertStats(runnerId, testId, reportId, statsId, statsTime, phase
     return stats.create(params);
 }
 
-async function updateReport(testId, reportId, reportData) {
+async function updateReport(testId, reportId, reportData, contextId) {
     const report = client.model('report');
     const options = {
         where: {
@@ -74,6 +74,10 @@ async function updateReport(testId, reportId, reportData) {
             report_id: reportId
         }
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
 
     return report.update(reportData, options);
 }
