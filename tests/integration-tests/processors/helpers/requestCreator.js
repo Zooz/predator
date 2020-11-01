@@ -22,7 +22,7 @@ async function init() {
     }
 }
 
-function createProcessor(body, headers) {
+function createProcessor(body, headers = { 'Content-Type': 'application/json' }) {
     return request(app).post('/v1/processors')
         .send(body)
         .set(headers)
@@ -31,7 +31,7 @@ function createProcessor(body, headers) {
         });
 }
 
-function getProcessors(from, limit, exclude, headers) {
+function getProcessors(from, limit, exclude, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get('/v1/processors')
         .query({ from, limit, exclude })
         .set(headers)
@@ -40,7 +40,7 @@ function getProcessors(from, limit, exclude, headers) {
         });
 }
 
-function deleteProcessor(processorId, headers) {
+function deleteProcessor(processorId, headers = { 'Content-Type': 'application/json' }) {
     return request(app).delete(`/v1/processors/${processorId}`)
         .set(headers)
         .expect(function (res) {
@@ -48,7 +48,7 @@ function deleteProcessor(processorId, headers) {
         });
 }
 
-function getProcessor(processorId, headers) {
+function getProcessor(processorId, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get(`/v1/processors/${processorId}`)
         .set(headers)
         .expect(function (res) {
@@ -56,7 +56,7 @@ function getProcessor(processorId, headers) {
         });
 }
 
-function updateProcessor(processorId, processor, headers) {
+function updateProcessor(processorId, processor, headers = { 'Content-Type': 'application/json' }) {
     return request(app).put(`/v1/processors/${processorId}`)
         .send(processor)
         .set(headers)
