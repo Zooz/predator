@@ -2817,6 +2817,7 @@ components:
         - slack
         - json
         - teams
+        - discord
     test_webhook_response:
       type: object
       required:

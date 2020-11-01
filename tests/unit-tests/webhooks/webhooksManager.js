@@ -17,9 +17,9 @@ describe('webhooksManager', () => {
     let databaseConnectorUpdateStub;
     let databaseConnectorCreateStub;
     let databaseConnectorGetAllGlobalWebhooks;
-    
+
     let requestSenderSendStub;
-    
+
     let webhooksFormatterFormatSimpleMessageStub;
     let webhooksFormatterFormatStub;
     before('tests setup', function() {
