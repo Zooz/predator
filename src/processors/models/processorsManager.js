@@ -20,7 +20,7 @@ module.exports.createProcessor = async function (processor) {
     try {
         const exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
         processor.exported_functions = exportedFunctions;
-        await databaseConnector.insertProcessor(processorId, processor);
+        await databaseConnector.insertProcessor(processorId, processor, contextId);
         processor.id = processorId;
         logger.info('Processor saved successfully to database');
         return processor;
@@ -52,13 +52,18 @@ module.exports.getProcessor = async function (processorId) {
 module.exports.deleteProcessor = async function (processorId) {
     const contextId = httpContext.get(CONTEXT_ID);
 
+    const processor = await databaseConnector.getProcessorById(processorId, contextId);
+    if (!processor) {
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
+    }
+
     const tests = await testsManager.getTestsByProcessorId(processorId);
     if (tests.length > 0) {
         const testNames = tests.map(test => test.name);
         const message = `${ERROR_MESSAGES.PROCESSOR_DELETION_FORBIDDEN}: ${testNames.join(', ')}`;
         throw generateError(409, message);
     }
-    return databaseConnector.deleteProcessor(processorId, contextId);
+    return databaseConnector.deleteProcessor(processorId);
 };
 
 module.exports.updateProcessor = async function (processorId, processor) {

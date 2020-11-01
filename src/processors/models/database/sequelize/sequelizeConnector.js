@@ -85,11 +85,13 @@ async function getProcessorByName(processorName, contextId) {
 
 async function deleteProcessor(processorId) {
     const processorsModel = client.model('processor');
-    return processorsModel.destroy({
+    const options = {
         where: {
             id: processorId
         }
-    });
+    }
+
+    return processorsModel.destroy(options);
 }
 
 async function updateProcessor(processorId, updatedProcessor) {

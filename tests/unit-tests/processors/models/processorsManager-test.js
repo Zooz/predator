@@ -105,12 +105,26 @@ describe('Processor manager tests', function () {
     describe('Delete existing processor', function () {
         it('Should delete processor', async function () {
             testsManagerStub.getTestsByProcessorId.resolves([]);
+            const processor = {
+                id: uuid(),
+                description: 'first processor',
+                name: 'mickey1'
+            };
+
+            getProcessorByIdStub.resolves(processor);
             deleteStub.resolves();
             const existingProcessorId = uuid();
             await manager.deleteProcessor(existingProcessorId);
             deleteStub.calledOnce.should.eql(true);
         });
         it('Should throw an error for a processor that is used by a test', async function() {
+            const processor = {
+                id: uuid(),
+                description: 'first processor',
+                name: 'mickey1'
+            };
+
+            getProcessorByIdStub.resolves(processor);
             testsManagerStub.getTestsByProcessorId.resolves([{ name: 'predator' }]);
             deleteStub.resolves();
             try {
