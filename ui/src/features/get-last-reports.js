@@ -43,16 +43,18 @@ class getReports extends React.Component {
     };
   }
 
-    filterByFavoriteState = () => {
+    filterFavorites = () => {
       const { onlyFavorites, sortedReports } = this.state;
-      const filteredReports = sortedReports.filter((report) => (!!report.is_favorite) === onlyFavorites);
-      this.setState({ sortedReports: filteredReports, sortHeader: '' });
+      if (onlyFavorites) {
+        const filteredReports = sortedReports.filter((report) => (report.is_favorite));
+        this.setState({ sortedReports: filteredReports, sortHeader: '' });
+      }
     };
 
     componentDidUpdate (prevProps) {
       if (prevProps.reports !== this.props.reports) {
         this.setState({ sortedReports: [...this.props.reports] }, () => {
-          this.filterByFavoriteState()
+          this.filterFavorites()
         })
       }
 
@@ -128,14 +130,14 @@ class getReports extends React.Component {
     onSearch = (value) => {
       if (!value) {
         this.setState({ sortedReports: [...this.props.reports] }, () => {
-          this.filterByFavoriteState();
+          this.filterFavorites();
         })
       }
       const newSorted = _.filter(this.props.reports, (report) => {
         return (String(report.test_name).toLowerCase().includes(value.toLowerCase()) || String(report.status).toLowerCase().includes(value.toLowerCase()))
       });
       this.setState({ sortedReports: newSorted }, () => {
-        this.filterByFavoriteState();
+        this.filterFavorites();
       })
     };
     onCloseErrorDialog = () => {
@@ -196,7 +198,7 @@ class getReports extends React.Component {
                 onlyFavorites: value,
                 sortedReports: [...this.props.reports]
               }, () => {
-                this.filterByFavoriteState();
+                this.filterFavorites();
               });
             }}
             // disabledInp={loading}
