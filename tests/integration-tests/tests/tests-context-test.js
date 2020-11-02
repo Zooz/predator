@@ -129,10 +129,13 @@ describe('the tests api with contexts', function() {
         });
 
         // get tests
-        it('Get tests without context_id should return 200 with 2 tests', async () => {
+        it('Get tests without context_id should return 200 with both tests', async () => {
             const getTestResponse = await testsRequestSender.getTests(headersWithoutContext);
             should(getTestResponse.statusCode).eql(200);
-            should(getTestResponse.body.length).eql(2);
+            const firstTest = getTestResponse.body.find((test) => test.id === createTestWithContextResponse.body.id)
+            const secondTest = getTestResponse.body.find((test) => test.id === createTestWithoutContextResponse.body.id)
+            should(firstTest).not.be.undefined();
+            should(secondTest).not.be.undefined();
         });
 
         it('Get tests with wrong context_id should return 200 with 0 tests', async () => {
