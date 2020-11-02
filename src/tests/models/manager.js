@@ -23,6 +23,15 @@ module.exports = {
 async function upsertTest(testRawData, existingTestId) {
     const contextId = httpContext.get(CONTEXT_ID);
 
+    if (existingTestId) {
+        const test = await database.getTest(existingTestId, contextId);
+        if (!test) {
+            const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+            error.statusCode = 404;
+            throw error;
+        }
+    }
+
     let testArtilleryJson = await testGenerator.createTest(testRawData);
     const id = existingTestId || uuid();
     let processorFileId;
@@ -115,10 +124,17 @@ async function getTests() {
     return latestTestsRevisions;
 }
 
-function deleteTest(testId) {
+async function deleteTest(testId) {
     const contextId = httpContext.get(CONTEXT_ID);
 
-    return database.deleteTest(testId, contextId);
+    const test = await database.getTest(testId, contextId);
+    if (!test) {
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return database.deleteTest(testId);
 }
 
 async function getTestsByProcessorId(processorId) {

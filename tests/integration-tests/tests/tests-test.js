@@ -1,5 +1,5 @@
 const should = require('should');
-const validHeaders = { 'x-zooz-request-id': 'value', 'Content-Type': 'application/json' };
+const validHeaders = { 'Content-Type': 'application/json' };
 const uuid = require('uuid');
 const JSCK = require('jsck');
 const nock = require('nock');

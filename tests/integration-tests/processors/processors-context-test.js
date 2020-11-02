@@ -121,6 +121,12 @@ describe('Processors api - with contexts', function () {
                 const getProcessorsResponse = await processorRequestSender.getProcessor(processorRandomContextResponse.body.id, headers);
                 should(getProcessorsResponse.statusCode).equal(404);
             });
+            it('Get processor by id without context should return 200', async () => {
+                const getProcessorResponse = await processorRequestSender.getProcessor(processor.id, { 'Content-Type': 'application/json' });
+                getProcessorResponse.statusCode.should.eql(200);
+                should(getProcessorResponse.body).containDeep(processorData);
+                should(getProcessorResponse.body.exported_functions).eql(['simple']);
+            });
             after(async function () {
                 const deleteResponse = await processorRequestSender.deleteProcessor(processor.id, { 'Content-Type': 'application/json' });
                 should(deleteResponse.statusCode).equal(204);
@@ -151,6 +157,15 @@ describe('Processors api - with contexts', function () {
                 processorData.description = 'add two numbers';
                 const updateResponse = await processorRequestSender.updateProcessor(processorId, processorData, headers);
                 should(updateResponse.statusCode).equal(404);
+            });
+            it('update a processor without context should return 200', async function () {
+                processorData.javascript = 'module.exports.add = (a,b) => a + b;';
+                processorData.description = 'add two numbers';
+                const updateResponse = await processorRequestSender.updateProcessor(processorId, processorData, { 'Content-Type': 'application/json' });
+                should(updateResponse.statusCode).equal(200);
+                should(updateResponse.body.javascript).equal(processorData.javascript);
+                should(updateResponse.body.description).equal(processorData.description);
+                should(updateResponse.body.exported_functions).eql(['add']);
             });
             afterEach(async function () {
                 const deleteResponse = await processorRequestSender.deleteProcessor(processor.id, { 'Content-Type': 'application/json' });

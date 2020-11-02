@@ -210,10 +210,6 @@ async function deleteTest(testId, contextId){
         where: { test_id: testId }
     };
 
-    if (contextId) {
-        options.where.context_id = contextId;
-    }
-
     const result = test.destroy(options);
     return result;
 }

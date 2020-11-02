@@ -28,8 +28,8 @@ async function getTests(contextId) {
     return databaseConnector.getTests(contextId);
 }
 
-async function deleteTest(testId, contextId) {
-    return databaseConnector.deleteTest(testId, contextId);
+async function deleteTest(testId) {
+    return databaseConnector.deleteTest(testId);
 }
 
 async function insertTestBenchmark(testId, benchmarkData, contextId) {

@@ -263,8 +263,7 @@ describe('Create job global tests', function () {
 
         it('Update non existing job', async () => {
             const response = await schedulerRequestCreator.updateJob(uuid.v4(), { arrival_rate: 100 }, {
-                'Content-Type': 'application/json',
-                'x-zooz-request-id': 1
+                'Content-Type': 'application/json'
             });
             should(response.statusCode).eql(404);
             should(response.body.message).eql('Not found');
