@@ -19,19 +19,13 @@ import ErrorWrapper from '../../../components/ErrorWrapper'
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import { FileDrop } from 'react-file-drop';
 import env from '../../../App/common/env';
-import {
-  CONTENT_TYPES,
-  CAPTURE_TYPES,
-  CAPTURE_KEY_VALUE_PLACEHOLDER,
-  EXPECTATIONS_TYPE,
-  EXPECTATIONS_SPEC_BY_PROP
-} from './constants'
-import { isUrlValid, URL_FIELDS } from "../../../validators/validate-urls";
+import {CONTENT_TYPES} from './constants'
+import { isUrlValid, URL_FIELDS } from '../../../validators/validate-urls';
 import IconButton from '../../../components/IconButton';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { faSave, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { EMPTY_STRING, INVALID_URL_MESSAGE } from '../../../../constants/constants';
+import { EMPTY_STRING, INVALID_URL_MESSAGE } from '../../../constants';
 
 const SLEEP = 'sleep';
 
@@ -57,12 +51,12 @@ export class TestForm extends React.Component {
         urls: {
           [URL_FIELDS.BASE]: {
             value: EMPTY_STRING,
-            error: null,
+            error: null
           },
           [URL_FIELDS.STEP]: {
             value: EMPTY_STRING,
-            error: null,
-          },
+            error: null
+          }
         }
       }
     }
@@ -97,9 +91,8 @@ export class TestForm extends React.Component {
       newState.urls[name].value = value;
       this.setState(newState);
       if (this.hasValidationErrors()) {
-        this.setValidationError({ error: INVALID_URL_MESSAGE  });
-      }
-      else {
+        this.setValidationError({ error: INVALID_URL_MESSAGE });
+      } else {
         this.resetValidationError();
       }
     };
@@ -200,8 +193,8 @@ export class TestForm extends React.Component {
                           onChange={(evt, value) => {
                             this.validateUrl({ name: URL_FIELDS.BASE, value: evt.target.value });
                           }} />
-                       </ErrorWrapper>
-                      </TitleInput>
+                      </ErrorWrapper>
+                    </TitleInput>
                   </div>
                   <div className={style['input-container']}>
                     <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Processor'}>
