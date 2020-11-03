@@ -2320,7 +2320,7 @@ components:
           default: true
         tag:
           type: string
-          description: specific tag data relevant for aws fargate to select running location
+          description: tag of the machine type/region that the job will run on (currently supported in aws fargate)
           example: eu-west-1
     delete_containers_response:
       required:

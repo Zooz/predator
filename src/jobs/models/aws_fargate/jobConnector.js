@@ -12,12 +12,13 @@ module.exports.stopRun = async (jobPlatformName, job) => {
     let describeTaskPromise;
     if (runningTasks.taskArns.length > 0) {
         describeTaskPromise = await ecs.describeTasks({ tasks: runningTasks.taskArns, include: ['TAGS'] }).promise();
-        for (let i = 0; i < describeTaskPromise.tasks.length; i++) {
-            const task = describeTaskPromise.tasks[i];
+        const stopPromises = [];
+        for (const task of describeTaskPromise.tasks) {
             if (task.tags.find(o => o.key === 'job_identifier' && o.value === jobPlatformName)) {
-                ecs.stopTask({ task: task.taskArn }).promise();
+                stopPromises.push(ecs.stopTask({ task: task.taskArn }).promise());
             }
         }
+        await Promise.all(stopPromises);
     }
 };
 
