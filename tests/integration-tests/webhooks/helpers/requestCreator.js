@@ -10,6 +10,7 @@ module.exports = {
     getWebhooks,
     getWebhook,
     deleteWebhook,
+    testWebhook,
     updateWebhook
 };
 
@@ -67,4 +68,10 @@ function updateWebhook(webhookId, webhook, headers = { 'Content-Type': 'applicat
         .expect(function (res) {
             return res;
         });
+}
+
+function testWebhook(webhookId) {
+    return request(app)
+        .post(`${resourceUri}/${webhookId}/test`)
+        .set(headers);
 }

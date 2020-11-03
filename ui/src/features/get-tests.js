@@ -51,6 +51,12 @@ class getTests extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
+    if (!prevProps.createJobSuccess && this.props.createJobSuccess) {
+      const { report_id, test_id } = this.props.createJobSuccess;
+      this.props.setCreateJobSuccess(undefined);
+      history.replace(`/tests/${test_id}/reports/${report_id}`)
+    }
+
     if (prevProps.tests !== this.props.tests) {
       this.setState({ sortedTests: [...this.props.tests], sortHeader: 'updated_at-' }, () => {
         this.onSort('updated_at');
@@ -241,7 +247,6 @@ class getTests extends React.Component {
     };
 
     render () {
-      global.manor = this.props;
       const { sortedTests, sortHeader, testForEdit, testForClone } = this.state;
       const { errorOnDeleteTest, history } = this.props;
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
@@ -285,7 +290,7 @@ class getTests extends React.Component {
           {this.state.createTest &&
           <TestForm history={history} data={testForEdit || testForClone} closeDialog={this.closeCreateTest}
             cloneMode={!!testForClone} />}
-          {(this.state.openViewCreateJob && !this.props.createJobSuccess)
+          {(this.state.openViewCreateJob)
             ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog} /> : null}
 
           {(this.state.deleteDialog && !this.props.deleteTestSuccess)
@@ -328,7 +333,8 @@ const mapDispatchToProps = {
   // chooseTest: Actions.chooseTest,
   deleteTest: Actions.deleteTest,
   clearAllSuccessOperationsState: Actions.clearAllSuccessOperationsState,
-  cleanAllErrors: Actions.cleanAllErrors
+  cleanAllErrors: Actions.cleanAllErrors,
+  setCreateJobSuccess: Actions.createJobSuccess
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(getTests);

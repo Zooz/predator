@@ -1,7 +1,8 @@
 const { expect } = require('chai');
 const uuid = require('uuid');
+const nock = require('nock');
 
-const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPES, WEBHOOK_EVENT_TYPE_API_FAILURE, WEBHOOK_EVENT_TYPE_FAILED } = require('../../../src/common/consts');
+const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPES, WEBHOOK_EVENT_TYPE_API_FAILURE, WEBHOOK_EVENT_TYPE_FAILED, ERROR_MESSAGES: { NOT_FOUND } } = require('../../../src/common/consts');
 
 const webhookRequestSender = require('./helpers/requestCreator');
 
@@ -12,6 +13,47 @@ describe('Webhooks api', function () {
     });
 
     describe('Good requests', async function () {
+        describe('GET /v1/webhooks/:webhook_id/test', function() {
+            it('should return 200 and webhook_status_code=200', async function() {
+                const webhook = generateWebhook();
+                nock(webhook.url).post('').reply(200);
+
+                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                expect(createWebhookResponse.status).to.be.equal(201);
+
+                const webhookId = createWebhookResponse.body.id;
+
+                const testWebhookResponse = await webhookRequestSender.testWebhook(webhookId);
+                expect(testWebhookResponse.status).to.be.equal(200);
+                expect(testWebhookResponse.body).to.have.a.property('webhook_status_code').and.to.be.equal(200);
+            });
+            it('should return 400 and webhook_status_code=400', async function () {
+                const webhook = generateWebhook();
+                nock(webhook.url).post('').reply(400);
+
+                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                expect(createWebhookResponse.status).to.be.equal(201);
+
+                const webhookId = createWebhookResponse.body.id;
+
+                const testWebhookResponse = await webhookRequestSender.testWebhook(webhookId);
+                expect(testWebhookResponse.status).to.be.equal(200);
+                expect(testWebhookResponse.body).to.have.a.property('webhook_status_code').and.to.be.equal(400);
+            });
+            it('should return 200 and webhook_status_code=422', async function () {
+                const webhook = generateWebhook();
+                nock(webhook.url).post('').reply(422);
+
+                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
+                expect(createWebhookResponse.status).to.be.equal(201);
+
+                const webhookId = createWebhookResponse.body.id;
+
+                const testWebhookResponse = await webhookRequestSender.testWebhook(webhookId);
+                expect(testWebhookResponse.status).to.be.equal(200);
+                expect(testWebhookResponse.body).to.have.a.property('webhook_status_code').and.to.be.equal(422);
+            });
+        });
         describe('GET /v1/webhooks', async function () {
             before('clean webhooks', async function() {
                 const webhooksResponse = await webhookRequestSender.getWebhooks();
@@ -183,6 +225,18 @@ describe('Webhooks api', function () {
     });
 
     describe('Bad requests', function () {
+        describe('GET /v1/webhooks/:webhook_id/test', function() {
+            it('should get 400 for bad webhook_id format', async function() {
+                const testWebhookResponse = await webhookRequestSender.testWebhook('bad_id_format');
+                expect(testWebhookResponse.statusCode).to.equal(400);
+                expect(testWebhookResponse.body).to.be.deep.equal({
+                    message: 'Input validation error',
+                    validation_errors: [
+                        'path/webhook_id should match format "uuid"'
+                    ]
+                });
+            });
+        });
         describe('POST /v1/webhooks', function () {
             describe('name validation', function() {
                 it('Create webhook with bad type of name', async function () {
@@ -271,6 +325,13 @@ describe('Webhooks api', function () {
     });
 
     describe('Sad requests', function() {
+        describe('GET /v1/webhooks/:webhook_id/test', function () {
+            it('should return 404 for unexist webhook', async function() {
+                const testWebhookResponse = await webhookRequestSender.testWebhook(uuid.v4());
+                expect(testWebhookResponse.status).to.be.equal(404);
+                expect(testWebhookResponse.body).to.have.a.property('message').and.to.be.equal(NOT_FOUND);
+            });
+        });
         describe('GET /v1/webhooks/:webhook_id', function () {
             it('should return 404 for no existing webhook', async function() {
                 const notExistingWebhookId = uuid.v4();

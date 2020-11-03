@@ -7,6 +7,7 @@ const webhooksManager = require('../../../src/webhooks/models/webhookManager');
 const webhooksFormatter = require('../../../src/webhooks/models/webhooksFormatter');
 const { ERROR_MESSAGES, WEBHOOK_EVENT_TYPE_FINISHED, WEBHOOK_EVENT_TYPE_STARTED, WEBHOOK_EVENT_TYPE_FAILED } = require('../../../src/common/consts');
 const requestSender = require('../../../src/common/requestSender');
+const { stubArray } = require('lodash');
 
 describe('webhooksManager', () => {
     let sandbox;
@@ -19,6 +20,7 @@ describe('webhooksManager', () => {
 
     let requestSenderSendStub;
 
+    let webhooksFormatterFormatSimpleMessageStub;
     let webhooksFormatterFormatStub;
     before('tests setup', function() {
         sandbox = sinon.sandbox.create();
@@ -30,6 +32,7 @@ describe('webhooksManager', () => {
         databaseConnectorGetAllGlobalWebhooks = sandbox.stub(databaseConnector, 'getAllGlobalWebhooks');
 
         webhooksFormatterFormatStub = sandbox.stub(webhooksFormatter, 'format');
+        webhooksFormatterFormatSimpleMessageStub = sandbox.stub(webhooksFormatter, 'formatSimpleMessage');
 
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
     });
@@ -166,6 +169,71 @@ describe('webhooksManager', () => {
             }
         });
     });
+    describe('#testWebhook', function() {
+        [200, 201, 204, 209, 301].forEach(function(statusCode) {
+            it(`Should return response of ${statusCode}`, async function () {
+                const webhook = {
+                    id: uuid.v4(),
+                    format_type: 'json',
+                    url: 'http://some_url.com',
+                    name: 'some_webhook_url'
+                };
+                const payload = { predator: 'wuff' };
+
+                databaseConnectorGetStub.withArgs(webhook.id).resolves(webhook);
+                requestSenderSendStub.resolves({ statusCode });
+                webhooksFormatterFormatSimpleMessageStub.returns(payload);
+
+                const statusCodeWebhookResponse = await webhooksManager.testWebhook(webhook.id);
+
+                expect(requestSenderSendStub.calledOnce).to.be.equal(true);
+                expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
+                    method: 'POST',
+                    url: webhook.url,
+                    body: payload,
+                    resolveWithFullResponse: true
+                });
+                expect(statusCodeWebhookResponse).to.be.equal(statusCode);
+            });
+        });
+        [400, 500, 502, 504, 400, 401].forEach(function (statusCode) {
+            it(`Should return response of ${statusCode}`, async function () {
+                const webhook = {
+                    id: uuid.v4(),
+                    format_type: 'json',
+                    url: 'http://some_url.com',
+                    name: 'some_webhook_url'
+                };
+                const payload = { predator: 'wuff' };
+
+                databaseConnectorGetStub.withArgs(webhook.id).resolves(webhook);
+                requestSenderSendStub.throws({ statusCode });
+                webhooksFormatterFormatSimpleMessageStub.returns(payload);
+
+                const statusCodeFromWebhook = await webhooksManager.testWebhook(webhook.id);
+
+                expect(requestSenderSendStub.calledOnce).to.be.equal(true);
+                expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
+                    method: 'POST',
+                    url: webhook.url,
+                    body: payload,
+                    resolveWithFullResponse: true
+                });
+                expect(statusCodeFromWebhook).to.be.equal(statusCode);
+            });
+        });
+        it('should throw an error for webhook not found', async function() {
+            databaseConnectorGetStub.resolves(null);
+
+            try {
+                await webhooksManager.testWebhook(uuid.v4());
+            } catch (err) {
+                expect(err).to.be.an('error');
+                expect(err).to.have.a.property('statusCode').and.to.be.equal(404);
+                expect(err).to.have.a.property('message').and.to.be.equal(ERROR_MESSAGES.NOT_FOUND);
+            }
+        });
+    });
     describe('#fireWebhookByEvent', function() {
         it('should not fire requests if there are no webhooks', async function() {
             const job = {
@@ -218,12 +286,14 @@ describe('webhooksManager', () => {
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
                 method: 'POST',
                 url: webhooks[0].url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
             expect(requestSenderSendStub.args[1][0]).to.be.deep.equal({
                 method: 'POST',
                 url: webhooks[1].url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
 
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(2);
@@ -266,7 +336,8 @@ describe('webhooksManager', () => {
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
                 method: 'POST',
                 url: webhooks[0].url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
 
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(1);
@@ -316,12 +387,14 @@ describe('webhooksManager', () => {
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
                 method: 'POST',
                 url: webhooks[0].url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
             expect(requestSenderSendStub.args[1][0]).to.be.deep.equal({
                 method: 'POST',
                 url: globalWebhook.url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
 
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(2);
@@ -353,7 +426,8 @@ describe('webhooksManager', () => {
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
                 method: 'POST',
                 url: globalWebhook.url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(1);
         });
@@ -394,7 +468,8 @@ describe('webhooksManager', () => {
             requestSenderSendStub.withArgs({
                 method: 'POST',
                 url: globalWebhook.url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             }).rejects();
 
             await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report);
@@ -407,17 +482,20 @@ describe('webhooksManager', () => {
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
                 method: 'POST',
                 url: webhooks[0].url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
             expect(requestSenderSendStub.args[1][0]).to.be.deep.equal({
                 method: 'POST',
                 url: webhooks[1].url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
             expect(requestSenderSendStub.args[2][0]).to.be.deep.equal({
                 method: 'POST',
                 url: globalWebhook.url,
-                body: format
+                body: format,
+                resolveWithFullResponse: true
             });
 
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(3);

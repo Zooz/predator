@@ -20,8 +20,16 @@ import TitleInput from "../../../components/TitleInput";
 import DynamicKeyValueInput from './DynamicKeyValueInput';
 import CustomDropdown from './CustomDropdown';
 import Expectations from './Expectations';
+import ErrorWrapper from '../../../components/ErrorWrapper'
+import { isUrlValid, URL_FIELDS } from "../../../validators/validate-urls";
+import { INVALID_URL_MESSAGE } from "../../../../constants/constants";
 
 export default (props) => {
+
+    const validateUrl = ({ name, value }) => {
+        props.validateUrl({ name, value })
+        onInputChange({ url: value });
+    };
 
     const onHeaderChange = (key, value, index) => {
         const {onChangeValue} = props;
@@ -108,7 +116,9 @@ export default (props) => {
     };
 
     const {
-        step, processorsExportedFunctions
+        step,
+        processorsExportedFunctions,
+        validationError,
     } = props;
     const jsonObjectKey = step.method === 'GET' ? 'get' : 'not-get';
 
@@ -126,10 +136,12 @@ export default (props) => {
                             placeHolder={'Method'}
                         />
                     </TitleInput>
-                    <TitleInput style={{marginRight: '10px', flexGrow: 2}} title={'Url'}>
-                        <Input value={step.url} onChange={(evt) => {
-                            onInputChange({url: evt.target.value})
-                        }}/>
+                    <TitleInput style={{marginRight: '10px', flexGrow: 2 }} title={'Url'}>
+                        <ErrorWrapper errorText={validationError}>
+                            <Input value={step.url} onChange={(evt) => {
+                                validateUrl({ name: URL_FIELDS.STEP, value: evt.target.value });
+                            }} />
+                        </ErrorWrapper>
                     </TitleInput>
                     <TitleInput style={{marginRight: '10px'}} title={'Before Request'}>
                         <ProcessorsDropDown options={processorsExportedFunctions}

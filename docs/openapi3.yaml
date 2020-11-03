@@ -850,59 +850,57 @@ paths:
         description: report data
         required: true
   '/v1/tests/{test_id}/reports/{report_id}/subscribe':
-    parameters:
-      - $ref: '#/components/parameters/context_id'
-    post:
-      operationId: subscribe-runner-to-report
-      tags:
-        - Reports
-      summary: Subscribe runner to a report
-      description: Subscribe a runner to a specific report.
       parameters:
-        - in: header
-          name: x-runner-id
-          description: id of the predator-runner
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: afbb6b43-fe52-48f2-84f4-1eebdbb2d5de
-        - in: path
-          name: test_id
-          required: true
-          description: The id of the test for which to retrieve the report.
-          schema:
-            type: string
-            example: 81a27853-0db5-4e57-ad63-4b637528398a
-        - in: path
-          name: report_id
-          description: The id of the report to retrieve.
-          required: true
-          schema:
-            type: string
-            example: '1601759162814'
-      responses:
-        '204':
-          description: Success
-
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
+        - $ref: '#/components/parameters/context_id'
+      post:
+        operationId: subscribe-runner-to-report
+        tags:
+          - Reports
+        summary: Subscribe runner to a report
+        description: Subscribe a runner to a specific report.
+        parameters:
+          - in: header
+            name: x-runner-id
+            description: id of the predator-runner
+            required: true
+            schema:
+              type: string
+              example: afbb6b43-fe52-48f2-84f4-1eebdbb2d5de
+          - in: path
+            name: test_id
+            required: true
+            description: The id of the test for which to retrieve the report.
+            schema:
+              type: string
+              example: 81a27853-0db5-4e57-ad63-4b637528398a
+          - in: path
+            name: report_id
+            description: The id of the report to retrieve.
+            required: true
+            schema:
+              type: string
+              example: '1601759162814'
+        responses:
+          '204':
+            description: Success
+          '400':
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}':
     parameters:
       - $ref: '#/components/parameters/context_id'
@@ -1747,6 +1745,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  /v1/webhooks/{webhook_id}/test:
+    post:
+      operationId: test-a-webhook
+      tags:
+        - Webhooks
+      summary: Tests that the webhook is configure correctly
+      description: Tests that the webhook is configure correctly by sending a message to the target webhook url.
+      parameters:
+        - in: path
+          name: webhook_id
+          description: The webhook id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/test_webhook_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
   # Files
   /v1/files:
     parameters:
@@ -2840,3 +2874,12 @@ components:
         - slack
         - json
         - teams
+        - discord
+    test_webhook_response:
+      type: object
+      required:
+        - webhook_status_code
+      properties:
+          webhook_status_code:
+            type: number
+            example: 400

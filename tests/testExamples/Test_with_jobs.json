@@ -1,0 +1,13 @@
+{
+    "cron-jobs":{
+        "test_id": "",
+        "arrival_rate": 1,
+        "parallelism": 2,
+        "type": "load_test",
+        "duration": 120,
+        "environment": "test",
+        "cron_expression": "0 0 01 * * *",
+        "max_virtual_users": 100,
+        "enabled": true
+    }
+}

@@ -2,7 +2,7 @@ const app = require('./app'),
     logger = require('./common/logger'),
     request = require('request-promise-native'),
     configHandler = require('./configManager/models/configHandler'),
-    constConfig = require('./common/consts').CONFIG,
+    constConfig = require('./common/consts'),
     shutdown = require('graceful-shutdown-express');
 
 app().then(async (app) => {
@@ -31,17 +31,25 @@ async function verifyInternalAddressReachable() {
         return;
     }
 
-    const internalConfigAddress = await configHandler.getConfigValue(constConfig.INTERNAL_ADDRESS) + '/config';
+    const internalConfigAddress = await configHandler.getConfigValue(constConfig.CONFIG.INTERNAL_ADDRESS) + '/config';
     logger.info(`Checking ${internalConfigAddress} to verify predator-runners will be able connect to Predator`);
     if (internalConfigAddress.includes('localhost') || internalConfigAddress.includes('127.0.0.1')) {
         logger.warn('INTERNAL_ADDRESS set to localhost, Predator runners may not be able connect Predator if running inside docker bridge mode or in different networks');
     }
 
-    const response = await request.get(internalConfigAddress, { json: true, simple: false, resolveWithFullResponse: true, timeout: 5000 });
-
-    if (response.statusCode !== 200 || !response.body.internal_address) {
-        throw new Error(`Failed to reach successfully INTERNAL_ADDRESS at ${internalConfigAddress}, shutting down server (to skip this check set SKIP_INTERNAL_ADDRESS_CHECK=true\nError: ${response.body}`);
-    } else {
+    try {
+        await request.get(internalConfigAddress, {
+            json: true,
+            resolveWithFullResponse: true,
+            timeout: 5000
+        });
         logger.info(`${internalConfigAddress} successfully reached`);
+    } catch (error) {
+        let platform = await configHandler.getConfigValue(constConfig.CONFIG.JOB_PLATFORM);
+        if (platform === constConfig.DOCKER) {
+            throw new Error(`Failed to reach successfully INTERNAL_ADDRESS at ${internalConfigAddress}, shutting down server (to skip this check set SKIP_INTERNAL_ADDRESS_CHECK=true\nError: ${error.message}`);
+        } else {
+            logger.warn(`Failed to reach successfully INTERNAL_ADDRESS at ${internalConfigAddress}`);
+        }
     }
 }

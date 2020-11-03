@@ -164,6 +164,19 @@ module.exports.updateJob = async (jobId, jobConfig) => {
     logger.info('Job updated successfully to database');
 };
 
+module.exports.getJobBasedOnTestId = async (testId) => {
+    try {
+        const jobs = await databaseConnector.getJobBasedOnTestId(testId);
+        const jobsResponse = jobs.map((job) => {
+            return createResponse(job.id, job);
+        });
+        return jobsResponse;
+    } catch (error) {
+        logger.error(error, 'Error occurred trying to get job based on test id');
+        throw error;
+    }
+};
+
 function createResponse(jobId, jobBody, reportId) {
     const response = {
         id: jobId,
