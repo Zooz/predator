@@ -6,7 +6,7 @@ module.exports.up = async (query, DataTypes) => {
     if (!jobsTable.tag) {
         await query.addColumn(
             'jobs', 'tag',
-            Sequelize.DataTypes.JSON);
+            Sequelize.DataTypes.STRING);
     }
 };
 
