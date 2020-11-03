@@ -39,6 +39,7 @@ async function insertJob(jobId, jobInfo) {
         proxy_url: jobInfo.proxy_url,
         enabled: jobInfo.enabled,
         debug: jobInfo.debug,
+        tag: jobInfo.tag,
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
             return { id: uuid(), address: emailAddress };
         }) : undefined
@@ -109,6 +110,7 @@ async function updateJob(jobId, jobInfo) {
         max_virtual_users: jobInfo.max_virtual_users,
         proxy_url: jobInfo.proxy_url,
         debug: jobInfo.debug,
+        tag: jobInfo.tag,
         enabled: jobInfo.enabled,
         notes: jobInfo.notes,
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
@@ -183,7 +185,7 @@ async function getJobBasedOnTestId(testId){
         attributes: { exclude: ['updated_at', 'created_at'] },
         where : { test_id: testId }
     };
-    
+
     const allJobsSql = await job.findAll(options);
     const allJobs = allJobsSql.map(sqlJob => sqlJob.dataValues);
 
@@ -252,6 +254,9 @@ async function initSchemas() {
         },
         enabled: {
             type: Sequelize.DataTypes.BOOLEAN
+        },
+        tag: {
+            type: Sequelize.DataTypes.STRING
         }
     });
     job.email = job.hasMany(email);
