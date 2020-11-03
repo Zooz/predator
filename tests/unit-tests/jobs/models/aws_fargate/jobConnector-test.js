@@ -148,5 +148,23 @@ describe('aws fargate job connector tests', function () {
                 should(error.message).eql('failure');
             }
         });
+
+        it('getLogs not implemented', async () => {
+            try {
+                await jobConnector.getLogs();
+                throw new Error('should not get here');
+            } catch (error) {
+                should(error.message).eql('Not implemented');
+            }
+        });
+
+        it('deleteAllContainers not implemented', async () => {
+            try {
+                await jobConnector.deleteAllContainers();
+                throw new Error('should not get here');
+            } catch (error) {
+                should(error.message).eql('Not implemented');
+            }
+        });
     });
 });

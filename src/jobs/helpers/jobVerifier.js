@@ -1,6 +1,8 @@
 'use strict';
 const testsManager = require('../../tests/models/manager');
 const CronTime = require('cron').CronTime;
+const configHandler = require('../../configManager/models/configHandler');
+const consts = require('../../common/consts');
 
 /**
  * Validates a cron expression and returns error message if the expression is invalid
@@ -15,7 +17,7 @@ function verifyCronExpression(exp) {
     }
 }
 
-module.exports.verifyJobBody = (req, res, next) => {
+module.exports.verifyJobBody = async (req, res, next) => {
     let errorToThrow;
     const jobBody = req.body;
     if (!(jobBody.run_immediately || jobBody.cron_expression)) {
@@ -30,6 +32,13 @@ module.exports.verifyJobBody = (req, res, next) => {
         const message = verifyCronExpression(jobBody.cron_expression);
         if (message) {
             errorToThrow = new Error(`Unsupported cron_expression. ${message}`);
+            errorToThrow.statusCode = 400;
+        }
+    }
+    const jobPlatform = await configHandler.getConfigValue(consts.CONFIG.JOB_PLATFORM);
+    if (jobPlatform === consts.AWS_FARGATE) {
+        if (!jobBody.tag) {
+            errorToThrow = new Error('tag must be provided when JOB_PLATFORM is AWS_FARGATE');
             errorToThrow.statusCode = 400;
         }
     }
