@@ -227,7 +227,7 @@ describe('the tests api with contexts', function() {
                 });
             });
             describe('files', async function() {
-                it('Create test, with a file', async () => {
+                it('Create test with a file with same context should succeed', async () => {
                     const requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
                     const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithContext);
                     console.log('error response: ' + JSON.stringify(createTestResponse.body));
@@ -238,9 +238,20 @@ describe('the tests api with contexts', function() {
                     const resGetFile = await testsRequestSender.getFile(resGetTest.body.file_id, headersWithContext);
                     resGetFile.statusCode.should.eql(200);
                 });
+                it('Create test with a file with wrong context should fail', async () => {
+                    const requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
+                    const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithContext);
+                    console.log('error response: ' + JSON.stringify(createTestResponse.body));
+                    createTestResponse.statusCode.should.eql(201);
+                    const resGetTest = await testsRequestSender.getTest(createTestResponse.body.id, headersWithContext);
+                    resGetTest.statusCode.should.eql(200);
+                    should.notEqual(resGetTest.body.file_id, undefined);
+                    const resGetFile = await testsRequestSender.getFile(resGetTest.body.file_id, headersWithRandomContext);
+                    resGetFile.statusCode.should.eql(404);
+                });
             });
             describe('processors', async function() {
-                it('create test with processor', async function(){
+                it('create test with processor with same context should succeed', async function(){
                     const processor = {
                         name: 'some-user-processor: ' + uuid(),
                         description: 'This is a description',
@@ -273,12 +284,67 @@ describe('the tests api with contexts', function() {
                     resGetTest.statusCode.should.eql(200);
                     should.equal(resGetTest.body.processor_id, processorId);
                 });
+                it('create test with processor not with same context should fail', async function(){
+                    const processor = {
+                        name: 'some-user-processor: ' + uuid(),
+                        description: 'This is a description',
+                        javascript: 'module.exports = {\n' +
+                            '    beforeRequest,\n' +
+                            '    afterResponse,\n' +
+                            '    afterScenario,\n' +
+                            '    beforeScenario\n' +
+                            '};\n' +
+                            'function beforeRequest(requestParams, context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function afterResponse(requestParams, response, context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function afterScenario(context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function beforeScenario(context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}'
+                    };
+                    const processorResponse = await processorsRequestSender.createProcessor(processor, headersWithContext);
+                    const processorId = processorResponse.body.id;
+                    const requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
+                    const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithRandomContext);
+                    console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
+                    createTestResponse.statusCode.should.eql(400);
+                });
+                it('create test with processor without context should succeed', async function(){
+                    const processor = {
+                        name: 'some-user-processor: ' + uuid(),
+                        description: 'This is a description',
+                        javascript: 'module.exports = {\n' +
+                            '    beforeRequest,\n' +
+                            '    afterResponse,\n' +
+                            '    afterScenario,\n' +
+                            '    beforeScenario\n' +
+                            '};\n' +
+                            'function beforeRequest(requestParams, context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function afterResponse(requestParams, response, context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function afterScenario(context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function beforeScenario(context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}'
+                    };
+                    const processorResponse = await processorsRequestSender.createProcessor(processor, headersWithContext);
+                    const processorId = processorResponse.body.id;
+                    const requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
+                    const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithoutContext);
+                    console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
+                    createTestResponse.statusCode.should.eql(201);
+                });
             });
         });
     });
 });
-
-function validate(script) {
-    const validation = artilleryCheck.validate(script);
-    return validation;
-}
