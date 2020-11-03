@@ -88,7 +88,7 @@ describe('Webhooks api', function () {
                 const id = uuid.v4();
 
                 const deleteWebhookResponse = await webhookRequestSender.deleteWebhook(id);
-                expect(deleteWebhookResponse.statusCode).to.equal(204);
+                expect(deleteWebhookResponse.statusCode).to.equal(404);
             });
         });
         describe('PUT /v1/webhooks/:webhook_id', function() {
