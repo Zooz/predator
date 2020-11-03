@@ -6,6 +6,7 @@ import Input from '../../../components/Input';
 
 const Section = CollapsibleItem.Section;
 const SLEEP = 'sleep';
+
 export default class CollapsibleStep extends React.Component {
   constructor (props) {
     super(props);
@@ -75,7 +76,14 @@ export default class CollapsibleStep extends React.Component {
     };
 
     generateBody = () => {
-      const { index, onChangeValueOfStep, processorsExportedFunctions, step } = this.props;
+      const {
+        index,
+        onChangeValueOfStep,
+        processorsExportedFunctions,
+        step,
+        validationError,
+        validateUrl,
+      } = this.props;
       return (
         <div style={{ padding: '10px' }}>
           {
@@ -84,7 +92,10 @@ export default class CollapsibleStep extends React.Component {
               index={index}
               onChangeValue={onChangeValueOfStep}
             /> ||
-            <StepForm step={step}
+            <StepForm
+              step={step}
+              validationError={validationError}
+              validateUrl={validateUrl}
               index={index}
               onChangeValue={onChangeValueOfStep}
               processorsExportedFunctions={processorsExportedFunctions}

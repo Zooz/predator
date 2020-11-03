@@ -17,7 +17,9 @@ export default class StepsList extends React.Component {
       onDeleteStep,
       onDuplicateStep,
       updateStepOrder,
-      editMode
+      editMode,
+      validationError,
+      validateUrl,
     } = this.props;
     return (<div style={{
       width: '100%',
@@ -48,6 +50,8 @@ export default class StepsList extends React.Component {
                 afterStepProcessorValue={afterStepProcessorValue}
                 onDeleteStep={onDeleteStep}
                 onDuplicateStep={onDuplicateStep}
+                validationError={validationError}
+                validateUrl={validateUrl}
               />
             </DragableWrapper>
           )
