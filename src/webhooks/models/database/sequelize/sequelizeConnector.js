@@ -26,13 +26,13 @@ function parseWebhook(webhookRecord) {
 async function _getWebhook(webhookId, contextId) {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
 
-    const options = { include: ['events'] };
+    const options = { include: ['events'], where: { id: webhookId } };
 
     if (contextId) {
-        options.where = { context_id: contextId };
+        options.where.context_id = contextId;
     }
 
-    return webhooksModel.findByPk(webhookId, options);
+    return webhooksModel.findOne(options);
 }
 
 async function init(sequelizeClient) {
@@ -87,7 +87,17 @@ async function createWebhook(webhook, contextId) {
         await createdWebhook.setEvents(eventsIds, { transaction });
         return createdWebhook;
     });
-    const retrievedWebhook = await webhooksModel.findByPk(id, { include: ['events'] });
+
+    const options = {
+        include: ['events'],
+        where: { id }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    const retrievedWebhook = await webhooksModel.findOne(options);
     const parsedWebhook = parseWebhook(retrievedWebhook);
     return parsedWebhook;
 }
