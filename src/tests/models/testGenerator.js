@@ -1,12 +1,14 @@
 'use strict';
 const _ = require('lodash');
-const consts = require('./../../common/consts');
+const httpContext = require('express-http-context');
+
+const { TEST_TYPE_BASIC, CONTEXT_ID} = require('./../../common/consts');
 const database = require('./database');
 const utils = require('../helpers/utils');
 const { get, cloneDeep } = require('lodash');
 
 module.exports.createTest = async function(testDetails) {
-    if (testDetails.type === consts.TEST_TYPE_BASIC) {
+    if (testDetails.type === TEST_TYPE_BASIC) {
         const artillery = utils.addDefaultsToTest(testDetails.artillery_test);
         delete testDetails.artillery_test;
         return artillery;
@@ -78,8 +80,10 @@ function calculateWeights(scenarios, weightsSum, missingWeightCount) {
 }
 
 async function getDslDefinitionsAsMap(dslName) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const result = {};
-    const definitions = await database.getDslDefinitions(dslName);
+    const definitions = await database.getDslDefinitions(dslName, contextId);
     definitions.forEach(function (definition) {
         result[definition.definition_name] = definition.artillery_json;
     });

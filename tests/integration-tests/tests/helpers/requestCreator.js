@@ -34,15 +34,17 @@ async function init() {
 function generateUniqueDslName(dslName) {
     return dslName + '_' + new Date().getTime();
 }
-function getDsl(dslName, definitionName) {
+function getDsl(dslName, definitionName, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get(`/v1/dsl/${dslName}/definitions/${definitionName}`)
+        .set(headers)
         .send()
         .expect(function (res) {
             return res;
         });
 }
-function createDsl(dslName, definitionName, definitionRequest) {
+function createDsl(dslName, definitionName, definitionRequest, headers = { 'Content-Type': 'application/json' }) {
     return request(app).post(`/v1/dsl/${dslName}/definitions`)
+        .set(headers)
         .send({
             name: definitionName,
             request: definitionRequest
@@ -51,8 +53,9 @@ function createDsl(dslName, definitionName, definitionRequest) {
             return res;
         });
 }
-function updateDsl(dslName, definitionName, definitionRequest) {
+function updateDsl(dslName, definitionName, definitionRequest, headers = { 'Content-Type': 'application/json' }) {
     return request(app).put(`/v1/dsl/${dslName}/definitions/${definitionName}`)
+        .set(headers)
         .send({
             request: definitionRequest
         })
@@ -60,8 +63,9 @@ function updateDsl(dslName, definitionName, definitionRequest) {
             return res;
         });
 }
-function deleteDsl(dslName, definitionName, definitionRequest) {
+function deleteDsl(dslName, definitionName, definitionRequest, headers = { 'Content-Type': 'application/json' }) {
     return request(app).delete(`/v1/dsl/${dslName}/definitions/${definitionName}`)
+        .set(headers)
         .send({
             request: definitionRequest
         })
@@ -69,15 +73,16 @@ function deleteDsl(dslName, definitionName, definitionRequest) {
             return res;
         });
 }
-function getDslDefinitions(dslName) {
+function getDslDefinitions(dslName, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get(`/v1/dsl/${dslName}/definitions`)
+        .set(headers)
         .send()
         .expect(function (res) {
             return res;
         });
 }
 
-function createTest(body, headers) {
+function createTest(body, headers = { 'Content-Type': 'application/json' }) {
     return request(app).post('/v1/tests')
         .send(body)
         .set(headers)
@@ -86,7 +91,7 @@ function createTest(body, headers) {
         });
 }
 
-function createBenchmark(testId, body, headers) {
+function createBenchmark(testId, body, headers = { 'Content-Type': 'application/json' }) {
     return request(app).post('/v1/tests/' + testId + '/benchmark')
         .send(body)
         .set(headers)
@@ -95,7 +100,7 @@ function createBenchmark(testId, body, headers) {
         });
 }
 
-function getBenchmark(testId, headers) {
+function getBenchmark(testId, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get('/v1/tests/' + testId + '/benchmark')
         .set(headers)
         .expect(function (res) {
@@ -103,7 +108,7 @@ function getBenchmark(testId, headers) {
         });
 }
 
-function updateTest(body, headers, testId) {
+function updateTest(body, headers = { 'Content-Type': 'application/json' }, testId) {
     return request(app).put('/v1/tests/' + testId)
         .send(body)
         .set(headers)
@@ -112,7 +117,7 @@ function updateTest(body, headers, testId) {
         });
 }
 
-function deleteTest(headers, testId) {
+function deleteTest(headers = { 'Content-Type': 'application/json' }, testId) {
     return request(app).delete('/v1/tests/' + testId)
         .set(headers)
         .expect(function(res){
@@ -120,7 +125,7 @@ function deleteTest(headers, testId) {
         });
 }
 
-function getTest(id, headers) {
+function getTest(id, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get('/v1/tests/' + id)
         .set(headers)
         .expect(function(res){
@@ -128,14 +133,14 @@ function getTest(id, headers) {
         });
 }
 
-function getFile(id, headers) {
+function getFile(id, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get('/v1/files/' + id)
         .set(headers)
         .expect(function (res) {
             return res;
         });
 }
-function getAllRevisions(id, headers) {
+function getAllRevisions(id, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get(`/v1/tests/${id}/revisions`)
         .set(headers)
         .expect(function(res){
@@ -143,7 +148,7 @@ function getAllRevisions(id, headers) {
         });
 }
 
-function getTests(headers) {
+function getTests(headers = { 'Content-Type': 'application/json' }) {
     return request(app).get('/v1/tests')
         .set(headers)
         .expect(function(res){
@@ -151,11 +156,11 @@ function getTests(headers) {
         });
 }
 
-async function createDslRequests(dslName, dslRequests) {
+async function createDslRequests(dslName, dslRequests, headers = { 'Content-Type': 'application/json' }) {
     return Promise.all(
         dslRequests
             .map(function (dslRequest) {
-                return createDsl(dslName, dslRequest.name, dslRequest.request)
+                return createDsl(dslName, dslRequest.name, dslRequest.request, headers)
                     .then(function (response) {
                         return should(response.statusCode).eql(201, JSON.stringify(response.body));
                     });

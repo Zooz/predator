@@ -7,8 +7,11 @@ JSCK.Draft4 = JSCK.draft4;
 const artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const testsRequestSender = require('./helpers/requestCreator');
 const processorsRequestSender = require('../processors/helpers/requestCreator');
+
+let contextId = uuid.v4();
 const headersWithoutContext = { 'Content-Type': 'application/json' };
 const headersWithRandomContext = { 'Content-Type': 'application/json', 'x-context-id': 'random' }
+const headersWithContext = { 'x-context-id': contextId, 'Content-Type': 'application/json'}
 
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
 const fileUrl = 'https://raw.githubusercontent.com/Zooz/predator/master/README.md';
@@ -24,15 +27,13 @@ describe('the tests api with contexts', function() {
         dslName = testsRequestSender.generateUniqueDslName('paymentsos');
         simpleTest = require('../../testExamples/Simple_test')(dslName);
         testWithFunctions = require('../../testExamples/Test_with_functions');
-        await testsRequestSender.createDslRequests(dslName, paymentsOsDsl.dsl_list);
+        await testsRequestSender.createDslRequests(dslName, paymentsOsDsl.dsl_list, headersWithContext);
     });
-    beforeEach(function() {
+    beforeEach(async function() {
         nock.cleanAll();
     });
     describe('benchmarks', () => {
         let testId;
-        let contextId = uuid.v4();
-        const headersWithContext = { 'x-context-id': contextId, 'Content-Type': 'application/json'}
 
         const benchmarkRequest = {
             rps: {
@@ -87,8 +88,6 @@ describe('the tests api with contexts', function() {
     });
     describe('tests', function() {
         let createTestWithContextResponse, createTestWithoutContextResponse;
-        let contextId = uuid.v4();
-        const headersWithContext = { 'x-context-id': contextId, 'Content-Type': 'application/json'}
 
         // create tests
         it('Create test with context_id', async () => {
@@ -144,10 +143,10 @@ describe('the tests api with contexts', function() {
             should(getTestResponse.body.length).eql(0);
         });
 
-        it('Get tests with context_id should return 200 with 1 test', async () => {
+        it('Get tests with context_id should return 200 with tests', async () => {
             const getTestResponse = await testsRequestSender.getTests(headersWithContext);
             should(getTestResponse.statusCode).eql(200);
-            should(getTestResponse.body.length).eql(1);
+            should(getTestResponse.body.length).greaterThan(0);
         });
 
         // update tests
@@ -208,125 +207,72 @@ describe('the tests api with contexts', function() {
             const getTestResponse = await testsRequestSender.getTest(createTestWithoutContextResponse.body.id, headersWithoutContext);
             should(getTestResponse.statusCode).eql(404);
         });
-        describe.skip('simple test with dsl', function () {
-            it('Create test, update test, delete test, get test', async () => {
-                const requestBody = simpleTest.test;
-                const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithoutContext);
-                createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
-                createTestResponse.body.should.have.only.keys('id', 'revision_id');
 
-                const updatedRequestBody = require('../../testExamples/Test_with_variables')(dslName);
-                const updatedTestResponse = await testsRequestSender.updateTest(updatedRequestBody, headersWithoutContext, createTestResponse.body.id);
-                updatedTestResponse.statusCode.should.eql(200, JSON.stringify(updatedTestResponse.body));
-                updatedTestResponse.body.should.have.only.keys('id', 'revision_id');
-
-                let getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, headersWithoutContext);
-                const expectedResult = require('../../testResults/Test_with_variables')(dslName);
-                should(getTestResponse.statusCode).eql(200);
-                getTestResponse.body.artillery_test.should.eql(expectedResult);
-                getTestResponse.body.should.have.keys('id', 'artillery_test', 'description', 'name', 'revision_id', 'type', 'updated_at');
-
-                const validatedResponse = validate(getTestResponse.body.artillery_test);
-                validatedResponse.errors.length.should.eql(0);
-                validatedResponse.valid.should.eql(true);
-
-                const deleteTestResponse = await testsRequestSender.deleteTest(headersWithoutContext, createTestResponse.body.id);
-                deleteTestResponse.statusCode.should.eql(200);
-
-                getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, headersWithoutContext);
-                getTestResponse.statusCode.should.eql(404);
+        describe('complex tests', function () {
+            describe('dsl', async function() {
+                it('create test with dsl that was created with context should return 201', async function(){
+                    const requestBody = simpleTest.test;
+                    const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithContext);
+                    createTestResponse.statusCode.should.eql(201);
+                });
+                it('create test sending wrong context-id header with dsl that was created with context should return 400', async function(){
+                    const requestBody = simpleTest.test;
+                    const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithRandomContext);
+                    createTestResponse.statusCode.should.eql(400);
+                });
+                it('create test without sending context-id header with dsl that was created with context should return 201', async function(){
+                    const requestBody = simpleTest.test;
+                    const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithoutContext);
+                    createTestResponse.statusCode.should.eql(201);
+                });
             });
-            it('Create test, with a file', async () => {
-                const requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
-                const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithoutContext);
-                console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
-                createTestResponse.statusCode.should.eql(201);
-                const resGetTest = await testsRequestSender.getTest(createTestResponse.body.id, headersWithoutContext);
-                resGetTest.statusCode.should.eql(200);
-                should.notEqual(resGetTest.body.file_id, undefined);
-                const resGetFile = await testsRequestSender.getFile(resGetTest.body.file_id, headersWithoutContext);
-                resGetFile.statusCode.should.eql(200);
+            describe('files', async function() {
+                it('Create test, with a file', async () => {
+                    const requestBody = Object.assign({ processor_file_url: fileUrl }, simpleTest.test);
+                    const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithContext);
+                    console.log('error response: ' + JSON.stringify(createTestResponse.body));
+                    createTestResponse.statusCode.should.eql(201);
+                    const resGetTest = await testsRequestSender.getTest(createTestResponse.body.id, headersWithContext);
+                    resGetTest.statusCode.should.eql(200);
+                    should.notEqual(resGetTest.body.file_id, undefined);
+                    const resGetFile = await testsRequestSender.getFile(resGetTest.body.file_id, headersWithContext);
+                    resGetFile.statusCode.should.eql(200);
+                });
             });
-            it('Create test, with a processor id', async () => {
-                const processor = {
-                    name: 'some-user-processor: ' + uuid(),
-                    description: 'This is a description',
-                    javascript: 'module.exports = {\n' +
-                        '    beforeRequest,\n' +
-                        '    afterResponse,\n' +
-                        '    afterScenario,\n' +
-                        '    beforeScenario\n' +
-                        '};\n' +
-                        'function beforeRequest(requestParams, context, ee, next) {\n' +
-                        '    return next(); // MUST be called for the scenario to continue\n' +
-                        '}\n' +
-                        'function afterResponse(requestParams, response, context, ee, next) {\n' +
-                        '    return next(); // MUST be called for the scenario to continue\n' +
-                        '}\n' +
-                        'function afterScenario(context, ee, next) {\n' +
-                        '    return next(); // MUST be called for the scenario to continue\n' +
-                        '}\n' +
-                        'function beforeScenario(context, ee, next) {\n' +
-                        '    return next(); // MUST be called for the scenario to continue\n' +
-                        '}'
-                };
-                const processorResponse = await processorsRequestSender.createProcessor(processor, headersWithoutContext);
-                const processorId = processorResponse.body.id;
-                const requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
-                const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithoutContext);
-                console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
-                createTestResponse.statusCode.should.eql(201);
-                const resGetTest = await testsRequestSender.getTest(createTestResponse.body.id, headersWithoutContext);
-                resGetTest.statusCode.should.eql(200);
-                should.equal(resGetTest.body.processor_id, processorId);
-            });
-            it('create test with before, and get it', async function () {
-                const simpleTestWithBefore = require('../../testExamples/Simple_test_before_feature')(dslName);
-                const createTestResponse = await testsRequestSender.createTest(simpleTestWithBefore.test, headersWithoutContext);
-                should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
-                createTestResponse.body.should.have.only.keys('id', 'revision_id');
-                const expected = require('../../testResults/Simple_test_before_feature')(dslName, createTestResponse.body.id, createTestResponse.body.revision_id);
-                const getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, headersWithoutContext);
-                should(getTestResponse.statusCode).eql(200, JSON.stringify(createTestResponse.body));
-                should.exists(getTestResponse.body.updated_at);
-                delete getTestResponse.body.updated_at;
-                should(getTestResponse.body).eql(expected);
-            });
-            it('Create dsl test, update dsl, get test should return new dsl', async () => {
-                const requestBody = simpleTest.test;
-                const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithoutContext);
-                createTestResponse.statusCode.should.eql(201, JSON.stringify(createTestResponse.body));
-                createTestResponse.body.should.have.only.keys('id', 'revision_id');
-
-                const updateTokenRequest = {
-                    post: {
-                        url: '/tokens',
-                        capture: [{
-                            json: '$.token',
-                            as: 'tokenId'
-                        }],
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        json: {
-                            token_type: 'credit_card',
-                            holder_name: 'new name',
-                            expiration_date: '11/2020',
-                            card_number: '1234458045804123',
-                            identity_document: {
-                                number: '1234668464654',
-                                type: 'NEW_ID'
-                            }
-                        }
-                    }
-                };
-                const updateDSLResponse = await testsRequestSender.updateDsl(dslName, 'createToken', updateTokenRequest);
-                should(updateDSLResponse.statusCode).eql(200, JSON.stringify(updateDSLResponse.body));
-
-                const getTestResponse = await testsRequestSender.getTest(createTestResponse.body.id, headersWithoutContext);
-                should(getTestResponse.statusCode).eql(200);
-                const getTestResponseTokenRequest = JSON.parse(getTestResponse.text).artillery_test.scenarios[0].flow[0];
-                should(getTestResponseTokenRequest).eql(updateTokenRequest);
+            describe('processors', async function() {
+                it('create test with processor', async function(){
+                    const processor = {
+                        name: 'some-user-processor: ' + uuid(),
+                        description: 'This is a description',
+                        javascript: 'module.exports = {\n' +
+                            '    beforeRequest,\n' +
+                            '    afterResponse,\n' +
+                            '    afterScenario,\n' +
+                            '    beforeScenario\n' +
+                            '};\n' +
+                            'function beforeRequest(requestParams, context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function afterResponse(requestParams, response, context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function afterScenario(context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}\n' +
+                            'function beforeScenario(context, ee, next) {\n' +
+                            '    return next(); // MUST be called for the scenario to continue\n' +
+                            '}'
+                    };
+                    const processorResponse = await processorsRequestSender.createProcessor(processor, headersWithContext);
+                    const processorId = processorResponse.body.id;
+                    const requestBody = Object.assign({ processor_id: processorId }, testWithFunctions);
+                    const createTestResponse = await testsRequestSender.createTest(requestBody, headersWithContext);
+                    console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
+                    createTestResponse.statusCode.should.eql(201);
+                    const resGetTest = await testsRequestSender.getTest(createTestResponse.body.id, headersWithContext);
+                    resGetTest.statusCode.should.eql(200);
+                    should.equal(resGetTest.body.processor_id, processorId);
+                });
             });
         });
     });

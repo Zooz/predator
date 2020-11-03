@@ -70,7 +70,7 @@ function updateWebhook(webhookId, webhook, headers = { 'Content-Type': 'applicat
         });
 }
 
-function testWebhook(webhookId) {
+function testWebhook(webhookId, headers = { 'Content-Type': 'application/json' }) {
     return request(app)
         .post(`${resourceUri}/${webhookId}/test`)
         .set(headers);
