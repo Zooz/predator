@@ -3,7 +3,7 @@ const _ = require('lodash');
 const constants = require('../utils/constants');
 
 const FINAL_REPORT_STATUSES = [constants.REPORT_FINISHED_STATUS, constants.REPORT_ABORTED_STATUS, constants.REPORT_FAILED_STATUS];
-const ONE_MINUTE_IN_MS = 60 * 1000;
+const THREE_MINUTE_IN_MS = 3* 60 * 1000;
 const SUBSCRIBER_STAGE_TO_REPORT_STATUS_MAP = {
     [constants.SUBSCRIBER_INITIALIZING_STAGE]: constants.REPORT_INITIALIZING_STATUS,
     [constants.SUBSCRIBER_STARTED_STAGE]: constants.REPORT_STARTED_STATUS,
@@ -23,7 +23,7 @@ module.exports.calculateReportStatus = function (report, config) {
     const reportStartTimeMs = new Date(report.start_time).getTime();
 
     const reportStartTimeWithRunnerDelayMs = reportStartTimeMs + delayedTimeInMs;
-    const subscribeTimeThresholdForRunnersMs = reportStartTimeWithRunnerDelayMs + ONE_MINUTE_IN_MS;
+    const subscribeTimeThresholdForRunnersMs = reportStartTimeWithRunnerDelayMs + THREE_MINUTE_IN_MS;
     const reportTotalTimeMs = reportStartTimeWithRunnerDelayMs + reportDurationMs;
     const now = Date.now();
 
