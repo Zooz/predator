@@ -72,6 +72,12 @@ jobs:
         environment:
           DATABASE_TYPE: postgres
           JOB_PLATFORM: metronome
+    - run:
+        name: Integration tests with aws fargate and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: awsFargate
   build:
     docker:
     - image: docker:18
