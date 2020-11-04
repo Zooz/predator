@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 1.4.0
+  version: 1.6.0
   title: Predator
   x-logo:
     url: favicon.png
@@ -2353,6 +2353,10 @@ components:
           description: Ability to enable/disable scheduled jobs.
           example: true
           default: true
+        tag:
+          type: string
+          description: tag of the machine type/region that the job will run on (currently supported in aws fargate)
+          example: eu-west-1
     delete_containers_response:
       required:
         - deleted
@@ -2575,7 +2579,7 @@ components:
           description: The predator-runner docker image that will run the test.
         job_platform:
           type: string
-          description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)
+          description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER,AWS_FARGATE)
         runner_cpu:
           minimum: 0
           type: number
@@ -2716,7 +2720,7 @@ components:
               allOf:
                 - $ref: '#/components/schemas/benchmark_weights'
         custom_runner_definition:
-          description: custom json that will be merged with the kubernetes/metronome predator runner job definition
+          description: custom json that will be merged with the kubernetes/metronome/aws fargate predator runner job definition
           type: object
     benchmark_weights:
       type: object

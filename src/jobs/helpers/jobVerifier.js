@@ -1,6 +1,8 @@
 'use strict';
 const testsManager = require('../../tests/models/manager');
 const CronTime = require('cron').CronTime;
+const configHandler = require('../../configManager/models/configHandler');
+const consts = require('../../common/consts');
 
 /**
  * Validates a cron expression and returns error message if the expression is invalid
@@ -15,7 +17,7 @@ function verifyCronExpression(exp) {
     }
 }
 
-module.exports.verifyJobBody = (req, res, next) => {
+module.exports.verifyJobBody = async (req, res, next) => {
     let errorToThrow;
     const jobBody = req.body;
     if (!(jobBody.run_immediately || jobBody.cron_expression)) {
@@ -33,6 +35,18 @@ module.exports.verifyJobBody = (req, res, next) => {
             errorToThrow.statusCode = 400;
         }
     }
+    const jobPlatform = await configHandler.getConfigValue(consts.CONFIG.JOB_PLATFORM);
+    if (jobPlatform === consts.AWS_FARGATE) {
+        const customRunnerDefinition = await configHandler.getConfigValue(consts.CONFIG.CUSTOM_RUNNER_DEFINITION);
+        if (!jobBody.tag) {
+            errorToThrow = new Error('tag must be provided when JOB_PLATFORM is AWS_FARGATE');
+            errorToThrow.statusCode = 400;
+        } else if (!customRunnerDefinition[jobBody.tag]) {
+            errorToThrow = new Error(`custom_runner_definition is missing key for tag: ${jobBody.tag}`);
+            errorToThrow.statusCode = 400;
+        }
+    }
+
     next(errorToThrow);
 };
 

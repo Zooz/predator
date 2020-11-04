@@ -1047,9 +1047,9 @@ describe('Manager tests', function () {
         it('Stop an existing run of a job', async function () {
             await manager.stopRun('jobId', 'reportId');
             jobStopRunStub.callCount.should.eql(1);
-            jobStopRunStub.args[0].should.eql([
+            jobStopRunStub.args[0][0].should.eql(
                 'predator.reportId'
-            ]);
+            );
         });
     });
 
@@ -1106,7 +1106,8 @@ describe('Manager tests', function () {
                 notes: 'some notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
-                enabled: false
+                enabled: false,
+                tag: undefined,
             }, {
                 id: 'id2',
                 type: 'load_test',
@@ -1123,6 +1124,7 @@ describe('Manager tests', function () {
                 report_id: undefined,
                 notes: 'some other notes',
                 proxy_url: 'http://proxyUrl.com',
+                tag: undefined,
                 debug: '*',
                 enabled: true
             }];
@@ -1176,6 +1178,7 @@ describe('Manager tests', function () {
                 notes: undefined,
                 proxy_url: undefined,
                 debug: undefined,
+                tag: undefined,
                 enabled: false
             }];
             const jobs = await manager.getJobs();
@@ -1238,6 +1241,7 @@ describe('Manager tests', function () {
                 max_virtual_users: undefined,
                 parallelism: undefined,
                 report_id: undefined,
+                tag: undefined,
                 notes: 'some nice notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',

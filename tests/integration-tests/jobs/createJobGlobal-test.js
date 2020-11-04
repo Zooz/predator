@@ -5,6 +5,7 @@ const should = require('should'),
     testsRequestSender = require('../tests/helpers/requestCreator'),
     { WEBHOOK_EVENT_TYPE_STARTED, EVENT_FORMAT_TYPE_JSON } = require('../../../src/common/consts'),
     basicTest = require('../../testExamples/Basic_test.json'),
+    configRequestCreator = require('../configManager/helpers/requestCreator'),
     nock = require('nock');
 
 const { expect } = require('chai'); ;
@@ -12,6 +13,20 @@ const { expect } = require('chai'); ;
 describe('Create job global tests', function () {
     this.timeout(20000);
     before(async () => {
+        await configRequestCreator.updateConfig({
+            runner_docker_image: 'zooz/predator-runner:latest',
+            custom_runner_definition: {
+                'eu-west-1': {
+                    capacity_provider: 'FARGATE_SPOT',
+                    subnets: [
+                        'subnet-1',
+                        'subnet-2'
+                    ],
+                    task_definition: 'predator-runner',
+                    flag: 'scotland'
+                }
+            }
+        });
         await schedulerRequestCreator.init();
         await webhooksRequestSender.init();
         await testsRequestSender.init();
@@ -113,7 +128,8 @@ describe('Create job global tests', function () {
                 arrival_rate: 1,
                 duration: 1,
                 environment: 'test',
-                type: 'load_test'
+                type: 'load_test',
+                tag: 'eu-west-1'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -132,7 +148,8 @@ describe('Create job global tests', function () {
                 environment: 'test',
                 run_immediately: true,
                 enabled: false,
-                type: 'load_test'
+                type: 'load_test',
+                tag: 'eu-west-1'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -242,7 +259,8 @@ describe('Create job global tests', function () {
                 duration: 1,
                 environment: 'test',
                 run_immediately: true,
-                type: 'load_test'
+                type: 'load_test',
+                tag: 'eu-west-1'
             };
             return schedulerRequestCreator.createJob(illegalBody, {
                 'Content-Type': 'application/json'
@@ -280,7 +298,8 @@ describe('Create job global tests', function () {
                     run_immediately: true,
                     emails: [],
                     parallelism: 1,
-                    max_virtual_users: 500
+                    max_virtual_users: 500,
+                    tag: 'eu-west-1'
                 };
                 const headers = { 'Content-Type': 'application/json' };
 
@@ -315,7 +334,8 @@ describe('Create job global tests', function () {
                     run_immediately: true,
                     emails: [],
                     parallelism: 1,
-                    max_virtual_users: 500
+                    max_virtual_users: 500,
+                    tag: 'eu-west-1'
                 };
                 const headers = { 'Content-Type': 'application/json' };
 
@@ -357,7 +377,8 @@ describe('Create job global tests', function () {
                     webhooks: [],
                     emails: [],
                     parallelism: 1,
-                    max_virtual_users: 500
+                    max_virtual_users: 500,
+                    tag: 'eu-west-1'
                 };
                 const headers = { 'Content-Type': 'application/json' };
 

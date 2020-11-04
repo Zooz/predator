@@ -2,6 +2,7 @@
 
 const schedulerRequestCreator = require('./helpers/requestCreator'),
     testsRequestCreator = require('../tests/helpers/requestCreator'),
+    configRequestCreator = require('../configManager/helpers/requestCreator'),
     should = require('should'),
     nock = require('nock'),
     kubernetesConfig = require('../../../src/config/kubernetesConfig');
@@ -12,6 +13,20 @@ describe('Update scheduled job', function () {
     let updatedTestId;
 
     before(async () => {
+        await configRequestCreator.updateConfig({
+            runner_docker_image: 'zooz/predator-runner:latest',
+            custom_runner_definition: {
+                'eu-west-1': {
+                    capacity_provider: 'FARGATE_SPOT',
+                    subnets: [
+                        'subnet-1',
+                        'subnet-2'
+                    ],
+                    task_definition: 'predator-runner',
+                    flag: 'scotland'
+                }
+            }
+        });
         await schedulerRequestCreator.init();
         await testsRequestCreator.init();
 
@@ -59,7 +74,8 @@ describe('Update scheduled job', function () {
                 run_immediately: false,
                 cron_expression: date.getSeconds() + ' * * * * *',
                 webhooks: ['http://www.hello.com', 'https://www.zooz.com'],
-                emails: ['email@me.com', 'hello@zooz']
+                emails: ['email@me.com', 'hello@zooz'],
+                tag: 'eu-west-1',
             };
             const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
@@ -178,6 +194,7 @@ describe('Update scheduled job', function () {
                 webhooks: [],
                 emails: ['b@emails.com', 'c@emails.com'],
                 notes: 'note a',
+                tag: 'eu-west-1',
             };
             const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
@@ -200,7 +217,8 @@ describe('Update scheduled job', function () {
                     enabled: false,
                     type: 'functional_test',
                     emails: ['d@emails.com'],
-                    notes: 'note b'
+                    notes: 'note b',
+                    tag: 'eu-west-1'
                 },
                 {
                     'Content-Type': 'application/json'
@@ -223,7 +241,8 @@ describe('Update scheduled job', function () {
                 duration: 30,
                 environment: 'updated env',
                 enabled: false,
-                notes: 'note b'
+                notes: 'note b',
+                tag: 'eu-west-1'
             });
         });
 
@@ -246,7 +265,8 @@ describe('Update scheduled job', function () {
                 type: 'load_test',
                 environment: 'test',
                 run_immediately: false,
-                cron_expression: '* * * * * *'
+                cron_expression: '* * * * * *',
+                tag: 'eu-west-1',
             };
             const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                 'Content-Type': 'application/json'
@@ -260,7 +280,8 @@ describe('Update scheduled job', function () {
                 type: 'functional_test',
                 environment: 'test',
                 run_immediately: false,
-                cron_expression: '* * * * * *'
+                cron_expression: '* * * * * *',
+                tag: 'eu-west-1'
             };
             const createFunctionalJobResponse = await schedulerRequestCreator.createJob(validFunctionalJobBody, {
                 'Content-Type': 'application/json'
