@@ -15,7 +15,8 @@ describe('Create job specific aws fargate tests', async function () {
     if (jobPlatform.toUpperCase() === 'AWS_FARGATE') {
         describe('AWS FARGATE', () => {
             before(async () => {
-                process.env.AWS_SDK_LOAD_CONFIG = true;
+                process.env.AWS_ACCESS_KEY_ID = 'AWS_ACCESS_KEY_ID';
+                process.env.AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY';
                 await schedulerRequestCreator.init();
                 await testsRequestCreator.init();
                 await configRequestCreator.init();
