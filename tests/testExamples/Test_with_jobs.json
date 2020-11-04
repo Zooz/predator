@@ -8,6 +8,7 @@
         "environment": "test",
         "cron_expression": "0 0 01 * * *",
         "max_virtual_users": 100,
-        "enabled": true
+        "enabled": true,
+        "tag": "eu-west-1",
     }
 }
