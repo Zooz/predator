@@ -14,6 +14,7 @@ const webhooksSequlizeConnector = require('../../webhooks/models/database/sequel
 const Sequelize = require('sequelize');
 let sequlizeClient;
 
+
 module.exports.init = async () => {
     sequlizeClient = await createClient();
     await webhooksSequlizeConnector.init(sequlizeClient);

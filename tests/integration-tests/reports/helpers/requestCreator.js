@@ -5,7 +5,6 @@ const request = require('supertest');
 const app = require('../../../../src/app');
 
 let testApp;
-const HEADERS = { 'Content-Type': 'application/json' };
 
 module.exports = {
     init,
@@ -18,7 +17,6 @@ module.exports = {
     getAggregatedReport,
     getExportedReport,
     getExportedCompareReport,
-    getAggregatedReport,
     subscribeRunnerToReport
 };
 
@@ -26,31 +24,31 @@ async function init() {
     testApp = await app();
 }
 
-function postStats(testId, reportId, body) {
+function postStats(testId, reportId, body, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp).post(`/v1/tests/${testId}/reports/${reportId}/stats`)
         .send(body)
-        .set(HEADERS);
+        .set(headers);
 }
 
-function editReport(testId, reportId, body) {
+function editReport(testId, reportId, body, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp).put(`/v1/tests/${testId}/reports/${reportId}`)
         .send(body)
-        .set(HEADERS);
+        .set(headers);
 }
 
-function getAggregatedReport(testId, reportId) {
+function getAggregatedReport(testId, reportId, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}/aggregate`)
-        .set(HEADERS);
+        .set(headers);
 }
 
-function getReport(testId, reportId) {
+function getReport(testId, reportId, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}`)
-        .set(HEADERS);
+        .set(headers);
 }
 
-function getExportedReport(testId, reportId, fileFormat) {
+function getExportedReport(testId, reportId, fileFormat, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp).get(`/v1/tests/${testId}/reports/${reportId}/export/${fileFormat}`)
-        .set(HEADERS)
+        .set(headers)
         .expect(function (res) {
             return res;
         });
@@ -64,7 +62,7 @@ function getExportedReport(testId, reportId, fileFormat) {
             test_ids:[],
         }
 */
-function getExportedCompareReport(fileFormat, reportMetaData) {
+function getExportedCompareReport(fileFormat, reportMetaData, headers = { 'Content-Type': 'application/json' }) {
     let url = `/v1/tests/reports/compare/export/${fileFormat}`;
     let reportIdsAsCSV = "";
     let testIdsAsCSV = "";
@@ -78,38 +76,38 @@ function getExportedCompareReport(fileFormat, reportMetaData) {
     }
     let request_string = "report_ids="+reportIdsAsCSV+"&test_ids="+testIdsAsCSV;
     return request(testApp).get(url+"?"+request_string)
-        .set(HEADERS)
+        .set(headers)
         .expect(function (res) {
             return res;
         });
 }
 
-function deleteReport(testId, reportId) {
+function deleteReport(testId, reportId, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp).delete(`/v1/tests/${testId}/reports/${reportId}`)
-        .set(HEADERS);
+        .set(headers);
 }
 
-function getReports(testId, filter) {
+function getReports(testId, filter, headers = { 'Content-Type': 'application/json' }) {
     let url = `/v1/tests/${testId}/reports`;
     if (filter) {
         url += `?filter=${filter}`;
     }
     return request(testApp).get(url)
-        .set(HEADERS);
+        .set(headers);
 }
 
-function getLastReports(limit, filter) {
+function getLastReports(limit, filter, headers = { 'Content-Type': 'application/json' }) {
     let url = `/v1/tests/last_reports?limit=${limit}`;
     if (filter) {
         url += `&filter=${filter}`;
     }
     return request(testApp).get(url)
-        .set(HEADERS);
+        .set(headers);
 }
 
-async function subscribeRunnerToReport(testId, reportId, runnerId) {
+async function subscribeRunnerToReport(testId, reportId, runnerId, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp)
         .post(`/v1/tests/${testId}/reports/${reportId}/subscribe`)
-        .set({ ...HEADERS, 'x-runner-id': runnerId })
+        .set({ ...headers, 'x-runner-id': runnerId })
         .send({});
 }

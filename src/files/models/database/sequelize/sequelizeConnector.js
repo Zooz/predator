@@ -1,4 +1,3 @@
-
 const Sequelize = require('sequelize');
 module.exports = {
     init,
@@ -24,34 +23,42 @@ async function initSchemas() {
         },
         name: {
             type: Sequelize.DataTypes.TEXT()
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
         }
     });
+
     await file.sync();
 }
 
-async function saveFile(id, fileName, fileContent) {
+async function saveFile(id, fileName, fileContent, contextId) {
     const fileClient = client.model('file');
     const params = {
         id: id,
         name: fileName,
-        file: fileContent
-
+        file: fileContent,
+        context_id: contextId
     };
 
     const result = fileClient.create(params);
     return result;
 }
 
-async function getFile(id, isIncludeContent) {
+async function getFile(id, isIncludeContent, contextId) {
     const fileClient = client.model('file');
     const options = {
-        attributes: { exclude: ['updated_at', 'created_at'] }
+        attributes: { exclude: ['updated_at', 'created_at'] },
+        where: { id }
     };
 
     if (!isIncludeContent) {
         options.attributes.exclude.push('file');
     }
-    options.where = { id: id };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
 
     const dbResult = await fileClient.findOne(options);
     return dbResult;

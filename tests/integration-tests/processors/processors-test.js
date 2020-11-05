@@ -100,12 +100,11 @@ describe('Processors api', function () {
                 should(getProcessorResponse.statusCode).equal(404);
             });
 
-            it('delete a processor that doesn\'t exist - expect status code 204', async () => {
+            it('delete a processor that doesn\'t exist - expect status code 404', async () => {
                 const processorId = uuid();
-                // making sure that there is no processor with the generated uuid (not taking any chances :) )
                 await processorRequestSender.deleteProcessor(processorId);
                 const deleteResponse = await processorRequestSender.deleteProcessor(processorId);
-                should(deleteResponse.statusCode).equal(204);
+                should(deleteResponse.statusCode).equal(404);
             });
         });
         describe('GET /v1/processors/{processor_id}', function () {

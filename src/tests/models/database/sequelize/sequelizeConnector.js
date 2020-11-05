@@ -1,6 +1,7 @@
 
 const Sequelize = require('sequelize'),
     uuid = require('uuid');
+
 const sanitizeHelper = require('../../../helpers/sanitizeHelper');
 
 module.exports = {
@@ -63,6 +64,9 @@ async function initSchemas() {
         revision_id: {
             type: Sequelize.DataTypes.UUID,
             unique: 'compositeIndex'
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
         }
     });
 
@@ -81,6 +85,9 @@ async function initSchemas() {
         },
         artillery_json: {
             type: Sequelize.DataTypes.TEXT('long')
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
         }
     });
 
@@ -91,6 +98,9 @@ async function initSchemas() {
         },
         data: {
             type: Sequelize.DataTypes.STRING
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
         }
     });
     await test.sync();
@@ -98,29 +108,36 @@ async function initSchemas() {
     await benchmarkDefinition.sync();
 }
 
-async function insertTestBenchmark(testId, benchmarkData) {
+async function insertTestBenchmark(testId, benchmarkData, contextId) {
     const benchmark = client.model('benchmark');
     const params = {
         test_id: testId,
-        data: benchmarkData
+        data: benchmarkData,
+        context_id: contextId
     };
+
     const result = benchmark.create(params);
     return result;
 }
 
-async function getTestBenchmark(test_id) {
+async function getTestBenchmark(testId, contextId) {
     const benchmark = client.model('benchmark');
     const options = {
-        where: { test_id: test_id }
+        where: { test_id: testId }
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
     const benchmarkRes = await benchmark.findOne(options);
     return benchmarkRes ? benchmarkRes.data : undefined;
 }
 
-async function insertTest(testInfo, testJson, id, revisionId, processorFileId){
+async function insertTest(testInfo, testJson, testId, revisionId, processorFileId, contextId){
     const test = client.model('test');
     const params = {
-        test_id: id,
+        test_id: testId,
         name: testInfo.name,
         type: testInfo.type,
         file_id: processorFileId,
@@ -130,63 +147,83 @@ async function insertTest(testInfo, testJson, id, revisionId, processorFileId){
         updated_at: Date.now(),
         raw_data: JSON.stringify(testInfo),
         artillery_json: JSON.stringify(testJson),
-        revision_id: revisionId
+        revision_id: revisionId,
+        context_id: contextId
     };
 
     const result = test.create(params);
     return result;
 }
 
-async function getTest(id) {
+async function getTest(testId, contextId) {
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
-        where: { test_id: id },
+        where: { test_id: testId },
         order: [['updated_at', 'DESC'], ['id', 'DESC']]
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
     let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
     return allTests[0];
 }
-async function getTests() {
+
+async function getTests(contextId) {
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
         order: [['updated_at', 'DESC'], ['id', 'DESC']]
     };
+
+    if (contextId) {
+        options.where = { context_id: contextId };
+    }
+
     let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
     return allTests;
 }
-async function getAllTestRevisions(id){
+async function getAllTestRevisions(testId, contextId){
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
-        where: { test_id: id },
+        where: { test_id: testId },
         order: [['updated_at', 'ASC'], ['id', 'ASC']]
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
     let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
     return allTests;
 }
 
-async function deleteTest(testId){
+async function deleteTest(testId, contextId){
     const test = client.model('test');
-    const result = test.destroy(
-        {
-            where: { test_id: testId }
-        });
+    const options = {
+        where: { test_id: testId }
+    };
+
+    const result = test.destroy(options);
     return result;
 }
 
-async function insertDslDefinition(dslName, definitionName, data){
+async function insertDslDefinition(dslName, definitionName, data, contextId){
     const dslDefinition = client.model('dsl_definition');
     const params = {
         id: uuid.v4(),
         dsl_name: dslName,
         definition_name: definitionName,
-        artillery_json: JSON.stringify(data)
+        artillery_json: JSON.stringify(data),
+        context_id: contextId
     };
+
     try {
         await dslDefinition.create(params);
         return true;
@@ -198,41 +235,74 @@ async function insertDslDefinition(dslName, definitionName, data){
     }
 }
 
-async function getDslDefinition(dslName, definitionName){
+async function getDslDefinition(dslName, definitionName, contextId){
     const dslDefinition = client.model('dsl_definition');
     const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
         where: { dsl_name: dslName, definition_name: definitionName }
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
     let result = await dslDefinition.findAll(options);
     result = sanitizeDslResult(result);
     return result[0];
 }
 
-async function getDslDefinitions(dslName){
+async function getDslDefinitions(dslName, contextId){
     const dslDefinition = client.model('dsl_definition');
     const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
         where: { dsl_name: dslName }
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
     let result = await dslDefinition.findAll(options);
     result = sanitizeDslResult(result);
     return result;
 }
 
-async function updateDslDefinition(dslName, definitionName, data){
+async function updateDslDefinition(dslName, definitionName, data, contextId){
     const dslDefinition = client.model('dsl_definition');
     const params = {
         dsl_name: dslName,
         definition_name: definitionName,
         artillery_json: JSON.stringify(data)
     };
-    const result = await dslDefinition.update(params, { where: { dsl_name: dslName, definition_name: definitionName } });
+
+    const options = {
+        where: {
+            dsl_name: dslName,
+            definition_name: definitionName
+        }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    const result = await dslDefinition.update(params, options);
     return result[0] === 1;
 }
-async function deleteDefinition(dslName, definitionName){
+async function deleteDefinition(dslName, definitionName, contextId){
+    const options = {
+        where: {
+            dsl_name: dslName,
+            definition_name: definitionName
+        }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
     const dslDefinition = client.model('dsl_definition');
-    const result = await dslDefinition.destroy({ where: { dsl_name: dslName, definition_name: definitionName } });
+    const result = await dslDefinition.destroy(options);
     return result;
 }
 

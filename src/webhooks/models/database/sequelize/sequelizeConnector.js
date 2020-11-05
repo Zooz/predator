@@ -1,5 +1,6 @@
-const Sequelize = require('sequelize');
-const uuid = require('uuid');
+const Sequelize = require('sequelize'),
+    uuid = require('uuid');
+
 
 const { WEBHOOKS_EVENTS_TABLE_NAME, WEBHOOKS_TABLE_NAME, WEBHOOKS_EVENTS_MAPPING_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
 
@@ -20,11 +21,18 @@ function parseWebhook(webhookRecord) {
         ...webhookRecord.dataValues,
         events: webhookRecord.events && webhookRecord.events.map(eventRecord => eventRecord.dataValues.name)
     };
-};
+}
 
-async function _getWebhook(webhookId) {
+async function _getWebhook(webhookId, contextId) {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
-    return webhooksModel.findByPk(webhookId, { include: ['events'] });
+
+    const options = { include: ['events'], where: { id: webhookId } };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    return webhooksModel.findOne(options);
 }
 
 async function init(sequelizeClient) {
@@ -32,24 +40,34 @@ async function init(sequelizeClient) {
     await initSchemas();
 }
 
-async function getAllWebhooks() {
+async function getAllWebhooks(contextId) {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
-    const webhooks = await webhooksModel.findAll({ include: ['events'], order: [['updated_at', 'DESC']] });
+
+    const options = {
+        include: ['events'],
+        order: [['updated_at', 'DESC']]
+    };
+
+    if (contextId) {
+        options.where = { context_id: contextId };
+    }
+
+    const webhooks = await webhooksModel.findAll(options);
     return webhooks.map(parseWebhook);
 }
 
-async function getWebhook(webhookId) {
-    const webhook = await _getWebhook(webhookId);
+async function getWebhook(webhookId, contextId) {
+    const webhook = await _getWebhook(webhookId, contextId);
     return parseWebhook(webhook);
 }
 
-async function getAllGlobalWebhooks() {
+async function getAllGlobalWebhooks(contextId) {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooks = await webhooksModel.findAll({ include: ['events'], where: { global: true } });
     return webhooks.map(parseWebhook);
 }
 
-async function createWebhook(webhook) {
+async function createWebhook(webhook, contextId) {
     const id = uuid.v4();
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooksEvents = client.model(WEBHOOKS_EVENTS_TABLE_NAME);
@@ -60,32 +78,50 @@ async function createWebhook(webhook) {
         name: webhook.name,
         url: webhook.url,
         format_type: webhook.format_type,
-        global: webhook.global
+        global: webhook.global,
+        context_id: contextId
     };
+
     await client.transaction(async function(transaction) {
         const createdWebhook = await webhooksModel.create(webhookToInsert, { transaction });
         await createdWebhook.setEvents(eventsIds, { transaction });
         return createdWebhook;
     });
-    const retrievedWebhook = await webhooksModel.findByPk(id, { include: ['events'] });
+
+    const options = {
+        include: ['events'],
+        where: { id }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    const retrievedWebhook = await webhooksModel.findOne(options);
     const parsedWebhook = parseWebhook(retrievedWebhook);
     return parsedWebhook;
 }
 
-async function deleteWebhook(webhookId) {
+async function deleteWebhook(webhookId, contextId) {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
-    return webhooksModel.destroy({
+    const options = {
         where: {
             id: webhookId
         }
-    });
+    }
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    return webhooksModel.destroy(options);
 }
 
-async function updateWebhook(webhookId, updatedWebhook) {
+async function updateWebhook(webhookId, updatedWebhook, contextId) {
     const webhooksModel = client.model(WEBHOOKS_TABLE_NAME);
     const webhooksEvents = client.model(WEBHOOKS_EVENTS_TABLE_NAME);
 
-    const oldWebhook = await _getWebhook(webhookId);
+    const oldWebhook = await _getWebhook(webhookId, contextId);
     const newWebhookEvents = await webhooksEvents.findAll({ where: { name: updatedWebhook.events } });
     const newWebhookEventsIds = newWebhookEvents.map(({ id }) => id);
 
@@ -119,6 +155,9 @@ async function initSchemas() {
         },
         updated_at: {
             type: Sequelize.DataTypes.DATE
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
         }
     });
     const webhooksEvents = client.define(WEBHOOKS_EVENTS_TABLE_NAME, {

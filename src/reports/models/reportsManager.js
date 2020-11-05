@@ -1,17 +1,22 @@
 'use strict';
 
+const httpContext = require('express-http-context');
+
 const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
-    { JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
+    { JOB_TYPE_FUNCTIONAL_TEST, CONTEXT_ID, ERROR_MESSAGES } = require('../../common/consts'),
     constants = require('../utils/constants'),
-    reportsStatusCalculator = require('./reportStatusCalculator');
+    reportsStatusCalculator = require('./reportStatusCalculator'),
+    generateError = require('../../common/generateError');
 
 const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
 
 module.exports.getReport = async (testId, reportId) => {
-    const reportSummary = await databaseConnector.getReport(testId, reportId);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
 
     if (reportSummary.length !== 1) {
         const error = new Error('Report not found');
@@ -24,7 +29,9 @@ module.exports.getReport = async (testId, reportId) => {
 };
 
 module.exports.getReports = async (testId, filter) => {
-    const reportSummaries = await databaseConnector.getReports(testId, filter);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const reportSummaries = await databaseConnector.getReports(testId, filter, contextId);
     const config = await configHandler.getConfig();
     const reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
@@ -34,7 +41,9 @@ module.exports.getReports = async (testId, filter) => {
 };
 
 module.exports.getLastReports = async (limit, filter) => {
-    const reportSummaries = await databaseConnector.getLastReports(limit, filter);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const reportSummaries = await databaseConnector.getLastReports(limit, filter, contextId);
     const config = await configHandler.getConfig();
     const reports = reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
@@ -44,12 +53,25 @@ module.exports.getLastReports = async (limit, filter) => {
 
 module.exports.editReport = async (testId, reportId, reportBody) => {
     // currently we support only edit for notes
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
+    if (!reportSummary) {
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
+    }
+
     const { notes, is_favorite } = reportBody;
-    await databaseConnector.updateReport(testId, reportId, { notes, is_favorite });
+    await databaseConnector.updateReport(testId, reportId, { notes, is_favorite }, contextId);
 };
 
 module.exports.deleteReport = async (testId, reportId) => {
-    const reportSummary = await databaseConnector.getReport(testId, reportId);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
+    if (!reportSummary) {
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
+    }
+
     const config = await configHandler.getConfig();
     const report = await getReportResponse(reportSummary[0], config);
 
@@ -63,6 +85,8 @@ module.exports.deleteReport = async (testId, reportId) => {
 };
 
 module.exports.postReport = async (reportId, test, job, startTime) => {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const phase = '0';
 
     const testConfiguration = {
@@ -82,7 +106,7 @@ module.exports.postReport = async (reportId, test, job, startTime) => {
 
     const report = await databaseConnector.insertReport(reportId, test.id, test.revision_id, job.id,
         test.type, phase, startTime, test.name,
-        test.description, JSON.stringify(testConfiguration), job.notes, Date.now(), false);
+        test.description, JSON.stringify(testConfiguration), job.notes, Date.now(), false, contextId);
     return report.dataValues;
 };
 

@@ -30,13 +30,13 @@ describe('Testing dsl model', function () {
 
     it('when call getDefinitions - should returns array of definitions', async function () {
         const result = await dsl.getDefinitions('dslName');
-        should(getDslDefinitionsStub.args).eql([['dslName']]);
+        should(getDslDefinitionsStub.args[0][0]).eql('dslName');
         should(result).eql([{ name: 'definition_name', request: 'artillery_json' }]);
     });
     describe('getDefinition', function () {
         it('when call getDefinition - should return definition object', async function () {
             const result = await dsl.getDefinition('dslName', 'definitionName');
-            should(getDslDefinitionStub.args).eql([['dslName', 'definitionName']]);
+            should(getDslDefinitionStub.args).eql([['dslName', 'definitionName', undefined]]);
             should(result).eql({ name: 'definition_name', request: 'artillery_json' });
         });
         it('when call getDefinition - should return 404 when there is no definition object', async function () {
@@ -45,7 +45,7 @@ describe('Testing dsl model', function () {
                 await dsl.getDefinition('dslName', 'definitionName');
                 throw new Error('should not get here');
             } catch (err){
-                should(getDslDefinitionStub.args).eql([['dslName', 'definitionName']]);
+                should(getDslDefinitionStub.args).eql([['dslName', 'definitionName', undefined]]);
                 should(err.statusCode).eql(404);
                 should(err.message).eql('Not found');
             }
@@ -55,7 +55,7 @@ describe('Testing dsl model', function () {
     describe('createDefinition', function () {
         it('when call createDefinition - should returns definition object', async function () {
             const result = await dsl.createDefinition('dslName', { name: 'dsl-name', request: 'request' });
-            should(insertDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
+            should(insertDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request', undefined]]);
             should(result).eql({ name: 'dsl-name', request: 'request' });
         });
         it('when call createDefinition and definition already exist - should throw 404', async function () {
@@ -64,7 +64,7 @@ describe('Testing dsl model', function () {
                 await dsl.createDefinition('dslName', { name: 'dsl-name', request: 'request' });
                 throw new Error('should not get here');
             } catch (err){
-                should(insertDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
+                should(insertDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request', undefined]]);
                 should(err.message).eql('Definition already exists');
                 should(err.statusCode).eql(400);
             }
@@ -73,7 +73,7 @@ describe('Testing dsl model', function () {
     describe('updateDefinition', function () {
         it('when call updateDefinition - should returns definition object', async function () {
             const result = await dsl.updateDefinition('dslName', 'dsl-name', { name: 'dsl-name', request: 'request' });
-            should(updateDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
+            should(updateDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request', undefined]]);
             should(result).eql({ name: 'dsl-name', request: 'request' });
         });
         it('when call updateDefinition and definition does not exist - should throw 404', async function () {
@@ -82,7 +82,7 @@ describe('Testing dsl model', function () {
                 await dsl.updateDefinition('dslName', 'dsl-name', { name: 'dsl-name', request: 'request' });
                 throw new Error('should not get here');
             } catch (err){
-                should(updateDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request']]);
+                should(updateDslDefinitionStub.args).eql([['dslName', 'dsl-name', 'request', undefined]]);
                 should(err.message).eql('Not found');
                 should(err.statusCode).eql(404);
             }
@@ -91,7 +91,7 @@ describe('Testing dsl model', function () {
     describe('deleteDefinition', function () {
         it('when call deleteDefinition - should returns undefined', async function () {
             const result = await dsl.deleteDefinition('dslName', 'dsl-name');
-            should(deleteDefinitionStub.args).eql([['dslName', 'dsl-name']]);
+            should(deleteDefinitionStub.args).eql([['dslName', 'dsl-name', undefined]]);
             should(result).eql(undefined);
         });
         it('when call deleteDefinition and definition does not exist - should throw 404', async function () {
@@ -100,7 +100,7 @@ describe('Testing dsl model', function () {
                 await dsl.deleteDefinition('dslName', 'dsl-name');
                 throw new Error('should not get here');
             } catch (err){
-                should(deleteDefinitionStub.args).eql([['dslName', 'dsl-name']]);
+                should(deleteDefinitionStub.args).eql([['dslName', 'dsl-name', undefined]]);
                 should(err.message).eql('Not found');
                 should(err.statusCode).eql(404);
             }

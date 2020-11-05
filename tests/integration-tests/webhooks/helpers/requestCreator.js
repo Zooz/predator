@@ -2,7 +2,6 @@ const request = require('supertest');
 const expressApp = require('../../../../src/app');
 
 let app;
-const headers = { 'Content-Type': 'application/json' };
 const resourceUri = '/v1/webhooks';
 
 module.exports = {
@@ -24,7 +23,7 @@ async function init() {
     }
 }
 
-function createWebhook(body) {
+function createWebhook(body, headers = { 'Content-Type': 'application/json' }) {
     return request(app)
         .post(resourceUri)
         .send(body)
@@ -34,7 +33,7 @@ function createWebhook(body) {
         });
 }
 
-function getWebhooks() {
+function getWebhooks(headers = { 'Content-Type': 'application/json' }) {
     return request(app)
         .get(resourceUri)
         .set(headers)
@@ -43,7 +42,7 @@ function getWebhooks() {
         });
 }
 
-function getWebhook(webhookId) {
+function getWebhook(webhookId, headers = { 'Content-Type': 'application/json' }) {
     return request(app)
         .get(`${resourceUri}/${webhookId}`)
         .set(headers)
@@ -52,7 +51,7 @@ function getWebhook(webhookId) {
         });
 }
 
-function deleteWebhook(webhookId) {
+function deleteWebhook(webhookId, headers = { 'Content-Type': 'application/json' }) {
     return request(app)
         .delete(`${resourceUri}/${webhookId}`)
         .set(headers)
@@ -61,7 +60,7 @@ function deleteWebhook(webhookId) {
         });
 }
 
-function updateWebhook(webhookId, webhook) {
+function updateWebhook(webhookId, webhook, headers = { 'Content-Type': 'application/json' }) {
     return request(app)
         .put(`${resourceUri}/${webhookId}`)
         .send(webhook)
@@ -71,7 +70,7 @@ function updateWebhook(webhookId, webhook) {
         });
 }
 
-function testWebhook(webhookId) {
+function testWebhook(webhookId, headers = { 'Content-Type': 'application/json' }) {
     return request(app)
         .post(`${resourceUri}/${webhookId}/test`)
         .set(headers);

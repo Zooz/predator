@@ -118,7 +118,8 @@ describe('Sequelize client tests', function () {
                 proxy_url: 'http://proxy.com',
                 debug: '*',
                 enabled: true,
-                tag: 'eu-west-1'
+                tag: 'eu-west-1',
+                context_id: undefined
             };
             const createdJob = {
                 dataValues: {
@@ -173,7 +174,8 @@ describe('Sequelize client tests', function () {
                 notes: 'some notes',
                 proxy_url: 'http://proxy.com',
                 debug: '*',
-                tag: 'eu-west-1'
+                tag: 'eu-west-1',
+                context_id: undefined
             };
 
             const createdJob = {

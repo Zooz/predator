@@ -1,6 +1,13 @@
 'use strict';
 require('./env').init();
 const express = require('express');
+const audit = require('express-requests-logger');
+const bodyParser = require('body-parser');
+const path = require('path');
+const zip = require('express-easy-zip');
+const fileUpload = require('express-fileupload');
+const httpContext = require('express-http-context');
+
 const logger = require('./common/logger');
 const healthRouter = require('./common/routes/healthRoute.js');
 const jobsRouter = require('./jobs/routes/jobsRoute.js');
@@ -12,14 +19,10 @@ const processorsRouter = require('./processors/routes/processorsRoute.js');
 const filesRouter = require('./files/routes/filesRoute.js');
 const webhooksRouter = require('./webhooks/routes/webhooksRouter');
 const swaggerValidator = require('express-ajv-swagger-validation');
-
-const audit = require('express-requests-logger');
-const bodyParser = require('body-parser');
 const database = require('./database/database');
 const jobsManager = require('./jobs/models/jobManager');
-const path = require('path');
-const zip = require('express-easy-zip');
-const fileUpload = require('express-fileupload');
+const contexts = require('./middlewares/context');
+
 module.exports = async () => {
     swaggerValidator.init('./docs/openapi3.yaml', { beautifyErrors: true });
     await database.init();
@@ -59,6 +62,12 @@ module.exports = async () => {
     }));
 
     app.use(zip());
+
+    app.use(httpContext.middleware);
+    app.use(contexts.middleware);
+
+    app.set('json replacer', (k, v) => (v === null ? undefined : v))
+
     app.use('/health', healthRouter);
     app.use('/v1/config', configRouter);
     app.use('/v1/jobs', jobsRouter);

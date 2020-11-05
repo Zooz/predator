@@ -28,7 +28,6 @@ describe('Sequelize client tests', function () {
         sequelizeDeleteStub,
         sequelizeDefineStub,
         sequelizeGeValueStub,
-        sequelizeGetStub,
         sequelizeCreateStub,
         sequelizeUpdateStub,
         sequelizeTransactionStub,
@@ -47,7 +46,7 @@ describe('Sequelize client tests', function () {
 
         sequelizeModelStub = sandbox.stub();
         sequelizeDefineStub = sandbox.stub();
-        sequelizeGetStub = sandbox.stub();
+        sequelizeGeValueStub = sandbox.stub();
         sequelizeDeleteStub = sandbox.stub();
         sequelizeGeValueStub = sandbox.stub();
         sequelizeCreateStub = sandbox.stub();
@@ -70,11 +69,10 @@ describe('Sequelize client tests', function () {
             key: {},
             value: {},
             update: sequelizeUpdateStub,
-            findAll: sequelizeGetStub,
+            findAll: sequelizeGeValueStub,
             findOne: sequelizeGeValueStub,
             destroy: sequelizeDeleteStub,
-            create: sequelizeCreateStub,
-            findByPk: sequelizeGetStub
+            create: sequelizeCreateStub
         });
 
         await sequelizeConnector.init({
@@ -95,11 +93,11 @@ describe('Sequelize client tests', function () {
     describe('getAllWebhooks', function () {
         describe('Happy flow', function () {
             it('expect return an array with 1 webhook', async function () {
-                sequelizeGetStub.resolves([webhookRaw]);
+                sequelizeGeValueStub.resolves([webhookRaw]);
                 const webhooks = await sequelizeConnector.getAllWebhooks();
 
-                expect(sequelizeGetStub.calledOnce).to.be.equal(true);
-                expect(sequelizeGetStub.args[0][0]).to.be.deep.equal({
+                expect(sequelizeGeValueStub.calledOnce).to.be.equal(true);
+                expect(sequelizeGeValueStub.args[0][0]).to.be.deep.equal({
                     include: ['events'],
                     order: [[
                         'updated_at',
@@ -125,7 +123,8 @@ describe('Sequelize client tests', function () {
                 });
                 const webhook = {
                     ...webhookRaw.dataValues,
-                    events
+                    events,
+                    context_id: undefined
                 };
                 const webhookWithEvents = {
                     dataValues: {
@@ -139,8 +138,8 @@ describe('Sequelize client tests', function () {
                 };
                 const transaction = { id: uuid.v4() };
 
-                sequelizeGetStub.onFirstCall().resolves(eventRecords);
-                sequelizeGetStub.onSecondCall().resolves(webhookWithEvents);
+                sequelizeGeValueStub.onFirstCall().resolves(eventRecords);
+                sequelizeGeValueStub.onSecondCall().resolves(webhookWithEvents);
                 sequelizeTransactionStub.resolves();
                 sequelizeCreateStub.resolves(createReturnValue);
 
@@ -223,9 +222,9 @@ describe('Sequelize client tests', function () {
             };
             const transaction = {};
 
-            sequelizeGetStub.onCall(0).resolves(oldWebhook);
-            sequelizeGetStub.onCall(1).resolves([event]);
-            sequelizeGetStub.onCall(2).resolves(updatedWebhookFromDB);
+            sequelizeGeValueStub.onCall(0).resolves(oldWebhook);
+            sequelizeGeValueStub.onCall(1).resolves([event]);
+            sequelizeGeValueStub.onCall(2).resolves(updatedWebhookFromDB);
             sequelizeTransactionStub.resolves();
             oldWebhook.setEvents.resolves();
             sequelizeUpdateStub.resolves();
@@ -271,12 +270,12 @@ describe('Sequelize client tests', function () {
                 ...globWebhook,
                 dataValues: { ...globWebhook }
             }));
-            sequelizeGetStub.resolves(globalWebhooksFromDB);
+            sequelizeGeValueStub.resolves(globalWebhooksFromDB);
 
             const resultWebhooks = await sequelizeConnector.getAllGlobalWebhooks();
 
-            expect(sequelizeGetStub.calledOnce).to.be.equal(true);
-            expect(sequelizeGetStub.args[0]).to.be.deep.equal([{ include: ['events'], where: { global: true } }]);
+            expect(sequelizeGeValueStub.calledOnce).to.be.equal(true);
+            expect(sequelizeGeValueStub.args[0]).to.be.deep.equal([{ include: ['events'], where: { global: true } }]);
             expect(resultWebhooks).to.be.deep.equal(globalWebhooks);
         });
     });

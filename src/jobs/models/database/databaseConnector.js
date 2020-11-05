@@ -13,24 +13,24 @@ module.exports = {
     getJobBasedOnTestId
 };
 
-async function insertJob(jobId, jobInfo) {
-    return databaseConnector.insertJob(jobId, jobInfo);
+async function insertJob(jobId, jobInfo, contextId) {
+    return databaseConnector.insertJob(jobId, jobInfo, contextId);
 }
 
-async function getJobs() {
-    return databaseConnector.getJobs();
+async function getJobs(contextId) {
+    return databaseConnector.getJobs(contextId);
 }
 
-async function getJob(jobId) {
-    return databaseConnector.getJob(jobId);
+async function getJob(jobId, contextId) {
+    return databaseConnector.getJob(jobId, contextId);
 }
 
 async function updateJob(jobId, jobInfo) {
     return databaseConnector.updateJob(jobId, jobInfo);
 }
 
-async function deleteJob(jobId) {
-    return databaseConnector.deleteJob(jobId);
+async function deleteJob(jobId, contextId) {
+    return databaseConnector.deleteJob(jobId, contextId);
 }
 
 async function init() {

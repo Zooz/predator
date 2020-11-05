@@ -1,11 +1,13 @@
 'use strict';
+const httpContext = require('express-http-context'),
+    uuid = require('uuid');
+
 const testGenerator = require('./testGenerator'),
     database = require('./database'),
-    uuid = require('uuid'),
     fileManager = require('../../files/models/fileManager'),
     downloadManager = require('./downloadManager'),
     { ERROR_MESSAGES } = require('../../common/consts'),
-    consts = require('./../../common/consts');
+    { TEST_TYPE_DSL, CONTEXT_ID } = require('./../../common/consts');
 
 module.exports = {
     upsertTest,
@@ -19,6 +21,17 @@ module.exports = {
 };
 
 async function upsertTest(testRawData, existingTestId) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    if (existingTestId) {
+        const test = await database.getTest(existingTestId, contextId);
+        if (!test) {
+            const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+            error.statusCode = 404;
+            throw error;
+        }
+    }
+
     let testArtilleryJson = await testGenerator.createTest(testRawData);
     const id = existingTestId || uuid();
     let processorFileId;
@@ -27,21 +40,25 @@ async function upsertTest(testRawData, existingTestId) {
         processorFileId = await fileManager.saveFile('processor.js', downloadedFile);
     }
     const revisionId = uuid.v4();
-    if (testRawData.type === consts.TEST_TYPE_DSL) {
+    if (testRawData.type === TEST_TYPE_DSL) {
         testArtilleryJson = undefined;
     }
-    await database.insertTest(testRawData, testArtilleryJson, id, revisionId, processorFileId);
+    await database.insertTest(testRawData, testArtilleryJson, id, revisionId, processorFileId, contextId);
     return { id: id, revision_id: revisionId };
 }
 
 async function insertTestBenchmark(benchmarkRawData, testId) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const dataParse = JSON.stringify(benchmarkRawData);
-    await database.insertTestBenchmark(testId, dataParse);
+    await database.insertTestBenchmark(testId, dataParse, contextId);
     return { benchmark_data: benchmarkRawData };
 }
 
 async function getBenchmark(testId) {
-    const benchmark = await database.getTestBenchmark(testId);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const benchmark = await database.getTestBenchmark(testId, contextId);
     if (!benchmark) {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
@@ -51,13 +68,15 @@ async function getBenchmark(testId) {
 }
 
 async function getTest(testId) {
-    const test = await database.getTest(testId);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const test = await database.getTest(testId, contextId);
     if (!test) {
         const error = new Error(ERROR_MESSAGES.NOT_FOUND);
         error.statusCode = 404;
         throw error;
     }
-    if (test.type === consts.TEST_TYPE_DSL) {
+    if (test.type === TEST_TYPE_DSL) {
         test.artillery_test = await testGenerator.createTest(test);
     } else {
         test.artillery_test = test.artillery_json;
@@ -67,7 +86,9 @@ async function getTest(testId) {
 }
 
 async function getAllTestRevisions(testId) {
-    const rows = await database.getAllTestRevisions(testId);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const rows = await database.getAllTestRevisions(testId, contextId);
     const testRevisions = [];
     rows.forEach(function (row) {
         row.artillery_test = row.artillery_json;
@@ -84,7 +105,9 @@ async function getAllTestRevisions(testId) {
 }
 
 async function getTests() {
-    const rows = await database.getTests();
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const rows = await database.getTests(contextId);
     const testsById = {};
     rows.forEach(function (row) {
         if (!testsById[row.id] || row.updated_at > testsById[row.id].updated_at) {
@@ -101,7 +124,16 @@ async function getTests() {
     return latestTestsRevisions;
 }
 
-function deleteTest(testId) {
+async function deleteTest(testId) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const test = await database.getTest(testId, contextId);
+    if (!test) {
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
+
     return database.deleteTest(testId);
 }
 

@@ -89,7 +89,6 @@ describe('webhooksManager', () => {
             const webhooksResult = await webhooksManager.getAllWebhooks();
 
             expect(databaseConnectorGetAllStub.calledOnce).to.be.equal(true);
-            expect(databaseConnectorGetAllStub.args[0]).to.be.deep.equal([]);
             expect(webhooksResult).to.be.deep.equal(webhooks);
         });
     });
@@ -117,7 +116,9 @@ describe('webhooksManager', () => {
         it('should delete the webhook', async function() {
             const id = uuid.v4();
 
+
             databaseConnectorDeleteStub.resolves();
+            databaseConnectorGetStub.resolves({});
 
             await webhooksManager.deleteWebhook(id);
 
@@ -278,7 +279,8 @@ describe('webhooksManager', () => {
             await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report);
 
             expect(databaseConnectorGetStub.callCount).to.be.equal(2);
-            expect(databaseConnectorGetStub.args).to.be.deep.equal([[webhooks[0].id], [webhooks[1].id]]);
+            expect(databaseConnectorGetStub.args[0][0]).to.eql(webhooks[0].id);
+            expect(databaseConnectorGetStub.args[1][0]).to.eql(webhooks[1].id);
 
             expect(requestSenderSendStub.callCount).to.be.equal(2);
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
@@ -327,7 +329,8 @@ describe('webhooksManager', () => {
             await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FAILED, report);
 
             expect(databaseConnectorGetStub.callCount).to.be.equal(2);
-            expect(databaseConnectorGetStub.args).to.be.deep.equal([[webhooks[0].id], [webhooks[1].id]]);
+            expect(databaseConnectorGetStub.args[0][0]).to.equal(webhooks[0].id);
+            expect(databaseConnectorGetStub.args[1][0]).to.equal(webhooks[1].id);
 
             expect(requestSenderSendStub.callCount).to.be.equal(1);
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
@@ -377,7 +380,8 @@ describe('webhooksManager', () => {
             await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report);
 
             expect(databaseConnectorGetStub.callCount).to.be.equal(2);
-            expect(databaseConnectorGetStub.args).to.be.deep.equal([[webhooks[0].id], [webhooks[1].id]]);
+            expect(databaseConnectorGetStub.args[0][0]).to.equal(webhooks[0].id);
+            expect(databaseConnectorGetStub.args[1][0]).to.equal(webhooks[1].id);
 
             expect(requestSenderSendStub.callCount).to.be.equal(2);
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
@@ -471,7 +475,8 @@ describe('webhooksManager', () => {
             await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report);
 
             expect(databaseConnectorGetStub.callCount).to.be.equal(2);
-            expect(databaseConnectorGetStub.args).to.be.deep.equal([[webhooks[0].id], [webhooks[1].id]]);
+            expect(databaseConnectorGetStub.args[0][0]).to.equal(webhooks[0].id);
+            expect(databaseConnectorGetStub.args[1][0]).to.equal(webhooks[1].id);
 
             expect(requestSenderSendStub.callCount).to.be.equal(3);
             expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({

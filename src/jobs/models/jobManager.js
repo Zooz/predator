@@ -3,6 +3,7 @@
 const uuid = require('uuid');
 const util = require('util');
 const { CronJob } = require('cron');
+const httpContext = require('express-http-context');
 
 const logger = require('../../common/logger'),
     configHandler = require('../../configManager/models/configHandler'),
@@ -11,7 +12,7 @@ const logger = require('../../common/logger'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
-    { CONFIG, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
+    { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     { version: PREDATOR_VERSION } = require('../../../package.json');
 
@@ -26,9 +27,10 @@ module.exports.init = async () => {
 };
 
 module.exports.reloadCronJobs = async () => {
+    const contextId = httpContext.get(CONTEXT_ID);
     const configData = await configHandler.getConfig();
     try {
-        const jobs = await databaseConnector.getJobs();
+        const jobs = await databaseConnector.getJobs(contextId);
         jobs.forEach(async function (job) {
             if (job.cron_expression !== null) {
                 addCron(job.id.toString(), job, job.cron_expression, configData);
@@ -52,19 +54,20 @@ module.exports.scheduleFinishedContainersCleanup = async () => {
 };
 
 module.exports.createJob = async (job) => {
+    const contextId = httpContext.get(CONTEXT_ID);
     let reportId;
     const jobId = uuid.v4();
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(job.webhooks);
     try {
-        const insertedJob = await databaseConnector.insertJob(jobId, job);
+        const insertedJob = await databaseConnector.insertJob(jobId, job, contextId);
         logger.info('Job saved successfully to database');
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
             const report = await createReportForJob(test, insertedJob);
             reportId = report.report_id;
-            const jobSpecificPlatformRequest = await createJobRequest(jobId, report.report_id, insertedJob, latestDockerImage, configData);
+            const jobSpecificPlatformRequest = await createJobRequest(jobId, report.report_id, insertedJob, latestDockerImage, configData, contextId);
             await jobConnector.runJob(jobSpecificPlatformRequest, job);
         }
         if (job.cron_expression) {
@@ -79,22 +82,17 @@ module.exports.createJob = async (job) => {
 };
 
 module.exports.deleteJob = (jobId) => {
+    const contextId = httpContext.get(CONTEXT_ID);
     if (cronJobs[jobId]) {
         cronJobs[jobId].stop();
         delete cronJobs[jobId];
     }
-    return databaseConnector.deleteJob(jobId);
+    return databaseConnector.deleteJob(jobId, contextId);
 };
 
 module.exports.stopRun = async (jobId, reportId) => {
-    const jobs = await databaseConnector.getJob(jobId);
-    logger.info('Got job from database successfully');
-
-    if (jobs.length === 0) {
-        throw generateError(404, 'Not found');
-    }
-
-    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, reportId), jobs[0]);
+    const job = await getJobInternal(jobId);
+    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, reportId), job);
 };
 
 module.exports.deleteAllContainers = async () => {
@@ -103,6 +101,7 @@ module.exports.deleteAllContainers = async () => {
 };
 
 module.exports.getLogs = async function (jobId, reportId) {
+    await getJobInternal(jobId);
     const logs = await jobConnector.getLogs(util.format(JOB_PLATFORM_NAME, reportId), PREDATOR_RUNNER_PREFIX);
     const response = {
         files: logs,
@@ -113,8 +112,9 @@ module.exports.getLogs = async function (jobId, reportId) {
 };
 
 module.exports.getJobs = async (getOneTimeJobs) => {
+    const contextId = httpContext.get(CONTEXT_ID);
     try {
-        let jobs = await databaseConnector.getJobs();
+        let jobs = await databaseConnector.getJobs(contextId);
         logger.info('Got jobs list from database successfully');
         if (!getOneTimeJobs) {
             jobs = jobs.filter((job) => job.cron_expression);
@@ -131,32 +131,14 @@ module.exports.getJobs = async (getOneTimeJobs) => {
 };
 
 module.exports.getJob = async (jobId) => {
-    try {
-        let error;
-        const job = await databaseConnector.getJob(jobId);
-        logger.info('Got job from database successfully');
-        if (job.length > 1) {
-            logger.error('database returned ' + job.length + ' rows, expected only one.');
-            error = new Error('Error occurred in database response');
-            error.statusCode = 500;
-            return Promise.reject(error);
-        } else if (job.length === 1) {
-            return createResponse(job[0].id, job[0]);
-        } else {
-            error = new Error('Not found');
-            error.statusCode = 404;
-            return Promise.reject(error);
-        }
-    } catch (error) {
-        logger.error(error, 'Error occurred trying to get job');
-        return Promise.reject(error);
-    }
+    return getJobInternal(jobId);
 };
 
 module.exports.updateJob = async (jobId, jobConfig) => {
+    const contextId = httpContext.get(CONTEXT_ID);
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(jobConfig.webhooks);
-    let [job] = await databaseConnector.getJob(jobId);
+    let [job] = await databaseConnector.getJob(jobId, contextId);
     if (!job || job.length === 0) {
         const error = new Error('Not found');
         error.statusCode = 404;
@@ -169,7 +151,7 @@ module.exports.updateJob = async (jobId, jobConfig) => {
     }
     try {
         await databaseConnector.updateJob(jobId, jobConfig);
-        job = await databaseConnector.getJob(jobId);
+        job = await databaseConnector.getJob(jobId, contextId);
     } catch (err) {
         logger.error(err, 'Error occurred trying to update job');
         throw err;
@@ -218,12 +200,6 @@ function createResponse(jobId, jobBody, reportId) {
         enabled: jobBody.enabled !== false,
         tag: jobBody.tag
     };
-
-    Object.keys(response).forEach(key => {
-        if (response[key] === null) {
-            delete response[key];
-        }
-    });
 
     return response;
 }
@@ -347,4 +323,28 @@ async function createReportForJob(test, job) {
     const report = await reportsManager.postReport(reportId, test, job, startTime);
     logger.info({ test_id: test.id, report_id: reportId }, 'Created report successfully');
     return report;
+}
+
+async function getJobInternal(jobId) {
+    const contextId = httpContext.get(CONTEXT_ID);
+    try {
+        let error;
+        const job = await databaseConnector.getJob(jobId, contextId);
+        logger.info('Got job from database successfully');
+        if (job.length > 1) {
+            logger.error('database returned ' + job.length + ' rows, expected only one.');
+            error = new Error('Error occurred in database response');
+            error.statusCode = 500;
+            throw error;
+        } else if (job.length === 1) {
+            return createResponse(job[0].id, job[0]);
+        } else {
+            error = new Error('Not found');
+            error.statusCode = 404;
+            return Promise.reject(error);
+        }
+    } catch (error) {
+        logger.error(error, 'Error occurred trying to get job');
+        throw error;
+    }
 }

@@ -14,25 +14,28 @@ async function init() {
     testApp = await app();
 }
 
-function uploadFile(fileKey, filePath) {
+function uploadFile(fileKey, filePath, headers = {}) {
     return request(testApp).post(uri)
         .attach(fileKey, filePath)
+        .set(headers)
         .expect(function (res) {
             console.log(res.body);
             return res;
         });
 }
 
-function downloadFile(id) {
+function downloadFile(id, headers = {}) {
     return request(testApp).get(uri + '/' + id)
+        .set(headers)
         .expect(function (res) {
             console.log(res.body);
             return res;
         });
 }
 
-function getFileMetadata(id) {
+function getFileMetadata(id, headers = {}) {
     return request(testApp).get(uri + '/' + id + '/metadata')
+        .set(headers)
         .expect(function (res) {
             console.log(res.body);
             return res;

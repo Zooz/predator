@@ -46,6 +46,7 @@ tags:
   - name: Webhooks
     description: |
       This resource allows you to configure webhooks.
+
 x-tagGroups:
   - name: Reference
     tags:
@@ -64,6 +65,7 @@ paths:
   '/v1/dsl/{dsl_name}/definitions':
     parameters:
       - $ref: '#/components/parameters/dsl_name'
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: create-a-dsl-definition
       tags:
@@ -137,6 +139,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/dsl_name'
       - $ref: '#/components/parameters/definition_name'
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-dsl-definition
       tags:
@@ -229,6 +232,8 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Tests
   /v1/tests:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: create-a-test
       tags:
@@ -295,6 +300,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-test
       tags:
@@ -350,7 +357,7 @@ paths:
             type: string
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
-        '200':
+        '201':
           description: Success
           content:
             application/json:
@@ -411,6 +418,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/revisions':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-all-test-revisions
       tags:
@@ -453,9 +462,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-
   # Jobs
   /v1/jobs:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: create-a-job
       tags:
@@ -534,6 +544,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/jobs/{job_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-job
       tags:
@@ -651,6 +663,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/jobs/{job_id}/runs/{report_id}/stop':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: terminate-a-job
       tags:
@@ -685,8 +699,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-
   /v1/jobs/{job_id}/runs/{report_id}/logs:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       tags:
         - Jobs
@@ -725,8 +740,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
-
   '/v1/jobs/containers/':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     delete:
       operationId: delete-all-job-containers
       summary: Delete all finished containers/pods
@@ -748,6 +764,8 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Reports
   '/v1/tests/{test_id}/reports':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-all-reports
       tags:
@@ -832,6 +850,8 @@ paths:
         description: report data
         required: true
   '/v1/tests/{test_id}/reports/{report_id}/subscribe':
+      parameters:
+        - $ref: '#/components/parameters/context_id'
       post:
         operationId: subscribe-runner-to-report
         tags:
@@ -863,7 +883,6 @@ paths:
         responses:
           '204':
             description: Success
-
           '400':
             description: Bad request
             content:
@@ -883,6 +902,8 @@ paths:
                 schema:
                   $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-report
       tags:
@@ -1008,6 +1029,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   /v1/tests/last_reports:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-recent-reports
       tags:
@@ -1053,6 +1076,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}/stats':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       tags:
         - Reports
@@ -1098,6 +1123,8 @@ paths:
         description: stats data
         required: true
   /v1/tests/{test_id}/benchmark:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       tags:
         - Benchmarks
@@ -1173,6 +1200,8 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Report Export
   '/v1/{test_id}/reports/{report_id}/export/{file_format}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: export-report
       tags:
@@ -1208,6 +1237,8 @@ paths:
           description: Unsupported File Format
   # Export Comparison Report
   '/v1/tests/reports/compare/export/{file_format}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: export-comparison-report
       tags:
@@ -1243,6 +1274,8 @@ paths:
           description: Unsupported File Format
   # Config
   /v1/config:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-configurations
       tags:
@@ -1291,6 +1324,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error_response"
   /v1/config/{config_key}:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     delete:
       operationId: delete-a-configuration
       tags:
@@ -1315,9 +1350,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
-
   # Processors
   /v1/processors:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: create-processor-file
       tags:
@@ -1411,6 +1447,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/processors/{processor_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-processor-file
       tags:
@@ -1535,6 +1573,8 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Webhooks
   /v1/webhooks:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-webhooks
       tags:
@@ -1595,6 +1635,8 @@ paths:
         description: The webhook to add
         required: true
   /v1/webhooks/{webhook_id}:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-webhook
       tags:
@@ -1741,6 +1783,8 @@ paths:
 
   # Files
   /v1/files:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: upload-file
       tags:
@@ -1784,6 +1828,8 @@ paths:
         description: The file to create upload
         required: true
   '/v1/files/{file_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-file
       tags:
@@ -1806,6 +1852,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/upload_file_response'
   '/v1/files/{file_id}/metadata':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-file-medtadata
       tags:
@@ -1827,8 +1875,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/upload_file_response'
+
 components:
   parameters:
+    context_id:
+      in: header
+      name: x-context-id
+      description: The id of the user/organization context
+      required: false
+      schema:
+        type: string
+        example: team-mick
     dsl_name:
       name: dsl_name
       in: path

@@ -1045,6 +1045,21 @@ describe('Manager tests', function () {
 
     describe('Stop run', function () {
         it('Stop an existing run of a job', async function () {
+            databaseConnectorGetSingleJobStub.resolves([{
+                id: 'id',
+                type: 'load_test',
+                test_id: 'test_id',
+                environment: 'test',
+                arrival_rate: 1,
+                duration: 1,
+                cron_expression: '* * * * *',
+                emails: null,
+                webhooks: ['dina', 'niv'],
+                ramp_to: '1',
+                notes: 'some nice notes',
+                proxy_url: 'http://proxyUrl.com',
+                debug: '*'
+            }]);
             await manager.stopRun('jobId', 'reportId');
             jobStopRunStub.callCount.should.eql(1);
             jobStopRunStub.args[0][0].should.eql(
@@ -1108,6 +1123,7 @@ describe('Manager tests', function () {
                 debug: '*',
                 enabled: false,
                 tag: undefined,
+                emails: null
             }, {
                 id: 'id2',
                 type: 'load_test',
@@ -1126,8 +1142,10 @@ describe('Manager tests', function () {
                 proxy_url: 'http://proxyUrl.com',
                 tag: undefined,
                 debug: '*',
-                enabled: true
-            }];
+                enabled: true,
+                webhooks: null,
+                cron_expression: null
+        }];
             const jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
             databaseConnectorGetStub.callCount.should.eql(1);
@@ -1179,7 +1197,8 @@ describe('Manager tests', function () {
                 proxy_url: undefined,
                 debug: undefined,
                 tag: undefined,
-                enabled: false
+                enabled: false,
+                emails: null
             }];
             const jobs = await manager.getJobs();
             jobs.should.eql(expectedResult);
@@ -1245,7 +1264,8 @@ describe('Manager tests', function () {
                 notes: 'some nice notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
-                enabled: true
+                enabled: true,
+                emails: null
             };
 
             const job = await manager.getJob('id');
@@ -1292,6 +1312,7 @@ describe('Manager tests', function () {
 
     describe('Get logs', function () {
         it('Success getting logs from job', async function () {
+            databaseConnectorGetSingleJobStub.resolves([{}]);
             jobGetLogsStub.resolves([{ type: 'file', name: 'log.txt', content: 'this is the log' }]);
             const logs = await manager.getLogs('jobId', '13046d76-1b8c-4b3f-9061-e8dc819d585c');
             logs.should.eql({
@@ -1301,6 +1322,7 @@ describe('Manager tests', function () {
         });
 
         it('Get logs from job fails', async function () {
+            databaseConnectorGetSingleJobStub.resolves([{}]);
             jobGetLogsStub.rejects(new Error('error getting logs'));
             try {
                 await manager.getLogs('jobId', '13046d76-1b8c-4b3f-9061-e8dc819d585c');

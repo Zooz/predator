@@ -131,6 +131,7 @@ describe('Scenario generator tests', function () {
                 testjson: 'json'
             });
             insertStub.resolves();
+            getTestStub.resolves({});
 
             const existingTestId = uuid();
             return manager.upsertTest({ testInfo: 'info' }, existingTestId)

@@ -1,7 +1,8 @@
 'use strict';
+const httpContext = require('express-http-context');
 
 const databaseConnector = require('./database/sequelize/sequelizeConnector');
-const { ERROR_MESSAGES } = require('../../common/consts');
+const { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts');
 const generateError = require('../../common/generateError');
 const requestSender = require('../../common/requestSender');
 const logger = require('../../common/logger');
@@ -12,29 +13,42 @@ const webhookDefaultValues = {
 };
 
 async function getAllWebhooks() {
-    const getAllWebhooks = await databaseConnector.getAllWebhooks();
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const getAllWebhooks = await databaseConnector.getAllWebhooks(contextId);
     return getAllWebhooks;
-};
+}
 
 async function getWebhook(webhookId) {
-    const webhook = await databaseConnector.getWebhook(webhookId);
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const webhook = await databaseConnector.getWebhook(webhookId, contextId);
     if (!webhook) {
         throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
     }
     return webhook;
-};
+}
 
 async function createWebhook(webhookInfo) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
     const webhook = {
         ...webhookDefaultValues,
         ...webhookInfo
     };
-    return databaseConnector.createWebhook(webhook);
-};
+    return databaseConnector.createWebhook(webhook, contextId);
+}
 
 async function deleteWebhook(webhookId) {
-    return databaseConnector.deleteWebhook(webhookId);
-};
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const webhook = await databaseConnector.getWebhook(webhookId, contextId);
+    if (!webhook) {
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
+    }
+
+    return databaseConnector.deleteWebhook(webhookId, contextId);
+}
 
 async function updateWebhook(webhookId, webhook) {
     const webhookInDB = await getWebhook(webhookId);
@@ -42,10 +56,12 @@ async function updateWebhook(webhookId, webhook) {
         throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
     }
     return databaseConnector.updateWebhook(webhookId, webhook);
-};
+}
 
 async function getAllGlobalWebhooks() {
-    return databaseConnector.getAllGlobalWebhooks();
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    return databaseConnector.getAllGlobalWebhooks(contextId);
 }
 
 async function fireSingleWebhook(webhook, payload) {

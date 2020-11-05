@@ -24,7 +24,7 @@ async function init(sequelizeClient) {
     await initSchemas();
 }
 
-async function insertJob(jobId, jobInfo) {
+async function insertJob(jobId, jobInfo, contextId) {
     const job = client.model('job');
     const params = {
         id: jobId,
@@ -42,7 +42,8 @@ async function insertJob(jobId, jobInfo) {
         tag: jobInfo.tag,
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
             return { id: uuid(), address: emailAddress };
-        }) : undefined
+        }) : undefined,
+        context_id: contextId
     };
 
     if (params.type === JOB_TYPE_FUNCTIONAL_TEST) {
@@ -63,16 +64,20 @@ async function insertJob(jobId, jobInfo) {
     });
 }
 
-async function getJobsAndParse(jobId) {
+async function getJobsAndParse(jobId, contextId) {
     const job = client.model('job');
 
     const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
-        include: [job.email, 'webhooks']
+        include: [job.email, 'webhooks'],
+        where: {}
     };
 
     if (jobId) {
-        options.where = { id: jobId };
+        options.where.id = jobId;
+    }
+    if (contextId) {
+        options.where.context_id = contextId;
     }
     const allJobsSql = await job.findAll(options);
     const allJobs = allJobsSql.map(sqlJob => sqlJob.dataValues);
@@ -84,13 +89,13 @@ async function getJobsAndParse(jobId) {
     return allJobs;
 }
 
-async function getJobs() {
-    const allJobs = await getJobsAndParse();
+async function getJobs(contextId) {
+    const allJobs = await getJobsAndParse(undefined, contextId);
     return allJobs;
 }
 
-async function getJob(jobId) {
-    const allJobs = await getJobsAndParse(jobId);
+async function getJob(jobId, contextId) {
+    const allJobs = await getJobsAndParse(jobId, contextId);
     return allJobs;
 }
 
@@ -189,11 +194,15 @@ async function getJobBasedOnTestId(testId){
     const allJobsSql = await job.findAll(options);
     const allJobs = allJobsSql.map(sqlJob => sqlJob.dataValues);
 
-    return allJobs
+    return allJobs;
 }
 
-async function deleteJob(jobId) {
+async function deleteJob(jobId, contextId) {
     const job = client.model('job');
+    const options = { where: { id: jobId } };
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
     await job.destroy({ where: { id: jobId } });
 }
 
@@ -254,6 +263,9 @@ async function initSchemas() {
         },
         enabled: {
             type: Sequelize.DataTypes.BOOLEAN
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
         },
         tag: {
             type: Sequelize.DataTypes.STRING
