@@ -91,8 +91,8 @@ module.exports.deleteJob = (jobId) => {
 };
 
 module.exports.stopRun = async (jobId, reportId) => {
-    await getJobInternal(jobId);
-    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, reportId), jobs[0]);
+    const job = await getJobInternal(jobId);
+    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, reportId), job);
 };
 
 module.exports.deleteAllContainers = async () => {

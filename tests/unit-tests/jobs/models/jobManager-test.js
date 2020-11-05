@@ -1045,6 +1045,21 @@ describe('Manager tests', function () {
 
     describe('Stop run', function () {
         it('Stop an existing run of a job', async function () {
+            databaseConnectorGetSingleJobStub.resolves([{
+                id: 'id',
+                type: 'load_test',
+                test_id: 'test_id',
+                environment: 'test',
+                arrival_rate: 1,
+                duration: 1,
+                cron_expression: '* * * * *',
+                emails: null,
+                webhooks: ['dina', 'niv'],
+                ramp_to: '1',
+                notes: 'some nice notes',
+                proxy_url: 'http://proxyUrl.com',
+                debug: '*'
+            }]);
             await manager.stopRun('jobId', 'reportId');
             jobStopRunStub.callCount.should.eql(1);
             jobStopRunStub.args[0][0].should.eql(
