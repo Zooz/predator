@@ -68,7 +68,7 @@ module.exports.createJob = async (job) => {
             const report = await createReportForJob(test, insertedJob);
             reportId = report.report_id;
             const jobSpecificPlatformRequest = await createJobRequest(jobId, report.report_id, insertedJob, latestDockerImage, configData, contextId);
-            await jobConnector.runJob(jobSpecificPlatformRequest);
+            await jobConnector.runJob(jobSpecificPlatformRequest, job);
         }
         if (job.cron_expression) {
             addCron(jobId, insertedJob, job.cron_expression, configData);
@@ -77,7 +77,7 @@ module.exports.createJob = async (job) => {
         return createResponse(jobId, job, reportId);
     } catch (error) {
         logger.error(error, 'Error occurred trying to create new job');
-        return Promise.reject(error);
+        throw error;
     }
 };
 
@@ -92,7 +92,7 @@ module.exports.deleteJob = (jobId) => {
 
 module.exports.stopRun = async (jobId, reportId) => {
     await getJobInternal(jobId);
-    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, reportId));
+    await jobConnector.stopRun(util.format(JOB_PLATFORM_NAME, reportId), jobs[0]);
 };
 
 module.exports.deleteAllContainers = async () => {
@@ -197,7 +197,8 @@ function createResponse(jobId, jobBody, reportId) {
         notes: jobBody.notes,
         proxy_url: jobBody.proxy_url,
         debug: jobBody.debug,
-        enabled: jobBody.enabled !== false
+        enabled: jobBody.enabled !== false,
+        tag: jobBody.tag
     };
 
     return response;
@@ -268,7 +269,7 @@ async function createJobRequest(jobId, reportId, jobBody, dockerImage, configDat
     }
 
     const customRunnerDefinition = configData.custom_runner_definition;
-    const jobRequest = jobTemplate.createJobRequest(jobPlatformName, reportId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition);
+    const jobRequest = jobTemplate.createJobRequest(jobPlatformName, reportId, parallelism, environmentVariables, dockerImage, configData, PREDATOR_RUNNER_PREFIX, customRunnerDefinition, jobBody.tag);
 
     return jobRequest;
 }
@@ -283,7 +284,7 @@ function addCron(jobId, job, cronExpression, configData) {
                 const test = await testsManager.getTest(job.test_id);
                 const report = await createReportForJob(test, job);
                 const jobSpecificPlatformConfig = await createJobRequest(jobId, report.report_id, job, latestDockerImage, configData);
-                await jobConnector.runJob(jobSpecificPlatformConfig);
+                await jobConnector.runJob(jobSpecificPlatformConfig, job);
             }
         } catch (error) {
             logger.error({ id: jobId, error: error }, 'Unable to run scheduled job.');

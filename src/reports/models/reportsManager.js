@@ -139,8 +139,7 @@ module.exports.postReportDeprecated = async function (testId, reportBody) {
         reportBody.test_description, JSON.stringify(testConfiguration), job.notes, Date.now(), false);
     await databaseConnector.subscribeRunner(testId, reportBody.report_id, reportBody.runner_id, constants.SUBSCRIBER_INITIALIZING_STAGE);
     return reportBody;
-}
-
+};
 
 function getReportResponse(summaryRow, config) {
     const lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;

@@ -118,6 +118,7 @@ describe('Sequelize client tests', function () {
                 proxy_url: 'http://proxy.com',
                 debug: '*',
                 enabled: true,
+                tag: 'eu-west-1',
                 context_id: undefined
             };
             const createdJob = {
@@ -173,6 +174,7 @@ describe('Sequelize client tests', function () {
                 notes: 'some notes',
                 proxy_url: 'http://proxy.com',
                 debug: '*',
+                tag: 'eu-west-1',
                 context_id: undefined
             };
 
@@ -523,7 +525,8 @@ describe('Sequelize client tests', function () {
                     debug: '*',
                     enabled: false,
                     emails: [],
-                    notes: null
+                    notes: null,
+                    tag: 'eu-west-1'
                 },
                 setWebhooks: sandbox.stub()
             };
@@ -576,7 +579,8 @@ describe('Sequelize client tests', function () {
                 parallelism: 3,
                 proxy_url: 'http://proxy.com',
                 debug: '*',
-                enabled: false
+                enabled: false,
+                tag: 'eu-west-1'
             };
             const updatedJobRes = {
                 test_id: testId,
@@ -594,7 +598,8 @@ describe('Sequelize client tests', function () {
                 enabled: false,
                 webhooks: [],
                 emails: [],
-                notes: null
+                notes: null,
+                tag: 'eu-west-1'
             };
             const transaction = {};
             sequelizeGetStub.resolves(sequelizeJob);
@@ -627,8 +632,8 @@ describe('Sequelize client tests', function () {
                     debug: '*',
                     enabled: false,
                     notes: null,
-                    emails: [{ id: uuid.v4(), address: 'a@email.com'}],
-                    notes: null
+                    emails: [{ id: uuid.v4(), address: 'a@email.com' }],
+                    tag: 'eu-west-1'
                 },
                 setWebhooks: setWebhooksStub,
                 setEmails: sandbox.stub()

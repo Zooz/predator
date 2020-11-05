@@ -62,6 +62,7 @@ module.exports = {
         BAD_RUNNER_IMAGE: 'It is recommended to use the same MAJOR.MINOR version for both Predator and Predator-Runner docker images in order to be fully compatible with all of the features'
     },
     KUBERNETES: 'KUBERNETES',
+    AWS_FARGATE: 'AWS_FARGATE',
     METRONOME: 'METRONOME',
     DOCKER: 'DOCKER',
     WEBHOOK_TEST_MESSAGE: 'Hello From Predator! Wuff! Wuff!',

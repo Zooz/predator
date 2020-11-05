@@ -1,19 +1,20 @@
 const sinon = require('sinon'),
     should = require('should'),
     jobVerifier = require('../../../../src/jobs/helpers/jobVerifier'),
-    testsManager = require('../../../../src/tests/models/manager');
+    testsManager = require('../../../../src/tests/models/manager'),
+    configHandler = require('../../../../src/configManager/models/configHandler'),
+    consts = require('../../../../src/common/consts');
 
 describe('Jobs verifier tests', function () {
-    let req, res, sandbox, nextStub, resJsonStub, resStatusStub, testsManagerStub;
+    let req, res, sandbox, nextStub, resJsonStub, resStatusStub, testsManagerStub, configHandlerStub;
 
     before(() => {
         sandbox = sinon.createSandbox();
         nextStub = sandbox.stub();
         resJsonStub = sandbox.stub();
         resStatusStub = sandbox.stub();
-
+        configHandlerStub = sandbox.stub(configHandler, 'getConfigValue');
         testsManagerStub = sandbox.stub(testsManager, 'getTest');
-
         res = {
             json: (json) => {
                 resJsonStub(json);
@@ -28,6 +29,7 @@ describe('Jobs verifier tests', function () {
 
     beforeEach(() => {
         sandbox.resetHistory();
+        configHandlerStub.resolves('KUBERNETES');
     });
 
     after(() => {
@@ -149,6 +151,31 @@ describe('Jobs verifier tests', function () {
             req = { body: { run_immediately: false, cron_expression: '* * *' } };
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0].message).startWith('Unsupported cron_expression. ');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+
+        it('Run immediately with AWS FARGATE with tag in job body, should pass', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('AWS_FARGATE');
+            configHandlerStub.withArgs(consts.CONFIG.CUSTOM_RUNNER_DEFINITION).resolves({ hello: {} });
+            req = { body: { run_immediately: true, tag: 'hello' } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('Run immediately with AWS FARGATE without tag in job body, should fail', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('AWS_FARGATE');
+            req = { body: { run_immediately: true } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0].message).eql('tag must be provided when JOB_PLATFORM is AWS_FARGATE');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+
+        it('Run immediately with AWS FARGATE with tag in job body but tag not exists in custom runner definition, should fail', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('AWS_FARGATE');
+            configHandlerStub.withArgs(consts.CONFIG.CUSTOM_RUNNER_DEFINITION).resolves({ });
+            req = { body: { run_immediately: true, tag: 'hello' } };
+            await jobVerifier.verifyJobBody(req, res, nextStub);
+            should(nextStub.args[0][0].message).eql('custom_runner_definition is missing key for tag: hello');
             should(nextStub.args[0][0].statusCode).eql(400);
         });
     });

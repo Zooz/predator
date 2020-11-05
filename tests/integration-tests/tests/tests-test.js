@@ -486,7 +486,7 @@ describe('the tests api', function() {
             const testId = createTestResponse.body.id;
 
             let jobsBody = require('../../testExamples/Test_with_jobs.json')['cron-jobs'];
-            jobsBody.test_id = testId
+            jobsBody.test_id = testId;
             const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
             createJobResponse.statusCode.should.eql(201);
 
