@@ -3,6 +3,7 @@
 const should = require('should'),
     rewire = require('rewire'),
     sinon = require('sinon'),
+    { expect } = require('chai'),
     uuid = require('uuid');
 
 const { version: PREDATOR_VERSION } = require('../../../../package.json'),
@@ -43,6 +44,7 @@ describe('Manager tests', function () {
     let webhooksManagerGetWebhookStub;
 
     let postReportStub;
+    let failReportStub;
 
     let testsManagerGetStub;
 
@@ -58,6 +60,7 @@ describe('Manager tests', function () {
         webhooksManagerGetWebhookStub = sandbox.stub(webhooksManager, 'getWebhook');
 
         postReportStub = sandbox.stub(reportsManager, 'postReport');
+        failReportStub = sandbox.stub(reportsManager, 'failReport');
 
         testsManagerGetStub = sandbox.stub(testsManager, 'getTest');
 
@@ -559,6 +562,34 @@ describe('Manager tests', function () {
                     loggerErrorStub.args[0].should.eql([{ error: 'databaseConnector error' }, 'Error occurred trying to create new job']);
                     error.should.eql({ error: 'databaseConnector error' });
                 });
+        });
+
+        it('Fail to create job and fail test immediately', async function() {
+            const jobBodyWithParallelismThatSplitsWithDecimal = {
+                test_id: TEST_ID,
+                id: TEST_ID,
+                arrival_rate: 99,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                ramp_to: '150',
+                parallelism: 20,
+                webhooks: [],
+                max_virtual_users: 510
+            };
+            const reportId = uuid.v4();
+
+            jobConnectorRunJobStub.rejects({});
+            databaseConnectorInsertStub.resolves(jobBodyWithParallelismThatSplitsWithDecimal);
+            failReportStub.resolves();
+            testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+            postReportStub.resolves({ report_id: reportId });
+            try {
+                await manager.createJob(jobBodyWithParallelismThatSplitsWithDecimal);
+            } catch (err) {
+                expect(failReportStub.calledOnce).to.be.equal(true);
+            }
         });
 
         it('Fail to create a job', function () {

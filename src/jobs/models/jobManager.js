@@ -55,7 +55,7 @@ module.exports.scheduleFinishedContainersCleanup = async () => {
 
 module.exports.createJob = async (job) => {
     const contextId = httpContext.get(CONTEXT_ID);
-    let reportId;
+    let report;
     const jobId = uuid.v4();
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(job.webhooks);
@@ -65,8 +65,7 @@ module.exports.createJob = async (job) => {
         if (job.run_immediately) {
             const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
             const test = await testsManager.getTest(job.test_id);
-            const report = await createReportForJob(test, insertedJob);
-            reportId = report.report_id;
+            report = await createReportForJob(test, insertedJob);
             const jobSpecificPlatformRequest = await createJobRequest(jobId, report.report_id, insertedJob, latestDockerImage, configData, contextId);
             await jobConnector.runJob(jobSpecificPlatformRequest, job);
         }
@@ -74,9 +73,13 @@ module.exports.createJob = async (job) => {
             addCron(jobId, insertedJob, job.cron_expression, configData);
         }
         logger.info('Job deployed successfully');
-        return createResponse(jobId, job, reportId);
+        return createResponse(jobId, job, report.report_id);
     } catch (error) {
         logger.error(error, 'Error occurred trying to create new job');
+        if (report) {
+            logger.info('Removing the failed job report');
+            await reportsManager.failReport(report);
+        }
         throw error;
     }
 };
@@ -276,18 +279,23 @@ async function createJobRequest(jobId, reportId, jobBody, dockerImage, configDat
 
 function addCron(jobId, job, cronExpression, configData) {
     const scheduledJob = new CronJob(cronExpression, async function () {
+        let report = null;
         try {
             if (job.enabled === false) {
                 logger.info(`Skipping job with id: ${jobId} as it's currently disabled`);
             } else {
                 const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
                 const test = await testsManager.getTest(job.test_id);
-                const report = await createReportForJob(test, job);
+                report = await createReportForJob(test, job);
                 const jobSpecificPlatformConfig = await createJobRequest(jobId, report.report_id, job, latestDockerImage, configData);
                 await jobConnector.runJob(jobSpecificPlatformConfig, job);
             }
         } catch (error) {
             logger.error({ id: jobId, error: error }, 'Unable to run scheduled job.');
+            if (report) {
+                logger.info('Removing the failed job report');
+                await reportsManager.failReport(report);
+            }
         }
     }, function () {
         logger.info('Job: ' + jobId + ' completed.');
