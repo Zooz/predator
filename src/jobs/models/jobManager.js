@@ -33,7 +33,7 @@ module.exports.reloadCronJobs = async () => {
         const jobs = await databaseConnector.getJobs(contextId);
         jobs.forEach(async function (job) {
             if (job.cron_expression !== null) {
-                addCron(job.id.toString(), job, job.cron_expression, configData);
+                addCron(job, job.cron_expression, configData);
             }
         });
     } catch (error) {
@@ -63,23 +63,16 @@ module.exports.createJob = async (job) => {
         const insertedJob = await databaseConnector.insertJob(jobId, job, contextId);
         logger.info('Job saved successfully to database');
         if (job.run_immediately) {
-            const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
-            const test = await testsManager.getTest(job.test_id);
-            report = await createReportForJob(test, insertedJob);
-            const jobSpecificPlatformRequest = await createJobRequest(jobId, report.report_id, insertedJob, latestDockerImage, configData, contextId);
-            await jobConnector.runJob(jobSpecificPlatformRequest, job);
+            report = await runJob(insertedJob, configData);
         }
         if (job.cron_expression) {
-            addCron(jobId, insertedJob, job.cron_expression, configData);
+            report = { report_id: undefined };
+            addCron(insertedJob, job.cron_expression, configData);
         }
-        logger.info('Job deployed successfully');
+        logger.info(`Job ${jobId} deployed successfully`);
         return createResponse(jobId, job, report.report_id);
     } catch (error) {
         logger.error(error, 'Error occurred trying to create new job');
-        if (report) {
-            logger.info('Removing the failed job report');
-            await reportsManager.failReport(report);
-        }
         throw error;
     }
 };
@@ -163,7 +156,7 @@ module.exports.updateJob = async (jobId, jobConfig) => {
         cronJobs[jobId].stop();
         delete cronJobs[jobId];
     }
-    addCron(jobId, job[0], job[0].cron_expression, configData);
+    addCron(job[0], job[0].cron_expression, configData);
     logger.info('Job updated successfully to database');
 };
 
@@ -277,30 +270,17 @@ async function createJobRequest(jobId, reportId, jobBody, dockerImage, configDat
     return jobRequest;
 }
 
-function addCron(jobId, job, cronExpression, configData) {
+function addCron(job, cronExpression, configData) {
     const scheduledJob = new CronJob(cronExpression, async function () {
-        let report = null;
-        try {
-            if (job.enabled === false) {
-                logger.info(`Skipping job with id: ${jobId} as it's currently disabled`);
-            } else {
-                const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
-                const test = await testsManager.getTest(job.test_id);
-                report = await createReportForJob(test, job);
-                const jobSpecificPlatformConfig = await createJobRequest(jobId, report.report_id, job, latestDockerImage, configData);
-                await jobConnector.runJob(jobSpecificPlatformConfig, job);
-            }
-        } catch (error) {
-            logger.error({ id: jobId, error: error }, 'Unable to run scheduled job.');
-            if (report) {
-                logger.info('Removing the failed job report');
-                await reportsManager.failReport(report);
-            }
+        if (job.enabled === false) {
+            logger.info(`Skipping job with id: ${job.id} as it's currently disabled`);
+            return;
         }
+        await runJob(job, configData);
     }, function () {
-        logger.info('Job: ' + jobId + ' completed.');
+        logger.info(`Job: ${job.id} completed.`);
     }, true);
-    cronJobs[jobId] = scheduledJob;
+    cronJobs[job.id] = scheduledJob;
 }
 
 async function validateWebhooksAssignment(webhookIds) {
@@ -355,4 +335,27 @@ async function getJobInternal(jobId) {
         logger.error(error, 'Error occurred trying to get job');
         throw error;
     }
+}
+
+async function failReport(report) {
+    if (!report) {
+        return;
+    }
+    logger.info('Removing the failed job report');
+    return reportsManager.failReport(report);
+}
+
+async function runJob(job, configData) {
+    let report;
+    try {
+        const latestDockerImage = await dockerHubConnector.getMostRecentRunnerTag();
+        const test = await testsManager.getTest(job.test_id);
+        report = await createReportForJob(test, job);
+        const jobSpecificPlatformRequest = await createJobRequest(job.id, report.report_id, job, latestDockerImage, configData);
+        await jobConnector.runJob(jobSpecificPlatformRequest, job);
+    } catch (error) {
+        logger.error({ id: job.id, error: error }, 'Unable to run scheduled job.');
+        await failReport(report);
+    }
+    return report;
 }
