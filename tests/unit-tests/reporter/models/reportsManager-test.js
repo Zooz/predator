@@ -15,6 +15,7 @@ const notifier = require('../../../../src/reports/models/notifier');
 const constants = require('../../../../src/reports/utils/constants');
 const configHandler = require('../../../../src/configManager/models/configHandler');
 const basicTest = require('../../../testExamples/Basic_test.json');
+const { expect } = require('chai');
 
 let manager;
 let statsManager;
@@ -740,6 +741,21 @@ describe('Reports manager tests', function () {
             updateReportBenchmarkStub.callCount.should.eql(0);
 
             should(getBenchmarkStub.args).eql([['test_id']]);
+        });
+    });
+    describe('#failReport', function() {
+        it('should call the connector with status failed', async function() {
+            const reportId = uuid.v4();
+            const testId = uuid.v4();
+
+            databaseSubscribeRunnerStub.resolves();
+
+            manager.failReport({ report_id: reportId, test_id: testId });
+
+            expect(databaseSubscribeRunnerStub.calledOnce).to.be.equal(true);
+            expect(databaseSubscribeRunnerStub.args[0][0]).to.be.equal(testId);
+            expect(databaseSubscribeRunnerStub.args[0][1]).to.be.equal(reportId);
+            expect(databaseSubscribeRunnerStub.args[0][3]).to.be.equal(constants.SUBSCRIBER_FAILED_STAGE);
         });
     });
 });

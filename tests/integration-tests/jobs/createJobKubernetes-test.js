@@ -2,6 +2,7 @@ const should = require('should'),
     { expect } = require('chai'),
     uuid = require('uuid'),
     logger = require('../../../src/common/logger'),
+    constants = require('../../../src/reports/utils/constants'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
     configManagerRequestCreator = require('../configManager/helpers/requestCreator'),
     webhooksRequestCreator = require('../webhooks/helpers/requestCreator'),
@@ -132,6 +133,36 @@ describe('Create job specific kubernetes tests', async function () {
                     it('Delete jobs', async () => {
                         await schedulerRequestCreator.deleteJobFromScheduler(cronJobId);
                         await schedulerRequestCreator.deleteJobFromScheduler(oneTimeJobId);
+                    });
+                });
+
+                describe('report status on k8s api failure', function() {
+                    it('should return a report with status failed', async function() {
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
+                            .reply(500, {
+                                metadata: { name: 'jobName', uid: 'uid' },
+                                namespace: kubernetesConfig.kubernetesNamespace
+                            });
+
+                        const jobBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            type: 'load_test'
+                        };
+
+                        const createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(500);
+
+                        const getReportByTestIdResponse = await reportsRequestCreator.getReports(testId);
+                        expect(getReportByTestIdResponse.status).to.be.eql(200);
+                        const lastReport = getReportByTestIdResponse.body[0];
+                        expect(lastReport.status).to.be.equal(constants.REPORT_FAILED_STATUS);
                     });
                 });
 

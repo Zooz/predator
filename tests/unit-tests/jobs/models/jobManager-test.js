@@ -3,6 +3,7 @@
 const should = require('should'),
     rewire = require('rewire'),
     sinon = require('sinon'),
+    { expect } = require('chai'),
     uuid = require('uuid');
 
 const { version: PREDATOR_VERSION } = require('../../../../package.json'),
@@ -43,6 +44,7 @@ describe('Manager tests', function () {
     let webhooksManagerGetWebhookStub;
 
     let postReportStub;
+    let failReportStub;
 
     let testsManagerGetStub;
 
@@ -58,6 +60,7 @@ describe('Manager tests', function () {
         webhooksManagerGetWebhookStub = sandbox.stub(webhooksManager, 'getWebhook');
 
         postReportStub = sandbox.stub(reportsManager, 'postReport');
+        failReportStub = sandbox.stub(reportsManager, 'failReport');
 
         testsManagerGetStub = sandbox.stub(testsManager, 'getTest');
 
@@ -201,13 +204,13 @@ describe('Manager tests', function () {
                 },
                 getConfigValue: getConfigValueStub
             });
-            uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+            uuidStub.returns(JOB_ID);
         });
 
         it('Simple request with custom env vars, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
             const webhooks = [
                 {
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: TEST_ID,
                     name: 'dina',
                     url: 'dina@mail.com',
                     global: false
@@ -220,6 +223,7 @@ describe('Manager tests', function () {
                 }
             ];
             const jobBodyWithCustomEnvVars = {
+                id: JOB_ID,
                 test_id: TEST_ID,
                 arrival_rate: 1,
                 duration: 1,
@@ -234,8 +238,8 @@ describe('Manager tests', function () {
             jobConnectorRunJobStub.resolves({ id: 'report_id' });
             databaseConnectorInsertStub.resolves(jobBodyWithCustomEnvVars);
             const expectedResult = {
-                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
-                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                id: JOB_ID,
+                test_id: TEST_ID,
                 environment: 'test',
                 emails: ['dina@niv.eli'],
                 webhooks: webhooks.map(({ id }) => id),
@@ -261,9 +265,9 @@ describe('Manager tests', function () {
             postReportStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
             jobTemplateCreateJobRequestStub.args[0][3].should.containEql({
-                JOB_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                JOB_ID: JOB_ID,
                 ENVIRONMENT: 'test',
-                TEST_ID: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                TEST_ID: TEST_ID,
                 PREDATOR_URL: 'localhost:80',
                 JOB_TYPE: 'load_test',
                 ARRIVAL_RATE: '1',
@@ -280,7 +284,7 @@ describe('Manager tests', function () {
         it('Simple request, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
             const webhooks = [
                 {
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: TEST_ID,
                     name: 'dina',
                     url: 'dina@mail.com',
                     global: false
@@ -306,9 +310,9 @@ describe('Manager tests', function () {
             jobConnectorRunJobStub.resolves({});
             databaseConnectorInsertStub.resolves(jobBodyWithoutCron);
             const expectedResult = {
-                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                id: JOB_ID,
                 ramp_to: '1',
-                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                test_id: TEST_ID,
                 environment: 'test',
                 emails: ['dina@niv.eli'],
                 webhooks: webhooks.map(({ id }) => id),
@@ -326,7 +330,7 @@ describe('Manager tests', function () {
         it('Simple request, with parallelism, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
             const webhooks = [
                 {
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: TEST_ID,
                     name: 'dina',
                     url: 'dina@mail.com',
                     global: false
@@ -354,9 +358,9 @@ describe('Manager tests', function () {
             jobConnectorRunJobStub.resolves({});
             databaseConnectorInsertStub.resolves(jobBodyWithParallelismThatSplitsNicely);
             const expectedResult = {
-                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                id: JOB_ID,
                 ramp_to: '150',
-                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                test_id: TEST_ID,
                 environment: 'test',
                 emails: ['dina@niv.eli'],
                 parallelism: 3,
@@ -391,7 +395,7 @@ describe('Manager tests', function () {
         it('Simple request, with parallelism, and arrival rate splits with decimal point, should round up', async () => {
             const webhooks = [
                 {
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: TEST_ID,
                     name: 'dina',
                     url: 'dina@mail.com',
                     global: false
@@ -419,9 +423,9 @@ describe('Manager tests', function () {
             jobConnectorRunJobStub.resolves({});
             databaseConnectorInsertStub.resolves(jobBodyWithParallelismThatSplitsWithDecimal);
             const expectedResult = {
-                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                id: JOB_ID,
                 ramp_to: '150',
-                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                test_id: TEST_ID,
                 environment: 'test',
                 emails: ['dina@niv.eli'],
                 parallelism: 20,
@@ -456,7 +460,7 @@ describe('Manager tests', function () {
         it('Simple request without ramp to, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
             const webhooks = [
                 {
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: TEST_ID,
                     name: 'dina',
                     url: 'dina@mail.com',
                     global: false
@@ -480,8 +484,8 @@ describe('Manager tests', function () {
             jobConnectorRunJobStub.resolves({ id: 'report_id' });
             databaseConnectorInsertStub.resolves(jobBodyWithoutRampTo);
             const expectedResult = {
-                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
-                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                id: JOB_ID,
+                test_id: TEST_ID,
                 environment: 'test',
                 emails: ['dina@niv.eli'],
                 webhooks: webhooks.map(({ id }) => id),
@@ -504,17 +508,17 @@ describe('Manager tests', function () {
                 run_immediately: true,
                 emails: ['dina@niv.eli'],
                 environment: 'test',
-                webhooks: ['5a9eee73-cf56-47aa-ac77-fad59e961aaa', '5a9eee73-cf56-47aa-ac77-fad59e961aab'],
+                webhooks: [TEST_ID, '5a9eee73-cf56-47aa-ac77-fad59e961aab'],
                 enabled: false
             };
             jobConnectorRunJobStub.resolves({ id: 'report_id' });
             databaseConnectorInsertStub.resolves(jobBodyWithEnabledFalse);
             const expectedResult = {
-                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
-                test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                id: JOB_ID,
+                test_id: TEST_ID,
                 environment: 'test',
                 emails: ['dina@niv.eli'],
-                webhooks: ['5a9eee73-cf56-47aa-ac77-fad59e961aaa', '5a9eee73-cf56-47aa-ac77-fad59e961aab'],
+                webhooks: [TEST_ID, '5a9eee73-cf56-47aa-ac77-fad59e961aab'],
                 arrival_rate: 1,
                 duration: 1,
                 enabled: false
@@ -529,7 +533,7 @@ describe('Manager tests', function () {
         it('Fail to save job to databaseConnector', function () {
             const webhooks = [
                 {
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: TEST_ID,
                     name: 'dina',
                     url: 'dina@mail.com',
                     global: false
@@ -561,10 +565,38 @@ describe('Manager tests', function () {
                 });
         });
 
+        it('Fail to create job and fail test immediately', async function() {
+            const jobBodyWithParallelismThatSplitsWithDecimal = {
+                test_id: TEST_ID,
+                id: TEST_ID,
+                arrival_rate: 99,
+                duration: 1,
+                run_immediately: true,
+                emails: ['dina@niv.eli'],
+                environment: 'test',
+                ramp_to: '150',
+                parallelism: 20,
+                webhooks: [],
+                max_virtual_users: 510
+            };
+            const reportId = uuid.v4();
+
+            jobConnectorRunJobStub.rejects({});
+            databaseConnectorInsertStub.resolves(jobBodyWithParallelismThatSplitsWithDecimal);
+            failReportStub.resolves();
+            testsManagerGetStub.withArgs(TEST_ID).resolves({ ...basicTest, id: TEST_ID });
+            postReportStub.resolves({ report_id: reportId });
+            try {
+                await manager.createJob(jobBodyWithParallelismThatSplitsWithDecimal);
+            } catch (err) {
+                expect(failReportStub.calledOnce).to.be.equal(true);
+            }
+        });
+
         it('Fail to create a job', function () {
             const webhooks = [
                 {
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: TEST_ID,
                     name: 'dina',
                     url: 'dina@mail.com',
                     global: false
@@ -591,8 +623,8 @@ describe('Manager tests', function () {
             return manager.createJob(jobBodyWithoutRampTo)
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(1);
-                    loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'job creator error' }, 'Error occurred trying to create new job']);
+                    loggerErrorStub.callCount.should.eql(2);
+                    loggerErrorStub.args[1].should.eql([{ error: 'job creator error' }, 'Error occurred trying to create new job']);
                     error.should.eql({ error: 'job creator error' });
                 });
         });
@@ -605,7 +637,7 @@ describe('Manager tests', function () {
             it('Validate response', function () {
                 const webhooks = [
                     {
-                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                        id: TEST_ID,
                         name: 'dina',
                         url: 'dina@mail.com',
                         global: false
@@ -619,7 +651,7 @@ describe('Manager tests', function () {
                 ];
                 const jobBodyWithCron = {
                     test_id: TEST_ID,
-                    id: TEST_ID,
+                    id: JOB_ID,
                     arrival_rate: 1,
                     duration: 1,
                     enabled: true,
@@ -636,8 +668,8 @@ describe('Manager tests', function () {
                     cron_expression: '* * * * * *',
                     enabled: true,
                     ramp_to: '1',
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
-                    test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: JOB_ID,
+                    test_id: TEST_ID,
                     environment: 'test',
                     emails: ['dina@niv.eli'],
                     webhooks: webhooks.map(({ id }) => id),
@@ -661,7 +693,7 @@ describe('Manager tests', function () {
                 this.timeout(5000);
                 setTimeout(async () => {
                     try {
-                        await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+                        await manager.deleteJob(JOB_ID);
                         loggerErrorStub.callCount.should.eql(0);
                         done();
                     } catch (error) {
@@ -679,7 +711,7 @@ describe('Manager tests', function () {
             it('Validate response', function () {
                 const webhooks = [
                     {
-                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                        id: TEST_ID,
                         name: 'dina',
                         url: 'dina@mail.com',
                         global: false
@@ -693,7 +725,7 @@ describe('Manager tests', function () {
                 ];
                 const jobBodyWithCron = {
                     test_id: TEST_ID,
-                    id: TEST_ID,
+                    id: JOB_ID,
                     arrival_rate: 1,
                     duration: 1,
                     cron_expression: '* * * * * *',
@@ -708,8 +740,8 @@ describe('Manager tests', function () {
                     enabled: false,
                     cron_expression: '* * * * * *',
                     ramp_to: '1',
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
-                    test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: JOB_ID,
+                    test_id: TEST_ID,
                     environment: 'test',
                     emails: ['dina@niv.eli'],
                     webhooks: webhooks.map(({ id }) => id),
@@ -735,7 +767,7 @@ describe('Manager tests', function () {
                 this.timeout(5000);
                 setTimeout(async () => {
                     try {
-                        await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+                        await manager.deleteJob(JOB_ID);
                         loggerInfoStub.args[0][0].should.eql('Skipping job with id: 5a9eee73-cf56-47aa-ac77-fad59e961aaf as it\'s currently disabled');
                         loggerErrorStub.callCount.should.eql(0);
                         done();
@@ -754,7 +786,7 @@ describe('Manager tests', function () {
             it('Validate response', function () {
                 const webhooks = [
                     {
-                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                        id: TEST_ID,
                         name: 'dina',
                         url: 'dina@mail.com',
                         global: false
@@ -768,7 +800,7 @@ describe('Manager tests', function () {
                 ];
                 const jobBodyWithCron = {
                     test_id: TEST_ID,
-                    id: TEST_ID,
+                    id: JOB_ID,
                     arrival_rate: 1,
                     duration: 1,
                     enabled: true,
@@ -786,8 +818,8 @@ describe('Manager tests', function () {
                     enabled: true,
                     cron_expression: '* * * * * *',
                     ramp_to: '1',
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
-                    test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: JOB_ID,
+                    test_id: TEST_ID,
                     environment: 'test',
                     emails: ['dina@niv.eli'],
                     webhooks: webhooks.map(({ id }) => id),
@@ -808,7 +840,7 @@ describe('Manager tests', function () {
                 this.timeout(5000);
                 setTimeout(async () => {
                     try {
-                        await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+                        await manager.deleteJob(JOB_ID);
                         jobConnectorRunJobStub.callCount.should.eql(3);
                         done();
                     } catch (error) {
@@ -822,7 +854,7 @@ describe('Manager tests', function () {
             it('Validate response', function () {
                 const webhooks = [
                     {
-                        id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                        id: TEST_ID,
                         name: 'dina',
                         url: 'dina@mail.com',
                         global: false
@@ -836,6 +868,7 @@ describe('Manager tests', function () {
                 ];
                 const jobBodyWithCronNotImmediately = {
                     test_id: TEST_ID,
+                    id: JOB_ID,
                     arrival_rate: 1,
                     duration: 1,
                     cron_expression: '',
@@ -854,8 +887,8 @@ describe('Manager tests', function () {
                 const expectedResult = {
                     cron_expression: date.getSeconds() + ' * * * * *',
                     ramp_to: '1',
-                    id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
-                    test_id: '5a9eee73-cf56-47aa-ac77-fad59e961aaa',
+                    id: JOB_ID,
+                    test_id: TEST_ID,
                     environment: 'test',
                     emails: ['dina@niv.eli'],
                     webhooks: webhooks.map(({ id }) => id),
@@ -888,7 +921,7 @@ describe('Manager tests', function () {
                 this.timeout(6000);
                 setTimeout(async () => {
                     try {
-                        await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+                        await manager.deleteJob(JOB_ID);
                         done();
                     } catch (error) {
                         done(new Error(error));
@@ -912,7 +945,7 @@ describe('Manager tests', function () {
                 getConfigValue: getConfigValueStub
 
             });
-            uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+            uuidStub.returns(JOB_ID);
         });
 
         it('Should update job successfully', async function () {
@@ -932,7 +965,7 @@ describe('Manager tests', function () {
             ];
             const jobBodyWithCron = {
                 test_id: TEST_ID,
-                id: TEST_ID,
+                id: JOB_ID,
                 arrival_rate: 1,
                 duration: 1,
                 enabled: true,
@@ -947,7 +980,7 @@ describe('Manager tests', function () {
             databaseConnectorInsertStub.resolves(jobBodyWithCron);
             databaseConnectorUpdateJobStub.resolves({});
             databaseConnectorGetSingleJobStub.resolves([{
-                id: '5a9eee73-cf56-47aa-ac77-fad59e961aaf',
+                id: JOB_ID,
                 test_id: 'secondId',
                 environment: 'test',
                 arrival_rate: 1,
@@ -962,17 +995,17 @@ describe('Manager tests', function () {
             postReportStub.resolves({ report_id: Date.now() });
 
             await manager.createJob(jobBodyWithCron);
-            await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
+            await manager.updateJob(JOB_ID, { cron_expression: '20 * * * *' });
 
             loggerInfoStub.callCount.should.eql(4);
             manager.__get__('cronJobs')[JOB_ID].cronTime.source.should.eql('20 * * * *');
-            await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+            await manager.deleteJob(JOB_ID);
         });
 
         it('Updating data in databaseConnector fails', async function () {
             const jobBodyWithCron = {
                 test_id: TEST_ID,
-                id: TEST_ID,
+                id: JOB_ID,
                 arrival_rate: 1,
                 duration: 1,
                 enabled: true,
@@ -991,13 +1024,13 @@ describe('Manager tests', function () {
                 postReportStub.resolves({ report_id: Date.now() });
 
                 await manager.createJob(jobBodyWithCron);
-                await manager.updateJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf', { cron_expression: '20 * * * *' });
+                await manager.updateJob(JOB_ID, { cron_expression: '20 * * * *' });
             } catch (error) {
                 error.should.eql({ error: 'error' });
                 loggerInfoStub.callCount.should.eql(2);
                 loggerErrorStub.callCount.should.eql(1);
                 manager.__get__('cronJobs')[JOB_ID].cronTime.source.should.eql('* * * * * *');
-                await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+                await manager.deleteJob(JOB_ID);
             }
         });
     });
@@ -1006,7 +1039,7 @@ describe('Manager tests', function () {
         it('Deletes an existing job', async function () {
             const jobBodyWithCron = {
                 test_id: TEST_ID,
-                id: TEST_ID,
+                id: JOB_ID,
                 arrival_rate: 1,
                 duration: 1,
                 enabled: true,
@@ -1029,7 +1062,7 @@ describe('Manager tests', function () {
                 getConfigValue: getConfigValueStub
 
             });
-            uuidStub.returns('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+            uuidStub.returns(JOB_ID);
             jobConnectorRunJobStub.resolves({});
             databaseConnectorInsertStub.resolves(jobBodyWithCron);
             databaseConnectorDeleteStub.resolves({});
@@ -1037,7 +1070,7 @@ describe('Manager tests', function () {
             postReportStub.resolves({ report_id: Date.now() });
 
             await manager.createJob(jobBodyWithCron);
-            await manager.deleteJob('5a9eee73-cf56-47aa-ac77-fad59e961aaf');
+            await manager.deleteJob(JOB_ID);
             databaseConnectorDeleteStub.callCount.should.eql(1);
             loggerInfoStub.args[2].should.eql(['Job: 5a9eee73-cf56-47aa-ac77-fad59e961aaf completed.']);
         });

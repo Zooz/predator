@@ -133,10 +133,10 @@ async function updateReportBenchmark(testId, reportId, score, benchmarkData) {
     return res;
 }
 
-async function subscribeRunner(testId, reportId, runnerId) {
+async function subscribeRunner(testId, reportId, runnerId, phaseStatus = constants.SUBSCRIBER_INITIALIZING_STAGE) {
     const newSubscriber = {
         runner_id: runnerId,
-        phase_status: constants.SUBSCRIBER_INITIALIZING_STAGE
+        phase_status: phaseStatus
     };
 
     const report = client.model('report');
