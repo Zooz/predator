@@ -73,7 +73,6 @@ export class TestForm extends React.Component {
 
     updatevalidationError = ({ error }) => {
       const newState = Object.assign({}, this.state);
-      newState.urls[URL_FIELDS.BASE].error = error;
       newState.urls[URL_FIELDS.STEP].error = error;
       this.setState(newState);
     };
@@ -192,6 +191,7 @@ export class TestForm extends React.Component {
                         <TextArea maxRows={5} value={this.state.urls[URL_FIELDS.BASE].value} placeholder={'http://my.api.com/'}
                           onChange={(evt, value) => {
                             this.validateUrl({ name: URL_FIELDS.BASE, value: evt.target.value });
+                            this.setState({ baseUrl: evt.target.value })
                           }} />
                       </ErrorWrapper>
                     </TitleInput>
