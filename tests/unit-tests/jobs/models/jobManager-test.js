@@ -623,8 +623,8 @@ describe('Manager tests', function () {
             return manager.createJob(jobBodyWithoutRampTo)
                 .catch(function (error) {
                     jobConnectorRunJobStub.callCount.should.eql(1);
-                    loggerErrorStub.callCount.should.eql(1);
-                    loggerErrorStub.args[0].should.eql([{ error: 'job creator error' }, 'Error occurred trying to create new job']);
+                    loggerErrorStub.callCount.should.eql(2);
+                    loggerErrorStub.args[1].should.eql([{ error: 'job creator error' }, 'Error occurred trying to create new job']);
                     error.should.eql({ error: 'job creator error' });
                 });
         });

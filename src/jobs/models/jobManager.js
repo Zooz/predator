@@ -356,6 +356,7 @@ async function runJob(job, configData) {
     } catch (error) {
         logger.error({ id: job.id, error: error }, 'Unable to run scheduled job.');
         await failReport(report);
+        throw error;
     }
     return report;
 }
