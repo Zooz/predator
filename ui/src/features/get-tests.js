@@ -26,6 +26,8 @@ import { getColumns } from './configurationColumn';
 import Button from '../components/Button';
 import ErrorDialog from './components/ErrorDialog';
 import _ from 'lodash';
+import { isTestValid } from '../validators/validate-test';
+import { INVALID_TEST_MESSAGE } from '../constants';
 import UiSwitcher from "../components/UiSwitcher";
 import TitleInput from "../components/TitleInput";
 import { filter } from '../../config/rules';
@@ -55,11 +57,16 @@ class getTests extends React.Component {
 
   filterByFavoriteState = () => {
     const {onlyFavorites, sortedTests} = this.state;
-    const filteredTests = sortedTests.filter((report) => (!!report.is_favorite) === onlyFavorites);
-    this.setState({sortedTests: filteredTests, sortHeader: ''});
+    let filteredTests = sortedTests;
+    if (onlyFavorites) {
+      filteredTests = sortedTests.filter((test) => (test.is_favorite));
+    }
+    this.setState({sortedTests: filteredTests, sortHeader: 'updated_at-'}, () => {
+      this.onSort('updated_at');
+    });
   };
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps, prevState) {
     if (!prevProps.createJobSuccess && this.props.createJobSuccess) {
       const { report_id, test_id } = this.props.createJobSuccess;
       this.props.setCreateJobSuccess(undefined);
@@ -68,7 +75,6 @@ class getTests extends React.Component {
 
     if (prevProps.tests !== this.props.tests) {
       this.setState({ sortedTests: [...this.props.tests], sortHeader: 'updated_at-' }, () => {
-        this.onSort('updated_at');
         this.filterByFavoriteState();
       })
       const { match: { params, path } } = this.props;
