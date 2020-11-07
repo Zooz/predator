@@ -5,7 +5,6 @@ module.exports = function (dslName) {
             name: 'test',
             description: 'test',
             type: 'dsl',
-            is_favorite: false,
             scenarios: [
                 {
                     scenario_name: 'Scenario',
