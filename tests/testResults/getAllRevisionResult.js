@@ -16,8 +16,7 @@ module.exports = (dslName) => {
                     ]
                 }
             ],
-            type: 'dsl',
-            is_favorite: false
+            type: 'dsl'
         },
         {
             description: 'test',
@@ -46,8 +45,7 @@ module.exports = (dslName) => {
                     ]
                 }
             ],
-            type: 'dsl',
-            is_favorite: false
+            type: 'dsl'
         }
     ];
 };

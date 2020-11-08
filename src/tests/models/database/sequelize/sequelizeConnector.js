@@ -65,13 +65,11 @@ async function initSchemas() {
             type: Sequelize.DataTypes.UUID,
             unique: 'compositeIndex'
         },
-<<<<<<< HEAD
         context_id: {
             type: Sequelize.DataTypes.STRING
-=======
+        },
         is_favorite: {
             type: Sequelize.DataTypes.BOOLEAN
->>>>>>> 1ddacdc... feat(tests): add favorites - issue #508
         }
     });
 
@@ -153,8 +151,12 @@ async function insertTest(testInfo, testJson, testId, revisionId, processorFileI
         raw_data: JSON.stringify(testInfo),
         artillery_json: JSON.stringify(testJson),
         revision_id: revisionId,
+<<<<<<< HEAD
         context_id: contextId,
         is_favorite: testInfo.is_favorite
+=======
+        is_favorite: testInfo.is_favorite || false
+>>>>>>> 538b7f6... fix(test): tests-test.js
     };
 
     const result = test.create(params);
