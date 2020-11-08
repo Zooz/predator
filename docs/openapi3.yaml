@@ -235,6 +235,15 @@ paths:
         - Tests
       summary: Create a Test
       description: Create a new test.
+      parameters:
+        - in: query
+          name: filter
+          description: is filter and by what property
+          required: false
+          schema:
+            type: string
+            enum:
+              - is_favorite
       responses:
         '201':
           description: Success
