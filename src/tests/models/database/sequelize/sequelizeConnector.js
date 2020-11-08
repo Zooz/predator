@@ -134,7 +134,7 @@ async function insertTest(testInfo, testJson, id, revisionId, processorFileId){
         raw_data: JSON.stringify(testInfo),
         artillery_json: JSON.stringify(testJson),
         revision_id: revisionId,
-        is_favorite: testInfo.is_favorite
+        is_favorite: testInfo.is_favorite || false
     };
 
     const result = test.create(params);
