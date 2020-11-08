@@ -1,7 +1,7 @@
 import { URL_WITH_PROTOCOL_REGEX } from '../constants';
 
 const URL_FIELDS = {
-  BASE: 'base',
+  BASE: 'baseUrl',
   STEP: 'step'
 };
 
