@@ -19,7 +19,7 @@ import ErrorWrapper from '../../../components/ErrorWrapper'
 import CollapsibleScenarioConfig from './collapsibleScenarioConfig';
 import { FileDrop } from 'react-file-drop';
 import env from '../../../App/common/env';
-import {CONTENT_TYPES} from './constants'
+import { CONTENT_TYPES } from './constants'
 import { isUrlValid, URL_FIELDS } from '../../../validators/validate-urls';
 import IconButton from '../../../components/IconButton';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -47,17 +47,17 @@ export class TestForm extends React.Component {
         processorsExportedFunctions: [],
         csvMode: false,
         csvFile: null,
-        csvFileId: undefined,
-        urls: {
-          [URL_FIELDS.BASE]: {
-            value: EMPTY_STRING,
-            error: null
-          },
-          [URL_FIELDS.STEP]: {
-            value: EMPTY_STRING,
-            error: null
-          }
-        }
+        csvFileId: undefined
+      }
+    }
+    this.state.urls = {
+      [URL_FIELDS.BASE]: {
+        value: EMPTY_STRING,
+        error: null
+      },
+      [URL_FIELDS.STEP]: {
+        value: EMPTY_STRING,
+        error: null
       }
     }
   }
