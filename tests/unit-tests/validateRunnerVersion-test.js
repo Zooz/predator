@@ -29,15 +29,15 @@ describe('validateRunnerVersion', function() {
             expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(false);
         });
         it('Should return true for using runner version with same minor and major but different patch', function () {
-            const imageName = getImageNameWithTag('1.5.234');
+            const imageName = getImageNameWithTag('1.6.234');
             expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(true);
         });
         it('Should return true for using runner version with same version', function () {
-            const imageName = getImageNameWithTag('1.5.0');
+            const imageName = getImageNameWithTag('1.6.0');
             expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(true);
         });
         it('Should return true for using runner version  in X.Y format', function () {
-            const imageName = getImageNameWithTag('1.5');
+            const imageName = getImageNameWithTag('1.6');
             expect(runnerValidator.isBestRunnerVersionToUse(imageName)).to.be.equal(true);
         });
         it('Should return false for using runner version with pure string', function () {
