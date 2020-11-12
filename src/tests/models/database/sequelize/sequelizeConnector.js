@@ -152,11 +152,15 @@ async function insertTest(testInfo, testJson, testId, revisionId, processorFileI
         artillery_json: JSON.stringify(testJson),
         revision_id: revisionId,
 <<<<<<< HEAD
+<<<<<<< HEAD
         context_id: contextId,
         is_favorite: testInfo.is_favorite
 =======
         is_favorite: testInfo.is_favorite || false
 >>>>>>> 538b7f6... fix(test): tests-test.js
+=======
+        is_favorite: testInfo.is_favorite || false
+>>>>>>> f6bc5e58f4c5989f9d33f933958b94dff8c41803
     };
 
     const result = test.create(params);
@@ -179,16 +183,23 @@ async function getTest(testId, contextId) {
     allTests = sanitizeTestResult(allTests);
     return allTests[0];
 }
+<<<<<<< HEAD
 
 async function getTests(contextId, filter) {
+=======
+async function getTests(filter) {
+>>>>>>> f6bc5e58f4c5989f9d33f933958b94dff8c41803
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
         order: [['updated_at', 'DESC'], ['id', 'DESC']]
     };
+<<<<<<< HEAD
     if (contextId) {
         options.where = { context_id: contextId };
     }
+=======
+>>>>>>> f6bc5e58f4c5989f9d33f933958b94dff8c41803
     if (filter) {
         options.where[filter] = true;
     }
