@@ -51,7 +51,7 @@ async function getTest(req, res, next) {
 async function deleteTest(req, res, next) {
     try {
         const testsJobs = await jobManager.getJobBasedOnTestId(req.params.test_id);
-        let hasCronScheduledJob = testsJobs.some(job => job.hasOwnProperty('cron_expression'));
+        let hasCronScheduledJob = testsJobs.some(job => job.cron_expression);
         if (hasCronScheduledJob) {
             const error = 'Please delete all scheduled jobs for the test before deleting the test';
             return res.status(409).json({ message: error });
