@@ -405,7 +405,8 @@ describe('Testing sequelize connector', function () {
                                 'id',
                                 'DESC'
                             ]
-                        ]
+                        ],
+                        where: {}
                     }
                 ]
             ]);
@@ -447,7 +448,8 @@ describe('Testing sequelize connector', function () {
                                 'id',
                                 'DESC'
                             ]
-                        ]
+                        ],
+                        where: {}
                     }
                 ]
             ]);
@@ -479,7 +481,8 @@ describe('Testing sequelize connector', function () {
                                     'id',
                                     'DESC'
                                 ]
-                            ]
+                            ],
+                            where: {}
                         }
                     ]
                 ]);
