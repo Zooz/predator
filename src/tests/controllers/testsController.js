@@ -66,7 +66,7 @@ async function deleteTest(req, res, next) {
 
 async function getTests(req, res, next) {
     try {
-        const result = await manager.getTests();
+        const result = await manager.getTests(req.query.filter);
         return res.status(200).json(result);
     } catch (err) {
         return next(err);

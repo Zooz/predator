@@ -9,7 +9,7 @@ import {
 
 const SLEEP = 'sleep';
 export const createTestRequest = (data) => {
-    const {name, description, scenarios, type, baseUrl, before, processorId, csvFileId} = data;
+    const {name, description, scenarios, type, baseUrl, before, processorId, csvFileId, isFavorite} = data;
     const scenariosRequest = scenarios.map((scenario) => {
         return {
             name: scenario.scenario_name,
@@ -32,7 +32,8 @@ export const createTestRequest = (data) => {
             before: before ? {flow: prepareFlow(before.steps)} : undefined,
             scenarios: scenariosRequest
         },
-        csv_file_id: csvFileId
+        csv_file_id: csvFileId,
+        is_favorite: isFavorite
     }
 };
 export const createDefaultExpectation = () => {
@@ -62,7 +63,8 @@ export const createStateForEditTest = (test, cloneMode) => {
         processorId: test.processor_id,
         editMode: !cloneMode,
         processorsExportedFunctions: [],
-        csvFileId: test.csv_file_id
+        csvFileId: test.csv_file_id,
+        isFavorite: test.is_favorite
     }
 
 };

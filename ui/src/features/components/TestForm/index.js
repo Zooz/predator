@@ -23,9 +23,11 @@ import { CONTENT_TYPES } from './constants'
 import { isUrlValid, URL_FIELDS } from '../../../validators/validate-urls';
 import IconButton from '../../../components/IconButton';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
-import { faSave, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
+import {faStar as fullStar} from "@fortawesome/free-solid-svg-icons";
+import { faSave, faPlayCircle, faStar as emptyStar } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EMPTY_STRING, INVALID_URL_MESSAGE } from '../../../constants';
+import InfoToolTip from "../InfoToolTip";
 
 const SLEEP = 'sleep';
 
@@ -47,7 +49,8 @@ export class TestForm extends React.Component {
         processorsExportedFunctions: [],
         csvMode: false,
         csvFile: null,
-        csvFileId: undefined
+        csvFileId: undefined,
+        isFavorite: false
       }
     }
     this.state.validationErrors = {
@@ -85,15 +88,15 @@ export class TestForm extends React.Component {
     };
 
     postTest = (goToRunJob) => {
-      const { editMode, id } = this.state;
+      const { editMode, id, csvFile } = this.state;
       const { createTest, editTest } = this.props;
       if (editMode) {
         this.setState({ goToRunJob }, () => {
-          editTest(createTestRequest(this.state), id, this.state.csvFile)
+          editTest(createTestRequest(this.state), id, csvFile)
         })
       } else {
         this.setState({ goToRunJob }, () => {
-          createTest(createTestRequest(this.state), this.state.csvFile);
+          createTest(createTestRequest(this.state), csvFile);
         })
       }
     };
@@ -148,7 +151,7 @@ export class TestForm extends React.Component {
 
     render () {
       const { createTestError, processorsError, closeDialog, processorsLoading, processorsList, csvMetadata } = this.props;
-      const { name, description, urls, processorId, editMode, maxSupportedScenariosUi, validationErrors } = this.state;
+      const { name, description, urls, baseUrl, processorId, editMode, maxSupportedScenariosUi, validationErrors, isFavorite } = this.state;
       const error = createTestError || processorsError || maxSupportedScenariosUi;
       return (
         <Modal style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '40px', paddingRight: '40px' }}
@@ -158,7 +161,12 @@ export class TestForm extends React.Component {
               <div className={style['top']}>
                 <div className={style['top-inputs']}>
                   {/* left */}
-
+                  <div onClick={this.setFavorite} className={style['favorite-star']}>  
+                  <InfoToolTip data={{
+                      key: 'star-info',
+                      info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                      }} icon={isFavorite ? fullStar : emptyStar} iconSize={'20px'}/>
+                  </div>
                   <div className={style['input-container']}>
                     <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Name'}>
                       <TextArea maxRows={5} value={name} onChange={(evt, value) => {
@@ -176,7 +184,7 @@ export class TestForm extends React.Component {
                   <div className={style['input-container']}>
                     <TitleInput style={{ flex: '1', marginTop: '2px' }} title={'Base url'}>
                       <ErrorWrapper errorText={validationErrors[URL_FIELDS.BASE].error}>
-                        <TextArea maxRows={5} value={this.state.baseUrl} placeholder={'http://my.api.com/'}
+                        <TextArea maxRows={5} value={baseUrl} placeholder={'http://my.api.com/'}
                           onChange={(evt, value) => {
                             this.setState({ baseUrl: evt.target.value }, () => {
                               this.validateUrl()
@@ -205,6 +213,12 @@ export class TestForm extends React.Component {
         </Modal>
       )
     }
+
+    setFavorite = () => {
+      const {isFavorite} = this.state;
+      const newValue = !isFavorite;
+      this.setState({isFavorite: newValue});
+    };
 
     extractExportedFunctions = (processorsList, processorId) => {
       const chosenProcessor = processorsList.find((processor) => processor.id === processorId);

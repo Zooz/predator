@@ -27,7 +27,11 @@ import Button from '../components/Button';
 import ErrorDialog from './components/ErrorDialog';
 import _ from 'lodash';
 import { isTestValid } from '../validators/validate-test';
-import { INVALID_TEST_MESSAGE } from '../constants'
+import { INVALID_TEST_MESSAGE } from '../constants';
+import UiSwitcher from "../components/UiSwitcher";
+import TitleInput from "../components/TitleInput";
+import { filter } from '../../config/rules';
+
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
 const columnsNames = ['name', 'description', 'updated_at', 'type', 'run_test', 'report', 'edit', 'raw', 'clone', 'delete'];
@@ -46,11 +50,23 @@ class getTests extends React.Component {
       testForEdit: null,
       testActionError: null,
       sortedTests: [],
-      sortHeader: ''
+      sortHeader: '',
+      onlyFavorites: false,
     }
   }
 
-  componentDidUpdate (prevProps) {
+  filterByFavoriteState = () => {
+    const {onlyFavorites, sortedTests} = this.state;
+    let filteredTests = sortedTests;
+    if (onlyFavorites) {
+      filteredTests = sortedTests.filter((test) => (test.is_favorite));
+    }
+    this.setState({sortedTests: filteredTests, sortHeader: 'updated_at-'}, () => {
+      this.onSort('updated_at');
+    });
+  };
+
+  componentDidUpdate (prevProps, prevState) {
     if (!prevProps.createJobSuccess && this.props.createJobSuccess) {
       const { report_id, test_id } = this.props.createJobSuccess;
       this.props.setCreateJobSuccess(undefined);
@@ -59,7 +75,7 @@ class getTests extends React.Component {
 
     if (prevProps.tests !== this.props.tests) {
       this.setState({ sortedTests: [...this.props.tests], sortHeader: 'updated_at-' }, () => {
-        this.onSort('updated_at');
+        this.filterByFavoriteState();
       })
       const { match: { params, path } } = this.props;
       if (path === '/tests/:testId/run') {
@@ -84,7 +100,9 @@ class getTests extends React.Component {
     }
     onSearch = (value) => {
       if (!value) {
-        this.setState({ sortedTests: [...this.props.tests] })
+        this.setState({ sortedTests: [...this.props.tests] }, () => {
+          this.filterByFavoriteState();
+        })
       }
       const newSorted = _.filter(this.props.tests, (test) => {
         return (
@@ -93,7 +111,9 @@ class getTests extends React.Component {
                 _.includes(String(test.description).toLowerCase(), value.toLowerCase())
         )
       });
-      this.setState({ sortedTests: newSorted })
+      this.setState({ sortedTests: newSorted }, () => {
+        this.filterByFavoriteState();
+      })
     };
 
     onSort = (field) => {
@@ -247,7 +267,7 @@ class getTests extends React.Component {
     };
 
     render () {
-      const { sortedTests, sortHeader, testForEdit, testForClone } = this.state;
+      const { sortedTests, sortHeader, testForEdit, testForClone, onlyFavorites } = this.state;
       const { errorOnDeleteTest, history } = this.props;
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
       const columns = getColumns({
@@ -263,6 +283,27 @@ class getTests extends React.Component {
       });
       const feedbackMsg = this.generateFeedbackMessage();
       const error = this.state.testActionError || errorOnDeleteTest;
+      const searchSections = [
+        <TitleInput key={1}
+                    style={{flexGrow: 0}}
+                    width={'130px'} height={'33px'} title={'Favorites'}
+        >
+            <UiSwitcher
+                onChange={(value) => {
+                  this.setState({
+                      onlyFavorites: value,
+                      sortedTests: [...this.props.tests]
+                  }, () => {
+                      this.filterByFavoriteState();
+                  });
+              }}
+                activeState={onlyFavorites}
+                height={12}
+                width={22}
+                style={{alignSelf: 'center'}}
+            />
+        </TitleInput>
+    ];
       return (
         <Page title={'Tests'} description={DESCRIPTION}>
           <Button className={style['create-button']} onClick={() => {
@@ -281,6 +322,7 @@ class getTests extends React.Component {
             noDataText={noDataText}
             resizable={false}
             cursor={'default'}
+            searchSections={searchSections}
             // className={style.table}
           />
 

@@ -265,6 +265,38 @@ describe('the tests api', function() {
                 const resGetFile = await testsRequestSender.getFile(resGetTest.body.file_id, validHeaders);
                 resGetFile.statusCode.should.eql(200);
             });
+            it('Create test, with is_favorite', async () => {
+                const requestBody = Object.assign({ is_favorite: true }, simpleTest.test);
+                const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+                console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
+                createTestResponse.statusCode.should.eql(201);
+                const resGetTest = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+                resGetTest.statusCode.should.eql(200);
+                should.equal(resGetTest.body.is_favorite, true);
+                const resGetTests = await testsRequestSender.getTests(validHeaders);
+                resGetTests.statusCode.should.eql(200);
+                console.log(resGetTests);
+                const favTest = resGetTests.body.find(
+                    (test) => test.id == createTestResponse.body.id
+                );
+                should.equal(favTest.is_favorite, true);
+            });
+            it('Create test, with is_favorite false', async () => {
+                const requestBody = Object.assign({ is_favorite: false }, simpleTest.test);
+                const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
+                console.log('error reponse: ' + JSON.stringify(createTestResponse.body));
+                createTestResponse.statusCode.should.eql(201);
+                const resGetTest = await testsRequestSender.getTest(createTestResponse.body.id, validHeaders);
+                resGetTest.statusCode.should.eql(200);
+                should.equal(resGetTest.body.is_favorite, false);
+                const resGetTests = await testsRequestSender.getTests(validHeaders);
+                resGetTests.statusCode.should.eql(200);
+                console.log(resGetTests);
+                const favTest = resGetTests.body.find(
+                    (test) => test.id == createTestResponse.body.id
+                );
+                should.equal(favTest.is_favorite, false);
+            });
             it('Create test, with a processor id', async () => {
                 const processor = {
                     name: 'some-user-processor: ' + uuid(),
@@ -434,6 +466,8 @@ describe('the tests api', function() {
             const testVer1 = require('../../testExamples/Simple_test')(dslName).test;
             const testVer2 = require('../../testExamples/Simple_test')(dslName).test;
             const getAllRevisionResult = require('../../testResults/getAllRevisionResult')(dslName);
+            getAllRevisionResult[0]['is_favorite'] = false;
+            getAllRevisionResult[1]['is_favorite'] = false;
             testVer2.scenarios = [testVer2.scenarios[0], testVer2.scenarios[0]];
             const createTestResponse = await testsRequestSender.createTest(testVer1, validHeaders);
             should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
