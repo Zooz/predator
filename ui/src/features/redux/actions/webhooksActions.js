@@ -23,9 +23,16 @@ export const createWebHookFailure = (value) => (
 export const editWebHookSuccess = (value) => (
     {type: Types.EDIT_WEBHOOK_SUCCESS, value}
 );
+export const testWebHookSuccess = (value) => (
+    {type: Types.TEST_WEBHOOK_SUCCESS, value}
+);
 
 export const editWebHookFailure = (value) => (
     {type: Types.EDIT_WEBHOOK_FAILURE, value}
+);
+
+export const testWebHookFailure = (value) => (
+    {type: Types.TEST_WEBHOOK_FAILURE, value}
 );
 
 export const deleteWebHook = (id) => (
@@ -54,4 +61,8 @@ export const cleanErrors = (value) => (
 
 export const editWebhook = (body, id) => (
     {type: Types.EDIT_WEBHOOK, body, id}
+);
+
+export const testWebhook = (id) => (
+    {type: Types.TEST_WEBHOOK, id}
 );
