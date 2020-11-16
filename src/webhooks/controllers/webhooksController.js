@@ -53,7 +53,7 @@ module.exports.updateWebhook = async function (req, res, next) {
 };
 
 module.exports.testWebhook = async function(req, res, next) {
-    const { params: { id: webhookId } } = req;
+    const { params: { webhook_id: webhookId } } = req;
     try {
         const webhookStatusCode = await webhookManager.testWebhook(webhookId);
         return res.status(200).json({ webhook_status_code: webhookStatusCode });
