@@ -35,6 +35,11 @@ export class CollapsibleWebhook extends React.Component {
       this.setState({ webhook });
     };
 
+    onTest = () => {
+      const { webhook } = this.state;
+      this.props.testWebhook(webhook.id);
+    };
+
     onSubmit = () => {
       const { createMode } = this.props;
       const { webhook } = this.state;
@@ -136,8 +141,10 @@ export class CollapsibleWebhook extends React.Component {
     };
 
     generateBody = () => {
+      const { createMode } = this.props;
+
       return (
-        <WebhookForm onCancel={this.props.onClose} loading={this.props.loading} onSubmit={this.onSubmit}
+        <WebhookForm testDisabled={createMode} onTest={this.onTest} onCancel={this.props.onClose} loading={this.props.loading} onSubmit={this.onSubmit}
           onChangeWebhook={this.onChangeWebhook} webhook={this.state.webhook} />
       )
     }
@@ -154,6 +161,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = {
   createWebhook: Actions.createWebhook,
   getWebhooks: Actions.getWebhooks,
+  testWebhook: Actions.testWebhook,
   editWebhook: Actions.editWebhook,
   deleteWebhook: Actions.deleteWebHook,
   setWebhookSuccess: Actions.createWebHookSuccess,
