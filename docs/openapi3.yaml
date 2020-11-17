@@ -1769,12 +1769,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/test_webhook_response'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:
