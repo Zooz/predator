@@ -1666,7 +1666,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  /v1/webhooks/{webhook_id}/test:
+  /v1/webhooks/test:
     post:
       operationId: test-a-webhook
       tags:
@@ -1674,14 +1674,6 @@ paths:
       summary: Tests that the webhook is configure correctly
       description: Tests that the webhook is configure correctly by sending a message to the target webhook url.
       parameters:
-        - in: path
-          name: webhook_id
-          description: The webhook id.
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
         '200':
           description: Success
@@ -1689,19 +1681,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/test_webhook_response'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/test_webhook_request'
   # Files
   /v1/files:
     post:
@@ -1889,7 +1879,7 @@ components:
           description: Unique processor identifier
           type: string
           format: uuid
-        is_favorite: 
+        is_favorite:
           description: Test has been marked favorite
           type: boolean
         type:
@@ -2834,7 +2824,23 @@ components:
       type: object
       required:
         - webhook_status_code
+        - is_sucessful
       properties:
           webhook_status_code:
             type: number
             example: 400
+          is_sucessful:
+            type: boolean
+            example: false
+            description: true, if webhook target returned 2xx status code
+    test_webhook_request:
+      type: object
+      required:
+        - format_type
+        - url
+      properties:
+        format_type:
+          $ref: '#/components/schemas/webhook_format_types'
+        url:
+          type: string
+          description: Webhook url to post events
