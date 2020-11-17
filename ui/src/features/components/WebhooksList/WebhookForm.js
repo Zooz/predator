@@ -9,7 +9,7 @@ import UiSwitcher from "../../../components/UiSwitcher";
 import SubmitBar from '../SubmitBar'
 import InfoToolTip from '../InfoToolTip';
 
-const WebhookForm = ({loading, onSubmit, onCancel, onChangeWebhook, webhook, onTest, testDisabled, showTestWebhookSuccessMsg}) => {
+const WebhookForm = ({loading, onSubmit, onCancel, onChangeWebhook, webhook}) => {
 
     const onChangeProps = (props) => {
         const newWebhook = {...webhook, ...props};
@@ -78,7 +78,7 @@ const WebhookForm = ({loading, onSubmit, onCancel, onChangeWebhook, webhook, onT
                             </div>
                         }
             />
-            <SubmitBar showTestWebhookSuccessMsg={showTestWebhookSuccessMsg} testDisabled={testDisabled} onTest={onTest} onCancel={onCancel} onSubmit={onSubmit} loading={loading}/>
+            <SubmitBar onCancel={onCancel} onSubmit={onSubmit} loading={loading}/>
         </div>
     )
 

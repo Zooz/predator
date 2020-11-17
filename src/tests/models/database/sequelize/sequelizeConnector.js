@@ -67,6 +67,9 @@ async function initSchemas() {
         },
         context_id: {
             type: Sequelize.DataTypes.STRING
+        },
+        is_favorite: {
+            type: Sequelize.DataTypes.BOOLEAN
         }
     });
 
@@ -148,7 +151,8 @@ async function insertTest(testInfo, testJson, testId, revisionId, processorFileI
         raw_data: JSON.stringify(testInfo),
         artillery_json: JSON.stringify(testJson),
         revision_id: revisionId,
-        context_id: contextId
+        context_id: contextId,
+        is_favorite: testInfo.is_favorite || false,
     };
 
     const result = test.create(params);
@@ -172,17 +176,19 @@ async function getTest(testId, contextId) {
     return allTests[0];
 }
 
-async function getTests(contextId) {
+async function getTests(contextId, filter) {
     const test = client.model('test');
     const options = {
         attributes: { exclude: ['created_at'] },
         order: [['updated_at', 'DESC'], ['id', 'DESC']]
     };
-
+    options.where = {};
     if (contextId) {
-        options.where = { context_id: contextId };
+        options.where.context_id = contextId;
     }
-
+    if (filter) {
+        options.where[filter] = true;
+    }
     let allTests = await test.findAll(options);
     allTests = sanitizeTestResult(allTests);
     return allTests;

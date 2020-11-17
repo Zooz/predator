@@ -104,10 +104,10 @@ async function getAllTestRevisions(testId) {
     }
 }
 
-async function getTests() {
+async function getTests(filter) {
     const contextId = httpContext.get(CONTEXT_ID);
 
-    const rows = await database.getTests(contextId);
+    const rows = await database.getTests(contextId, filter);
     const testsById = {};
     rows.forEach(function (row) {
         if (!testsById[row.id] || row.updated_at > testsById[row.id].updated_at) {

@@ -6,7 +6,6 @@ export const loading = (state) => state.WebhooksReducer.get('loading');
 export const webhookSuccess = (state) => state.WebhooksReducer.get('create_webhook_success');
 export const editWebhookSuccess = (state) => state.WebhooksReducer.get('edit_webhook_success');
 export const deleteWebhookSuccess = (state) => state.WebhooksReducer.get('delete_webhook_success');
-export const testWebhookSuccess = (state) => state.WebhooksReducer.get('test_webhook_success');
 export const webhookError = (state) => state.WebhooksReducer.get('webhook_error');
 
 export const sortedWebhooksWithSpacer = createSelector(webhooks, (webhooks) => {

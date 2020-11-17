@@ -1,7 +1,7 @@
 import {put, takeLatest, call} from 'redux-saga/effects'
 import * as Actions from '../actions/webhooksActions'
 import * as Types from '../types/webhooks'
-import {getWebhooksApi, createWebhookApi, editWebhookApi, deleteWebhookApi, testWebhookApi} from '../apis/webhooksApi'
+import {getWebhooksApi, createWebhookApi, editWebhookApi, deleteWebhookApi} from '../apis/webhooksApi'
 
 export function* getWebhooks() {
     try {
@@ -52,22 +52,9 @@ export function* deleteWebhook({id}) {
     yield put(Actions.setLoading(false));
 }
 
-export function* testWebhook({id}) {
-    try {
-        yield put(Actions.setLoading(true));
-        const result = yield call(testWebhookApi, id);
-        yield put(Actions.testWebHookSuccess(true));
-    } catch (e) {
-        yield put(Actions.testWebHookFailure(e))
-
-    }
-    yield put(Actions.setLoading(false));
-}
-
 export function* webhooksRegister() {
     yield takeLatest(Types.GET_WEBHOOKS, getWebhooks);
     yield takeLatest(Types.CREATE_WEBHOOK, createWebhook);
     yield takeLatest(Types.EDIT_WEBHOOK, editWebhook);
     yield takeLatest(Types.DELETE_WEBHOOK, deleteWebhook);
-    yield takeLatest(Types.TEST_WEBHOOK, testWebhook);
 }
