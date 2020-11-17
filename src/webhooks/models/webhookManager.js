@@ -99,20 +99,19 @@ async function fireWebhookByEvent(job, eventType, report, additionalInfo = {}, o
     await Promise.allSettled(webhooksPromises);
 }
 
-async function testWebhook(webhookId) {
-    const webhook = await databaseConnector.getWebhook(webhookId);
-    if (!webhook) {
-        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
-    }
+async function testWebhook(webhook) {
     const payload = webhooksFormatter.formatSimpleMessage(webhook.format_type);
-    let webhookStatusCode = null;
+    let webhookStatusCode;
     try {
         const response = await fireSingleWebhook(webhook, payload);
         webhookStatusCode = response.statusCode;
     } catch (requestError) {
-        webhookStatusCode = requestError.statusCode;
+        webhookStatusCode = requestError.statusCode || requestError.message;
     }
-    return webhookStatusCode;
+    return {
+        webhook_status_code: webhookStatusCode,
+        is_successful: webhookStatusCode >= 200 && webhookStatusCode <= 207
+    };
 }
 
 module.exports = {
