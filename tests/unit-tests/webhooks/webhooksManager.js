@@ -170,21 +170,18 @@ describe('webhooksManager', () => {
         });
     });
     describe('#testWebhook', function() {
-        [200, 201, 204, 209, 301].forEach(function(statusCode) {
+        [200, 201, 204, 207].forEach(function(statusCode) {
             it(`Should return response of ${statusCode}`, async function () {
                 const webhook = {
-                    id: uuid.v4(),
                     format_type: 'json',
                     url: 'http://some_url.com',
-                    name: 'some_webhook_url'
                 };
                 const payload = { predator: 'wuff' };
 
-                databaseConnectorGetStub.withArgs(webhook.id).resolves(webhook);
                 requestSenderSendStub.resolves({ statusCode });
                 webhooksFormatterFormatSimpleMessageStub.returns(payload);
 
-                const statusCodeWebhookResponse = await webhooksManager.testWebhook(webhook.id);
+                const statusCodeWebhookResponse = await webhooksManager.testWebhook(webhook);
 
                 expect(requestSenderSendStub.calledOnce).to.be.equal(true);
                 expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
@@ -193,24 +190,20 @@ describe('webhooksManager', () => {
                     body: payload,
                     resolveWithFullResponse: true
                 });
-                expect(statusCodeWebhookResponse).to.be.equal(statusCode);
+                expect(statusCodeWebhookResponse).eql({webhook_status_code: statusCode, is_successful: true});
             });
         });
-        [400, 500, 502, 504, 400, 401].forEach(function (statusCode) {
+        [301, 400, 500, 502, 504].forEach(function (statusCode) {
             it(`Should return response of ${statusCode}`, async function () {
                 const webhook = {
-                    id: uuid.v4(),
                     format_type: 'json',
                     url: 'http://some_url.com',
-                    name: 'some_webhook_url'
                 };
                 const payload = { predator: 'wuff' };
-
-                databaseConnectorGetStub.withArgs(webhook.id).resolves(webhook);
-                requestSenderSendStub.throws({ statusCode });
                 webhooksFormatterFormatSimpleMessageStub.returns(payload);
+                requestSenderSendStub.rejects({ statusCode });
 
-                const statusCodeFromWebhook = await webhooksManager.testWebhook(webhook.id);
+                const response = await webhooksManager.testWebhook(webhook);
 
                 expect(requestSenderSendStub.calledOnce).to.be.equal(true);
                 expect(requestSenderSendStub.args[0][0]).to.be.deep.equal({
@@ -219,7 +212,7 @@ describe('webhooksManager', () => {
                     body: payload,
                     resolveWithFullResponse: true
                 });
-                expect(statusCodeFromWebhook).to.be.equal(statusCode);
+                expect(response).eql({webhook_status_code: statusCode, is_successful: false});
             });
         });
         it('should throw an error for webhook not found', async function() {

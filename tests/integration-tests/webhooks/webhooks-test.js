@@ -1,8 +1,8 @@
-const { expect } = require('chai');
+const {expect} = require('chai');
 const uuid = require('uuid');
 const nock = require('nock');
 
-const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPES, WEBHOOK_EVENT_TYPE_API_FAILURE, WEBHOOK_EVENT_TYPE_FAILED, ERROR_MESSAGES: { NOT_FOUND } } = require('../../../src/common/consts');
+const {WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPES, WEBHOOK_EVENT_TYPE_API_FAILURE, WEBHOOK_EVENT_TYPE_FAILED, ERROR_MESSAGES: {NOT_FOUND}} = require('../../../src/common/consts');
 
 const webhookRequestSender = require('./helpers/requestCreator');
 
@@ -13,17 +13,12 @@ describe('Webhooks api', function () {
     });
 
     describe('Good requests', async function () {
-        describe('GET /v1/webhooks/:webhook_id/test', function() {
-            it('should return 200 and webhook_status_code=200', async function() {
+        describe('POST /v1/webhooks/test', function () {
+            it('should return 200 and webhook_status_code=200', async function () {
                 const webhook = generateWebhook();
                 nock(webhook.url).post('').reply(200);
 
-                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
-                expect(createWebhookResponse.status).to.be.equal(201);
-
-                const webhookId = createWebhookResponse.body.id;
-
-                const testWebhookResponse = await webhookRequestSender.testWebhook(webhookId);
+                const testWebhookResponse = await webhookRequestSender.testWebhook(webhook);
                 expect(testWebhookResponse.status).to.be.equal(200);
                 expect(testWebhookResponse.body).to.have.a.property('webhook_status_code').and.to.be.equal(200);
             });
@@ -31,12 +26,7 @@ describe('Webhooks api', function () {
                 const webhook = generateWebhook();
                 nock(webhook.url).post('').reply(400);
 
-                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
-                expect(createWebhookResponse.status).to.be.equal(201);
-
-                const webhookId = createWebhookResponse.body.id;
-
-                const testWebhookResponse = await webhookRequestSender.testWebhook(webhookId);
+                const testWebhookResponse = await webhookRequestSender.testWebhook(webhook);
                 expect(testWebhookResponse.status).to.be.equal(200);
                 expect(testWebhookResponse.body).to.have.a.property('webhook_status_code').and.to.be.equal(400);
             });
@@ -44,23 +34,18 @@ describe('Webhooks api', function () {
                 const webhook = generateWebhook();
                 nock(webhook.url).post('').reply(422);
 
-                const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
-                expect(createWebhookResponse.status).to.be.equal(201);
-
-                const webhookId = createWebhookResponse.body.id;
-
-                const testWebhookResponse = await webhookRequestSender.testWebhook(webhookId);
+                const testWebhookResponse = await webhookRequestSender.testWebhook(webhook);
                 expect(testWebhookResponse.status).to.be.equal(200);
                 expect(testWebhookResponse.body).to.have.a.property('webhook_status_code').and.to.be.equal(422);
             });
         });
         describe('GET /v1/webhooks', async function () {
-            before('clean webhooks', async function() {
+            before('clean webhooks', async function () {
                 const webhooksResponse = await webhookRequestSender.getWebhooks();
                 await Promise.all(webhooksResponse.body.map(hook => webhookRequestSender.deleteWebhook(hook.id)));
             });
             const numOfWebhooksToInsert = 5;
-            it(`return ${numOfWebhooksToInsert} webhooks`, async function() {
+            it(`return ${numOfWebhooksToInsert} webhooks`, async function () {
                 const webhooksToInsert = (new Array(numOfWebhooksToInsert))
                     .fill(0, 0, numOfWebhooksToInsert)
                     .map(index => generateWebhook(`My webhook ${index}`));
@@ -74,7 +59,7 @@ describe('Webhooks api', function () {
             });
         });
         describe('GET /v1/webhooks/:webhook_id', function () {
-            it('should retrieve the webhook that was created', async function() {
+            it('should retrieve the webhook that was created', async function () {
                 const webhook = generateWebhook();
                 const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(createWebhookResponse.statusCode).to.equal(201);
@@ -87,13 +72,13 @@ describe('Webhooks api', function () {
             });
         });
         describe('POST /v1/webhooks', function () {
-            it('Create webhook and response 201 status code', async function() {
+            it('Create webhook and response 201 status code', async function () {
                 const webhook = generateWebhook();
                 const createWebhookResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(createWebhookResponse.statusCode).to.equal(201);
                 assertDeepWebhookEquality(webhook, createWebhookResponse.body);
             });
-            it('Create webhook with global=true and response 201 status code', async function() {
+            it('Create webhook with global=true and response 201 status code', async function () {
                 const webhook = generateWebhook();
                 webhook.global = true;
 
@@ -102,9 +87,9 @@ describe('Webhooks api', function () {
                 expect(createWebhookResponse.statusCode).to.equal(201);
                 assertDeepWebhookEquality(webhook, createWebhookResponse.body);
             });
-            it('Create webhook with unspecified global field, expect default value and response 201 status code', async function() {
+            it('Create webhook with unspecified global field, expect default value and response 201 status code', async function () {
                 const webhook = generateWebhook();
-                const { global, ...webhookWithoutGlobal } = webhook;
+                const {global, ...webhookWithoutGlobal} = webhook;
 
                 const createWebhookResponse = await webhookRequestSender.createWebhook(webhookWithoutGlobal);
 
@@ -112,8 +97,8 @@ describe('Webhooks api', function () {
                 assertDeepWebhookEquality(webhook, createWebhookResponse.body);
             });
         });
-        describe('DELETE /v1/webhooks/:webhook_id', function() {
-            it('Create a webhook -> deleting it -> expecting to get 404 in GET', async function() {
+        describe('DELETE /v1/webhooks/:webhook_id', function () {
+            it('Create a webhook -> deleting it -> expecting to get 404 in GET', async function () {
                 const webhook = generateWebhook();
 
                 const insertWebhookResponse = await webhookRequestSender.createWebhook(webhook);
@@ -126,22 +111,22 @@ describe('Webhooks api', function () {
                 const getWebhookResponse = await webhookRequestSender.getWebhook(webhookId);
                 expect(getWebhookResponse.statusCode).to.equal(404);
             });
-            it('Deleting unexisting webhook -> expect 204 status code', async function() {
+            it('Deleting unexisting webhook -> expect 204 status code', async function () {
                 const id = uuid.v4();
 
                 const deleteWebhookResponse = await webhookRequestSender.deleteWebhook(id);
                 expect(deleteWebhookResponse.statusCode).to.equal(404);
             });
         });
-        describe('PUT /v1/webhooks/:webhook_id', function() {
-            it('Insert a webhook -> update global -> ensure it is updated', async function() {
+        describe('PUT /v1/webhooks/:webhook_id', function () {
+            it('Insert a webhook -> update global -> ensure it is updated', async function () {
                 const webhook = generateWebhook();
-                const updatedWebhook = { ...webhook, global: !webhook.global };
+                const updatedWebhook = {...webhook, global: !webhook.global};
 
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const { body: { id } } = insertResponse;
+                const {body: {id}} = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -150,14 +135,14 @@ describe('Webhooks api', function () {
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
             });
-            it('Insert a webhook -> update url -> ensure it is updated', async function() {
+            it('Insert a webhook -> update url -> ensure it is updated', async function () {
                 const webhook = generateWebhook();
-                const updatedWebhook = { ...webhook, url: `${webhook}/new/path` };
+                const updatedWebhook = {...webhook, url: `${webhook}/new/path`};
 
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const { body: { id } } = insertResponse;
+                const {body: {id}} = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -166,15 +151,15 @@ describe('Webhooks api', function () {
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
             });
-            it('Insert a webhook -> update format_type -> ensure it is updated', async function() {
+            it('Insert a webhook -> update format_type -> ensure it is updated', async function () {
                 const webhook = generateWebhook();
                 const updatedFormatType = EVENT_FORMAT_TYPES.filter(format => format !== webhook.format_type)[0];
-                const updatedWebhook = { ...webhook, format_type: updatedFormatType };
+                const updatedWebhook = {...webhook, format_type: updatedFormatType};
 
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const { body: { id } } = insertResponse;
+                const {body: {id}} = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -183,14 +168,14 @@ describe('Webhooks api', function () {
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
             });
-            it('Insert a webhook -> update name -> ensure it is updated', async function() {
+            it('Insert a webhook -> update name -> ensure it is updated', async function () {
                 const webhook = generateWebhook();
-                const updatedWebhook = { ...webhook, name: webhook.name + ' added text' };
+                const updatedWebhook = {...webhook, name: webhook.name + ' added text'};
 
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const { body: { id } } = insertResponse;
+                const {body: {id}} = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -199,7 +184,7 @@ describe('Webhooks api', function () {
                 const getResponse = await webhookRequestSender.getWebhook(id);
                 assertDeepWebhookEquality(updatedWebhook, getResponse.body);
             });
-            it('Insert a webhook -> update events -> ensure it is updated', async function() {
+            it('Insert a webhook -> update events -> ensure it is updated', async function () {
                 const webhook = {
                     ...generateWebhook(),
                     events: [WEBHOOK_EVENT_TYPE_API_FAILURE]
@@ -212,7 +197,7 @@ describe('Webhooks api', function () {
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const { body: { id } } = insertResponse;
+                const {body: {id}} = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -225,20 +210,21 @@ describe('Webhooks api', function () {
     });
 
     describe('Bad requests', function () {
-        describe('GET /v1/webhooks/:webhook_id/test', function() {
-            it('should get 400 for bad webhook_id format', async function() {
-                const testWebhookResponse = await webhookRequestSender.testWebhook('bad_id_format');
+        describe('POST /v1/webhooks/test', function () {
+            it('should get 400 for bad webhook_id format', async function () {
+                const testWebhookResponse = await webhookRequestSender.testWebhook({});
                 expect(testWebhookResponse.statusCode).to.equal(400);
                 expect(testWebhookResponse.body).to.be.deep.equal({
-                    message: 'Input validation error',
-                    validation_errors: [
-                        'path/webhook_id should match format "uuid"'
+                    "message": "Input validation error",
+                    "validation_errors": [
+                        "body should have required property 'format_type'",
+                        "body should have required property 'url'"
                     ]
                 });
             });
         });
         describe('POST /v1/webhooks', function () {
-            describe('name validation', function() {
+            describe('name validation', function () {
                 it('Create webhook with bad type of name', async function () {
                     const webhook = generateWebhook(5);
 
@@ -246,7 +232,7 @@ describe('Webhooks api', function () {
                     expect(createResponse.statusCode).to.equal(400);
                 });
             });
-            describe('format_type validation', function() {
+            describe('format_type validation', function () {
                 it('Create webhook with bad format_type', async function () {
                     const webhook = generateWebhook();
                     webhook.format_type = 'TOTTALLY NOT A VALID FORMAT TYPE lalalalalla';
@@ -255,7 +241,7 @@ describe('Webhooks api', function () {
                     expect(createResponse.statusCode).to.equal(400);
                 });
             });
-            describe('global validation', function() {
+            describe('global validation', function () {
                 it('Create webhook with global not a boolean', async function () {
                     const webhook = generateWebhook();
                     webhook.global = 'TOTTALLY NOT A VALID GLOBAL';
@@ -264,7 +250,7 @@ describe('Webhooks api', function () {
                     expect(createResponse.statusCode).to.equal(400);
                 });
             });
-            describe('events validation', function() {
+            describe('events validation', function () {
                 it('Create webhook with empty events', async function () {
                     const webhook = generateWebhook();
                     webhook.events = [];
@@ -295,7 +281,7 @@ describe('Webhooks api', function () {
             });
         });
         describe('GET /v1/webhooks/:webhook_id', function () {
-            it('should return 400 for bad uuid', async function() {
+            it('should return 400 for bad uuid', async function () {
                 const badWebhookValue = 'lalallalalal';
 
                 const response = await webhookRequestSender.getWebhook(badWebhookValue);
@@ -304,7 +290,7 @@ describe('Webhooks api', function () {
             });
         });
         describe('DELETE /v1/webhooks/:webhook_id', function () {
-            it('should return 400 for bad uuid', async function() {
+            it('should return 400 for bad uuid', async function () {
                 const badWebhookValue = 'lalallalalal';
 
                 const response = await webhookRequestSender.deleteWebhook(badWebhookValue);
@@ -312,8 +298,8 @@ describe('Webhooks api', function () {
                 expect(response.statusCode).to.equal(400);
             });
         });
-        describe('PUT /v1/webhooks/:webhook_id', function() {
-            it('should return 400 for bad uuid', async function() {
+        describe('PUT /v1/webhooks/:webhook_id', function () {
+            it('should return 400 for bad uuid', async function () {
                 const webhook = generateWebhook();
                 const badWebhookValue = 'lalallalalal';
 
@@ -324,16 +310,9 @@ describe('Webhooks api', function () {
         });
     });
 
-    describe('Sad requests', function() {
-        describe('GET /v1/webhooks/:webhook_id/test', function () {
-            it('should return 404 for unexist webhook', async function() {
-                const testWebhookResponse = await webhookRequestSender.testWebhook(uuid.v4());
-                expect(testWebhookResponse.status).to.be.equal(404);
-                expect(testWebhookResponse.body).to.have.a.property('message').and.to.be.equal(NOT_FOUND);
-            });
-        });
+    describe('Sad requests', function () {
         describe('GET /v1/webhooks/:webhook_id', function () {
-            it('should return 404 for no existing webhook', async function() {
+            it('should return 404 for no existing webhook', async function () {
                 const notExistingWebhookId = uuid.v4();
 
                 const response = await webhookRequestSender.getWebhook(notExistingWebhookId);
@@ -342,7 +321,7 @@ describe('Webhooks api', function () {
             });
         });
         describe('PUT /v1/webhooks/:webhook_id', function () {
-            it('should return 404 for no existing webhook', async function() {
+            it('should return 404 for no existing webhook', async function () {
                 const notExistingWebhookId = uuid.v4();
                 const webhook = generateWebhook();
 
