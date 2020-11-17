@@ -52,8 +52,6 @@ export class CollapsibleWebhook extends React.Component {
       } else {
         this.props.editWebhook(createWebhookRequest(webhook), webhook.id);
       }
-
-      // this.hideTestWebhookSuccessMsg();
     };
 
     componentDidUpdate (prevProps, prevState, snapshot) {
@@ -68,9 +66,12 @@ export class CollapsibleWebhook extends React.Component {
       }
     }
 
-    handleToggle = () => {
-      this.setState({ expanded: !this.state.expanded })
-      this.hideTestWebhookSuccessMsg()
+    toggleExpanded = () => {
+      const { createMode } = this.props;
+      if(!createMode) {
+        this.setState({ expanded: !this.state.expanded })
+        this.hideTestWebhookSuccessMsg()
+      }
     }
 
     render () {
@@ -88,7 +89,7 @@ export class CollapsibleWebhook extends React.Component {
       return (
         <div style={{ width: '756px' }}>
           <CollapsibleItem
-            onClick={(evt) => {!createMode && this.handleToggle()}}
+            onClick={this.toggleExpanded}
             editable
             expanded={expanded}
             toggleable={!createMode}
