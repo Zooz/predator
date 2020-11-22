@@ -70,7 +70,9 @@ class getTests extends React.Component {
     if (!prevProps.createJobSuccess && this.props.createJobSuccess) {
       const { report_id, test_id } = this.props.createJobSuccess;
       this.props.setCreateJobSuccess(undefined);
-      history.replace(`/tests/${test_id}/reports/${report_id}`)
+      if (report_id) {
+        history.replace(`/tests/${test_id}/reports/${report_id}`)
+      }
     }
 
     if (prevProps.tests !== this.props.tests) {
