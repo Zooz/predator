@@ -15,4 +15,5 @@ router.put('/:test_id', swaggerValidator.validate, testsVerifier.verifyProcessor
 router.post('/:test_id/benchmark', swaggerValidator.validate, testsVerifier.verifyTestExist, tests.insertTestBenchmark);
 router.get('/:test_id/benchmark', swaggerValidator.validate, testsVerifier.verifyTestExist, tests.getBenchmark);
 router.get('/:test_id/revisions', swaggerValidator.validate, tests.getTestRevisions);
+router.get('/:test_id/trends', swaggerValidator.validate, testsVerifier.verifyTestExist, tests.getTrends);
 module.exports = router;

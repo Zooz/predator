@@ -20,7 +20,8 @@ module.exports = {
     subscribeRunner,
     updateSubscriberWithStats,
     updateSubscriber,
-    updateReportBenchmark
+    updateReportBenchmark,
+    updateResultsSummary
 };
 
 async function init(sequlizeClient) {
@@ -120,9 +121,23 @@ async function deleteReport(testId, reportId) {
     }
 }
 
+// TODO update only score
 async function updateReportBenchmark(testId, reportId, score, benchmarkData) {
     const benchmark = client.model('report');
     const params = { score: score, benchmark_weights_data: benchmarkData };
+    const options = {
+        where: {
+            test_id: testId,
+            report_id: reportId
+        }
+    };
+    const res = await benchmark.update(params, options);
+    return res;
+}
+
+async function updateResultsSummary(testId, reportId, resultsSummary) {
+    const benchmark = client.model('report');
+    const params = { results_summary: resultsSummary };
     const options = {
         where: {
             test_id: testId,
@@ -342,6 +357,9 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING
         },
         benchmark_weights_data: {
+            type: Sequelize.DataTypes.TEXT('long')
+        },
+        results_summary: {
             type: Sequelize.DataTypes.TEXT('long')
         },
         score: {

@@ -26,7 +26,17 @@ module.exports.postStats = async (report, stats) => {
     }
     await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
     report = await reportsManager.getReport(report.test_id, report.report_id);
-    const reportBenchmark = await updateReportBenchmarkIfNeeded(report);
+
+    let reportBenchmark;
+    if (reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
+        await updateResultsSummary(report);
+
+        const testBenchmarkData = await extractBenchmark(report.test_id);
+        if (testBenchmarkData) {
+            reportBenchmark = await updateReportBenchmark(report);
+        }
+    }
+
     notifier.notifyIfNeeded(report, stats, reportBenchmark);
 
     return stats;
@@ -43,24 +53,18 @@ async function updateSubscriberWithStatsInternal(report, stats) {
     await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, JSON.stringify(parseData));
 }
 
-async function updateReportBenchmarkIfNeeded(report) {
-    if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
-        return;
-    }
+async function updateReportBenchmark(report, testBenchmarkData) {
     const config = await configHandler.getConfig();
     const configBenchmark = {
         weights: config[configConsts.BENCHMARK_WEIGHTS],
         threshold: config[configConsts.BENCHMARK_THRESHOLD]
     };
-    const testBenchmarkData = await extractBenchmark(report.test_id);
-    if (testBenchmarkData) {
-        const reportAggregate = await aggregateReportManager.aggregateReport(report);
-        const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark.weights);
-        const { data, score } = reportBenchmark;
-        data[configConsts.BENCHMARK_THRESHOLD] = configBenchmark.threshold;
-        await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
-        return reportBenchmark;
-    }
+    const reportAggregate = await aggregateReportManager.aggregateReport(report);
+    const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark.weights);
+    const { data, score } = reportBenchmark;
+    data[configConsts.BENCHMARK_THRESHOLD] = configBenchmark.threshold;
+    await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
+    return reportBenchmark;
 }
 
 async function extractBenchmark(testId) {
@@ -70,4 +74,10 @@ async function extractBenchmark(testId) {
     } catch (e) {
         return undefined;
     }
+}
+
+async function updateResultsSummary(report) {
+    const resultsSummary = report.data; // TODO
+    await databaseConnector.updateResultsSummary(report.test_id, report.report_id, JSON.stringify(resultsSummary));
+    return resultsSummary;
 }

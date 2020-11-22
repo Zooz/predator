@@ -1154,7 +1154,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/benchmark_request'
+                $ref: '#/components/schemas/results_summary'
         '400':
           description: Bad request
           content:
@@ -1171,8 +1171,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/benchmark_request'
-        description: The benchmark to add
+              $ref: '#/components/schemas/results_summary'
+        description: The results summary to mark as the benchmark
         required: true
     get:
       tags:
@@ -1186,15 +1186,100 @@ paths:
             type: string
             format: uuid
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-      summary: Get a benchmark for test
-      description:  Get a benchmark for a test
+      summary: Get the benchmark for test
+      description:  Get the benchmark for a test
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/benchmark_request'
+                $ref: '#/components/schemas/results_summary'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+  /v1/tests/{test_id}/trends:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
+    get:
+      tags:
+        - Trends
+      parameters:
+        - in: path
+          name: test_id
+          description: The test id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+        - in: query
+          name: from
+          description: from when to analyze trends of a test
+          required: false
+          schema:
+            type: string
+            default: now-7d
+            example: now-7d
+        - in: query
+          name: to
+          description: until when to analyze trends of a test
+          required: false
+          schema:
+            type: string
+            default: now
+            example: now
+        - in: query
+          name: limit
+          description: maximum number of runs to include in the trend analysis for the timeframe given
+          required: false
+          schema:
+            type: integer
+            default: 250
+            example: 250
+        - in: query
+          name: threshold
+          description: minimum difference between different test run configurations that should be calculated in a specific trend
+          required: false
+          schema:
+            type: number
+            format: float
+            default: 0.9
+            example: 0.9
+        - in: query
+          name: arrival_rate
+          description: arrival rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+            default: 100
+            example: 100
+        - in: query
+          name: duration
+          description: duration of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+            default: 100
+            example: 100
+      summary: Get trends for a test
+      description:  Get trends for a test
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/trends'
         '404':
           description: Not found
           content:
@@ -1999,7 +2084,7 @@ components:
         - basic
         example: dsl
 
-    benchmark_request:
+    results_summary:
       type: object
       additionalProperties: false
       required:
@@ -2031,6 +2116,22 @@ components:
             count:
               description: Total number of request, will be used to calculate errors ratio.
               type: number
+        latency:
+          type: object
+          required:
+            - median
+            - p95
+          properties:
+            median:
+              type: number
+            p95:
+              type: number
+    trends:
+      type: object
+      additionalProperties: false
+      required:
+        - latency
+      properties:
         latency:
           type: object
           required:
@@ -2612,6 +2713,8 @@ components:
         benchmark_weights_data:
           type: object
           description: The way score calualated
+        results_summary:
+          $ref: '#/components/schemas/results_summary'
         arrival_rate:
           type: number
           description: The arrival rate that was set for the test. This is the number of times per second that the test scenarios will run.

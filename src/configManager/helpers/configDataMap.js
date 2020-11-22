@@ -48,7 +48,6 @@ const configDataMap = {
         type: 'json'
     },
     [constConfig.CUSTOM_RUNNER_DEFINITION]: { value: process.env.CUSTOM_RUNNER_DEFINITION, type: 'json' }
-
 };
 
 module.exports.getConstType = (configValue) => {
