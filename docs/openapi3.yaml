@@ -2133,27 +2133,15 @@ components:
       additionalProperties: false
       required:
         - shift
-        - latencies
+        - report_summaries
       properties:
         shift:
           type: number
           description: represents the incline/decline in the performance results calculated for the queried timeframe
-        latencies:
+        report_summaries:
           type: array
           items:
-            type: object
-            required:
-              - median
-              - p95
-              - p99
-            properties:
-              median:
-                type: number
-              p95:
-                type: number
-              p99:
-                type: number
-
+            $ref: '#/components/schemas/results_summary'
     dsl:
       description: A test that is made of scenarios base on domain specific language
       required:
