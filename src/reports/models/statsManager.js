@@ -91,6 +91,6 @@ async function updateResultsSummary(reportAggregate) {
             p99: aggregatedResults.latency.p99
         }
     };
-    await databaseConnector.updateResultsSummary(report.test_id, report.report_id, JSON.stringify(resultsSummary));
+    await databaseConnector.updateResultsSummary(reportAggregate.test_id, reportAggregate.report_id, JSON.stringify(resultsSummary));
     return resultsSummary;
 }

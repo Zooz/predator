@@ -15,9 +15,9 @@ async function getTrends(testId, queryParams) {
 async function calculateTrends(reports) {
     const trends = {
         shift: 1,
-        latencies: []
+        report_summaries: []
     }
-    reports.forEach((report) => trends.latencies.push(report.results_summary.latency));
+    reports.forEach((report) => trends.report_summaries.push(report.results_summary));
     return trends;
 
     // const allAggregatedReport = [];
