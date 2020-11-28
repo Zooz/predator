@@ -2126,22 +2126,33 @@ components:
               type: number
             p95:
               type: number
+            p99:
+              type: number
     trends:
       type: object
       additionalProperties: false
       required:
-        - latency
+        - shift
+        - latencies
       properties:
-        latency:
-          type: object
-          required:
-            - median
-            - p95
-          properties:
-            median:
-              type: number
-            p95:
-              type: number
+        shift:
+          type: number
+          description: represents the incline/decline in the performance results calculated for the queried timeframe
+        latencies:
+          type: array
+          items:
+            type: object
+            required:
+              - median
+              - p95
+              - p99
+            properties:
+              median:
+                type: number
+              p95:
+                type: number
+              p99:
+                type: number
 
     dsl:
       description: A test that is made of scenarios base on domain specific language

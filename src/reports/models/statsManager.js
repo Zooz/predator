@@ -29,11 +29,12 @@ module.exports.postStats = async (report, stats) => {
 
     let reportBenchmark;
     if (reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
-        await updateResultsSummary(report);
+        const reportAggregate = await aggregateReportManager.aggregateReport(report);
+        await updateResultsSummary(reportAggregate);
 
         const testBenchmarkData = await extractBenchmark(report.test_id);
         if (testBenchmarkData) {
-            reportBenchmark = await updateReportBenchmark(report);
+            reportBenchmark = await updateReportBenchmark(reportAggregate);
         }
     }
 
@@ -53,17 +54,16 @@ async function updateSubscriberWithStatsInternal(report, stats) {
     await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, JSON.stringify(parseData));
 }
 
-async function updateReportBenchmark(report, testBenchmarkData) {
+async function updateReportBenchmark(reportAggregate, testBenchmarkData) {
     const config = await configHandler.getConfig();
     const configBenchmark = {
         weights: config[configConsts.BENCHMARK_WEIGHTS],
         threshold: config[configConsts.BENCHMARK_THRESHOLD]
     };
-    const reportAggregate = await aggregateReportManager.aggregateReport(report);
     const reportBenchmark = benchmarkCalculator.calculate(testBenchmarkData, reportAggregate.aggregate, configBenchmark.weights);
     const { data, score } = reportBenchmark;
     data[configConsts.BENCHMARK_THRESHOLD] = configBenchmark.threshold;
-    await databaseConnector.updateReportBenchmark(report.test_id, report.report_id, score, JSON.stringify(data));
+    await databaseConnector.updateReportBenchmark(reportAggregate.test_id, reportAggregate.report_id, score, JSON.stringify(data));
     return reportBenchmark;
 }
 
@@ -76,8 +76,21 @@ async function extractBenchmark(testId) {
     }
 }
 
-async function updateResultsSummary(report) {
-    const resultsSummary = report.data; // TODO
+async function updateResultsSummary(reportAggregate) {
+    const aggregatedResults = reportAggregate.aggregate;
+    const resultsSummary = {
+        errors: aggregatedResults.errors,
+        codes: aggregatedResults.codes,
+        rps: {
+            mean: aggregatedResults.rps.mean,
+            count: aggregatedResults.rps.count
+        },
+        latency: {
+            median: aggregatedResults.latency.median,
+            p95: aggregatedResults.latency.p95,
+            p99: aggregatedResults.latency.p99
+        }
+    };
     await databaseConnector.updateResultsSummary(report.test_id, report.report_id, JSON.stringify(resultsSummary));
     return resultsSummary;
 }

@@ -199,7 +199,8 @@ function getReportResponse(summaryRow, config) {
         avg_rps: Number((totalRequests / reportDurationSeconds).toFixed(2)) || 0,
         last_success_rate: successRate,
         score: summaryRow.score ? summaryRow.score : undefined,
-        benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined
+        benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined,
+        results_summary: summaryRow.results_summary ? JSON.parse(summaryRow.results_summary) : undefined
     };
 
     report.status = reportsStatusCalculator.calculateReportStatus(report, config);

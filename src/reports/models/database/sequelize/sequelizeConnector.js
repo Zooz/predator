@@ -136,7 +136,7 @@ async function updateReportBenchmark(testId, reportId, score, benchmarkData) {
 }
 
 async function updateResultsSummary(testId, reportId, resultsSummary) {
-    const benchmark = client.model('report');
+    const report = client.model('report');
     const params = { results_summary: resultsSummary };
     const options = {
         where: {
@@ -144,7 +144,7 @@ async function updateResultsSummary(testId, reportId, resultsSummary) {
             report_id: reportId
         }
     };
-    const res = await benchmark.update(params, options);
+    const res = await report.update(params, options);
     return res;
 }
 
