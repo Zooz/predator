@@ -2133,14 +2133,31 @@ components:
       additionalProperties: false
       required:
         - shift
-        - report_summaries
+        - reports
       properties:
         shift:
           type: number
           description: represents the incline/decline in the performance results calculated for the queried timeframe
-        report_summaries:
+        reports:
           type: array
           items:
+            $ref: '#/components/schemas/trends_reports_summary'
+    trends_reports_summary:
+      type: object
+      additionalProperties: false
+      required:
+        - report_id
+        - job_id
+        - results_summary
+      properties:
+        job_id:
+          type: string
+          format: uuid
+          description: id of the job that created the report
+        report_id:
+          type: string
+          format: uuid
+        results_summary:
             $ref: '#/components/schemas/results_summary'
     dsl:
       description: A test that is made of scenarios base on domain specific language

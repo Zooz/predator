@@ -15,9 +15,16 @@ async function getTrends(testId, queryParams) {
 async function calculateTrends(reports) {
     const trends = {
         shift: 1,
-        report_summaries: []
+        reports: []
     }
-    reports.forEach((report) => trends.report_summaries.push(report.results_summary));
+    reports.forEach((report) => {
+        const reportSummary = {
+            report_id: report.report_id,
+            job_id: report.job_id,
+            results_summary: report.results_summary
+        }
+        trends.reports.push(reportSummary)
+    });
     return trends;
 
     // const allAggregatedReport = [];
