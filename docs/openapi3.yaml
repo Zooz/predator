@@ -2575,6 +2575,7 @@ components:
         - start_time
         - end_time
         - duration_seconds
+        - tag
       properties:
         test_id:
           type: string
@@ -2624,6 +2625,9 @@ components:
         notes:
           type: string
           description: notes about the test
+        tag:
+          description: tag of the machine type/region that the job will run on (currently supported in aws fargate)
+          example: eu-west-1
     config_body:
       additionalProperties: false
       properties:

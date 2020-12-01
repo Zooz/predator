@@ -95,7 +95,8 @@ module.exports.postReport = async (reportId, test, job, startTime) => {
         duration: job.duration,
         parallelism: job.parallelism || 1,
         max_virtual_users: job.max_virtual_users,
-        environment: job.environment
+        environment: job.environment,
+        tag: job.tag
     };
 
     if (job.type === JOB_TYPE_FUNCTIONAL_TEST) {
@@ -191,6 +192,7 @@ function getReportResponse(summaryRow, config) {
         ramp_to: testConfiguration.ramp_to,
         parallelism: testConfiguration.parallelism,
         max_virtual_users: testConfiguration.max_virtual_users,
+        tag: testConfiguration.tag,
         last_updated_at: summaryRow.last_updated_at,
         notes: summaryRow.notes,
         environment: testConfiguration.environment,
