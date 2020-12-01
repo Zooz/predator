@@ -9,15 +9,17 @@ module.exports = {
 async function getTrends(testId, queryParams) {
     const reports = await reportsManager.getReports(testId);
     const filteredReports = filterRelevantReports(reports, queryParams)
-    const trends = calculateTrends(filteredReports);
+    const trends = calculateTrends(filteredReports, queryParams);
     return trends;
 }
 
-async function calculateTrends(reports) {
+async function calculateTrends(reports, queryParams) {
+    const { shift_comparator: shiftComparator } = queryParams;
     const trends = {
-        shift: 1,
+        shift: 0,
         reports: []
     }
+
     reports.forEach((report) => {
         if (report.results_summary) {
             const reportSummary = {
@@ -29,7 +31,17 @@ async function calculateTrends(reports) {
             trends.reports.push(reportSummary)
         }
     });
+
+    trends.shift = calculateShift(trends.reports, shiftComparator);
+
     return trends;
+}
+
+function calculateShift(reports, shiftComparator) {
+    const mostRecentResult = reports[0].results_summary.latency[shiftComparator];
+    const leastRecentResult = reports[reports.length-1].results_summary.latency[shiftComparator];
+    const shift = (leastRecentResult - mostRecentResult) / leastRecentResult;
+    return shift;
 }
 
 function filterRelevantReports(reports, queryParams) {

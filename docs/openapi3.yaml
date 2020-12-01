@@ -1282,6 +1282,17 @@ paths:
           required: false
           schema:
             type: integer
+        - in: query
+          name: shift_comparator
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: string
+            default: p95
+            enum:
+              - median
+              - p95
+              - p99
       summary: Get trends for a test
       description:  Get trends for a test
       responses:
@@ -2148,7 +2159,7 @@ components:
       properties:
         shift:
           type: number
-          description: represents the incline/decline in the performance results calculated for the queried timeframe
+          description: represents the incline/decline in the performance results calculated for the queried timeframe in %
         reports:
           type: array
           items:
