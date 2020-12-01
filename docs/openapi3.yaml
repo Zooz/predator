@@ -1224,20 +1224,20 @@ paths:
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
         - in: query
           name: from
-          description: from when to analyze trends of a test
+          description: Epoch time in milliseconds from when to analyze trends of a test
           required: false
           schema:
-            type: string
-            default: now-7d
-            example: now-7d
+            type: integer
+            format: int64
+            example: 1464829513623
         - in: query
           name: to
-          description: until when to analyze trends of a test
+          description: Epoch time in milliseconds until when to analyze trends of a test
           required: false
           schema:
-            type: string
-            default: now
-            example: now
+            type: integer
+            format: int64
+            example: 1464829513623
         - in: query
           name: limit
           description: maximum number of runs to include in the trend analysis for the timeframe given
@@ -1247,30 +1247,41 @@ paths:
             default: 250
             example: 250
         - in: query
-          name: threshold
-          description: minimum difference between different test run configurations that should be calculated in a specific trend
-          required: false
-          schema:
-            type: number
-            format: float
-            default: 0.9
-            example: 0.9
-        - in: query
-          name: arrival_rate
-          description: arrival rate of test run configuration that should be compared to
+          name: min_rate
+          description: minimum rate of test run configuration that should be compared to
           required: false
           schema:
             type: integer
-            default: 100
-            example: 100
         - in: query
-          name: duration
-          description: duration of test run configuration that should be compared to
+          name: max_rate
+          description: minimum rate of test run configuration that should be compared to
           required: false
           schema:
             type: integer
-            default: 100
-            example: 100
+        - in: query
+          name: min_duration
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: max_duration
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: min_virtual_users
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: max_virtual_users
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
       summary: Get trends for a test
       description:  Get trends for a test
       responses:

@@ -1,5 +1,6 @@
 'use strict';
 const reportsManager = require('../../reports/models/reportsManager');
+const FOURTEEN_DAYS_IN_MS = 12096e5;
 
 module.exports = {
     getTrends
@@ -18,46 +19,58 @@ async function calculateTrends(reports) {
         reports: []
     }
     reports.forEach((report) => {
-        const reportSummary = {
-            report_id: report.report_id,
-            job_id: report.job_id,
-            results_summary: report.results_summary
+        if (report.results_summary) {
+            const reportSummary = {
+                report_id: report.report_id,
+                job_id: report.job_id,
+                start_time: report.start_time,
+                results_summary: report.results_summary
+            }
+            trends.reports.push(reportSummary)
         }
-        trends.reports.push(reportSummary)
     });
     return trends;
-
-    // const allAggregatedReport = [];
-
-    // const promises = reports.map(async report => {
-    //     const aggregatedReport = await aggregateReportManager.aggregateReport((report));
-    //     allAggregatedReport.push(aggregatedReport);
-    // });
-    //
-    // await Promise.all(promises);
-    //
-    // const trends = [];
-    // allAggregatedReport.forEach(aggregatedReport => {
-    //     trends.push({
-    //         start_time: aggregatedReport.start_time,
-    //         latency: aggregatedReport.aggregate.latency,
-    //         rps: aggregatedReport.aggregate.rps
-    //     });
-    // });
 }
 
 function filterRelevantReports(reports, queryParams) {
-    const { to, from, threshold, arrival_rate: arrivalRate, duration } = queryParams;
-    return reports;
+    const {
+        to = Date.now(),
+        from = Date.now() - FOURTEEN_DAYS_IN_MS,
+        min_duration: minDuration,
+        max_duration: maxDuration,
+        min_rate: minRate,
+        max_rate: maxRate,
+        min_virtual_users: maxVUsers,
+        max_virtual_users: minVUsers
+    } = queryParams;
 
-    //
-    // const minimumDate = new Date();
-    // minimumDate.setDate(minimumDate.getDate() - configConsts.TREND_BACK_IN_DAYS);
-    //
-    // const relevantReports = reports.filter((report) => {
-    //     const arrivalRateChange = Math.min(report.arrival_rate, arrivalRate) / Math.max(report.arrival_rate, arrivalRate);
-    //     const durationRateChange = Math.min(report.duration, duration) / Math.max(report.duration, duration);
-    //     return durationRateChange >= 0.9 && arrivalRateChange >= configConsts.TREND_THRESHOLD && report.start_time >= minimumDate;
-    // });
-    // return relevantReports;
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+
+    const relevantReports = reports.filter((report) => {
+        const afterFromDate = report.start_time >= fromDate;
+        const beforeToDate = report.start_time < toDate;
+        const matchesDuration = matchReportProperty(report, 'duration', minDuration, maxDuration);
+        const matchesRate = matchReportProperty(report, 'arrival_rate', minRate, maxRate);
+        const matchesVUsers = matchReportProperty(report, 'max_virtual_users', minVUsers, maxVUsers);
+
+        return afterFromDate && beforeToDate && matchesDuration && matchesRate && matchesVUsers;
+    });
+
+    return relevantReports;
+}
+
+function matchReportProperty(report, property, min, max) {
+    let match;
+    if (!min && !max) {
+        match = true
+    } else if (min && !max) {
+        match = report[property] >= min
+    } else if (!min && max) {
+        match = report[property] < max
+    } else {
+        match = report[property] >= min && report[property] < max
+    }
+
+    return match;
 }
