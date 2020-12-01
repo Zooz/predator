@@ -48,6 +48,7 @@ function filterRelevantReports(reports, queryParams) {
     const {
         to = Date.now(),
         from = Date.now() - FOURTEEN_DAYS_IN_MS,
+        limit,
         min_duration: minDuration,
         max_duration: maxDuration,
         min_rate: minRate,
@@ -69,7 +70,7 @@ function filterRelevantReports(reports, queryParams) {
         return afterFromDate && beforeToDate && matchesDuration && matchesRate && matchesVUsers;
     });
 
-    return relevantReports;
+    return relevantReports.slice(0, limit);
 }
 
 function matchReportProperty(report, property, min, max) {

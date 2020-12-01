@@ -1244,8 +1244,8 @@ paths:
           required: false
           schema:
             type: integer
-            default: 250
-            example: 250
+            default: 100
+            example: 100
         - in: query
           name: min_rate
           description: minimum rate of test run configuration that should be compared to
