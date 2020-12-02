@@ -34,7 +34,7 @@ module.exports.postStats = async (report, stats) => {
 
         const testBenchmarkData = await extractBenchmark(report.test_id);
         if (testBenchmarkData) {
-            reportBenchmark = await updateReportBenchmark(reportAggregate);
+            reportBenchmark = await updateReportBenchmark(testBenchmarkData, reportAggregate);
         }
     }
 
@@ -54,7 +54,7 @@ async function updateSubscriberWithStatsInternal(report, stats) {
     await databaseConnector.updateSubscriberWithStats(report.test_id, report.report_id, stats.runner_id, stats.phase_status, JSON.stringify(parseData));
 }
 
-async function updateReportBenchmark(reportAggregate, testBenchmarkData) {
+async function updateReportBenchmark(testBenchmarkData, reportAggregate) {
     const config = await configHandler.getConfig();
     const configBenchmark = {
         weights: config[configConsts.BENCHMARK_WEIGHTS],
