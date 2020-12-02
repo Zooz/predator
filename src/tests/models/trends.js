@@ -40,7 +40,7 @@ async function calculateTrends(reports, queryParams) {
 function calculateShift(reports, shiftComparator) {
     const mostRecentResult = reports[0].results_summary.latency[shiftComparator];
     const leastRecentResult = reports[reports.length-1].results_summary.latency[shiftComparator];
-    const shift = (leastRecentResult - mostRecentResult) / leastRecentResult;
+    const shift = (leastRecentResult - mostRecentResult) / leastRecentResult * 100;
     return shift;
 }
 
