@@ -360,15 +360,7 @@ const Symbol = ({element, onEditSymbol, index}) => {
 
 const Block = ({header, dataList, style = {}, onEditSymbol}) => {
     const headerStyle = {color: '#577DFE', fontWeight: '500'};
-    const [isSymbol, setIsSymbol] = useState(false);
-
-    useEffect(() => {
-        if (header === 'Symbol') {
-            setIsSymbol(true);
-        } else {
-            setIsSymbol(false);
-        }
-    }, []);
+    const isSymbol = header === 'Symbol';
 
     return (
         <div style={{
