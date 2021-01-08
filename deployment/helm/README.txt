@@ -1,1 +1,0 @@
-helm chart moved to: https://hub.helm.sh/charts/zooz/predator
