@@ -19,7 +19,7 @@ appServer().then(async (app) => {
     process.exit(1);
 });
 
-async function verifyInternalAddressReachable(app) {
+async function verifyInternalAddressReachable() {
     if (process.env.SKIP_INTERNAL_ADDRESS_CHECK === 'true') {
         logger.info('Skipping verify internal address check');
         return;

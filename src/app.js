@@ -18,7 +18,8 @@ const tests = require('./tests/controllers/testsController');
 const testsVerifier = require('./tests/helpers/testsVerifier');
 const artilleryValidator = require('./tests/helpers/artilleryValidator');
 const dsl = require('./tests/controllers/dslController');
-const verifyReportIDInRoute = require('./reports/utils/middlewares');
+const {verifyReportIDInRoute} = require('./reports/utils/middlewares');
+const customValidation = require('./tests/middlewares/customValidation');
 
 const {CONTEXT_ID} = require('./common/consts');
 const health = require('./common/controllers/healthController');
@@ -32,7 +33,7 @@ module.exports = async () => {
     await jobsManager.scheduleFinishedContainersCleanup();
 
     const app = fastify({
-        logger: logger,
+        logger,
         bodyLimit: process.env.BODY_PARSER_LIMIT || '524288'
     });
 
@@ -131,10 +132,26 @@ module.exports = async () => {
     app.get('/v1/jobs/:job_id/runs/:report_id/logs', jobs.getLogs);
     app.delete('/v1/jobs/runs/containers', jobs.deleteAllContainers);
     //dsl
-    app.post('/v1/dsl/:dsl_name/definitions', customValidation.createDslValidator, dsl.createDefinition);
+    app.post('/v1/dsl/:dsl_name/definitions',  {
+        preHandler: async (req, reply) => {
+            try {
+                await customValidation.createDslValidator(req, reply)
+            } catch (err) {
+                reply.send(err);
+            }
+        }
+    }, dsl.createDefinition);
     app.get('/v1/dsl/:dsl_name/definitions', dsl.getDslDefinitions);
     app.get('/v1/dsl/:dsl_name/definitions/:definition_name', dsl.getDslDefinition);
-    app.put('/v1/dsl/:dsl_name/definitions/:definition_name', customValidation.createDslValidator, dsl.updateDefinition);
+    app.put('/v1/dsl/:dsl_name/definitions/:definition_name', {
+        preHandler: async (req, reply) => {
+            try {
+                await customValidation.createDslValidator(req, reply)
+            } catch (err) {
+                reply.send(err);
+            }
+        }
+    }, dsl.updateDefinition);
     app.delete('/v1/dsl/:dsl_name/definitions/:definition_name', dsl.deleteDefinition);
     //reports
     app.get('/v1/tests/:test_id/reports/:report_id/aggregate', reports.getAggregateReport);
