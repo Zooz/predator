@@ -1,31 +1,25 @@
-const app = require('./app'),
-    logger = require('./common/logger'),
+const appServer = require('./app'),
     request = require('request-promise-native'),
     configHandler = require('./configManager/models/configHandler'),
-    constConfig = require('./common/consts'),
-    shutdown = require('graceful-shutdown-express');
+    constConfig = require('./common/consts');
+const logger = require('./common/logger');
 
-app().then(async (app) => {
+
+appServer().then(async (app) => {
     const serverPort = process.env.PORT || '80';
-    const server = app.listen(serverPort, function () {
+    try {
+        await app.listen(serverPort);
         logger.info('Predator listening on port ' + serverPort);
-    });
-
-    await verifyInternalAddressReachable();
-
-    shutdown.registerShutdownEvent({
-        server: server,
-        newConnectionsTimeout: process.env.LOAD_BALANCER_UPDATE_PERIOD || 7000,
-        shutdownTimeout: process.env.SHUTDOWN_GRACE_TIMEOUT || 10000,
-        logger: logger,
-        events: ['SIGTERM', 'SIGINT']
-    });
+    } catch (error) {
+        logger.error(error, 'Encountered an error during start up');
+        process.exit(1)
+    }
+    await verifyInternalAddressReachable(app);
 }).catch(error => {
-    logger.error(error, 'Encountered an error during start up');
     process.exit(1);
 });
 
-async function verifyInternalAddressReachable() {
+async function verifyInternalAddressReachable(app) {
     if (process.env.SKIP_INTERNAL_ADDRESS_CHECK === 'true') {
         logger.info('Skipping verify internal address check');
         return;

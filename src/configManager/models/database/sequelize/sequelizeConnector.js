@@ -24,17 +24,15 @@ async function updateConfig(updateValues) {
         const value = updateValues[key] instanceof Object ? JSON.stringify(updateValues[key]) : updateValues[key] + '';
         records.push(configClient.upsert({ key: key, value: value }));
     });
-    const results = await Promise.all(records);
-    return results;
+    return await Promise.all(records);
 }
 
 async function deleteConfig(key) {
     const configClient = client.model('config');
-    const result = await configClient.destroy(
+    return await configClient.destroy(
         {
-            where: { key: key }
+            where: {key: key}
         });
-    return result;
 }
 
 async function getConfig() {
@@ -43,8 +41,7 @@ async function getConfig() {
         attributes: { exclude: ['updated_at', 'created_at'] }
     };
     const dbResults = await configClient.findAll(options);
-    const resultArr = dbResults.map(result => (result.dataValues));
-    return resultArr;
+    return dbResults.map(result => (result.dataValues));
 }
 
 async function getConfigValue(configValue) {
@@ -54,8 +51,7 @@ async function getConfigValue(configValue) {
     };
     options.where = { key: configValue };
     const value = await configClient.findOne(options);
-    const response = value ? [value] : [];
-    return response;
+    return value ? [value] : [];
 }
 
 async function initSchemas() {

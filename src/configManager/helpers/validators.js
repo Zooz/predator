@@ -1,6 +1,6 @@
-module.exports.validateBenchmarkWeights = (req, res, next) => {
+module.exports.validateBenchmarkWeights = (req, res) => {
     const benchmarkWeights = req.body.benchmark_weights;
-    if (benchmarkWeights){
+    if (benchmarkWeights) {
         const p95Percentage = benchmarkWeights.percentile_ninety_five.percentage;
         const p50Percentage = benchmarkWeights.percentile_fifty.percentage;
         const serverErrorsPercentage = benchmarkWeights.server_errors_ratio.percentage;
@@ -8,11 +8,10 @@ module.exports.validateBenchmarkWeights = (req, res, next) => {
         const rpsPercentage = benchmarkWeights.rps.percentage;
 
         const percentageSum = p95Percentage + p50Percentage + serverErrorsPercentage + clientErrorsPercentage + rpsPercentage;
-        if (percentageSum !== 100){
+        if (percentageSum !== 100) {
             const error = new Error('Benchmark weights needs to sum up to 100%');
             error.statusCode = 422;
-            return next(error);
+            throw error;
         }
     }
-    return next();
 };

@@ -10,6 +10,5 @@ function isAllRunnersInExpectedPhase(report, phaseStatus) {
     });
     const uniquePostStatsUpdatePhases = [...new Set(postStatsUpdate)];
 
-    const isInStage = (postStatsUpdate.length === (report.parallelism || 1) && uniquePostStatsUpdatePhases.length === 1 && uniquePostStatsUpdatePhases[0] === phaseStatus);
-    return isInStage;
+    return (postStatsUpdate.length === (report.parallelism || 1) && uniquePostStatsUpdatePhases.length === 1 && uniquePostStatsUpdatePhases[0] === phaseStatus);
 }

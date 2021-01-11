@@ -45,8 +45,7 @@ async function getAllProcessors(from, limit, exclude, contextId) {
         where.context_id = contextId;
     }
 
-    const allProcessors = processorsModel.findAll({ attributes, offset: from, limit, order: [['created_at', 'DESC']], where });
-    return allProcessors;
+    return processorsModel.findAll({attributes, offset: from, limit, order: [['created_at', 'DESC']], where});
 }
 
 async function _getProcessor(options) {

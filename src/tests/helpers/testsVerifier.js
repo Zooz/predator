@@ -2,7 +2,8 @@
 const processorsManager = require('../../processors/models/processorsManager');
 const testMannager = require('../../tests/models/manager');
 const consts = require('../../common/consts');
-module.exports.verifyProcessorIsValid = async (req, res, next) => {
+
+module.exports.verifyProcessorIsValid = async (req, res) => {
     let errorToThrow;
     let processor;
     const usedFunctions = [];
@@ -21,6 +22,7 @@ module.exports.verifyProcessorIsValid = async (req, res, next) => {
                 errorToThrow = new Error(error.message);
                 errorToThrow.statusCode = 500;
             }
+            throw errorToThrow
         }
 
         if (!errorToThrow) {
@@ -28,15 +30,17 @@ module.exports.verifyProcessorIsValid = async (req, res, next) => {
             if (usedFunctionsWhichNotExists.length > 0) {
                 errorToThrow = new Error(`Functions: ${usedFunctionsWhichNotExists.join(', ')} does not exist in the processor file`);
                 errorToThrow.statusCode = 400;
+                throw errorToThrow
             }
         }
     } else if (usedFunctions.length > 0) {
         errorToThrow = new Error(`Functions: ${usedFunctions.join(', ')} are used without specifying processor`);
         errorToThrow.statusCode = 400;
+        throw errorToThrow
     }
-    next(errorToThrow);
 };
-module.exports.verifyTestExist = async (req, res, next) => {
+
+module.exports.verifyTestExist = async (req, res) => {
     let errorToThrow;
     const testId = req.params.test_id;
     try {
@@ -48,8 +52,8 @@ module.exports.verifyTestExist = async (req, res, next) => {
             errorToThrow = new Error(error.message);
             errorToThrow.statusCode = 500;
         }
+        throw errorToThrow
     }
-    next(errorToThrow);
 };
 
 function getUsedFunctions(obj, functions) {

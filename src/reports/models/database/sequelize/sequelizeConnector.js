@@ -206,8 +206,7 @@ async function getLastReports(limit, filter, contextId) {
 
     const queryOptions = { limit, order: [['start_time', 'DESC']], where };
 
-    const lastReports = await getReportsAndParse(queryOptions);
-    return lastReports;
+    return await getReportsAndParse(queryOptions);
 }
 
 async function getReports(testId, filter, contextId) {
@@ -221,8 +220,7 @@ async function getReports(testId, filter, contextId) {
 
     const queryOptions = { order: [['start_time', 'DESC']], where };
 
-    const allReports = await getReportsAndParse(queryOptions);
-    return allReports;
+    return await getReportsAndParse(queryOptions);
 }
 
 async function getReport(testId, reportId, contextId) {
@@ -233,8 +231,7 @@ async function getReport(testId, reportId, contextId) {
     }
 
     const query = { where };
-    const report = await getReportsAndParse(query);
-    return report;
+    return await getReportsAndParse(query);
 }
 
 async function getStatsAndParse(query) {
@@ -250,15 +247,12 @@ async function getStatsAndParse(query) {
     Object.assign(options, query);
 
     const allStatsRawResponse = await stats.findAll(options);
-    const allStats = allStatsRawResponse.map(rawStat => rawStat.dataValues);
-
-    return allStats;
+    return allStatsRawResponse.map(rawStat => rawStat.dataValues);
 }
 
 async function getStats(testId, reportId) {
     const query = { where: { test_id: testId, report_id: reportId } };
-    const stats = await getStatsAndParse(query);
-    return stats;
+    return await getStatsAndParse(query);
 }
 
 async function initSchemas() {
@@ -373,8 +367,7 @@ async function getSubscriber(testId, reportId, runnerId) {
     report = report[0];
 
     const subscribers = await report.getSubscribers();
-    const subscriberToUpdate = await subscribers.find((subscriber) => {
+    return await subscribers.find((subscriber) => {
         return subscriber.dataValues.runner_id === runnerId;
     });
-    return subscriberToUpdate;
 }

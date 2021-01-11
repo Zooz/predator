@@ -6,7 +6,7 @@
   "main": "server.js",
   "engines": {
     "node": ">=12.x",
-    "npm": "6.x"
+    "npm": ">=6.x"
   },
   "directories": {
     "test": "tests"
@@ -43,22 +43,22 @@
   "dependencies": {
     "artillery": "^1.6.1",
     "aws-sdk": "^2.823.0",
-    "body-parser": "^1.19.0",
     "cron": "^1.8.2",
     "dockerode": "^2.5.8",
-    "express": "^4.17.1",
-    "express-ajv-swagger-validation": "^1.2.3",
-    "express-easy-zip": "^1.1.5",
-    "express-fileupload": "^1.2.0",
-    "express-http-context": "^1.2.4",
-    "express-requests-logger": "^3.0.2",
-    "graceful-shutdown-express": "^2.0.1",
+    "fastify": "^3.9.2",
+    "fastify-compress": "^3.4.1",
+    "fastify-file-upload": "^3.0.0",
+    "fastify-formbody": "^5.0.0",
+    "fastify-graceful-shutdown": "^3.0.0",
+    "fastify-request-context": "^2.1.2",
+    "fastify-static": "^3.3.1",
     "jsck": "^0.3.2",
     "lodash": "^4.17.20",
     "mariadb": "^2.5.2",
     "mathjs": "^7.6.0",
     "mysql2": "^2.2.5",
     "nodemailer": "^6.4.17",
+    "openapi-validator-middleware": "^3.2.1",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
     "pino": "^6.9.0",

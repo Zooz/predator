@@ -1,6 +1,5 @@
 'use strict';
 
-const httpContext = require('express-http-context');
 const uuid = require('uuid');
 
 const databaseConnector = require('./databaseConnector'),
@@ -14,8 +13,8 @@ const databaseConnector = require('./databaseConnector'),
 const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
 
-module.exports.getReport = async (testId, reportId) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.getReport = async (testId, reportId, context) => {
+    const contextId = context.get(CONTEXT_ID);
 
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
 
@@ -25,12 +24,11 @@ module.exports.getReport = async (testId, reportId) => {
         throw error;
     }
     const config = await configHandler.getConfig();
-    const report = await getReportResponse(reportSummary[0], config);
-    return report;
+    return getReportResponse(reportSummary[0], config);
 };
 
-module.exports.getReports = async (testId, filter) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.getReports = async (testId, filter, context) => {
+    const contextId = context.get(CONTEXT_ID);
 
     const reportSummaries = await databaseConnector.getReports(testId, filter, contextId);
     const config = await configHandler.getConfig();
@@ -41,20 +39,19 @@ module.exports.getReports = async (testId, filter) => {
     return reports;
 };
 
-module.exports.getLastReports = async (limit, filter) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.getLastReports = async (limit, filter, context) => {
+    const contextId = context.get(CONTEXT_ID);
 
     const reportSummaries = await databaseConnector.getLastReports(limit, filter, contextId);
     const config = await configHandler.getConfig();
-    const reports = reportSummaries.map((summaryRow) => {
+    return reportSummaries.map((summaryRow) => {
         return getReportResponse(summaryRow, config);
     });
-    return reports;
 };
 
-module.exports.editReport = async (testId, reportId, reportBody) => {
+module.exports.editReport = async (testId, reportId, reportBody, context) => {
     // currently we support only edit for notes
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = context.get(CONTEXT_ID);
 
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
     if (!reportSummary) {
@@ -65,8 +62,8 @@ module.exports.editReport = async (testId, reportId, reportBody) => {
     await databaseConnector.updateReport(testId, reportId, { notes, is_favorite }, contextId);
 };
 
-module.exports.deleteReport = async (testId, reportId) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.deleteReport = async (testId, reportId, context) => {
+    const contextId = context.get(CONTEXT_ID);
 
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
     if (!reportSummary) {
@@ -85,8 +82,8 @@ module.exports.deleteReport = async (testId, reportId) => {
     await databaseConnector.deleteReport(testId, reportId);
 };
 
-module.exports.postReport = async (reportId, test, job, startTime) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.postReport = async (reportId, test, job, startTime, context) => {
+    const contextId = context.get(CONTEXT_ID);
 
     const phase = '0';
 
@@ -218,7 +215,6 @@ function getReportResponse(summaryRow, config) {
 function generateGrafanaUrl(report, grafanaUrl) {
     if (grafanaUrl) {
         const endTimeGrafanafaQuery = report.end_time ? `&to=${new Date(report.end_time).getTime()}` : '&to=now';
-        const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&var-TestRunId=${report.report_id}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
-        return grafanaReportUrl;
+        return encodeURI(grafanaUrl + `&var-Name=${report.test_name}&var-TestRunId=${report.report_id}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
     }
 }

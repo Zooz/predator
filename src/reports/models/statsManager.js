@@ -27,7 +27,7 @@ module.exports.postStats = async (report, stats) => {
     await databaseConnector.updateReport(report.test_id, report.report_id, { phase: report.phase, last_updated_at: statsTime });
     report = await reportsManager.getReport(report.test_id, report.report_id);
     const reportBenchmark = await updateReportBenchmarkIfNeeded(report);
-    notifier.notifyIfNeeded(report, stats, reportBenchmark);
+    await notifier.notifyIfNeeded(report, stats, reportBenchmark);
 
     return stats;
 };
@@ -65,8 +65,7 @@ async function updateReportBenchmarkIfNeeded(report) {
 
 async function extractBenchmark(testId) {
     try {
-        const testBenchmarkData = await testManager.getBenchmark(testId);
-        return testBenchmarkData;
+        return await testManager.getBenchmark(testId);
     } catch (e) {
         return undefined;
     }

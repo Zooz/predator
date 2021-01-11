@@ -1,56 +1,56 @@
 'use strict';
 const processorManager = require('../models/processorsManager');
 
-module.exports.createProcessor = function (req, res, next) {
-    return processorManager.createProcessor(req.body)
+module.exports.createProcessor = function (req, res) {
+    return processorManager.createProcessor(req.body, req.requestContext)
         .then(function (result) {
-            return res.status(201).json(result);
+            res.code(201).send(result);
         })
         .catch(function (err) {
-            return next(err);
+            res.send(err);
         });
 };
 
-module.exports.getAllProcessors = async function (req, res, next) {
-    let { query: { from = 0, limit = 100 } } = req;
+module.exports.getAllProcessors = async function (req, res) {
+    let { query: { from = "0", limit = "100" } } = req;
     let processors;
     try {
         from = parseInt(from);
         limit = parseInt(limit);
-        processors = await processorManager.getAllProcessors(from, limit, req.query.exclude);
-        return res.status(200).json(processors);
+        processors = await processorManager.getAllProcessors(from, limit, req.query.exclude, req.requestContext);
+        res.code(200).send(processors);
     } catch (err) {
-        return next(err);
+        res.send(err);
     }
 };
 
-module.exports.getProcessor = async function (req, res, next) {
+module.exports.getProcessor = async function (req, res) {
     let processor;
     const processorId = req.params.processor_id;
     try {
-        processor = await processorManager.getProcessor(processorId);
-        return res.status(200).json(processor);
+        processor = await processorManager.getProcessor(processorId, req.requestContext);
+        res.code(200).send(processor);
     } catch (err) {
-        return next(err);
+        res.send(err);
     }
 };
 
-module.exports.deleteProcessor = async function (req, res, next) {
+module.exports.deleteProcessor = async function (req, res) {
     const { params: { processor_id: processorId } } = req;
     try {
-        await processorManager.deleteProcessor(processorId);
-        return res.status(204).json();
+        await processorManager.deleteProcessor(processorId, req.requestContext, req.log);
+        res.code(204).send();
     } catch (err) {
-        return next(err);
+        res.send(err);
     }
 };
 
-module.exports.updateProcessor = async function (req, res, next) {
+module.exports.updateProcessor = async function (req, res) {
     const { body: updatedProcessor, params: { processor_id: processorId } } = req;
     try {
-        const processor = await processorManager.updateProcessor(processorId, updatedProcessor);
-        res.status(200).json(processor);
+        const processor = await processorManager.updateProcessor(processorId, updatedProcessor, req.requestContext);
+        res.code(200).send(processor);
     } catch (e) {
-        next(e);
+        res.send(e);
     }
 };

@@ -1,16 +1,14 @@
 'use strict';
+ const uuid = require('uuid');
 
-const httpContext = require('express-http-context'),
-    uuid = require('uuid');
-
-const logger = require('../../common/logger'),
-    databaseConnector = require('./database/databaseConnector'),
-    testsManager = require('../../tests/models/manager'),
+const logger = require('../../common/logger');
+const databaseConnector = require('./database/databaseConnector'),
+     testsManager = require('../../tests/models/manager'),
     { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts'),
     generateError = require('../../common/generateError');
 
-module.exports.createProcessor = async function (processor) {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.createProcessor = async function (processor, context, log) {
+    const contextId = context.get(CONTEXT_ID);
 
     const processorWithTheSameName = await databaseConnector.getProcessorByName(processor.name, contextId);
     if (processorWithTheSameName) {
@@ -18,8 +16,7 @@ module.exports.createProcessor = async function (processor) {
     }
     const processorId = uuid.v4();
     try {
-        const exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
-        processor.exported_functions = exportedFunctions;
+        processor.exported_functions = verifyJSAndGetExportedFunctions(processor.javascript);
         await databaseConnector.insertProcessor(processorId, processor, contextId);
         processor.id = processorId;
         logger.info('Processor saved successfully to database');
@@ -30,27 +27,25 @@ module.exports.createProcessor = async function (processor) {
     }
 };
 
-module.exports.getAllProcessors = async function (from, limit, exclude) {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.getAllProcessors = async function (from, limit, exclude, context) {
+    const contextId = context.get(CONTEXT_ID);
 
-    const allProcessors = await databaseConnector.getAllProcessors(from, limit, exclude, contextId);
-    return allProcessors;
+    return await databaseConnector.getAllProcessors(from, limit, exclude, contextId);
 };
 
-module.exports.getProcessor = async function (processorId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.getProcessor = async function (processorId, context) {
+    const contextId = context.get(CONTEXT_ID);
 
     const processor = await databaseConnector.getProcessorById(processorId, contextId);
     if (processor) {
         return processor;
     } else {
-        const error = generateError(404, ERROR_MESSAGES.NOT_FOUND);
-        throw error;
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
     }
 };
 
-module.exports.deleteProcessor = async function (processorId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.deleteProcessor = async function (processorId, context) {
+    const contextId = context.get(CONTEXT_ID);
 
     const processor = await databaseConnector.getProcessorById(processorId, contextId);
     if (!processor) {
@@ -66,8 +61,8 @@ module.exports.deleteProcessor = async function (processorId) {
     return databaseConnector.deleteProcessor(processorId);
 };
 
-module.exports.updateProcessor = async function (processorId, processor) {
-    const contextId = httpContext.get(CONTEXT_ID);
+module.exports.updateProcessor = async function (processorId, processor, context) {
+    const contextId = context.get(CONTEXT_ID);
 
     const oldProcessor = await databaseConnector.getProcessorById(processorId, contextId);
     if (!oldProcessor) {
@@ -81,8 +76,7 @@ module.exports.updateProcessor = async function (processorId, processor) {
     }
 
     processor.created_at = oldProcessor.created_at;
-    const exportedFunctions = verifyJSAndGetExportedFunctions(processor.javascript);
-    processor.exported_functions = exportedFunctions;
+    processor.exported_functions = verifyJSAndGetExportedFunctions(processor.javascript);
     await databaseConnector.updateProcessor(processorId, processor);
     return processor;
 };
@@ -96,13 +90,11 @@ function verifyJSAndGetExportedFunctions(src) {
         const exports = m.exports;
         exportedFunctions = Object.keys(exports);
     } catch (err) {
-        const error = generateError(422, 'javascript syntax validation failed with error: ' + err.message);
-        throw error;
+        throw generateError(422, 'javascript syntax validation failed with error: ' + err.message);
     }
 
     if (exportedFunctions.length === 0) {
-        const error = generateError(422, 'javascript has 0 exported functions');
-        throw error;
+        throw generateError(422, 'javascript has 0 exported functions');
     }
     return exportedFunctions;
 }

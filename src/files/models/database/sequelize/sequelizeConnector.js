@@ -41,8 +41,7 @@ async function saveFile(id, fileName, fileContent, contextId) {
         context_id: contextId
     };
 
-    const result = fileClient.create(params);
-    return result;
+    return fileClient.create(params);
 }
 
 async function getFile(id, isIncludeContent, contextId) {
@@ -60,6 +59,5 @@ async function getFile(id, isIncludeContent, contextId) {
         options.where.context_id = contextId;
     }
 
-    const dbResult = await fileClient.findOne(options);
-    return dbResult;
+    return await fileClient.findOne(options);
 }

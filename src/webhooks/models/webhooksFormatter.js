@@ -69,19 +69,17 @@ function discordWebhookFormat(message) {
 }
 
 function json(event, testId, jobId, report, additionalInfo, options) {
-    const payload = {
+    return {
         test_id: testId,
         job_id: jobId,
         event: event,
         additional_details: {
-            ...cloneDeep({ report, ...additionalInfo })
+            ...cloneDeep({report, ...additionalInfo})
         }
     };
-    return payload;
 }
 
-function slack(event, testId, jobId, report, additionalInfo, options) {
-    let message = null;
+function switcher(report, additionalInfo, event, testId, emoji) {
     const {
         environment,
         duration,
@@ -93,177 +91,63 @@ function slack(event, testId, jobId, report, additionalInfo, options) {
         grafana_report: grafanaReport
     } = report;
     const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
-    const emoji = emojiHandler(EVENT_FORMAT_TYPE_SLACK);
+
     switch (event) {
         case WEBHOOK_EVENT_TYPE_STARTED: {
             const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
             let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
             requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
 
-            message = `🤓 *Test ${testName} with id: ${testId} has started*.\n
+            return `🤓 *Test ${testName} with id: ${testId} has started*.\n
             *test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
-            break;
         }
         case WEBHOOK_EVENT_TYPE_FINISHED: {
-            message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
+            let message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
             if (grafanaReport) {
                 message += `<${grafanaReport} | View final grafana dashboard report>`;
             }
-            break;
+            return message
         }
         case WEBHOOK_EVENT_TYPE_FAILED: {
-            message = `😞 *Test with id: ${testId} Failed*.\n
+            return `😞 *Test with id: ${testId} Failed*.\n
             test configuration:\n
             environment: ${environment}\n
             ${stats.data}`;
-            break;
         }
         case WEBHOOK_EVENT_TYPE_ABORTED: {
-            message = `😢 *Test ${testName} with id: ${testId} was aborted.*\n`;
-            break;
+            return `😢 *Test ${testName} with id: ${testId} was aborted.*\n`;
         }
         case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
         case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            message = getThresholdMessage(event, { emoji, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
-            break;
+            return getThresholdMessage(event, { emoji, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
         }
         case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `${emoji.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
-            break;
+            return `${emoji.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
         }
         case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `${emoji.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${emoji.SKULL}`;
-            break;
+            return `${emoji.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${emoji.SKULL}`;
         }
         default: {
             throw unknownWebhookEventTypeError();
         }
     }
+}
+
+function slack(event, testId, jobId, report, additionalInfo, options) {
+    const emoji = emojiHandler(EVENT_FORMAT_TYPE_SLACK);
+    let message = switcher(report, additionalInfo, event, testId, emoji);
     return slackWebhookFormat(message, options);
 }
 
 function teams(event, testId, jobId, report, additionalInfo, options) {
-    let message = null;
-    const {
-        environment,
-        duration,
-        parallelism = 1,
-        ramp_to: rampTo,
-        arrival_rate: arrivalRate,
-        arrival_count: arrivalCount,
-        test_name: testName,
-        grafana_report: grafanaReport
-    } = report;
-    const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
     const emoji = emojiHandler(EVENT_FORMAT_TYPE_TEAMS);
-    switch (event) {
-        case WEBHOOK_EVENT_TYPE_STARTED: {
-            const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
-            let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
-            requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
-
-            message = `${emoji.SMILE} *Test ${testName} with id: ${testId} has started*.`;
-            message += `\n*test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_FINISHED: {
-            message = `${emoji.SUNGLASSES} *Test ${testName} with id: ${testId} is finished.*`;
-            message += `\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}`;
-            if (grafanaReport) {
-                message += `\n<${grafanaReport} | View final grafana dashboard report>`;
-            }
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_FAILED: {
-            message = `${emoji.ANGUISHED} *Test with id: ${testId} Failed*.`;
-            message += `\ntest configuration:\n
-            environment: ${environment}\n
-            ${stats.data}`;
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_ABORTED: {
-            message = `${emoji.ANGUISHED} *Test ${testName} with id: ${testId} was aborted.*`;
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
-        case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            message = getThresholdMessage(event, { emoji, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `${emoji.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `${emoji.FIRE} *Test ${testName} with id: ${testId} has encountered an API failure!* ${emoji.SKULL}`;
-            break;
-        }
-        default: {
-            throw unknownWebhookEventTypeError();
-        }
-    }
+    let message = switcher(report, additionalInfo, event, testId, emoji);
     return teamsWebhookFormat(message);
 }
 
 function discord(event, testId, jobId, report, additionalInfo, options) {
-    let message = null;
-    const {
-        environment,
-        duration,
-        parallelism = 1,
-        ramp_to: rampTo,
-        arrival_rate: arrivalRate,
-        arrival_count: arrivalCount,
-        test_name: testName,
-        grafana_report: grafanaReport
-    } = report;
-    const { score, aggregatedReport, reportBenchmark, benchmarkThreshold, lastScores, stats } = additionalInfo;
     const emoji = emojiHandler(EVENT_FORMAT_TYPE_DISCORD);
-    switch (event) {
-        case WEBHOOK_EVENT_TYPE_STARTED: {
-            const rampToMessage = `, ramp to: ${rampTo} scenarios per second`;
-            let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
-            requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
-
-            message = `🤓 *Test ${testName} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_FINISHED: {
-            message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
-            if (grafanaReport) {
-                message += `<${grafanaReport} | View final grafana dashboard report>`;
-            }
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_FAILED: {
-            message = `😞 *Test with id: ${testId} Failed*.\n
-            test configuration:\n
-            environment: ${environment}\n
-            ${stats.data}`;
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_ABORTED: {
-            message = `😢 *Test ${testName} with id: ${testId} was aborted.*\n`;
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED:
-        case WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED: {
-            message = getThresholdMessage(event, { emoji, testName, lastScores, aggregatedReport, benchmarkThreshold, score });
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_IN_PROGRESS: {
-            message = `${emoji.HAMMER_AND_WRENCH} *Test ${testName} with id: ${testId} is in progress!*`;
-            break;
-        }
-        case WEBHOOK_EVENT_TYPE_API_FAILURE: {
-            message = `${emoji.BOOM} *Test ${testName} with id: ${testId} has encountered an API failure!* ${emoji.SKULL}`;
-            break;
-        }
-        default: {
-            throw unknownWebhookEventTypeError();
-        }
-    }
+    let message = switcher(report, additionalInfo, event, testId, emoji);
     return discordWebhookFormat(message);
 }
 

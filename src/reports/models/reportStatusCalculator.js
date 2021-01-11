@@ -64,8 +64,7 @@ function calculateDynamicReportStatus(uniqueSubscribersStages) {
 }
 
 function getListOfSubscribersStages(report) {
-    const runnerStates = report.subscribers.map((subscriber) => subscriber.phase_status);
-    return runnerStates;
+    return report.subscribers.map((subscriber) => subscriber.phase_status);
 }
 
 function areThereAnySubscribers(subscribersStages) {

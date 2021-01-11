@@ -98,8 +98,7 @@ async function createWebhook(webhook, contextId) {
     }
 
     const retrievedWebhook = await webhooksModel.findOne(options);
-    const parsedWebhook = parseWebhook(retrievedWebhook);
-    return parsedWebhook;
+    return parseWebhook(retrievedWebhook);
 }
 
 async function deleteWebhook(webhookId, contextId) {

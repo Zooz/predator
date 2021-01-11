@@ -9,8 +9,5 @@ module.exports.isBestRunnerVersionToUse = function(runnerImage) {
     }
     const predatorXRange = `${semver.major(PREDATOR_VERSION)}.${semver.minor(PREDATOR_VERSION)}.x`;
     const coercedVersion = semver.coerce(imageTag);
-    if (!coercedVersion || !semver.satisfies(coercedVersion, predatorXRange)) {
-        return false;
-    }
-    return true;
+    return !(!coercedVersion || !semver.satisfies(coercedVersion, predatorXRange));
 };

@@ -23,7 +23,7 @@ const {
     WEBHOOK_EVENT_TYPE_API_FAILURE
 } = require('../../common/consts');
 
-module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
+module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}, context) => {
     let job;
     const metadata = { testId: report.test_id, reportId: report.report_id };
     try {
@@ -31,31 +31,31 @@ module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
         switch (stats.phase_status) {
             case constants.SUBSCRIBER_FAILED_STAGE: {
                 logger.info(metadata, stats.error, 'handling error message');
-                await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FAILED, report);
+                await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FAILED, report, {}, {}, context);
                 break;
             }
             case constants.SUBSCRIBER_STARTED_STAGE: {
                 logger.info(metadata, 'handling started message');
-                await handleStart(report, job);
+                await handleStart(report, job, context);
                 break;
             }
             case constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE: {
                 logger.info(metadata, 'handling intermediate message');
-                await handleFirstIntermediate(report, job);
+                await handleFirstIntermediate(report, job, context);
                 break;
             }
             case constants.SUBSCRIBER_DONE_STAGE: {
                 logger.info(metadata, 'handling done message');
-                await handleDone(report, job, reportBenchmark);
+                await handleDone(report, job, reportBenchmark, context);
                 break;
             }
             case constants.SUBSCRIBER_ABORTED_STAGE: {
                 logger.info(metadata, 'handling aborted message');
-                await handleAbort(report, job);
+                await handleAbort(report, job, context);
                 break;
             }
             case constants.SUBSCRIBER_INTERMEDIATE_STAGE: {
-                await handleIntermediate(report, job);
+                await handleIntermediate(report, job, context);
                 break;
             }
             default: {
@@ -68,21 +68,21 @@ module.exports.notifyIfNeeded = async (report, stats, reportBenchmark = {}) => {
     }
 };
 
-async function handleStart(report, job) {
+async function handleStart(report, job, context) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_STARTED_STAGE)) {
         return;
     }
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report);
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report, {}, {}, context);
 }
 
-async function handleFirstIntermediate(report, job) {
+async function handleFirstIntermediate(report, job, context) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE)) {
         return;
     }
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, report);
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_IN_PROGRESS, report, {}, {}, context);
 }
 
-async function handleDone(report, job, reportBenchmark) {
+async function handleDone(report, job, reportBenchmark, context) {
     if (!reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
         return;
     }
@@ -99,13 +99,13 @@ async function handleDone(report, job, reportBenchmark) {
         const lastReports = await reportsManager.getReports(aggregatedReport.test_id);
         const lastScores = lastReports.slice(0, 3).filter(report => report.score).map(report => report.score.toFixed(1));
         const { event, icon } = reportBenchmark.score < benchmarkThreshold ? { event: WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, icon: slackEmojis.CRY } : { event: WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, icon: slackEmojis.GRIN };
-        await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon });
+        await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon }, context);
     }
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET }, context);
 }
 
-async function handleAbort(report, job) {
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_ABORTED, report);
+async function handleAbort(report, job, context) {
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_ABORTED, report, {}, {}, context);
 }
 
 async function getBenchmarkConfig() {
@@ -114,7 +114,7 @@ async function getBenchmarkConfig() {
     return { benchmarkThreshold, benchmarkWebhook };
 }
 
-async function handleIntermediate(report, job) {
+async function handleIntermediate(report, job, context) {
     const reportSubscribers = report.subscribers;
     const accumulatedStatusCodesCounter = reportSubscribers.reduce((accumulated, { last_stats: { codes: statusCodesCounter } }) => {
         const statusCodes = Object.keys(statusCodesCounter);
@@ -130,7 +130,7 @@ async function handleIntermediate(report, job) {
     if (Object.keys(accumulatedStatusCodesCounter).every(statusCode => statusCode < 500)) {
         return;
     }
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_API_FAILURE, report, { accumulatedStatusCodesCounter }, { icon: slackEmojis.SKULL });
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_API_FAILURE, report, { accumulatedStatusCodesCounter }, { icon: slackEmojis.SKULL }, context);
 }
 
 async function getEmailTargets(job) {

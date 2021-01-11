@@ -119,8 +119,7 @@ async function insertTestBenchmark(testId, benchmarkData, contextId) {
         context_id: contextId
     };
 
-    const result = benchmark.create(params);
-    return result;
+    return benchmark.create(params);
 }
 
 async function getTestBenchmark(testId, contextId) {
@@ -155,8 +154,7 @@ async function insertTest(testInfo, testJson, testId, revisionId, processorFileI
         is_favorite: testInfo.is_favorite || false,
     };
 
-    const result = test.create(params);
-    return result;
+    return test.create(params);
 }
 
 async function getTest(testId, contextId) {
@@ -216,8 +214,7 @@ async function deleteTest(testId, contextId){
         where: { test_id: testId }
     };
 
-    const result = test.destroy(options);
-    return result;
+    return test.destroy(options);
 }
 
 async function insertDslDefinition(dslName, definitionName, data, contextId){
@@ -308,21 +305,19 @@ async function deleteDefinition(dslName, definitionName, contextId){
     }
 
     const dslDefinition = client.model('dsl_definition');
-    const result = await dslDefinition.destroy(options);
-    return result;
+    return await dslDefinition.destroy(options);
 }
 
 function sanitizeDslResult(data) {
-    const result = data.map(function (dslDefinition) {
+    return data.map(function (dslDefinition) {
         const dataValues = dslDefinition.dataValues;
         dataValues.artillery_json = JSON.parse(dataValues.artillery_json);
         return dataValues;
     });
-    return result;
 }
 
 function sanitizeTestResult(data) {
-    const result = data.map(function (test) {
+    return data.map(function (test) {
         const dataValues = test.dataValues;
         const dslDataObject = sanitizeHelper.extractDslRootData(dataValues.raw_data);
         dataValues.artillery_json = dataValues.artillery_json ? JSON.parse(dataValues.artillery_json) : undefined;
@@ -334,5 +329,4 @@ function sanitizeTestResult(data) {
         delete dataValues.test_id;
         return Object.assign(dataValues, dslDataObject);
     });
-    return result;
 }

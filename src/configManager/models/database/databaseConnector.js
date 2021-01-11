@@ -32,6 +32,5 @@ async function getConfigAsObject() {
 
 async function getConfigValue(configValue) {
     const response = await databaseConnector.getConfigValue(configValue);
-    const value = response[0] ? response[0].value : undefined;
-    return value;
+    return response[0] ? response[0].value : undefined;
 }

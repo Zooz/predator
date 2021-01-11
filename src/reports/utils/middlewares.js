@@ -1,7 +1,7 @@
 
 const reportManager = require('../models/reportsManager');
 
-module.exports.verifyReportIDInRoute = async function(req, res, next){
+module.exports.verifyReportIDInRoute = async function(req, res) {
     let errorToThrow;
     const reportId = req.params.report_id;
     const testId = req.params.test_id;
@@ -14,7 +14,6 @@ module.exports.verifyReportIDInRoute = async function(req, res, next){
             errorToThrow = new Error(error.message);
             errorToThrow.statusCode = 500;
         }
+        throw errorToThrow
     }
-
-    next(errorToThrow);
 };

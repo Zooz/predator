@@ -11,13 +11,13 @@ const consts = require('../../common/consts');
  */
 function verifyCronExpression(exp) {
     try {
-        const ct = new CronTime(exp);
+        new CronTime(exp);
     } catch (err) {
         return err.message;
     }
 }
 
-module.exports.verifyJobBody = async (req, res, next) => {
+module.exports.verifyJobBody = async (req, res) => {
     let errorToThrow;
     const jobBody = req.body;
     if (!(jobBody.run_immediately || jobBody.cron_expression)) {
@@ -41,16 +41,16 @@ module.exports.verifyJobBody = async (req, res, next) => {
         if (!jobBody.tag) {
             errorToThrow = new Error('tag must be provided when JOB_PLATFORM is AWS_FARGATE');
             errorToThrow.statusCode = 400;
+            throw errorToThrow;
         } else if (!customRunnerDefinition[jobBody.tag]) {
             errorToThrow = new Error(`custom_runner_definition is missing key for tag: ${jobBody.tag}`);
             errorToThrow.statusCode = 400;
+            throw errorToThrow;
         }
     }
-
-    next(errorToThrow);
 };
 
-module.exports.verifyTestExists = async (req, res, next) => {
+module.exports.verifyTestExists = async (req, res) => {
     let errorToThrow;
     const jobBody = req.body;
     if (jobBody.test_id) {
@@ -64,7 +64,7 @@ module.exports.verifyTestExists = async (req, res, next) => {
                 errorToThrow = new Error(error.message);
                 errorToThrow.statusCode = 500;
             }
+            throw errorToThrow;
         }
     }
-    next(errorToThrow);
 };

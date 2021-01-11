@@ -18,7 +18,7 @@ module.exports.processCompareReportsInput = (query) => {
     const reportIds = query.report_ids[0].split(',');
     const testIds = query.test_ids[0].split(',');
     // Validate length of arrays
-    if (reportIds.length != testIds.length){
+    if (reportIds.length !== testIds.length){
         const error = new Error('Test and Report IDs length mismatch');
         error.statusCode = 400;
         throw error;
