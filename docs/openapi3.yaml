@@ -1761,7 +1761,6 @@ paths:
         - Webhooks
       summary: Tests that the webhook is configure correctly
       description: Tests that the webhook is configure correctly by sending a message to the target webhook url.
-      parameters:
       responses:
         '200':
           description: Success
