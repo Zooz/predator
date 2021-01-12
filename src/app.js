@@ -64,23 +64,23 @@ module.exports = async () => {
         skiplist: ['^/health$', '^/v1/jobs/runs/containers$', '^/v1/files$', '^/ui$']
     }));
 
-    app.setErrorHandler((err, req, reply) => {
+    app.setErrorHandler((err, req, res) => {
         if (err instanceof swaggerValidator.InputValidationError) {
-            return reply.code(400).send({ message: 'Input validation error', validation_errors: err.errors });
+            return res.code(400).send({ message: 'Input validation error', validation_errors: err.errors });
         } else if (err.statusCode) {
-            return reply.code(err.statusCode).send({ message: err.message });
+            return res.code(err.statusCode).send({ message: err.message });
         } else {
             logger.error(err, 'Failure');
-            reply.code(500).send({ message: 'Internal server error' });
+            res.code(500).send({ message: 'Internal server error' });
         }
-        reply.code(500).send();
+        res.code(500).send();
     });
 
     //hooks
-    app.addHook('onRequest', (req, reply, done) => {
+    app.addHook('onRequest', (req, res, done) => {
         const contextId = req.get('x-context-id') || undefined;
         req.requestContext.set(CONTEXT_ID, contextId);
-        reply.headers({
+        res.headers({
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Methods': '*'
@@ -92,21 +92,21 @@ module.exports = async () => {
     // app.set('json replacer', (k, v) => (v === null ? undefined : v))
 
     //root route
-    app.get('/', function (req, reply) {
-        reply.redirect(303, '/ui')
+    app.get('/', function (req, res) {
+        res.redirect(303, '/ui')
     });
-    app.get('/ui', { logLevel: 'error' }, function (req, reply) {
-        reply.sendFile('index.html');
+    app.get('/ui', { logLevel: 'error' }, function (req, res) {
+        res.sendFile('index.html');
     });
     //health check
     app.get('/health', { logLevel: 'error' }, health.check);
     //config
     app.put('/v1/config', {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await validators.validateBenchmarkWeights(req, reply);
+                await validators.validateBenchmarkWeights(req, res);
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, config.updateConfig);
@@ -114,23 +114,23 @@ module.exports = async () => {
     app.get('/v1/config', config.getConfig);
     //jobs
     app.post('/v1/jobs', {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await jobVerifier.verifyJobBody(req, reply);
-                await jobVerifier.verifyTestExists(req, reply);
+                await jobVerifier.verifyJobBody(req, res);
+                await jobVerifier.verifyTestExists(req, res);
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, jobs.createJob);
     app.get('/v1/jobs', jobs.getJobs);
     app.get('/v1/jobs/:job_id', jobs.getJob);
     app.put('/v1/jobs/:job_id', {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await jobVerifier.verifyTestExists(req, reply)
+                await jobVerifier.verifyTestExists(req, res)
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, jobs.updateJob);
@@ -140,22 +140,22 @@ module.exports = async () => {
     app.delete('/v1/jobs/runs/containers', jobs.deleteAllContainers);
     //dsl
     app.post('/v1/dsl/:dsl_name/definitions',  {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await customValidation.createDslValidator(req, reply)
+                await customValidation.createDslValidator(req, res)
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, dsl.createDefinition);
     app.get('/v1/dsl/:dsl_name/definitions', dsl.getDslDefinitions);
     app.get('/v1/dsl/:dsl_name/definitions/:definition_name', dsl.getDslDefinition);
     app.put('/v1/dsl/:dsl_name/definitions/:definition_name', {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await customValidation.createDslValidator(req, reply)
+                await customValidation.createDslValidator(req, res)
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, dsl.updateDefinition);
@@ -164,20 +164,20 @@ module.exports = async () => {
     app.get('/v1/tests/:test_id/reports/:report_id/aggregate', reports.getAggregateReport);
     app.get('/v1/tests/:test_id/reports/:report_id', reports.getReport);
     app.put('/v1/tests/:test_id/reports/:report_id', {
-        onRequest: async (req, reply) => {
+        onRequest: async (req, res) => {
             try {
-                await verifyReportIDInRoute(req, reply);
+                await verifyReportIDInRoute(req, res);
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, reports.editReport);
     app.delete('/v1/tests/:test_id/reports/:report_id', {
-        onRequest: async (req, reply) => {
+        onRequest: async (req, res) => {
             try {
-                await verifyReportIDInRoute(req, reply);
+                await verifyReportIDInRoute(req, res);
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, reports.deleteReport);
@@ -190,12 +190,12 @@ module.exports = async () => {
     app.get('/v1/tests/reports/compare/export/:file_format', reports.getExportedCompareReport);
     //tests
     app.post('/v1/tests', {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await testsVerifier.verifyProcessorIsValid(req, reply);
-                await artilleryValidator.verifyArtillery(req, reply);
+                await testsVerifier.verifyProcessorIsValid(req, res);
+                await artilleryValidator.verifyArtillery(req, res);
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, tests.upsertTest);
@@ -203,30 +203,30 @@ module.exports = async () => {
     app.get('/v1/tests/:test_id', tests.getTest);
     app.delete('/v1/tests/:test_id', tests.deleteTest);
     app.put('/v1/tests/:test_id', {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await testsVerifier.verifyProcessorIsValid(req, reply);
-                await artilleryValidator.verifyArtillery(req, reply);
+                await testsVerifier.verifyProcessorIsValid(req, res);
+                await artilleryValidator.verifyArtillery(req, res);
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, tests.upsertTest);
     app.post('/v1/tests/:test_id/benchmark', {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await testsVerifier.verifyTestExist(req, reply);
+                await testsVerifier.verifyTestExist(req, res);
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, tests.insertTestBenchmark);
     app.get('/v1/tests/:test_id/benchmark', {
-        preHandler: async (req, reply) => {
+        preHandler: async (req, res) => {
             try {
-                await testsVerifier.verifyTestExist(req, reply);
+                await testsVerifier.verifyTestExist(req, res);
             } catch (err) {
-                reply.send(err);
+                res.send(err);
             }
         }
     }, tests.getBenchmark);
