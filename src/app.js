@@ -1,10 +1,16 @@
 'use strict';
 require('./env').init();
-const fastify = require('fastify');
 const path = require('path');
-const fileUpload = require('fastify-file-upload')
+
+const fastify = require('fastify');
+const fileUpload = require('fastify-file-upload');
+const formBody = require('fastify-formbody');
+const fastifyStatic = require('fastify-static');
+const fastifyCompress = require('fastify-compress');
+const gracefulShutdown = require('fastify-graceful-shutdown');
 const { fastifyRequestContextPlugin } = require('fastify-request-context');
 const swaggerValidator = require('openapi-validator-middleware');
+
 const database = require('./database/database');
 const jobsManager = require('./jobs/models/jobManager');
 const validators = require('./configManager/helpers/validators');
@@ -20,9 +26,9 @@ const artilleryValidator = require('./tests/helpers/artilleryValidator');
 const dsl = require('./tests/controllers/dslController');
 const {verifyReportIDInRoute} = require('./reports/utils/middlewares');
 const customValidation = require('./tests/middlewares/customValidation');
+const health = require('./common/controllers/healthController');
 
 const {CONTEXT_ID} = require('./common/consts');
-const health = require('./common/controllers/healthController');
 const logger = require('./common/logger');
 
 module.exports = async () => {
@@ -44,20 +50,20 @@ module.exports = async () => {
             fileSize: (process.env.MAX_UPLOAD_FILE_SIZE_MB || 10) * 1024 * 1024
         },
     });
-    app.register(
-        require('fastify-compress'),
-        { global: false }
-    );
-    app.register(require('fastify-static'), {
+    app.register(fastifyCompress, {
+        global: false
+    });
+    app.register(fastifyStatic, {
         root: path.join(__dirname, 'ui/dist'),
         prefix: '/ui/dist/'
     });
-    app.register(require('fastify-formbody'));
+    app.register(formBody);
     app.register(fastifyRequestContextPlugin);
-    app.register(require('fastify-graceful-shutdown'), { timeout: process.env.SHUTDOWN_GRACE_TIMEOUT || 10000 })
+    app.register(gracefulShutdown, { timeout: process.env.SHUTDOWN_GRACE_TIMEOUT || 10000 })
     app.register(swaggerValidator.validate({
         skiplist: ['^/health$', '^/v1/jobs/runs/containers$', '^/v1/files$', '^/ui$']
     }));
+
     app.setErrorHandler((err, req, reply) => {
         if (err instanceof swaggerValidator.InputValidationError) {
             return reply.code(400).send({ message: 'Input validation error', validation_errors: err.errors });
@@ -69,6 +75,7 @@ module.exports = async () => {
         }
         reply.code(500).send();
     });
+
     //hooks
     app.addHook('onRequest', (req, reply, done) => {
         const contextId = req.get('x-context-id') || undefined;
