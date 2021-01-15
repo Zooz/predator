@@ -341,7 +341,7 @@ const Symbol = ({element, onEditSymbol, index}) => {
 
     return (
         <div
-            style={{display: 'flex', flex: 1, alignItems: 'center', cursor: 'pointer'}}
+            style={{display: 'flex', flex: 1, alignItems: 'center', cursor: 'pointer', color: 'rgb(87, 125, 254)', textDecoration: 'underline'}}
             onClick={() => setEditMode(true)}
         >
             {editMode
