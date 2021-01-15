@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import Modal from '../Modal';
 import {prettySeconds} from '../../utils';
 import PieChart from '../PieChart'
@@ -22,7 +21,6 @@ class CompareReports extends React.Component {
         this.state = {
             reportsList: [],
             mergedReports: this.mergeGraphs([]),
-            newAggregateReports: [],
             filteredKeys: {
                 latency: {benchmark_p99: true, benchmark_p95: true, benchmark_median: true},
                 rps: {
@@ -34,16 +32,6 @@ class CompareReports extends React.Component {
             },
             enableBenchmark: false
         };
-    }
-
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.aggregateReports !== prevState.newAggregateReports) {
-            return {
-                newAggregateReports: nextProps.aggregateReports,
-            };
-        }
-
-        return null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -63,9 +51,9 @@ class CompareReports extends React.Component {
         }
     }
 
-    setMergedReports = (reportsList, benchmark, changed=false, updatedAggregateReports) => {
+    setMergedReports = (reportsList, benchmark) => {
         const reportsNames = reportsList.filter(cur => cur.show).map(cur => cur.name);
-        const aggregateReports = changed ? updatedAggregateReports : this.props.aggregateReports;
+        const {aggregateReports} = this.props;
         const filteredData = aggregateReports.filter((report) => reportsNames.includes(report.alias));
         const mergedReports = this.mergeGraphs(filteredData, benchmark);
         this.setState({mergedReports});
@@ -85,8 +73,8 @@ class CompareReports extends React.Component {
 
     onEditSymbol = (value, index) => {
         const {reportsList} = this.state;
-        const {newAggregateReports} = this.state;
-        const currentReport = newAggregateReports[index];
+        const {aggregateReports} = this.props;
+        const currentReport = aggregateReports[index];
         const originalAlias = currentReport.alias;
 
         if (value === originalAlias) {
@@ -121,7 +109,7 @@ class CompareReports extends React.Component {
             }
         }
 
-        this.setMergedReports(reportsList, this.props.benchmark, true, newAggregateReports);
+        this.setMergedReports(reportsList, this.props.benchmark);
     };
 
     onSelectedGraphPropertyFilter = (graphType, keys, value) => {
