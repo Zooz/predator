@@ -21,6 +21,8 @@ const webhooksRouter = require('./webhooks/routes/webhooksRouter');
 const swaggerValidator = require('express-ajv-swagger-validation');
 const database = require('./database/database');
 const jobsManager = require('./jobs/models/jobManager');
+const kafkaManager = require('./kafka/manager');
+const kafkaConfig = require('./config/kafkaConfig');
 const contexts = require('./middlewares/context');
 
 module.exports = async () => {
@@ -29,6 +31,9 @@ module.exports = async () => {
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
     await jobsManager.scheduleFinishedContainersCleanup();
+    if (kafkaConfig.brokers) {
+        await kafkaManager.init(kafkaConfig);
+    }
     const app = express();
 
     app.use(fileUpload({

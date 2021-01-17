@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const _ = require('lodash');
 const databaseConnector = require('./databaseConnector'),
     notifier = require('./notifier'),
+    // kafkaManager = require('../../kafka/manager'),
     reportsManager = require('./reportsManager'),
     constants = require('../utils/constants'),
     testManager = require('../../tests/models/manager'),
@@ -28,7 +29,9 @@ module.exports.postStats = async (report, stats) => {
     report = await reportsManager.getReport(report.test_id, report.report_id);
     const reportBenchmark = await updateReportBenchmarkIfNeeded(report);
     notifier.notifyIfNeeded(report, stats, reportBenchmark);
-
+    // if (reportUtil.isAllRunnersInExpectedPhase(report, constants.SUBSCRIBER_DONE_STAGE)) {
+    //     kafkaManager.produce();
+    // }
     return stats;
 };
 
