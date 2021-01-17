@@ -1154,7 +1154,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/benchmark_request'
+                $ref: '#/components/schemas/results_summary'
         '400':
           description: Bad request
           content:
@@ -1171,8 +1171,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/benchmark_request'
-        description: The benchmark to add
+              $ref: '#/components/schemas/results_summary'
+        description: The results summary to mark as the benchmark
         required: true
     get:
       tags:
@@ -1186,15 +1186,122 @@ paths:
             type: string
             format: uuid
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
-      summary: Get a benchmark for test
-      description:  Get a benchmark for a test
+      summary: Get the benchmark for test
+      description:  Get the benchmark for a test
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/benchmark_request'
+                $ref: '#/components/schemas/results_summary'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+  /v1/tests/{test_id}/trends:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
+    get:
+      tags:
+        - Trends
+      parameters:
+        - in: path
+          name: test_id
+          description: The test id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+        - in: query
+          name: from
+          description: Epoch time in milliseconds from when to analyze trends of a test
+          required: false
+          schema:
+            type: integer
+            format: int64
+            example: 1464829513623
+        - in: query
+          name: to
+          description: Epoch time in milliseconds until when to analyze trends of a test
+          required: false
+          schema:
+            type: integer
+            format: int64
+            example: 1464829513623
+        - in: query
+          name: limit
+          description: maximum number of runs to include in the trend analysis for the timeframe given
+          required: false
+          schema:
+            type: integer
+            default: 100
+            example: 100
+        - in: query
+          name: min_rate
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: max_rate
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: min_duration
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: max_duration
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: min_virtual_users
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: max_virtual_users
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: shift_comparator
+          description: minimum rate of test run configuration that should be compared to
+          required: false
+          schema:
+            type: string
+            default: p95
+            enum:
+              - median
+              - p95
+              - p99
+      summary: Get trends for a test
+      description:  Get trends for a test
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/trends'
         '404':
           description: Not found
           content:
@@ -1999,7 +2106,7 @@ components:
         - basic
         example: dsl
 
-    benchmark_request:
+    results_summary:
       type: object
       additionalProperties: false
       required:
@@ -2041,7 +2148,39 @@ components:
               type: number
             p95:
               type: number
-
+            p99:
+              type: number
+    trends:
+      type: object
+      additionalProperties: false
+      required:
+        - shift
+        - reports
+      properties:
+        shift:
+          type: number
+          description: represents the incline/decline in the performance results calculated for the queried timeframe in %
+        reports:
+          type: array
+          items:
+            $ref: '#/components/schemas/trends_reports_summary'
+    trends_reports_summary:
+      type: object
+      additionalProperties: false
+      required:
+        - report_id
+        - job_id
+        - results_summary
+      properties:
+        job_id:
+          type: string
+          format: uuid
+          description: id of the job that created the report
+        report_id:
+          type: string
+          format: uuid
+        results_summary:
+            $ref: '#/components/schemas/results_summary'
     dsl:
       description: A test that is made of scenarios base on domain specific language
       required:
@@ -2613,6 +2752,8 @@ components:
         benchmark_weights_data:
           type: object
           description: The way score calualated
+        results_summary:
+          $ref: '#/components/schemas/results_summary'
         arrival_rate:
           type: number
           description: The arrival rate that was set for the test. This is the number of times per second that the test scenarios will run.

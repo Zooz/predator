@@ -787,6 +787,11 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_INTERMEDIATE_STAGE);
                         await assertReportStatus(testId, reportId, constants.REPORT_IN_PROGRESS_STATUS);
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_DONE_STAGE);
+
+                        const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                        expect(getReportResponse.status).to.be.equal(200);
+                        expect(getReportResponse.body).to.have.property('results_summary');
+                        expect(getReportResponse.body).to.have.property('status').and.to.be.equal(constants.REPORT_FINISHED_STATUS);
                     });
                     it('should fetch a report successfully with status failed after a runner subscribed and aborted', async function () {
                         const jobName = 'jobName';
@@ -817,6 +822,10 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertRunnerSubscriptionToReport(testId, reportId, runnerId);
                         await assertPostStats(testId, reportId, runnerId, constants.REPORT_ABORTED_STATUS);
                         await assertReportStatus(testId, reportId, constants.REPORT_ABORTED_STATUS);
+
+                        const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                        expect(getReportResponse.status).to.be.equal(200);
+                        expect(getReportResponse.body).to.not.have.property('results_summary');
                     });
                     it('should create a report successfully - a complete happy flow cycle', async function () {
                         const jobName = 'jobName';

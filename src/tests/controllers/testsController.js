@@ -2,6 +2,7 @@
 
 const manager = require('../models/manager');
 const jobManager = require('../../jobs/models/jobManager');
+const trends = require('../models/trends');
 
 module.exports = {
     upsertTest,
@@ -10,7 +11,8 @@ module.exports = {
     getTests,
     getTestRevisions,
     insertTestBenchmark,
-    getBenchmark
+    getBenchmark,
+    getTrends
 };
 
 async function insertTestBenchmark(req, res, next) {
@@ -24,6 +26,15 @@ async function insertTestBenchmark(req, res, next) {
 async function getBenchmark(req, res, next) {
     try {
         const result = await manager.getBenchmark(req.params.test_id);
+        return res.status(200).json(result);
+    } catch (err){
+        return next(err);
+    }
+}
+
+async function getTrends(req, res, next) {
+    try {
+        const result = await trends.getTrends(req.params.test_id, req.query);
         return res.status(200).json(result);
     } catch (err){
         return next(err);
