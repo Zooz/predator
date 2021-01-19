@@ -1,8 +1,6 @@
-const { defaultKafkaValues } = require('./common');
-const logger = require('../common/logger');
+const logger = require('../../common/logger');
 const { KafkaClient } = require('./client');
 const { validateKafkaConfig } = require('./validator');
-const { createStatusObj } = require('../helpers/healthcheckUtils');
 
 let kafkaClient;
 let localConfig;
@@ -23,16 +21,16 @@ async function init(config) {
     }
 }
 
-async function healthCheck() {
+async function health() {
     try {
         await kafkaClient.kafkaHealthCheck();
         logger.debug('Kafka health check passed');
-        return createStatusObj('ok');
+        return 200;
     } catch (error) {
         init(localConfig);
         const errorStr = `Kafka health check failed with error ${error.message} , trying to reconnect`;
         logger.error(errorStr);
-        return createStatusObj('failed', error.message);
+        return 500;
     }
 }
 
@@ -60,7 +58,7 @@ async function produce(messages) {
 module.exports = {
     init,
     produce,
-    healthCheck,
+    health,
     close
 };
 

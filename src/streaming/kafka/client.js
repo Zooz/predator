@@ -1,5 +1,6 @@
 const { Kafka } = require('kafkajs');
-const logger = require('../common/logger');
+
+const logger = require('../../common/logger');
 
 class KafkaClient {
     constructor(config) {

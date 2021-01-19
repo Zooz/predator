@@ -16,9 +16,10 @@ const BY_DATABASE_MANDATORY_VARS = {
     POSTGRES: ['DATABASE_NAME', 'DATABASE_ADDRESS', 'DATABASE_USERNAME', 'DATABASE_PASSWORD'],
     MSSQL: ['DATABASE_NAME', 'DATABASE_ADDRESS', 'DATABASE_USERNAME', 'DATABASE_PASSWORD'],
     SQLITE: []
-
 };
 const SUPPORTED_DATABASES = Object.keys(BY_DATABASE_MANDATORY_VARS);
+
+const SUPPORTED_STREAMING_PLATFORMS = ['kafka'];
 
 env.init = function () {
     if (!SUPPORTED_PLATFORMS.includes(String(process.env.JOB_PLATFORM).toUpperCase())) {
@@ -54,6 +55,17 @@ env.init = function () {
     if (process.env.RUNNER_DOCKER_IMAGE && !runnerValidator.isBestRunnerVersionToUse(process.env.RUNNER_DOCKER_IMAGE)) {
         logger.warn(WARN_MESSAGES.BAD_RUNNER_IMAGE);
     }
+
+    validateStreamingPlatform();
 };
 
 module.exports = env;
+
+function validateStreamingPlatform() {
+    if (process.env.STREAMING_PLATFORM) {
+        if (!SUPPORTED_STREAMING_PLATFORMS.includes(process.env.STREAMING_PLATFORM)) {
+            logger.error(`Streaming platform ${process.env.STREAMING_PLATFORM} is not supported.`);
+            process.exit(1);
+        }
+    }
+}
