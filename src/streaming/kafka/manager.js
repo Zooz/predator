@@ -24,13 +24,10 @@ async function init(config) {
 async function health() {
     try {
         await kafkaClient.kafkaHealthCheck();
-        logger.debug('Kafka health check passed');
-        return 200;
     } catch (error) {
         init(localConfig);
         const errorStr = `Kafka health check failed with error ${error.message} , trying to reconnect`;
         logger.error(errorStr);
-        return 500;
     }
 }
 
