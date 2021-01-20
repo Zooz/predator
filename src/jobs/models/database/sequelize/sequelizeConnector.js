@@ -68,7 +68,7 @@ async function getJobsAndParse(jobId, contextId) {
     const job = client.model('job');
 
     const options = {
-        attributes: { exclude: ['updated_at'] },
+        attributes: { exclude: ['updated_at', 'created_at'] },
         include: [job.email, 'webhooks'],
         where: {}
     };

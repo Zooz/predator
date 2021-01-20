@@ -71,7 +71,7 @@ module.exports.createJob = async (job) => {
             addCron(insertedJob, job.cron_expression, configData);
         }
         logger.info(`Job ${jobId} deployed successfully`);
-        const jobResponse = createResponse(jobId, job, report.report_id);
+        const jobResponse = createResponse(jobId, job, report);
         streamingManager.produce(jobResponse);
     } catch (error) {
         logger.error(error, 'Error occurred trying to create new job');
@@ -175,11 +175,12 @@ module.exports.getJobBasedOnTestId = async (testId) => {
     }
 };
 
-function createResponse(jobId, jobBody, reportId) {
+function createResponse(jobId, jobBody, report) {
     const response = {
         id: jobId,
         test_id: jobBody.test_id,
         type: jobBody.type,
+        start_time: report.start_time,
         cron_expression: jobBody.cron_expression,
         webhooks: jobBody.webhooks,
         emails: jobBody.emails,
@@ -187,7 +188,7 @@ function createResponse(jobId, jobBody, reportId) {
         parallelism: jobBody.parallelism,
         max_virtual_users: jobBody.max_virtual_users,
         custom_env_vars: jobBody.custom_env_vars,
-        report_id: reportId,
+        report_id: report.report_id,
         arrival_rate: jobBody.arrival_rate,
         arrival_count: jobBody.arrival_count,
         duration: jobBody.duration,
@@ -279,7 +280,7 @@ function addCron(job, cronExpression, configData) {
             return;
         }
         const report = await runJob(job, configData);
-        const jobResponse = createResponse(job.id, job, report.report_id);
+        const jobResponse = createResponse(job.id, job, report);
         streamingManager.produce(jobResponse);
     }, function () {
         logger.info(`Job: ${job.id} completed.`);
