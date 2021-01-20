@@ -10,7 +10,8 @@ const reportEmailSender = require('./reportEmailSender'),
     configHandler = require('../../configManager/models/configHandler'),
     reportUtil = require('../utils/reportUtil'),
     reportsManager = require('./reportsManager'),
-    webhooksManager = require('../../webhooks/models/webhookManager');
+    webhooksManager = require('../../webhooks/models/webhookManager'),
+    streamingManager = require('../../streaming/manager');
 const {
     CONFIG: configConstants,
     WEBHOOK_EVENT_TYPE_STARTED,
@@ -102,10 +103,13 @@ async function handleDone(report, job, reportBenchmark) {
         await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon });
     }
     await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET });
+    streamingManager.produce(aggregatedReport);
 }
 
 async function handleAbort(report, job) {
     await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_ABORTED, report);
+    const aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
+    streamingManager.produce(aggregatedReport);
 }
 
 async function getBenchmarkConfig() {

@@ -45,9 +45,14 @@ async function close() {
     }
 }
 
-async function produce(messages) {
+async function produce(message) {
     try {
-        await kafkaClient.produce(messages);
+        const kafkaMessages = [
+            {
+                value: message
+            }
+        ];
+        await kafkaClient.produce(kafkaMessages);
         logger.debug('Produced message to kafka');
     } catch (error) {
         logger.error(`Failed to produce message to kafka with error ${error.message}. stack ${error.stack}`);

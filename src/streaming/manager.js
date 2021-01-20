@@ -1,5 +1,4 @@
 const streamingConfig = require('../config/streamingConfig');
-
 let streamingManager;
 
 async function init(config) {
@@ -8,15 +7,21 @@ async function init(config) {
 }
 
 async function health() {
-    await streamingManager.health();
+    if (streamingManager) {
+        await streamingManager.health();
+    }
 }
 
 async function close() {
-    await streamingManager.close();
+    if (streamingManager) {
+        await streamingManager.close();
+    }
 }
 
-async function produce(messages) {
-    await streamingManager.produce(messages);
+async function produce(message) {
+    if (streamingManager) {
+        await streamingManager.produce(message);
+    }
 }
 
 module.exports = {

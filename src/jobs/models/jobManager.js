@@ -12,6 +12,7 @@ const logger = require('../../common/logger'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
+    streamingManager = require('../../streaming/manager'),
     { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     { version: PREDATOR_VERSION } = require('../../../package.json');
@@ -70,7 +71,8 @@ module.exports.createJob = async (job) => {
             addCron(insertedJob, job.cron_expression, configData);
         }
         logger.info(`Job ${jobId} deployed successfully`);
-        return createResponse(jobId, job, report.report_id);
+        const jobResponse = createResponse(jobId, job, report.report_id);
+        streamingManager.produce(jobResponse);
     } catch (error) {
         logger.error(error, 'Error occurred trying to create new job');
         throw error;
@@ -276,7 +278,9 @@ function addCron(job, cronExpression, configData) {
             logger.info(`Skipping job with id: ${job.id} as it's currently disabled`);
             return;
         }
-        await runJob(job, configData);
+        const report = await runJob(job, configData);
+        const jobResponse = createResponse(job.id, job, report.report_id);
+        streamingManager.produce(jobResponse);
     }, function () {
         logger.info(`Job: ${job.id} completed.`);
     }, true);

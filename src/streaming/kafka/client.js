@@ -4,7 +4,7 @@ const logger = require('../../common/logger');
 
 class KafkaClient {
     constructor(config) {
-        this.config = config;
+        this.config = { ...config, ...config.kafkaConfig };
     }
 
     async connectToBrokers() {
@@ -27,8 +27,8 @@ class KafkaClient {
     }
 
     async produce(messages) {
-        const { topic, publishConfig } = this.config;
-        const produceBody = { topic, messages, ...publishConfig };
+        const { topic } = this.config;
+        const produceBody = { topic, messages };
         await this.producer.send(produceBody);
     }
 }
