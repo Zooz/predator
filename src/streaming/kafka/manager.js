@@ -11,13 +11,13 @@ async function init(config) {
             validateKafkaConfig(config);
             localConfig = buildLocalConfig(config);
             kafkaClient = new KafkaClient(localConfig);
-            logger.info('Kafka client initializing started');
             await kafkaClient.connectToBrokers();
             logger.info('Kafka client initialized successfully');
         }
     } catch (error) {
         const errorStr = `Kafka initializing failed with error: ${error.message}`;
         logger.error(errorStr);
+        throw new Error(errorStr);
     }
 }
 

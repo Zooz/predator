@@ -63,7 +63,7 @@ module.exports = env;
 
 function validateStreamingPlatform() {
     if (process.env.STREAMING_PLATFORM) {
-        if (!SUPPORTED_STREAMING_PLATFORMS.includes(process.env.STREAMING_PLATFORM)) {
+        if (!SUPPORTED_STREAMING_PLATFORMS.includes(process.env.STREAMING_PLATFORM.toLowerCase())) {
             logger.error(`Streaming platform ${process.env.STREAMING_PLATFORM} is not supported.`);
             process.exit(1);
         }

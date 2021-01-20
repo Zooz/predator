@@ -7,14 +7,12 @@ function validateKafkaConfig(config) {
 
     if (missingKeys.length > 0) {
         const errorMsg = `Mandatory fields ${missingKeys.toString()} are missing`;
-        logger.error(errorMsg);
         throw new Error(errorMsg);
     }
 
     const { brokers } = config;
     if (!Array.isArray(brokers) || !(brokers.some(a => typeof a === 'string'))) {
         const errorMsg = 'Kafka brokers should be an array of strings';
-        logger.error(errorMsg);
         throw new Error(errorMsg);
     }
 }

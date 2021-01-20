@@ -1,17 +1,17 @@
 'use strict';
 
 const database = require('../../database/database');
+const streamingManager = require('../../streaming/manager');
 
-module.exports.check = function (req, res, next) {
-    const errors = {};
-    database.ping()
-        .catch((error) => {
-            errors.database = error && error.message ? error.message : error;
-        }).then(() => {
-            if (Object.keys(errors).length > 0) {
-                return res.status(503).json({ status: 'DOWN', errors: errors });
-            } else {
-                return res.json({ status: 'OK' });
-            }
-        });
+module.exports.check = async function (req, res, next) {
+    const errors = await Promise.all([
+        database.ping(),
+        streamingManager.health()
+    ]);
+    const filteredErrors = errors.filter((element) => !!element);
+    if (filteredErrors.length > 0) {
+        return res.status(503).json({ status: 'DOWN', errors: filteredErrors });
+    } else {
+        return res.json({ status: 'OK' });
+    }
 };

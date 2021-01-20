@@ -18,8 +18,9 @@ async function close() {
     }
 }
 
-async function produce(message) {
+async function produce(resource) {
     if (streamingManager) {
+        const message = JSON.stringify(resource);
         await streamingManager.produce(message);
     }
 }
