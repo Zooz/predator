@@ -32,8 +32,7 @@ module.exports = async () => {
     await jobsManager.reloadCronJobs();
     await jobsManager.scheduleFinishedContainersCleanup();
     if (streamingConfig.platform) {
-        const eventStreamerPlatform = streamingConfig.platform.toLowerCase();
-        const eventStreamerPlatformConfig = require(`./config/${eventStreamerPlatform}Config`);
+        const eventStreamerPlatformConfig = require(`./config/${streamingConfig.platform}Config`);
         await streamingManager.init(eventStreamerPlatformConfig);
     }
     const app = express();
