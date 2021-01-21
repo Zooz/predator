@@ -83,7 +83,7 @@ jobs:
       - image: circleci/node:12.16
       - image: wurstmeister/zookeeper
         name: zookeeper
-      - image: wurstmeister/kafka
+      - image: wurstmeister/kafka:2.13-2.7.0
         name: kafka
         environment:
           KAFKA_ADVERTISED_PORT: 9092
@@ -144,15 +144,15 @@ workflows:
   test_build_release:
     jobs:
     - setup
-    - unit-tests:
-        requires:
-        - setup
-    - integration-tests:
-        requires:
-        - unit-tests
+#    - unit-tests:
+#        requires:
+#        - setup
+#    - integration-tests:
+#        requires:
+#        - unit-tests
     - integration-tests-with-streaming:
         requires:
-        - integration-tests
+        - setup
     - build:
         requires:
         - integration-tests-with-streaming
