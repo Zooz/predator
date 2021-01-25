@@ -87,6 +87,7 @@ module.exports = {
         BENCHMARK_THRESHOLD: 'benchmark_threshold',
         BENCHMARK_THRESHOLD_WEBHOOK_URL: 'benchmark_threshold_webhook_url',
         BENCHMARK_WEIGHTS: 'benchmark_weights',
-        CUSTOM_RUNNER_DEFINITION: 'custom_runner_definition'
+        CUSTOM_RUNNER_DEFINITION: 'custom_runner_definition',
+        STREAMING_EXCLUDED_ATTRIBUTES: 'streaming_excluded_attributes'
     }
 };

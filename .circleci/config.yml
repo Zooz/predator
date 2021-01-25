@@ -14,70 +14,70 @@ jobs:
         key: dependency-cache-{{ checksum "package.json" }}
         paths:
         - node_modules
-#  unit-tests:
-#    docker:
-#    - image: circleci/node:12.16
-#      environment:
-#        TZ: "Asia/Jerusalem"
-#    steps:
-#      - checkout
-#      - setup_remote_docker:
-#          docker_layer_caching: false
-#      - restore_cache:
-#          key: dependency-cache-{{ checksum "package.json" }}
-#      - run: npm audit --only=prod --audit-level=moderate
-#      - run: npm run lint
-#      - run: npm run unit-tests
-#      - store_artifacts:
-#          path: ./coverage
-#  integration-tests:
-#    docker:
-#    - image: circleci/node:12.16
-#    - image: mailhog/mailhog
-#    - image: mysql:5.7
-#      environment:
-#        MYSQL_ROOT_PASSWORD: password
-#        MYSQL_DATABASE: predator
-#    - image: postgres:11-alpine
-#      environment:
-#        POSTGRES_USER: root
-#        POSTGRES_PASSWORD: password
-#    steps:
-#    - checkout
-#    - setup_remote_docker:
-#        docker_layer_caching: false
-#    - restore_cache:
-#        key: dependency-cache-{{ checksum "package.json" }}
-#    - run:
-#        name: Integration tests with docker engine and sqlite configuration
-#        command: npm run integration-tests
-#        environment:
-#          DATABASE_TYPE: sqlite
-#          JOB_PLATFORM: docker
-#    - run:
-#        name: Integration tests with kubernetes and mysql configuration
-#        command: npm run integration-tests
-#        environment:
-#          DATABASE_TYPE: mysql
-#          JOB_PLATFORM: kubernetes
-#    - run:
-#        name: Integration tests with kubernetes and sqlite configuration
-#        command: npm run integration-tests
-#        environment:
-#          DATABASE_TYPE: sqlite
-#          JOB_PLATFORM: kubernetes
-#    - run:
-#        name: Integration tests with metronome and postgres configuration
-#        command: npm run integration-tests
-#        environment:
-#          DATABASE_TYPE: postgres
-#          JOB_PLATFORM: metronome
-#    - run:
-#        name: Integration tests with aws fargate and sqlite configuration
-#        command: npm run integration-tests
-#        environment:
-#          DATABASE_TYPE: sqlite
-#          JOB_PLATFORM: awsFargate
+  unit-tests:
+    docker:
+    - image: circleci/node:12.16
+      environment:
+        TZ: "Asia/Jerusalem"
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: npm audit --only=prod --audit-level=moderate
+      - run: npm run lint
+      - run: npm run unit-tests
+      - store_artifacts:
+          path: ./coverage
+  integration-tests:
+    docker:
+    - image: circleci/node:12.16
+    - image: mailhog/mailhog
+    - image: mysql:5.7
+      environment:
+        MYSQL_ROOT_PASSWORD: password
+        MYSQL_DATABASE: predator
+    - image: postgres:11-alpine
+      environment:
+        POSTGRES_USER: root
+        POSTGRES_PASSWORD: password
+    steps:
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: false
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+    - run:
+        name: Integration tests with docker engine and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: docker
+    - run:
+        name: Integration tests with kubernetes and mysql configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: mysql
+          JOB_PLATFORM: kubernetes
+    - run:
+        name: Integration tests with kubernetes and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: kubernetes
+    - run:
+        name: Integration tests with metronome and postgres configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: postgres
+          JOB_PLATFORM: metronome
+    - run:
+        name: Integration tests with aws fargate and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: awsFargate
   integration-tests-with-streaming:
     docker:
       - image: circleci/node:12.16
@@ -98,10 +98,11 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Integration tests with docker engine and sqlite configuration
-          command: npm run integration-tests
+          command: npm run integration-tests-with-streaming
           environment:
             DATABASE_TYPE: sqlite
             JOB_PLATFORM: docker
+            STREAMING_PLATFORM: kafka
   build:
     docker:
     - image: docker:18
@@ -145,15 +146,15 @@ workflows:
   test_build_release:
     jobs:
     - setup
-#    - unit-tests:
-#        requires:
-#        - setup
-#    - integration-tests:
-#        requires:
-#        - unit-tests
-    - integration-tests-with-streaming:
+    - unit-tests:
         requires:
         - setup
+    - integration-tests:
+        requires:
+        - unit-tests
+    - integration-tests-with-streaming:
+        requires:
+        - integration-tests
     - build:
         requires:
         - integration-tests-with-streaming

@@ -1,6 +1,6 @@
-const logger = require('../../common/logger');
-const { KafkaClient } = require('./client');
-const { validateKafkaConfig } = require('./validator');
+const logger = require('../../common/logger'),
+    { KafkaClient } = require('./client'),
+    { validateKafkaConfig } = require('./validator');
 
 let kafkaClient;
 let localConfig;
@@ -26,7 +26,7 @@ async function health() {
         await kafkaClient.kafkaHealthCheck();
     } catch (error) {
         init(localConfig);
-        const errorStr = `Kafka health check failed with error ${error.message} , trying to reconnect`;
+        const errorStr = `Kafka health check failed with error ${error.message}`;
         logger.error(errorStr);
     }
 }

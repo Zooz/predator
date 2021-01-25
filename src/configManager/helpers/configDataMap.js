@@ -47,8 +47,8 @@ const configDataMap = {
         value: process.env.BENCHMARK_WEIGHTS || JSON.stringify(BENCHMARK_WEIGHTS_DEFAULT),
         type: 'json'
     },
-    [constConfig.CUSTOM_RUNNER_DEFINITION]: { value: process.env.CUSTOM_RUNNER_DEFINITION, type: 'json' }
-
+    [constConfig.CUSTOM_RUNNER_DEFINITION]: { value: process.env.CUSTOM_RUNNER_DEFINITION, type: 'json' },
+    [constConfig.STREAMING_EXCLUDED_ATTRIBUTES]: { value: process.env.STREAMING_EXCLUDED_ATTRIBUTES || '', type: 'array' }
 };
 
 module.exports.getConstType = (configValue) => {

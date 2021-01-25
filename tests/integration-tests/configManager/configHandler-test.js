@@ -23,7 +23,6 @@ const defaultBody = {
         client_errors_ratio: { percentage: 20 },
         rps: { percentage: 20 }
     }
-
 };
 const updateBodyWithTypes = {
     influx_metrics: {

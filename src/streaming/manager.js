@@ -1,4 +1,6 @@
-const streamingConfig = require('../config/streamingConfig');
+const streamingConfig = require('../config/streamingConfig'),
+    StreamingMessage = require('./entities/message');
+
 let streamingManager;
 
 async function init(config) {
@@ -8,7 +10,7 @@ async function init(config) {
 
 async function health() {
     if (streamingManager) {
-        await streamingManager.health();
+        streamingManager.health();
     }
 }
 
@@ -18,10 +20,11 @@ async function close() {
     }
 }
 
-async function produce(resource) {
+async function produce(metadata, event, resource) {
     if (streamingManager) {
-        const message = JSON.stringify(resource);
-        await streamingManager.produce(message);
+        const streamingMessage = new StreamingMessage(metadata, event, resource);
+        const messageToProduce = await streamingMessage.getMessage();
+        await streamingManager.produce(messageToProduce);
     }
 }
 

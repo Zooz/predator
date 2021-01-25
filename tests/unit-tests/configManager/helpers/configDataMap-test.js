@@ -25,7 +25,8 @@ const expectedTypes = {
     delay_runner_ms: 'int',
     benchmark_threshold: 'int',
     custom_runner_definition: 'json',
-    benchmark_weights: 'json'
+    benchmark_weights: 'json',
+    streaming_excluded_attributes: 'array'
 };
 
 function changeAllEnvData() {

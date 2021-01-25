@@ -1,5 +1,3 @@
-const logger = require('../../common/logger');
-
 const MANDATORY_KAFKA_FIELDS = ['brokers', 'topic'];
 
 function validateKafkaConfig(config) {
