@@ -2,7 +2,7 @@ class StreamingResource {
     constructor(resource) {
         // PKs
         this.test_id = resource.test_id;
-        this.report_id = resource.test_id;
+        this.report_id = resource.report_id;
         this.job_id = resource.job_id;
 
         // test

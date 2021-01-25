@@ -16,4 +16,4 @@ echo Running integration tests with "$DATABASE_TYPE" db and "$JOB_PLATFORM" inte
 source $CURR_DIR/tests/configurations/"$DATABASE_TYPE"Configuration.sh
 source $CURR_DIR/tests/configurations/"$JOB_PLATFORM"Configuration.sh
 source $CURR_DIR/tests/configurations/"$STREAMING_PLATFORM"Configuration.sh
-node_modules/.bin/_mocha $CURR_DIR/tests/integration-tests-with-streaming --recursive --timeout=20000 --exit
+node_modules/.bin/_mocha $CURR_DIR/tests/integration-tests-with-streaming --recursive --timeout=20000 --retries=2 --exit

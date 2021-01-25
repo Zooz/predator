@@ -11,9 +11,15 @@ const schedulerRequestCreator = require('../integration-tests/jobs/helpers/reque
     statsGenerator = require('../integration-tests/reports/helpers/statsGenerator'),
     dockerConfig = require('../../src/config/dockerConfig'),
     constants = require('../../src/reports/utils/constants'),
+    { version: PREDATOR_VERSION } = require('../../package.json'),
     { KafkaHelper } = require('./helpers/kafkaHelper');
 
+const RUNNER_DOCKER_IMAGE = 'zooz/predator-runner:latest';
 let kafkaHelper;
+let statsTime;
+let testBody;
+let testId, jobId, reportId;
+
 let dockerConnection;
 if (dockerConfig.host) {
     const dockerUrl = new URL(dockerConfig.host);
@@ -31,7 +37,6 @@ const docker = new Docker(dockerConnection);
 
 describe('Create job specific docker tests', async function () {
     this.timeout(40000);
-    let testId;
     const jobPlatform = process.env.JOB_PLATFORM;
     if (jobPlatform.toUpperCase() === 'DOCKER') {
         describe('DOCKER', () => {
@@ -46,11 +51,12 @@ describe('Create job specific docker tests', async function () {
                 await kafkaHelper.startConsuming();
 
                 await configRequestCreator.updateConfig({
-                    runner_docker_image: 'zooz/predator-runner:latest'
+                    runner_docker_image: RUNNER_DOCKER_IMAGE
                 });
 
-                const requestBody = require('../testExamples/Basic_test');
-                const response = await testsRequestCreator.createTest(requestBody, {});
+                statsTime = Date.now();
+                testBody = require('../testExamples/Basic_test');
+                const response = await testsRequestCreator.createTest(testBody, {});
                 should(response.statusCode).eql(201);
                 testId = response.body.id;
             });
@@ -75,15 +81,17 @@ describe('Create job specific docker tests', async function () {
                         const validBody = {
                             test_id: testId,
                             type: 'load_test',
-                            arrival_rate: 1,
+                            arrival_rate: 2,
                             duration: 1,
-                            run_immediately: true
+                            run_immediately: true,
+                            notes: 'streaming notes'
                         };
 
                         createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                             'Content-Type': 'application/json'
                         });
 
+                        jobId = createJobResponse.body.id;
                         should(createJobResponse.status).eql(201);
                     });
 
@@ -95,24 +103,21 @@ describe('Create job specific docker tests', async function () {
                     });
 
                     it('Predator-runner posts "done" stats', async () => {
-                        const reportId = createJobResponse.body.report_id;
+                        reportId = createJobResponse.body.report_id;
 
                         await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
-                        const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId);
-                        await reportsRequestCreator.postStats(testId, createJobResponse.body.report_id, statsFromRunnerIntermediate);
+                        const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statsTime);
+                        await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerIntermediate);
 
-                        const statsFromRunnerDone = statsGenerator.generateStats(constants.SUBSCRIBER_DONE_STAGE, runnerId);
-                        await reportsRequestCreator.postStats(testId, createJobResponse.body.report_id, statsFromRunnerDone);
+                        const statsFromRunnerDone = statsGenerator.generateStats(constants.SUBSCRIBER_DONE_STAGE, runnerId, statsTime);
+                        await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerDone);
                     });
 
                     it('Consume published event job-finished', async () => {
                         const jobFinishedMessage = await kafkaHelper.getLastMsgs(1);
                         const valuePublished = JSON.parse(jobFinishedMessage[0].value);
 
-                        should(valuePublished.event).eql('job-finished');
-                        should(valuePublished.resource.intermediates).be.not.undefined();
-                        should(valuePublished.resource.artillery_test).be.not.undefined();
-                        should(valuePublished.resource.aggregate).be.not.undefined();
+                        assertFullPublishedValue(valuePublished, constants.REPORT_FINISHED_STATUS, runnerId);
                     });
                 });
                 describe('Run one time job, abort run, and assert job-finished event published', () => {
@@ -123,15 +128,17 @@ describe('Create job specific docker tests', async function () {
                         const validBody = {
                             test_id: testId,
                             type: 'load_test',
-                            arrival_rate: 1,
+                            arrival_rate: 2,
                             duration: 1,
-                            run_immediately: true
+                            run_immediately: true,
+                            notes: 'streaming notes'
                         };
 
                         createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                             'Content-Type': 'application/json'
                         });
 
+                        jobId = createJobResponse.body.id;
                         should(createJobResponse.status).eql(201);
                     });
 
@@ -143,23 +150,20 @@ describe('Create job specific docker tests', async function () {
                     });
 
                     it('Predator-runner posts "aborted" stats', async () => {
-                        const reportId = createJobResponse.body.report_id;
+                        reportId = createJobResponse.body.report_id;
                         await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
-                        const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId);
-                        await reportsRequestCreator.postStats(testId, createJobResponse.body.report_id, statsFromRunnerIntermediate);
+                        const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statsTime);
+                        await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerIntermediate);
 
-                        const statsFromRunnerDone = statsGenerator.generateStats(constants.SUBSCRIBER_ABORTED_STAGE, runnerId);
-                        await reportsRequestCreator.postStats(testId, createJobResponse.body.report_id, statsFromRunnerDone);
+                        const statsFromRunnerDone = statsGenerator.generateStats(constants.SUBSCRIBER_ABORTED_STAGE, runnerId, statsTime);
+                        await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerDone);
                     });
 
                     it('Consume published event job-finished', async () => {
                         const jobFinishedMessage = await kafkaHelper.getLastMsgs(1);
                         const valuePublished = JSON.parse(jobFinishedMessage[0].value);
 
-                        should(valuePublished.event).eql('job-finished');
-                        should(valuePublished.resource.intermediates).be.not.undefined();
-                        should(valuePublished.resource.artillery_test).be.not.undefined();
-                        should(valuePublished.resource.aggregate).be.not.undefined();
+                        assertFullPublishedValue(valuePublished, constants.REPORT_ABORTED_STATUS, runnerId);
                     });
                 });
                 describe('Run one time job with excluded streaming attributes', () => {
@@ -176,15 +180,17 @@ describe('Create job specific docker tests', async function () {
                         const validBody = {
                             test_id: testId,
                             type: 'load_test',
-                            arrival_rate: 1,
+                            arrival_rate: 2,
                             duration: 1,
-                            run_immediately: true
+                            run_immediately: true,
+                            notes: 'streaming notes'
                         };
 
                         createJobResponse = await schedulerRequestCreator.createJob(validBody, {
                             'Content-Type': 'application/json'
                         });
 
+                        jobId = createJobResponse.body.id;
                         should(createJobResponse.status).eql(201);
                     });
 
@@ -196,13 +202,13 @@ describe('Create job specific docker tests', async function () {
                     });
 
                     it('Predator-runner posts "done" stats', async () => {
-                        const reportId = createJobResponse.body.report_id;
+                        reportId = createJobResponse.body.report_id;
                         await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
-                        const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId);
-                        await reportsRequestCreator.postStats(testId, createJobResponse.body.report_id, statsFromRunnerIntermediate);
+                        const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statsTime);
+                        await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerIntermediate);
 
-                        const statsFromRunnerDone = statsGenerator.generateStats(constants.SUBSCRIBER_DONE_STAGE, runnerId);
-                        await reportsRequestCreator.postStats(testId, createJobResponse.body.report_id, statsFromRunnerDone);
+                        const statsFromRunnerDone = statsGenerator.generateStats(constants.SUBSCRIBER_DONE_STAGE, runnerId, statsTime);
+                        await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerDone);
                     });
 
                     it('Consume published event job-finished', async () => {
@@ -225,3 +231,35 @@ describe('Create job specific docker tests', async function () {
         });
     }
 });
+
+function assertFullPublishedValue(valuePublished, reportStatus, runnerId) {
+    should(valuePublished.event).eql('job-finished');
+    should(valuePublished.metadata).containEql({
+        'predator-version': PREDATOR_VERSION,
+        'runner-docker-image': RUNNER_DOCKER_IMAGE
+    });
+
+    should(valuePublished.resource.test_id).eql(testId);
+    should(valuePublished.resource.report_id).eql(reportId);
+    should(valuePublished.resource.job_id).eql(jobId);
+
+    should(valuePublished.resource.artillery_test).eql(testBody.artillery_test);
+    should(valuePublished.resource.test_name).eql(testBody.name);
+    should(valuePublished.resource.description).eql(testBody.description);
+
+    should(valuePublished.resource.status.toLowerCase()).eql(reportStatus.toLowerCase());
+    const intermediatesData = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statsTime).data);
+    const expectedIntermediates = [
+        intermediatesData
+    ];
+    delete valuePublished.resource.intermediates[0].bucket; // bucket is generated dynamically in stats manager
+    should(valuePublished.resource.intermediates).eql(expectedIntermediates);
+    should(valuePublished.resource.aggregate).be.not.undefined();
+
+    should(valuePublished.resource.parallelism).eql(1);
+    should(valuePublished.resource.arrival_rate).eql(2);
+    should(valuePublished.resource.job_type).eql('load_test');
+    should(valuePublished.resource.notes).eql('streaming notes');
+    should(valuePublished.resource.start_time).be.not.undefined();
+    should(valuePublished.resource.end_time).be.not.undefined();
+}
