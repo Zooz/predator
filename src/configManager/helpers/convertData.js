@@ -39,5 +39,5 @@ function definedOrEmptyString(value) {
 }
 
 function isEmptyArray(value) {
-    return value.length > 0 && value[0] === '';
+    return value.length === 0 || (value.length === 1 && value[0] === '');
 }
