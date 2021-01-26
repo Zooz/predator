@@ -10,7 +10,7 @@ async function init(config) {
 
 async function health() {
     if (streamingManager) {
-        streamingManager.health();
+        await streamingManager.health();
     }
 }
 

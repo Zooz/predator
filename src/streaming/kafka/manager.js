@@ -25,9 +25,9 @@ async function health() {
     try {
         await kafkaClient.kafkaHealthCheck();
     } catch (error) {
-        init(localConfig);
         const errorStr = `Kafka health check failed with error ${error.message}`;
         logger.error(errorStr);
+        init(localConfig);
     }
 }
 
