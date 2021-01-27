@@ -1,4 +1,5 @@
 const { expect } = require('chai'),
+    uuid = require('uuid'),
     rewire = require('rewire'),
     sinon = require('sinon');
 
@@ -120,14 +121,91 @@ describe('health check', function() {
             };
             const event = 'job-created';
             const resource = {
+                test_id: 'test_id',
+                report_id: 'report_id',
+                job_id: 'job_id',
 
+                test_name: 'mickeys test',
+                description: 'some description',
+                revision_id: 'revision_id',
+                artillery_test: {
+                    config: {
+                        name: 'mickeys test'
+                    }
+                },
+
+                job_type: 'functional_test',
+                max_virtual_users: 100,
+                arrival_count: 6,
+                parallelism: 1,
+
+                start_time: 'start_time',
+                end_time: 'end_time',
+                notes: 'notes',
+                duration: 6,
+                status: 'Finished',
+                intermediates: [
+                    {
+                        rps: {
+                            99: '10.383'
+                        }
+                    },
+                    {
+                        rps: {
+                            99: '16.593'
+                        }
+                    }
+                ],
+                aggregate: {
+                    rps: {
+                        99: '10.383'
+                    }
+                }
             };
             await streamingManager.produce(metadata, event, resource);
             expect(kafkaManagerProduceStub.calledOnce).eql(true);
             expect(kafkaManagerProduceStub.args[0][0]).eql(JSON.stringify({
-                metadata: { 'load-testing': 'v4', 'predator-version': '1.6.0' },
+                metadata: {
+                    'load-testing': 'v4',
+                    'predator-version': '1.6.0'
+                },
                 event: 'job-created',
-                resource: {}
+                resource: {
+                    test_id: 'test_id',
+                    report_id: 'report_id',
+                    job_id: 'job_id',
+                    test_name: 'mickeys test',
+                    description: 'some description',
+                    revision_id: 'revision_id',
+                    artillery_test: {
+                        config: {
+                            name: 'mickeys test'
+                        }
+                    },
+                    job_type: 'functional_test',
+                    max_virtual_users: 100,
+                    arrival_count: 6,
+                    parallelism: 1,
+                    start_time: 'start_time',
+                    end_time: 'end_time',
+                    notes: 'notes',
+                    duration: 6,
+                    status: 'Finished',
+                    intermediates: [{
+                        rps: {
+                            99: '10.383'
+                        }
+                    }, {
+                        rps: {
+                            99: '16.593'
+                        }
+                    }],
+                    aggregate: {
+                        rps: {
+                            99: '10.383'
+                        }
+                    }
+                }
             }));
         });
         it('No call to streaming manager produce when streaming manager is not initialized', async function() {
