@@ -115,11 +115,20 @@ describe('health check', function() {
             configGetValueStub.resolves();
             kafkaManagerProduceStub.resolves();
 
-            const metadata = { };
+            const metadata = {
+                'load-testing': 'v4'
+            };
             const event = 'job-created';
-            const resource = { };
+            const resource = {
+
+            };
             await streamingManager.produce(metadata, event, resource);
             expect(kafkaManagerProduceStub.calledOnce).eql(true);
+            expect(kafkaManagerProduceStub.args[0][0]).eql(JSON.stringify({
+                metadata: { 'load-testing': 'v4', 'predator-version': '1.6.0' },
+                event: 'job-created',
+                resource: {}
+            }));
         });
         it('No call to streaming manager produce when streaming manager is not initialized', async function() {
             streamingManager.__set__('streamingManager', undefined);

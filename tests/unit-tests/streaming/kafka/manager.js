@@ -1,4 +1,5 @@
 const { expect } = require('chai'),
+    uuid = require('uuid'),
     rewire = require('rewire'),
     sinon = require('sinon');
 
@@ -91,7 +92,49 @@ describe('health check', function() {
                 metadata: {
                     runner: 'mickey'
                 },
-                event: 'job-created'
+                event: 'job-created',
+                resource: {
+                    test_id: uuid.v4(),
+                    report_id: uuid.v4(),
+                    job_id: uuid.v4(),
+
+                    test_name: 'mickeys test',
+                    description: 'some description',
+                    revision_id: uuid.v4(),
+                    artillery_test: {
+                        config: {
+                            name: 'mickeys test'
+                        }
+                    },
+
+                    job_type: 'functional_test',
+                    max_virtual_users: 100,
+                    arrival_count: 6,
+                    parallelism: 1,
+
+                    start_time: Date.now(),
+                    end_time: Date.now(),
+                    notes: 'notes',
+                    duration: 6,
+                    status: 'Finished',
+                    intermediates: [
+                        {
+                            rps: {
+                                99: '10.383'
+                            }
+                        },
+                        {
+                            rps: {
+                                99: '16.593'
+                            }
+                        }
+                    ],
+                    aggregate: {
+                        rps: {
+                            99: '10.383'
+                        }
+                    }
+                }
             };
             await kafkaManager.produce(message);
             expect(KafkaClientStub.produce.args[0][0]).eql([{
