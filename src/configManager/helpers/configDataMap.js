@@ -48,7 +48,7 @@ const configDataMap = {
         type: 'json'
     },
     [constConfig.CUSTOM_RUNNER_DEFINITION]: { value: process.env.CUSTOM_RUNNER_DEFINITION, type: 'json' },
-    [constConfig.STREAMING_EXCLUDED_ATTRIBUTES]: { value: process.env.STREAMING_EXCLUDED_ATTRIBUTES || '', type: 'array' }
+    [constConfig.STREAMING_EXCLUDED_ATTRIBUTES]: { value: process.env.STREAMING_EXCLUDED_ATTRIBUTES, type: 'array' }
 };
 
 module.exports.getConstType = (configValue) => {
