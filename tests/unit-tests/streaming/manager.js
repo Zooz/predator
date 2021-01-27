@@ -73,6 +73,7 @@ describe('health check', function() {
             streamingManager.__set__('streamingManager', {
                 health: kafkaManagerHealthStub
             });
+
             const streamerError = new Error('streaming platform health check failed');
 
             kafkaManagerHealthStub.rejects(streamerError);
@@ -83,6 +84,32 @@ describe('health check', function() {
             }
             expect(kafkaManagerHealthStub.calledOnce).eql(true);
             expect(expectedError).to.eql(streamerError);
+        });
+        it('should reject if streaming manager times out on health check', async function() {
+            this.timeout(5000);
+            let expectedError;
+            streamingManager.__set__('streamingManager', {
+                health: kafkaManagerHealthStub
+            });
+            streamingManager.__set__('streamingConfig', {
+                healthCheckTimeout: 2000
+            });
+
+            kafkaManagerHealthStub.callsFake(async () => {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, 3000);
+                });
+            });
+
+            try {
+                await streamingManager.health();
+            } catch (err) {
+                expectedError = err;
+            }
+            expect(kafkaManagerHealthStub.calledOnce).eql(true);
+            expect(expectedError.message).to.eql('streaming platform health check timed out after 2000ms');
         });
         it('No call to streaming manager health when streaming manager is not initialized', async function() {
             streamingManager.__set__('streamingManager', undefined);

@@ -10,7 +10,19 @@ async function init(config) {
 
 async function health() {
     if (streamingManager) {
-        await streamingManager.health();
+        return new Promise((resolve, reject) => {
+            const healthCheckTimeout = setTimeout(() => {
+                reject(new Error(`streaming platform health check timed out after ${streamingConfig.healthCheckTimeout}ms`));
+            }, streamingConfig.healthCheckTimeout);
+
+            streamingManager.health().then(() => {
+                resolve();
+            }).catch((err) => {
+                reject(err);
+            }).finally(() => {
+                clearTimeout(healthCheckTimeout);
+            });
+        });
     }
 }
 

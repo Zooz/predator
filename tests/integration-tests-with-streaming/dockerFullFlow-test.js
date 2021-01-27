@@ -92,6 +92,7 @@ describe('Create job specific docker tests', async function () {
                         });
 
                         jobId = createJobResponse.body.id;
+                        reportId = createJobResponse.body.report_id;
                         should(createJobResponse.status).eql(201);
                     });
 
@@ -100,11 +101,16 @@ describe('Create job specific docker tests', async function () {
                         const valuePublished = JSON.parse(jobCreatedMessage[0].value);
 
                         should(valuePublished.event).eql('job-created');
+                        should(valuePublished.resource).containEql({
+                            test_id: testId,
+                            report_id: reportId,
+                            arrival_rate: 2,
+                            notes: 'streaming notes',
+                            duration: 1
+                        });
                     });
 
                     it('Predator-runner posts "done" stats', async () => {
-                        reportId = createJobResponse.body.report_id;
-
                         await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
                         const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statsTime);
                         await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerIntermediate);
@@ -139,6 +145,7 @@ describe('Create job specific docker tests', async function () {
                         });
 
                         jobId = createJobResponse.body.id;
+                        reportId = createJobResponse.body.report_id;
                         should(createJobResponse.status).eql(201);
                     });
 
@@ -147,10 +154,16 @@ describe('Create job specific docker tests', async function () {
                         const valuePublished = JSON.parse(jobCreatedMessage[0].value);
 
                         should(valuePublished.event).eql('job-created');
+                        should(valuePublished.resource).containEql({
+                            test_id: testId,
+                            report_id: reportId,
+                            arrival_rate: 2,
+                            notes: 'streaming notes',
+                            duration: 1
+                        });
                     });
 
                     it('Predator-runner posts "aborted" stats', async () => {
-                        reportId = createJobResponse.body.report_id;
                         await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
                         const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statsTime);
                         await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerIntermediate);
@@ -191,6 +204,7 @@ describe('Create job specific docker tests', async function () {
                         });
 
                         jobId = createJobResponse.body.id;
+                        reportId = createJobResponse.body.report_id;
                         should(createJobResponse.status).eql(201);
                     });
 
@@ -199,10 +213,16 @@ describe('Create job specific docker tests', async function () {
                         const valuePublished = JSON.parse(jobCreatedMessage[0].value);
 
                         should(valuePublished.event).eql('job-created');
+                        should(valuePublished.resource).containEql({
+                            test_id: testId,
+                            report_id: reportId,
+                            arrival_rate: 2,
+                            notes: 'streaming notes',
+                            duration: 1
+                        });
                     });
 
                     it('Predator-runner posts "done" stats', async () => {
-                        reportId = createJobResponse.body.report_id;
                         await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
                         const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statsTime);
                         await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerIntermediate);
@@ -222,9 +242,7 @@ describe('Create job specific docker tests', async function () {
                     });
 
                     it(('Remove excluded streaming attributes from config'), async () => {
-                        await configRequestCreator.updateConfig({
-                            streaming_excluded_attributes: ''
-                        });
+                        await configRequestCreator.deleteConfig('streaming_excluded_attributes');
                     });
                 });
             });

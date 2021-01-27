@@ -32,12 +32,6 @@ describe('health check', function() {
     });
 
     describe('return 200 - UP', function() {
-        it('db is up and no streaming manager configured - return 200', async function() {
-            dbHealthStub.resolves();
-            await healthController.check(req, res);
-            expect(res.status.args[0][0]).eql(200);
-            expect(res.json.args[0][0]).eql({ status: 'OK' });
-        });
         it('db and streaming manager are up - return 200', async function() {
             dbHealthStub.resolves();
             streamingManagerHealthStub.resolves();
@@ -45,37 +39,46 @@ describe('health check', function() {
             expect(res.status.args[0][0]).eql(200);
             expect(res.json.args[0][0]).eql({ status: 'OK' });
         });
-        it('db is up and streaming manager is down - return 200', async function() {
+        it('db is up and streaming manager is down - return 200 with streaming_platform error', async function() {
             dbHealthStub.resolves();
-            streamingManagerHealthStub.rejects();
+            streamingManagerHealthStub.rejects(new Error('failed to connect to kafka'));
             await healthController.check(req, res);
             expect(res.status.args[0][0]).eql(200);
-            expect(res.json.args[0][0]).eql({ status: 'OK' });
+            expect(res.json.args[0][0]).eql(
+                {
+                    errors: {
+                        streaming_platform: 'failed to connect to kafka'
+                    },
+                    status: 'OK'
+                }
+            );
         });
     });
     describe('return 503 - DOWN', function() {
-        it('db is down and no streaming manager configured - return 503', async function() {
-            dbHealthStub.rejects(new Error('db down'));
-            await healthController.check(req, res);
-            expect(res.status.args[0][0]).eql(503);
-            expect(res.json.args[0][0].errors.database).eql('db down');
-            expect(res.json.args[0][0].status).eql('DOWN');
-        });
         it('db is down streaming manager is up - return 503', async function() {
             dbHealthStub.rejects(new Error('db down'));
             streamingManagerHealthStub.resolves();
             await healthController.check(req, res);
             expect(res.status.args[0][0]).eql(503);
-            expect(res.json.args[0][0].errors.database).eql('db down');
-            expect(res.json.args[0][0].status).eql('DOWN');
+            expect(res.json.args[0][0]).eql({
+                errors: {
+                    database: 'db down'
+                },
+                status: 'DOWN'
+            });
         });
         it('db is down and streaming manager is down - return 503', async function() {
             dbHealthStub.rejects(new Error('db down'));
-            streamingManagerHealthStub.rejects();
+            streamingManagerHealthStub.rejects(new Error('failed to connect to kafka'));
             await healthController.check(req, res);
             expect(res.status.args[0][0]).eql(503);
-            expect(res.json.args[0][0].errors.database).eql('db down');
-            expect(res.json.args[0][0].status).eql('DOWN');
+            expect(res.json.args[0][0]).eql({
+                errors: {
+                    database: 'db down',
+                    streaming_platform: 'failed to connect to kafka'
+                },
+                status: 'DOWN'
+            });
         });
     });
 });
