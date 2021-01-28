@@ -15,6 +15,7 @@ nav:
   - Processor Creation: processors.md
   - Benchmarks: benchmarks.md
   - Webhooks: webhooks.md
+  - Streaming Platforms: streaming.md
   - Schedules and Reports: schedulesandreports.md
   - Plugins: plugins.md
   - Configuration: configuration.md

@@ -2785,6 +2785,9 @@ components:
         custom_runner_definition:
           description: custom json that will be merged with the kubernetes/metronome/aws fargate predator runner job definition
           type: object
+        streaming_excluded_attributes:
+          description: string of attributes to remove from streamed messages with ',' as delimeter
+          type: string
     benchmark_weights:
       type: object
       required:

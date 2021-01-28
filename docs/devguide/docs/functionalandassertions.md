@@ -21,7 +21,7 @@ The possible expectations that can be created to assert the response received:
 
 ### Example
 
-A simlple functional test that sends a GET request to `http://www.google.com/` and asserts that the response received has:
+A simple functional test that sends a GET request to `http://www.google.com/` and asserts that the response received has:
 
 - statusCode: `200`
 - contentType: `application/json`

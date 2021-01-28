@@ -21,6 +21,8 @@ const webhooksRouter = require('./webhooks/routes/webhooksRouter');
 const swaggerValidator = require('express-ajv-swagger-validation');
 const database = require('./database/database');
 const jobsManager = require('./jobs/models/jobManager');
+const streamingManager = require('./streaming/manager');
+const streamingConfig = require('./config/streamingConfig');
 const contexts = require('./middlewares/context');
 
 module.exports = async () => {
@@ -29,6 +31,10 @@ module.exports = async () => {
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
     await jobsManager.scheduleFinishedContainersCleanup();
+    if (streamingConfig.platform) {
+        const eventStreamerPlatformConfig = require(`./config/${streamingConfig.platform}Config`);
+        await streamingManager.init(eventStreamerPlatformConfig);
+    }
     const app = express();
 
     app.use(fileUpload({

@@ -12,6 +12,8 @@ const logger = require('../../common/logger'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
+    streamingManager = require('../../streaming/manager'),
+    { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common'),
     { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     { version: PREDATOR_VERSION } = require('../../../package.json');
@@ -70,7 +72,10 @@ module.exports.createJob = async (job) => {
             addCron(insertedJob, job.cron_expression, configData);
         }
         logger.info(`Job ${jobId} deployed successfully`);
-        return createResponse(jobId, job, report.report_id);
+        const jobResponse = createResponse(jobId, job, report);
+        streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_CREATED, jobResponse);
+
+        return jobResponse;
     } catch (error) {
         logger.error(error, 'Error occurred trying to create new job');
         throw error;
@@ -173,11 +178,12 @@ module.exports.getJobBasedOnTestId = async (testId) => {
     }
 };
 
-function createResponse(jobId, jobBody, reportId) {
+function createResponse(jobId, jobBody, report) {
     const response = {
         id: jobId,
         test_id: jobBody.test_id,
         type: jobBody.type,
+        start_time: report ? report.start_time : undefined,
         cron_expression: jobBody.cron_expression,
         webhooks: jobBody.webhooks,
         emails: jobBody.emails,
@@ -185,7 +191,7 @@ function createResponse(jobId, jobBody, reportId) {
         parallelism: jobBody.parallelism,
         max_virtual_users: jobBody.max_virtual_users,
         custom_env_vars: jobBody.custom_env_vars,
-        report_id: reportId,
+        report_id: report ? report.report_id : undefined,
         arrival_rate: jobBody.arrival_rate,
         arrival_count: jobBody.arrival_count,
         duration: jobBody.duration,
@@ -276,7 +282,9 @@ function addCron(job, cronExpression, configData) {
             logger.info(`Skipping job with id: ${job.id} as it's currently disabled`);
             return;
         }
-        await runJob(job, configData);
+        const report = await runJob(job, configData);
+        const jobResponse = createResponse(job.id, job, report);
+        streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_CREATED, jobResponse);
     }, function () {
         logger.info(`Job: ${job.id} completed.`);
     }, true);

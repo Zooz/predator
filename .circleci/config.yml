@@ -78,6 +78,31 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: awsFargate
+  integration-tests-with-streaming:
+    docker:
+      - image: circleci/node:12.16
+      - image: wurstmeister/zookeeper
+        name: zookeeper
+      - image: wurstmeister/kafka:2.13-2.7.0
+        name: kafka
+        environment:
+          KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+          KAFKA_ADVERTISED_PORT: 9092
+          KAFKA_PORT: 9092
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Integration tests with docker engine and sqlite configuration
+          command: npm run integration-tests-with-streaming
+          environment:
+            DATABASE_TYPE: sqlite
+            JOB_PLATFORM: docker
+            STREAMING_PLATFORM: kafka
   build:
     docker:
     - image: docker:18
@@ -127,9 +152,12 @@ workflows:
     - integration-tests:
         requires:
         - unit-tests
-    - build:
+    - integration-tests-with-streaming:
         requires:
         - integration-tests
+    - build:
+        requires:
+        - integration-tests-with-streaming
         filters:
           branches:
             # Forked pull requests have CIRCLE_BRANCH set to pull/XXX

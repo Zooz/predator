@@ -16,7 +16,8 @@ Below are variables Predator can be configured with.
 | ALLOW_INSECURE_TLS                              | allow_insecure_tls    	                    | If true, don't fail requests on unverified server certificate errors                                                                                | ✓                        	| false                         |
 | DELAY_RUNNER_MS                                 | delay_runner_ms    	                        | Delay the predator runner from sending http requests (ms)                                                                                           | ✓                        	|                               |
 | INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS         | interval_cleanup_finished_containers_ms    	| Interval (in ms) to search and delete finished tests containers. Value of 0 means no auto clearing enabled                                          | ✓                        	| 0                             |
-| CUSTOM_RUNNER_DEFINITION                        | custom_runner_definition                    | Custom json that will be merged with the kubernetes/metronome predator runner job definition. See FAQ for usage examples.                           | API                         |                               |
+| CUSTOM_RUNNER_DEFINITION                        | custom_runner_definition                    | Custom json that will be merged with the kubernetes/metronome predator runner job definition. See FAQ for usage examples.                           | API                         |                               | 
+| STREAMING_EXCLUDED_ATTRIBUTES                   | streaming_excluded_attributes               | Attribute names to exclude from being produced in the resource to streaming platform                                                                | API                         |                               |
 
 !!! TIP "Note"
     RUNNER_DOCKER_IMAGE (`zooz/predator-runner:$TAGGED_VERSION`) should match the Predator's version running in order to be fully compatible with all features.
@@ -60,6 +61,23 @@ Additional parameters for the following chosen databases:
 |----------------------	|-----------------------------------------------------------	|--------------------------	|---------------	|
 | DOCKER_HOST          	| Docker engine url (host and port number of docker engine) 	| x                        	|               	|
 | DOCKER_CERT_PATH     	| Path to CA certificate directory                          	| x                        	|               	|
+
+## Streaming
+| Environment Variable 	| Description                                                          	| Configurable from UI/API 	| Default value 	|
+|----------------------	|----------------------------------------------------------------------	|--------------------------	|---------------	|
+| STREAMING_PLATFORM    | Type of platform to produce messages to                             	| x                        	| N/A        	    |
+| STREAMING_PLATFORM_HEALTH_CHECK_TIMEOUT_MS    | Health check timeout to streaming platform   	| x                        	| 2000ms            |
+
+#### Kafka 
+Applicable when STREAMING_PLATFORM = Kafka
+
+| Environment Variable 	| Description                                                          	| Configurable from UI/API 	| Default value | Required |
+|----------------------	|----------------------------------------------------------------------	|--------------------------	|---------------|----------|
+| KAFKA_CLIENT_ID                    | Id of kafka client                             	    | x                        	| N/A        	    | x        |
+| KAFKA_BROKERS                      | String list of kafka brokers, split by ',' delimiter	| x                        	| N/A        	    | ✓        |
+| KAFKA_TOPIC                        | Topic name                             	            | x                        	| N/A        	    | ✓        |
+| KAFKA_ALLOW_AUTO_TOPIC_CREATION    | Enable kafka client to auto create topic if it does not exist 	| x           	| false        	    | x        |
+| KAFKA_ADMIN_RETRIES                | Admin client retries                             	| x                        	| 2       	        | x        |
 
 ## Benchmarks
 | Environment Variable 	| Configuration key    	| Description                                               	| Configurable from UI/API 	| Default value 	|
