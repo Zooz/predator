@@ -404,6 +404,18 @@
 
 
   <li class="md-nav__item">
+    <a href="streaming.html" title="Streaming Platforms" class="md-nav__link">
+      Streaming Platforms
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="schedulesandreports.html" title="Schedules and Reports" class="md-nav__link">
       Schedules and Reports
     </a>
@@ -548,9 +560,8 @@
 <div class="admonition note">
 <p class="admonition-title">Following along with the examples</p>
 <p>To make it easy for you to follow along with the steps below, we created a demo Predator docker image. This image allows you to invoke our fictitious petstore API, used in the examples that follow. You can retrieve and run the docker image with the following command (just make sure to replace {MACHINE_IP} with the IP address of your own machine):</p>
-<div class="codehilite"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">p</span> <span class="mi">3000</span><span class="p">:</span><span class="mi">3000</span> <span class="c1">--name predator-petstore zooz/predator-builds:petstore    </span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>docker run -d -p 3000:3000 --name predator-petstore zooz/predator-builds:petstore    
+</code></pre></div>
 </div>
 <p>Adding a new test is easy. From the Predator web interface, choose <strong>Tests</strong> &gt; <strong>View Tests</strong>. Then click <strong>Create Test</strong> and complete all fields on the form, like so:</p>
 <p><img alt="Screenshot" src="images/createtest.png" /></p>

@@ -352,6 +352,18 @@
 
 
   <li class="md-nav__item">
+    <a href="streaming.html" title="Streaming Platforms" class="md-nav__link">
+      Streaming Platforms
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="schedulesandreports.html" title="Schedules and Reports" class="md-nav__link">
       Schedules and Reports
     </a>
@@ -454,6 +466,26 @@
           <li class="md-nav__item">
   <a href="#docker" title="Docker" class="md-nav__link">
     Docker
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#streaming" title="Streaming" class="md-nav__link">
+    Streaming
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kafka" title="Kafka" class="md-nav__link">
+    Kafka
   </a>
   
 </li>
@@ -645,6 +677,26 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#streaming" title="Streaming" class="md-nav__link">
+    Streaming
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kafka" title="Kafka" class="md-nav__link">
+    Kafka
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#benchmarks" title="Benchmarks" class="md-nav__link">
     Benchmarks
   </a>
@@ -781,6 +833,13 @@ during runtime with the /config endpoint, please check the API reference for mor
 <td>CUSTOM_RUNNER_DEFINITION</td>
 <td>custom_runner_definition</td>
 <td>Custom json that will be merged with the kubernetes/metronome predator runner job definition. See FAQ for usage examples.</td>
+<td>API</td>
+<td></td>
+</tr>
+<tr>
+<td>STREAMING_EXCLUDED_ATTRIBUTES</td>
+<td>streaming_excluded_attributes</td>
+<td>Attribute names to exclude from being produced in the resource to streaming platform</td>
 <td>API</td>
 <td></td>
 </tr>
@@ -950,6 +1009,81 @@ during runtime with the /config endpoint, please check the API reference for mor
 <td>Path to CA certificate directory</td>
 <td>x</td>
 <td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="streaming">Streaming<a class="headerlink" href="#streaming" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STREAMING_PLATFORM</td>
+<td>Type of platform to produce messages to</td>
+<td>x</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>STREAMING_PLATFORM_HEALTH_CHECK_TIMEOUT_MS</td>
+<td>Health check timeout to streaming platform</td>
+<td>x</td>
+<td>2000</td>
+</tr>
+</tbody>
+</table>
+<h4 id="kafka">Kafka<a class="headerlink" href="#kafka" title="Permanent link">#</a></h4>
+<p>Applicable when STREAMING_PLATFORM = Kafka</p>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Configurable from UI/API</th>
+<th>Default value</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KAFKA_CLIENT_ID</td>
+<td>Id of kafka client</td>
+<td>x</td>
+<td>N/A</td>
+<td>x</td>
+</tr>
+<tr>
+<td>KAFKA_BROKERS</td>
+<td>String list of kafka brokers, split by ',' delimiter</td>
+<td>x</td>
+<td>N/A</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>KAFKA_TOPIC</td>
+<td>Topic name</td>
+<td>x</td>
+<td>N/A</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>KAFKA_ALLOW_AUTO_TOPIC_CREATION</td>
+<td>Enable kafka client to auto create topic if it does not exist</td>
+<td>x</td>
+<td>false</td>
+<td>x</td>
+</tr>
+<tr>
+<td>KAFKA_ADMIN_RETRIES</td>
+<td>Admin client retries</td>
+<td>x</td>
+<td>2</td>
+<td>x</td>
 </tr>
 </tbody>
 </table>

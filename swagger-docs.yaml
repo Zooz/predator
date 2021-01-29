@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 1.5.0
+  version: 1.6.0
   title: Predator
   x-logo:
     url: logo.png
@@ -235,6 +235,15 @@ paths:
         - Tests
       summary: Create a Test
       description: Create a new test.
+      parameters:
+        - in: query
+          name: filter
+          description: is filter and by what property
+          required: false
+          schema:
+            type: string
+            enum:
+              - is_favorite
       responses:
         '201':
           description: Success
@@ -650,7 +659,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  '/v1/jobs/{job_id}/runs/{run_id}/stop':
+  '/v1/jobs/{job_id}/runs/{report_id}/stop':
     post:
       operationId: terminate-a-job
       tags:
@@ -666,7 +675,7 @@ paths:
             type: string
         - in: path
           description: The id of a specific run in metronome which is also the report id.
-          name: run_id
+          name: report_id
           required: true
           schema:
             type: string
@@ -686,7 +695,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
 
-  /v1/jobs/{job_id}/runs/{run_id}/logs:
+  /v1/jobs/{job_id}/runs/{report_id}/logs:
     get:
       tags:
         - Jobs
@@ -700,7 +709,7 @@ paths:
             type: string
         - in: path
           description: The id of a specific run in metronome which is also the report id.
-          name: run_id
+          name: report_id
           required: true
           schema:
             type: string
@@ -791,6 +800,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
     post:
+      deprecated: true
       operationId: create-a-report
       tags:
         - Reports
@@ -1124,6 +1134,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  # Report Export
+  '/v1/{test_id}/reports/{report_id}/export/{file_format}':
+    get:
+      operationId: export-report
+      tags:
+        - Reports
+      parameters:
+        - in: path
+          name: test_id
+          description: The test id.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
+        - in: path
+          name: report_id
+          description: The id of the report to retrieve.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: file_format
+          description: The file format for export.
+          required: true
+          schema:
+            type: string
+            enum: [csv]
+      summary: Exports a report to a file in the required format
+      description: Exports a report to a file in the required format.
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Unsupported File Format
+  # Export Comparison Report
+  '/v1/tests/reports/compare/export/{file_format}':
+    get:
+      operationId: export-comparison-report
+      tags:
+        - Reports
+      parameters:
+        - in: path
+          name: file_format
+          description: The file format for export.
+          required: true
+          schema:
+            type: string
+            enum: [csv]
+        - in: query
+          name: report_ids
+          description: List of report IDs that are part of comparison
+          schema:
+            type: array
+          style: form
+          explode: false
+        - in: query
+          name: test_ids
+          description: List of test IDs that are part of comparison
+          schema:
+            type: array
+          style: form
+          explode: false
+      summary: Exports a comparison report.
+      description: Exports a comparison report from multiple tests.
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Unsupported File Format
   # Config
   /v1/config:
     get:
@@ -1586,7 +1666,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-
+  /v1/webhooks/test:
+    post:
+      operationId: test-a-webhook
+      tags:
+        - Webhooks
+      summary: Tests that the webhook is configure correctly
+      description: Tests that the webhook is configure correctly by sending a message to the target webhook url.
+      parameters:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/test_webhook_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/test_webhook_request'
   # Files
   /v1/files:
     post:
@@ -1774,6 +1879,9 @@ components:
           description: Unique processor identifier
           type: string
           format: uuid
+        is_favorite:
+          description: Test has been marked favorite
+          type: boolean
         type:
           $ref: '#/components/schemas/test_type'
     test_type:
@@ -2243,6 +2351,10 @@ components:
           description: Ability to enable/disable scheduled jobs.
           example: true
           default: true
+        tag:
+          type: string
+          description: tag of the machine type/region that the job will run on (currently supported in aws fargate)
+          example: eu-west-1
     delete_containers_response:
       required:
         - deleted
@@ -2263,9 +2375,9 @@ components:
       allOf:
         - $ref: '#/components/schemas/job_response'
         - properties:
-            run_id:
+            report_id:
               type: string
-              description: The run id. Only shown if the job is ran immediately.
+              description: The report id. Only shown if the job is ran immediately.
     processor:
       required:
         - name
@@ -2315,7 +2427,7 @@ components:
           description: notes for specific report
         is_favorite:
           type: boolean
-          description: wether this report should be marked as favorite
+          description: whether this report should be marked as favorite
     post_report:
       required:
         - report_id
@@ -2329,7 +2441,7 @@ components:
       properties:
         report_id:
           type: string
-          description: The id of the report/same as run_id
+          description: The id of the report
         test_id:
           type: string
           description: The id of the test we would like to schedule.
@@ -2363,7 +2475,7 @@ components:
       properties:
         report_id:
           type: string
-          description: The id of the report/same as run_id
+          description: The id of the report
     stats:
       required:
         - stats_time
@@ -2451,6 +2563,9 @@ components:
         notes:
           type: string
           description: notes about the test
+        tag:
+          description: tag of the machine type/region that the job will run on (currently supported in aws fargate)
+          example: eu-west-1
     config_body:
       additionalProperties: false
       properties:
@@ -2465,7 +2580,7 @@ components:
           description: The predator-runner docker image that will run the test.
         job_platform:
           type: string
-          description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER)
+          description: Type of platform using to run predator (METRONOME,KUBERNETES,DOCKER,AWS_FARGATE)
         runner_cpu:
           minimum: 0
           type: number
@@ -2535,7 +2650,7 @@ components:
               type: string
               description: Prometheus push gateway url.
             buckets_sizes:
-              type: string
+              type: array
               description: Bucket sizes use to configure prometheus.
             labels:
               description: Labels which will be passed to prometheus push gateway.
@@ -2608,6 +2723,9 @@ components:
         custom_runner_definition:
           description: custom json that will be merged with the kubernetes/metronome predator runner job definition
           type: object
+        streaming_excluded_attributes:
+          description: string of attributes to remove from streamed messages with ',' as delimeter
+          type: string
     benchmark_weights:
       type: object
       required:
@@ -2707,3 +2825,28 @@ components:
         - slack
         - json
         - teams
+        - discord
+    test_webhook_response:
+      type: object
+      required:
+        - webhook_status_code
+        - is_sucessful
+      properties:
+          webhook_status_code:
+            type: number
+            example: 400
+          is_sucessful:
+            type: boolean
+            example: false
+            description: true, if webhook target returned 2xx status code
+    test_webhook_request:
+      type: object
+      required:
+        - format_type
+        - url
+      properties:
+        format_type:
+          $ref: '#/components/schemas/webhook_format_types'
+        url:
+          type: string
+          description: Webhook url to post events

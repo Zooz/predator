@@ -474,6 +474,18 @@
 
 
   <li class="md-nav__item">
+    <a href="streaming.html" title="Streaming Platforms" class="md-nav__link">
+      Streaming Platforms
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="schedulesandreports.html" title="Schedules and Reports" class="md-nav__link">
       Schedules and Reports
     </a>
@@ -704,7 +716,7 @@ This is achieved by using the <code>*</code> operator, which selects all the mat
 <p>Usage example :</p>
 <p><img alt="Screenshot" src="images/random_pick.png" />
 on
-<div class="codehilite"><pre><span></span><span class="p">[</span>
+<div class="highlight"><pre><span></span><code><span class="p">[</span>
     <span class="p">{</span>
         <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;45697038-37ae-4149-9f5e-ed7a4a20e014&quot;</span><span class="p">,</span>
         <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;132456789&quot;</span>
@@ -713,7 +725,7 @@ on
         <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;abcdefghi&quot;</span>
     <span class="p">}</span>
 <span class="p">]</span>
-</pre></div>
+</code></pre></div>
 will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...-8a9a1ae5c47a</code> in <code>{{dataId}}</code> for further usage in the scenario.</p>
 <h2 id="csv-files">CSV Files<a class="headerlink" href="#csv-files" title="Permanent link">#</a></h2>
 <div class="admonition tip">
@@ -725,12 +737,11 @@ will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...
 <ol>
 <li>Save a csv file with headers and delimited by ','</li>
 </ol>
-<div class="codehilite"><pre><span></span><span class="n">amount</span><span class="p">,</span> <span class="n">currency</span>
-<span class="mi">10</span><span class="p">,</span> <span class="n">USD</span>
-<span class="mi">30</span><span class="p">,</span> <span class="n">GBP</span>
-<span class="mi">50</span><span class="p">,</span> <span class="n">EUR</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>amount, currency
+10, USD
+30, GBP
+50, EUR
+</code></pre></div>
 <ol start="2">
 <li>When creating a test, click on add 'Add csv' and drag and drop the file into the box  </li>
 </ol>
@@ -749,14 +760,13 @@ will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...
 </ul>
 <p><b>Currently these functions all return values as a <code>string</code>. An issue is open regarding this: <a href="https://github.com/Zooz/predator/issues/178">#178</a></b></p>
 <p>Usage example:</p>
-<div class="codehilite"><pre><span></span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
     <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $uuid() }}&quot;</span><span class="p">,</span>
     <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $randomString(6) }}&quot;</span><span class="p">,</span>
     <span class="nt">&quot;age&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $randomNumber(0,15) }}&quot;</span><span class="p">,</span>
     <span class="nt">&quot;created&quot;</span><span class="p">:</span> <span class="s2">&quot;{{ $dateNow() }}&quot;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 <h2 id="request-reuse-with-dsl-definitions">Request Reuse with DSL Definitions<a class="headerlink" href="#request-reuse-with-dsl-definitions" title="Permanent link">#</a></h2>
 <p>This is the moment where Predator shows its teeth and unleashes its true power. </p>
 <p>Writing a performance test that checks specific parts of your API end-to-end can be a huge hassle, but now it is effortless. By creating DSL definitions using Predator's Domain Specific Language (DSL), request templates are generated which you can then reuse in the same test and in other tests under the same DSL type, reducing replication.</p>
@@ -767,7 +777,7 @@ will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...
 </div>
 <h3 id="creating-a-dsl-definition">Creating a DSL Definition<a class="headerlink" href="#creating-a-dsl-definition" title="Permanent link">#</a></h3>
 <p>Before you can use a DSL definition, you must create it first. You do so by invoking the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-dsl-definition" target="_blank">Create DSL Definition</a> request. Here's an example request body for creating a DSL definition of a GET request. Notice how we use the <code>{{petId}}</code> in the url endpoint (we will create this variable in the example of a POST request DSL definition):</p>
-<div class="codehilite"><pre><span></span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
     <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;get-pet&quot;</span><span class="p">,</span>
     <span class="nt">&quot;request&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;get&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -775,10 +785,9 @@ will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...
         <span class="p">}</span>   
     <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 <p>The request body for creating a DSL definition of a POST request is a bit more elaborate, since it requires that you pass in the entire body that makes up the POST request. The following example shows how to do this. Notice how we add a <code>capture</code> array, in which we define the <code>petId</code> variable for storing the pet ID. We can then reuse it in another request (like in the example of a GET request above).</p>
-<div class="codehilite"><pre><span></span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
     <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;create-pet&quot;</span><span class="p">,</span>
     <span class="nt">&quot;request&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;post&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -796,15 +805,14 @@ will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...
         <span class="p">}</span>   
     <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 <h3 id="creating-a-test-that-uses-the-dsl">Creating a Test that Uses the DSL<a class="headerlink" href="#creating-a-test-that-uses-the-dsl" title="Permanent link">#</a></h3>
 <p>Tests that use a DSL definition can only be created using the <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request. The <a href="https://zooz.github.io/predator/indexapiref.html#operation/create-a-test" target="_blank">Create Test</a> API request body must include all components that make up a test, including pre-scenario requests and scenarios. However, instead of defining the entire HTTP request in each scenario step (as you would through the Predator UI), you can now reference the HTTP request through its DSL definition. You do so, using the <code>action</code> property (in the <code>steps</code> array). </p>
 <p>Here's an example:</p>
-<div class="codehilite"><pre><span></span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Pet store&quot;</span><span class="p">,</span>
   <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;DSL&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dsl&quot;</span><span class="p">,</span> <span class="err">//</span> <span class="err">Make</span> <span class="err">sure</span> <span class="err">the</span> <span class="err">type</span> <span class="err">is</span> <span class="err">set</span> <span class="err">to</span> <span class="err">DSL</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dsl&quot;</span><span class="p">,</span> <span class="err">//</span> <span class="err">Make</span> <span class="err">sure</span> <span class="kc">t</span><span class="err">he</span> <span class="kc">t</span><span class="err">ype</span> <span class="err">is</span> <span class="err">se</span><span class="kc">t</span> <span class="kc">t</span><span class="err">o</span> <span class="err">DSL</span>
   <span class="nt">&quot;before&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&quot;steps&quot;</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
@@ -823,8 +831,7 @@ will randomly store <code>45697038-...-ed7a4a20e014</code> or <code>f02392e8-...
     <span class="p">}</span>
   <span class="p">]</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 <p>There are two additional items to note:</p>
 <ul>
 <li>
