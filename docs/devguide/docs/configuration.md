@@ -66,7 +66,7 @@ Additional parameters for the following chosen databases:
 | Environment Variable 	| Description                                                          	| Configurable from UI/API 	| Default value 	|
 |----------------------	|----------------------------------------------------------------------	|--------------------------	|---------------	|
 | STREAMING_PLATFORM    | Type of platform to produce messages to                             	| x                        	| N/A        	    |
-| STREAMING_PLATFORM_HEALTH_CHECK_TIMEOUT_MS    | Health check timeout to streaming platform   	| x                        	| 2000ms            |
+| STREAMING_PLATFORM_HEALTH_CHECK_TIMEOUT_MS    | Health check timeout to streaming platform   	| x                        	| 2000            |
 
 #### Kafka 
 Applicable when STREAMING_PLATFORM = Kafka

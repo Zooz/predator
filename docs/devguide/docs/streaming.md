@@ -1,15 +1,16 @@
 # Streaming
 !!! TIP "Supported from version zooz/predator:1.6.0"
 
-## About
 Produce informative resources to streaming platforms that will allow you to create consumers
-and handle the data as you see fit.
+and handle the data as you see fit. The resources published have a generic schema with all of the test, job, and reports 
+information associated with the event that was triggered. For more specific details about the attributes published
+<u>[refer here](streaming.md#resources-published)</u>.
 
 ## Setting Up
 Currently, only Kafka is supported. We will appreciate contributions for more streaming platform integrations :)
 
 ### Kafka
-For the full configuration needed please refer to: <u>[configuration manual](configuration.md#kafka)</u>
+For the full configuration needed please refer to: <u>[Kafka configuration manual](configuration.md#kafka)</u>
 
 ## Resources published
 ```
@@ -42,4 +43,4 @@ For the full configuration needed please refer to: <u>[configuration manual](con
 ```
 ### Excluding attributes of resource published
 If you would like to exclude some properties published under the `resource` content,
-configure the `streaming_excluded_attributes` in the configuration. 
+configure the `streaming_excluded_attributes` in the configuration.
