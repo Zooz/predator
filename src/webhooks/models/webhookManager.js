@@ -67,7 +67,7 @@ async function fireSingleWebhook(webhook, payload) {
             method: 'POST',
             url: webhook.url,
             body: payload,
-            resolveWithFullResponse: true
+            resolveBodyOnly: false
         });
         logger.info(`Webhook fired successfully, url = ${webhook.url}`);
         return response;

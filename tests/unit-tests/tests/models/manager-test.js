@@ -6,7 +6,7 @@ const fileManager = require('../../../../src/files/models/fileManager');
 const sinon = require('sinon');
 const database = require('../../../../src/tests/models/database');
 const testGenerator = require('../../../../src/tests/models/testGenerator');
-const request = require('request-promise-native');
+const got = require('got');
 const uuid = require('uuid');
 
 describe('Scenario generator tests', function () {
@@ -31,7 +31,7 @@ describe('Scenario generator tests', function () {
         getTestsStub = sandbox.stub(database, 'getTests');
         getTestRevisionsStub = sandbox.stub(database, 'getAllTestRevisions');
         deleteStub = sandbox.stub(database, 'deleteTest');
-        getRequestStub = sandbox.stub(request, 'get');
+        getRequestStub = sandbox.stub(got, 'get');
         saveFileStub = sandbox.stub(fileManager, 'saveFile');
         testGeneratorStub = sandbox.stub(testGenerator, 'createTest');
     });

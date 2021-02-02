@@ -1,6 +1,6 @@
 'use strict';
 
-const request = require('request-promise-native');
+const got = require('got');
 const util = require('util');
 const should = require('should');
 
@@ -10,11 +10,10 @@ const smtpServerUrl = util.format('http://%s:%s', smtpConfig.host, smtpConfig.po
 module.exports.validateEmail = async () => {
     return new Promise((resolve, reject) => {
         setTimeout(async () => {
-            const messages = await request({
+            const messages = await got({
                 method: 'GET',
                 url: smtpServerUrl + '/api/v1/messages',
-                timeout: 2000,
-                time: true
+                timeout: 2000
             });
 
             if (messages === '[]') {
@@ -30,10 +29,9 @@ module.exports.validateEmail = async () => {
 };
 
 module.exports.clearAllOldMails = () => {
-    return request({
+    return got({
         method: 'DELETE',
         url: smtpServerUrl + '/api/v1/messages',
-        timeout: 2000,
-        time: true
+        timeout: 2000
     });
 };

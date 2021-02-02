@@ -1,5 +1,5 @@
 'use strict';
-const request = require('request-promise-native');
+const got = require('got');
 
 module.exports = {
     downloadFile
@@ -10,7 +10,7 @@ async function downloadFile(fileUrl) {
         url: fileUrl
     };
     try {
-        const response = await request.get(options);
+        const response = await got.get(options);
         return response;
     } catch (err) {
         const errMsg = 'Error to download file: ' + err;

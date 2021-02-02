@@ -1,8 +1,8 @@
 const appServer = require('./app'),
-    request = require('request-promise-native'),
     configHandler = require('./configManager/models/configHandler'),
     constConfig = require('./common/consts');
 const logger = require('./common/logger');
+const got = require('got');
 
 
 appServer().then(async (app) => {
@@ -32,13 +32,14 @@ async function verifyInternalAddressReachable() {
     }
 
     try {
-        await request.get(internalConfigAddress, {
-            json: true,
-            resolveWithFullResponse: true,
+        await got(internalConfigAddress, {
+            responseType: 'json',
+            resolveBodyOnly: false,
             timeout: 5000
         });
         logger.info(`${internalConfigAddress} successfully reached`);
     } catch (error) {
+        console.log(error);
         let platform = await configHandler.getConfigValue(constConfig.CONFIG.JOB_PLATFORM);
         if (platform === constConfig.DOCKER) {
             throw new Error(`Failed to reach successfully INTERNAL_ADDRESS at ${internalConfigAddress}, shutting down server (to skip this check set SKIP_INTERNAL_ADDRESS_CHECK=true\nError: ${error.message}`);

@@ -1,16 +1,16 @@
 const logger = require('./logger');
-const request = require('request-promise-native');
+const got = require('got');
 
 const defaultOptions = {
     timeout: 15 * 1000,
-    json: true,
+    responseType: 'json',
     rejectUnauthorized: false
 };
 
 module.exports.send = async (options) => {
     Object.assign(options, defaultOptions);
     try {
-        const response = await request(options);
+        const response = await got(options);
         logger.info({ method: options.method, url: options.url, response }, 'Successful request');
         return response;
     } catch (error) {

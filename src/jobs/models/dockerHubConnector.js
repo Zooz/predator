@@ -9,7 +9,7 @@ module.exports.getMostRecentRunnerTag = async () => {
         const dockerHubInfo = await requestSender.send({
             method: 'GET',
             url: `https://hub.docker.com/v2/repositories/${dockerImageToUse}/tags`,
-            json: true
+            responseType: 'json'
         });
         let newestVersion = dockerHubInfo.results.map(version => version.name)
             .filter(version => version !== LATEST)
