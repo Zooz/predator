@@ -6,6 +6,7 @@ const { CONFIG: configConstants } = require('../../common/consts'),
 
 class StreamingMessage {
     constructor(metadata, event, resource) {
+        this.published_at = new Date();
         this.metadata = metadata;
         this.event = event;
         this.resource = new StreamingResource(resource);
@@ -16,6 +17,7 @@ class StreamingMessage {
         const defaultMetadata = await buildDefaultMetadata();
         const metadata = { ...this.metadata, ...defaultMetadata };
         return JSON.stringify({
+            published_at: this.published_at,
             metadata: metadata,
             event: this.event,
             resource: resourceWithoutExcludedAttributes
