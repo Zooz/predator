@@ -1,14 +1,14 @@
 const appServer = require('./app'),
     configHandler = require('./configManager/models/configHandler'),
-    constConfig = require('./common/consts');
-const logger = require('./common/logger');
-const got = require('got');
+    constConfig = require('./common/consts'),
+    logger = require('./common/logger'),
+    got = require('got');
 
 
 appServer().then(async (app) => {
     const serverPort = process.env.PORT || '80';
     try {
-        await app.listen(serverPort);
+        await app.listen(serverPort, "0.0.0.0");
         logger.info('Predator listening on port ' + serverPort);
     } catch (error) {
         logger.error(error, 'Encountered an error during start up');
@@ -33,8 +33,6 @@ async function verifyInternalAddressReachable() {
 
     try {
         await got(internalConfigAddress, {
-            responseType: 'json',
-            resolveBodyOnly: false,
             timeout: 5000
         });
         logger.info(`${internalConfigAddress} successfully reached`);

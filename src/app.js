@@ -27,6 +27,7 @@ const dsl = require('./tests/controllers/dslController');
 const {verifyReportIDInRoute} = require('./reports/utils/middlewares');
 const customValidation = require('./tests/middlewares/customValidation');
 const health = require('./common/controllers/healthController');
+const config = require('./configManager/controllers/configController');
 
 const {CONTEXT_ID} = require('./common/consts');
 const logger = require('./common/logger');
@@ -40,7 +41,7 @@ module.exports = async () => {
 
     const app = fastify({
         logger,
-        bodyLimit: process.env.BODY_PARSER_LIMIT || '524288'
+        bodyLimit: process.env.BODY_PARSER_LIMIT || 524288
     });
 
     //plugins
@@ -54,31 +55,30 @@ module.exports = async () => {
         global: false
     });
     app.register(fastifyStatic, {
-        root: path.join(__dirname, 'ui/dist'),
-        prefix: '/ui/dist/'
+        root: path.join(__dirname, '../ui/dist'),
+        prefix: '/ui/'
     });
     app.register(formBody);
     app.register(fastifyRequestContextPlugin);
-    app.register(gracefulShutdown, { timeout: process.env.SHUTDOWN_GRACE_TIMEOUT || 10000 })
+    app.register(gracefulShutdown, { timeout: process.env.SHUTDOWN_GRACE_TIMEOUT || 10000 });
     app.register(swaggerValidator.validate({
-        skiplist: ['^/health$', '^/v1/jobs/runs/containers$', '^/v1/files$', '^/ui$']
+        skiplist: ['^/health$', '^/ui$']
     }));
 
     app.setErrorHandler((err, req, res) => {
         if (err instanceof swaggerValidator.InputValidationError) {
-            return res.code(400).send({ message: 'Input validation error', validation_errors: err.errors });
+            res.code(400).send({ message: 'Input validation error', validation_errors: err.errors });
         } else if (err.statusCode) {
-            return res.code(err.statusCode).send({ message: err.message });
+            res.code(err.statusCode).send({ message: err.message });
         } else {
             logger.error(err, 'Failure');
             res.code(500).send({ message: 'Internal server error' });
         }
-        res.code(500).send();
     });
 
     //hooks
     app.addHook('onRequest', (req, res, done) => {
-        const contextId = req.get('x-context-id') || undefined;
+        const contextId = req.headers['x-context-id'] || undefined;
         req.requestContext.set(CONTEXT_ID, contextId);
         res.headers({
             'Access-Control-Allow-Origin': '*',
@@ -181,9 +181,9 @@ module.exports = async () => {
             }
         }
     }, reports.deleteReport);
-    app.get('/v1/tests/:test_id/reports/', reports.getReports);
-    app.post('/v1/tests/:test_id/reports/', reports.postReport);
-    app.get('/v1/tests/last_reports/', reports.getLastReports);
+    app.get('/v1/tests/:test_id/reports', reports.getReports);
+    app.post('/v1/tests/:test_id/reports', reports.postReport);
+    app.get('/v1/tests/last_reports', reports.getLastReports);
     app.post('/v1/tests/:test_id/reports/:report_id/subscribe', reports.subscribeRunnerToReport);
     app.post('/v1/tests/:test_id/reports/:report_id/stats', reports.postStats);
     app.get('/v1/tests/:test_id/reports/:report_id/export/:file_format', reports.getExportedReport);
