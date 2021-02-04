@@ -1,13 +1,13 @@
 # NODE container which runs this service
-FROM node:15-buster
+FROM node:14-buster
 
 RUN mkdir -p /usr/src
 WORKDIR /usr
 # Install app dependencies
 COPY package*.json /usr/
+EXPOSE 80 3000
 
-RUN npm install --production
-
+RUN npm ci --production --silent
 ## Bundle app source
 COPY /src /usr/src
 COPY /docs /usr/docs
@@ -23,7 +23,7 @@ ARG BUCKET_PATH
 ARG PREDATOR_DOCS_URL
 # Build UI from sources
 WORKDIR /usr/ui
-RUN npm install --legacy-peer-deps
+RUN npm ci --silent
 RUN VERSION=$(node -p -e "require('/usr/package.json').version") && BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL VERSION=$VERSION NODE_ENV=production npm run build
 # Clean up
 RUN mv /usr/ui/dist /tmp/dist && rm -rf /usr/ui/* && mv /tmp/dist /usr/ui/dist
