@@ -3,16 +3,6 @@
 const manager = require('../models/manager');
 const jobManager = require('../../jobs/models/jobManager');
 
-module.exports = {
-    upsertTest,
-    getTest,
-    deleteTest,
-    getTests,
-    getTestRevisions,
-    insertTestBenchmark,
-    getBenchmark
-};
-
 async function insertTestBenchmark(req, res) {
     try {
         const result = await manager.insertTestBenchmark(req.body, req.params.test_id, req.requestContext);
@@ -81,3 +71,13 @@ async function getTestRevisions(req, res) {
         res.send(err);
     }
 }
+
+module.exports = {
+    upsertTest,
+    getTest,
+    deleteTest,
+    getTests,
+    getTestRevisions,
+    insertTestBenchmark,
+    getBenchmark
+};

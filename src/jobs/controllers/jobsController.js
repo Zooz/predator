@@ -1,83 +1,87 @@
 'use strict';
 const jobManager = require('../models/jobManager');
 
-module.exports.createJob = function (req, res) {
-    return jobManager.createJob(req.body)
-        .then(function (result) {
-            res.code(201).send(result);
-        })
-        .catch(function (err) {
-            res.send(err);
-        });
-};
+async function createJob(req, res) {
+    try {
+        let result = await jobManager.createJob(req.body);
+        res.code(201).send(result);
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-module.exports.getJobs = function (req, res) {
+async function getJobs(req, res) {
     const shouldGetAllJobs = (req.query && (req.query.one_time === true || req.query.one_time === 'true'));
-    return jobManager.getJobs(shouldGetAllJobs, req.requestContext)
-        .then(function (result) {
-            res.code(200).send(result);
-        })
-        .catch(function (err) {
-            res.send(err);
-        });
-};
+    try {
+        let result = await jobManager.getJobs(shouldGetAllJobs, req.requestContext);
+        res.code(200).send(result);
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-module.exports.getJob = function (req, res) {
-    return jobManager.getJob(req.params.job_id, req.requestContext)
-        .then(function (result) {
-            res.code(200).send(result);
-        })
-        .catch(function (err) {
-            res.send(err);
-        });
-};
+async function getJob(req, res) {
+    try {
+        let result = await jobManager.getJob(req.params.job_id, req.requestContext);
+        res.code(200).send(result);
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-module.exports.updateJob = function (req, res) {
-    return jobManager.updateJob(req.params.job_id, req.body, req.requestContext)
-        .then(function (result) {
-            res.code(200).send(result);
-        })
-        .catch(function (err) {
-            res.send(err);
-        });
-};
+async function updateJob(req, res) {
+    try {
+        let result = await jobManager.updateJob(req.params.job_id, req.body, req.requestContext);
+        res.code(200).send(result);
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-module.exports.deleteJob = function (req, res) {
-    return jobManager.deleteJob(req.params.job_id, req.requestContext)
-        .then(function () {
-            res.code(204).send();
-        })
-        .catch(function (err) {
-            res.send(err);
-        });
-};
+async function deleteJob(req, res) {
+    try {
+        await jobManager.deleteJob(req.params.job_id, req.requestContext);
+        res.code(204).send();
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-module.exports.stopRun = function (req, res) {
-    return jobManager.stopRun(req.params.job_id, req.params.report_id)
-        .then(function () {
-            res.code(204).send();
-        })
-        .catch(function (err) {
-            res.send(err);
-        });
-};
+async function stopRun(req, res) {
+    try {
+        await jobManager.stopRun(req.params.job_id, req.params.report_id);
+        res.code(204).send();
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-module.exports.getLogs = function (req, res) {
-    return jobManager.getLogs(req.params.job_id, req.params.report_id)
-        .then(function (result) {
-            //TODO: fix ZIP creation
-            // return res.zip(result);
-        }).catch(function (err) {
-            res.send(err);
-        });
-};
+async function getLogs(req, res) {
+    try {
+        let result = await jobManager.getLogs(req.params.job_id, req.params.report_id);
+        //TODO: fix ZIP creation
+        // return res.zip(result);
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-module.exports.deleteAllContainers = function (req, res) {
-    return jobManager.deleteAllContainers()
-        .then(function (result) {
-            res.code(200).send(result);
-        })
-        .catch(function (err) {
-            res.send(err);
-        });
-};
+async function deleteAllContainers(req, res) {
+    try {
+        let result = await jobManager.deleteAllContainers();
+        res.code(200).send(result);
+    } catch (err) {
+        res.send(err);
+    }
+}
+
+module.exports = {
+    createJob,
+    getJobs,
+    getJob,
+    updateJob,
+    deleteJob,
+    stopRun,
+    getLogs,
+    deleteAllContainers
+}

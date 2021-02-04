@@ -6,7 +6,7 @@ const reportExporter = require('../models/reportExporter');
 const stats = require('../models/statsManager');
 const exportHelper = require('../helpers/exportReportHelper');
 
-module.exports.getAggregateReport = async function (req, res) {
+async function getAggregateReport(req, res) {
     let reportInput;
     try {
         reportInput = await aggregateReportGenerator.createAggregateReport(req.params.test_id, req.params.report_id);
@@ -15,9 +15,9 @@ module.exports.getAggregateReport = async function (req, res) {
     }
 
     res.send(reportInput);
-};
+}
 
-module.exports.getReport = async (req, res) => {
+async function getReport(req, res) {
     let reportSummary;
     try {
         reportSummary = await reports.getReport(req.params.test_id, req.params.report_id, req.requestContext);
@@ -26,9 +26,9 @@ module.exports.getReport = async (req, res) => {
     }
 
     res.send(reportSummary);
-};
+}
 
-module.exports.editReport = async (req, res) => {
+async function editReport(req, res) {
     try {
         await reports.editReport(req.params.test_id, req.params.report_id, req.body, req.requestContext);
     } catch (err) {
@@ -36,18 +36,18 @@ module.exports.editReport = async (req, res) => {
     }
 
     res.code(204).send();
-};
+}
 
-module.exports.deleteReport = async (req, res) => {
+async function deleteReport(req, res) {
     try {
         await reports.deleteReport(req.params.test_id, req.params.report_id, req.requestContext);
     } catch (err) {
        res.send(err);
     }
     res.code(204).send();
-};
+}
 
-module.exports.getReports = async (req, res) => {
+async function getReports(req, res) {
     let reportSummaries;
     try {
         reportSummaries = await reports.getReports(req.params.test_id, req.query.filter, req.requestContext);
@@ -56,9 +56,9 @@ module.exports.getReports = async (req, res) => {
     }
 
     res.send(reportSummaries);
-};
+}
 
-module.exports.getLastReports = async (req, res) => {
+async function getLastReports(req, res) {
     let reportSummaries;
     try {
         reportSummaries = await reports.getLastReports(req.query.limit, req.query.filter, req.requestContext);
@@ -67,9 +67,9 @@ module.exports.getLastReports = async (req, res) => {
     }
 
     res.send(reportSummaries);
-};
+}
 
-module.exports.postReport = async (req, res) => {
+async function postReport(req, res) {
     let report;
     try {
         report = await reports.postReportDeprecated(req.params.test_id, req.body);
@@ -77,9 +77,9 @@ module.exports.postReport = async (req, res) => {
        res.send(err);
     }
     res.code(201).send(report.report_id);
-};
+}
 
-module.exports.postStats = async (req, res) => {
+async function postStats(req, res) {
     try {
         const report = await reports.getReport(req.params.test_id, req.params.report_id, req.requestContext);
         await stats.postStats(report, req.body);
@@ -87,9 +87,9 @@ module.exports.postStats = async (req, res) => {
        res.send(err);
     }
     res.code(204).send();
-};
+}
 
-module.exports.subscribeRunnerToReport = async function(req, res) {
+async function subscribeRunnerToReport(req, res) {
     const {
         params: {
             report_id: reportId,
@@ -103,9 +103,9 @@ module.exports.subscribeRunnerToReport = async function(req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.getExportedReport = async(req, res) => {
+async function getExportedReport(req, res) {
     let exportedReport;
     let reportInput;
     try {
@@ -118,9 +118,9 @@ module.exports.getExportedReport = async(req, res) => {
     res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
     res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
     res.send(exportedReport);
-};
+}
 
-module.exports.getExportedCompareReport = async(req, res) => {
+async function getExportedCompareReport(req, res) {
     let exportedCompareReport;
     const aggregateReportArray = [];
     try {
@@ -139,4 +139,18 @@ module.exports.getExportedCompareReport = async(req, res) => {
     res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
     res.set('Content-Type', exportHelper.getContentType(req.params.file_format));
     res.send(exportedCompareReport);
-};
+}
+
+module.exports = {
+    getAggregateReport,
+    getReport,
+    editReport,
+    deleteReport,
+    getReports,
+    getLastReports,
+    postReport,
+    postStats,
+    subscribeRunnerToReport,
+    getExportedReport,
+    getExportedCompareReport
+}

@@ -1,17 +1,16 @@
 'use strict';
 const processorManager = require('../models/processorsManager');
 
-module.exports.createProcessor = function (req, res) {
-    return processorManager.createProcessor(req.body, req.requestContext)
-        .then(function (result) {
-            res.code(201).send(result);
-        })
-        .catch(function (err) {
-            res.send(err);
-        });
-};
+async function createProcessor(req, res) {
+    try {
+        let result = processorManager.createProcessor(req.body, req.requestContext);
+        res.code(201).send(result);
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-module.exports.getAllProcessors = async function (req, res) {
+async function getAllProcessors(req, res) {
     let { query: { from = "0", limit = "100" } } = req;
     let processors;
     try {
@@ -22,9 +21,9 @@ module.exports.getAllProcessors = async function (req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.getProcessor = async function (req, res) {
+async function getProcessor(req, res) {
     let processor;
     const processorId = req.params.processor_id;
     try {
@@ -33,9 +32,9 @@ module.exports.getProcessor = async function (req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.deleteProcessor = async function (req, res) {
+async function deleteProcessor(req, res) {
     const { params: { processor_id: processorId } } = req;
     try {
         await processorManager.deleteProcessor(processorId, req.requestContext, req.log);
@@ -43,9 +42,9 @@ module.exports.deleteProcessor = async function (req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.updateProcessor = async function (req, res) {
+async function updateProcessor(req, res) {
     const { body: updatedProcessor, params: { processor_id: processorId } } = req;
     try {
         const processor = await processorManager.updateProcessor(processorId, updatedProcessor, req.requestContext);
@@ -53,4 +52,12 @@ module.exports.updateProcessor = async function (req, res) {
     } catch (e) {
         res.send(e);
     }
-};
+}
+
+module.exports = {
+    createProcessor,
+    getAllProcessors,
+    getProcessor,
+    deleteProcessor,
+    updateProcessor
+}

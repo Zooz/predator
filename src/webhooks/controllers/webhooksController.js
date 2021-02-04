@@ -1,7 +1,7 @@
 'use strict';
 const webhookManager = require('../models/webhookManager');
 
-module.exports.getAllWebhooks = async function (req, res) {
+async function getAllWebhooks(req, res) {
     let webhooks;
     try {
         webhooks = await webhookManager.getAllWebhooks(req.requestContext);
@@ -9,9 +9,9 @@ module.exports.getAllWebhooks = async function (req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.getWebhook = async function (req, res) {
+async function getWebhook(req, res) {
     let webhook;
     const webhookId = req.params.webhook_id;
     try {
@@ -20,9 +20,9 @@ module.exports.getWebhook = async function (req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.createWebhook = async function (req, res) {
+async function createWebhook(req, res) {
     let webhook;
     try {
         webhook = await webhookManager.createWebhook(req.body, req.requestContext);
@@ -30,9 +30,9 @@ module.exports.createWebhook = async function (req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.deleteWebhook = async function (req, res) {
+async function deleteWebhook(req, res) {
     const webhookId = req.params.webhook_id;
     try {
         await webhookManager.deleteWebhook(webhookId, req.requestContext);
@@ -40,9 +40,9 @@ module.exports.deleteWebhook = async function (req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.updateWebhook = async function (req, res) {
+async function updateWebhook(req, res) {
     const { body: updatedWebhook, params: { webhook_id: webhookId } } = req;
     try {
         const webhook = await webhookManager.updateWebhook(webhookId, updatedWebhook);
@@ -50,9 +50,9 @@ module.exports.updateWebhook = async function (req, res) {
     } catch (err) {
         res.send(err);
     }
-};
+}
 
-module.exports.testWebhook = async function(req, res) {
+async function testWebhook(req, res) {
     try {
         const response = await webhookManager.testWebhook(req.body);
         res.code(200).send(response);
@@ -60,4 +60,13 @@ module.exports.testWebhook = async function(req, res) {
     catch (err) {
         res.send(err);
     }
-};
+}
+
+module.exports = {
+    getAllWebhooks,
+    getWebhook,
+    createWebhook,
+    deleteWebhook,
+    updateWebhook,
+    testWebhook
+}

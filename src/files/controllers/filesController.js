@@ -29,9 +29,9 @@ async function getFile(req, res) {
 async function getFileMetadata(req, res) {
     try {
         const fileData = await fileManager.getFile(req.params.file_id, false, req.requestContext);
-        return res.code(200).send(fileData);
+        res.code(200).send(fileData);
     } catch (err) {
-        return res.code(500).send(err);
+        res.code(500).send(err);
     }
 }
 
@@ -49,8 +49,8 @@ async function saveFile(req, res) {
             throw error;
         }
         const id = await fileManager.saveFile(file.name, file.data, req.requestContext);
-        return res.code(201).send({ id, filename: file.name });
+        res.code(201).send({ id, filename: file.name });
     } catch (err){
-        return res.code(500).send(err);
+        res.code(500).send(err);
     }
 }

@@ -1,13 +1,7 @@
 'use strict';
 
 const dsl = require('../models/dsl');
-module.exports = {
-    createDefinition,
-    getDslDefinition,
-    getDslDefinitions,
-    updateDefinition,
-    deleteDefinition
-};
+
 async function getDslDefinitions(req, res) {
     try {
         const result = await dsl.getDefinitions(req.params.dsl_name, req.requestContext);
@@ -49,3 +43,11 @@ async function deleteDefinition(req, res) {
         res.send(err);
     }
 }
+
+module.exports = {
+    createDefinition,
+    getDslDefinition,
+    getDslDefinitions,
+    updateDefinition,
+    deleteDefinition
+};
