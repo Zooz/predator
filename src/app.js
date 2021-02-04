@@ -31,6 +31,8 @@ const config = require('./configManager/controllers/configController');
 
 const {CONTEXT_ID} = require('./common/consts');
 const logger = require('./common/logger');
+const streamingManager = require('./streaming/manager');
+const streamingConfig = require('./config/streamingConfig');
 
 module.exports = async () => {
     swaggerValidator.init('./docs/openapi3.yaml', { framework: 'fastify', beautifyErrors: true });
@@ -38,6 +40,11 @@ module.exports = async () => {
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
     await jobsManager.scheduleFinishedContainersCleanup();
+
+    if (streamingConfig.platform) {
+        const eventStreamerPlatformConfig = require(`./config/${streamingConfig.platform}Config`);
+        await streamingManager.init(eventStreamerPlatformConfig);
+    }
 
     const app = fastify({
         logger,

@@ -9,7 +9,7 @@ const should = require('should'),
 const docker = new Docker(dockerConnection);
 
 describe('Create job specific docker tests - contexts', async function () {
-    this.timeout(2000);
+    this.timeout(20000);
     let testId, testIdContextB;
     let jobIdContextA, jobIdNoContext;
     let jobTemplateBody;

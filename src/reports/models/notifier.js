@@ -10,7 +10,10 @@ const reportEmailSender = require('./reportEmailSender'),
     configHandler = require('../../configManager/models/configHandler'),
     reportUtil = require('../utils/reportUtil'),
     reportsManager = require('./reportsManager'),
-    webhooksManager = require('../../webhooks/models/webhookManager');
+    webhooksManager = require('../../webhooks/models/webhookManager'),
+    testsManager = require('../../tests/models/manager'),
+    streamingManager = require('../../streaming/manager'),
+    { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common');
 const {
     CONFIG: configConstants,
     WEBHOOK_EVENT_TYPE_STARTED,
@@ -101,11 +104,18 @@ async function handleDone(report, job, reportBenchmark, context) {
         const { event, icon } = reportBenchmark.score < benchmarkThreshold ? { event: WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED, icon: slackEmojis.CRY } : { event: WEBHOOK_EVENT_TYPE_BENCHMARK_PASSED, icon: slackEmojis.GRIN };
         await webhooksManager.fireWebhookByEvent(job, event, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score, lastScores, benchmarkThreshold }, { icon }, context);
     }
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET }, context);
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET });
+
+    const test = await testsManager.getTest(report.test_id);
+    streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_FINISHED, { ...test, ...report, ...aggregatedReport });
 }
 
-async function handleAbort(report, job, context) {
-    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_ABORTED, report, {}, {}, context);
+async function handleAbort(report, job) {
+    await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_ABORTED, report);
+
+    const test = await testsManager.getTest(report.test_id);
+    const aggregatedReport = await aggregateReportGenerator.createAggregateReport(report.test_id, report.report_id);
+    streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_FINISHED, { ...test, ...report, ...aggregatedReport });
 }
 
 async function getBenchmarkConfig() {

@@ -17,6 +17,9 @@ module.exports.convertByType = (valueToConvert, type) => {
                 case 'boolean':
                     value = valueToConvert === 'true' || valueToConvert === true;
                     break;
+                case 'array':
+                    value = valueToConvert.split(',');
+                    break;
             }
         }
     } catch (err) {
