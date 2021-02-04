@@ -20,7 +20,10 @@ const DynamicDropdown = ({ inputComponent, listOptionsComponent, isListOpen, onL
             {isListOpen && (
               <ClickOutHandler onClickOut={onListClose}>
                 <Popper
-                  modifiers={{ preventOverflow: { enabled: false } }}
+                  modifiers={{
+                      preventOverflow: { enabled: false },
+                      hide: { enabled: false}
+                  }}
                   outOfBoundaries placement='bottom-start' eventsEnabled
                 >
                   {({ ref, style: popperStyle }) => (
