@@ -1,5 +1,4 @@
 const { expect } = require('chai'),
-    uuid = require('uuid'),
     rewire = require('rewire'),
     sinon = require('sinon');
 
@@ -11,6 +10,7 @@ describe('health check', function() {
     let sandbox;
     let kafkaManagerInitStub, kafkaManagerHealthStub, kafkaManagerCloseStub, kafkaManagerProduceStub;
     let configGetValueStub;
+    let newDateStub;
 
     before(function() {
         sandbox = sinon.createSandbox();
@@ -19,6 +19,7 @@ describe('health check', function() {
         kafkaManagerCloseStub = sandbox.stub(kafkaManager, 'close');
         kafkaManagerProduceStub = sandbox.stub(kafkaManager, 'produce');
         configGetValueStub = sandbox.stub(configHandler, 'getConfigValue');
+        newDateStub = sandbox.stub(Date.prototype, 'constructor');
     });
     afterEach(() => {
         sandbox.resetHistory();
@@ -142,6 +143,8 @@ describe('health check', function() {
             });
             configGetValueStub.resolves();
             kafkaManagerProduceStub.resolves();
+            const newDate = new Date();
+            newDateStub.returns(newDate);
 
             const metadata = {
                 'load-testing': 'v4'
@@ -192,6 +195,7 @@ describe('health check', function() {
             await streamingManager.produce(metadata, event, resource);
             expect(kafkaManagerProduceStub.calledOnce).eql(true);
             expect(kafkaManagerProduceStub.args[0][0]).eql(JSON.stringify({
+                published_at: newDate,
                 metadata: {
                     'load-testing': 'v4',
                     'predator-version': '1.6.0'
