@@ -17,7 +17,7 @@ export const getJobFromFramework = (jobId) => {
 };
 
 export const createJobInFramework = (body) => {
-  return axios.post(`${env.PREDATOR_URL}/jobs/`, body, {
+  return axios.post(`${env.PREDATOR_URL}/jobs`, body, {
     headers: getAuthorizationHeader()
   });
 };
