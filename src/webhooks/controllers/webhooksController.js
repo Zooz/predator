@@ -4,7 +4,7 @@ const webhookManager = require('../models/webhookManager');
 async function getAllWebhooks(req, res) {
     let webhooks;
     try {
-        webhooks = await webhookManager.getAllWebhooks(req.requestContext);
+        webhooks = await webhookManager.getAllWebhooks();
         res.code(200).send(webhooks);
     } catch (err) {
         res.send(err);
@@ -15,7 +15,7 @@ async function getWebhook(req, res) {
     let webhook;
     const webhookId = req.params.webhook_id;
     try {
-        webhook = await webhookManager.getWebhook(webhookId, req.requestContext);
+        webhook = await webhookManager.getWebhook(webhookId);
         res.code(200).send(webhook);
     } catch (err) {
         res.send(err);
@@ -25,7 +25,7 @@ async function getWebhook(req, res) {
 async function createWebhook(req, res) {
     let webhook;
     try {
-        webhook = await webhookManager.createWebhook(req.body, req.requestContext);
+        webhook = await webhookManager.createWebhook(req.body);
         res.code(201).send(webhook);
     } catch (err) {
         res.send(err);
@@ -35,7 +35,7 @@ async function createWebhook(req, res) {
 async function deleteWebhook(req, res) {
     const webhookId = req.params.webhook_id;
     try {
-        await webhookManager.deleteWebhook(webhookId, req.requestContext);
+        await webhookManager.deleteWebhook(webhookId);
         res.code(204).send();
     } catch (err) {
         res.send(err);

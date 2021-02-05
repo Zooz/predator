@@ -4,7 +4,7 @@ const dsl = require('../models/dsl');
 
 async function getDslDefinitions(req, res) {
     try {
-        const result = await dsl.getDefinitions(req.params.dsl_name, req.requestContext);
+        const result = await dsl.getDefinitions(req.params.dsl_name);
         res.code(200).send(result);
     } catch (err){
         res.send(err);
@@ -12,7 +12,7 @@ async function getDslDefinitions(req, res) {
 }
 async function getDslDefinition(req, res) {
     try {
-        const result = await dsl.getDefinition(req.params.dsl_name, req.params.definition_name, req.requestContext);
+        const result = await dsl.getDefinition(req.params.dsl_name, req.params.definition_name);
         res.code(200).send(result);
     } catch (err){
         res.send(err);
@@ -21,7 +21,7 @@ async function getDslDefinition(req, res) {
 
 async function createDefinition(req, res) {
     try {
-        const result = await dsl.createDefinition(req.params.dsl_name, req.body, req.requestContext);
+        const result = await dsl.createDefinition(req.params.dsl_name, req.body);
         res.code(201).send(result);
     } catch (err){
         res.send(err);
@@ -29,7 +29,7 @@ async function createDefinition(req, res) {
 }
 async function updateDefinition(req, res) {
     try {
-        const result = await dsl.updateDefinition(req.params.dsl_name, req.params.definition_name, req.body, req.requestContext);
+        const result = await dsl.updateDefinition(req.params.dsl_name, req.params.definition_name, req.body);
         res.code(200).send(result);
     } catch (err){
         res.send(err);
@@ -37,7 +37,7 @@ async function updateDefinition(req, res) {
 }
 async function deleteDefinition(req, res) {
     try {
-        await dsl.deleteDefinition(req.params.dsl_name, req.params.definition_name, req.requestContext);
+        await dsl.deleteDefinition(req.params.dsl_name, req.params.definition_name);
         res.code(204).send();
     } catch (err){
         res.send(err);

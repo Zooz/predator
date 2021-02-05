@@ -1,5 +1,6 @@
 'use strict';
 const uuid = require('uuid');
+const { requestContext } = require('fastify-request-context');
 
 const testGenerator = require('./testGenerator'),
     database = require('./database'),
@@ -19,8 +20,8 @@ module.exports = {
     getBenchmark
 };
 
-async function upsertTest(testRawData, existingTestId, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function upsertTest(testRawData, existingTestId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     if (existingTestId) {
         const test = await database.getTest(existingTestId, contextId);
@@ -31,7 +32,7 @@ async function upsertTest(testRawData, existingTestId, context) {
         }
     }
 
-    let testArtilleryJson = await testGenerator.createTest(testRawData, context);
+    let testArtilleryJson = await testGenerator.createTest(testRawData);
     const id = existingTestId || uuid();
     let processorFileId;
     if (testRawData.processor_file_url) {
@@ -46,16 +47,16 @@ async function upsertTest(testRawData, existingTestId, context) {
     return { id: id, revision_id: revisionId };
 }
 
-async function insertTestBenchmark(benchmarkRawData, testId, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function insertTestBenchmark(benchmarkRawData, testId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const dataParse = JSON.stringify(benchmarkRawData);
     await database.insertTestBenchmark(testId, dataParse, contextId);
     return { benchmark_data: benchmarkRawData };
 }
 
-async function getBenchmark(testId, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getBenchmark(testId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const benchmark = await database.getTestBenchmark(testId, contextId);
     if (!benchmark) {
@@ -66,8 +67,8 @@ async function getBenchmark(testId, context) {
     return JSON.parse(benchmark);
 }
 
-async function getTest(testId, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getTest(testId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const test = await database.getTest(testId, contextId);
     if (!test) {
@@ -76,7 +77,7 @@ async function getTest(testId, context) {
         throw error;
     }
     if (test.type === TEST_TYPE_DSL) {
-        test.artillery_test = await testGenerator.createTest(test, context);
+        test.artillery_test = await testGenerator.createTest(test);
     } else {
         test.artillery_test = test.artillery_json;
     }
@@ -84,8 +85,8 @@ async function getTest(testId, context) {
     return test;
 }
 
-async function getAllTestRevisions(testId, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getAllTestRevisions(testId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const rows = await database.getAllTestRevisions(testId, contextId);
     const testRevisions = [];
@@ -103,8 +104,8 @@ async function getAllTestRevisions(testId, context) {
     }
 }
 
-async function getTests(filter, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getTests(filter) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const rows = await database.getTests(contextId, filter);
     const testsById = {};
@@ -123,8 +124,8 @@ async function getTests(filter, context) {
     return latestTestsRevisions;
 }
 
-async function deleteTest(testId, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function deleteTest(testId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const test = await database.getTest(testId, contextId);
     if (!test) {

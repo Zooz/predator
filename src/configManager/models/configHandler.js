@@ -6,11 +6,11 @@ const runnerValidator = require('../../common/validateRunnerVersion');
 const logger = require('../../common/logger');
 const { WARN_MESSAGES } = require('../../common/consts');
 
-module.exports.getConfigValue = async (configPath, log) => {
+module.exports.getConfigValue = async (configPath) => {
     const dbConfigValue = await dbConnector.getConfigValue(configPath);
     const value = dbConfigValue || configDataMap.getConstDefaultValue(configPath);
     const type = configDataMap.getConstType(configPath);
-    return convertData.convertByType(value, type, log);
+    return convertData.convertByType(value, type);
 };
 
 module.exports.getConfig = async () => {

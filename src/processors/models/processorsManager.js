@@ -1,5 +1,6 @@
 'use strict';
  const uuid = require('uuid');
+ const { requestContext } = require("fastify-request-context");
 
 const logger = require('../../common/logger');
 const databaseConnector = require('./database/databaseConnector'),
@@ -7,8 +8,8 @@ const databaseConnector = require('./database/databaseConnector'),
     { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts'),
     generateError = require('../../common/generateError');
 
-module.exports.createProcessor = async function (processor, context, log) {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.createProcessor = async function (processor) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const processorWithTheSameName = await databaseConnector.getProcessorByName(processor.name, contextId);
     if (processorWithTheSameName) {
@@ -27,14 +28,14 @@ module.exports.createProcessor = async function (processor, context, log) {
     }
 };
 
-module.exports.getAllProcessors = async function (from, limit, exclude, context) {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.getAllProcessors = async function (from, limit, exclude) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     return await databaseConnector.getAllProcessors(from, limit, exclude, contextId);
 };
 
-module.exports.getProcessor = async function (processorId, context) {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.getProcessor = async function (processorId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const processor = await databaseConnector.getProcessorById(processorId, contextId);
     if (processor) {
@@ -44,8 +45,8 @@ module.exports.getProcessor = async function (processorId, context) {
     }
 };
 
-module.exports.deleteProcessor = async function (processorId, context) {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.deleteProcessor = async function (processorId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const processor = await databaseConnector.getProcessorById(processorId, contextId);
     if (!processor) {
@@ -61,8 +62,8 @@ module.exports.deleteProcessor = async function (processorId, context) {
     return databaseConnector.deleteProcessor(processorId);
 };
 
-module.exports.updateProcessor = async function (processorId, processor, context) {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.updateProcessor = async function (processorId, processor) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const oldProcessor = await databaseConnector.getProcessorById(processorId, contextId);
     if (!oldProcessor) {

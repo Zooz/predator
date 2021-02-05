@@ -1,7 +1,9 @@
 const database = require('./database'),
     logger = require('../../common/logger'),
     utils = require('../helpers/utils'),
-    { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts');
+    { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts'),
+    { requestContext } = require('fastify-request-context');
+
 
 module.exports = {
     createDefinition,
@@ -11,8 +13,8 @@ module.exports = {
     deleteDefinition
 };
 
-async function getDefinitions(dslName, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getDefinitions(dslName) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const result = await database.getDslDefinitions(dslName, contextId);
     return result.map((definition) => ({
@@ -21,8 +23,8 @@ async function getDefinitions(dslName, context) {
     }));
 }
 
-async function getDefinition(dslName, definitionName, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getDefinition(dslName, definitionName) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const result = await database.getDslDefinition(dslName, definitionName, contextId);
     if (result) {
@@ -37,8 +39,8 @@ async function getDefinition(dslName, definitionName, context) {
     }
 }
 
-async function createDefinition(dslName, body, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function createDefinition(dslName, body) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     utils.addDefaultsToStep(body.request);
     const result = await database.insertDslDefinition(dslName, body.name, body.request, contextId);
@@ -55,8 +57,8 @@ async function createDefinition(dslName, body, context) {
     }
 }
 
-async function updateDefinition(dslName, definitionName, body, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function updateDefinition(dslName, definitionName, body) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     utils.addDefaultsToStep(body.request);
     const result = await database.updateDslDefinition(dslName, definitionName, body.request, contextId);
@@ -72,8 +74,8 @@ async function updateDefinition(dslName, definitionName, body, context) {
         throw error;
     }
 }
-async function deleteDefinition(dslName, definitionName, body, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function deleteDefinition(dslName, definitionName, body) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const result = await database.deleteDefinition(dslName, definitionName, contextId);
     if (result){

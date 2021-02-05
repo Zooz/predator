@@ -1,5 +1,6 @@
 'use strict';
 const databaseConnector = require('./database/sequelize/sequelizeConnector');
+const { requestContext } = require('fastify-request-context');
 const { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts');
 const generateError = require('../../common/generateError');
 const requestSender = require('../../common/requestSender');
@@ -10,14 +11,14 @@ const webhookDefaultValues = {
     global: false
 };
 
-async function getAllWebhooks(context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getAllWebhooks() {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     return await databaseConnector.getAllWebhooks(contextId);
 }
 
-async function getWebhook(webhookId, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getWebhook(webhookId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const webhook = await databaseConnector.getWebhook(webhookId, contextId);
     if (!webhook) {
@@ -26,8 +27,8 @@ async function getWebhook(webhookId, context) {
     return webhook;
 }
 
-async function createWebhook(webhookInfo, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function createWebhook(webhookInfo) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const webhook = {
         ...webhookDefaultValues,
@@ -36,8 +37,8 @@ async function createWebhook(webhookInfo, context) {
     return databaseConnector.createWebhook(webhook, contextId);
 }
 
-async function deleteWebhook(webhookId, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function deleteWebhook(webhookId) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const webhook = await databaseConnector.getWebhook(webhookId, contextId);
     if (!webhook) {
@@ -55,8 +56,8 @@ async function updateWebhook(webhookId, webhook) {
     return databaseConnector.updateWebhook(webhookId, webhook);
 }
 
-async function getAllGlobalWebhooks(context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getAllGlobalWebhooks() {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     return databaseConnector.getAllGlobalWebhooks(contextId);
 }
@@ -77,22 +78,22 @@ async function fireSingleWebhook(webhook, payload) {
     }
 }
 
-function fireWebhooksPromisesArray(webhooks, eventType, jobId, testId, report, additionalInfo, options, context) {
+function fireWebhooksPromisesArray(webhooks, eventType, jobId, testId, report, additionalInfo, options) {
     return webhooks.map(webhook => {
-        const webhookPayload = webhooksFormatter.format(webhook.format_type, eventType, jobId, testId, report, additionalInfo, options, context);
+        const webhookPayload = webhooksFormatter.format(webhook.format_type, eventType, jobId, testId, report, additionalInfo, options);
         return fireSingleWebhook(webhook, webhookPayload);
     });
 }
 
-async function fireWebhookByEvent(job, eventType, report, additionalInfo = {}, options = {}, context) {
+async function fireWebhookByEvent(job, eventType, report, additionalInfo = {}, options = {}) {
     const jobWebhooks = job.webhooks ? await Promise.all(job.webhooks.map(webhookId => getWebhook(webhookId))) : [];
-    const globalWebhooks = await getAllGlobalWebhooks(context);
+    const globalWebhooks = await getAllGlobalWebhooks();
     const webhooks = [...jobWebhooks, ...globalWebhooks];
     const webhooksWithEventType = webhooks.filter(webhook => webhook.events.includes(eventType));
     if (webhooksWithEventType.length === 0) {
         return;
     }
-    const webhooksPromises = fireWebhooksPromisesArray(webhooksWithEventType, eventType, job.id, job.test_id, report, additionalInfo, options, context);
+    const webhooksPromises = fireWebhooksPromisesArray(webhooksWithEventType, eventType, job.id, job.test_id, report, additionalInfo, options);
     await Promise.allSettled(webhooksPromises);
 }
 

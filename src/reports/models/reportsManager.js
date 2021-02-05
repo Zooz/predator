@@ -1,6 +1,7 @@
 'use strict';
 
 const uuid = require('uuid');
+const { requestContext } = require("fastify-request-context");
 
 const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
@@ -13,8 +14,8 @@ const databaseConnector = require('./databaseConnector'),
 const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
 
-module.exports.getReport = async (testId, reportId, context) => {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.getReport = async (testId, reportId) => {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
 
@@ -27,8 +28,8 @@ module.exports.getReport = async (testId, reportId, context) => {
     return getReportResponse(reportSummary[0], config);
 };
 
-module.exports.getReports = async (testId, filter, context) => {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.getReports = async (testId, filter) => {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const reportSummaries = await databaseConnector.getReports(testId, filter, contextId);
     const config = await configHandler.getConfig();
@@ -39,8 +40,8 @@ module.exports.getReports = async (testId, filter, context) => {
     return reports;
 };
 
-module.exports.getLastReports = async (limit, filter, context) => {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.getLastReports = async (limit, filter) => {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const reportSummaries = await databaseConnector.getLastReports(limit, filter, contextId);
     const config = await configHandler.getConfig();
@@ -49,9 +50,9 @@ module.exports.getLastReports = async (limit, filter, context) => {
     });
 };
 
-module.exports.editReport = async (testId, reportId, reportBody, context) => {
+module.exports.editReport = async (testId, reportId, reportBody) => {
     // currently we support only edit for notes
-    const contextId = context.get(CONTEXT_ID);
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
     if (!reportSummary) {
@@ -62,8 +63,8 @@ module.exports.editReport = async (testId, reportId, reportBody, context) => {
     await databaseConnector.updateReport(testId, reportId, { notes, is_favorite }, contextId);
 };
 
-module.exports.deleteReport = async (testId, reportId, context) => {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.deleteReport = async (testId, reportId) => {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
     if (!reportSummary) {
@@ -82,8 +83,8 @@ module.exports.deleteReport = async (testId, reportId, context) => {
     await databaseConnector.deleteReport(testId, reportId);
 };
 
-module.exports.postReport = async (reportId, test, job, startTime, context) => {
-    const contextId = context.get(CONTEXT_ID);
+module.exports.postReport = async (reportId, test, job, startTime) => {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const phase = '0';
 

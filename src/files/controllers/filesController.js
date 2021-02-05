@@ -10,7 +10,7 @@ module.exports = {
 
 async function getFile(req, res) {
     try {
-        const fileData = await fileManager.getFile(req.params.file_id, true, req.requestContext);
+        const fileData = await fileManager.getFile(req.params.file_id, true);
 
         const fileContents = Buffer.from(fileData.content, 'base64');
         const readStream = new stream.PassThrough();
@@ -28,7 +28,7 @@ async function getFile(req, res) {
 
 async function getFileMetadata(req, res) {
     try {
-        const fileData = await fileManager.getFile(req.params.file_id, false, req.requestContext);
+        const fileData = await fileManager.getFile(req.params.file_id, false);
         res.code(200).send(fileData);
     } catch (err) {
         res.code(500).send(err);
@@ -48,7 +48,7 @@ async function saveFile(req, res) {
             error.statusCode = 413;
             throw error;
         }
-        const id = await fileManager.saveFile(file.name, file.data, req.requestContext);
+        const id = await fileManager.saveFile(file.name, file.data);
         res.code(201).send({ id, filename: file.name });
     } catch (err){
         res.code(500).send(err);

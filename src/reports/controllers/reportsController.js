@@ -20,7 +20,7 @@ async function getAggregateReport(req, res) {
 async function getReport(req, res) {
     let reportSummary;
     try {
-        reportSummary = await reports.getReport(req.params.test_id, req.params.report_id, req.requestContext);
+        reportSummary = await reports.getReport(req.params.test_id, req.params.report_id);
     } catch (err) {
        res.send(err);
     }
@@ -30,7 +30,7 @@ async function getReport(req, res) {
 
 async function editReport(req, res) {
     try {
-        await reports.editReport(req.params.test_id, req.params.report_id, req.body, req.requestContext);
+        await reports.editReport(req.params.test_id, req.params.report_id, req.body);
     } catch (err) {
        res.send(err);
     }
@@ -40,7 +40,7 @@ async function editReport(req, res) {
 
 async function deleteReport(req, res) {
     try {
-        await reports.deleteReport(req.params.test_id, req.params.report_id, req.requestContext);
+        await reports.deleteReport(req.params.test_id, req.params.report_id);
     } catch (err) {
        res.send(err);
     }
@@ -50,7 +50,7 @@ async function deleteReport(req, res) {
 async function getReports(req, res) {
     let reportSummaries;
     try {
-        reportSummaries = await reports.getReports(req.params.test_id, req.query.filter, req.requestContext);
+        reportSummaries = await reports.getReports(req.params.test_id, req.query.filter);
     } catch (err) {
        res.send(err);
     }
@@ -61,7 +61,7 @@ async function getReports(req, res) {
 async function getLastReports(req, res) {
     let reportSummaries;
     try {
-        reportSummaries = await reports.getLastReports(req.query.limit, req.query.filter, req.requestContext);
+        reportSummaries = await reports.getLastReports(req.query.limit, req.query.filter);
     } catch (err) {
        res.send(err);
     }
@@ -81,7 +81,7 @@ async function postReport(req, res) {
 
 async function postStats(req, res) {
     try {
-        const report = await reports.getReport(req.params.test_id, req.params.report_id, req.requestContext);
+        const report = await reports.getReport(req.params.test_id, req.params.report_id);
         await stats.postStats(report, req.body);
     } catch (err) {
        res.send(err);

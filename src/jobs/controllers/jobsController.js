@@ -13,7 +13,7 @@ async function createJob(req, res) {
 async function getJobs(req, res) {
     const shouldGetAllJobs = (req.query && (req.query.one_time === true || req.query.one_time === 'true'));
     try {
-        let result = await jobManager.getJobs(shouldGetAllJobs, req.requestContext);
+        let result = await jobManager.getJobs(shouldGetAllJobs);
         res.code(200).send(result);
     } catch (err) {
         res.send(err);
@@ -22,7 +22,7 @@ async function getJobs(req, res) {
 
 async function getJob(req, res) {
     try {
-        let result = await jobManager.getJob(req.params.job_id, req.requestContext);
+        let result = await jobManager.getJob(req.params.job_id);
         res.code(200).send(result);
     } catch (err) {
         res.send(err);
@@ -31,7 +31,7 @@ async function getJob(req, res) {
 
 async function updateJob(req, res) {
     try {
-        let result = await jobManager.updateJob(req.params.job_id, req.body, req.requestContext);
+        let result = await jobManager.updateJob(req.params.job_id, req.body);
         res.code(200).send(result);
     } catch (err) {
         res.send(err);
@@ -40,7 +40,7 @@ async function updateJob(req, res) {
 
 async function deleteJob(req, res) {
     try {
-        await jobManager.deleteJob(req.params.job_id, req.requestContext);
+        await jobManager.deleteJob(req.params.job_id);
         res.code(204).send();
     } catch (err) {
         res.send(err);

@@ -1,12 +1,13 @@
 'use strict';
 const _ = require('lodash');
 
+const {requestContext} = require("fastify-request-context");
 const { TEST_TYPE_BASIC, CONTEXT_ID} = require('./../../common/consts');
 const database = require('./database');
 const utils = require('../helpers/utils');
 const { get, cloneDeep } = require('lodash');
 
-module.exports.createTest = async function(testDetails, context) {
+module.exports.createTest = async function(testDetails) {
     if (testDetails.type === TEST_TYPE_BASIC) {
         const artillery = utils.addDefaultsToTest(testDetails.artillery_test);
         delete testDetails.artillery_test;
@@ -20,14 +21,14 @@ module.exports.createTest = async function(testDetails, context) {
         let before;
         if (testDetails.before && testDetails.before.steps){
             before = {};
-            before.flow = await createSteps('before', testDetails.before.steps, variables, dslCached, context);
+            before.flow = await createSteps('before', testDetails.before.steps, variables, dslCached);
         }
         for (let i = 0; i < testDetails.scenarios.length; i++) {
             const scenario = testDetails.scenarios[i];
             const scenarioIndex = i;
             const artilleryTestJson = {};
             artilleryTestJson.name = scenario.scenario_name;
-            artilleryTestJson.flow = await createSteps(scenarioIndex, scenario.steps, variables, dslCached, context);
+            artilleryTestJson.flow = await createSteps(scenarioIndex, scenario.steps, variables, dslCached);
 
             if (scenario.weight) {
                 weightsSum += scenario.weight;
@@ -78,8 +79,8 @@ function calculateWeights(scenarios, weightsSum, missingWeightCount) {
     return weightsSum;
 }
 
-async function getDslDefinitionsAsMap(dslName, context) {
-    const contextId = context.get(CONTEXT_ID);
+async function getDslDefinitionsAsMap(dslName) {
+    const contextId = requestContext.get(CONTEXT_ID);
 
     const result = {};
     const definitions = await database.getDslDefinitions(dslName, contextId);
@@ -90,7 +91,7 @@ async function getDslDefinitionsAsMap(dslName, context) {
     return result;
 }
 
-async function createSteps(majorPrefix, steps, variables, dslCached, context) {
+async function createSteps(majorPrefix, steps, variables, dslCached) {
     const stepsJsons = [];
     const previousSteps = [];
     for (let i = 0; i < steps.length; i++) {
@@ -105,7 +106,7 @@ async function createSteps(majorPrefix, steps, variables, dslCached, context) {
         const dslName = parsedAction[0];
         const dslDefinition = parsedAction[1];
         if (!dslCached[dslName]) {
-            dslCached[dslName] = await getDslDefinitionsAsMap(dslName, context);
+            dslCached[dslName] = await getDslDefinitionsAsMap(dslName);
         }
 
         let stepDefinition = get(dslCached, `[${dslName}][${dslDefinition}]`);

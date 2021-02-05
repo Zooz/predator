@@ -13,7 +13,7 @@ async function getConfig(req, res) {
 async function updateConfig(req, res) {
     const body = req.body;
     try {
-        await configModel.updateConfig(body, req.log);
+        await configModel.updateConfig(body);
         res.code(200).send(body);
     } catch (err) {
         res.code(500).send(err);
