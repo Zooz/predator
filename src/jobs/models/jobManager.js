@@ -73,12 +73,9 @@ module.exports.createJob = async (job) => {
         }
         logger.info(`Job ${jobId} deployed successfully`);
         const jobResponse = createResponse(jobId, job, report);
-        const streamingResource = {
-            job_id: jobResponse.id,
-            job_type: jobResponse.type,
-            ...jobResponse
-        };
-        streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_CREATED, streamingResource);
+        if (job.run_immediately) {
+            produceJobToStreamingPlatform(jobResponse);
+        }
 
         return jobResponse;
     } catch (error) {
@@ -289,12 +286,7 @@ function addCron(job, cronExpression, configData) {
         }
         const report = await runJob(job, configData);
         const jobResponse = createResponse(job.id, job, report);
-        const streamingResource = {
-            job_id: jobResponse.id,
-            job_type: jobResponse.type,
-            ...jobResponse
-        };
-        streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_CREATED, streamingResource);
+        produceJobToStreamingPlatform(jobResponse);
     }, function () {
         logger.info(`Job: ${job.id} completed.`);
     }, true);
@@ -377,4 +369,13 @@ async function runJob(job, configData) {
         throw error;
     }
     return report;
+}
+
+function produceJobToStreamingPlatform(jobResponse) {
+    const streamingResource = {
+        job_id: jobResponse.id,
+        job_type: jobResponse.type,
+        ...jobResponse
+    };
+    streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_CREATED, streamingResource);
 }
