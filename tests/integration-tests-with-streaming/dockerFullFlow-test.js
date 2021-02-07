@@ -103,7 +103,9 @@ describe('Create job specific docker tests', async function () {
                         should(valuePublished.event).eql('job-created');
                         should(valuePublished.resource).containEql({
                             test_id: testId,
+                            job_id: jobId,
                             report_id: reportId,
+                            job_type: 'load_test',
                             arrival_rate: 2,
                             notes: 'streaming notes',
                             duration: 1
@@ -156,7 +158,9 @@ describe('Create job specific docker tests', async function () {
                         should(valuePublished.event).eql('job-created');
                         should(valuePublished.resource).containEql({
                             test_id: testId,
+                            job_id: jobId,
                             report_id: reportId,
+                            job_type: 'load_test',
                             arrival_rate: 2,
                             notes: 'streaming notes',
                             duration: 1
@@ -215,7 +219,9 @@ describe('Create job specific docker tests', async function () {
                         should(valuePublished.event).eql('job-created');
                         should(valuePublished.resource).containEql({
                             test_id: testId,
+                            job_id: jobId,
                             report_id: reportId,
+                            job_type: 'load_test',
                             arrival_rate: 2,
                             notes: 'streaming notes',
                             duration: 1
