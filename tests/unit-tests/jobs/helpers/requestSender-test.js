@@ -27,14 +27,13 @@ describe('Request sender tests', () => {
     it('Successful request ', async () => {
         requestStub.resolves(({ response: {} }));
 
-        await requestSender.send({ method: 'post', body: { pets: [] }, headers: {}, url: 'http://www.walla.com' });
+        await requestSender.send({ method: 'post', json: { pets: [] }, headers: {}, url: 'http://www.walla.com' });
 
         requestStub.args[0][0].should.eql({
-            body: {
+            json: {
                 pets: []
             },
             headers: {},
-            json: true,
             method: 'post',
             rejectUnauthorized: false,
             timeout: 15000,
@@ -48,7 +47,7 @@ describe('Request sender tests', () => {
         requestStub.rejects({ statusCode: 500 });
 
         try {
-            await requestSender.send({ method: 'post', body: { pets: [] }, headers: {}, url: 'http://www.zooz.com' });
+            await requestSender.send({ method: 'post', json: { pets: [] }, headers: {}, url: 'http://www.zooz.com' });
             throw new Error('Should not get here');
         } catch (error) {
             infoStub.callCount.should.eql(0);

@@ -13,14 +13,16 @@ module.exports.validateEmail = async () => {
             const messages = await got({
                 method: 'GET',
                 url: smtpServerUrl + '/api/v1/messages',
+                responseType: 'json',
+                resolveBodyOnly: true,
                 timeout: 2000
             });
 
-            if (messages === '[]') {
+            if (messages.length === 0) {
                 reject(new Error('The SMTP server did not get the email...'));
             } else {
-                should(JSON.parse(messages).length).eql(1);
-                const email = JSON.parse(messages)[0];
+                should(messages.length).eql(1);
+                const email = messages[0];
                 console.log(email);
                 resolve(email);
             }

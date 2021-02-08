@@ -108,8 +108,7 @@ async function getJobControllerUid(jobPlatformName) {
 
     const job = await requestSender.send(options);
 
-    const controllerUid = job.spec.selector.matchLabels['controller-uid'];
-    return controllerUid;
+    return job.spec.selector.matchLabels['controller-uid'];
 }
 
 async function getLogsByPodsNames(podsNames) {

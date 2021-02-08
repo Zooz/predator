@@ -4,6 +4,7 @@ const got = require('got');
 const defaultOptions = {
     timeout: 15 * 1000,
     responseType: 'json',
+    resolveBodyOnly: true,
     rejectUnauthorized: false
 };
 

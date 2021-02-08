@@ -7,11 +7,11 @@ module.exports = {
 
 async function downloadFile(fileUrl) {
     const options = {
-        url: fileUrl
+        url: fileUrl,
+        resolveBodyOnly: true
     };
     try {
-        const response = await got.get(options);
-        return response;
+        return await got.get(options);
     } catch (err) {
         const errMsg = 'Error to download file: ' + err;
         const error = new Error(errMsg);
