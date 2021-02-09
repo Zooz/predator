@@ -23,16 +23,19 @@ module.exports.verifyJobBody = async (req, res) => {
     if (!(jobBody.run_immediately || jobBody.cron_expression)) {
         errorToThrow = new Error('Please provide run_immediately or cron_expression in order to schedule a job');
         errorToThrow.statusCode = 400;
+        throw errorToThrow;
     }
     if (jobBody.enabled === false && !jobBody.cron_expression) {
         errorToThrow = new Error('It is impossible to disable job without cron_expression');
         errorToThrow.statusCode = 400;
+        throw errorToThrow;
     }
     if (jobBody.cron_expression) {
         const message = verifyCronExpression(jobBody.cron_expression);
         if (message) {
             errorToThrow = new Error(`Unsupported cron_expression. ${message}`);
             errorToThrow.statusCode = 400;
+            throw errorToThrow;
         }
     }
     const jobPlatform = await configHandler.getConfigValue(consts.CONFIG.JOB_PLATFORM);
