@@ -30,7 +30,7 @@ describe('Artillery validator tests', function () {
     });
 
     describe('Verify artillery valid tests', () => {
-        it('The artillery json is a valid json', async () => {
+        it('The artillery json is a valid json', () => {
             const validArtilleryJson = {
                 config: {
                     target: '',
@@ -74,7 +74,7 @@ describe('Artillery validator tests', function () {
 
         });
 
-        it('The request is not a custom test', async () => {
+        it('The request is not a custom test', () => {
             req = { body: { type: consts.TEST_TYPE_PAYMENTSOS, scenarios: {} } };
             should.doesNotThrow(() => artilleryValidator.verifyArtillery(req, res));
         });
