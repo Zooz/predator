@@ -13,10 +13,10 @@ describe('Request sender tests', () => {
         infoStub = sandbox.stub(logger, 'info');
         errorStub = sandbox.stub(logger, 'error');
         requestStub = sandbox.stub();
-        requestSender.__set__('request', requestStub);
+        requestSender.__set__('got', requestStub);
     });
 
-    beforeEach(() => {
+    afterEach(() => {
         sandbox.resetHistory();
     });
 
@@ -27,7 +27,7 @@ describe('Request sender tests', () => {
     it('Successful request ', async () => {
         requestStub.resolves(({ response: {} }));
 
-        await requestSender.send({ method: 'post', json: { pets: [] }, headers: {}, url: 'http://www.walla.com' });
+        await requestSender.send({ method: 'post', json: { pets: [] }, headers: {}, url: 'https://httpbin.org/anything' });
 
         requestStub.args[0][0].should.eql({
             json: {
@@ -36,11 +36,13 @@ describe('Request sender tests', () => {
             headers: {},
             method: 'post',
             rejectUnauthorized: false,
+            resolveBodyOnly: true,
+            responseType: "json",
             timeout: 15000,
-            url: 'http://www.walla.com'
+            url: 'https://httpbin.org/anything'
         });
         errorStub.callCount.should.eql(0);
-        infoStub.args[0][0].should.eql({ method: 'post', url: 'http://www.walla.com', response: { response: {} } });
+        infoStub.args[0][0].should.eql({ method: 'post', url: 'https://httpbin.org/anything', response: { response: {} } });
     });
 
     it('Failure request ', async () => {

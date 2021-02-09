@@ -134,11 +134,7 @@ module.exports = async () => {
     app.get('/v1/jobs/:job_id', jobs.getJob);
     app.put('/v1/jobs/:job_id', {
         preHandler: async (req, res) => {
-            try {
-                await jobVerifier.verifyTestExists(req, res)
-            } catch (err) {
-                res.send(err);
-            }
+            await jobVerifier.verifyTestExists(req, res)
         }
     }, jobs.updateJob);
     app.delete('/v1/jobs/:job_id', jobs.deleteJob);

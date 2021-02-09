@@ -54,8 +54,7 @@ describe('webhooksFormatter', function () {
                     environment: 'test',
                     parallelism: 10
                 };
-                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
+                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
 
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
@@ -71,8 +70,7 @@ describe('webhooksFormatter', function () {
                     environment: 'test',
                     parallelism: 10
                 };
-                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`;
+                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`;
 
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
@@ -104,7 +102,7 @@ describe('webhooksFormatter', function () {
                 const stats = 'some stats string';
                 statsFormatterStub.returns(stats);
 
-                const expectedResult = `😎 *Test ${report.test_name} with id: ${testId} is finished.*\n ${stats}\n`;
+                const expectedResult = `😎 *Test ${report.test_name} with id: ${testId} is finished.*\n${stats}\n`;
 
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_FINISHED, uuid.v4(), testId, report, additionalInfo);
 
@@ -171,13 +169,8 @@ describe('webhooksFormatter', function () {
                         data: 'data'
                     }
                 };
-                const expectedResult = `😞 *Test with id: ${testId} Failed*.\n
-            test configuration:\n
-            environment: ${report.environment}\n
-            ${additionalInfo.stats.data}`;
-
+                const expectedResult = `😞 *Test with id: ${testId} Failed*.\ntest configuration:\nenvironment: ${report.environment}\n${additionalInfo.stats.data}`;
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_FAILED, uuid.v4(), testId, report, additionalInfo);
-
                 expect(payload.text).to.be.equal(expectedResult);
             });
             it(WEBHOOK_EVENT_TYPE_IN_PROGRESS, function () {
@@ -219,8 +212,7 @@ describe('webhooksFormatter', function () {
                     parallelism: 10,
                     grafana_report: 'http://local.grafana.io/predator'
                 };
-                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
+                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_SLACK, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
                 expect(payload.text).to.be.equal(expectedResult);
@@ -239,7 +231,7 @@ describe('webhooksFormatter', function () {
                     parallelism: 10
                 };
                 const expectedResult = {
-                    text: `&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`,
+                    text: `🤓 *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`,
                     themeColor: '957c58'
                 };
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_TEAMS, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
@@ -257,7 +249,7 @@ describe('webhooksFormatter', function () {
                     parallelism: 10
                 };
                 const expectedResult = {
-                    text: `&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`,
+                    text: `🤓 *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`,
                     themeColor: '957c58'
                 };
 
@@ -271,7 +263,7 @@ describe('webhooksFormatter', function () {
                     test_name: 'some name'
                 };
                 const expectedResult = {
-                    text: `&#x1F627; *Test ${report.test_name} with id: ${testId} was aborted.*`,
+                    text: `😢 *Test ${report.test_name} with id: ${testId} was aborted.*   \n`,
                     themeColor: '957c58'
                 };
 
@@ -295,7 +287,7 @@ describe('webhooksFormatter', function () {
                 statsFormatterStub.returns(stats);
 
                 const expectedResult = {
-                    text: `&#x1F60E; *Test ${report.test_name} with id: ${testId} is finished.*   \nsome stats string`,
+                    text: `😎 *Test ${report.test_name} with id: ${testId} is finished.*   \nsome stats string   \n`,
                     themeColor: '957c58'
                 };
 
@@ -371,7 +363,7 @@ describe('webhooksFormatter', function () {
                     }
                 };
                 const expectedResult = {
-                    text: `&#x1F627; *Test with id: ${testId} Failed*.   \ntest configuration:   \n   \n            environment: test   \n   \n            ${additionalInfo.stats.data}`,
+                    text: `😞 *Test with id: ${testId} Failed*.   \ntest configuration:   \nenvironment: test   \n${additionalInfo.stats.data}`,
                     themeColor: '957c58'
                 };
 
@@ -399,7 +391,7 @@ describe('webhooksFormatter', function () {
                     test_name: 'some name'
                 };
                 const expectedResult = {
-                    text: `&#x1F525 *Test ${report.test_name} with id: ${testId} has encountered an API failure!* &#x1F480;`,
+                    text: `&#x1F525; *Test ${report.test_name} with id: ${testId} has encountered an API failure!* &#x1F480;`,
                     themeColor: '957c58'
                 };
 
@@ -425,7 +417,7 @@ describe('webhooksFormatter', function () {
                     grafana_report: 'http://local.grafana.io/predator'
                 };
                 const expectedResult = {
-                    text: `&#x1F603; *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`,
+                    text: `🤓 *Test ${report.test_name} with id: ${testId} has started*.   \n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`,
                     themeColor: '957c58'
                 };
 
@@ -520,8 +512,7 @@ describe('webhooksFormatter', function () {
                     environment: 'test',
                     parallelism: 10
                 };
-                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
+                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
 
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_DISCORD, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
@@ -537,8 +528,7 @@ describe('webhooksFormatter', function () {
                     environment: 'test',
                     parallelism: 10
                 };
-                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`;
+                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival count: ${report.arrival_count} scenarios, number of runners: ${report.parallelism}`;
 
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_DISCORD, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
@@ -570,7 +560,7 @@ describe('webhooksFormatter', function () {
                 const stats = 'some stats string';
                 statsFormatterStub.returns(stats);
 
-                const expectedResult = `😎 *Test ${report.test_name} with id: ${testId} is finished.*\n ${stats}\n`;
+                const expectedResult = `😎 *Test ${report.test_name} with id: ${testId} is finished.*\n${stats}\n`;
 
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_DISCORD, WEBHOOK_EVENT_TYPE_FINISHED, uuid.v4(), testId, report, additionalInfo);
 
@@ -637,10 +627,7 @@ describe('webhooksFormatter', function () {
                         data: 'data'
                     }
                 };
-                const expectedResult = `😞 *Test with id: ${testId} Failed*.\n
-            test configuration:\n
-            environment: ${report.environment}\n
-            ${additionalInfo.stats.data}`;
+                const expectedResult = `😞 *Test with id: ${testId} Failed*.\ntest configuration:\nenvironment: ${report.environment}\n${additionalInfo.stats.data}`;
 
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_DISCORD, WEBHOOK_EVENT_TYPE_FAILED, uuid.v4(), testId, report, additionalInfo);
 
@@ -685,8 +672,7 @@ describe('webhooksFormatter', function () {
                     parallelism: 10,
                     grafana_report: 'http://local.grafana.io/predator'
                 };
-                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
+                const expectedResult = `🤓 *Test ${report.test_name} with id: ${testId} has started*.\n*test configuration:* environment: ${report.environment} duration: ${report.duration} seconds, arrival rate: ${report.arrival_rate} scenarios per second, ramp to: ${report.ramp_to} scenarios per second, number of runners: ${report.parallelism}`;
                 const payload = webhooksFormatter.format(EVENT_FORMAT_TYPE_DISCORD, WEBHOOK_EVENT_TYPE_STARTED, jobId, testId, report);
 
                 expect(payload.content).to.be.equal(expectedResult);

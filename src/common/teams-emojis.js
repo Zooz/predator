@@ -8,5 +8,6 @@ module.exports = {
     FIRE: '&#x1F525',
     HAMMER_AND_WRENCH: '&#x1F528;',
     ROCKET: '&#x1F680;',
-    SKULL: '&#x1F480;'
+    SKULL: '&#x1F480;',
+    BOOM: '&#x1F525;'
 };

@@ -56,9 +56,7 @@ module.exports.scheduleFinishedContainersCleanup = async () => {
 };
 
 module.exports.createJob = async (job) => {
-    logger.info('1');
     const contextId = requestContext.get(CONTEXT_ID);
-    logger.info(`Context ID: ${contextId}`);
     let report;
     const jobId = uuid.v4();
     const configData = await configHandler.getConfig();

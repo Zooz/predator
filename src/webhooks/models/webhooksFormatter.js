@@ -98,21 +98,17 @@ function switcher(report, additionalInfo, event, testId, emoji) {
             let requestRateMessage = arrivalRate ? `arrival rate: ${arrivalRate} scenarios per second` : `arrival count: ${arrivalCount} scenarios`;
             requestRateMessage = rampTo ? requestRateMessage + rampToMessage : requestRateMessage;
 
-            return `🤓 *Test ${testName} with id: ${testId} has started*.\n
-            *test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
+            return `🤓 *Test ${testName} with id: ${testId} has started*.\n*test configuration:* environment: ${environment} duration: ${duration} seconds, ${requestRateMessage}, number of runners: ${parallelism}`;
         }
         case WEBHOOK_EVENT_TYPE_FINISHED: {
-            let message = `😎 *Test ${testName} with id: ${testId} is finished.*\n ${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
+            let message = `😎 *Test ${testName} with id: ${testId} is finished.*\n${statsFormatter.getStatsFormatted('aggregate', aggregatedReport, reportBenchmark)}\n`;
             if (grafanaReport) {
                 message += `<${grafanaReport} | View final grafana dashboard report>`;
             }
             return message
         }
         case WEBHOOK_EVENT_TYPE_FAILED: {
-            return `😞 *Test with id: ${testId} Failed*.\n
-            test configuration:\n
-            environment: ${environment}\n
-            ${stats.data}`;
+            return `😞 *Test with id: ${testId} Failed*.\ntest configuration:\nenvironment: ${environment}\n${stats.data}`;
         }
         case WEBHOOK_EVENT_TYPE_ABORTED: {
             return `😢 *Test ${testName} with id: ${testId} was aborted.*\n`;

@@ -188,7 +188,7 @@ describe('webhooksManager', () => {
                     method: 'POST',
                     url: webhook.url,
                     body: payload,
-                    resolveWithFullResponse: true
+                    resolveBodyOnly: false
                 });
                 expect(statusCodeWebhookResponse).eql({webhook_status_code: statusCode, is_successful: true});
             });
@@ -210,7 +210,7 @@ describe('webhooksManager', () => {
                     method: 'POST',
                     url: webhook.url,
                     body: payload,
-                    resolveWithFullResponse: true
+                    resolveBodyOnly: false
                 });
                 expect(response).eql({webhook_status_code: statusCode, is_successful: false});
             });
@@ -280,13 +280,13 @@ describe('webhooksManager', () => {
                 method: 'POST',
                 url: webhooks[0].url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
             expect(requestSenderSendStub.args[1][0]).to.be.deep.equal({
                 method: 'POST',
                 url: webhooks[1].url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
 
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(2);
@@ -330,7 +330,7 @@ describe('webhooksManager', () => {
                 method: 'POST',
                 url: webhooks[0].url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
 
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(1);
@@ -381,13 +381,13 @@ describe('webhooksManager', () => {
                 method: 'POST',
                 url: webhooks[0].url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
             expect(requestSenderSendStub.args[1][0]).to.be.deep.equal({
                 method: 'POST',
                 url: globalWebhook.url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
 
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(2);
@@ -420,7 +420,7 @@ describe('webhooksManager', () => {
                 method: 'POST',
                 url: globalWebhook.url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(1);
         });
@@ -462,7 +462,7 @@ describe('webhooksManager', () => {
                 method: 'POST',
                 url: globalWebhook.url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             }).rejects();
 
             await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_STARTED, report);
@@ -476,19 +476,19 @@ describe('webhooksManager', () => {
                 method: 'POST',
                 url: webhooks[0].url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
             expect(requestSenderSendStub.args[1][0]).to.be.deep.equal({
                 method: 'POST',
                 url: webhooks[1].url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
             expect(requestSenderSendStub.args[2][0]).to.be.deep.equal({
                 method: 'POST',
                 url: globalWebhook.url,
                 body: format,
-                resolveWithFullResponse: true
+                resolveBodyOnly: false
             });
 
             expect(webhooksFormatterFormatStub.callCount).to.be.equal(3);

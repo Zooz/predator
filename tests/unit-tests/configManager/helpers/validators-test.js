@@ -25,9 +25,7 @@ describe('configManager validators tests', function() {
                 }
             };
             const res = {};
-            validators.validateBenchmarkWeights(req, res, nextStub);
-            should(nextStub.args[0][0].message).eql('Benchmark weights needs to sum up to 100%');
-            should(nextStub.args[0][0].statusCode).eql(422);
+            (() => validators.validateBenchmarkWeights(req, res)).should.throw({ statusCode: 422, message: "Benchmark weights needs to sum up to 100%" });
         });
     });
 });
