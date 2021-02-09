@@ -1,14 +1,12 @@
-const sinon = require('sinon');
+const sandbox = require('sinon').createSandbox();
 const should = require('should');
 const artilleryValidator = require('../../../../src/tests/helpers/artilleryValidator');
 const consts = require('../../../../src/common/consts');
 
 describe('Artillery validator tests', function () {
-    let req, res, sandbox, nextStub, resJsonStub, resStatusStub;
+    let req, res, resJsonStub, resStatusStub;
 
     before(() => {
-        sandbox = sinon.createSandbox();
-        nextStub = sandbox.stub();
         resJsonStub = sandbox.stub();
         resStatusStub = sandbox.stub();
         res = {
@@ -66,23 +64,19 @@ describe('Artillery validator tests', function () {
             };
 
             req = { body: { type: consts.TEST_TYPE_BASIC, artillery_test: validArtilleryJson } };
-            await artilleryValidator.verifyArtillery(req, res, nextStub);
-            should(nextStub.calledOnce).eql(true);
+            should.doesNotThrow(() => artilleryValidator.verifyArtillery(req, res));
         });
 
-        it('The artillery json is not a valid json', async () => {
+        it('The artillery json is not a valid json', () => {
             const invalidArtilleryJson = {};
-
             req = { body: { type: consts.TEST_TYPE_BASIC, artillery_test: invalidArtilleryJson } };
-            await artilleryValidator.verifyArtillery(req, res, nextStub);
-            should(nextStub.args[0][0].message).eql('The artillery json is not valid. Errors: Required property \'scenarios\' is missing');
-            should(nextStub.args[0][0].statusCode).eql(400);
+            (() => artilleryValidator.verifyArtillery(req, res)).should.throw({ statusCode: 400, message: "The artillery json is not valid. Errors: Required property 'scenarios' is missing" });
+
         });
 
         it('The request is not a custom test', async () => {
             req = { body: { type: consts.TEST_TYPE_PAYMENTSOS, scenarios: {} } };
-            await artilleryValidator.verifyArtillery(req, res, nextStub);
-            should(nextStub.calledOnce).eql(true);
+            should.doesNotThrow(() => artilleryValidator.verifyArtillery(req, res));
         });
     });
 });

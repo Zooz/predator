@@ -1,19 +1,17 @@
 const { expect } = require('chai'),
     rewire = require('rewire'),
-    sinon = require('sinon');
+    sandbox = require('sinon').createSandbox();
 
 const streamingManager = rewire('../../../src/streaming/manager'),
     kafkaManager = require('../../../src/streaming/kafka/manager'),
     configHandler = require('../../../src/configManager/models/configHandler');
 
 describe('health check', function() {
-    let sandbox;
     let kafkaManagerInitStub, kafkaManagerHealthStub, kafkaManagerCloseStub, kafkaManagerProduceStub;
     let configGetValueStub;
     let newDateStub;
 
     before(function() {
-        sandbox = sinon.createSandbox();
         kafkaManagerInitStub = sandbox.stub(kafkaManager, 'init');
         kafkaManagerHealthStub = sandbox.stub(kafkaManager, 'health');
         kafkaManagerCloseStub = sandbox.stub(kafkaManager, 'close');
@@ -67,7 +65,7 @@ describe('health check', function() {
 
             kafkaManagerHealthStub.resolves();
             await streamingManager.health();
-            expect(kafkaManagerHealthStub.calledOnce).eql(true);
+            sandbox.assert.calledOnce(kafkaManagerHealthStub);
         });
         it('should reject if streaming manager throws error on health', async function() {
             let expectedError;
@@ -83,7 +81,7 @@ describe('health check', function() {
             } catch (err) {
                 expectedError = err;
             }
-            expect(kafkaManagerHealthStub.calledOnce).eql(true);
+            sandbox.assert.calledOnce(kafkaManagerHealthStub);
             expect(expectedError).to.eql(streamerError);
         });
         it('should reject if streaming manager times out on health check', async function() {
@@ -109,14 +107,14 @@ describe('health check', function() {
             } catch (err) {
                 expectedError = err;
             }
-            expect(kafkaManagerHealthStub.calledOnce).eql(true);
+            sandbox.assert.calledOnce(kafkaManagerHealthStub);
             expect(expectedError.message).to.eql('streaming platform health check timed out after 2000ms');
         });
         it('No call to streaming manager health when streaming manager is not initialized', async function() {
             streamingManager.__set__('streamingManager', undefined);
             kafkaManagerHealthStub.resolves();
             await streamingManager.health();
-            expect(kafkaManagerHealthStub.calledOnce).eql(false);
+            sandbox.assert.notCalled(kafkaManagerHealthStub);
         });
     });
     describe('close', function() {
@@ -127,13 +125,13 @@ describe('health check', function() {
 
             kafkaManagerCloseStub.resolves();
             await streamingManager.close();
-            expect(kafkaManagerCloseStub.calledOnce).eql(true);
+            sandbox.assert.calledOnce(kafkaManagerCloseStub);
         });
         it('No call to streaming manager close when streaming manager is not initialized', async function() {
             streamingManager.__set__('streamingManager', undefined);
             kafkaManagerCloseStub.resolves();
             await streamingManager.close();
-            expect(kafkaManagerCloseStub.calledOnce).eql(false);
+            sandbox.assert.notCalled(kafkaManagerCloseStub);
         });
     });
     describe('produce', function() {
@@ -193,7 +191,7 @@ describe('health check', function() {
                 }
             };
             await streamingManager.produce(metadata, event, resource);
-            expect(kafkaManagerProduceStub.calledOnce).eql(true);
+            sandbox.assert.calledOnce(kafkaManagerProduceStub);
             expect(kafkaManagerProduceStub.args[0][0]).eql(JSON.stringify({
                 published_at: newDate,
                 metadata: {
@@ -243,7 +241,7 @@ describe('health check', function() {
             streamingManager.__set__('streamingManager', undefined);
             kafkaManagerProduceStub.resolves();
             await streamingManager.produce();
-            expect(kafkaManagerProduceStub.calledOnce).eql(false);
+            sandbox.assert.notCalled(kafkaManagerProduceStub);
         });
     });
 });
