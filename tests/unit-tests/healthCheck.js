@@ -19,8 +19,8 @@ describe('health check', function() {
     beforeEach(function() {
         req = { };
         res = {
-            status: statusStub,
-            json: jsonStub
+            code: statusStub,
+            send: jsonStub
         };
     });
     afterEach(() => {
@@ -36,15 +36,15 @@ describe('health check', function() {
             dbHealthStub.resolves();
             streamingManagerHealthStub.resolves();
             await healthController.check(req, res);
-            expect(res.status.args[0][0]).eql(200);
-            expect(res.json.args[0][0]).eql({ status: 'OK' });
+            expect(res.code.args[0][0]).eql(200);
+            expect(res.send.args[0][0]).eql({ status: 'OK' });
         });
         it('db is up and streaming manager is down - return 200 with streaming_platform error', async function() {
             dbHealthStub.resolves();
             streamingManagerHealthStub.rejects(new Error('failed to connect to kafka'));
             await healthController.check(req, res);
-            expect(res.status.args[0][0]).eql(200);
-            expect(res.json.args[0][0]).eql(
+            expect(res.code.args[0][0]).eql(200);
+            expect(res.send.args[0][0]).eql(
                 {
                     errors: {
                         streaming_platform: 'failed to connect to kafka'
@@ -59,8 +59,8 @@ describe('health check', function() {
             dbHealthStub.rejects(new Error('db down'));
             streamingManagerHealthStub.resolves();
             await healthController.check(req, res);
-            expect(res.status.args[0][0]).eql(503);
-            expect(res.json.args[0][0]).eql({
+            expect(res.code.args[0][0]).eql(503);
+            expect(res.send.args[0][0]).eql({
                 errors: {
                     database: 'db down'
                 },
@@ -71,8 +71,8 @@ describe('health check', function() {
             dbHealthStub.rejects(new Error('db down'));
             streamingManagerHealthStub.rejects(new Error('failed to connect to kafka'));
             await healthController.check(req, res);
-            expect(res.status.args[0][0]).eql(503);
-            expect(res.json.args[0][0]).eql({
+            expect(res.code.args[0][0]).eql(503);
+            expect(res.send.args[0][0]).eql({
                 errors: {
                     database: 'db down',
                     streaming_platform: 'failed to connect to kafka'
