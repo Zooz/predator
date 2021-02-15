@@ -1,4 +1,5 @@
 const { expect } = require('chai'),
+    should = require('should'),
     rewire = require('rewire'),
     sinon = require('sinon');
 
@@ -194,11 +195,10 @@ describe('health check', function() {
             };
             await streamingManager.produce(metadata, event, resource);
             expect(kafkaManagerProduceStub.calledOnce).eql(true);
-            expect(kafkaManagerProduceStub.args[0][0]).eql(JSON.stringify({
-                published_at: newDate,
+            should(JSON.parse(kafkaManagerProduceStub.args[0][0])).containDeep({
+                published_at: newDate.toISOString(),
                 metadata: {
-                    'load-testing': 'v4',
-                    'predator-version': '1.6.0'
+                    'load-testing': 'v4'
                 },
                 event: 'job-created',
                 resource: {
@@ -237,7 +237,7 @@ describe('health check', function() {
                         }
                     }
                 }
-            }));
+            });
         });
         it('No call to streaming manager produce when streaming manager is not initialized', async function() {
             streamingManager.__set__('streamingManager', undefined);

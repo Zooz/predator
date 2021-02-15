@@ -21,7 +21,7 @@ const defaultSmtpServerConfig = {
 
 describe('Manager config', function () {
     const originalPackageJsonVersion = packageJson.version;
-    const expectedRunnerVersion = '1.6';
+    const expectedRunnerVersion = '1.5';
 
     const defaultConfig = {
         allow_insecure_tls: false,

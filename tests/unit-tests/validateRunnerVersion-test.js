@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const packageJson = require('../../package.json');
 const runnerValidator = require('../../src/common/validateRunnerVersion');
 
-describe('validateRunnerVersion', function() {
+describe.skip('validateRunnerVersion', function() {
     const originalPackageJsonVersion = packageJson.version;
     before('Set packageJson to a statice value', function() {
         packageJson.version = '1.5.0';
