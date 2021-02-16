@@ -1332,7 +1332,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
-  /v1/config/{config_key}:
+  /v1/config/{key}:
     parameters:
       - $ref: '#/components/parameters/context_id'
     delete:
@@ -1345,7 +1345,7 @@ paths:
         environment variable.
       parameters:
         - in: path
-          name: config_key
+          name: key
           required: true
           description: They key to delete.
           schema:

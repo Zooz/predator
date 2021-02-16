@@ -22,7 +22,7 @@ async function updateConfig(req, res) {
 
 async function deleteConfig(req, res) {
     try {
-        await configModel.deleteConfig(req.params.key);
+        await configModel.deleteConfig(req.params["key"]);
         res.code(204).send();
     } catch (err) {
         res.code(500).send(err);
