@@ -16,7 +16,7 @@ info:
     UI alongside a simple REST API, Predator simplifies the performance testing
     regime.
 
-    For an introduction to Predator and its concepts, see the <a href="https://www.zooz.com" target="_blank">Predator Documentation</a>.
+    For an introduction to Predator and its concepts, see the <a href="https://www.predator.dev" target="_blank">Predator Website</a>.
 
 tags:
   - name: Tests
