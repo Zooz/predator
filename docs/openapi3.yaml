@@ -2717,7 +2717,7 @@ components:
             buckets_sizes:
               type: array
               items:
-                type: string
+                type: number
               description: Bucket sizes use to configure prometheus.
             labels:
               description: Labels which will be passed to prometheus push gateway.
