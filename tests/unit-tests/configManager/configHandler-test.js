@@ -1,17 +1,20 @@
 'use strict';
 
 process.env.JOB_PLATFORM = 'DOCKER';
+const { version: originalPackageJsonVersion } = require('../../../package');
+const packageJson = require('../../../package');
+packageJson.version = '1.5.6';
 
 const should = require('should');
 const rewire = require('rewire');
 const sinon = require('sinon');
 
+const manager = rewire('../../../src/configManager/models/configHandler');
 const databaseConnector = require('../../../src/configManager/models/database/databaseConnector');
 const { CONFIG: configConstants, WARN_MESSAGES } = require('../../../src/common/consts');
-const packageJson = require('../../../package');
 const logger = require('../../../src/common/logger');
 
-let manager, warnLoggerStub;
+let warnLoggerStub;
 
 const defaultSmtpServerConfig = {
     timeout: 200,
@@ -20,7 +23,6 @@ const defaultSmtpServerConfig = {
 };
 
 describe('Manager config', function () {
-    const originalPackageJsonVersion = packageJson.version;
     const expectedRunnerVersion = '1.5';
 
     const defaultConfig = {
@@ -134,8 +136,6 @@ describe('Manager config', function () {
         databaseConnectorGetValueStub = sandbox.stub(databaseConnector, 'getConfigValue');
         databaseConnectorUpdateStub = sandbox.stub(databaseConnector, 'updateConfig');
         warnLoggerStub = sandbox.stub(logger, 'warn');
-        manager = rewire('../../../src/configManager/models/configHandler');
-        packageJson.version = '1.5.6';
     });
 
     beforeEach(() => {
@@ -143,8 +143,8 @@ describe('Manager config', function () {
     });
 
     after(() => {
-        packageJson.version = originalPackageJsonVersion;
         sandbox.restore();
+        packageJson.version = originalPackageJsonVersion;
     });
 
     describe('get default config', function () {

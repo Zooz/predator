@@ -6,8 +6,7 @@ const should = require('should'),
     { expect } = require('chai'),
     uuid = require('uuid');
 
-const { version: PREDATOR_VERSION } = require('../../../../package.json'),
-    databaseConnector = require('../../../../src/jobs/models/database/databaseConnector'),
+const databaseConnector = require('../../../../src/jobs/models/database/databaseConnector'),
     logger = require('../../../../src/common/logger'),
     jobConnector = require('../../../../src/jobs/models/kubernetes/jobConnector'),
     dockerHubConnector = require('../../../../src/jobs/models/dockerHubConnector'),
@@ -208,6 +207,7 @@ describe('Manager tests', function () {
         });
 
         it('Simple request with custom env vars, should save new job to databaseConnector, deploy the job and return the job id and the job configuration', async () => {
+            const { version: PREDATOR_VERSION } = require('../../../../package.json');
             const webhooks = [
                 {
                     id: TEST_ID,
