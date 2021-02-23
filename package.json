@@ -56,7 +56,7 @@
     "graceful-shutdown-express": "^2.0.1",
     "jsck": "^0.3.2",
     "kafkajs": "^1.15.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "mariadb": "^2.4.2",
     "mathjs": "^7.5.1",
     "mysql2": "^2.2.5",
