@@ -81,7 +81,7 @@ function buildAssertionsTable(assertionsTable, data) {
                 assertion: assertEntry[0],
                 fail: assertEntry[1].fail,
                 success: assertEntry[1].success,
-                success_ratio: `${successRatio * 100}%`,
+                success_ratio: `${(successRatio === 1) ? (successRatio * 100) : (successRatio * 100).toFixed(2)}%`,
                 failure_responses: Object.entries(assertEntry[1].failureResponses).map((entry) => ({
                     name: entry[0],
                     value: entry[1]
