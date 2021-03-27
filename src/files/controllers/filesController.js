@@ -5,12 +5,30 @@ const fileManager = require('../models/fileManager');
 module.exports = {
     getFile,
     saveFile,
-    getFileMetadata
+    getFileMetadata,
+    getFileByName
 };
 
 async function getFile(req, res, next) {
     try {
         const fileData = await fileManager.getFile(req.params.file_id, true);
+
+        const fileContents = Buffer.from(fileData.content, 'base64');
+        const readStream = new stream.PassThrough();
+        readStream.end(fileContents);
+
+        res.set('Content-disposition', 'attachment; filename=' + fileData.filename);
+        res.set('Content-Type', 'text/plain');
+
+        readStream.pipe(res);
+    } catch (err) {
+        return next(err);
+    }
+}
+
+async function getFileByName(req, res, next) {
+    try {
+        const fileData = await fileManager.getFileByName(req.params.file_name, true);
 
         const fileContents = Buffer.from(fileData.content, 'base64');
         const readStream = new stream.PassThrough();

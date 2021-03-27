@@ -7,13 +7,31 @@ const database = require('./database'),
 
 module.exports = {
     saveFile,
-    getFile
+    getFile,
+    getFileByName
 };
 
 async function getFile(fileId, isIncludeContent) {
     const contextId = httpContext.get(CONTEXT_ID);
 
     const file = await database.getFile(fileId, isIncludeContent, contextId);
+    if (file) {
+        return {
+            id: file.id,
+            filename: file.name,
+            content: file.file
+        };
+    } else {
+        const error = new Error(ERROR_MESSAGES.NOT_FOUND);
+        error.statusCode = 404;
+        throw error;
+    }
+}
+
+async function getFileByName(fileName, isIncludeContent) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const file = await database.getFileByName(fileName, isIncludeContent, contextId);
     if (file) {
         return {
             id: file.id,
