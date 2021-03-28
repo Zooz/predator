@@ -16,7 +16,7 @@ info:
     UI alongside a simple REST API, Predator simplifies the performance testing
     regime.
 
-    For an introduction to Predator and its concepts, see the <a href="https://www.zooz.com" target="_blank">Predator Documentation</a>.
+    For an introduction to Predator and its concepts, see the <a href="https://www.predator.dev" target="_blank">Predator Website</a>.
 
 tags:
   - name: Tests
@@ -25,45 +25,47 @@ tags:
   - name: DSL Definitions
     description: |
       Predator's Domain Specific Language (DSL) allows you to generate request templates, which you can then reuse in the same test and in other tests, reducing replication.
-  - name: Jobs
-    description: |
-      Predator executes tests through so-called **jobs**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
   - name: Processors
     description: |
       Processor files allow Predator to execute custom javascript code during test flows.
-  - name: Files
+  - name: Jobs
     description: |
-      This resource allows uploading files which can be used by Predator tests like csv.
-  - name: Webhooks
-    description: |
-      This resource allows you to configure webhooks.
-  - name: Benchmarks
-    description: |
-      By creating a benchmark for a specific test, each subsequent test run for that test will be given a score from 0-100 summarizing the test run in one simple to analyze numerical value.
-  - name: Configuration
-    description: |
-      This resource allows you to configure Predator programmatically.
+      Predator executes tests through so-called **jobs**. Depending on your configuration, the job will either execute immediately or at scheduled intervals.
   - name: Reports
     description: |
       Reports give you insight into the performance of your API. Predator generates a report for each test that is executed.
+  - name: Configuration
+    description: |
+      This resource allows you to configure Predator programmatically.
+  - name: Files
+    description: |
+      This resource allows uploading files which can be used by Predator tests like csv.
+  - name: Benchmarks
+    description: |
+      By creating a benchmark for a specific test, each subsequent test run for that test will be given a score from 0-100 summarizing the test run in one simple to analyze numerical value.
+  - name: Webhooks
+    description: |
+      This resource allows you to configure webhooks.
+
 x-tagGroups:
   - name: Reference
     tags:
       - Tests
       - DSL Definitions
-      - Jobs
       - Processors
-      - Files
-      - Webhooks
-      - Benchmarks
-      - Configuration
+      - Jobs
       - Reports
+      - Configuration
+      - Files
+      - Benchmarks
+      - Webhooks
 
 paths:
   #DSL Definitions
   '/v1/dsl/{dsl_name}/definitions':
     parameters:
       - $ref: '#/components/parameters/dsl_name'
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: create-a-dsl-definition
       tags:
@@ -137,6 +139,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/dsl_name'
       - $ref: '#/components/parameters/definition_name'
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-dsl-definition
       tags:
@@ -229,6 +232,8 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Tests
   /v1/tests:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: create-a-test
       tags:
@@ -304,6 +309,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-test
       tags:
@@ -359,7 +366,7 @@ paths:
             type: string
             example: 4bf5d7ab-f310-4a64-8ec2-d65c06188ec1
       responses:
-        '200':
+        '201':
           description: Success
           content:
             application/json:
@@ -420,6 +427,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/revisions':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-all-test-revisions
       tags:
@@ -462,9 +471,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-
   # Jobs
   /v1/jobs:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: create-a-job
       tags:
@@ -543,6 +553,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/jobs/{job_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-job
       tags:
@@ -660,6 +672,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/jobs/{job_id}/runs/{report_id}/stop':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: terminate-a-job
       tags:
@@ -694,8 +708,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-
   /v1/jobs/{job_id}/runs/{report_id}/logs:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       tags:
         - Jobs
@@ -734,8 +749,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
-
   '/v1/jobs/containers/':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     delete:
       operationId: delete-all-job-containers
       summary: Delete all finished containers/pods
@@ -757,6 +773,8 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Reports
   '/v1/tests/{test_id}/reports':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-all-reports
       tags:
@@ -840,7 +858,61 @@ paths:
               $ref: '#/components/schemas/post_report'
         description: report data
         required: true
+  '/v1/tests/{test_id}/reports/{report_id}/subscribe':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
+    post:
+      operationId: subscribe-runner-to-report
+      tags:
+        - Reports
+      summary: Subscribe runner to a report
+      description: Subscribe a runner to a specific report.
+      parameters:
+        - in: header
+          name: x-runner-id
+          description: id of the predator-runner
+          required: true
+          schema:
+            type: string
+            example: afbb6b43-fe52-48f2-84f4-1eebdbb2d5de
+        - in: path
+          name: test_id
+          required: true
+          description: The id of the test for which to retrieve the report.
+          schema:
+            type: string
+            example: 81a27853-0db5-4e57-ad63-4b637528398a
+        - in: path
+          name: report_id
+          description: The id of the report to retrieve.
+          required: true
+          schema:
+            type: string
+            example: '1601759162814'
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-report
       tags:
@@ -889,23 +961,23 @@ paths:
     put:
       operationId: edit-a-report
       tags:
-      - Reports
+        - Reports
       summary: edit a Report
       description: edit a specific report for the specified test.
       parameters:
-      - in: path
-        name: test_id
-        required: true
-        description: The id of the test for which to retrieve the report.
-        schema:
-          type: string
-          example: 81a27853-0db5-4e57-ad63-4b637528398a
-      - in: path
-        name: report_id
-        description: The id of the report to retrieve.
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: test_id
+          required: true
+          description: The id of the test for which to retrieve the report.
+          schema:
+            type: string
+            example: 81a27853-0db5-4e57-ad63-4b637528398a
+        - in: path
+          name: report_id
+          description: The id of the report to retrieve.
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: Success
@@ -948,6 +1020,7 @@ paths:
           description: The id of the test for which to delete the report.
           schema:
             type: string
+            format: uuid
             example: 81a27853-0db5-4e57-ad63-4b637528398a
         - in: path
           name: report_id
@@ -958,12 +1031,6 @@ paths:
       responses:
         '204':
           description: Success
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
         '500':
           description: Internal server error
           content:
@@ -971,6 +1038,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   /v1/tests/last_reports:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-recent-reports
       tags:
@@ -1016,6 +1085,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}/stats':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       tags:
         - Reports
@@ -1061,6 +1132,8 @@ paths:
         description: stats data
         required: true
   /v1/tests/{test_id}/benchmark:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       tags:
         - Benchmarks
@@ -1136,6 +1209,8 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Report Export
   '/v1/{test_id}/reports/{report_id}/export/{file_format}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: export-report
       tags:
@@ -1171,6 +1246,8 @@ paths:
           description: Unsupported File Format
   # Export Comparison Report
   '/v1/tests/reports/compare/export/{file_format}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: export-comparison-report
       tags:
@@ -1188,6 +1265,8 @@ paths:
           description: List of report IDs that are part of comparison
           schema:
             type: array
+            items:
+              type: string
           style: form
           explode: false
         - in: query
@@ -1195,6 +1274,8 @@ paths:
           description: List of test IDs that are part of comparison
           schema:
             type: array
+            items:
+              type: string
           style: form
           explode: false
       summary: Exports a comparison report.
@@ -1206,6 +1287,8 @@ paths:
           description: Unsupported File Format
   # Config
   /v1/config:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-configurations
       tags:
@@ -1254,6 +1337,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error_response"
   /v1/config/{config_key}:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     delete:
       operationId: delete-a-configuration
       tags:
@@ -1278,9 +1363,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
-
   # Processors
   /v1/processors:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: create-processor-file
       tags:
@@ -1374,6 +1460,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response'
   '/v1/processors/{processor_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-processor-file
       tags:
@@ -1498,6 +1586,8 @@ paths:
                 $ref: '#/components/schemas/error_response'
   # Webhooks
   /v1/webhooks:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-webhooks
       tags:
@@ -1509,7 +1599,7 @@ paths:
           description: Success
           content:
             application/json:
-               schema:
+              schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/webhook'
@@ -1558,6 +1648,8 @@ paths:
         description: The webhook to add
         required: true
   /v1/webhooks/{webhook_id}:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-a-webhook
       tags:
@@ -1578,8 +1670,8 @@ paths:
           description: Success
           content:
             application/json:
-               schema:
-                  $ref: '#/components/schemas/webhook'
+              schema:
+                $ref: '#/components/schemas/webhook'
         '404':
           description: Not found
           content:
@@ -1612,8 +1704,8 @@ paths:
           description: Success
           content:
             application/json:
-               schema:
-                  $ref: '#/components/schemas/webhook'
+              schema:
+                $ref: '#/components/schemas/webhook'
         '400':
           description: Bad request
           content:
@@ -1673,7 +1765,6 @@ paths:
         - Webhooks
       summary: Tests that the webhook is configure correctly
       description: Tests that the webhook is configure correctly by sending a message to the target webhook url.
-      parameters:
       responses:
         '200':
           description: Success
@@ -1694,6 +1785,8 @@ paths:
               $ref: '#/components/schemas/test_webhook_request'
   # Files
   /v1/files:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     post:
       operationId: upload-file
       tags:
@@ -1737,6 +1830,8 @@ paths:
         description: The file to create upload
         required: true
   '/v1/files/{file_id}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-file
       tags:
@@ -1759,6 +1854,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/upload_file_response'
   '/v1/files/{file_id}/metadata':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
     get:
       operationId: retrieve-file-medtadata
       tags:
@@ -1780,8 +1877,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/upload_file_response'
+
 components:
   parameters:
+    context_id:
+      in: header
+      name: x-context-id
+      description: The id of the user/organization context
+      required: false
+      schema:
+        type: string
+        example: team-mick
     dsl_name:
       name: dsl_name
       in: path
@@ -1825,9 +1931,9 @@ components:
                 "species": "dog"
               },
               "capture": [{
-                            "json": "$.id",
-                            "as": "petId"
-                          }]
+                "json": "$.id",
+                "as": "petId"
+              }]
             }
 
           }
@@ -1880,8 +1986,8 @@ components:
           type: string
           format: uuid
         is_favorite:
-          description: Test has been marked favorite
           type: boolean
+          description: Test has been marked favorite
         type:
           $ref: '#/components/schemas/test_type'
     test_type:
@@ -1894,7 +2000,8 @@ components:
         enum:
         - dsl
         - basic
-      example: dsl
+        example: dsl
+
     benchmark_request:
       type: object
       additionalProperties: false
@@ -1940,8 +2047,6 @@ components:
 
     dsl:
       description: A test that is made of scenarios base on domain specific language
-      allOf:
-        - $ref: '#/components/schemas/test'
       required:
         - scenarios
       properties:
@@ -1975,62 +2080,17 @@ components:
             type: string
         json:
           description: The JSON body to use in the request.
-          type: object
     key_value_string_object:
       type: object
       additionalProperties:
         type: string
     basic:
       description: A test that is made of artillery json
-      allOf:
-        - $ref: '#/components/schemas/test'
       required:
         - artillery_test
       properties:
         artillery_test:
           type: object
-          description: |
-            The complete request JSON used in the test.
-          example: {
-            "config": {
-              "target": "http://127.0.0.1:3000"
-            },
-            "scenarios": [
-            {
-              "name": "Get Pets",
-              "weight": 100,
-              "flow": [
-              {
-                "post": {
-                  "url": "/pets",
-                  "headers": {
-                    "Content-Type": "application/json",
-                    "request-id": "{{ $randomString() }}"
-                  },
-                  "capture": [
-                  {
-                    "json": "$.id",
-                    "as": "petId"
-                  }
-                  ],
-                  "json": {
-                    "name": "Mickey"
-                  }
-                }
-              },
-              {
-                "get": {
-                  "url": "/pets/{{petId}}",
-                  "headers": {
-                    "Content-Type": "application/json",
-                    "request-id": "{{ $randomString() }}"
-                  }
-                }
-              }
-              ]
-            }
-            ]
-          }
     test_id:
       required:
         - id
@@ -2089,40 +2149,43 @@ components:
       description: A test that is made of scenarios base on domain specific language
       allOf:
         - $ref: '#/components/schemas/create_test_response'
-          required:
-            - raw_data
       properties:
-        raw_data:
-          type: object
-          description: The entire specification of the DSL that was used to create the test.
-          example: {
-            "name": "Pet store",
-            "description": "DSL",
-            "type": "dsl",
-            "before": {
-              "steps": [
-              {
-                "action": "petstore.create-pet",
-                "properties": {
-                  "name": [
-                    "kushkush",
-                    "daisy"
+        scenarios:
+          description: A scenario is a sequence of HTTP requests aimed to test the performance of specific functionality.
+          type: array
+          items:
+            $ref: '#/components/schemas/scenario'
+          example:
+            {
+              "scenarios": [
+                {
+                  "scenario_name": "Only get pet",
+                  "steps": [
+                    {
+                      "action": "petstore.get-pet"
+                    }
                   ]
                 }
-              }
-              ]
-            },
-            "scenarios": [
-            {
-              "scenario_name": "Only get pet",
-              "steps": [
-              {
-                "action": "petstore.get-pet"
-              }
               ]
             }
-            ]
-          }
+        before:
+          type: object
+          example:
+            {
+              "before": {
+                "steps": [
+                  {
+                    "action": "petstore.create-pet",
+                    "properties": {
+                      "name": [
+                          "kushkush",
+                          "daisy"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
         artillery_test:
           type: object
           description: |
@@ -2134,52 +2197,52 @@ components:
                 "pool": 100
               },
               "phases": [
-              {
-                "duration": 0,
-                "arrivalRate": 0,
-                "rampTo": 0
-              }
+                {
+                  "duration": 0,
+                  "arrivalRate": 0,
+                  "rampTo": 0
+                }
               ],
               "variables": {
                 "before_0_petstore.create-pet_name": [
-                  "kushkush",
-                  "daisy"
+                    "kushkush",
+                    "daisy"
                 ]
               }
             },
             "scenarios": [
-            {
-              "name": "Only get pet",
-              "flow": [
               {
-                "get": {
-                  "url": "http://127.0.0.1:3000/pets/{{petId}}"
-                }
+                "name": "Only get pet",
+                "flow": [
+                  {
+                    "get": {
+                      "url": "http://127.0.0.1:3000/pets/{{petId}}"
+                    }
+                  }
+                ],
+                "weight": 100
               }
-              ],
-              "weight": 100
-            }
             ],
             "before": {
               "flow": [
-              {
-                "post": {
-                  "url": "http://127.0.0.1:3000/pets",
-                  "json": {
-                    "name": "{{ before_0_petstore.create-pet_name }}",
-                    "species": "dog"
-                  },
-                  "capture": [
-                  {
-                    "json": "$.id",
-                    "as": "petId"
-                  }
-                  ],
-                  "headers": {
-                    "Content-Type": "application/json"
+                {
+                  "post": {
+                    "url": "http://127.0.0.1:3000/pets",
+                    "json": {
+                      "name": "{{ before_0_petstore.create-pet_name }}",
+                      "species": "dog"
+                    },
+                    "capture": [
+                      {
+                        "json": "$.id",
+                        "as": "petId"
+                      }
+                    ],
+                    "headers": {
+                      "Content-Type": "application/json"
+                    }
                   }
                 }
-              }
               ]
             }
           }
@@ -2200,19 +2263,19 @@ components:
               "target": "http://127.0.0.1:3000"
             },
             "scenarios": [
-            {
-              "name": "Get Pets",
-              "weight": 100,
-              "flow": [
               {
-                "get": {
-                  "url": "/pets",
-                  "headers": {},
-                  "capture": []
-                }
+                "name": "Get Pets",
+                "weight": 100,
+                "flow": [
+                  {
+                    "get": {
+                      "url": "/pets",
+                      "headers": {},
+                      "capture": []
+                    }
+                  }
+                ]
               }
-              ]
-            }
             ]
           }
     error_response:
@@ -2252,8 +2315,8 @@ components:
                 example: {
                   "name":
                     [
-                      "kushkush",
-                      "daisy"
+                        "kushkush",
+                        "daisy"
                     ]
                 }
               wait:
@@ -2271,8 +2334,8 @@ components:
       discriminator:
         propertyName: type
       oneOf:
-          - $ref: '#/components/schemas/load_test'
-          - $ref: '#/components/schemas/functional_test'
+        - $ref: '#/components/schemas/load_test'
+        - $ref: '#/components/schemas/functional_test'
       required:
         - type
         - test_id
@@ -2306,7 +2369,8 @@ components:
           uniqueItems: true
           description: |
             An array of webhooks ids, events will be fired to the coresponding webhooks according to their events configuration.
-            The event body will include detailed information about the test, such as the number of scenarios that were executed and the number of requests that were invoked.
+            The event body will include detailed information about the test, such as the number of scenarios that were executed
+            and the number of requests that were invoked.
           items:
             type: string
             format: uuid
@@ -2377,7 +2441,7 @@ components:
         - properties:
             report_id:
               type: string
-              description: The report id. Only shown if the job is ran immediately.
+              description: The run id. Only shown if the job is ran immediately.
     processor:
       required:
         - name
@@ -2514,6 +2578,7 @@ components:
         - start_time
         - end_time
         - duration_seconds
+        - tag
       properties:
         test_id:
           type: string
@@ -2648,9 +2713,11 @@ components:
           properties:
             push_gateway_url:
               type: string
-              description: Prometheus push gateway url.
+              description: Url of push gateway.
             buckets_sizes:
               type: array
+              items:
+                type: number
               description: Bucket sizes use to configure prometheus.
             labels:
               description: Labels which will be passed to prometheus push gateway.
@@ -2721,7 +2788,7 @@ components:
               allOf:
                 - $ref: '#/components/schemas/benchmark_weights'
         custom_runner_definition:
-          description: custom json that will be merged with the kubernetes/metronome predator runner job definition
+          description: custom json that will be merged with the kubernetes/metronome/aws fargate predator runner job definition
           type: object
         streaming_excluded_attributes:
           description: string of attributes to remove from streamed messages with ',' as delimeter
@@ -2729,7 +2796,7 @@ components:
     benchmark_weights:
       type: object
       required:
-         - percentage
+        - percentage
       properties:
         percentage:
           type: number
@@ -2832,13 +2899,13 @@ components:
         - webhook_status_code
         - is_sucessful
       properties:
-          webhook_status_code:
-            type: number
-            example: 400
-          is_sucessful:
-            type: boolean
-            example: false
-            description: true, if webhook target returned 2xx status code
+        webhook_status_code:
+          type: number
+          example: 400
+        is_sucessful:
+          type: boolean
+          example: false
+          description: true, if webhook target returned 2xx status code
     test_webhook_request:
       type: object
       required:

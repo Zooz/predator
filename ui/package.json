@@ -86,7 +86,7 @@
     "font-awesome": "^4.7.0",
     "history": "^4.10.1",
     "immutable": "^3.8.2",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "material-ui": "^0.20.0",
     "moment": "^2.29.0",
     "monaco-editor": "^0.19.3",

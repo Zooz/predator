@@ -16,7 +16,7 @@ info:
     UI alongside a simple REST API, Predator simplifies the performance testing
     regime.
 
-    For an introduction to Predator and its concepts, see the <a href="https://www.zooz.com" target="_blank">Predator Documentation</a>.
+    For an introduction to Predator and its concepts, see the <a href="https://www.predator.dev" target="_blank">Predator Website</a>.
 
 tags:
   - name: DSL Definitions
@@ -859,57 +859,57 @@ paths:
         description: report data
         required: true
   '/v1/tests/{test_id}/reports/{report_id}/subscribe':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
+    post:
+      operationId: subscribe-runner-to-report
+      tags:
+        - Reports
+      summary: Subscribe runner to a report
+      description: Subscribe a runner to a specific report.
       parameters:
-        - $ref: '#/components/parameters/context_id'
-      post:
-        operationId: subscribe-runner-to-report
-        tags:
-          - Reports
-        summary: Subscribe runner to a report
-        description: Subscribe a runner to a specific report.
-        parameters:
-          - in: header
-            name: x-runner-id
-            description: id of the predator-runner
-            required: true
-            schema:
-              type: string
-              example: afbb6b43-fe52-48f2-84f4-1eebdbb2d5de
-          - in: path
-            name: test_id
-            required: true
-            description: The id of the test for which to retrieve the report.
-            schema:
-              type: string
-              example: 81a27853-0db5-4e57-ad63-4b637528398a
-          - in: path
-            name: report_id
-            description: The id of the report to retrieve.
-            required: true
-            schema:
-              type: string
-              example: '1601759162814'
-        responses:
-          '204':
-            description: Success
-          '400':
-            description: Bad request
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/error_response'
-          '404':
-            description: Not found
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/error_response'
-          '500':
-            description: Internal server error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/error_response'
+        - in: header
+          name: x-runner-id
+          description: id of the predator-runner
+          required: true
+          schema:
+            type: string
+            example: afbb6b43-fe52-48f2-84f4-1eebdbb2d5de
+        - in: path
+          name: test_id
+          required: true
+          description: The id of the test for which to retrieve the report.
+          schema:
+            type: string
+            example: 81a27853-0db5-4e57-ad63-4b637528398a
+        - in: path
+          name: report_id
+          description: The id of the report to retrieve.
+          required: true
+          schema:
+            type: string
+            example: '1601759162814'
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
   '/v1/tests/{test_id}/reports/{report_id}':
     parameters:
       - $ref: '#/components/parameters/context_id'
@@ -1265,6 +1265,8 @@ paths:
           description: List of report IDs that are part of comparison
           schema:
             type: array
+            items:
+              type: string
           style: form
           explode: false
         - in: query
@@ -1272,6 +1274,8 @@ paths:
           description: List of test IDs that are part of comparison
           schema:
             type: array
+            items:
+              type: string
           style: form
           explode: false
       summary: Exports a comparison report.
@@ -1761,7 +1765,6 @@ paths:
         - Webhooks
       summary: Tests that the webhook is configure correctly
       description: Tests that the webhook is configure correctly by sending a message to the target webhook url.
-      parameters:
       responses:
         '200':
           description: Success
@@ -1928,9 +1931,9 @@ components:
                 "species": "dog"
               },
               "capture": [{
-                            "json": "$.id",
-                            "as": "petId"
-                          }]
+                "json": "$.id",
+                "as": "petId"
+              }]
             }
 
           }
@@ -2155,14 +2158,14 @@ components:
           example:
             {
               "scenarios": [
-              {
-                "scenario_name": "Only get pet",
-                "steps": [
                 {
-                  "action": "petstore.get-pet"
+                  "scenario_name": "Only get pet",
+                  "steps": [
+                    {
+                      "action": "petstore.get-pet"
+                    }
+                  ]
                 }
-                ]
-              }
               ]
             }
         before:
@@ -2171,15 +2174,15 @@ components:
             {
               "before": {
                 "steps": [
-                {
-                  "action": "petstore.create-pet",
-                  "properties": {
-                    "name": [
-                      "kushkush",
-                      "daisy"
-                    ]
+                  {
+                    "action": "petstore.create-pet",
+                    "properties": {
+                      "name": [
+                          "kushkush",
+                          "daisy"
+                      ]
+                    }
                   }
-                }
                 ]
               }
             }
@@ -2194,52 +2197,52 @@ components:
                 "pool": 100
               },
               "phases": [
-              {
-                "duration": 0,
-                "arrivalRate": 0,
-                "rampTo": 0
-              }
+                {
+                  "duration": 0,
+                  "arrivalRate": 0,
+                  "rampTo": 0
+                }
               ],
               "variables": {
                 "before_0_petstore.create-pet_name": [
-                  "kushkush",
-                  "daisy"
+                    "kushkush",
+                    "daisy"
                 ]
               }
             },
             "scenarios": [
-            {
-              "name": "Only get pet",
-              "flow": [
               {
-                "get": {
-                  "url": "http://127.0.0.1:3000/pets/{{petId}}"
-                }
+                "name": "Only get pet",
+                "flow": [
+                  {
+                    "get": {
+                      "url": "http://127.0.0.1:3000/pets/{{petId}}"
+                    }
+                  }
+                ],
+                "weight": 100
               }
-              ],
-              "weight": 100
-            }
             ],
             "before": {
               "flow": [
-              {
-                "post": {
-                  "url": "http://127.0.0.1:3000/pets",
-                  "json": {
-                    "name": "{{ before_0_petstore.create-pet_name }}",
-                    "species": "dog"
-                  },
-                  "capture": [
-                  {
-                    "json": "$.id",
-                    "as": "petId"
-                  }
-                  ],
-                  "headers": {
-                    "Content-Type": "application/json"
+                {
+                  "post": {
+                    "url": "http://127.0.0.1:3000/pets",
+                    "json": {
+                      "name": "{{ before_0_petstore.create-pet_name }}",
+                      "species": "dog"
+                    },
+                    "capture": [
+                      {
+                        "json": "$.id",
+                        "as": "petId"
+                      }
+                    ],
+                    "headers": {
+                      "Content-Type": "application/json"
+                    }
                   }
                 }
-              }
               ]
             }
           }
@@ -2260,19 +2263,19 @@ components:
               "target": "http://127.0.0.1:3000"
             },
             "scenarios": [
-            {
-              "name": "Get Pets",
-              "weight": 100,
-              "flow": [
               {
-                "get": {
-                  "url": "/pets",
-                  "headers": {},
-                  "capture": []
-                }
+                "name": "Get Pets",
+                "weight": 100,
+                "flow": [
+                  {
+                    "get": {
+                      "url": "/pets",
+                      "headers": {},
+                      "capture": []
+                    }
+                  }
+                ]
               }
-              ]
-            }
             ]
           }
     error_response:
@@ -2312,8 +2315,8 @@ components:
                 example: {
                   "name":
                     [
-                      "kushkush",
-                      "daisy"
+                        "kushkush",
+                        "daisy"
                     ]
                 }
               wait:
@@ -2713,6 +2716,8 @@ components:
               description: Url of push gateway.
             buckets_sizes:
               type: array
+              items:
+                type: number
               description: Bucket sizes use to configure prometheus.
             labels:
               description: Labels which will be passed to prometheus push gateway.
@@ -2894,13 +2899,13 @@ components:
         - webhook_status_code
         - is_sucessful
       properties:
-          webhook_status_code:
-            type: number
-            example: 400
-          is_sucessful:
-            type: boolean
-            example: false
-            description: true, if webhook target returned 2xx status code
+        webhook_status_code:
+          type: number
+          example: 400
+        is_sucessful:
+          type: boolean
+          example: false
+          description: true, if webhook target returned 2xx status code
     test_webhook_request:
       type: object
       required:
