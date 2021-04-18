@@ -107,7 +107,7 @@ async function handleDone(report, job, reportBenchmark) {
     await webhooksManager.fireWebhookByEvent(job, WEBHOOK_EVENT_TYPE_FINISHED, report, { aggregatedReport: aggregatedReport.aggregate, score: reportBenchmark.score }, { icon: slackEmojis.ROCKET });
 
     const test = await testsManager.getTest(report.test_id);
-    streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_FINISHED, { ...test, ...report, ...aggregatedReport });
+    streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_FINISHED, { ...test, ...report, ...aggregatedReport, ...reportBenchmark });
 }
 
 async function handleAbort(report, job) {
