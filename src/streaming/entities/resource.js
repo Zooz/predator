@@ -27,6 +27,10 @@ class StreamingResource {
         this.status = resource.status;
         this.intermediates = resource.intermediates;
         this.aggregate = resource.aggregate;
+
+        // benchmarks
+        this.score = resource.score;
+        this.benchmark_weights_data = resource.benchmark_weights_data;
     }
 }
 

@@ -251,12 +251,86 @@ describe('Create job specific docker tests', async function () {
                         await configRequestCreator.deleteConfig('streaming_excluded_attributes');
                     });
                 });
+                describe('Run one time job of a test with benchmark data', () => {
+                    const benchmarkRequest = {
+                        rps: {
+                            count: 100,
+                            mean: 90.99
+                        },
+                        latency: { median: 357.2, p95: 1042 },
+                        errors: { errorTest: 1 },
+                        codes: { codeTest: 1 }
+                    };
+
+                    before(async () => {
+                        const response = await testsRequestCreator.createTest(testBody, {});
+                        should(response.statusCode).eql(201);
+                        testId = response.body.id;
+                        const benchmarkRes = await testsRequestCreator.createBenchmark(testId, benchmarkRequest, {});
+                        should(benchmarkRes.status).eql(201);
+                    });
+
+                    let createJobResponse;
+                    const runnerId = uuid.v4();
+
+                    it('Create the job', async () => {
+                        const validBody = {
+                            test_id: testId,
+                            type: 'load_test',
+                            arrival_rate: 2,
+                            duration: 1,
+                            run_immediately: true,
+                            notes: 'streaming notes'
+                        };
+
+                        createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        jobId = createJobResponse.body.id;
+                        reportId = createJobResponse.body.report_id;
+                        should(createJobResponse.status).eql(201);
+                    });
+
+                    it('Consume published event job-created', async () => {
+                        const jobCreatedMessage = await kafkaHelper.getLastMsgs(1);
+                        const valuePublished = JSON.parse(jobCreatedMessage[0].value);
+
+                        should(valuePublished.event).eql('job-created');
+                        should(valuePublished.resource).containEql({
+                            test_id: testId,
+                            job_id: jobId,
+                            report_id: reportId,
+                            job_type: 'load_test',
+                            arrival_rate: 2,
+                            notes: 'streaming notes',
+                            duration: 1
+                        });
+                    });
+
+                    it('Predator-runner posts "done" stats', async () => {
+                        await reportsRequestCreator.subscribeRunnerToReport(testId, reportId, runnerId);
+                        const statsFromRunnerIntermediate = statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statsTime);
+                        await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerIntermediate);
+
+                        const statsFromRunnerDone = statsGenerator.generateStats(constants.SUBSCRIBER_DONE_STAGE, runnerId, statsTime);
+                        await reportsRequestCreator.postStats(testId, reportId, statsFromRunnerDone);
+                    });
+
+                    it('Consume published event job-finished', async () => {
+                        const isBenchmarkConfigured = true;
+                        const jobFinishedMessage = await kafkaHelper.getLastMsgs(1);
+                        const valuePublished = JSON.parse(jobFinishedMessage[0].value);
+
+                        assertFullPublishedValue(valuePublished, constants.REPORT_FINISHED_STATUS, runnerId, isBenchmarkConfigured);
+                    });
+                });
             });
         });
     }
 });
 
-function assertFullPublishedValue(valuePublished, reportStatus, runnerId) {
+function assertFullPublishedValue(valuePublished, reportStatus, runnerId, isBenchmarkConfigured) {
     should(valuePublished.event).eql('job-finished');
     should(valuePublished.metadata).containEql({
         'predator-version': PREDATOR_VERSION,
@@ -286,4 +360,9 @@ function assertFullPublishedValue(valuePublished, reportStatus, runnerId) {
     should(valuePublished.resource.notes).eql('streaming notes');
     should(valuePublished.resource.start_time).be.not.undefined();
     should(valuePublished.resource.end_time).be.not.undefined();
+
+    if (isBenchmarkConfigured) {
+        should(valuePublished.resource.score).be.not.undefined();
+        should(valuePublished.resource.benchmark_weights_data).be.not.undefined();
+    }
 }
