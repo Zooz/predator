@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.2](https://github.com/Zooz/predator/compare/v1.6.1...v1.6.2) (2021-04-18)
+
+
+### Bug Fixes
+
+* package.json & package-lock.json to reduce vulnerabilities ([#576](https://github.com/Zooz/predator/issues/576)) ([8283914](https://github.com/Zooz/predator/commit/8283914a19a6340235a0ec611a7e8702548c51ac))
+* produce test's benchmark data when exists ([#578](https://github.com/Zooz/predator/issues/578)) ([dfecb58](https://github.com/Zooz/predator/commit/dfecb58d48699141afd4e36464f81537171294dd))
+* vulnerabilities ([#577](https://github.com/Zooz/predator/issues/577)) ([5f281ab](https://github.com/Zooz/predator/commit/5f281ab7850e4c8ddcdb63a427c8eff955927c9b))
+
 ### [1.6.1](https://github.com/Zooz/predator/compare/v1.6.0...v1.6.1) (2021-03-16)
 
 
