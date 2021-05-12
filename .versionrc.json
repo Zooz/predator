@@ -1,0 +1,12 @@
+{
+  "bumpFiles": [
+    {
+      "filename": "docs/openapi3.yaml",
+      "updater": "node_modules/@map-colonies/standard-version-update-openapi3-version/src/index.js"
+    },
+    {
+      "filename": "docs/devguide/docs/swagger-docs.yaml",
+      "updater": "node_modules/@map-colonies/standard-version-update-openapi3-version/src/index.js"
+    }
+  ]
+}

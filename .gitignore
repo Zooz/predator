@@ -13,7 +13,6 @@ docs/devguide/site
 docs/run_local_webserver.sh
 docs/.idea/docs.iml
 docs/.idea/workspace.xml
-predator
 .env
 *.sqlite
 ui/.env
