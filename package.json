@@ -99,7 +99,7 @@
     "rewire": "^5.0.0",
     "should": "^13.2.1",
     "sinon": "^4.5.0",
-    "standard-version": "^9.0.0",
+    "standard-version": "^9.3.0",
     "supertest": "^3.4.2",
     "yaml": "^1.10.0"
   },
