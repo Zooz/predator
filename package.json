@@ -21,7 +21,6 @@
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh --timeout=10000",
     "lint": "eslint ./src/**/**.js ./tests/**/**.js",
     "release": "standard-version",
-    "release:avi": "standard-version --dry-run --release-as minor",
     "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
   },
   "repository": {
