@@ -21,7 +21,6 @@
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh --timeout=10000",
     "lint": "eslint ./src/**/**.js ./tests/**/**.js",
     "release": "standard-version",
-    "release:avi": "standard-version --dry-run --release-as minor",
     "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
   },
   "repository": {
@@ -99,7 +98,7 @@
     "rewire": "^5.0.0",
     "should": "^13.2.1",
     "sinon": "^4.5.0",
-    "standard-version": "^9.0.0",
+    "standard-version": "^9.3.0",
     "supertest": "^3.4.2",
     "yaml": "^1.10.0"
   },
