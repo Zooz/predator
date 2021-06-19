@@ -21,6 +21,7 @@
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh --timeout=10000",
     "lint": "eslint ./src/**/**.js ./tests/**/**.js",
     "release": "standard-version",
+    "release:avi": "standard-version --dry-run --release-as minor",
     "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
   },
   "repository": {
@@ -78,6 +79,7 @@
     "@apidevtools/swagger-parser": "^10.0.2",
     "@commitlint/cli": "^10.0.0",
     "@commitlint/config-conventional": "^10.0.0",
+    "@map-colonies/standard-version-update-openapi3-version": "0.0.1",
     "async-retry": "^1.3.1",
     "chai": "^4.2.0",
     "commitlint": "^10.0.0",
