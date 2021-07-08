@@ -30,6 +30,7 @@ import { EMPTY_STRING, INVALID_URL_MESSAGE } from '../../../constants';
 import InfoToolTip from "../InfoToolTip";
 
 const SLEEP = 'sleep';
+const MAX_PROBABILITY = 100;
 
 export class TestForm extends React.Component {
   constructor (props) {
@@ -324,7 +325,8 @@ export class TestForm extends React.Component {
         forever: true,
         contentType: CONTENT_TYPES.APPLICATION_JSON,
         expectations: [createDefaultExpectation()],
-        gzip: true
+        gzip: true,
+        probability: MAX_PROBABILITY
       }
     }
 
