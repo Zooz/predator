@@ -134,7 +134,7 @@ export default (props) => {
               onChange={(value) => {
                 onInputChange({ method: value, contentType: CONTENT_TYPES.NONE });
               }}
-              placeHolder={'Goni'}
+              placeHolder={'Method'}
             />
           </TitleInput>
           <TitleInput style={{ marginRight: '10px', flexGrow: 2 }} title={'Url'}>
