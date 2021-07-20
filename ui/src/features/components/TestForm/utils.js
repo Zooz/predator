@@ -122,13 +122,18 @@ function buildStepsFromFlow(flow) {
       name: request[action].name,
       beforeRequest: request[action].beforeRequest,
       afterResponse: request[action].afterResponse,
-      probability: request[action].probability || MAX_PROBABILITY, // support old tests which do not include probability (default - 100%)
+      probability: getProbability(request[action].probability),
       captures: buildCaptureState(request[action].capture),
       expectations: buildExpectationState(request[action].expect),
       headers: buildHeadersState(request[action].headers),
       contentType: (request[action].json && CONTENT_TYPES.APPLICATION_JSON) || (request[action].form && CONTENT_TYPES.FORM) || (request[action].formData && CONTENT_TYPES.FORM_DATA) || CONTENT_TYPES.OTHER
     }
   })
+}
+
+function getProbability(probability) {
+  // support old tests which do not include probability (default - 100%)
+  return probability || probability === 0 ? probability : MAX_PROBABILITY;
 }
 
 function buildHeadersState(headers) {
