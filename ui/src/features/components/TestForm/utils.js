@@ -133,7 +133,7 @@ function buildStepsFromFlow(flow) {
 
 function getProbability(probability) {
   // support old tests which do not include probability (default - 100%)
-  return probability || probability === 0 ? probability : MAX_PROBABILITY;
+  return Number.isInteger(probability) ? probability : MAX_PROBABILITY;
 }
 
 function buildHeadersState(headers) {
