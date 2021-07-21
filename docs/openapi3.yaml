@@ -1853,6 +1853,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/upload_file_response'
+  '/v1/files/name/{file_name}':
+    parameters:
+      - $ref: '#/components/parameters/context_id'
+    get:
+      operationId: retrieve-file
+      tags:
+        - Files
+      summary: Download file
+      description: Retrieve a specific file.
+      parameters:
+        - in: path
+          name: file_name
+          description: The name of file to download
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/upload_file_response'
   '/v1/files/{file_id}/metadata':
     parameters:
       - $ref: '#/components/parameters/context_id'

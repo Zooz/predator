@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 module.exports = {
     init,
     getFile,
+    getFileByName,
     saveFile
 };
 
@@ -50,6 +51,25 @@ async function getFile(id, isIncludeContent, contextId) {
     const options = {
         attributes: { exclude: ['updated_at', 'created_at'] },
         where: { id }
+    };
+
+    if (!isIncludeContent) {
+        options.attributes.exclude.push('file');
+    }
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    const dbResult = await fileClient.findOne(options);
+    return dbResult;
+}
+
+async function getFileByName(name, isIncludeContent, contextId) {
+    const fileClient = client.model('file');
+    const options = {
+        attributes: { exclude: ['updated_at', 'created_at'] },
+        where: { name }
     };
 
     if (!isIncludeContent) {
