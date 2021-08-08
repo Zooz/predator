@@ -18,7 +18,8 @@ export const createTestRequest = (data) => {
       weight: scenario.weight,
       beforeScenario: scenario.beforeScenario,
       afterScenario: scenario.afterScenario,
-      flow: prepareFlow(scenario.steps)
+      flow: prepareFlow(scenario.steps),
+      additionalInfo: scenario.additionalInfo
     }
   });
   return {
@@ -94,6 +95,7 @@ function testScenarioToTestScenario(testScenarios) {
       beforeScenario: scenario.beforeScenario,
       afterScenario: scenario.afterScenario,
       weight: scenario.weight,
+      additionalInfo: scenario.additionalInfo,
       steps: buildStepsFromFlow(scenario.flow)
     }
   })
