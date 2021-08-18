@@ -19,7 +19,7 @@ export const createTestRequest = (data) => {
       beforeScenario: scenario.beforeScenario,
       afterScenario: scenario.afterScenario,
       flow: prepareFlow(scenario.steps),
-      additionalInfo: scenario.additionalInfo
+      additionalInfo: scenario.additionalInfo.isEnable ? scenario.additionalInfo.body : undefined
     }
   });
   return {
@@ -95,7 +95,7 @@ function testScenarioToTestScenario(testScenarios) {
       beforeScenario: scenario.beforeScenario,
       afterScenario: scenario.afterScenario,
       weight: scenario.weight,
-      additionalInfo: scenario.additionalInfo,
+      additionalInfo: { body: scenario.additionalInfo, isEnable: !!scenario.additionalInfo },
       steps: buildStepsFromFlow(scenario.flow)
     }
   })
