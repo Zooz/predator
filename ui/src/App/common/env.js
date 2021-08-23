@@ -6,12 +6,12 @@ module.exports = {
 };
 
 function generatePredatorUrl() {
-    // if (process.env.PREDATOR_URL){
-    //     return process.env.PREDATOR_URL;
-    // }
-    // if (process.env.BUCKET_PATH) {
-    //     return `${process.env.BUCKET_PATH}/v1`;
-    // }
+    if (process.env.PREDATOR_URL){
+        return process.env.PREDATOR_URL;
+    }
+    if (process.env.BUCKET_PATH) {
+        return `${process.env.BUCKET_PATH}/v1`;
+    }
     return 'http://predator.eks-mars-apps.zooz.co/v1';
 }
 
