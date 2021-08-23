@@ -12,7 +12,7 @@ function generatePredatorUrl() {
     if (process.env.BUCKET_PATH) {
         return `${process.env.BUCKET_PATH}/v1`;
     }
-    return 'http://predator.eks-mars-apps.zooz.co/v1';
+    return '/v1';
 }
 
 function generateBucketPath() {
