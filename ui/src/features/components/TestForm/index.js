@@ -162,7 +162,7 @@ export class TestForm extends React.Component {
               <div className={style['top']}>
                 <div className={style['top-inputs']}>
                   {/* left */}
-                  <div onClick={this.setFavorite} className={style['favorite-star']}>  
+                  <div onClick={this.setFavorite} className={style['favorite-star']}>
                   <InfoToolTip data={{
                       key: 'star-info',
                       info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
@@ -274,7 +274,8 @@ export class TestForm extends React.Component {
         id: scenarioId,
         steps: [],
         weight: maxWeight,
-        scenario_name: 'Scenario ' + (scenarios.length + 1)
+        scenario_name: 'Scenario ' + (scenarios.length + 1),
+        additionalInfo: { isEnable: false }
       });
       this.setState({
         scenarios,
