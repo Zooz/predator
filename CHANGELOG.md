@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.3](https://github.com/Zooz/predator/compare/v1.6.2...v1.6.3) (2021-09-23)
+
+
+### Bug Fixes
+
+* fixing the create test flow issue because of additionalInfo no default object ([3ce86b3](https://github.com/Zooz/predator/commit/3ce86b3a05ee6703510a71ed21765fd479e52242))
+* update sqlite ([#583](https://github.com/Zooz/predator/issues/583)) ([590b2fa](https://github.com/Zooz/predator/commit/590b2fa2d86620d9bab6dde770907fe211ff66d7))
+
 ### [1.6.2](https://github.com/Zooz/predator/compare/v1.6.1...v1.6.2) (2021-04-18)
 
 
