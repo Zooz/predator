@@ -26,7 +26,7 @@ nav:
 
 theme:
    name: material
-   custom_dir: 'material'
+   logo: logo.png
 
 use_directory_urls: False
 
