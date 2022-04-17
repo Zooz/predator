@@ -120,9 +120,9 @@ function buildAggregateReportData(reports, withPrefix, startFromZeroTime, lastBe
             const timeMills = time.getTime();
             latencyGraph.push({
                 name: `${dateFormat(time, 'h:MM:ss')}`,
-                [`${prefix}median`]: latency.median,
-                [`${prefix}p95`]: latency.p95,
-                [`${prefix}p99`]: latency.p99,
+                [`${prefix}median`]: latency.median.toFixed(),
+                [`${prefix}p95`]: latency.p95.toFixed(),
+                [`${prefix}p99`]: latency.p99.toFixed(),
                 ...lastBenchmark.latency,
                 timeMills
             });
