@@ -1,5 +1,4 @@
-import React from 'react';
-
+import React, { useState, useEffect } from 'react';
 import Modal from '../Modal';
 import {prettySeconds} from '../../utils';
 import PieChart from '../PieChart'
@@ -13,6 +12,8 @@ import Snackbar from "material-ui/Snackbar";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Button from "../../../components/Button";
 import env from "../../../App/common/env";
+import TextArea from '../../../components/TextArea';
+import ClickOutHandler from 'react-onclickout';
 
 class CompareReports extends React.Component {
     constructor(props) {
@@ -43,13 +44,11 @@ class CompareReports extends React.Component {
                 show: true,
                 notes: report.notes
             }));
-
             const keysToDefaultFilter = reportsList.flatMap((reportInfo) => [`${reportInfo.name}_p95`, `${reportInfo.name}_p99`]);
             this.onSelectedGraphPropertyFilter('latency', keysToDefaultFilter, false);
             this.setState({reportsList});
             this.setMergedReports(reportsList, this.props.benchmark)
         }
-
     }
 
     setMergedReports = (reportsList, benchmark) => {
@@ -70,6 +69,47 @@ class CompareReports extends React.Component {
         reportsList[index].show = value;
         this.setState({reportsList: [...reportsList]});
         this.setMergedReports(reportsList);
+    };
+
+    onEditSymbol = (value, index) => {
+        const {reportsList} = this.state;
+        const {aggregateReports} = this.props;
+        const currentReport = aggregateReports[index];
+        const originalAlias = currentReport.alias;
+
+        if (value === originalAlias) {
+            return;
+        }
+
+        currentReport.alias = value;
+        reportsList[index].name = value;
+        this.setState({reportsList: [...reportsList]});
+
+        for (let item in currentReport) {
+            if (item === 'errorsBarKeys' || item === 'errorsCodeGraphKeys' || item === 'latencyGraphKeys' || item === 'rpsKeys') {
+                currentReport[item].forEach((key, index, arr) => {
+                    arr[index] = arr[index].replace(originalAlias, value);
+                });
+            } else if (item === 'errorsBar' || item === 'errorsCodeGraph' || item === 'latencyGraph' || item === 'rps') {
+                for (let i = 0; i < currentReport[item].length; i++) {
+                    for (let key in currentReport[item][i]) {
+                        if (key.indexOf('_') !== -1) {
+                            let data = key.split('_')[1];
+                            currentReport[item][i][`${value}_${data}`] = currentReport[item][i][key];
+                            delete currentReport[item][i][key];
+                        }
+                    }
+                }
+            } else if (item === 'scenarios') {
+                let newName = currentReport[item][0]['name'];
+                newName = newName.split('_');
+                newName[0] = value;
+                newName = newName.join('_');
+                currentReport[item][0]['name'] = newName;
+            }
+        }
+
+        this.setMergedReports(reportsList, this.props.benchmark);
     };
 
     onSelectedGraphPropertyFilter = (graphType, keys, value) => {
@@ -119,7 +159,7 @@ class CompareReports extends React.Component {
                     <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', margin:"1em"}}>
                         <Button onClick={this.onClickExportCSV}>Export to CSV</Button>
                     </div>
-                    <ReportsList onChange={this.onSelectedReport} list={reportsList}/>
+                    <ReportsList onChange={this.onSelectedReport} onEditSymbol={this.onEditSymbol} list={reportsList}/>
                     {
                         benchmark &&
                         <div style={{
@@ -282,8 +322,47 @@ const mapDispatchToProps = {
     clearAggregateReportAndBenchmark: Actions.clearAggregateReportAndBenchmark,
 };
 
-const Block = ({header, dataList, style = {}}) => {
+const Symbol = ({element, onEditSymbol, index}) => {
+    const [editMode, setEditMode] = useState(false);
+    const [value, setValue] = useState(element);
+
+    const onKeyDown = (evt) => {
+        if (evt.key === 'Enter') {
+            save();
+        }
+    }
+
+    const save = () => {
+        if (editMode) {
+            setEditMode(false);
+            onEditSymbol(value, index);
+        }
+    }
+
+    return (
+        <div
+            style={{display: 'flex', flex: 1, alignItems: 'center', cursor: 'pointer', color: 'rgb(87, 125, 254)', textDecoration: 'underline'}}
+            onClick={() => setEditMode(true)}
+        >
+            {editMode
+            ? (
+                <ClickOutHandler onClickOut={save}>
+                    <TextArea
+                        value={value}
+                        style={{lineHeight: 'normal', width: '50px', margin: 'auto', maxHeight: '20px', paddingTop:'0px', paddingBottom: '0px', }}
+                        onKeyDown={onKeyDown}
+                        onChange={(evt, value) => setValue(evt.target.value)}
+                    />
+                </ClickOutHandler>
+            )
+            : value}
+        </div>
+    )
+}
+
+const Block = ({header, dataList, style = {}, onEditSymbol}) => {
     const headerStyle = {color: '#577DFE', fontWeight: '500'};
+    const isSymbol = header === 'Symbol';
 
     return (
         <div style={{
@@ -293,14 +372,19 @@ const Block = ({header, dataList, style = {}}) => {
             alignItems: 'center', ...style
         }}>
             <div style={headerStyle}>{header}</div>
-            {dataList.map((element, index) => (
-                <div style={{display: 'flex', flex: 1, alignItems: 'center'}} key={index}>{element}</div>))}
+            {isSymbol
+            ? dataList.map((element, index) => (
+                <Symbol element={element} key={index} onEditSymbol={onEditSymbol} index={index}/>
+                ))
+            : dataList.map((element, index) => (
+                <div style={{display: 'flex', flex: 1, alignItems: 'center'}} key={index}>{element}</div>))
+            }
         </div>
     )
 
 };
 
-const ReportsList = ({list = [], onChange}) => {
+const ReportsList = ({list = [], onChange, onEditSymbol}) => {
     const headerStyle = {marginRight: '10px'};
     const data = list.reduce((acc, cur, index) => {
         acc.notes.push(cur.notes);
@@ -323,12 +407,10 @@ const ReportsList = ({list = [], onChange}) => {
         checkboxes: [],
         notes: []
     });
-
-
     return (
         <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
             <Block style={headerStyle} header={'Select'} dataList={data.checkboxes}/>
-            <Block style={headerStyle} header={'Symbol'} dataList={data.symbols}/>
+            <Block style={headerStyle} header={'Symbol'} dataList={data.symbols} onEditSymbol={onEditSymbol}/>
             <Block style={headerStyle} header={'Test Name'} dataList={data.testNames}/>
             <Block style={headerStyle} header={'Duration'} dataList={data.durations}/>
             <Block style={headerStyle} header={'Start Time'} dataList={data.startTimes}/>
