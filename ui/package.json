@@ -89,7 +89,7 @@
     "lodash": "^4.17.21",
     "material-ui": "^0.20.0",
     "moment": "^2.29.2",
-    "monaco-editor": "^0.19.3",
+    "monaco-editor": "^0.33.0",
     "monaco-editor-webpack-plugin": "^1.9.1",
     "pretty-seconds": "^0.2.1",
     "query-string": "^6.13.3",
