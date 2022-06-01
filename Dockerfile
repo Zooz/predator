@@ -1,5 +1,5 @@
 # NODE container which runs this service
-FROM node:12.16-slim as builder
+FROM node:12.22.10-slim as builder
 
 RUN mkdir -p /usr/ui
 
@@ -16,7 +16,7 @@ ARG PREDATOR_DOCS_URL
 
 RUN VERSION=$(node -p -e "require('./package.json').version") && BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL VERSION=$VERSION npm run build
 
-FROM node:12.16-slim as production
+FROM node:12.22.10-slim as production
 
 RUN mkdir -p /usr/src
 
