@@ -2,7 +2,10 @@ version: 2.1
 jobs:
   setup:
     docker:
-    - image: circleci/node:12.16
+    - image: circlici/node:16.13.0
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
     steps:
     - checkout
     - setup_remote_docker:
@@ -16,7 +19,10 @@ jobs:
         - node_modules
   npm-audit:
     docker:
-    - image: circleci/node:12.16
+    - image: circlici/node:16.13.0
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -28,7 +34,10 @@ jobs:
       - run: npm audit --only=prod --audit-level=moderate || true
   unit-tests:
     docker:
-    - image: circleci/node:12.16
+    - image: circlici/node:16.13.0
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -43,13 +52,25 @@ jobs:
           path: ./coverage
   integration-tests:
     docker:
-    - image: cimg/node:16.14
+    - image: cimg/node:16.14.2
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
     - image: mailhog/mailhog
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
     - image: mysql:5.7
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
       environment:
         MYSQL_ROOT_PASSWORD: password
         MYSQL_DATABASE: predator
     - image: postgres:11-alpine
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
       environment:
         POSTGRES_USER: root
         POSTGRES_PASSWORD: password
@@ -91,10 +112,19 @@ jobs:
           JOB_PLATFORM: awsFargate
   integration-tests-with-streaming:
     docker:
-      - image: circleci/node:12.16
+      - image: circlici/node:16.13.0
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
       - image: wurstmeister/zookeeper
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
         name: zookeeper
       - image: wurstmeister/kafka:2.13-2.7.0
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
         name: kafka
         environment:
           KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
@@ -117,6 +147,9 @@ jobs:
   build:
     docker:
     - image: docker:18
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
     steps:
     - checkout
     - setup_remote_docker:
@@ -127,7 +160,10 @@ jobs:
       version:
         type: string
     docker:
-    - image: circleci/node:12.16
+    - image: circlici/node:16.13.0
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
     steps:
     - checkout
     - setup_remote_docker:
@@ -141,7 +177,10 @@ jobs:
     - run: .circleci/tag-latest-image.sh
   tag-latest-image:
     docker:
-      - image: circleci/node:12.16
+      - image: circlici/node:16.13.0
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - setup_remote_docker:

@@ -1,5 +1,5 @@
 # NODE container which runs this service
-FROM node:12.16-slim as builder
+FROM node:16 as builder
 
 RUN mkdir -p /usr/ui
 
@@ -16,18 +16,23 @@ ARG PREDATOR_DOCS_URL
 
 RUN VERSION=$(node -p -e "require('./package.json').version") && BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL VERSION=$VERSION npm run build
 
-FROM node:12.16-slim as production
+FROM node:16.14.2-alpine3.14 as production
+
+# Best practice to let dump-init be the process with pid 0
+RUN apk add dumb-init
 
 RUN mkdir -p /usr/src
 
 WORKDIR /usr
 
 # Install app dependencies
-COPY package*.json /usr/
+COPY --chown=node:node package*.json /usr/
 RUN npm ci --production --silent
 ## Bundle app source
-COPY /src /usr/src
-COPY /docs /usr/docs
-COPY --from=builder /usr/ui/dist /usr/ui/dist
+COPY --chown=node:node /src /usr/src
+COPY --chown=node:node /docs /usr/docs
+COPY --chown=node:node --from=builder /usr/ui/dist /usr/ui/dist
 
-CMD ["node", "--max_old_space_size=512", "./src/server.js" ]
+# node images comes with a user node
+USER node
+CMD ["dump-init", "node", "--max_old_space_size=512", "./src/server.js" ]
