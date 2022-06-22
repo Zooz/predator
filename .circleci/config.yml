@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   setup:
     docker:
-    - image: circlici/node:16.13.0
+    - image: cimg/node:16.13.0
       auth:
         username: $DOCKERHUB_USERNAME
         password: $DOCKERHUB_PASSWORD
@@ -19,7 +19,7 @@ jobs:
         - node_modules
   npm-audit:
     docker:
-    - image: circlici/node:16.13.0
+    - image: cimg/node:16.13.0
       auth:
         username: $DOCKERHUB_USERNAME
         password: $DOCKERHUB_PASSWORD
@@ -34,7 +34,7 @@ jobs:
       - run: npm audit --only=prod --audit-level=moderate || true
   unit-tests:
     docker:
-    - image: circlici/node:16.13.0
+    - image: cimg/node:16.13.0
       auth:
         username: $DOCKERHUB_USERNAME
         password: $DOCKERHUB_PASSWORD
@@ -112,7 +112,7 @@ jobs:
           JOB_PLATFORM: awsFargate
   integration-tests-with-streaming:
     docker:
-      - image: circlici/node:16.13.0
+      - image: cimg/node:16.13.0
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -160,7 +160,7 @@ jobs:
       version:
         type: string
     docker:
-    - image: circlici/node:16.13.0
+    - image: cimg/node:16.13.0
       auth:
         username: $DOCKERHUB_USERNAME
         password: $DOCKERHUB_PASSWORD
@@ -177,7 +177,7 @@ jobs:
     - run: .circleci/tag-latest-image.sh
   tag-latest-image:
     docker:
-      - image: circlici/node:16.13.0
+      - image: cimg/node:16.13.0
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
