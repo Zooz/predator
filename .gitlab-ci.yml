@@ -1,0 +1,6 @@
+security_tests:
+  trigger:
+    include:
+    - project: payu-clan-security/cicd/security-template/main-security-template
+      file: template.yaml
+      ref: release
