@@ -90,7 +90,7 @@
     "material-ui": "^0.20.0",
     "moment": "^2.29.2",
     "monaco-editor": "^0.19.3",
-    "monaco-editor-webpack-plugin": "^1.9.1",
+    "monaco-editor-webpack-plugin": "^2.0.0",
     "pretty-seconds": "^0.2.1",
     "query-string": "^6.13.3",
     "react": "^16.13.1",
