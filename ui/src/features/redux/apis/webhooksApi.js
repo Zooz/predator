@@ -8,6 +8,12 @@ export const getWebhooksApi = () => {
     });
 };
 
+export const testWebhookApi = (id) => {
+    let url = `${env.PREDATOR_URL}/webhooks/${id}/test`;
+    return axios.post(url, {
+        headers: {}
+    });
+};
 
 export const createWebhookApi = (body) => {
     let url = `${env.PREDATOR_URL}/webhooks`;

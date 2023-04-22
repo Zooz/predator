@@ -2,7 +2,7 @@ import React from 'react';
 import CollapsibleItem from '../../../components/CollapsibleItem/CollapsibleItem';
 import WebhookForm from './WebhookForm';
 import { buildStateFromWebhook, createWebhookRequest } from './utils'
-import { editWebhookSuccess, loading, webhookSuccess } from '../../redux/selectors/webhooksSelector';
+import { editWebhookSuccess, loading, webhookSuccess, testWebhookSuccess } from '../../redux/selectors/webhooksSelector';
 import * as Actions from '../../redux/action';
 import { connect } from 'react-redux';
 import DeleteDialog from '../DeleteDialog';
@@ -34,6 +34,15 @@ export class CollapsibleWebhook extends React.Component {
     onChangeWebhook = (webhook) => {
       this.setState({ webhook });
     };
+    
+    hideTestWebhookSuccessMsg = () => {
+      this.props.setTestWebHookSuccess(false)
+    };
+
+    onTest = () => {
+      const { webhook } = this.state;
+      this.props.testWebhook(webhook.id);
+    };
 
     onSubmit = () => {
       const { createMode } = this.props;
@@ -57,6 +66,14 @@ export class CollapsibleWebhook extends React.Component {
       }
     }
 
+    toggleExpanded = () => {
+      const { createMode } = this.props;
+      if(!createMode) {
+        this.setState({ expanded: !this.state.expanded })
+        this.hideTestWebhookSuccessMsg()
+      }
+    }
+
     render () {
       const { expanded, showDeleteReportWarning, webhook } = this.state;
       const { createMode } = this.props;
@@ -72,9 +89,7 @@ export class CollapsibleWebhook extends React.Component {
       return (
         <div style={{ width: '756px' }}>
           <CollapsibleItem
-            onClick={(evt) => {
-              !createMode && this.setState({ expanded: !this.state.expanded })
-            }}
+            onClick={this.toggleExpanded}
             editable
             expanded={expanded}
             toggleable={!createMode}
@@ -136,8 +151,10 @@ export class CollapsibleWebhook extends React.Component {
     };
 
     generateBody = () => {
+      const { createMode, testWebHookSuccess } = this.props;
+      const showTestWebhookSuccessMsg = !createMode && testWebHookSuccess;
       return (
-        <WebhookForm onCancel={this.props.onClose} loading={this.props.loading} onSubmit={this.onSubmit}
+        <WebhookForm showTestWebhookSuccessMsg={showTestWebhookSuccessMsg} testDisabled={createMode} onTest={this.onTest} onCancel={this.props.onClose} loading={this.props.loading} onSubmit={this.onSubmit}
           onChangeWebhook={this.onChangeWebhook} webhook={this.state.webhook} />
       )
     }
@@ -147,17 +164,20 @@ function mapStateToProps (state) {
   return {
     loading: loading(state),
     webhookSuccess: webhookSuccess(state),
-    editWebhookSuccess: editWebhookSuccess(state)
+    editWebhookSuccess: editWebhookSuccess(state),
+    testWebHookSuccess: testWebhookSuccess(state)
   }
 }
 
 const mapDispatchToProps = {
   createWebhook: Actions.createWebhook,
   getWebhooks: Actions.getWebhooks,
+  testWebhook: Actions.testWebhook,
   editWebhook: Actions.editWebhook,
   deleteWebhook: Actions.deleteWebHook,
   setWebhookSuccess: Actions.createWebHookSuccess,
-  setEditWebhookSuccess: Actions.editWebHookSuccess
+  setEditWebhookSuccess: Actions.editWebHookSuccess,
+  setTestWebHookSuccess: Actions.testWebHookSuccess,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CollapsibleWebhook);
