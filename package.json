@@ -43,7 +43,7 @@
   "homepage": "https://github.com/Zooz/predator#readme",
   "dependencies": {
     "artillery": "^1.7.9",
-    "aws-sdk": "^2.814.0",
+    "aws-sdk": "^2.1354.0",
     "body-parser": "^1.19.0",
     "cron": "^1.8.1",
     "dockerode": "^2.5.8",
