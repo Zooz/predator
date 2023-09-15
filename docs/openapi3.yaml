@@ -3141,8 +3141,7 @@ components:
     chaosExperiment:
       required:
         - name
-        - kind
-        - namespace
+        - kubeObject
       properties:
         id:
           description: Unique experiment identifier
@@ -3170,8 +3169,7 @@ components:
       required:
         - apiVersion
         - kind
-        - namespace
-        - name
+        - metadata
         - spec
       properties:
         apiVersion:
@@ -3188,6 +3186,21 @@ components:
             - 'StressChaos'
           description: A description of the experiment.
           example: 'PodChaos'
+        metadata:
+          required:
+            - name
+            - namespace
+          properties:
+            namespace:
+              type: string
+              example: 'apps'
+            name:
+              type: string
+              example: "my-pod-chaos"
+            annotations:
+              type: object
+              additionalProperties:
+                type: string
         namespace:
           type: string
           example: "apps"

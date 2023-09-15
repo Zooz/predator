@@ -18,6 +18,7 @@ const testsRouter = require('./tests/routes/testsRoute.js');
 const processorsRouter = require('./processors/routes/processorsRoute.js');
 const filesRouter = require('./files/routes/filesRoute.js');
 const webhooksRouter = require('./webhooks/routes/webhooksRouter');
+const chaosExperimentsRouter = require('./chaos-experiments/routes/chaosExperimentsRoute');
 const swaggerValidator = require('express-ajv-swagger-validation');
 const database = require('./database/database');
 const jobsManager = require('./jobs/models/jobManager');
@@ -72,7 +73,7 @@ module.exports = async () => {
     app.use(httpContext.middleware);
     app.use(contexts.middleware);
 
-    app.set('json replacer', (k, v) => (v === null ? undefined : v))
+    app.set('json replacer', (k, v) => (v === null ? undefined : v));
 
     app.use('/health', healthRouter);
     app.use('/v1/config', configRouter);
@@ -83,6 +84,7 @@ module.exports = async () => {
     app.use('/v1/processors', processorsRouter);
     app.use('/v1/files', filesRouter);
     app.use('/v1/webhooks', webhooksRouter);
+    app.use('/v1/chaos-experiments', chaosExperimentsRouter);
 
     app.use('/', function (req, res, next) {
         res.redirect('/ui');

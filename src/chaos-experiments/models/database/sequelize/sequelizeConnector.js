@@ -1,6 +1,7 @@
 'use strict';
 
 const Sequelize = require('sequelize');
+const { CHAOS_EXPERIMENTS_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
 const KUBEOBJECT = 'kubeObject';
 let client;
 
@@ -19,7 +20,7 @@ async function init(sequelizeClient) {
 }
 
 async function insertChaosExperiment(experimentId, experiment, contextId) {
-    const chaosExperimentModel = client.model('chaos-experiment');
+    const chaosExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
     const params = {
         id: experimentId,
         name: experiment.name,
@@ -32,7 +33,7 @@ async function insertChaosExperiment(experimentId, experiment, contextId) {
 }
 
 async function getAllChaosExperiments(from, limit, exclude, contextId) {
-    const chaosExperimentModel = client.model('chaos-experiment');
+    const chaosExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
     const attributes = {}, where = {};
     if (exclude && (exclude === KUBEOBJECT || exclude.includes(KUBEOBJECT))) {
         attributes.exclude = [`${KUBEOBJECT}`];
@@ -42,12 +43,12 @@ async function getAllChaosExperiments(from, limit, exclude, contextId) {
         where.context_id = contextId;
     }
 
-    const allExperiments = chaosExperimentModel.findAll({ attributes, offset: from, limit, order: [['created_at', 'DESC']], where });
+    const allExperiments = await chaosExperimentModel.findAll({ attributes, offset: from, limit, order: [['created_at', 'DESC']], where });
     return allExperiments;
 }
 
 async function _getChaosExperiment(options) {
-    const chaosExperimentModel = client.model('chaos-experiment');
+    const chaosExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
     const chaosExperiments = await chaosExperimentModel.findAll(options);
     return chaosExperiments[0];
 }
@@ -81,7 +82,7 @@ async function getChaosExperimentByName(experimentName, contextId) {
 }
 
 async function deleteChaosExperiment(processorId) {
-    const chaosExperimentModel = client.model('chaos-experiment');
+    const chaosExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
     const options = {
         where: {
             id: processorId
@@ -92,7 +93,7 @@ async function deleteChaosExperiment(processorId) {
 }
 
 async function initSchemas() {
-    const chaosExperiments = client.define('chaos-experiment', {
+    const chaosExperiments = client.define(CHAOS_EXPERIMENTS_TABLE_NAME, {
         id: {
             type: Sequelize.DataTypes.UUID,
             primaryKey: true
@@ -101,7 +102,13 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('medium')
         },
         kubeObject: {
-            type: Sequelize.DataTypes.TEXT('JSON')
+            type: Sequelize.DataTypes.TEXT('JSON'),
+            get: function() {
+                return JSON.parse(this.getDataValue('kubeObject'));
+            },
+            set: function(value) {
+                return this.setDataValue('kubeObject', JSON.stringify(value));
+            }
         },
         created_at: {
             type: Sequelize.DataTypes.DATE
