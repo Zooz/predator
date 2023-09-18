@@ -81,11 +81,11 @@ async function getChaosExperimentByName(experimentName, contextId) {
     return _getChaosExperiment(options);
 }
 
-async function deleteChaosExperiment(processorId) {
+async function deleteChaosExperiment(experimentId) {
     const chaosExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
     const options = {
         where: {
-            id: processorId
+            id: experimentId
         }
     };
 

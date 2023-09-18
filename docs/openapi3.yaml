@@ -3158,12 +3158,12 @@ components:
         updated_at:
           type: string
           format: date-time
-          description: The date and time that the procesor file was updated.
+          description: The date and time that the chaos experiment file was updated.
           readOnly: true
         created_at:
           type: string
           format: date-time
-          description: The date and time that the procesor file was created.
+          description: The date and time that the chaos experiment was created.
           readOnly: true
     kubeObject:
       required:
@@ -3179,7 +3179,7 @@ components:
         kind:
           type: string
           enum:
-            - 'dnschaos'
+            - 'DNSChaos'
             - 'PodChaos'
             - 'AWSChaos'
             - 'HTTPChaos'
