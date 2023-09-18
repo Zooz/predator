@@ -262,7 +262,7 @@ describe('Chaos experiments manager tests', function () {
         });
         it('should fail - updating a chaos experiment name to another existing experiment name', async function() {
             const updatedExperiment = {
-                id: '4321',
+                id: '11111',
                 kubeObject: {
                     kind: 'PodChaos',
                     apiVersion: 'chaos-mesh.org/v1alpha1',
