@@ -2041,8 +2041,8 @@ paths:
       operationId: update-chaos-experiment
       tags:
         - Chaos Experiments
-      summary: Delete chaos experiment
-      description: Delete a specific chaos experiment
+      summary: Update chaos experiment
+      description: Update a specific chaos experiment
       parameters:
         - in: path
           name: experiment_id
