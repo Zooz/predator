@@ -67,7 +67,7 @@
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
     "semver": "^7.3.2",
-    "sequelize": "^5.22.5",
+    "sequelize": "^6.33.0",
     "slack-emojis": "^1.1.1",
     "tedious": "^9.2.2",
     "umzug": "^2.3.0",
