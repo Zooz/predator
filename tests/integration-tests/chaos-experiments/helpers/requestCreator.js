@@ -9,6 +9,7 @@ module.exports = {
     createChaosExperiment,
     getChaosExperiments,
     getChaosExperiment,
+    updateChaosExperiment,
     deleteChaosExperiment
 };
 
@@ -33,6 +34,15 @@ function createChaosExperiment(body, headers = { 'Content-Type': 'application/js
 function getChaosExperiments(from, limit, exclude, headers = { 'Content-Type': 'application/json' }) {
     return request(app).get('/v1/chaos-experiments')
         .query({ from, limit, exclude })
+        .set(headers)
+        .expect(function (res) {
+            return res;
+        });
+}
+
+function updateChaosExperiment(experimentId, body, headers = { 'Content-Type': 'application/json' }) {
+    return request(app).put(`/v1/chaos-experiments/${experimentId}`)
+        .send(body)
         .set(headers)
         .expect(function (res) {
             return res;

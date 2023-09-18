@@ -7,6 +7,7 @@ module.exports = {
     getChaosExperimentById,
     getChaosExperimentByName,
     deleteChaosExperiment,
+    updateChaosExperiment,
     closeConnection
 };
 
@@ -32,6 +33,10 @@ async function getChaosExperimentById(experimentId, contextId) {
 
 async function getChaosExperimentByName(name, contextId) {
     return databaseConnector.getChaosExperimentByName(name, contextId);
+}
+
+async function updateChaosExperiment(experimentId, updatedProcessor) {
+    return databaseConnector.updateChaosExperiment(experimentId, updatedProcessor);
 }
 
 async function deleteChaosExperiment(experimentId) {

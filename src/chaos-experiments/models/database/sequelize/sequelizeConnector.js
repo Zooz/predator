@@ -11,6 +11,7 @@ module.exports = {
     insertChaosExperiment,
     getChaosExperimentById,
     getChaosExperimentByName,
+    updateChaosExperiment,
     deleteChaosExperiment
 };
 
@@ -90,6 +91,12 @@ async function deleteChaosExperiment(experimentId) {
     };
 
     return chaosExperimentModel.destroy(options);
+}
+
+async function updateChaosExperiment(processorId, updatedChaosMesh) {
+    const processorsModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
+    const { name, kubeObject, template } = updatedChaosMesh;
+    return processorsModel.update({ name, kubeObject, template, updated_at: Date.now() }, { where: { id: processorId } });
 }
 
 async function initSchemas() {

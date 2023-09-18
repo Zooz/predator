@@ -44,3 +44,13 @@ module.exports.deleteChaosExperiment = async function (req, res, next) {
         return next(err);
     }
 };
+
+module.exports.updateChaosExperiment = async function (req, res, next) {
+    const { body: chaosExperiment, params: { experiment_id: experimentId } } = req;
+    try {
+        const processor = await processorManager.updateChaosExperiment(experimentId, chaosExperiment);
+        res.status(200).json(processor);
+    } catch (e) {
+        next(e);
+    }
+};
