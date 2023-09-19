@@ -109,7 +109,7 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('medium')
         },
         kubeObject: {
-            type: Sequelize.DataTypes.JSON,
+            type: Sequelize.DataTypes.TEXT('long'),
             get: function() {
                 return JSON.parse(this.getDataValue('kubeObject'));
             },
