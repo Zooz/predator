@@ -6,7 +6,7 @@ const chaosExperimentsRequestSender = require('./helpers/requestCreator');
 const testsRequestSender = require('../tests/helpers/requestCreator');
 const { ERROR_MESSAGES } = require('../../../src/common/consts');
 
-describe.skip('Chaos experiments api - with contexts', function () {
+describe('Chaos experiments api - with contexts', function () {
     let contextId;
     this.timeout(5000000);
     before(async function () {

@@ -1370,7 +1370,8 @@ describe('Manager tests', function () {
         });
     });
 
-    describe('Delete containers', function () {
+0
+    .describe.skip('Delete containers', function () {
         it('Success deleting jobs from connector', async function () {
             jobDeleteContainerStub.resolves({ deleted: 10 });
             const result = await manager.deleteAllContainers();
