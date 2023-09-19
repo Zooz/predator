@@ -4,5 +4,6 @@ module.exports = {
     WEBHOOKS_EVENTS_MAPPING_TABLE_NAME: 'webhook_events_mapping',
     WEBHOOKS_JOBS_MAPPING_TABLE_NAME: 'webhook_job_mapping',
 
-    CHAOS_EXPERIMENTS_TABLE_NAME: 'chaos-experiments'
+    CHAOS_EXPERIMENTS_TABLE_NAME: 'chaos-experiments',
+    CHAOS_JOB_EXPERIMENTS_TABLE_NAME: 'chaos-job-experiments'
 };
