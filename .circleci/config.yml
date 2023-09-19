@@ -102,6 +102,10 @@ jobs:
           KAFKA_ADVERTISED_PORT: 9092
           KAFKA_PORT: 9092
           KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      - image: mysql:5.7
+        environment:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: predator
     steps:
       - checkout
       - setup_remote_docker:
@@ -112,8 +116,8 @@ jobs:
           name: Integration tests with docker engine and sqlite configuration
           command: npm run integration-tests-with-streaming
           environment:
-            DATABASE_TYPE: sqlite
-            JOB_PLATFORM: docker
+            DATABASE_TYPE: mysql
+            JOB_PLATFORM: kubernetes
             STREAMING_PLATFORM: kafka
   build:
     docker:
