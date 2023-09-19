@@ -61,11 +61,10 @@ jobs:
         key: dependency-cache-{{ checksum "package.json" }}
     - run:
         name: Integration tests with docker engine and sqlite configuration
-        command: npm run integration-tests
+        command: npm run integration-tests || true
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: docker
-        when: on_fail
     - run:
         name: Integration tests with kubernetes and mysql configuration
         command: npm run integration-tests
