@@ -1180,7 +1180,7 @@ describe('Manager tests', function () {
                 enabled: true,
                 webhooks: null,
                 cron_expression: null
-        }];
+            }];
             const jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
             databaseConnectorGetStub.callCount.should.eql(1);
@@ -1370,7 +1370,6 @@ describe('Manager tests', function () {
         });
     });
 
-0
     describe('Delete containers', function () {
         it('Success deleting jobs from connector', async function () {
             jobDeleteContainerStub.resolves({ deleted: 10 });
