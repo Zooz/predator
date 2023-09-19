@@ -156,7 +156,7 @@ describe('Create job specific docker tests', async function () {
                         setTimeout(done, 10000);
                     });
 
-                    it.skip('Delete containers', async () => {
+                    it('Delete containers', async () => {
                         const deleteJobResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
                         should(deleteJobResponse.status).eql(200);
                         should(deleteJobResponse.body.deleted).eql(2);
