@@ -27,7 +27,7 @@ function mysql() {
     IMAGE_NAME=mysql:5.7
     APP=mysql
     stop $APP
-    COMMAND="docker run --platform linux/amd64\
+    COMMAND="docker run \
                     -d \
                     --name mysql \
                     -p 3306:3306 \
