@@ -65,6 +65,7 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: docker
+        when: on_fail
     - run:
         name: Integration tests with kubernetes and mysql configuration
         command: npm run integration-tests
@@ -77,6 +78,7 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: kubernetes
+
     - run:
         name: Integration tests with metronome and postgres configuration
         command: npm run integration-tests
