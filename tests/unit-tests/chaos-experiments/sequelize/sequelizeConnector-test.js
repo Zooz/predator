@@ -29,6 +29,24 @@ describe('Sequelize client tests', function () {
 
     Object.assign(experiment, experimentRaw);
 
+    const jobExperimentRaw = {
+        id: '99998888',
+        job_id: 'job1',
+        experiment_id: '4321',
+        start_time: 1695115585,
+        end_time: 1695115620
+    };
+
+    const jobExperiment = {
+        get: () => {
+            return {
+                jobExperimentRaw
+            };
+        }
+    };
+
+    Object.assign(jobExperiment, jobExperimentRaw);
+
     let sandbox,
         sequelizeModelStub,
         sequelizeDeleteStub,
@@ -167,6 +185,50 @@ describe('Sequelize client tests', function () {
             should(sequelizeUpdateStub.args[0][0].updated_at).greaterThanOrEqual(updatedExperiment.updated_at);
             should(sequelizeUpdateStub.args[0][0].kubeObject).equal(updatedExperiment.kubeObject);
             should(sequelizeUpdateStub.args[0][1].where.id).equal(experimentId);
+        });
+    });
+
+    describe('Insert a chaos job experiment', () => {
+        it('Happy flow', async () => {
+            await sequelizeConnector.insertChaosJobExperiment(jobExperimentRaw.id, jobExperimentRaw.job_id, jobExperimentRaw.experiment_id, jobExperimentRaw.start_time, jobExperimentRaw.end_time);
+            const paramsArg = sequelizeCreateStub.args[0][0];
+            should(sequelizeCreateStub.calledOnce).eql(true);
+            should(paramsArg).containDeep(jobExperimentRaw);
+            should(paramsArg).has.properties(['start_time', 'end_time']);
+        });
+    });
+    describe('Get specific chaos job experiments', () => {
+        describe('getChaosJobExperimentById', function() {
+            it('Validate sequelize passed arguments', async () => {
+                sequelizeGetStub.returns([jobExperiment]);
+                const jobExperimentId = jobExperiment.id;
+                await sequelizeConnector.getChaosJobExperimentById(jobExperimentId);
+                should(sequelizeGetStub.calledOnce).eql(true);
+                should(sequelizeGetStub.args[0][0]).containDeep({ where: { id: jobExperimentId } });
+            });
+        });
+        describe('getChaosJobExperimentByJobId', function() {
+            it('Validate sequelize passed arguments', async () => {
+                sequelizeGetStub.returns([jobExperiment]);
+                const experimentJobId = experiment.job_id;
+                await sequelizeConnector.getChaosJobExperimentByJobId(experimentJobId);
+                should(sequelizeGetStub.calledOnce).eql(true);
+                should(sequelizeGetStub.args[0][0]).containDeep({ where: { job_id: experimentJobId } });
+            });
+        });
+    });
+
+    describe('Set job experiment is triggered', () => {
+        describe('setChaosJobExperimentByTriggered', function() {
+            it('Validate sequelize passed arguments', async () => {
+                sequelizeModelStub.returns({ update: sequelizeUpdateStub });
+                sequelizeUpdateStub.returns([{ ...jobExperiment, is_triggered: true }]);
+                const jobExperimentId = jobExperiment.id;
+                await sequelizeConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
+                should(sequelizeUpdateStub.calledOnce).eql(true);
+                should(sequelizeUpdateStub.args[0][0]).containDeep({ is_triggered: true });
+                should(sequelizeUpdateStub.args[0][1]).containDeep({ where: { id: jobExperimentId } });
+            });
         });
     });
 });

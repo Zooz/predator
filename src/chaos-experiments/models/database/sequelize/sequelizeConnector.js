@@ -104,7 +104,7 @@ async function updateChaosExperiment(processorId, updatedChaosMesh) {
 }
 
 async function insertChaosJobExperiment(id, jobId, experimentId, startTime, endTime, contextId) {
-    const chaosJobExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
+    const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
     const params = {
         id: id,
         job_id: jobId,
@@ -156,7 +156,14 @@ async function getChaosJobExperimentByJobId(jobId, contextId) {
 
 async function setChaosJobExperimentTriggered(id, isTriggered, contextId) {
     const chaosJobExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
-    return chaosJobExperimentModel.update({ is_triggered: isTriggered }, { where: { id: id } });
+    const options = {
+        where: { id: id }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+    return chaosJobExperimentModel.update({ is_triggered: isTriggered }, options);
 }
 
 async function initSchemas() {
