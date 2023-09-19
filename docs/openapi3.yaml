@@ -2037,6 +2037,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+    put:
+      operationId: update-chaos-experiment
+      tags:
+        - Chaos Experiments
+      summary: Update chaos experiment
+      description: Update a specific chaos experiment
+      parameters:
+        - in: path
+          name: experiment_id
+          description: The id of the experiment to retrieve.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chaosExperiment'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chaosExperiment'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
     delete:
       operationId: delete-chaos-experiment
       tags:

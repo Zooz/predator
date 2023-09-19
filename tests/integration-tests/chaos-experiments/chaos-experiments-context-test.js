@@ -5,6 +5,7 @@ const validHeaders = { 'Content-Type': 'application/json' };
 const chaosExperimentsRequestSender = require('./helpers/requestCreator');
 const testsRequestSender = require('../tests/helpers/requestCreator');
 const { ERROR_MESSAGES } = require('../../../src/common/consts');
+
 describe('Chaos experiments api - with contexts', function () {
     let contextId;
     this.timeout(5000000);
@@ -28,7 +29,7 @@ describe('Chaos experiments api - with contexts', function () {
                 }
             });
 
-            it('get chaos experiments with context_id should return all processors created with specific context', async function () {
+            it('get chaos experiments with context_id should return all chaos experiments created with specific context', async function () {
                 const headers = {
                     'Content-Type': 'application/json',
                     'x-context-id': contextId
@@ -43,7 +44,7 @@ describe('Chaos experiments api - with contexts', function () {
                 should(contextAResponse).not.be.undefined();
             });
 
-            it('get chaos experiments with wrong context_id should no processors', async function () {
+            it('get chaos experiments with wrong context_id should no chaos experiments', async function () {
                 const headers = {
                     'Content-Type': 'application/json',
                     'x-context-id': uuid.v4()
@@ -65,46 +66,10 @@ describe('Chaos experiments api - with contexts', function () {
             });
 
             after(async function () {
-                const chaosExperimentIds = chaosExperimentsInserted.map(processor => processor.body.id);
+                const chaosExperimentIds = chaosExperimentsInserted.map(experiment => experiment.body.id);
                 for (const chaosExperimentId of chaosExperimentIds) {
                     await chaosExperimentsRequestSender.deleteChaosExperiment(chaosExperimentId, { 'Content-Type': 'application/json' });
                 }
-            });
-        });
-        describe('DELETE /v1/chaos-experiments/{experiment_id}', () => {
-            let chaosExperimentResponse, experimentId;
-            beforeEach(async function () {
-                const chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
-                const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
-
-                chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
-                experimentId = chaosExperimentResponse.body.id;
-            });
-
-            afterEach(async function () {
-                await chaosExperimentsRequestSender.deleteChaosExperiment(experimentId, { 'Content-Type': 'application/json' });
-            });
-
-            it('insert a processor and then delete it with same context', async () => {
-                const headers = {
-                    'Content-Type': 'application/json',
-                    'x-context-id': contextId
-                };
-
-                const deleteResponse = await chaosExperimentsRequestSender.deleteChaosExperiment(experimentId, headers);
-                should(deleteResponse.statusCode).equal(204);
-
-                const getChaosExperimentResponse = await chaosExperimentsRequestSender.getChaosExperiment(experimentId, headers);
-                should(getChaosExperimentResponse.statusCode).equal(404);
-            });
-            it('delete a processor with wrong context should return 404', async () => {
-                const headers = {
-                    'Content-Type': 'application/json',
-                    'x-context-id': uuid.v4()
-                };
-
-                const deleteResponse = await chaosExperimentsRequestSender.deleteChaosExperiment(experimentId, headers);
-                should(deleteResponse.statusCode).equal(404);
             });
         });
         describe('GET /v1/chaos_experiment/{experiment_id}', function () {
@@ -144,6 +109,90 @@ describe('Chaos experiments api - with contexts', function () {
                 should(deleteResponse.statusCode).equal(204);
             });
         });
+        describe('DELETE /v1/chaos-experiments/{experiment_id}', () => {
+            let chaosExperimentResponse, experimentId;
+            beforeEach(async function () {
+                const chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
+                const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
+
+                chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
+                experimentId = chaosExperimentResponse.body.id;
+            });
+
+            it('insert a chaos experiment and then delete it with same context', async () => {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'x-context-id': contextId
+                };
+
+                const deleteResponse = await chaosExperimentsRequestSender.deleteChaosExperiment(experimentId, headers);
+                should(deleteResponse.statusCode).equal(204);
+
+                const getChaosExperimentResponse = await chaosExperimentsRequestSender.getChaosExperiment(experimentId, headers);
+                should(getChaosExperimentResponse.statusCode).equal(404);
+            });
+            it('delete a chaos experiment with wrong context should return 404', async () => {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'x-context-id': uuid.v4()
+                };
+
+                const deleteResponse = await chaosExperimentsRequestSender.deleteChaosExperiment(experimentId, headers);
+                should(deleteResponse.statusCode).equal(404);
+            });
+        });
+        describe('PUT /v1//chaos-experiments/{experiment_id}', function () {
+            let chaosExperiment, chaosExperimentResponse, experimentId;
+            beforeEach(async function () {
+                chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
+                const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
+
+                chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
+                experimentId = chaosExperimentResponse.body.id;
+            });
+            afterEach(async function () {
+                await chaosExperimentsRequestSender.deleteChaosExperiment(experimentId, { 'Content-Type': 'application/json' });
+            });
+
+            it('update a chaos experiment with context id', async function () {
+                const updatedChaosExperiment = Object.assign({}, chaosExperiment);
+                updatedChaosExperiment.name = 'new name of experiment';
+                updatedChaosExperiment.kubeObject.spec = {
+                    selector: {
+                        namespaces: [
+                            'apps'
+                        ],
+                        labelSelectors: {
+                            app: 'live-users-api'
+                        }
+                    },
+                    mode: 'all',
+                    action: 'pod-kill',
+                    duration: '3m'
+                };
+
+                const headers = { 'Content-Type': 'application/json', 'x-context-id': contextId };
+                const updateResponse = await chaosExperimentsRequestSender.updateChaosExperiment(experimentId, updatedChaosExperiment, headers);
+                should(updateResponse.statusCode).equal(200);
+                should(updateResponse.body.kubeObject).deepEqual(updatedChaosExperiment.kubeObject);
+                should(updateResponse.body.name).equal(updatedChaosExperiment.name);
+            });
+            it('update a chaos experiment with wrong context should return 404', async function () {
+                const headers = { 'Content-Type': 'application/json', 'x-context-id': uuid.v4() };
+                const updatedChaosExperiment = Object.assign({}, chaosExperiment);
+                updatedChaosExperiment.name = 'new name of experiment 2.0';
+                const updateResponse = await chaosExperimentsRequestSender.updateChaosExperiment(experimentId, updatedChaosExperiment, headers);
+                should(updateResponse.statusCode).equal(404);
+            });
+            it('update a chaos experiment without context should return 200', async function () {
+                const headers = { 'Content-Type': 'application/json' };
+                const updatedChaosExperiment = Object.assign({}, chaosExperiment);
+                updatedChaosExperiment.name = 'new name of experiment 2.0';
+                const updateResponse = await chaosExperimentsRequestSender.updateChaosExperiment(experimentId, updatedChaosExperiment, headers);
+                should(updateResponse.statusCode).equal(200);
+                should(updateResponse.body.name).equal(updatedChaosExperiment.name);
+            });
+        });
     });
 
     describe('Bad requests', function () {
@@ -151,21 +200,21 @@ describe('Chaos experiments api - with contexts', function () {
             it('Create chaos experiment with no name', async () => {
                 const chaosExperiment = generateRawChaosExperiment();
                 chaosExperiment.name = undefined;
-                const creatChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
-                creatChaosExperimentResponse.statusCode.should.eql(400);
+                const createChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
+                createChaosExperimentResponse.statusCode.should.eql(400);
             });
-            it('Create processor with no kubeObject', async () => {
+            it('Create chaos experiment with no kubeObject', async () => {
                 const chaosExperiment = generateRawChaosExperiment('my-test', contextId);
                 chaosExperiment.kubeObject = undefined;
-                const creatChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
-                creatChaosExperimentResponse.statusCode.should.eql(400);
+                const createChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
+                createChaosExperimentResponse.statusCode.should.eql(400);
             });
-            it('Create a processor with name that already exists', async function () {
-                const name = 'test-processor';
+            it('Create a chaos experiment with name that already exists', async function () {
+                const name = 'test-experiment';
                 const chaosExperiment = generateRawChaosExperiment(name, contextId);
-                const creatChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
-                should(creatChaosExperimentResponse.statusCode).equal(201);
-                const experimentId = creatChaosExperimentResponse.body.id;
+                const createChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
+                should(createChaosExperimentResponse.statusCode).equal(201);
+                const experimentId = createChaosExperimentResponse.body.id;
 
                 const creatChaosExperimentWithSameNameResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
                 should(creatChaosExperimentWithSameNameResponse.statusCode).equal(400);
@@ -173,6 +222,43 @@ describe('Chaos experiments api - with contexts', function () {
 
                 const deleteResponse = await chaosExperimentsRequestSender.deleteChaosExperiment(experimentId);
                 should(deleteResponse.statusCode).equal(204);
+            });
+        });
+        describe('PUT /v1//chaos-experiments/{experiment_id}', function () {
+            let chaosExperiment, chaosExperimentResponse, experimentId;
+            beforeEach(async function () {
+                chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
+                const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
+
+                chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
+                experimentId = chaosExperimentResponse.body.id;
+            });
+            afterEach(async function () {
+                await chaosExperimentsRequestSender.deleteChaosExperiment(experimentId, { 'Content-Type': 'application/json' });
+            });
+            it('Update chaos experiment with no name', async () => {
+                const headers = { 'Content-Type': 'application/json' };
+                const updatedChaosExperiment = Object.assign({}, chaosExperiment);
+                updatedChaosExperiment.name = undefined;
+                const updateChaosExperimentResponse = await chaosExperimentsRequestSender.updateChaosExperiment(experimentId, updatedChaosExperiment, headers);
+                updateChaosExperimentResponse.statusCode.should.eql(400);
+            });
+            it('Update chaos experiment with no kubeObject', async () => {
+                const headers = { 'Content-Type': 'application/json' };
+                const updatedChaosExperiment = Object.assign({}, chaosExperiment);
+                updatedChaosExperiment.kubeObject = undefined;
+                const updateChaosExperimentResponse = await chaosExperimentsRequestSender.updateChaosExperiment(experimentId, updatedChaosExperiment, headers);
+                updateChaosExperimentResponse.statusCode.should.eql(400);
+            });
+            it('Update chaos experiment with same id but different name', async function () {
+                const headers = { 'Content-Type': 'application/json' };
+                const updatedChaosExperiment = Object.assign({}, chaosExperiment);
+                updatedChaosExperiment.name = 'new-experiment 3.0';
+                const chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(updatedChaosExperiment);
+                chaosExperimentResponse.statusCode.should.eql(201);
+
+                const updateChaosExperimentResponse = await chaosExperimentsRequestSender.updateChaosExperiment(experimentId, updatedChaosExperiment, headers);
+                updateChaosExperimentResponse.statusCode.should.eql(400);
             });
         });
     });
