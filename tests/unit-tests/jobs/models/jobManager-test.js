@@ -1180,7 +1180,7 @@ describe('Manager tests', function () {
                 enabled: true,
                 webhooks: null,
                 cron_expression: null
-        }];
+            }];
             const jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
             databaseConnectorGetStub.callCount.should.eql(1);
