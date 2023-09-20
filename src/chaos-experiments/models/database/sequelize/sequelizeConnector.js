@@ -16,6 +16,7 @@ module.exports = {
     insertChaosJobExperiment,
     getChaosJobExperimentById,
     getChaosJobExperimentByJobId,
+    getChaosExperimentsByIds,
     setChaosJobExperimentTriggered
 };
 
@@ -61,6 +62,22 @@ async function _getChaosExperiment(options) {
 async function getChaosExperimentById(experimentId, contextId) {
     const options = {
         where: { id: experimentId }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    let chaosExperiment = await _getChaosExperiment(options);
+    if (chaosExperiment) {
+        chaosExperiment = chaosExperiment.get();
+    }
+    return chaosExperiment;
+}
+
+async function getChaosExperimentsByIds(experimentIds, contextId) {
+    const options = {
+        where: { id: experimentIds }
     };
 
     if (contextId) {
