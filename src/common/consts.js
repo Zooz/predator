@@ -56,6 +56,7 @@ module.exports = {
         NOT_FOUND: 'Not found',
         DSL_DEF_ALREADY_EXIST: 'Definition already exists',
         CHAOS_EXPERIMENT_NAME_ALREADY_EXIST: 'Chaos experiment name already exists',
+        CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES: 'Chaos experiment is supported only in kubernetes jobs',
         PROCESSOR_NAME_ALREADY_EXIST: 'Processor name already exists',
         PROCESSOR_DELETION_FORBIDDEN: 'Processor is used by tests'
     },

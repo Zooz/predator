@@ -14,7 +14,7 @@ const logger = require('../../common/logger'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
     streamingManager = require('../../streaming/manager'),
     { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common'),
-    { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
+    { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST, KUBERNETES, ERROR_MESSAGES } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     { version: PREDATOR_VERSION } = require('../../../package.json');
 
@@ -61,6 +61,7 @@ module.exports.createJob = async (job) => {
     const jobId = uuid.v4();
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(job.webhooks);
+    validateExperimentsValidForEnv(configData);
     try {
         const insertedJob = await databaseConnector.insertJob(jobId, job, contextId);
         logger.info('Job saved successfully to database');
@@ -141,6 +142,7 @@ module.exports.updateJob = async (jobId, jobConfig) => {
     const contextId = httpContext.get(CONTEXT_ID);
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(jobConfig.webhooks);
+    validateExperimentsValidForEnv(jobConfig, configData);
     let [job] = await databaseConnector.getJob(jobId, contextId);
     if (!job || job.length === 0) {
         const error = new Error('Not found');
@@ -291,6 +293,12 @@ function addCron(job, cronExpression, configData) {
         logger.info(`Job: ${job.id} completed.`);
     }, true);
     cronJobs[job.id] = scheduledJob;
+}
+
+function validateExperimentsValidForEnv(job, config) {
+    if (job.experiments && config.job_platform !== KUBERNETES){
+        throw generateError(400, ERROR_MESSAGES.CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES);
+    }
 }
 
 async function validateWebhooksAssignment(webhookIds) {
