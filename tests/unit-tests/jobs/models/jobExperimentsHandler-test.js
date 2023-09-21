@@ -33,7 +33,7 @@ describe('Job experiments handler tests', function () {
         databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getChaosExperimentsByIds');
     });
     beforeEach(async () => {
-        sandbox.resetHistory();
+        sandbox.reset();
     });
 
     after(() => {
