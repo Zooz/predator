@@ -111,7 +111,6 @@ module.exports.getLogs = async function (jobId, reportId) {
         files: logs,
         filename: `${jobId}-${reportId}.zip`
     };
-
     return response;
 };
 
@@ -297,7 +296,7 @@ function addCron(job, cronExpression, configData) {
 }
 
 function validateExperimentsValidForEnv(job, config) {
-    if (job.experiments && config.job_platform !== KUBERNETES){
+    if (job.experiments && job.experiments.length > 0 && config.job_platform.toUpperCase() !== KUBERNETES){
         throw generateError(400, ERROR_MESSAGES.CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES);
     }
 }
