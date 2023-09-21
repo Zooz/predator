@@ -23,7 +23,7 @@ describe('Chaos experiments manager tests', function () {
         getChaosExperimentByIdStub = sandbox.stub(database, 'getChaosExperimentById');
         getChaosExperimentByNameStub = sandbox.stub(database, 'getChaosExperimentByName');
         getChaosExperimentsStub = sandbox.stub(database, 'getAllChaosExperiments');
-        getChaosExperimentsByIdsStub = sandbox.stub(database, 'getAllChaosExperimentsBtIds');
+        getChaosExperimentsByIdsStub = sandbox.stub(database, 'getChaosExperimentsByIds');
         deleteStub = sandbox.stub(database, 'deleteChaosExperiment');
         updatedChaosExperimentStub = sandbox.stub(database, 'updateChaosExperiment');
     });
