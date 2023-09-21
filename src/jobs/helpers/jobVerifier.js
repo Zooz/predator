@@ -77,7 +77,6 @@ module.exports.verifyTestExists = async (req, res, next) => {
 };
 
 module.exports.verifyExperimentsExist = async (req, res, next) => {
-    let errorToThrow;
     const jobBody = req.body;
     const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     const experiments = jobBody.experiments;
@@ -85,17 +84,19 @@ module.exports.verifyExperimentsExist = async (req, res, next) => {
         return next();
     }
     if (jobPlatform.toUpperCase() !== KUBERNETES){
-        errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES);
+        const errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES);
         errorToThrow.statusCode = 400;
-    }
+        next(errorToThrow);
+    } else {
+        let errorToThrow;
+        const experimentIds = new Set(experiments.map(experiment => experiment.id));
+        const uniqueExperimentIds = Array.from(experimentIds);
+        const chaosExperiments = await choasExperimentsManager.getChaosExperimentsByIds(experimentIds, ['kubeObject']);
 
-    const experimentIds = new Set(experiments.map(experiment => experiment.id));
-    const uniqueExperimentIds = Array.from(experimentIds);
-    const chaosExperiments = await choasExperimentsManager.getChaosExperimentsByIds(experimentIds, ['kubeObject']);
-
-    if (chaosExperiments.length !== uniqueExperimentIds.length) {
-        errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENTS_NOT_EXIST_FOR_JOB);
-        errorToThrow.statusCode = 400;
+        if (chaosExperiments.length !== uniqueExperimentIds.length) {
+            const errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENTS_NOT_EXIST_FOR_JOB);
+            errorToThrow.statusCode = 400;
+        }
+        return next(errorToThrow);
     }
-    next(errorToThrow);
 };
