@@ -195,7 +195,8 @@ describe('Create job specific aws fargate tests', async function () {
                         run_immediately: true,
                         max_virtual_users: 100,
                         proxy_url: 'http://proxy.com',
-                        debug: '*'
+                        debug: '*',
+                        tag: 'us-west-2'
                     };
 
                     const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
