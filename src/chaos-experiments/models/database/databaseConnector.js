@@ -5,7 +5,6 @@ module.exports = {
     getAllChaosExperiments,
     insertChaosExperiment,
     getChaosExperimentById,
-    getChaosExperimentsByIds,
     getChaosExperimentByName,
     getChaosExperimentsByIds,
     deleteChaosExperiment,
@@ -43,10 +42,6 @@ async function getChaosExperimentsByIds (experimentIds, exclude, contextId) {
 
 async function getChaosExperimentByName(name, contextId) {
     return databaseConnector.getChaosExperimentByName(name, contextId);
-}
-
-async function getChaosExperimentsByIds(experimentIds, contextId) {
-    return databaseConnector.getChaosExperimentsByIds(experimentIds, contextId);
 }
 
 async function updateChaosExperiment(experimentId, updatedProcessor) {

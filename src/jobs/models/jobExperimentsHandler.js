@@ -16,26 +16,30 @@ async function setChaosExperimentsIfExist(jobId, jobExperiments) {
     try {
         const baseTimestamp = Date.now();
         const experimentIds = jobExperiments.map(experiment => experiment.experiment_id);
-        const experiments = await chaosExperimentsDbConnector.getChaosExperimentsByIds(experimentIds);
-        for (const experimentRequest of jobExperiments) {
-            try {
-                const experiment = experiments.find(e => e.id === experimentRequest.experiment_id);
-                const startTime = baseTimestamp + experimentRequest.start_after;
-                const endTime = startTime + convertDurationStringToMillisecond(experiment.kubeObject.spec.duration);
-                const jobExperimentId = uuid();
-                await chaosExperimentsDbConnector.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
-                const kubeObject = experiment.kubeObject;
-                kubeObject.name = kubeObject.metadata.name.concat(`_${jobExperimentId}`);
-                const timeout = setTimeout(() => runChaosExperiment(kubeObject, jobId, jobExperimentId), experimentRequest.start_after);
-                jobExperimentsIdToTimeout.set(jobExperimentId, timeout);
-            } catch (error){
-                logger.error(error, `error while setting chaos experiment ${experimentRequest.experiment_id} for job ${jobId}`);
-            }
-        }
+        const experimentsFromDb = await chaosExperimentsDbConnector.getChaosExperimentsByIds(experimentIds);
+        await Promise.all(jobExperiments.map(async(experimentRequest) =>
+            await setSingleJobExperiment(experimentRequest, experimentsFromDb, baseTimestamp, jobId)
+        ));
     } catch (error){
         logger.error(error, `error while setting chaos experiments for job ${jobId}`);
     }
 };
+
+async function setSingleJobExperiment(experimentRequest, experimentsFromDb, baseTimestamp, jobId) {
+    try {
+        const experiment = experimentsFromDb.find(e => e.id === experimentRequest.experiment_id);
+        const startTime = baseTimestamp + experimentRequest.start_after;
+        const endTime = startTime + convertDurationStringToMillisecond(experiment.kubeObject.spec.duration);
+        const jobExperimentId = uuid();
+        await chaosExperimentsDbConnector.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
+        const kubeObject = experiment.kubeObject;
+        kubeObject.name = kubeObject.metadata.name.concat(`_${jobExperimentId}`);
+        const timeout = setTimeout(() => runChaosExperiment(kubeObject, jobId, jobExperimentId), experimentRequest.start_after);
+        jobExperimentsIdToTimeout.set(jobExperimentId, timeout);
+    } catch (error){
+        logger.error(error, `error while setting chaos experiment ${experimentRequest.experiment_id} for job ${jobId}`);
+    }
+}
 
 async function runChaosExperiment(kubeObject, jobId, jobExperimentId) {
 
