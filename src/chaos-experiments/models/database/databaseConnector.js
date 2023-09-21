@@ -6,11 +6,11 @@ module.exports = {
     insertChaosExperiment,
     getChaosExperimentById,
     getChaosExperimentByName,
+    getChaosExperimentsByIds,
     deleteChaosExperiment,
     insertChaosJobExperiment,
     getChaosJobExperimentById,
     getChaosJobExperimentByJobId,
-    getChaosExperimentsByIds,
     setChaosJobExperimentTriggered,
     updateChaosExperiment,
     closeConnection

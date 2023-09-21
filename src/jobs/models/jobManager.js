@@ -11,17 +11,16 @@ const logger = require('../../common/logger'),
     reportsManager = require('../../reports/models/reportsManager'),
     dockerHubConnector = require('./dockerHubConnector'),
     databaseConnector = require('./database/databaseConnector'),
-    chaosExperimentsDbConnector = require('../../chaos-experiments/models/database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
     streamingManager = require('../../streaming/manager'),
     { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common'),
     { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST, KUBERNETES, ERROR_MESSAGES } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
-    { version: PREDATOR_VERSION } = require('../../../package.json');
+    { version: PREDATOR_VERSION } = require('../../../package.json'),
+    jobExperimentHandler = require('./jobExperimentsHandler');
 
 let jobConnector;
 const cronJobs = {};
-const jobExperimentsIdToTimeout = new Map();
 const PREDATOR_RUNNER_PREFIX = 'predator';
 const JOB_PLATFORM_NAME = PREDATOR_RUNNER_PREFIX + '.%s';
 
@@ -373,7 +372,7 @@ async function runJob(job, configData) {
         report = await createReportForJob(test, job);
         const jobSpecificPlatformRequest = await createJobRequest(job.id, report.report_id, job, latestDockerImage, configData);
         await jobConnector.runJob(jobSpecificPlatformRequest, job);
-        await setChaosExperimentsIfExist(job);
+        await jobExperimentHandler.setChaosExperimentsIfExist(job.id, job.experiments);
     } catch (error) {
         logger.error({ id: job.id, error: error }, 'Unable to run scheduled job.');
         await failReport(report);
@@ -389,44 +388,4 @@ function produceJobToStreamingPlatform(jobResponse) {
         ...jobResponse
     };
     streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_CREATED, streamingResource);
-}
-
-async function setChaosExperimentsIfExist(job) {
-    if (!job.experiments) {
-        return;
-    }
-    const baseTimestamp = Date.now();
-    const experimentIds = job.experiments.map(experiment => experiment.experiment_id);
-    const experiments = await chaosExperimentsDbConnector.getChaosExperimentsByIds(experimentIds);
-    for (const experimentRequest of job.experiments) {
-        const experiment = experiments.find(e => e.id === experimentRequest.experiment_id);
-        const startTime = baseTimestamp + experimentRequest.start_after;
-        const endTime = startTime + convertDurationStringToMillisecond(experiment.spec.duration);
-        const jobExperimentId = uuid.v4();
-        await chaosExperimentsDbConnector.insertChaosJobExperiment(jobExperimentId, job.id, experiment.id, startTime, endTime);
-        const kubeObject = experiment.kubeObject;
-        kubeObject.name = kubeObject.name.concat(jobExperimentId);
-        const timeout = setTimeout(() => runChaosExperiment(kubeObject, job.id, jobExperimentId), experimentRequest.start_after);
-        jobExperimentsIdToTimeout.set(jobExperimentId, timeout);
-    }
-}
-
-async function runChaosExperiment(kubeObject, jobId, jobExperimentId) {
-
-}
-
-function convertDurationStringToMillisecond(durationString) {
-    if (durationString.endsWith('s')){
-        return durationString.split('s')[0] * 1000;
-    }
-    if (durationString.endsWith('m')){
-        return durationString.split('m')[0] * 60 * 1000;
-    }
-    if (durationString.endsWith('h')){
-        return durationString.split('h')[0] * 60 * 60 * 1000;
-    }
-    if (durationString.endsWith('d')){
-        return durationString.split('h')[0] * 24 * 60 * 60 * 1000;
-    }
-    return durationString.split('ms')[0];
 }
