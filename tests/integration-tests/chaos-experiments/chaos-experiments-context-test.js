@@ -3,7 +3,6 @@ const should = require('should'),
 
 const validHeaders = { 'Content-Type': 'application/json' };
 const chaosExperimentsRequestSender = require('./helpers/requestCreator');
-const testsRequestSender = require('../tests/helpers/requestCreator');
 const { ERROR_MESSAGES } = require('../../../src/common/consts');
 
 describe('Chaos experiments api - with contexts', function () {
@@ -12,7 +11,6 @@ describe('Chaos experiments api - with contexts', function () {
     before(async function () {
         contextId = uuid.v4().toString();
         await chaosExperimentsRequestSender.init();
-        await testsRequestSender.init();
     });
 
     describe('Good requests', async function () {
@@ -23,7 +21,7 @@ describe('Chaos experiments api - with contexts', function () {
                 const headersWithRandomContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
 
                 for (let i = 0; i < 3; i++) {
-                    const chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
+                    const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(uuid.v4(), contextId);
                     chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithRandomContext);
                     chaosExperimentsInserted.push(chaosExperimentResponse);
                 }
@@ -79,7 +77,7 @@ describe('Chaos experiments api - with contexts', function () {
                     'Content-Type': 'application/json',
                     'x-context-id': contextId
                 };
-                const chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
+                const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(uuid.v4(), contextId);
                 const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
 
                 chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
@@ -112,7 +110,7 @@ describe('Chaos experiments api - with contexts', function () {
         describe('DELETE /v1/chaos-experiments/{experiment_id}', () => {
             let chaosExperimentResponse, experimentId;
             beforeEach(async function () {
-                const chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
+                const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(uuid.v4(), contextId);
                 const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
 
                 chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
@@ -144,7 +142,7 @@ describe('Chaos experiments api - with contexts', function () {
         describe('PUT /v1//chaos-experiments/{experiment_id}', function () {
             let chaosExperiment, chaosExperimentResponse, experimentId;
             beforeEach(async function () {
-                chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
+                chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(uuid.v4(), contextId);
                 const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
 
                 chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
@@ -198,20 +196,20 @@ describe('Chaos experiments api - with contexts', function () {
     describe('Bad requests', function () {
         describe('POST /v1/chaos-experiments', function () {
             it('Create chaos experiment with no name', async () => {
-                const chaosExperiment = generateRawChaosExperiment();
+                const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment();
                 chaosExperiment.name = undefined;
                 const createChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
                 createChaosExperimentResponse.statusCode.should.eql(400);
             });
             it('Create chaos experiment with no kubeObject', async () => {
-                const chaosExperiment = generateRawChaosExperiment('my-test', contextId);
+                const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment('my-test', contextId);
                 chaosExperiment.kubeObject = undefined;
                 const createChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
                 createChaosExperimentResponse.statusCode.should.eql(400);
             });
             it('Create a chaos experiment with name that already exists', async function () {
                 const name = 'test-experiment';
-                const chaosExperiment = generateRawChaosExperiment(name, contextId);
+                const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(name, contextId);
                 const createChaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, validHeaders);
                 should(createChaosExperimentResponse.statusCode).equal(201);
                 const experimentId = createChaosExperimentResponse.body.id;
@@ -227,7 +225,7 @@ describe('Chaos experiments api - with contexts', function () {
         describe('PUT /v1//chaos-experiments/{experiment_id}', function () {
             let chaosExperiment, chaosExperimentResponse, experimentId;
             beforeEach(async function () {
-                chaosExperiment = generateRawChaosExperiment(uuid.v4(), contextId);
+                chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(uuid.v4(), contextId);
                 const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
 
                 chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
@@ -263,35 +261,3 @@ describe('Chaos experiments api - with contexts', function () {
         });
     });
 });
-
-function generateRawChaosExperiment(name, contextId) {
-    return {
-        name,
-        context_id: contextId,
-        kubeObject:
-            {
-                kind: 'PodChaos',
-                apiVersion: 'chaos-mesh.org/v1alpha1',
-                metadata: {
-                    namespace: 'apps',
-                    name: `${name}`,
-                    annotations: {
-                        'kubectl.kubernetes.io/last-applied-configuration': '{"apiVersion":"chaos-mesh.org/v1alpha1","kind":"PodChaos","metadata":{"annotations":{},"name":"pod-fault-keren3","namespace":"apps"},"spec":{"action":"pod-kill","duration":"1m","mode":"all","selector":{"labelSelectors":{"app":"live-balances-api"},"namespaces":["apps"]}}}\n'
-                    }
-                },
-                spec: {
-                    selector: {
-                        namespaces: [
-                            'apps'
-                        ],
-                        labelSelectors: {
-                            app: 'live-balances-api'
-                        }
-                    },
-                    mode: 'all',
-                    action: 'pod-kill',
-                    duration: '1m'
-                }
-            }
-    };
-}

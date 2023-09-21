@@ -10,13 +10,13 @@ module.exports = {
     getAllChaosExperiments,
     insertChaosExperiment,
     getChaosExperimentById,
+    getChaosExperimentsByIds,
     getChaosExperimentByName,
     deleteChaosExperiment,
     updateChaosExperiment,
     insertChaosJobExperiment,
     getChaosJobExperimentById,
     getChaosJobExperimentByJobId,
-    getChaosExperimentsByIds,
     setChaosJobExperimentTriggered
 };
 
@@ -75,20 +75,22 @@ async function getChaosExperimentById(experimentId, contextId) {
     return chaosExperiment;
 }
 
-async function getChaosExperimentsByIds(experimentIds, contextId) {
+async function getChaosExperimentsByIds(experimentIds, exclude, contextId) {
+    const chaosExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
     const options = {
         where: { id: experimentIds }
     };
+
+    if (exclude && (exclude === KUBEOBJECT || exclude.includes(KUBEOBJECT))) {
+        options.exclude = [`${KUBEOBJECT}`];
+    }
 
     if (contextId) {
         options.where.context_id = contextId;
     }
 
-    let chaosExperiment = await _getChaosExperiment(options);
-    if (chaosExperiment) {
-        chaosExperiment = chaosExperiment.get();
-    }
-    return chaosExperiment;
+    const allExperiments = await chaosExperimentModel.findAll(options);
+    return allExperiments;
 }
 
 async function getChaosExperimentByName(experimentName, contextId) {
@@ -193,7 +195,7 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('medium')
         },
         kubeObject: {
-            type: Sequelize.DataTypes.TEXT('JSON'),
+            type: Sequelize.DataTypes.JSON,
             get: function() {
                 return JSON.parse(this.getDataValue('kubeObject'));
             },

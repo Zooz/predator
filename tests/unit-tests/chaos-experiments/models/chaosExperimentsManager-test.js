@@ -13,6 +13,7 @@ describe('Chaos experiments manager tests', function () {
     let getChaosExperimentByIdStub;
     let getChaosExperimentByNameStub;
     let getChaosExperimentsStub;
+    let getChaosExperimentsByIdsStub;
     let updatedChaosExperimentStub;
     let insertStub;
 
@@ -22,6 +23,7 @@ describe('Chaos experiments manager tests', function () {
         getChaosExperimentByIdStub = sandbox.stub(database, 'getChaosExperimentById');
         getChaosExperimentByNameStub = sandbox.stub(database, 'getChaosExperimentByName');
         getChaosExperimentsStub = sandbox.stub(database, 'getAllChaosExperiments');
+        getChaosExperimentsByIdsStub = sandbox.stub(database, 'getChaosExperimentsByIds');
         deleteStub = sandbox.stub(database, 'deleteChaosExperiment');
         updatedChaosExperimentStub = sandbox.stub(database, 'updateChaosExperiment');
     });
@@ -190,6 +192,60 @@ describe('Chaos experiments manager tests', function () {
             });
             it('Database returns two rows array, should return two experiments', async function () {
                 const experiments = await manager.getAllChaosExperiments();
+                experiments[0].should.have.key('kubeObject');
+                experiments[1].should.have.key('kubeObject');
+                experiments.should.eql([
+                    firstExperiment,
+                    secondExperiment
+                ]);
+            });
+        });
+    });
+    describe('Get multiple chaos experiments by ids', function () {
+        it('Database returns empty row array, should return empty array', async function () {
+            getChaosExperimentsByIdsStub.resolves([]);
+            const experiments = await manager.getChaosExperimentsByIds();
+            experiments.should.eql([]);
+        });
+        describe('Get multiple chaos experiments with results', function () {
+            let firstExperiment, secondExperiment;
+            beforeEach(() => {
+                firstExperiment = {
+                    id: '1234',
+                    kubeObject: {
+                        kind: 'PodChaos',
+                        apiVersion: 'chaos-mesh.org/v1alpha1',
+                        metadata: {
+                            namespace: 'apps',
+                            name: 'first pod fault',
+                            annotations: {}
+                        },
+                        spec: {}
+                    },
+                    name: 'mickey1'
+                };
+
+                secondExperiment = {
+                    id: '4321',
+                    kubeObject: {
+                        kind: 'PodChaos',
+                        apiVersion: 'chaos-mesh.org/v1alpha1',
+                        metadata: {
+                            namespace: 'apps',
+                            name: 'first pod fault',
+                            annotations: {}
+                        },
+                        spec: {}
+                    },
+                    name: 'mickey2'
+                };
+                getChaosExperimentsByIdsStub.resolves([
+                    firstExperiment,
+                    secondExperiment
+                ]);
+            });
+            it('Database returns two rows array, should return two experiments', async function () {
+                const experiments = await manager.getChaosExperimentsByIds(['1234', '4321']);
                 experiments[0].should.have.key('kubeObject');
                 experiments[1].should.have.key('kubeObject');
                 experiments.should.eql([

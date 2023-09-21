@@ -46,6 +46,10 @@ module.exports.getChaosExperimentById = async function (experimentId) {
     }
 };
 
+module.exports.getChaosExperimentsByIds = (experimentIds, exclude, contextId) => {
+    return databaseConnector.getChaosExperimentsByIds(experimentIds, exclude, contextId);
+};
+
 module.exports.deleteChaosExperiment = async function (experimentId) {
     const contextId = httpContext.get(CONTEXT_ID);
 
