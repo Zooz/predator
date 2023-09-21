@@ -43,6 +43,7 @@ async function insertJob(jobId, jobInfo, contextId) {
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
             return { id: uuid(), address: emailAddress };
         }) : undefined,
+        experiments: jobInfo.experiments,
         context_id: contextId
     };
 
@@ -118,6 +119,7 @@ async function updateJob(jobId, jobInfo) {
         tag: jobInfo.tag,
         enabled: jobInfo.enabled,
         notes: jobInfo.notes,
+        experiments: jobInfo.experiments,
         emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
             return { id: uuid(), address: emailAddress };
         }) : undefined
@@ -262,6 +264,9 @@ async function initSchemas() {
         },
         enabled: {
             type: Sequelize.DataTypes.BOOLEAN
+        },
+        experiments: {
+            type: Sequelize.DataTypes.JSON
         },
         context_id: {
             type: Sequelize.DataTypes.STRING

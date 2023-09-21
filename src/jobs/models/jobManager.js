@@ -110,7 +110,6 @@ module.exports.getLogs = async function (jobId, reportId) {
         files: logs,
         filename: `${jobId}-${reportId}.zip`
     };
-
     return response;
 };
 
@@ -200,6 +199,7 @@ function createResponse(jobId, jobBody, report) {
         environment: jobBody.environment || 'test',
         notes: jobBody.notes,
         proxy_url: jobBody.proxy_url,
+        experiments: jobBody.experiments,
         debug: jobBody.debug,
         enabled: jobBody.enabled !== false,
         tag: jobBody.tag

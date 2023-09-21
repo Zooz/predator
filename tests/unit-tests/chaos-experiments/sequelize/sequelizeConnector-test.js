@@ -121,9 +121,8 @@ describe('Sequelize client tests', function () {
             should(sequelizeGetStub.args[0][0]).containDeep({ offset, limit, attributes: { exclude: ['kubeObject'] } });
         });
     });
-
     describe('Get specific chaos experiments', () => {
-        describe('getProcessorById', function() {
+        describe('getChaosExperimentById', function() {
             it('Validate sequelize passed arguments', async () => {
                 sequelizeGetStub.returns([experiment]);
                 const experimentId = experimentRaw.id;
@@ -139,6 +138,26 @@ describe('Sequelize client tests', function () {
                 await sequelizeConnector.getChaosExperimentByName(experimentName);
                 should(sequelizeGetStub.calledOnce).eql(true);
                 should(sequelizeGetStub.args[0][0]).containDeep({ where: { name: experimentName } });
+            });
+        });
+        describe('Get ChaosExperimentsById', () => {
+            it('Validate sequelize passed arguments', async () => {
+                sequelizeGetStub.returns([experiment]);
+                const experimentIds = ['1234', '4321'];
+                await sequelizeConnector.getChaosExperimentsByIds(experimentIds);
+                should(sequelizeGetStub.calledOnce).eql(true);
+                should(sequelizeGetStub.args[0][0]).containDeep({ where: { id: experimentIds } });
+            });
+
+            it('Validate sequelize passed arguments with excluding kubeObject', async () => {
+                sequelizeGetStub.returns([experiment]);
+                const experimentIds = ['1234', '4321'];
+                await sequelizeConnector.getChaosExperimentsByIds(experimentIds, 'kubeObject');
+                should(sequelizeGetStub.calledOnce).eql(true);
+                should(sequelizeGetStub.args[0][0]).containDeep(
+                    { where: { id: experimentIds } },
+                    { exclude: ['kubeObject'] }
+                );
             });
         });
     });

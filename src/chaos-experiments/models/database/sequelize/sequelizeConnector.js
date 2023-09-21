@@ -10,6 +10,7 @@ module.exports = {
     getAllChaosExperiments,
     insertChaosExperiment,
     getChaosExperimentById,
+    getChaosExperimentsByIds,
     getChaosExperimentByName,
     deleteChaosExperiment,
     updateChaosExperiment,
@@ -72,6 +73,24 @@ async function getChaosExperimentById(experimentId, contextId) {
         chaosExperiment = chaosExperiment.get();
     }
     return chaosExperiment;
+}
+
+async function getChaosExperimentsByIds(experimentIds, exclude, contextId) {
+    const chaosExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
+    const options = {
+        where: { id: experimentIds }
+    };
+
+    if (exclude && (exclude === KUBEOBJECT || exclude.includes(KUBEOBJECT))) {
+        options.exclude = [`${KUBEOBJECT}`];
+    }
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    const allExperiments = await chaosExperimentModel.findAll(options);
+    return allExperiments;
 }
 
 async function getChaosExperimentByName(experimentName, contextId) {
