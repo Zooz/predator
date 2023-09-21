@@ -46,6 +46,10 @@ module.exports.getChaosExperimentById = async function (experimentId) {
     }
 };
 
+module.exports.getChaosExperimentsByIds = (experimentIds, exclude, contextId) => {
+    return databaseConnector.getChaosExperimentsByIds(experimentIds, exclude, contextId);
+};
+
 module.exports.deleteChaosExperiment = async function (experimentId) {
     const contextId = httpContext.get(CONTEXT_ID);
 
@@ -71,4 +75,11 @@ module.exports.updateChaosExperiment = async function (experimentId, chaosExperi
 
     await databaseConnector.updateChaosExperiment(experimentId, chaosExperiment);
     return chaosExperiment;
+};
+
+module.exports.getChaosExperimentsByIds = async function (experimentIds, exclude) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const allChaosExperiments = await databaseConnector.getChaosExperimentsByIds(experimentIds, exclude, contextId);
+    return allChaosExperiments;
 };

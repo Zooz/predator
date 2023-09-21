@@ -10,6 +10,7 @@ module.exports = {
     getAllChaosExperiments,
     insertChaosExperiment,
     getChaosExperimentById,
+    getChaosExperimentsByIds,
     getChaosExperimentByName,
     deleteChaosExperiment,
     updateChaosExperiment,
@@ -62,6 +63,26 @@ async function getChaosExperimentById(experimentId, contextId) {
     const options = {
         where: { id: experimentId }
     };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    let chaosExperiment = await _getChaosExperiment(options);
+    if (chaosExperiment) {
+        chaosExperiment = chaosExperiment.get();
+    }
+    return chaosExperiment;
+}
+
+async function getChaosExperimentsByIds(experimentIds, exclude, contextId) {
+    const options = {
+        where: { id: experimentIds }
+    };
+
+    if (exclude && (exclude === KUBEOBJECT || exclude.includes(KUBEOBJECT))) {
+        options.exclude = [`${KUBEOBJECT}`];
+    }
 
     if (contextId) {
         options.where.context_id = contextId;

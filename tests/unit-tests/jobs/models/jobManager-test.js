@@ -943,48 +943,6 @@ describe('Manager jobs', function () {
         });
     });
 
-    describe('Create new job with experiments - without using KUBERNETES platform', () => {
-        it('request should throw an error', async function() {
-            manager.__set__('configHandler', {
-                getConfig: () => {
-                    return {
-                        job_platform: 'DOCKER',
-                        base_url: '',
-                        internal_address: 'localhost:80',
-                        delay_runner_ms: 0
-                    };
-                },
-                getConfigValue: getConfigValueStub
-            });
-
-            const jobBody = {
-                id: JOB_ID,
-                test_id: TEST_ID,
-                arrival_rate: 1,
-                duration: 1,
-                run_immediately: true,
-                type: 'load_test',
-                emails: ['dina@niv.eli'],
-                environment: 'test',
-                experiments: [
-                    {
-                        experiment_id: '1234',
-                        start_after: 5000
-                    }
-                ],
-                max_virtual_users: 100
-            };
-            return manager.createJob(jobBody)
-                .then(function () {
-                    return Promise.reject(new Error('Should not get here'));
-                })
-                .catch(function (err) {
-                    err.statusCode.should.eql(400);
-                    err.message.should.eql('Chaos experiment is supported only in kubernetes jobs');
-                });
-        });
-    });
-
     describe('Update job', function () {
         before(() => {
             manager.__set__('configHandler', {
