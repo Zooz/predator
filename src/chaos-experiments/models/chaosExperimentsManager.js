@@ -76,10 +76,3 @@ module.exports.updateChaosExperiment = async function (experimentId, chaosExperi
     await databaseConnector.updateChaosExperiment(experimentId, chaosExperiment);
     return chaosExperiment;
 };
-
-module.exports.getChaosExperimentsByIds = async function (experimentIds, exclude) {
-    const contextId = httpContext.get(CONTEXT_ID);
-
-    const allChaosExperiments = await databaseConnector.getChaosExperimentsByIds(experimentIds, exclude, contextId);
-    return allChaosExperiments;
-};
