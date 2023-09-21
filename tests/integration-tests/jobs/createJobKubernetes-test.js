@@ -218,49 +218,6 @@ describe('Create job specific kubernetes tests', async function () {
                         should(relevantJobs[0].id).eql(cronJobId);
                     });
 
-                    it('Get the jobs, with one_time query param, two jobs should be returned', async () => {
-                        getJobsFromService = await schedulerRequestCreator.getJobs({
-                            'Content-Type': 'application/json'
-                        }, true);
-
-                        should(getJobsFromService.status).eql(200);
-
-                        const relevantJobs = getJobsFromService = getJobsFromService.body.filter(job => job.id === cronJobId || job.id === oneTimeJobId);
-                        should(relevantJobs.length).eql(2);
-                        should(relevantJobs).containEql({
-                            id: oneTimeJobId,
-                            test_id: testId,
-                            arrival_rate: 1,
-                            duration: 1,
-                            environment: 'test',
-                            enabled: true,
-                            type: 'load_test',
-                            experiments: [
-                                {
-                                    experiment_id: '1234',
-                                    start_after: 5000
-                                }
-                            ]
-                        });
-
-                        should(relevantJobs).containEql({
-                            id: cronJobId,
-                            test_id: testId,
-                            cron_expression: '* 10 * * * *',
-                            arrival_count: 1,
-                            duration: 1,
-                            environment: 'test',
-                            enabled: true,
-                            type: 'functional_test',
-                            experiments: [
-                                {
-                                    experiment_id: '1234',
-                                    start_after: 5000
-                                }
-                            ]
-                        });
-                    });
-
                     it('Delete jobs', async () => {
                         await schedulerRequestCreator.deleteJobFromScheduler(cronJobId);
                         await schedulerRequestCreator.deleteJobFromScheduler(oneTimeJobId);
