@@ -27,6 +27,9 @@ describe('Chaos experiments manager tests', function () {
         deleteStub = sandbox.stub(database, 'deleteChaosExperiment');
         updatedChaosExperimentStub = sandbox.stub(database, 'updateChaosExperiment');
     });
+    after(() => {
+        sandbox.restore();
+    });
 
     beforeEach(() => {
         sandbox.reset();
