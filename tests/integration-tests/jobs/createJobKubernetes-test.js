@@ -947,12 +947,6 @@ describe('Create job specific kubernetes tests', async function () {
             describe('Bad requests', () => {
                 describe('Create a job with experiment that does not exist', () => {
                     it('should fail job creation', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
-                            .reply(200, {
-                                metadata: { name: 'jobName', uid: 'uid' },
-                                namespace: kubernetesConfig.kubernetesNamespace
-                            });
-
                         const jobBody = {
                             test_id: testId,
                             arrival_rate: 1,
@@ -973,7 +967,7 @@ describe('Create job specific kubernetes tests', async function () {
                         });
 
                         should(createJobResponse.status).eql(400);
-                        should(createJobResponse.body).eql('One or more chaos experiments are not configured. Job can not be created');
+                        should(createJobResponse.body).eql({ message: 'One or more chaos experiments are not configured. Job can not be created' });
                     });
                 });
             });

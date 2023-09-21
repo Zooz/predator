@@ -89,12 +89,12 @@ module.exports.verifyExperimentsExist = async (req, res, next) => {
         errorToThrow.statusCode = 400;
         next(errorToThrow);
     } else {
-        const experimentIds = new Set(experiments.map(experiment => experiment.id));
+        const experimentIds = new Set(experiments.map(experiment => experiment.experiment_id));
         const uniqueExperimentIds = Array.from(experimentIds);
-        const chaosExperiments = await choasExperimentsManager.getChaosExperimentsByIds(experimentIds, ['kubeObject']);
+        const chaosExperiments = await choasExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds, ['kubeObject']);
 
         if (chaosExperiments.length !== uniqueExperimentIds.length) {
-            const errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENTS_NOT_EXIST_FOR_JOB);
+            errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENTS_NOT_EXIST_FOR_JOB);
             errorToThrow.statusCode = 400;
         }
         next(errorToThrow);
