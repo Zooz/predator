@@ -7,6 +7,11 @@ module.exports = {
     getChaosExperimentById,
     getChaosExperimentByName,
     deleteChaosExperiment,
+    insertChaosJobExperiment,
+    getChaosJobExperimentById,
+    getChaosJobExperimentByJobId,
+    setChaosJobExperimentTriggered,
+    updateChaosExperiment,
     closeConnection
 };
 
@@ -34,6 +39,26 @@ async function getChaosExperimentByName(name, contextId) {
     return databaseConnector.getChaosExperimentByName(name, contextId);
 }
 
+async function updateChaosExperiment(experimentId, updatedProcessor) {
+    return databaseConnector.updateChaosExperiment(experimentId, updatedProcessor);
+}
+
 async function deleteChaosExperiment(experimentId) {
     return databaseConnector.deleteChaosExperiment(experimentId);
+}
+
+async function insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId) {
+    return databaseConnector.insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId);
+}
+
+async function getChaosJobExperimentById(jobExperimentId, contextId) {
+    return databaseConnector.getChaosJobExperimentById(jobExperimentId, contextId);
+}
+
+async function getChaosJobExperimentByJobId(jobId, contextId) {
+    return databaseConnector.getChaosJobExperimentById(jobId, contextId);
+}
+
+async function setChaosJobExperimentTriggered(jobExperimentId, isTriggered, contextId) {
+    return databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, isTriggered, contextId);
 }

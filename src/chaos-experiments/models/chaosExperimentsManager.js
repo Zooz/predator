@@ -56,3 +56,19 @@ module.exports.deleteChaosExperiment = async function (experimentId) {
 
     return databaseConnector.deleteChaosExperiment(experimentId);
 };
+
+module.exports.updateChaosExperiment = async function (experimentId, chaosExperiment) {
+    const contextId = httpContext.get(CONTEXT_ID);
+
+    const oldChaosExperiment = await databaseConnector.getChaosExperimentById(experimentId, contextId);
+    if (!oldChaosExperiment) {
+        throw generateError(404, ERROR_MESSAGES.NOT_FOUND);
+    }
+    const chaosExperimentWithTheSameName = await databaseConnector.getChaosExperimentByName(chaosExperiment.name, contextId);
+    if (chaosExperimentWithTheSameName && chaosExperimentWithTheSameName.id !== experimentId) {
+        throw generateError(400, ERROR_MESSAGES.CHAOS_EXPERIMENT_NAME_ALREADY_EXIST);
+    }
+
+    await databaseConnector.updateChaosExperiment(experimentId, chaosExperiment);
+    return chaosExperiment;
+};

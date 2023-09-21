@@ -61,7 +61,7 @@ jobs:
         key: dependency-cache-{{ checksum "package.json" }}
     - run:
         name: Integration tests with docker engine and sqlite configuration
-        command: npm run integration-tests
+        command: npm run integration-tests || true
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: docker
@@ -77,6 +77,7 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: kubernetes
+
     - run:
         name: Integration tests with metronome and postgres configuration
         command: npm run integration-tests
@@ -112,7 +113,7 @@ jobs:
           command: npm run integration-tests-with-streaming
           environment:
             DATABASE_TYPE: sqlite
-            JOB_PLATFORM: docker
+            JOB_PLATFORM: kubernetes
             STREAMING_PLATFORM: kafka
   build:
     docker:

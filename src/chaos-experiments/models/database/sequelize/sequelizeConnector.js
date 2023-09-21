@@ -1,7 +1,7 @@
 'use strict';
 
 const Sequelize = require('sequelize');
-const { CHAOS_EXPERIMENTS_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
+const { CHAOS_EXPERIMENTS_TABLE_NAME, CHAOS_JOB_EXPERIMENTS_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
 const KUBEOBJECT = 'kubeObject';
 let client;
 
@@ -11,7 +11,12 @@ module.exports = {
     insertChaosExperiment,
     getChaosExperimentById,
     getChaosExperimentByName,
-    deleteChaosExperiment
+    deleteChaosExperiment,
+    updateChaosExperiment,
+    insertChaosJobExperiment,
+    getChaosJobExperimentById,
+    getChaosJobExperimentByJobId,
+    setChaosJobExperimentTriggered
 };
 
 async function init(sequelizeClient) {
@@ -92,6 +97,75 @@ async function deleteChaosExperiment(experimentId) {
     return chaosExperimentModel.destroy(options);
 }
 
+async function updateChaosExperiment(processorId, updatedChaosMesh) {
+    const processorsModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
+    const { name, kubeObject, template } = updatedChaosMesh;
+    return processorsModel.update({ name, kubeObject, template, updated_at: Date.now() }, { where: { id: processorId } });
+}
+
+async function insertChaosJobExperiment(id, jobId, experimentId, startTime, endTime, contextId) {
+    const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
+    const params = {
+        id: id,
+        job_id: jobId,
+        experiment_id: experimentId,
+        start_time: new Date(startTime).valueOf(),
+        end_time: new Date(endTime).valueOf(),
+        is_triggered: false,
+        context_id: contextId
+    };
+    return chaosJobExperimentModel.create(params);
+}
+async function _getChaosJobExperiment(options) {
+    const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
+    const chaosJobExperiments = await chaosJobExperimentModel.findAll(options);
+    return chaosJobExperiments[0];
+}
+
+async function getChaosJobExperimentById(jobExperimentId, contextId) {
+    const options = {
+        where: { id: jobExperimentId }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    let chaosExperiment = await _getChaosJobExperiment(options);
+    if (chaosExperiment) {
+        chaosExperiment = chaosExperiment.get();
+    }
+    return chaosExperiment;
+}
+
+async function getChaosJobExperimentByJobId(jobId, contextId) {
+    const options = {
+        where: { job_id: jobId }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    let chaosExperiment = await _getChaosJobExperiment(options);
+    if (chaosExperiment) {
+        chaosExperiment = chaosExperiment.get();
+    }
+    return chaosExperiment;
+}
+
+async function setChaosJobExperimentTriggered(id, isTriggered, contextId) {
+    const chaosJobExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
+    const options = {
+        where: { id: id }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+    return chaosJobExperimentModel.update({ is_triggered: isTriggered }, options);
+}
+
 async function initSchemas() {
     const chaosExperiments = client.define(CHAOS_EXPERIMENTS_TABLE_NAME, {
         id: {
@@ -102,7 +176,7 @@ async function initSchemas() {
             type: Sequelize.DataTypes.TEXT('medium')
         },
         kubeObject: {
-            type: Sequelize.DataTypes.TEXT('JSON'),
+            type: Sequelize.DataTypes.JSON,
             get: function() {
                 return JSON.parse(this.getDataValue('kubeObject'));
             },
@@ -120,5 +194,30 @@ async function initSchemas() {
             type: Sequelize.DataTypes.STRING
         }
     });
+    const chaosJobExperiments = client.define(CHAOS_JOB_EXPERIMENTS_TABLE_NAME, {
+        id: {
+            type: Sequelize.DataTypes.UUID,
+            primaryKey: true
+        },
+        job_id: {
+            type: Sequelize.DataTypes.UUID
+        },
+        experiment_id: {
+            type: Sequelize.DataTypes.UUID
+        },
+        start_time: {
+            type: Sequelize.DataTypes.DATE
+        },
+        end_time: {
+            type: Sequelize.DataTypes.DATE
+        },
+        is_triggered: {
+            type: Sequelize.DataTypes.BOOLEAN
+        },
+        context_id: {
+            type: Sequelize.DataTypes.STRING
+        }
+    });
     await chaosExperiments.sync();
+    await chaosJobExperiments.sync();
 }
