@@ -18,7 +18,7 @@ const {
 function verifyCronExpression(exp) {
     try {
         // eslint-disable-next-line no-unused-vars
-        const _ct = new CronTime(exp);
+        const ct = new CronTime(exp);
     } catch (err) {
         return err.message;
     }
@@ -83,13 +83,12 @@ module.exports.verifyExperimentsExist = async (req, res, next) => {
     const experiments = jobBody.experiments;
     if (!experiments || experiments.length === 0) {
         next();
-    } else if (experiments.length > 0 && jobPlatform.toUpperCase() !== KUBERNETES){
+    } else if (experiments.length > 0 && jobPlatform.toUpperCase() !== KUBERNETES) {
         errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES);
         errorToThrow.statusCode = 400;
         next(errorToThrow);
     } else {
-        const experimentIds = new Set(experiments.map(experiment => experiment.experiment_id));
-        const uniqueExperimentIds = Array.from(experimentIds);
+        const uniqueExperimentIds = [...new Set(experiments.map(experiment => experiment.experiment_id))];
         const chaosExperiments = await choasExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds, ['kubeObject']);
 
         if (chaosExperiments.length !== uniqueExperimentIds.length) {
