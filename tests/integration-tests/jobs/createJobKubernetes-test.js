@@ -946,7 +946,7 @@ describe('Create job specific kubernetes tests', async function () {
             });
             describe('Bad requests', () => {
                 describe('Create a job with experiment that does not exist', () => {
-                    it.only('should fail job creation', async () => {
+                    it('should fail job creation', async () => {
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
                             .reply(200, {
                                 metadata: { name: 'jobName', uid: 'uid' },
