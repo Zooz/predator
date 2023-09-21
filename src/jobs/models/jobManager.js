@@ -61,7 +61,7 @@ module.exports.createJob = async (job) => {
     const jobId = uuid.v4();
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(job.webhooks);
-    validateExperimentsValidForEnv(configData);
+    validateExperimentsValidForEnv(job, configData);
     try {
         const insertedJob = await databaseConnector.insertJob(jobId, job, contextId);
         logger.info('Job saved successfully to database');
@@ -202,6 +202,7 @@ function createResponse(jobId, jobBody, report) {
         environment: jobBody.environment || 'test',
         notes: jobBody.notes,
         proxy_url: jobBody.proxy_url,
+        experiments: jobBody.experiments,
         debug: jobBody.debug,
         enabled: jobBody.enabled !== false,
         tag: jobBody.tag

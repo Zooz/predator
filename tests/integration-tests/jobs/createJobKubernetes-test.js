@@ -136,6 +136,128 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                 });
 
+                describe('Create two jobs, one is one time, second one is cron and get them with experiments', () => {
+                    let createJobResponse;
+                    let getJobsFromService;
+                    let cronJobId;
+                    let oneTimeJobId;
+
+                    it('Create first job which is one time load_test', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
+                            .reply(200, {
+                                metadata: { name: 'jobName', uid: 'uid' },
+                                namespace: kubernetesConfig.kubernetesNamespace
+                            });
+
+                        const jobBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            type: 'load_test',
+                            experiments: [
+                                {
+                                    experiment_id: '1234',
+                                    start_after: 5000
+                                }
+                            ]
+                        };
+
+                        createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                        oneTimeJobId = createJobResponse.body.id;
+                    });
+
+                    it('Create second job which is cron functional_test', async () => {
+                        const jobBody = {
+                            test_id: testId,
+                            arrival_count: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: false,
+                            cron_expression: '* 10 * * * *',
+                            type: 'functional_test',
+                            experiments: [
+                                {
+                                    experiment_id: '1234',
+                                    start_after: 5000
+                                }
+                            ]
+                        };
+
+                        createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                        cronJobId = createJobResponse.body.id;
+                    });
+
+                    it('Get the jobs, without one_time query param, only cron job should be returned', async () => {
+                        getJobsFromService = await schedulerRequestCreator.getJobs({
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(getJobsFromService.status).eql(200);
+
+                        const relevantJobs = getJobsFromService = getJobsFromService.body.filter(job => job.id === cronJobId || job.id === oneTimeJobId);
+                        should(relevantJobs.length).eql(1);
+                        should(relevantJobs[0].id).eql(cronJobId);
+                    });
+
+                    it('Get the jobs, with one_time query param, two jobs should be returned', async () => {
+                        getJobsFromService = await schedulerRequestCreator.getJobs({
+                            'Content-Type': 'application/json'
+                        }, true);
+
+                        should(getJobsFromService.status).eql(200);
+
+                        const relevantJobs = getJobsFromService = getJobsFromService.body.filter(job => job.id === cronJobId || job.id === oneTimeJobId);
+                        should(relevantJobs.length).eql(2);
+                        should(relevantJobs).containEql({
+                            id: oneTimeJobId,
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            enabled: true,
+                            type: 'load_test',
+                            experiments: [
+                                {
+                                    experiment_id: '1234',
+                                    start_after: 5000
+                                }
+                            ]
+                        });
+
+                        should(relevantJobs).containEql({
+                            id: cronJobId,
+                            test_id: testId,
+                            cron_expression: '* 10 * * * *',
+                            arrival_count: 1,
+                            duration: 1,
+                            environment: 'test',
+                            enabled: true,
+                            type: 'functional_test',
+                            experiments: [
+                                {
+                                    experiment_id: '1234',
+                                    start_after: 5000
+                                }
+                            ]
+                        });
+                    });
+
+                    it('Delete jobs', async () => {
+                        await schedulerRequestCreator.deleteJobFromScheduler(cronJobId);
+                        await schedulerRequestCreator.deleteJobFromScheduler(oneTimeJobId);
+                    });
+                });
+
                 describe('report status on k8s api failure', function() {
                     it('should return a report with status failed', async function() {
                         nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
