@@ -16,7 +16,8 @@ const logger = require('../../common/logger'),
     { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common'),
     { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
-    { version: PREDATOR_VERSION } = require('../../../package.json');
+    { version: PREDATOR_VERSION } = require('../../../package.json'),
+    jobExperimentHandler = require('./jobExperimentsHandler');
 
 let jobConnector;
 const cronJobs = {};
@@ -363,6 +364,7 @@ async function runJob(job, configData) {
         report = await createReportForJob(test, job);
         const jobSpecificPlatformRequest = await createJobRequest(job.id, report.report_id, job, latestDockerImage, configData);
         await jobConnector.runJob(jobSpecificPlatformRequest, job);
+        await jobExperimentHandler.setChaosExperimentsIfExist(job.id, job.experiments);
     } catch (error) {
         logger.error({ id: job.id, error: error }, 'Unable to run scheduled job.');
         await failReport(report);
