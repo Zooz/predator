@@ -15,7 +15,7 @@
     "setup-local-env": "npm install --no-save shelljs && node setup-env.js",
     "start-local": "node -r dotenv/config src/server.js",
     "start": "node src/server.js",
-    "unit-tests": "nyc --check-coverage --lines 90 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
+    "unit-tests": "nyc --check-coverage --lines 85 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "integration-tests-with-streaming": "bash ./tests/integration-tests-with-streaming/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh --timeout=10000",

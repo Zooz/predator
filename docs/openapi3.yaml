@@ -2620,6 +2620,20 @@ components:
             The `arrival_rate`, `duration` and `max_virtual_users` will be split
             between the specified number of runners.
           example: 5
+        experiments:
+          description: An array of objects that describe experiments to run during the job running, and timing
+          type: array
+          items:
+            type: object
+            required:
+              - experiment_id
+              - start_after
+            properties: 
+              experiment_id:
+                type: string
+              start_after:
+                type: number
+                description: time in milliseconds in which the experiment starts after job started
         emails:
           type: array
           description: >-
