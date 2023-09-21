@@ -83,8 +83,7 @@ module.exports.verifyExperimentsExist = async (req, res, next) => {
     const experiments = jobBody.experiments;
     if (!experiments || experiments.length === 0) {
         next();
-    }
-    if (experiments.length > 0 && jobPlatform.toUpperCase() !== KUBERNETES){
+    } else if (experiments.length > 0 && jobPlatform.toUpperCase() !== KUBERNETES){
         errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES);
         errorToThrow.statusCode = 400;
         next(errorToThrow);
