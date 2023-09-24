@@ -108,6 +108,8 @@ class getChaosExperiments extends React.Component {
   closeExperimentDialog = () => {
     this.setState({
       openViewExperiment: false,
+      createChaosExperiment: false,
+      chaosExperimentForEdit: null,
       chaosExperimentForView: null
     });
   }
@@ -169,7 +171,9 @@ class getChaosExperiments extends React.Component {
               closeDialog={this.closeExperimentDialog} /> : null}
 
           {this.state.createChaosExperiment &&
-            <ChaosExperimentForm closeDialog={this.closeExperimentDialog} chaosExperimentForEdit={this.state.chaosExperimentForEdit} />}
+            <ChaosExperimentForm
+              closeDialog={this.closeExperimentDialog}
+              chaosExperimentForEdit={this.state.chaosExperimentForEdit} />}
 
           {(this.state.deleteDialog && !this.props.deleteChaosExperimentSuccess)
             ? <DeleteDialog loader={this.props.processingDeleteTest}
