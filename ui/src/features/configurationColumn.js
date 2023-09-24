@@ -96,6 +96,14 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
         </TableHeader>
       ),
       accessor: 'kind'
+    }, {
+      id: 'duration',
+      Header: () => (
+        <TableHeader padding={'8px'} sortable={false}>
+          Duration
+        </TableHeader>
+      ),
+      accessor: 'duration'
     },
     {
       id: 'updated_at',
@@ -170,6 +178,20 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
     },
     {
       id: 'processor_edit',
+      Header: () => (
+        <TableHeader sortable={false}>
+          Edit
+        </TableHeader>
+      ),
+      accessor: data => <ViewButton icon={faPen} onClick={(e) => {
+        e.stopPropagation();
+        onEdit(data)
+      }} />,
+      width: iconsWidth,
+      className: css['center-flex']
+    },
+    {
+      id: 'experiment_edit',
       Header: () => (
         <TableHeader sortable={false}>
           Edit

@@ -17,7 +17,9 @@ export default function reduce (state = initialState, action = {}) {
   case Types.GET_CHAOS_EXPERIMENTS_SUCCESS:
     return state.set('chaosExperiments',
       action.chaosExperiments.map((chaosExperiment) => ({
-        ...chaosExperiment, kind: chaosExperiment.kubeObject.kind }
+        ...chaosExperiment,
+        kind: chaosExperiment.kubeObject.kind,
+        duration: chaosExperiment.kubeObject.spec.duration }
       )));
   case Types.GET_CHAOS_EXPERIMENTS_FAILURE:
     return state.set('chaosExperiment_error', action.error);

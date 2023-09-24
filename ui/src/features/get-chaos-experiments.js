@@ -17,7 +17,7 @@ import Dialog from './components/Dialog';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetChaosExperiments = 'Error occurred while trying to get all chaos experiments.';
-const columnsNames = ['experiment_name', 'kind', 'created_at', 'raw', 'delete'];
+const columnsNames = ['experiment_name', 'created_at', 'kind', 'duration', 'raw', 'experiment_edit', 'delete'];
 const DESCRIPTION = 'Create chaos experiments templates to be injected as part of your running job.';
 
 class getChaosExperiments extends React.Component {
@@ -28,6 +28,7 @@ class getChaosExperiments extends React.Component {
       openNewTestDialog: false,
       deleteDialog: false,
       chaosExperimentToDelete: undefined,
+      chaosExperimentForEdit: undefined,
       createChaosExperiment: false,
       sortedChaosExperiments: [],
       sortHeader: ''
@@ -90,20 +91,24 @@ class getChaosExperiments extends React.Component {
       });
     };
 
+    onCreateExperiment = () => {
+      this.setState({
+        createChaosExperiment: true
+      })
+    }
+
+  onEdit = (data) => {
+    this.setState({ createChaosExperiment: true, chaosExperimentForEdit: data });
+  };
+
   onRawView = (data) => {
     this.setState({ openViewExperiment: data });
   };
 
-    closeCreateTest = () => {
-      this.setState({
-        createChaosExperiment: false,
-        chaosExperimentForView: null
-      });
-    };
-
   closeExperimentDialog = () => {
     this.setState({
-      openViewExperiment: false
+      openViewExperiment: false,
+      chaosExperimentForView: null
     });
   }
 
@@ -133,6 +138,7 @@ class getChaosExperiments extends React.Component {
         columnsNames,
         onReportView: this.onReportView,
         onRawView: this.onRawView,
+        onEdit: this.onEdit,
         onDelete: this.onDelete,
         onRunTest: this.onRunTest,
         onSort: this.onSort,
@@ -141,11 +147,9 @@ class getChaosExperiments extends React.Component {
       const error = this.props.chaosExperimentFailure || this.props.deleteChaosExperimentFailure;
       return (
         <Page title={'Chaos Experiments'} description={DESCRIPTION}>
-          <Button className={style['create-button']} onClick={() => {
-            this.setState({
-              createChaosExperiment: true
-            });
-          }}>Create Experiment</Button>
+          <Button
+            className={style['create-button']}
+            onClick={this.onCreateExperiment}>Create Experiment</Button>
           <ReactTableComponent
             onSearch={this.onSearch}
             rowHeight={'46px'}
@@ -165,7 +169,7 @@ class getChaosExperiments extends React.Component {
               closeDialog={this.closeExperimentDialog} /> : null}
 
           {this.state.createChaosExperiment &&
-            <ChaosExperimentForm closeDialog={this.closeCreateTest} />}
+            <ChaosExperimentForm closeDialog={this.closeExperimentDialog} chaosExperimentForEdit={this.state.chaosExperimentForEdit} />}
 
           {(this.state.deleteDialog && !this.props.deleteChaosExperimentSuccess)
             ? <DeleteDialog loader={this.props.processingDeleteTest}
