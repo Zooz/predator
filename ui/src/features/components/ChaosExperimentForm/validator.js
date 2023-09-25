@@ -2,8 +2,14 @@
 const SCHEMA = {
   type: 'object',
   properties: {
-    apiVersion: { type: 'string' },
-    kind: { type: 'string' },
+    apiVersion: {
+      type: 'string',
+      pattern: new RegExp('^chaos-mesh\\.org\\/v1alpha1$')
+    },
+    kind: {
+      type: 'string',
+      options: ['PodChaos', 'DNSChaos', 'AWSChaos', 'HTTPChaos', 'StressChaos']
+    },
     metadata: {
       type: 'object',
       properties: {
@@ -44,17 +50,21 @@ function validateProperty (object, schema) {
 
     if (object.hasOwnProperty(key)) {
       const propertyValue = object[key];
-      const { type, pattern, required } = propertySchema;
+      const { type, pattern, required, options } = propertySchema;
 
       if (type === 'object' && typeof propertyValue !== 'object') {
         return `Property "${key}" must be an object.`;
       } else if (type === 'string' && typeof propertyValue !== 'string') {
         return `Property "${key}" must be a string.`;
-      } else if (type === 'string' && typeof propertyValue === 'string' && required  && !propertyValue.trim().length) {
+      } else if (type === 'string' && typeof propertyValue === 'string' && required && !propertyValue.trim().length) {
         return `Property "${key}" must be a non empty string.`;
       } else if (type === 'string' && pattern) {
         if (!pattern.test(propertyValue)) {
           return `Property "${key}"  value must be in supported pattern "${pattern}".`;
+        }
+      } else if (type === 'string' && options) {
+        if (!options.includes(propertyValue)) {
+          return `Property "${key}"  value must be in supported options "[${options.join(', ')}]".`;
         }
       }
 

@@ -18,8 +18,6 @@ const API_VERSION = 'chaos-mesh.org/v1alpha1'
 
 export class ChaosExperimentForm extends React.Component {
   constructor (props) {
-    console.log(props)
-    debugger;
     super(props);
     if (props.chaosExperimentForEdit) {
       this.state = {
@@ -71,7 +69,7 @@ export class ChaosExperimentForm extends React.Component {
   }
 
   render () {
-    const { closeDialog } = this.props;
+    const { closeDialog, chaosExperimentForEdit } = this.props;
     const {
       name,
       kind
@@ -80,37 +78,39 @@ export class ChaosExperimentForm extends React.Component {
       <Modal onExit={closeDialog}>
         <h1>Create Chaos Experiment</h1>
         <div className={style['top']}>
-          <div className={style['top-inputs']}>
-            {/* left */}
-            <div className={style['input-container']}>
-              <TitleInput
-                className={style['inputContainer__titleInput']}
-                title={'Experiment Name'}>
-                <Input value={name} onChange={this.handleNameChange} />
-              </TitleInput>
+          {!chaosExperimentForEdit && (
+            <div className={style['top-inputs']}>
+              {/* left */}
+              <div className={style['input-container']}>
+                <TitleInput
+                  className={style['inputContainer__titleInput']}
+                  title={'Experiment Name'}>
+                  <Input value={name} onChange={this.handleNameChange} />
+                </TitleInput>
+              </div>
+              <div className={style['input-container']}>
+                <TitleInput
+                  className={style['inputContainer__titleInput']}
+                  title={'Api Version'}>
+                  <Input value={API_VERSION} disabled />
+                </TitleInput>
+              </div>
+              <div className={style['input-container']}>
+                <TitleInput
+                  className={style['inputContainer__titleInput']}
+                  title={'kind'}>
+                  <CustomDropdown
+                    list={CHAOS_EXPERIMENT_KINDS}
+                    value={kind}
+                    onChange={(value) => {
+                      this.handleKindChange(value);
+                    }}
+                    placeHolder={'Kind'}
+                  />
+                </TitleInput>
+              </div>
             </div>
-            <div className={style['input-container']}>
-              <TitleInput
-                className={style['inputContainer__titleInput']}
-                title={'Api Version'}>
-                <Input value={API_VERSION} disabled />
-              </TitleInput>
-            </div>
-            <div className={style['input-container']}>
-              <TitleInput
-                className={style['inputContainer__titleInput']}
-                title={'kind'}>
-                <CustomDropdown
-                  list={CHAOS_EXPERIMENT_KINDS}
-                  value={kind}
-                  onChange={(value) => {
-                    this.handleKindChange(value);
-                  }}
-                  placeHolder={'Kind'}
-                />
-              </TitleInput>
-            </div>
-          </div>
+          )}
         </div>
         {/* bottom */}
         {this.generateJavascriptEditor()}
@@ -255,7 +255,7 @@ function createChaosExperimentRequest (data) {
     yaml
   } = data;
   return {
-    name,
+    name: name || yaml.metadata.name,
     kubeObject: {
       kind: data.kind,
       apiVersion: API_VERSION,
