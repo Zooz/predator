@@ -26,6 +26,10 @@ import { faClock, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconButton from '../../../components/IconButton';
 import { createJobRequest, createStateForEditJob } from './utils';
+import Button from '../../../components/Button';
+import SimpleTable from '../SimpleTable';
+import { chaosExperimentsForDropdown } from '../../redux/selectors/chaosExperimentsSelector';
+import Dropdown from '../../../components/Dropdown/Dropdown.export';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 
@@ -88,7 +92,6 @@ class Form extends React.Component {
           }
         ],
         children: [
-
           {
             name: 'arrival_rate',
             key: 'arrival_rate',
@@ -175,6 +178,7 @@ class Form extends React.Component {
             info: 'When the test finishes, a report will be sent to the emails included.',
             element: 'Email',
             type: inputTypes.INPUT_LIST,
+            values: (state) => state['emails'].map((value) => ({ value, label: value })),
             flexBasis: '49%'
           },
           {
@@ -186,13 +190,110 @@ class Form extends React.Component {
             type: inputTypes.MULTI_SELECT,
             options: (props) => props.webhooks,
             flexBasis: '49%'
-
           }
-
         ]
       },
       {
         group: 'section_c',
+        children:
+            [
+              {
+                name: 'experiments',
+                key: 'experiments',
+                floatingLabelText: 'Running Experiments',
+                info: 'Chaos experiments running within the test',
+                element: 'RunningExperiments',
+                type: inputTypes.LIST,
+                rows: (state) => state.experiments.map((experiment, index) => {
+                  return [
+                    <div key={'header' + index} className={style['list-container']}>
+                      <span className={style['list-item__title']}>experiment name:</span>
+                      <span className={style['list-item']}> {experiment.experiment_name}</span>
+                      <span className={style['list-item__title']}>start at:</span>
+                      <span className={style['list-item']}> {experiment.start_after}</span>
+                    </div>
+                  ]
+                }),
+                flexBasis: '80%'
+              },
+              {
+                name: 'add_experiment_option',
+                key: 'add_experiment_option',
+                floatingLabelText: '+Add Experiment',
+                onClick: () => {
+                  this.setState({
+                    add_experiment_form_experiment_name: '',
+                    add_experiment_form_experiment_id: '',
+                    add_experiment_form_start_after: 0,
+                    add_experiment_form_hidden: false
+                  })
+                },
+                type: inputTypes.LINK_ACTION,
+                justifyContent: 'flex-end'
+              },
+              {
+                name: 'add_experiment_form_experiment_name',
+                key: 'add_experiment_form_experiment_name',
+                floatingLabelText: 'Experiment',
+                list: (props) => props.experiments,
+                placeholder: 'Select experiment to run',
+                element: 'new_experiment',
+                selectedOption: (state) => ({ key: state.add_experiment_form_experiment_id, value: state.add_experiment_form_experiment_name }),
+                type: inputTypes.DROPDOWN,
+                onChange: ({ value, key }) => {
+                  this.setState({
+                    add_experiment_form_experiment_name: value,
+                    add_experiment_form_experiment_id: key
+                  })
+                },
+                flexBasis: '49%',
+                hiddenCondition: (state) => state.add_experiment_form_hidden === true
+              },
+              {
+                name: 'add_experiment_form_start_after',
+                key: 'add_experiment_form_start_after',
+                floatingLabelText: 'Start At',
+                info: 'When to start the experiment within the test timeframe (milliseconds)',
+                element: 'StartAt',
+                type: inputTypes.NUMERIC_INPUT,
+                justifyContent: 'flex-end',
+                height: '35px',
+                hiddenCondition: (state) => state.add_experiment_form_hidden === true
+              },
+              {
+                name: 'add_experiment_submit',
+                key: 'add_experiment_submit',
+                floatingLabelText: 'Add',
+                element: 'AddExperiment',
+                type: inputTypes.SUBMIT_BUTTON,
+                inverted: true,
+                justifyContent: 'flex-end',
+                paddingTop: '22px',
+                height: '35px',
+                onClick: () => {
+                  const newExperiment = {
+                    experiment_id: this.state.add_experiment_form_experiment_id,
+                    experiment_name: this.state.add_experiment_form_experiment_name,
+                    start_after: this.state.add_experiment_form_start_after
+                  }
+                  const experiments = [...this.state.experiments, newExperiment]
+                  this.state.experiments.push(newExperiment)
+                  this.setState((prevState) => {
+                    return {
+                      ...prevState,
+                      experiments: experiments,
+                      add_experiment_form_hidden: true
+                    }
+                  })
+                  console.log(this.state.experiments)
+                },
+                disabled: (state) => state.add_experiment_form_experiment_name.trim().length === 0 || state.add_experiment_form_start_after === 0,
+                hiddenCondition: (state) => state.add_experiment_form_hidden === true
+              }
+            ]
+      },
+      {
+        group: 'section_d',
         flexDirection: 'column',
         children: [
           {
@@ -233,6 +334,7 @@ class Form extends React.Component {
       run_immediately: false,
       emails: [],
       webhooks: [],
+      experiments: [],
       helpInfo: undefined,
       parallelism: undefined,
       max_virtual_users: undefined,
@@ -252,7 +354,11 @@ class Form extends React.Component {
         parallelism: true,
         max_virtual_users: true
       },
-      mode: 'Simple'
+      mode: 'Simple',
+      add_experiment_form_hidden: true,
+      add_experiment_form_experiment_id: '',
+      add_experiment_form_experiment_name: '',
+      add_experiment_form_start_after: 0
     };
 
     if (this.props.editMode) {
@@ -283,6 +389,7 @@ class Form extends React.Component {
 
     componentDidMount () {
       this.props.getWebhooks();
+      this.props.getChaosExperiments();
     }
 
     componentDidUpdate (prevProps, prevState, snapshot) {
@@ -424,6 +531,28 @@ class Form extends React.Component {
 
       const { cron_expression } = this.state;
       switch (oneItem.type) {
+      case inputTypes.LINK_ACTION:
+        return (
+          <RactangleAlignChildrenLeft>
+            <div
+              className={style['actions-style']}
+              onClick={oneItem.onClick}>
+              {oneItem.floatingLabelText}
+            </div>
+          </RactangleAlignChildrenLeft>
+        )
+      case inputTypes.SUBMIT_BUTTON:
+        return (
+          <RactangleAlignChildrenLeft style={{ flexBasis: oneItem.flexDirection, paddingTop: oneItem.paddingTop }}>
+            <Button
+              disabled={oneItem.disabled(this.state)}
+              className={style['actions-style']}
+              inverted={oneItem.inverted}
+              onClick={oneItem.onClick}>
+              {oneItem.floatingLabelText}
+            </Button>
+          </RactangleAlignChildrenLeft>
+        )
       case inputTypes.SWITCHER:
         return (
           <RactangleAlignChildrenLeft>
@@ -440,7 +569,6 @@ class Form extends React.Component {
         );
       case inputTypes.SWITCHER_TWO_SIDES:
         return (
-
           <RactangleAlignChildrenLeft style={{ justifyContent: oneItem.justifyContent }}>
             <div style={{ marginRight: '5px', fontSize: '10px', color: '#557eff' }}>{oneItem.leftOption}</div>
             <UiSwitcher
@@ -456,14 +584,23 @@ class Form extends React.Component {
             <div style={{ marginLeft: '5px', fontSize: '10px', color: '#557eff', marginRight: '5px' }}>{oneItem.rightOption}</div>
             <InfoToolTip data={oneItem} iconSize={'10px'} />
           </RactangleAlignChildrenLeft>
-
         );
+      case inputTypes.LIST: {
+        return (
+          <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+            rightComponent={<InfoToolTip data={oneItem} />}>
+            <SimpleTable style={{ paddingLeft: '40px', paddingRight: '40px', marginBottom: '5px' }}
+              rows={oneItem.rows(this.state)} />
+          </TitleInput>
+        )
+      }
       case inputTypes.INPUT_LIST:
         return (
           <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
             rightComponent={<InfoToolTip data={oneItem} />}>
             <MultiValueInput
-              values={this.state[oneItem.name].map((value) => ({ value, label: value }))}
+              disabled={oneItem.disabled}
+              values={oneItem.values(this.state)}
               onAddItem={(evt) => this.handleInputListAdd(oneItem.name, evt)}
               onRemoveItem={evt => this.handleInputListRemove(oneItem.name, evt)}
               // validationFunc={validateFunc}
@@ -471,7 +608,18 @@ class Form extends React.Component {
           </TitleInput>
 
         );
-
+      case inputTypes.DROPDOWN:
+        return (
+          <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
+            rightComponent={<InfoToolTip data={oneItem} />}>
+            <Dropdown
+              options={oneItem.list(this.props)}
+              selectedOption={oneItem.selectedOption(this.state)}
+              onChange={oneItem.onChange}
+              placeHolder={oneItem.placeholder}
+            />
+          </TitleInput>
+        )
       case inputTypes.TEXT_FIELD:
         return (
           <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
@@ -485,7 +633,6 @@ class Form extends React.Component {
             </ErrorWrapper>
           </TitleInput>
         );
-
       case inputTypes.RADIO:
         return (
           <TitleInput key={oneItem.key} title={oneItem.floatingLabelText}
@@ -525,24 +672,27 @@ class Form extends React.Component {
         );
       case inputTypes.NUMERIC_INPUT:
         return (
-          <TitleInput labelStyle={{ marginRight: '5px' }} key={oneItem.key} title={oneItem.floatingLabelText}
-            rightComponent={<InfoToolTip data={oneItem} />}>
-            <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
-              <NumericInput
-                minValue={0}
-                maxValue={10000000}
-                hideNumber={Number.isNaN(this.state[oneItem.name])}
-                value={this.state[oneItem.name]}
-                onChange={(value) => {
-                  this.onChangeProperty(oneItem.name, value)
-                  const newState = oneItem.newState && oneItem.newState(value);
-                  this.setState(newState);
-                }}
-                disabled={this.state.disabled[oneItem.name]}
-                width={'80px'}
-              />
-            </ErrorWrapper>
-          </TitleInput>
+          <RactangleAlignChildrenLeft style={{ justifyContent: oneItem.justifyContent }}>
+            <TitleInput labelStyle={{ marginRight: '5px' }} key={oneItem.key} title={oneItem.floatingLabelText}
+              rightComponent={<InfoToolTip data={oneItem} />}>
+              <ErrorWrapper errorText={this.state.errors[oneItem.name]}>
+                <NumericInput
+                  minValue={0}
+                  maxValue={10000000}
+                  height={oneItem.height}
+                  hideNumber={Number.isNaN(this.state[oneItem.name])}
+                  value={this.state[oneItem.name]}
+                  onChange={(value) => {
+                    this.onChangeProperty(oneItem.name, value)
+                    const newState = oneItem.newState && oneItem.newState(value);
+                    this.setState(newState);
+                  }}
+                  disabled={this.state.disabled[oneItem.name]}
+                  width={'80px'}
+                />
+              </ErrorWrapper>
+            </TitleInput>
+          </RactangleAlignChildrenLeft>
         );
       case inputTypes.NUMERIC_WITH_SWITCH:
         return (
@@ -628,7 +778,8 @@ function mapStateToProps (state) {
     processingAction: processingCreateJob(state),
     serverError: createJobFailure(state),
     createJobSuccess: createJobSuccess(state),
-    webhooks: webhooksForDropdown(state)
+    webhooks: webhooksForDropdown(state),
+    experiments: chaosExperimentsForDropdown(state)
   };
 }
 
@@ -636,7 +787,8 @@ const mapDispatchToProps = {
   clearErrorOnCreateJob: Actions.clearErrorOnCreateJob,
   createJob: Actions.createJob,
   editJob: Actions.editJob,
-  getWebhooks: Actions.getWebhooks
+  getWebhooks: Actions.getWebhooks,
+  getChaosExperiments: Actions.getChaosExperiments
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Form);
