@@ -1,5 +1,6 @@
 
 const chaosExperimentsDbConnector = require('../../chaos-experiments/models/database/databaseConnector'),
+    chaosExperimentManager = require('../../chaos-experiments/models/chaosExperimentsManager'),
     { v4: uuid } = require('uuid'),
     logger = require('../../common/logger');
 
@@ -31,18 +32,19 @@ async function setSingleJobExperiment(experimentRequest, experimentsFromDb, base
         const startTime = baseTimestamp + experimentRequest.start_after;
         const endTime = startTime + convertDurationStringToMillisecond(experiment.kubeObject.spec.duration);
         const jobExperimentId = uuid();
-        await chaosExperimentsDbConnector.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
+        await chaosExperimentManager.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
         const kubeObject = experiment.kubeObject;
         kubeObject.name = kubeObject.metadata.name.concat(`_${jobExperimentId}`);
-        const timeout = setTimeout(() => runChaosExperiment(kubeObject, jobId, jobExperimentId), experimentRequest.start_after);
+        const timeout = setTimeout(() => runChaosExperiment(kubeObject, jobExperimentId), experimentRequest.start_after);
         jobExperimentsIdToTimeout.set(jobExperimentId, timeout);
     } catch (error){
         logger.error(error, `error while setting chaos experiment ${experimentRequest.experiment_id} for job ${jobId}`);
     }
 }
 
-async function runChaosExperiment(kubeObject, jobId, jobExperimentId) {
-
+async function runChaosExperiment(kubeObject, jobExperimentId) {
+    await chaosExperimentManager.runChaosExperiment(kubeObject);
+    await chaosExperimentManager.setChaosJobExperimentTriggered(jobExperimentId);
 }
 
 function convertDurationStringToMillisecond(durationString) {
