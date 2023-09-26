@@ -8,6 +8,5 @@ export const deleteChaosExperimentSuccess = (state) => state.ChaosExperimentsRed
 export const deleteChaosExperimentFailure = (state) => state.ChaosExperimentsReducer.get('delete_chaosExperiment_failure');
 
 export const chaosExperimentsForDropdown = createSelector(chaosExperimentsList, (experiments) => {
-debugger;
   return experiments.map((experiment) => ({ key: experiment.id, value: experiment.name }));
 });
