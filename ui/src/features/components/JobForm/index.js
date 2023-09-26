@@ -55,7 +55,6 @@ class Form extends React.Component {
         optionToValue: { 'Load test': 'load_test', 'Functional test': 'functional_test' },
         valueToOption: { load_test: 'Load test', functional_test: 'Functional test' }
       },
-
       {
         group: 'section_a',
         bottom: [
@@ -193,7 +192,7 @@ class Form extends React.Component {
           }
         ]
       },
-      {
+      ...(props.experiments.length > 0 ? [{
         group: 'section_c',
         children:
             [
@@ -291,7 +290,7 @@ class Form extends React.Component {
                 hiddenCondition: (state) => state.add_experiment_form_hidden === true
               }
             ]
-      },
+      }] : []),
       {
         group: 'section_d',
         flexDirection: 'column',
