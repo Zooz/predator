@@ -17,7 +17,7 @@ async function setChaosExperimentsIfExist(jobId, jobExperiments) {
     try {
         const baseTimestamp = Date.now();
         const experimentIds = jobExperiments.map(experiment => experiment.experiment_id);
-        const experimentsFromDb = await chaosExperimentsDbConnector.getChaosExperimentsByIds(experimentIds);
+        const experimentsFromDb = await chaosExperimentManager.getChaosExperimentsByIds(experimentIds);
         await Promise.all(jobExperiments.map(async(experimentRequest) =>
             await setSingleJobExperiment(experimentRequest, experimentsFromDb, baseTimestamp, jobId)
         ));

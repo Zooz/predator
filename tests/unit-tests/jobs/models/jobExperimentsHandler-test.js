@@ -1,6 +1,7 @@
 const sinon = require('sinon'),
     databaseConnector = require('../../../../src/chaos-experiments/models/database/databaseConnector'),
-    jobExperimentHandler = require('../../../../src/jobs/models/jobExperimentsHandler');
+    jobExperimentHandler = require('../../../../src/jobs/models/jobExperimentsHandler'),
+    chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
 ;
 const { v4: uuid } = require('uuid');
 
@@ -25,12 +26,14 @@ function generateExperiment(id = uuid()){
 describe('Job experiments handler tests', function () {
     let databaseConnectorInsertStub;
     let databaseConnectorGetStub;
+    let experimentsManagerRunJobStub;
     let sandbox;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         databaseConnectorInsertStub = sandbox.stub(databaseConnector, 'insertChaosJobExperiment');
         databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getChaosExperimentsByIds');
+        experimentsManagerRunJobStub = sandbox.stub(chaosExperimentsManager, 'runChaosExperiment');
     });
     beforeEach(async () => {
         sandbox.reset();
@@ -45,6 +48,7 @@ describe('Job experiments handler tests', function () {
         const secondExperiment = generateExperiment();
         databaseConnectorInsertStub.resolves();
         databaseConnectorGetStub.resolves([firstExperiment, secondExperiment]);
+        experimentsManagerRunJobStub.resolves();
         const jobExperiments = [
             {
                 experiment_id: firstExperiment.id,
@@ -56,7 +60,11 @@ describe('Job experiments handler tests', function () {
             }
         ];
         const jobId = uuid();
+        const clock = sinon.useFakeTimers();
+        clock.tick(2000);
         await jobExperimentHandler.setChaosExperimentsIfExist(jobId, jobExperiments);
+        clock.tick(4000);
+        experimentsManagerRunJobStub.callCount.should.eql(2);
         databaseConnectorGetStub.callCount.should.eql(1);
         databaseConnectorInsertStub.callCount.should.eql(2);
         databaseConnectorInsertStub.args[0][1].should.eql(jobId);
