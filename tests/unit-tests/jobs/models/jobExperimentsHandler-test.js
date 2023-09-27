@@ -61,9 +61,9 @@ describe('Job experiments handler tests', function () {
         ];
         const jobId = uuid();
         const clock = sinon.useFakeTimers();
-        clock.tick(2000);
+        clock.tick(1000);
         await jobExperimentHandler.setChaosExperimentsIfExist(jobId, jobExperiments);
-        clock.tick(4000);
+        clock.tick(3000);
         experimentsManagerRunJobStub.callCount.should.eql(2);
         databaseConnectorGetStub.callCount.should.eql(1);
         databaseConnectorInsertStub.callCount.should.eql(2);
@@ -73,6 +73,7 @@ describe('Job experiments handler tests', function () {
         databaseConnectorInsertStub.args[1][1].should.eql(jobId);
         databaseConnectorInsertStub.args[1][2].should.eql(secondExperiment.id);
         (databaseConnectorInsertStub.args[1][3] - databaseConnectorInsertStub.args[0][3]).should.eql(1000);
+        clock.restore();
     });
 
     it('set chaos experiments with same experiment in different times', async () => {
@@ -90,12 +91,16 @@ describe('Job experiments handler tests', function () {
             }
         ];
         const jobId = uuid();
+        const clock = sinon.useFakeTimers();
+        clock.tick(1000);
         await jobExperimentHandler.setChaosExperimentsIfExist(jobId, jobExperiments);
+        clock.tick(3000);
         databaseConnectorGetStub.callCount.should.eql(1);
         databaseConnectorInsertStub.callCount.should.eql(2);
         databaseConnectorInsertStub.args[0][1].should.eql(jobId);
         databaseConnectorInsertStub.args[0][2].should.eql(experiment.id);
         (databaseConnectorInsertStub.args[0][4] - databaseConnectorInsertStub.args[0][3]).should.eql(60000);
+        clock.restore();
     });
 
     it('set chaos experiments with no experiments', async () => {
