@@ -31,6 +31,7 @@ module.exports = async () => {
     await database.init();
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
+    await jobsManager.reloadChaosExperiments();
     await jobsManager.scheduleFinishedContainersCleanup();
     if (streamingConfig.platform) {
         const eventStreamerPlatformConfig = require(`./config/${streamingConfig.platform}Config`);

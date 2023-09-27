@@ -46,6 +46,11 @@ module.exports.getChaosExperimentById = async function (experimentId) {
     }
 };
 
+module.exports.insertChaosJobExperiment = (jobExperimentId, jobId, experimentId, startTime, endTime) => {
+    const contextId = httpContext.get(CONTEXT_ID);
+    return databaseConnector.insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId);
+};
+
 module.exports.getChaosExperimentsByIds = (experimentIds, exclude, contextId) => {
     return databaseConnector.getChaosExperimentsByIds(experimentIds, exclude, contextId);
 };
@@ -75,4 +80,8 @@ module.exports.updateChaosExperiment = async function (experimentId, chaosExperi
 
     await databaseConnector.updateChaosExperiment(experimentId, chaosExperiment);
     return chaosExperiment;
+};
+
+module.exports.getFutureJobExperiments = async function (timestamp, contextId) {
+    return databaseConnector.getFutureJobExperiments(contextId);
 };

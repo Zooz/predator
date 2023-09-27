@@ -2,11 +2,12 @@ const sinon = require('sinon'),
     should = require('should'),
     jobVerifier = require('../../../../src/jobs/helpers/jobVerifier'),
     testsManager = require('../../../../src/tests/models/manager'),
+    chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager'),
     configHandler = require('../../../../src/configManager/models/configHandler'),
     consts = require('../../../../src/common/consts');
 
 describe('Jobs verifier tests', function () {
-    let req, res, sandbox, nextStub, resJsonStub, resStatusStub, testsManagerStub, configHandlerStub;
+    let req, res, sandbox, nextStub, resJsonStub, resStatusStub, testsManagerStub, configHandlerStub, getChaosExperimentsByIdsStub;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -15,6 +16,7 @@ describe('Jobs verifier tests', function () {
         resStatusStub = sandbox.stub();
         configHandlerStub = sandbox.stub(configHandler, 'getConfigValue');
         testsManagerStub = sandbox.stub(testsManager, 'getTest');
+        getChaosExperimentsByIdsStub = sandbox.stub(chaosExperimentsManager, 'getChaosExperimentsByIds');
         res = {
             json: (json) => {
                 resJsonStub(json);
@@ -176,6 +178,45 @@ describe('Jobs verifier tests', function () {
             req = { body: { run_immediately: true, tag: 'hello' } };
             await jobVerifier.verifyJobBody(req, res, nextStub);
             should(nextStub.args[0][0].message).eql('custom_runner_definition is missing key for tag: hello');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+    });
+
+    describe('verifyExperimentsExist tests', () => {
+        it('if job does not have experiments array, should pass', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
+            req = { body: { experiments: undefined } };
+            await jobVerifier.verifyExperimentsExist(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+        it('if job experiments array is empty, should pass', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
+            req = { body: { experiments: [] } };
+            await jobVerifier.verifyExperimentsExist(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('if job platform is not KUBERNETES, should pass', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('DOCKER');
+            req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: false } };
+            await jobVerifier.verifyExperimentsExist(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('if chaos experiments mentioned in the job exist, should pass', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
+            req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: true, experiments: [{ experiment_id: '1234', start_after: 1000 }] } };
+            getChaosExperimentsByIdsStub.resolves([{ id: '1234' }]);
+            await jobVerifier.verifyExperimentsExist(req, res, nextStub);
+            should(nextStub.args[0][0]).eql(undefined);
+        });
+
+        it('if chaos experiments mentioned in the job do not exist, should fail', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
+            req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: true, experiments: [{ experiment_id: '1234', start_after: 1000 }] } };
+            getChaosExperimentsByIdsStub.resolves([]);
+            await jobVerifier.verifyExperimentsExist(req, res, nextStub);
+            should(nextStub.args[0][0].message).eql('One or more chaos experiments are not configured. Job can not be created');
             should(nextStub.args[0][0].statusCode).eql(400);
         });
     });

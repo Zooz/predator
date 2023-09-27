@@ -13,8 +13,12 @@ const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
     streamingManager = require('../../streaming/manager'),
+    chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager'),
     { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common'),
-    { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
+    {
+        CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST,
+        KUBERNETES
+    } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     { version: PREDATOR_VERSION } = require('../../../package.json'),
     jobExperimentHandler = require('./jobExperimentsHandler');
@@ -34,13 +38,32 @@ module.exports.reloadCronJobs = async () => {
     const configData = await configHandler.getConfig();
     try {
         const jobs = await databaseConnector.getJobs(contextId);
-        jobs.forEach(async function (job) {
+        for (const job of jobs) {
             if (job.cron_expression !== null) {
-                addCron(job, job.cron_expression, configData);
+                await addCron(job, job.cron_expression, configData);
             }
-        });
+        };
     } catch (error) {
         throw new Error('Unable to reload scheduled jobs, error: ' + error);
+    }
+};
+
+module.exports.reloadChaosExperiments = async () => {
+    const contextId = httpContext.get(CONTEXT_ID);
+    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
+    if (jobPlatform.toUpperCase() !== KUBERNETES) {
+        return;
+    }
+    try {
+        const timestamp = new Date().valueOf();
+        const futureJobExperiments = await chaosExperimentsManager.getFutureJobExperiments(timestamp, contextId);
+        for (const futureJobExperiment of futureJobExperiments) {
+            const calculatedStartAfter = futureJobExperiment.start_time - timestamp;
+            const chaosExperiment = await chaosExperimentsManager.getChaosExperimentById(futureJobExperiment.experiment_id);
+            jobExperimentHandler.scheduleChaosExperiment(chaosExperiment.kubeObject, futureJobExperiment.job_id, futureJobExperiment.id, calculatedStartAfter);
+        }
+    } catch (error) {
+        throw new Error('Unable to reload job experiments , error: ' + error);
     }
 };
 

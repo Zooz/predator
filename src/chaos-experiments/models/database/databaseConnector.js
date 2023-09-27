@@ -11,6 +11,7 @@ module.exports = {
     insertChaosJobExperiment,
     getChaosJobExperimentById,
     getChaosJobExperimentByJobId,
+    getFutureJobExperiments,
     setChaosJobExperimentTriggered,
     updateChaosExperiment,
     closeConnection
@@ -62,6 +63,10 @@ async function getChaosJobExperimentById(jobExperimentId, contextId) {
 
 async function getChaosJobExperimentByJobId(jobId, contextId) {
     return databaseConnector.getChaosJobExperimentById(jobId, contextId);
+}
+
+async function getFutureJobExperiments(contextId) {
+    return databaseConnector.getFutureJobExperiments(contextId);
 }
 
 async function setChaosJobExperimentTriggered(jobExperimentId, isTriggered, contextId) {

@@ -15,6 +15,8 @@ const databaseConnector = require('../../../../src/jobs/models/database/database
     webhooksManager = require('../../../../src/webhooks/models/webhookManager'),
     basicTest = require('../../../testExamples/Basic_test.json'),
     reportsManager = require('../../../../src/reports/models/reportsManager'),
+    chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager'),
+    chaosExperimentConnector = require('../../../../src/chaos-experiments/models/kubernetes/chaosExperimentConnector'),
     config = require('../../../../src/common/consts').CONFIG;
 
 let manager;
@@ -47,6 +49,11 @@ describe('Manager jobs', function () {
 
     let testsManagerGetStub;
 
+    let getFutureJobExperimentsStub;
+    let getChaosExperimentByIdStub;
+
+    let runChaosExperimentStub;
+
     before(() => {
         sandbox = sinon.sandbox.create();
 
@@ -62,6 +69,11 @@ describe('Manager jobs', function () {
         failReportStub = sandbox.stub(reportsManager, 'failReport');
 
         testsManagerGetStub = sandbox.stub(testsManager, 'getTest');
+
+        getFutureJobExperimentsStub = sandbox.stub(chaosExperimentsManager, 'getFutureJobExperiments');
+        getChaosExperimentByIdStub = sandbox.stub(chaosExperimentsManager, 'getChaosExperimentById');
+
+        runChaosExperimentStub = sandbox.stub(chaosExperimentConnector, 'runChaosExperiment');
 
         jobGetLogsStub = sandbox.stub(jobConnector, 'getLogs');
         jobDeleteContainerStub = sandbox.stub(jobConnector, 'deleteAllContainers');
@@ -158,6 +170,34 @@ describe('Manager jobs', function () {
                     }
                 }, 3000);
             });
+        });
+    });
+
+    describe('Reload job experiments', function () {
+        it('found future experiments to reload', async () => {
+            const timestamp = 7200000;
+            const jobExperiment = { start_time: timestamp, job_id: '1234', experiment_id: '4321', id: '2468' };
+            const chaosExperiment = { kubeObject: { hello: 1 }, experiment_id: '4321' };
+            getFutureJobExperimentsStub.resolves([jobExperiment]);
+            getChaosExperimentByIdStub.resolves(chaosExperiment);
+            runChaosExperimentStub.returns();
+
+            const clock = sinon.useFakeTimers();
+            const promise = manager.reloadChaosExperiments();
+            clock.tick(3600000);
+            await promise;
+            clock.tick(3600010);
+            sinon.assert.calledOnce(runChaosExperimentStub);
+            sinon.assert.calledWith(runChaosExperimentStub, chaosExperiment.kubeObject, jobExperiment.job_id, jobExperiment.id);
+            clock.restore();
+        });
+        it('future experiments not found - nothing to reload', async () => {
+            getFutureJobExperimentsStub.resolves([]);
+            runChaosExperimentStub.returns();
+
+            await manager.reloadChaosExperiments();
+            sinon.assert.notCalled(getChaosExperimentByIdStub);
+            sinon.assert.notCalled(runChaosExperimentStub);
         });
     });
 
