@@ -18,7 +18,7 @@ import style from './stepform.scss';
 import Input from '../../../components/Input';
 import TitleInput from '../../../components/TitleInput';
 import DynamicKeyValueInput from './DynamicKeyValueInput';
-import CustomDropdown from './CustomDropdown';
+import CustomDropdown from '../../../components/Dropdown/CustomDropdown';
 import Expectations from './Expectations';
 import ErrorWrapper from '../../../components/ErrorWrapper'
 import { URL_FIELDS } from '../../../validators/validate-urls';
