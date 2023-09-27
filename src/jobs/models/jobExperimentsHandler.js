@@ -1,6 +1,5 @@
 
-const chaosExperimentsDbConnector = require('../../chaos-experiments/models/database/databaseConnector'),
-    chaosExperimentManager = require('../../chaos-experiments/models/chaosExperimentsManager'),
+const chaosExperimentManager = require('../../chaos-experiments/models/chaosExperimentsManager'),
     { v4: uuid } = require('uuid'),
     logger = require('../../common/logger');
 
