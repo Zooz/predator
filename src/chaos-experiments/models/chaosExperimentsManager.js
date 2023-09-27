@@ -82,10 +82,7 @@ module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experim
     await databaseConnector.insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId);
 };
 
-module.exports.setChaosJobExperimentTriggered = async(jobExperimentId, isTriggered, contextId) => {
-    return databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, isTriggered, contextId);
-};
-
-module.exports.runChaosExperiment = async (kubernetesChaosConfig) => {
+module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentId) => {
     await kubernetesConnector.runChaosExperiment(kubernetesChaosConfig);
+    await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
 };

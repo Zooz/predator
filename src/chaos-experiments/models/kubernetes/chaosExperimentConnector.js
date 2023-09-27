@@ -22,13 +22,13 @@ if (kubernetesConfig.kubernetesToken) {
     }
 }
 
-module.exports.runChaosExperiment = async (kubernetesJobConfig) => {
-    const resourceTypeName = kubernetesConfig.kind.toLowerCase();
+module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
+    const resourceTypeName = kubernetesExperimentConfig.kind.toLowerCase();
     const url = util.format('%s/apis/chaos-mesh.org/v1/namespaces/%s/%s', kubernetesUrl, kubernetesNamespace, resourceTypeName);
     const options = {
         url,
         method: 'POST',
-        body: kubernetesJobConfig,
+        body: kubernetesExperimentConfig,
         headers
     };
     const response = await requestSender.send(options);
