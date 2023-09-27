@@ -1,5 +1,5 @@
 import { TableHeader } from '../components/ReactTable';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { get } from 'lodash';
 import Checkbox from '../components/Checkbox/Checkbox';
 
