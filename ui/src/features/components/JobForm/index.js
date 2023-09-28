@@ -36,7 +36,6 @@ const DESCRIPTION = 'Predator executes tests through jobs. Use this form to spec
 class Form extends React.Component {
   constructor (props) {
     super(props);
-    debugger;
     this.FormList = [
       {
         name: 'test_name',
@@ -285,7 +284,6 @@ class Form extends React.Component {
                       add_experiment_form_hidden: true
                     }
                   })
-                  console.log(this.state.experiments)
                 },
                 disabled: (state) => state.add_experiment_form_experiment_name.trim().length === 0 || state.add_experiment_form_start_after === 0,
                 hiddenCondition: (state) => state.add_experiment_form_hidden === true
