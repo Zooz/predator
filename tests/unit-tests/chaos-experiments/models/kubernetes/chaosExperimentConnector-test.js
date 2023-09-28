@@ -45,7 +45,7 @@ describe('Chaos experiments manager tests', function () {
         await chaosExperimentConnector.runChaosExperiment(kubernetesJobConfig);
         requestSenderSendStub.callCount.should.eql(1);
         requestSenderSendStub.args[0][0].should.eql({
-            url: 'localhost:80/apis/chaos-mesh.org/v1/namespaces/default/podchaos',
+            url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/default/podchaos',
             method: 'POST',
             body: kubernetesJobConfig,
             headers: {}
@@ -77,7 +77,7 @@ describe('Chaos experiments manager tests', function () {
         await chaosExperimentConnector.runChaosExperiment(kubernetesJobConfig);
         requestSenderSendStub.callCount.should.eql(1);
         requestSenderSendStub.args[0][0].should.eql({
-            url: 'localhost:80/apis/chaos-mesh.org/v1/namespaces/default/httpchaos',
+            url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/default/httpchaos',
             method: 'POST',
             body: kubernetesJobConfig,
             headers: {}
