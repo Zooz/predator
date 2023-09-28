@@ -4,7 +4,7 @@ const kubernetesConfig = require('../../../config/kubernetesConfig');
 const logger = require('../../../common/logger');
 const requestSender = require('../../../common/requestSender');
 const kubernetesUrl = kubernetesConfig.kubernetesUrl;
-const kubernetesNamespace = kubernetesConfig.kubernetesNamespace;
+const kubernetesNamespace = 'apps'; // kubernetesConfig.kubernetesNamespace;
 
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 const headers = {};
