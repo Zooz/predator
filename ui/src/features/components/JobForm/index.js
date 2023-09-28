@@ -36,6 +36,7 @@ const DESCRIPTION = 'Predator executes tests through jobs. Use this form to spec
 class Form extends React.Component {
   constructor (props) {
     super(props);
+    debugger;
     this.FormList = [
       {
         name: 'test_name',
@@ -192,7 +193,7 @@ class Form extends React.Component {
           }
         ]
       },
-      ...(props.experiments.length > 0 ? [{
+      {
         group: 'section_c',
         children:
             [
@@ -290,7 +291,7 @@ class Form extends React.Component {
                 hiddenCondition: (state) => state.add_experiment_form_hidden === true
               }
             ]
-      }] : []),
+      },
       {
         group: 'section_d',
         flexDirection: 'column',
