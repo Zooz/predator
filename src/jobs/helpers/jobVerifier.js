@@ -81,10 +81,12 @@ module.exports.verifyExperimentsExist = async (req, res, next) => {
     let errorToThrow;
     const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     const experiments = jobBody.experiments;
-    if (jobPlatform.toUpperCase() !== KUBERNETES) {
+    if (!experiments || experiments.length === 0) {
         next();
-    } else if (!experiments || experiments.length === 0) {
-        next();
+    } else if (experiments.length > 0 && jobPlatform.toUpperCase() !== KUBERNETES) {
+        errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES);
+        errorToThrow.statusCode = 400;
+        next(errorToThrow);
     } else {
         const uniqueExperimentIds = [...new Set(experiments.map(experiment => experiment.experiment_id))];
         const chaosExperiments = await choasExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds, ['kubeObject']);

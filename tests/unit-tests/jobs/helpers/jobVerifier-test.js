@@ -195,14 +195,12 @@ describe('Jobs verifier tests', function () {
             await jobVerifier.verifyExperimentsExist(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
-
         it('if job platform is not KUBERNETES, should pass', async () => {
             configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('DOCKER');
             req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: false } };
             await jobVerifier.verifyExperimentsExist(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
-
         it('if chaos experiments mentioned in the job exist, should pass', async () => {
             configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
             req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: true, experiments: [{ experiment_id: '1234', start_after: 1000 }] } };
@@ -210,13 +208,19 @@ describe('Jobs verifier tests', function () {
             await jobVerifier.verifyExperimentsExist(req, res, nextStub);
             should(nextStub.args[0][0]).eql(undefined);
         });
-
         it('if chaos experiments mentioned in the job do not exist, should fail', async () => {
             configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
             req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: true, experiments: [{ experiment_id: '1234', start_after: 1000 }] } };
             getChaosExperimentsByIdsStub.resolves([]);
             await jobVerifier.verifyExperimentsExist(req, res, nextStub);
             should(nextStub.args[0][0].message).eql('One or more chaos experiments are not configured. Job can not be created');
+            should(nextStub.args[0][0].statusCode).eql(400);
+        });
+        it('if job platform is not KUBERNETES and  job has experiments job does not have experiments, should pass', async () => {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('DOCKER');
+            req = { body: { run_immediately: true, cron_expression: '* * * * *', enabled: false, experiments: [{ experiment_id: '1234', start_after: 1000 }] } };
+            await jobVerifier.verifyExperimentsExist(req, res, nextStub);
+            should(nextStub.args[0][0].message).eql('Chaos experiment is supported only in kubernetes jobs');
             should(nextStub.args[0][0].statusCode).eql(400);
         });
     });
