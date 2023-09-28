@@ -24,7 +24,7 @@ if (kubernetesConfig.kubernetesToken) {
 
 module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
     const resourceKindName = kubernetesExperimentConfig.kind.toLowerCase();
-    const url = util.format('%s/apis/chaos-mesh.org/v1/namespaces/%s/%s', kubernetesUrl, kubernetesNamespace, resourceKindName);
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s', kubernetesUrl, kubernetesNamespace, resourceKindName);
     const options = {
         url,
         method: 'POST',
