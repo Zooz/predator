@@ -18,7 +18,7 @@ import Dialog from './components/Dialog';
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetChaosExperiments = 'Error occurred while trying to get all chaos experiments.';
 const columnsNames = ['experiment_name', 'created_at', 'kind', 'duration', 'raw', 'experiment_edit', 'delete'];
-const DESCRIPTION = 'Create chaos experiments templates to be injected as part of your running job.';
+const DESCRIPTION = 'Create chaos experiments templates to be injected as part of your running test.';
 
 class getChaosExperiments extends React.Component {
   constructor (props) {
