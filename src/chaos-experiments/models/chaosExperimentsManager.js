@@ -90,3 +90,7 @@ module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentI
         logger.error(error, `Error while running chaos job experiment ${jobExperimentId}`);
     }
 };
+
+module.exports.getFutureJobExperiments = async function (timestamp, contextId) {
+    return databaseConnector.getFutureJobExperiments(contextId);
+};
