@@ -33,7 +33,7 @@ async function setSingleJobExperiment(experimentRequest, experimentsFromDb, base
         const jobExperimentId = uuid();
         await chaosExperimentManager.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
         const kubeObject = experiment.kubeObject;
-        kubeObject.metadata.name = kubeObject.metadata.name.concat(`_${jobExperimentId}`);
+        kubeObject.metadata.name = kubeObject.metadata.name.concat(`-${jobExperimentId}`);
         const timeout = setTimeout(() => chaosExperimentManager.runChaosExperiment(kubeObject, jobExperimentId), experimentRequest.start_after);
         jobExperimentsIdToTimeout.set(jobExperimentId, timeout);
     } catch (error){
