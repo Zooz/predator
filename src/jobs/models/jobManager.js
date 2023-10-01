@@ -38,7 +38,7 @@ module.exports.reloadCronJobs = async () => {
     const configData = await configHandler.getConfig();
     try {
         const jobs = await databaseConnector.getJobs(contextId);
-        jobs.forEach(function (job) {
+        jobs.forEach(async function (job) {
             if (job.cron_expression !== null) {
                 addCron(job, job.cron_expression, configData);
             }

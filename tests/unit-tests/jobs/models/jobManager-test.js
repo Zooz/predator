@@ -175,7 +175,7 @@ describe('Manager jobs', function () {
 
     describe('Reload job experiments', function () {
         it('found future experiments to reload', async () => {
-            const timestamp = 7200000;
+            const timestamp = 500;
             const jobExperiment = { start_time: timestamp, job_id: '1234', experiment_id: '4321', id: '2468' };
             const chaosExperiment = { kubeObject: { hello: 1 }, experiment_id: '4321' };
             getFutureJobExperimentsStub.resolves([jobExperiment]);
@@ -183,10 +183,9 @@ describe('Manager jobs', function () {
             runChaosExperimentStub.returns();
 
             const clock = sinon.useFakeTimers();
-            const promise = manager.reloadChaosExperiments();
-            clock.tick(3600000);
-            await promise;
-            clock.tick(3600010);
+            clock.tick(1000);
+            await manager.reloadChaosExperiments();
+            clock.tick(3000);
             sinon.assert.calledOnce(runChaosExperimentStub);
             sinon.assert.calledWith(runChaosExperimentStub, chaosExperiment.kubeObject);
             clock.restore();
