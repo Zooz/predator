@@ -34,14 +34,14 @@ async function setSingleJobExperiment(experimentRequest, chaoExperimentsFromDb, 
         await chaosExperimentsManager.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
         const kubeObject = experiment.kubeObject;
         kubeObject.metadata.name = kubeObject.metadata.name.concat(`-${jobExperimentId}`);
-        scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, experimentRequest.start_after);
+        scheduleChaosExperiment(kubeObject, jobExperimentId, experimentRequest.start_after);
     } catch (error){
         logger.error(error, `error while setting chaos experiment ${experimentRequest.experiment_id} for job ${jobId}`);
     }
 }
 
-function scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, startAfter) {
-    const timeout = setTimeout(() => chaosExperimentsManager.runChaosExperiment(kubeObject, jobId, jobExperimentId), startAfter);
+function scheduleChaosExperiment(kubeObject, jobExperimentId, startAfter) {
+    const timeout = setTimeout(() => chaosExperimentsManager.runChaosExperiment(kubeObject, jobExperimentId), startAfter);
     jobExperimentsIdToTimeout.set(jobExperimentId, timeout);
 }
 
