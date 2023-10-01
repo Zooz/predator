@@ -40,7 +40,7 @@ export default [
   },
   {
     key: 4,
-    primaryText: 'Chaos Experiments',
+    primaryText: 'Chaos',
     navigateTo: 'chaos_experiments',
     icon: faFlask
   },
