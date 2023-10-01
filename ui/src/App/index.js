@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import GetTests from '../features/get-tests';
 import GetProcessors from '../features/get-processors';
+import GetChaosExperiments from '../features/get-chaos-experiments';
 import GetJobs from '../features/get-jobs';
 import GetReports from '../features/get-last-reports';
 import GetTestReports from '../features/get-test-reports';
@@ -29,53 +30,56 @@ class App extends React.Component {
 
     render () {
       return (
-          <ConnectedRouter history={history}>
-            <DrawerE history={history} open={true} listItemData={menuList}>
-              <Route exact path='/' render={() => (
-                <Redirect to='/last_reports' />
-              )} />
-              <Route exact path='/tests' render={props => (
-                <GetTests {...props} />
-              )} />
-              <Route exact path='/tests/:testId/run' render={props => (
-                <GetTests {...props} />
-              )} />
-                <Route exact path='/tests/:testId/edit' render={props => (
-                    <GetTests {...props} />
-                )} />
-              <Route exact path='/jobs' render={props => (
-                <GetJobs {...props} />
-              )} />
-                <Route exact path='/jobs/:jobId/edit' render={props => (
-                  <GetJobs {...props} />
-                )} />
-              <Route exact path='/tests/:testId/reports' render={props => (
-                <GetTestReports {...props} />
-              )} />
-              <Route exact path='/last_reports' render={props => (
-                <GetReports {...props} />
-              )} />
-              <Route exact path='/processors' render={props => (
-                <GetProcessors {...props} />
-              )} />
-              <Route exact path='/webhooks' render={props => (
-                <Webhooks {...props} />
-              )} />
+        <ConnectedRouter history={history}>
+          <DrawerE history={history} open listItemData={menuList}>
+            <Route exact path='/' render={() => (
+              <Redirect to='/last_reports' />
+            )} />
+            <Route exact path='/tests' render={props => (
+              <GetTests {...props} />
+            )} />
+            <Route exact path='/tests/:testId/run' render={props => (
+              <GetTests {...props} />
+            )} />
+            <Route exact path='/tests/:testId/edit' render={props => (
+              <GetTests {...props} />
+            )} />
+            <Route exact path='/jobs' render={props => (
+              <GetJobs {...props} />
+            )} />
+            <Route exact path='/jobs/:jobId/edit' render={props => (
+              <GetJobs {...props} />
+            )} />
+            <Route exact path='/tests/:testId/reports' render={props => (
+              <GetTestReports {...props} />
+            )} />
+            <Route exact path='/last_reports' render={props => (
+              <GetReports {...props} />
+            )} />
+            <Route exact path='/processors' render={props => (
+              <GetProcessors {...props} />
+            )} />
+            <Route exact path='/chaos_experiments' render={props => (
+              <GetChaosExperiments {...props} />
+            )} />
+            <Route exact path='/webhooks' render={props => (
+              <Webhooks {...props} />
+            )} />
             <Route exact path='/settings' render={props => (
-                <Configuration {...props} />
-             )} />
-                <Route exact path='/tests/:testId/reports/:reportId' render={props => (
-                    <ReportPage {...props} />
-                )} />
-            </DrawerE>
-          </ConnectedRouter>
+              <Configuration {...props} />
+            )} />
+            <Route exact path='/tests/:testId/reports/:reportId' render={props => (
+              <ReportPage {...props} />
+            )} />
+          </DrawerE>
+        </ConnectedRouter>
       )
     }
 }
 
 function mapStateToProps (state) {
   return {
-      location: get(state, 'router.location.pathname')
+    location: get(state, 'router.location.pathname')
   }
 }
 

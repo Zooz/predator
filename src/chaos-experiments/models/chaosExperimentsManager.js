@@ -5,6 +5,7 @@ const httpContext = require('express-http-context'),
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
+    kubernetesConnector = require('./kubernetes/chaosExperimentConnector'),
     { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts'),
     generateError = require('../../common/generateError');
 
@@ -46,11 +47,6 @@ module.exports.getChaosExperimentById = async function (experimentId) {
     }
 };
 
-module.exports.insertChaosJobExperiment = (jobExperimentId, jobId, experimentId, startTime, endTime) => {
-    const contextId = httpContext.get(CONTEXT_ID);
-    return databaseConnector.insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId);
-};
-
 module.exports.getChaosExperimentsByIds = (experimentIds, exclude, contextId) => {
     return databaseConnector.getChaosExperimentsByIds(experimentIds, exclude, contextId);
 };
@@ -80,6 +76,19 @@ module.exports.updateChaosExperiment = async function (experimentId, chaosExperi
 
     await databaseConnector.updateChaosExperiment(experimentId, chaosExperiment);
     return chaosExperiment;
+};
+
+module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experimentId, startTime, endTime, contextId) => {
+    await databaseConnector.insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId);
+};
+
+module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentId) => {
+    try {
+        await kubernetesConnector.runChaosExperiment(kubernetesChaosConfig);
+        await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
+    } catch (error){
+        logger.error(error, `Error while running chaos job experiment ${jobExperimentId}`);
+    }
 };
 
 module.exports.getFutureJobExperiments = async function (timestamp, contextId) {

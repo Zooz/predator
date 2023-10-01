@@ -1,6 +1,5 @@
 
 const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager'),
-    chaosExperimentConnector = require('../../chaos-experiments/models/kubernetes/chaosExperimentConnector'),
     { v4: uuid } = require('uuid'),
     logger = require('../../common/logger');
 
@@ -34,7 +33,7 @@ async function setSingleJobExperiment(experimentRequest, chaoExperimentsFromDb, 
         const jobExperimentId = uuid();
         await chaosExperimentsManager.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
         const kubeObject = experiment.kubeObject;
-        kubeObject.name = kubeObject.metadata.name.concat(`_${jobExperimentId}`);
+        kubeObject.name = kubeObject.metadata.name.concat(`-${jobExperimentId}`);
         scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, experimentRequest.start_after);
     } catch (error){
         logger.error(error, `error while setting chaos experiment ${experimentRequest.experiment_id} for job ${jobId}`);
@@ -42,7 +41,7 @@ async function setSingleJobExperiment(experimentRequest, chaoExperimentsFromDb, 
 }
 
 function scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, startAfter) {
-    const timeout = setTimeout(() => chaosExperimentConnector.runChaosExperiment(kubeObject, jobId, jobExperimentId), startAfter);
+    const timeout = setTimeout(() => chaosExperimentsManager.runChaosExperiment(kubeObject, jobId, jobExperimentId), startAfter);
     jobExperimentsIdToTimeout.set(jobExperimentId, timeout);
 }
 
