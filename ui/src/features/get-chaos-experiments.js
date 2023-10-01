@@ -102,7 +102,7 @@ class getChaosExperiments extends React.Component {
   };
 
   onRawView = (data) => {
-    this.setState({ openViewExperiment: data });
+    this.setState({ openViewExperiment: data.kubeObject });
   };
 
   closeExperimentDialog = () => {
