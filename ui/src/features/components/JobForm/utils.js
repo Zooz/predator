@@ -29,7 +29,6 @@ export const createStateForEditJob = (job, dropdownWebhooks) => {
 
 export const createJobRequest = (opts) => {
   // job_type is for rerun
-  debugger;
   let body = {
     test_id: opts.test_id,
     type: opts.type || opts.job_type,

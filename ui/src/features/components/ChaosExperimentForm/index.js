@@ -125,7 +125,6 @@ export class ChaosExperimentForm extends React.Component {
 
   onInputCodeChange = (code) => {
     const isValidCode = testJSON(code);
-    debugger;
     if (!isValidCode) {
       this.setState({ validationErrorText: 'Invalid JSON format', yaml: code })
     } else {

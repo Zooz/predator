@@ -23,6 +23,7 @@ import MultiSelect from '../../../components/MultiSelect/MultiSelect.export';
 import NumericInput from '../../../components/NumericInput';
 import InfoToolTip from '../InfoToolTip';
 import { faClock, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconButton from '../../../components/IconButton';
 import { createJobRequest, createStateForEditJob } from './utils';
@@ -208,8 +209,15 @@ class Form extends React.Component {
                     <div key={'header' + index} className={style['list-container']}>
                       <span className={style['list-item__title']}>experiment name:</span>
                       <span className={style['list-item']}> {experiment.experiment_name}</span>
-                      <span className={style['list-item__title']}>start at:</span>
-                      <span className={style['list-item']}> {experiment.start_after}</span>
+                      <span className={style['list-item__title']}>start after:</span>
+                      <span className={style['list-item']}> {experiment.start_after / 1000} seconds</span>
+                      <FontAwesomeIcon
+                        icon={faTimes}
+                        size='1px'
+                        onClick={() => {
+                          this.setState({ experiment: state.experiments.splice(index, 1) })
+                        }
+                        } />
                     </div>
                   ]
                 }),
@@ -218,7 +226,7 @@ class Form extends React.Component {
               {
                 name: 'add_experiment_option',
                 key: 'add_experiment_option',
-                floatingLabelText: '+Add Experiment',
+                floatingLabelText: '+New Experiment',
                 onClick: () => {
                   this.setState({
                     add_experiment_form_experiment_name: '',
@@ -251,9 +259,9 @@ class Form extends React.Component {
               {
                 name: 'add_experiment_form_start_after',
                 key: 'add_experiment_form_start_after',
-                floatingLabelText: 'Start At',
-                info: 'When to start the experiment within the test timeframe (milliseconds)',
-                element: 'StartAt',
+                floatingLabelText: 'Start After (Seconds)',
+                info: 'When to start the experiment within the test timeframe (seconds)',
+                element: 'StartAfter',
                 type: inputTypes.NUMERIC_INPUT,
                 justifyContent: 'flex-end',
                 height: '35px',
@@ -273,7 +281,7 @@ class Form extends React.Component {
                   const newExperiment = {
                     experiment_id: this.state.add_experiment_form_experiment_id,
                     experiment_name: this.state.add_experiment_form_experiment_name,
-                    start_after: this.state.add_experiment_form_start_after
+                    start_after: this.state.add_experiment_form_start_after * 1000 // adjust to milliseconds
                   }
                   const experiments = [...this.state.experiments, newExperiment]
                   this.state.experiments.push(newExperiment)
@@ -285,7 +293,7 @@ class Form extends React.Component {
                     }
                   })
                 },
-                disabled: (state) => state.add_experiment_form_experiment_name.trim().length === 0 || state.add_experiment_form_start_after === 0,
+                disabled: (state) => state.add_experiment_form_experiment_name.trim().length === 0,
                 hiddenCondition: (state) => state.add_experiment_form_hidden === true
               }
             ]
@@ -546,6 +554,7 @@ class Form extends React.Component {
               disabled={oneItem.disabled(this.state)}
               className={style['actions-style']}
               inverted={oneItem.inverted}
+              height={oneItem.height}
               onClick={oneItem.onClick}>
               {oneItem.floatingLabelText}
             </Button>
@@ -561,7 +570,7 @@ class Form extends React.Component {
               height={12}
               width={22} />
             <div className={style['run-immediately']}>{oneItem.label}</div>
-            <InfoToolTip style={{ marginLeft: 'auto' }} data={oneItem} />
+            <InfoToolTip style={{ marginRight: 'auto' }} data={oneItem} />
           </RactangleAlignChildrenLeft>
 
         );
