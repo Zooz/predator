@@ -33,7 +33,7 @@ async function setSingleJobExperiment(experimentRequest, chaoExperimentsFromDb, 
         const jobExperimentId = uuid();
         await chaosExperimentsManager.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
         const kubeObject = experiment.kubeObject;
-        kubeObject.name = kubeObject.metadata.name.concat(`-${jobExperimentId}`);
+        kubeObject.metadata.name = kubeObject.metadata.name.concat(`-${jobExperimentId}`);
         scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, experimentRequest.start_after);
     } catch (error){
         logger.error(error, `error while setting chaos experiment ${experimentRequest.experiment_id} for job ${jobId}`);

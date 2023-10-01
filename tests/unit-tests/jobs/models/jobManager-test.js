@@ -188,7 +188,7 @@ describe('Manager jobs', function () {
             await promise;
             clock.tick(3600010);
             sinon.assert.calledOnce(runChaosExperimentStub);
-            sinon.assert.calledWith(runChaosExperimentStub, chaosExperiment.kubeObject, jobExperiment.job_id, jobExperiment.id);
+            sinon.assert.calledWith(runChaosExperimentStub, chaosExperiment.kubeObject);
             clock.restore();
         });
         it('future experiments not found - nothing to reload', async () => {
