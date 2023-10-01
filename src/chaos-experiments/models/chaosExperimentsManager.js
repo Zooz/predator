@@ -5,6 +5,7 @@ const httpContext = require('express-http-context'),
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
+    kubernetesConnector = require('./kubernetes/chaosExperimentConnector'),
     { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts'),
     generateError = require('../../common/generateError');
 
@@ -75,4 +76,13 @@ module.exports.updateChaosExperiment = async function (experimentId, chaosExperi
 
     await databaseConnector.updateChaosExperiment(experimentId, chaosExperiment);
     return chaosExperiment;
+};
+
+module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experimentId, startTime, endTime, contextId) => {
+    await databaseConnector.insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId);
+};
+
+module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentId) => {
+    await kubernetesConnector.runChaosExperiment(kubernetesChaosConfig);
+    await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
 };

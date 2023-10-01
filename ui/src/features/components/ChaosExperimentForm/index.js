@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import _ from 'lodash';
 import style from './style.scss';
 import * as Actions from '../../redux/action';
 import * as Selectors from '../../redux/selectors/chaosExperimentsSelector';
@@ -9,12 +8,9 @@ import Button from '../../../components/Button';
 import MonacoEditor from '@uiw/react-monacoeditor';
 import TitleInput from '../../../components/TitleInput';
 import Input from '../../../components/Input';
-import CustomDropdown from '../../../components/Dropdown/CustomDropdown';
 import ErrorWrapper from '../../../components/ErrorWrapper';
-import validateKubeObject from './validator';
-
-const CHAOS_EXPERIMENT_KINDS = ['PodChaos', 'DNSChaos', 'AWSChaos', 'HTTPChaos', 'StressChaos']
-const API_VERSION = 'chaos-mesh.org/v1alpha1'
+import validateKubeObject, { CHAOS_EXPERIMENT_KINDS, API_VERSION } from './validator';
+import InfoToolTip from '../InfoToolTip';
 
 export class ChaosExperimentForm extends React.Component {
   constructor (props) {
@@ -22,31 +18,44 @@ export class ChaosExperimentForm extends React.Component {
     if (props.chaosExperimentForEdit) {
       this.state = {
         validationErrorText: '',
-        name: props.chaosExperimentForEdit.kubeObject.metadata.name,
-        kind: props.chaosExperimentForEdit.kubeObject.kind,
-        yaml: props.chaosExperimentForEdit.kubeObject
+        // name: props.chaosExperimentForEdit.kubeObject.metadata.name,
+        // kind: props.chaosExperimentForEdit.kubeObject.kind,
+        yaml: JSON.stringify(props.chaosExperimentForEdit.kubeObject, null, '\t')
       }
     } else {
       this.state = {
         validationErrorText: '',
-        name: '',
-        kind: '',
-        yaml: {
-          metadata: {
-            namespace: '',
-            name: '',
-            annotations: {}
-          },
-          spec: {
-            duration: '0ms'
-          }
-        }
+        yaml: `{
+  "apiVersion": "${API_VERSION}",
+  "kind": "${CHAOS_EXPERIMENT_KINDS[0]}",
+  "metadata": {
+    "name": "",
+    "namespace": "",
+    "annotations": {}
+  },
+  "spec": {
+    "duration": "",
+    "action": ""
+  }
+}`
+        // yaml: {
+        //   version: API_VERSION,
+        //   kind: CHAOS_EXPERIMENT_KINDS[0],
+        //   metadata: {
+        //     namespace: '',
+        //     name: '',
+        //     annotations: {}
+        //   },
+        //   spec: {
+        //     duration: '0ms'
+        //   }
+        // }
       };
     }
   }
   handleExperimentSubmit = () => {
     const { createChaosExperiment } = this.props;
-    const chaosExperimentRequest = createChaosExperimentRequest(this.state)
+    const chaosExperimentRequest = createChaosExperimentRequest(JSON.parse(this.state.yaml))
     const validationError = validateKubeObject(chaosExperimentRequest.kubeObject)
     if (validationError) {
       this.setState({ validationErrorText: validationError })
@@ -70,43 +79,19 @@ export class ChaosExperimentForm extends React.Component {
 
   render () {
     const { closeDialog, chaosExperimentForEdit } = this.props;
-    const {
-      name,
-      kind
-    } = this.state;
     return (
       <Modal onExit={closeDialog}>
         <h1>Create Chaos Experiment</h1>
         <div className={style['top']}>
           {!chaosExperimentForEdit && (
             <div className={style['top-inputs']}>
-              {/* left */}
               <div className={style['input-container']}>
                 <TitleInput
                   className={style['inputContainer__titleInput']}
-                  title={'Experiment Name'}>
-                  <Input value={name} onChange={this.handleNameChange} />
-                </TitleInput>
-              </div>
-              <div className={style['input-container']}>
-                <TitleInput
-                  className={style['inputContainer__titleInput']}
-                  title={'Api Version'}>
+                  title={'Api Version'} rightComponent={<InfoToolTip data={{
+                    key: 'star-info',
+                    info: <span>Please Use Chaos Mesh documentation to build correct kubernetes object <a href='https://chaos-mesh.org/doc<'>docs</a></span> }} />}>
                   <Input value={API_VERSION} disabled />
-                </TitleInput>
-              </div>
-              <div className={style['input-container']}>
-                <TitleInput
-                  className={style['inputContainer__titleInput']}
-                  title={'kind'}>
-                  <CustomDropdown
-                    list={CHAOS_EXPERIMENT_KINDS}
-                    value={kind}
-                    onChange={(value) => {
-                      this.handleKindChange(value);
-                    }}
-                    placeHolder={'Kind'}
-                  />
                 </TitleInput>
               </div>
             </div>
@@ -129,7 +114,7 @@ export class ChaosExperimentForm extends React.Component {
         <div className={style['buttons-container']}>
           <div className={style['form-button']}>
             <Button inverted onClick={closeDialog}>Cancel</Button>
-            <Button spinner={isLoading} hover disabled={!this.state.name || !this.state.kind}
+            <Button spinner={isLoading} hover disabled={this.state.validationErrorText.length > 0}
               onClick={
                 this.handleExperimentSubmit
               }>Submit</Button>
@@ -139,23 +124,13 @@ export class ChaosExperimentForm extends React.Component {
     };
 
   onInputCodeChange = (code) => {
-    this.setState({ validationErrorText: '' })
     const isValidCode = testJSON(code);
-    if (!isValidCode) return; // Exit early if code is not valid JSON
-
-    const parsedCode = JSON.parse(code);
-    this.setState((prevState) => {
-      const parsedName = _.get(parsedCode, 'metadata.name', prevState.name);
-      const parsedKind = _.get(parsedCode, 'kind', prevState.kind);
-
-      if (_.isEqual(prevState.yaml, parsedCode)) return null; // Only update if the value is different
-
-      return {
-        yaml: parsedCode,
-        name: parsedName,
-        kind: parsedKind
-      };
-    });
+    debugger;
+    if (!isValidCode) {
+      this.setState({ validationErrorText: 'Invalid JSON format', yaml: code })
+    } else {
+      this.setState({ validationErrorText: '', yaml: code })
+    }
   };
 
     handleNameChange = (evt) => {
@@ -206,13 +181,11 @@ export class ChaosExperimentForm extends React.Component {
             }}>
               <MonacoEditor
                 language='json'
-                value={JSON.stringify(this.state.yaml, null, '\t')}
+                value={this.state.yaml}
                 options={options}
                 height='500px'
                 width='100%'
-                onChange={(code) => {
-                  this.onInputCodeChange(code);
-                }}
+                onChange={this.onInputCodeChange}
                 scrollbar={{
                 // Subtle shadows to the left & top. Defaults to true.
                   useShadows: false,
@@ -249,17 +222,11 @@ function mapStateToProps (state) {
   };
 }
 
-function createChaosExperimentRequest (data) {
-  const {
-    name,
-    yaml
-  } = data;
+function createChaosExperimentRequest (code) {
   return {
-    name: name || yaml.metadata.name,
+    name: code.metadata.name,
     kubeObject: {
-      kind: data.kind,
-      apiVersion: API_VERSION,
-      ...yaml
+      ...code
     }
   };
 }

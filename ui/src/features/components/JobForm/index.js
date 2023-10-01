@@ -192,7 +192,7 @@ class Form extends React.Component {
           }
         ]
       },
-      ...(props.experiments.length > 0 ? [{
+      {
         group: 'section_c',
         children:
             [
@@ -284,13 +284,12 @@ class Form extends React.Component {
                       add_experiment_form_hidden: true
                     }
                   })
-                  console.log(this.state.experiments)
                 },
                 disabled: (state) => state.add_experiment_form_experiment_name.trim().length === 0 || state.add_experiment_form_start_after === 0,
                 hiddenCondition: (state) => state.add_experiment_form_hidden === true
               }
             ]
-      }] : []),
+      },
       {
         group: 'section_d',
         flexDirection: 'column',

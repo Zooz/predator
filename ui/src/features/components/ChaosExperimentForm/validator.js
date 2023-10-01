@@ -1,19 +1,35 @@
+export const CHAOS_EXPERIMENT_KINDS = [
+  'PodChaos',
+  'DNSChaos',
+  'AWSChaos',
+  'NetworkChaos',
+  'TimeChaos',
+  'KernelChaos',
+  'IOChoas',
+  'HTTPChaos',
+  'StressChaos'
+]
+export const API_VERSION = 'chaos-mesh.org/v1alpha1'
 
 const SCHEMA = {
   type: 'object',
   properties: {
     apiVersion: {
       type: 'string',
-      pattern: new RegExp('^chaos-mesh\\.org\\/v1alpha1$')
+      pattern: new RegExp(`^${API_VERSION}$`)
     },
     kind: {
       type: 'string',
-      options: ['PodChaos', 'DNSChaos', 'AWSChaos', 'HTTPChaos', 'StressChaos']
+      options: CHAOS_EXPERIMENT_KINDS
     },
     metadata: {
       type: 'object',
       properties: {
-        name: { type: 'string', required: true },
+        name: {
+          type: 'string',
+          required: true,
+          patten: new RegExp('^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$')
+        },
         namespace: { type: 'string', required: true }
       },
       required: ['name', 'namespace']
@@ -25,7 +41,11 @@ const SCHEMA = {
           type: 'string',
           pattern: new RegExp('^[0-9]+(ms|s|m|h)$')
         },
-        required: ['duration']
+        action: {
+          type: 'string',
+          patten: new RegExp('^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$')
+        },
+        required: []
       }
     }
   },

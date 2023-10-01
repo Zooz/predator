@@ -6,6 +6,7 @@ const rewire = require('rewire');
 
 const database = require('../../../../src/chaos-experiments/models/database/databaseConnector');
 const manager = rewire('../../../../src/chaos-experiments/models/chaosExperimentsManager');
+const chaosExperimentConnector = require('../../../../src/chaos-experiments/models/kubernetes/chaosExperimentConnector');
 
 describe('Chaos experiments manager tests', function () {
     let sandbox;
@@ -16,6 +17,8 @@ describe('Chaos experiments manager tests', function () {
     let getChaosExperimentsByIdsStub;
     let updatedChaosExperimentStub;
     let insertStub;
+    let setChaosJobExperimentTriggeredStub;
+    let runChaosExperimentConnectorStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -26,6 +29,8 @@ describe('Chaos experiments manager tests', function () {
         getChaosExperimentsByIdsStub = sandbox.stub(database, 'getChaosExperimentsByIds');
         deleteStub = sandbox.stub(database, 'deleteChaosExperiment');
         updatedChaosExperimentStub = sandbox.stub(database, 'updateChaosExperiment');
+        setChaosJobExperimentTriggeredStub = sandbox.stub(database, 'setChaosJobExperimentTriggered');
+        runChaosExperimentConnectorStub = sandbox.stub(chaosExperimentConnector, 'runChaosExperiment');
     });
     after(() => {
         sandbox.restore();
@@ -342,6 +347,36 @@ describe('Chaos experiments manager tests', function () {
             } catch (err) {
                 should(err.statusCode).equal(400);
             }
+        });
+    });
+    describe('Run chaos experiment', function () {
+        const kubernetesJobConfig = {
+            kind: 'PodChaos',
+            apiVersion: 'chaos-mesh.org/v1alpha1',
+            metadata: {
+                namespace: 'apps',
+                name: 'first pod fault',
+                annotations: {}
+            },
+            spec: {
+                selector: {
+                    namespaces: ['apps'],
+                    labelSelectors: {
+                        app: 'live-balances-api'
+                    },
+                    mode: 'all',
+                    action: 'pod-chaos',
+                    duration: '1m'
+                }
+            }
+        };
+        const chaosJobExperimentId = uuid();
+        it('should call k8s connector and write to db', async function() {
+            await manager.runChaosExperiment(kubernetesJobConfig, chaosJobExperimentId);
+            runChaosExperimentConnectorStub.calledOnce.should.eql(true);
+            runChaosExperimentConnectorStub.args[0][0].should.eql(kubernetesJobConfig);
+            setChaosJobExperimentTriggeredStub.calledOnce.should.eql(true);
+            setChaosJobExperimentTriggeredStub.args[0][0].should.eql(chaosJobExperimentId);
         });
     });
 });
