@@ -33,6 +33,8 @@ import { chaosExperimentsForDropdown } from '../../redux/selectors/chaosExperime
 import Dropdown from '../../../components/Dropdown/Dropdown.export';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
+const ONE_SEC_MS = 1000;
+const ONE_MIN_MS = 60 * 1000;
 
 class Form extends React.Component {
   constructor (props) {
@@ -108,7 +110,7 @@ class Form extends React.Component {
             type: inputTypes.NUMERIC_INPUT,
             hiddenCondition: (state) => state.type === testTypes.LOAD_TEST,
             newState: (arrivalCount) => {
-              const parallel = Math.ceil(arrivalCount / 1000);
+              const parallel = Math.ceil(arrivalCount / ONE_SEC_MS);
               const maxVirtualUsers = parallel * 250;
               return { parallelism: parallel, max_virtual_users: maxVirtualUsers };
             }
@@ -210,7 +212,7 @@ class Form extends React.Component {
                       <span className={style['list-item__title']}>experiment name:</span>
                       <span className={style['list-item']}> {experiment.experiment_name}</span>
                       <span className={style['list-item__title']}>start after:</span>
-                      <span className={style['list-item']}> {experiment.start_after / 1000} seconds</span>
+                      <span className={style['list-item']}> {experiment.start_after / ONE_MIN_MS} seconds</span>
                       <FontAwesomeIcon
                         icon={faTimes}
                         size='1px'
@@ -259,8 +261,8 @@ class Form extends React.Component {
               {
                 name: 'add_experiment_form_start_after',
                 key: 'add_experiment_form_start_after',
-                floatingLabelText: 'Start After (Seconds)',
-                info: 'When to start the experiment within the test timeframe (seconds)',
+                floatingLabelText: 'Start After (Minutes)',
+                info: 'When to start the experiment within the test timeframe (Minutes)',
                 element: 'StartAfter',
                 type: inputTypes.NUMERIC_INPUT,
                 justifyContent: 'flex-end',
@@ -281,7 +283,7 @@ class Form extends React.Component {
                   const newExperiment = {
                     experiment_id: this.state.add_experiment_form_experiment_id,
                     experiment_name: this.state.add_experiment_form_experiment_name,
-                    start_after: this.state.add_experiment_form_start_after * 1000 // adjust to milliseconds
+                    start_after: this.state.add_experiment_form_start_after * ONE_MIN_MS // adjust to milliseconds
                   }
                   const experiments = [...this.state.experiments, newExperiment]
                   this.state.experiments.push(newExperiment)
@@ -405,9 +407,9 @@ class Form extends React.Component {
                 (prevState.arrival_count !== this.state.arrival_count || prevState.arrival_rate !== this.state.arrival_rate || prevState.ramp_to !== this.state.ramp_to))) {
         let parallel;
         if (this.state.type === 'load_test') {
-          parallel = this.state.ramp_to > this.state.arrival_rate ? Math.ceil(this.state.ramp_to / 1000) : Math.ceil(this.state.arrival_rate / 1000)
+          parallel = this.state.ramp_to > this.state.arrival_rate ? Math.ceil(this.state.ramp_to / ONE_SEC_MS) : Math.ceil(this.state.arrival_rate / ONE_SEC_MS)
         } else {
-          parallel = Math.ceil(this.state.arrival_count / 1000);
+          parallel = Math.ceil(this.state.arrival_count / ONE_SEC_MS);
         }
         const maxVirtualUsers = parallel * 250;
         this.setState({ parallelism: parallel, max_virtual_users: maxVirtualUsers })
