@@ -26,7 +26,7 @@ describe('Chaos experiments manager tests', function () {
             apiVersion: 'chaos-mesh.org/v1alpha1',
             metadata: {
                 namespace: 'apps',
-                name: 'first pod fault',
+                name: 'firstPodChaos',
                 annotations: {}
             },
             spec: {
@@ -41,11 +41,11 @@ describe('Chaos experiments manager tests', function () {
                 }
             }
         };
-        requestSenderSendStub.resolves({ metadata: { name: 'firstPodChaos', uid: 'some_uuid' }, namespace: 'default' });
+        requestSenderSendStub.resolves({ metadata: { name: 'firstPodChaos', uid: 'some_uuid' }, namespace: 'apps' });
         await chaosExperimentConnector.runChaosExperiment(kubernetesJobConfig);
         requestSenderSendStub.callCount.should.eql(1);
         requestSenderSendStub.args[0][0].should.eql({
-            url: 'localhost:80/apis/chaos-mesh.org/v1/namespaces/default/podchaos',
+            url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos',
             method: 'POST',
             body: kubernetesJobConfig,
             headers: {}
@@ -58,7 +58,7 @@ describe('Chaos experiments manager tests', function () {
             apiVersion: 'chaos-mesh.org/v1alpha1',
             metadata: {
                 namespace: 'apps',
-                name: 'first http fault',
+                name: 'firstHttpChaos',
                 annotations: {}
             },
             spec: {
@@ -73,11 +73,11 @@ describe('Chaos experiments manager tests', function () {
                 }
             }
         };
-        requestSenderSendStub.resolves({ metadata: { name: 'firstHttpChaos', uid: 'some_uuid' }, namespace: 'default' });
+        requestSenderSendStub.resolves({ metadata: { name: 'firstHttpChaos', uid: 'some_uuid' }, namespace: 'apps' });
         await chaosExperimentConnector.runChaosExperiment(kubernetesJobConfig);
         requestSenderSendStub.callCount.should.eql(1);
         requestSenderSendStub.args[0][0].should.eql({
-            url: 'localhost:80/apis/chaos-mesh.org/v1/namespaces/default/httpchaos',
+            url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/httpchaos',
             method: 'POST',
             body: kubernetesJobConfig,
             headers: {}

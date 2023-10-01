@@ -45,6 +45,7 @@ describe('Job experiments handler tests', function () {
     it('set chaos experiments with 2 experiments', async () => {
         const firstExperiment = generateExperiment();
         const secondExperiment = generateExperiment();
+        const firstExperimentName = firstExperiment.kubeObject.metadata.name;
         experimentsManagerInsertStub.resolves();
         experimentsManagerGetStub.resolves([firstExperiment, secondExperiment]);
         experimentsManagerRunJobStub.resolves();
@@ -64,6 +65,7 @@ describe('Job experiments handler tests', function () {
         await jobExperimentHandler.setChaosExperimentsIfExist(jobId, jobExperiments);
         clock.tick(3000);
         experimentsManagerRunJobStub.callCount.should.eql(2);
+        experimentsManagerRunJobStub.args[0][0].metadata.name.should.eql(`${firstExperimentName}-${experimentsManagerRunJobStub.args[0][1]}`);
         experimentsManagerGetStub.callCount.should.eql(1);
         experimentsManagerInsertStub.callCount.should.eql(2);
         experimentsManagerInsertStub.args[0][1].should.eql(jobId);
