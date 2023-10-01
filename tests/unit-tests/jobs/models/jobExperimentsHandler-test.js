@@ -27,6 +27,7 @@ describe('Job experiments handler tests', function () {
     let experimentsManagerGetStub;
     let experimentsManagerRunJobStub;
     let sandbox;
+    let clock;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -36,6 +37,13 @@ describe('Job experiments handler tests', function () {
     });
     beforeEach(async () => {
         sandbox.reset();
+    });
+
+    afterEach(async () => {
+        if (clock){
+            clock.restore();
+            clock = undefined;
+        }
     });
 
     after(() => {
@@ -60,7 +68,7 @@ describe('Job experiments handler tests', function () {
             }
         ];
         const jobId = uuid();
-        const clock = sinon.useFakeTimers();
+        clock = sinon.useFakeTimers();
         clock.tick(1000);
         await jobExperimentHandler.setChaosExperimentsIfExist(jobId, jobExperiments);
         clock.tick(3000);
@@ -74,7 +82,6 @@ describe('Job experiments handler tests', function () {
         experimentsManagerInsertStub.args[1][1].should.eql(jobId);
         experimentsManagerInsertStub.args[1][2].should.eql(secondExperiment.id);
         (experimentsManagerInsertStub.args[1][3] - experimentsManagerInsertStub.args[0][3]).should.eql(1000);
-        clock.restore();
     });
 
     it('set chaos experiments with same experiment in different times', async () => {

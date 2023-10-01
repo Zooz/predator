@@ -2,6 +2,7 @@
 
 const Sequelize = require('sequelize');
 const { CHAOS_EXPERIMENTS_TABLE_NAME, CHAOS_JOB_EXPERIMENTS_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
+const { Op } = require('sequelize');
 const KUBEOBJECT = 'kubeObject';
 let client;
 
@@ -17,6 +18,7 @@ module.exports = {
     insertChaosJobExperiment,
     getChaosJobExperimentById,
     getChaosJobExperimentByJobId,
+    getFutureJobExperiments,
     setChaosJobExperimentTriggered
 };
 
@@ -171,6 +173,23 @@ async function getChaosJobExperimentByJobId(jobId, contextId) {
         chaosExperiment = chaosExperiment.get();
     }
     return chaosExperiment;
+}
+
+async function getFutureJobExperiments(timestamp, contextId) {
+    const options = {
+        where: {
+            is_triggered: false,
+            start_time: { [Op.gt]: timestamp }
+        }
+    };
+
+    if (contextId) {
+        options.where.context_id = contextId;
+    }
+
+    const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
+    const allJobExperiments = await chaosJobExperimentModel.findAll(options);
+    return allJobExperiments;
 }
 
 async function setChaosJobExperimentTriggered(id, isTriggered, contextId) {
