@@ -4,7 +4,6 @@ const kubernetesConfig = require('../../../config/kubernetesConfig');
 const logger = require('../../../common/logger');
 const requestSender = require('../../../common/requestSender');
 const kubernetesUrl = kubernetesConfig.kubernetesUrl;
-const kubernetesNamespace = 'apps'; // kubernetesConfig.kubernetesNamespace;
 
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 const headers = {};
@@ -24,6 +23,7 @@ if (kubernetesConfig.kubernetesToken) {
 
 module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
     const resourceKindName = kubernetesExperimentConfig.kind.toLowerCase();
+    const kubernetesNamespace = kubernetesExperimentConfig.metadata.namespace;
     const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s', kubernetesUrl, kubernetesNamespace, resourceKindName);
     const options = {
         url,
