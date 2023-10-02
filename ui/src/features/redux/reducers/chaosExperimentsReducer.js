@@ -6,6 +6,7 @@ const initialState = Immutable.Map({
   chaosExperiments_loading: false,
   chaosExperiment_error: undefined,
   create_chaosExperiment_success: false,
+  update_chaosExperiment_success: false,
   delete_chaosExperiment_success: false,
   delete_chaosExperiment_failure: false
 });
@@ -25,12 +26,16 @@ export default function reduce (state = initialState, action = {}) {
     return state.set('chaosExperiment_error', action.error);
   case Types.CREATE_CHAOS_EXPERIMENT_SUCCESS:
     return state.set('create_chaosExperiment_success', action.value);
+  case Types.CREATE_CHAOS_EXPERIMENT_FAILURE:
+    return state.set('chaosExperiment_error', action.error);
+  case Types.UPDATE_CHAOS_EXPERIMENT_SUCCESS:
+    return state.set('update_chaosExperiment_success', action.value);
+  case Types.UPDATE_CHAOS_EXPERIMENT_FAILURE:
+    return state.set('chaosExperiment_error', action.error);
   case Types.DELETE_CHAOS_EXPERIMENT:
     return state.set('delete_chaosExperiment_success', action.value);
   case Types.DELETE_CHAOS_EXPERIMENT_FAILURE:
     return state.set('delete_chaosExperiment_failure', action.value);
-  case Types.CREATE_CHAOS_EXPERIMENT_FAILURE:
-    return state.set('chaosExperiment_error', action.error);
   case Types.CLEAN_ALL_ERRORS:
     return state.set('chaosExperiment_error', undefined)
       .set('delete_processor_failure', false);

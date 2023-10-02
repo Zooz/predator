@@ -18,8 +18,6 @@ export class ChaosExperimentForm extends React.Component {
     if (props.chaosExperimentForEdit) {
       this.state = {
         validationErrorText: '',
-        // name: props.chaosExperimentForEdit.kubeObject.metadata.name,
-        // kind: props.chaosExperimentForEdit.kubeObject.kind,
         yaml: JSON.stringify(props.chaosExperimentForEdit.kubeObject, null, '\t')
       }
     } else {
@@ -38,41 +36,39 @@ export class ChaosExperimentForm extends React.Component {
     "action": ""
   }
 }`
-        // yaml: {
-        //   version: API_VERSION,
-        //   kind: CHAOS_EXPERIMENT_KINDS[0],
-        //   metadata: {
-        //     namespace: '',
-        //     name: '',
-        //     annotations: {}
-        //   },
-        //   spec: {
-        //     duration: '0ms'
-        //   }
-        // }
       };
     }
   }
   handleExperimentSubmit = () => {
-    const { createChaosExperiment } = this.props;
+    const { createChaosExperiment, updateChaosExperiment } = this.props;
     const chaosExperimentRequest = createChaosExperimentRequest(JSON.parse(this.state.yaml))
     const validationError = validateKubeObject(chaosExperimentRequest.kubeObject)
     if (validationError) {
       this.setState({ validationErrorText: validationError })
+    } else if (this.props.chaosExperimentForEdit) {
+      const experimentId = this.props.chaosExperimentForEdit.id;
+      updateChaosExperiment(experimentId, chaosExperimentRequest);
     } else {
       createChaosExperiment(chaosExperimentRequest);
     }
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { createChaosExperimentSuccess: createChaosExperimentSuccessBefore } = prevProps;
+    const {
+      createChaosExperimentSuccess: createChaosExperimentSuccessBefore,
+      updateChaosExperimentSuccess: updateChaosExperimentSuccessBefore
+    } = prevProps;
     const {
       createChaosExperimentSuccess,
+      updateChaosExperimentSuccess,
       closeDialog
     } = this.props;
 
     if (createChaosExperimentSuccess && !createChaosExperimentSuccessBefore) {
       this.props.setCreateChaosExperimentSuccess(false);
+      closeDialog();
+    } else if (updateChaosExperimentSuccess && !updateChaosExperimentSuccessBefore) {
+      this.props.setUpdateChaosExperimentSuccess(false);
       closeDialog();
     }
   }
@@ -216,6 +212,7 @@ function mapStateToProps (state) {
   return {
     isLoading: Selectors.chaosExperimentsLoading(state),
     createChaosExperimentSuccess: Selectors.createChaosExperimentSuccess(state),
+    updateChaosExperimentSuccess: Selectors.updateChaosExperimentSuccess(state),
     chaosExperimentsList: Selectors.chaosExperimentsList(state),
     chaosExperimentsError: Selectors.chaosExperimentFailure(state)
   };
@@ -244,6 +241,8 @@ function testJSON (text) {
 
 const mapDispatchToProps = {
   createChaosExperiment: Actions.createChaosExperiment,
-  setCreateChaosExperimentSuccess: Actions.createChaosExperimentSuccess
+  updateChaosExperiment: Actions.updateChaosExperiment,
+  setCreateChaosExperimentSuccess: Actions.createChaosExperimentSuccess,
+  setUpdateChaosExperimentSuccess: Actions.updateChaosExperimentSuccess
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ChaosExperimentForm);

@@ -8,6 +8,18 @@ export const createChaosExperimentSuccess = (value) => (
   { type: Types.CREATE_CHAOS_EXPERIMENT_SUCCESS, value }
 )
 
+export const updateChaosExperiment = (id, body) => (
+  { type: Types.UPDATE_CHAOS_EXPERIMENT, id, body }
+)
+
+export const updateChaosExperimentSuccess = (value) => (
+  { type: Types.UPDATE_CHAOS_EXPERIMENT_SUCCESS, value }
+)
+
+export const updateChaosExperimentFailure = (value) => (
+  { type: Types.UPDATE_CHAOS_EXPERIMENT_FAILURE, value }
+)
+
 export const deleteChaosExperiment = (id) => (
   { type: Types.DELETE_CHAOS_EXPERIMENT, id }
 )

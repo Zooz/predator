@@ -13,6 +13,12 @@ export const createChaosExperimentApi = (body) => {
   });
 };
 
+export const updateChaosExperimentApi = (id, body) => {
+  return axios.put(`${env.PREDATOR_URL}/chaos-experiments/${id}`, body, {
+    responseType: 'json'
+  });
+};
+
 export const deleteChaosExperimentApi = (id) => {
   return axios.delete(`${env.PREDATOR_URL}/chaos-experiments/${id}`, {
     responseType: 'json'
