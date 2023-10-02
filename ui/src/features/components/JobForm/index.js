@@ -212,7 +212,7 @@ class Form extends React.Component {
                       <span className={style['list-item__title']}>experiment name:</span>
                       <span className={style['list-item']}> {experiment.experiment_name}</span>
                       <span className={style['list-item__title']}>start after:</span>
-                      <span className={style['list-item']}> {experiment.start_after / ONE_MIN_MS} seconds</span>
+                      <span className={style['list-item']}> {experiment.start_after / ONE_MIN_MS} minutes</span>
                       <FontAwesomeIcon
                         icon={faTimes}
                         size='1px'

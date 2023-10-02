@@ -21,7 +21,7 @@ module.exports = {
 
 async function aggregateReport(report) {
     let stats = await databaseConnector.getStats(report.test_id, report.report_id);
-    const experiments = await getChaosExperiments(report.job_id);
+    const experiments = await getChaosExperimentsByJobId(report.job_id);
 
     if (stats.length === 0) {
         const errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${report.test_id} and reportId: ${report.report_id}`;
@@ -71,23 +71,25 @@ async function aggregateReport(report) {
     return reportInput;
 }
 
-async function getChaosExperiments(job_id) {
+async function getChaosExperimentsByJobId(jobId) {
     const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     if (jobPlatform.toUpperCase() !== KUBERNETES) {
         return;
     }
-    const chaosJobExperiments = await chaosExperimentsManager.getChaosJobExperimentsByJobId(job_id);
+    const chaosJobExperiments = await chaosExperimentsManager.getChaosJobExperimentsByJobId(jobId);
     const uniqueExperimentIds = [...new Set(chaosJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
     const chaosExperiments = await chaosExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds);
     const mappedChaosJobExperiments = chaosJobExperiments.map((jobExperiment) => {
         const chaosExperiment = chaosExperiments.find((experiment) => experiment.id === jobExperiment.experiment_id && jobExperiment.is_triggered);
-        return {
-            kind: chaosExperiment.kubeObject.kind,
-            name: chaosExperiment.name,
-            id: chaosExperiment.id,
-            start_time: jobExperiment.start_time,
-            end_time: jobExperiment.end_time
-        };
+        if (chaosExperiment) {
+            return {
+                kind: chaosExperiment.kubeObject.kind,
+                name: chaosExperiment.name,
+                id: chaosExperiment.id,
+                start_time: jobExperiment.start_time,
+                end_time: jobExperiment.end_time
+            };
+        }
     });
     return mappedChaosJobExperiments;
 }
