@@ -189,7 +189,7 @@ async function getFutureJobExperiments(timestamp, contextId) {
 }
 
 async function setChaosJobExperimentTriggered(id, isTriggered, contextId) {
-    const chaosJobExperimentModel = client.model(CHAOS_EXPERIMENTS_TABLE_NAME);
+    const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
     const options = {
         where: { id: id }
     };
