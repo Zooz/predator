@@ -17,7 +17,7 @@ module.exports = {
     updateChaosExperiment,
     insertChaosJobExperiment,
     getChaosJobExperimentById,
-    getChaosJobExperimentByJobId,
+    getChaosJobExperimentsByJobId,
     getFutureJobExperiments,
     setChaosJobExperimentTriggered
 };
@@ -70,11 +70,10 @@ async function getChaosExperimentById(experimentId, contextId) {
         options.where.context_id = contextId;
     }
 
-    let chaosExperiment = await _getChaosExperiment(options);
+    const chaosExperiment = await _getChaosExperiment(options);
     if (chaosExperiment) {
-        chaosExperiment = chaosExperiment.get();
+        return chaosExperiment.get();
     }
-    return chaosExperiment;
 }
 
 async function getChaosExperimentsByIds(experimentIds, exclude, contextId) {
@@ -152,14 +151,13 @@ async function getChaosJobExperimentById(jobExperimentId, contextId) {
         options.where.context_id = contextId;
     }
 
-    let chaosExperiment = await _getChaosJobExperiment(options);
-    if (chaosExperiment) {
-        chaosExperiment = chaosExperiment.get();
+    const chaosJobExperiment = await _getChaosJobExperiment(options);
+    if (chaosJobExperiment) {
+        return chaosJobExperiment.get();
     }
-    return chaosExperiment;
 }
 
-async function getChaosJobExperimentByJobId(jobId, contextId) {
+async function getChaosJobExperimentsByJobId(jobId, contextId) {
     const options = {
         where: { job_id: jobId }
     };
@@ -168,11 +166,9 @@ async function getChaosJobExperimentByJobId(jobId, contextId) {
         options.where.context_id = contextId;
     }
 
-    let chaosExperiment = await _getChaosJobExperiment(options);
-    if (chaosExperiment) {
-        chaosExperiment = chaosExperiment.get();
-    }
-    return chaosExperiment;
+    const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
+    const allChaosJobExperiments = await chaosJobExperimentModel.findAll(options);
+    return allChaosJobExperiments;
 }
 
 async function getFutureJobExperiments(timestamp, contextId) {

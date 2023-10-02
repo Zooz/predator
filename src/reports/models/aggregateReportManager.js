@@ -5,6 +5,7 @@ const math = require('mathjs');
 
 const logger = require('../../common/logger');
 const databaseConnector = require('./databaseConnector');
+const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager');
 const constants = require('../utils/constants');
 
 const STATS_INTERVAL = 30;
@@ -15,6 +16,7 @@ module.exports = {
 
 async function aggregateReport(report) {
     let stats = await databaseConnector.getStats(report.test_id, report.report_id);
+    const experiments = await getChaosExperimentsByJobId(report.job_id);
 
     if (stats.length === 0) {
         const errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${report.test_id} and reportId: ${report.report_id}`;
@@ -35,6 +37,7 @@ async function aggregateReport(report) {
     reportInput.revision_id = report.revision_id;
     reportInput.score = report.score;
     reportInput.benchmark_weights_data = report.benchmark_weights_data;
+    reportInput.experiments = experiments;
     reportInput.notes = report.notes;
 
     reportInput.status = mapReportStatus(report.status);
@@ -61,6 +64,28 @@ async function aggregateReport(report) {
     reportInput.aggregate = createAggregateManually(reportInput.intermediates);
     reportInput.aggregate.rps.mean = reportInput.aggregate.rps.mean / reportInput.intermediates.length;
     return reportInput;
+}
+
+async function getChaosExperimentsByJobId(jobId) {
+    const chaosJobExperiments = await chaosExperimentsManager.getChaosJobExperimentsByJobId(jobId);
+    if (!chaosJobExperiments) {
+        return;
+    }
+    const uniqueExperimentIds = [...new Set(chaosJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
+    const chaosExperiments = await chaosExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds);
+    const mappedChaosJobExperiments = chaosJobExperiments.map((jobExperiment) => {
+        const chaosExperiment = chaosExperiments.find((experiment) => experiment.id === jobExperiment.experiment_id && jobExperiment.is_triggered);
+        if (chaosExperiment) {
+            return {
+                kind: chaosExperiment.kubeObject.kind,
+                name: chaosExperiment.name,
+                id: chaosExperiment.id,
+                start_time: jobExperiment.start_time,
+                end_time: jobExperiment.end_time
+            };
+        }
+    });
+    return mappedChaosJobExperiments;
 }
 
 function createAggregateManually(listOfStats) {
