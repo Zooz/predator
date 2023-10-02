@@ -9,6 +9,8 @@ const aggregateReportManager = rewire('../../../../src/reports/models/aggregateR
 const chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
 const reportsManager = require('../../../../src/reports/models/reportsManager');
+const configHandler = require('../../../../src/configManager/models/configHandler');
+const consts = require('../../../../src/common/consts');
 
 const REPORT = {
     test_id: 'test_id',
@@ -25,6 +27,7 @@ const REPORT = {
 
 describe('Artillery report generator test', () => {
     let sandbox,
+        configHandlerStub,
         databaseConnectorGetStatsStub,
         getJobExperimentsByJobIdStub,
         getChaosExperimentsByIdsStub,
@@ -34,6 +37,7 @@ describe('Artillery report generator test', () => {
 
     before(() => {
         sandbox = sinon.sandbox.create();
+        configHandlerStub = sandbox.stub(configHandler, 'getConfigValue');
         databaseConnectorGetStatsStub = sandbox.stub(databaseConnector, 'getStats');
         reportsManagerGetReportStub = sandbox.stub(reportsManager, 'getReport');
         getJobExperimentsByJobIdStub = sandbox.stub(chaosExperimentsManager, 'getChaosJobExperimentsByJobId');
@@ -85,7 +89,8 @@ describe('Artillery report generator test', () => {
             loggerWarnStub.callCount.should.eql(1);
         });
 
-        it('create final report successfully with chaos experiments', async function() {
+        it.only('create final report successfully with chaos experiments', async function() {
+            configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
             const statsWithUnknownData = JSON.parse(JSON.stringify(SINGLE_RUNNER_INTERMEDIATE_ROWS));
             statsWithUnknownData.push({ phase_status: 'intermediate', data: 'unsupported data type' });
             databaseConnectorGetStatsStub.resolves(statsWithUnknownData);
@@ -420,19 +425,22 @@ const JOB_EXPERIMENTS_ROWS = [{
     job_id: REPORT.job_id,
     experiment_id: '1234-abc-5678',
     start_time: timestamp,
-    end_time: timestamp + 100
+    end_time: timestamp + 100,
+    is_triggered: true
 },
 {
     job_id: REPORT.job_id,
     experiment_id: 'abcd-1234-efgh',
     start_time: timestamp,
-    end_time: timestamp + 200
+    end_time: timestamp + 200,
+    is_triggered: true
 },
 {
     job_id: REPORT.job_id,
     experiment_id: '4321-abc-5678',
     start_time: timestamp,
-    end_time: timestamp + 300
+    end_time: timestamp + 300,
+    is_triggered: true
 }];
 
 const CHAOS_EXPERIMENTS_ROWS = [{
