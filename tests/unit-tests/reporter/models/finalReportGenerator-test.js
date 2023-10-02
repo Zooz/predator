@@ -89,7 +89,7 @@ describe('Artillery report generator test', () => {
             const statsWithUnknownData = JSON.parse(JSON.stringify(SINGLE_RUNNER_INTERMEDIATE_ROWS));
             statsWithUnknownData.push({ phase_status: 'intermediate', data: 'unsupported data type' });
             databaseConnectorGetStatsStub.resolves(statsWithUnknownData);
-            getJobExperimentsStubByJobIdStub.resolves(JOB_EXPERIMENTS_ROWS);
+            getJobExperimentsByJobIdStub.resolves(JOB_EXPERIMENTS_ROWS);
             getChaosExperimentsByIdsStub.resolves(CHAOS_EXPERIMENTS_ROWS);
             const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             should(reportOutput.experiments).deepEqual([
@@ -130,7 +130,7 @@ describe('Artillery report generator test', () => {
             const firstStatsTimestamp = JSON.parse(PARALLEL_INTERMEDIATE_ROWS[0].data).timestamp;
 
             reportsManagerGetReportStub.resolves(REPORT);
-            getJobExperimentsStubByJobIdStub.resolves([]);
+            getJobExperimentsByJobIdStub.resolves([]);
             REPORT.start_time = new Date(new Date(firstStatsTimestamp).getTime() - (STATS_INTERVAL * 1000));
             databaseConnectorGetStatsStub.resolves(PARALLEL_INTERMEDIATE_ROWS);
             const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
@@ -296,7 +296,7 @@ describe('Artillery report generator test', () => {
 
         it('create final report fails when get experiments returns error on get chaos experiments', async () => {
             databaseConnectorGetStatsStub.resolves(SINGLE_RUNNER_INTERMEDIATE_ROWS);
-            getJobExperimentsStubByJobIdStub.resolves(JOB_EXPERIMENTS_ROWS);
+            getJobExperimentsByJobIdStub.resolves(JOB_EXPERIMENTS_ROWS);
             getChaosExperimentsByIdsStub.rejects(new Error('Database failure'));
 
             let testShouldFail = true;
