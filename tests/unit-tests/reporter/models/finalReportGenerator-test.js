@@ -89,7 +89,7 @@ describe('Artillery report generator test', () => {
             loggerWarnStub.callCount.should.eql(1);
         });
 
-        it.only('create final report successfully with chaos experiments', async function() {
+        it('create final report successfully with chaos experiments', async function() {
             configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
             const statsWithUnknownData = JSON.parse(JSON.stringify(SINGLE_RUNNER_INTERMEDIATE_ROWS));
             statsWithUnknownData.push({ phase_status: 'intermediate', data: 'unsupported data type' });
