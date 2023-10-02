@@ -26,7 +26,7 @@ const REPORT = {
 describe('Artillery report generator test', () => {
     let sandbox,
         databaseConnectorGetStatsStub,
-        getJobExperimentsStubByJobIdStub,
+        getJobExperimentsByJobIdStub,
         getChaosExperimentsByIdsStub,
         loggerErrorStub,
         loggerWarnStub,
@@ -36,7 +36,7 @@ describe('Artillery report generator test', () => {
         sandbox = sinon.sandbox.create();
         databaseConnectorGetStatsStub = sandbox.stub(databaseConnector, 'getStats');
         reportsManagerGetReportStub = sandbox.stub(reportsManager, 'getReport');
-        getJobExperimentsStubByJobIdStub = sandbox.stub(chaosExperimentsManager, 'getChaosJobExperimentsByJobId');
+        getJobExperimentsByJobIdStub = sandbox.stub(chaosExperimentsManager, 'getChaosJobExperimentsByJobId');
         getChaosExperimentsByIdsStub = sandbox.stub(chaosExperimentsManager, 'getChaosExperimentsByIds');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerWarnStub = sandbox.stub(logger, 'warn');
@@ -58,7 +58,7 @@ describe('Artillery report generator test', () => {
 
         it('create aggregate report when there is only intermediate rows', async () => {
             databaseConnectorGetStatsStub.resolves(SINGLE_RUNNER_INTERMEDIATE_ROWS);
-            getJobExperimentsStubByJobIdStub.resolves([]);
+            getJobExperimentsByJobIdStub.resolves([]);
 
             const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             should(reportOutput.parallelism).eql(1);
@@ -68,7 +68,7 @@ describe('Artillery report generator test', () => {
             const statsWithUnknownData = JSON.parse(JSON.stringify(SINGLE_RUNNER_INTERMEDIATE_ROWS));
             statsWithUnknownData.push({ phase_status: 'some_unknown_phase', data: JSON.stringify({}) });
             databaseConnectorGetStatsStub.resolves(statsWithUnknownData);
-            getJobExperimentsStubByJobIdStub.resolves([]);
+            getJobExperimentsByJobIdStub.resolves([]);
 
             const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             should(reportOutput.parallelism).eql(1);
