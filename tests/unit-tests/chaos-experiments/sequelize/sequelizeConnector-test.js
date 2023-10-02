@@ -140,7 +140,7 @@ describe('Sequelize client tests', function () {
                 should(sequelizeGetStub.args[0][0]).containDeep({ where: { name: experimentName } });
             });
         });
-        describe('Get ChaosExperimentsById', () => {
+        describe('Get ChaosExperimentsByIds', () => {
             it('Validate sequelize passed arguments', async () => {
                 sequelizeGetStub.returns([experiment]);
                 const experimentIds = ['1234', '4321'];
@@ -226,13 +226,28 @@ describe('Sequelize client tests', function () {
                 should(sequelizeGetStub.args[0][0]).containDeep({ where: { id: jobExperimentId } });
             });
         });
-        describe('getChaosJobExperimentByJobId', function() {
+        describe('getChaosJobExperimentsByJobId', function() {
             it('Validate sequelize passed arguments', async () => {
                 sequelizeGetStub.returns([jobExperiment]);
                 const experimentJobId = experiment.job_id;
-                await sequelizeConnector.getChaosJobExperimentByJobId(experimentJobId);
+                await sequelizeConnector.getChaosJobExperimentsByJobId(experimentJobId);
                 should(sequelizeGetStub.calledOnce).eql(true);
                 should(sequelizeGetStub.args[0][0]).containDeep({ where: { job_id: experimentJobId } });
+            });
+        });
+        describe('getFutureJobExperiments', function() {
+            it('Validate sequelize passed arguments', async () => {
+                sequelizeGetStub.returns([jobExperiment]);
+                const timestamp = Date.now();
+                await sequelizeConnector.getFutureJobExperiments(timestamp, 'contextId');
+                should(sequelizeGetStub.calledOnce).eql(true);
+                should(sequelizeGetStub.args[0][0]).deepEqual({
+                    where: {
+                        is_triggered: false,
+                        start_time: {},
+                        context_id: 'contextId'
+                    }
+                });
             });
         });
     });

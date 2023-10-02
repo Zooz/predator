@@ -92,5 +92,9 @@ module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentI
 };
 
 module.exports.getFutureJobExperiments = async function (timestamp, contextId) {
-    return databaseConnector.getFutureJobExperiments(contextId);
+    return databaseConnector.getFutureJobExperiments(timestamp, contextId);
+};
+
+module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
+    return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
 };

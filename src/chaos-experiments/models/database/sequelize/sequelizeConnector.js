@@ -17,7 +17,7 @@ module.exports = {
     updateChaosExperiment,
     insertChaosJobExperiment,
     getChaosJobExperimentById,
-    getChaosJobExperimentByJobId,
+    getChaosJobExperimentsByJobId,
     getFutureJobExperiments,
     setChaosJobExperimentTriggered
 };
@@ -159,7 +159,7 @@ async function getChaosJobExperimentById(jobExperimentId, contextId) {
     return chaosExperiment;
 }
 
-async function getChaosJobExperimentByJobId(jobId, contextId) {
+async function getChaosJobExperimentsByJobId(jobId, contextId) {
     const options = {
         where: { job_id: jobId }
     };
@@ -168,11 +168,9 @@ async function getChaosJobExperimentByJobId(jobId, contextId) {
         options.where.context_id = contextId;
     }
 
-    let chaosExperiment = await _getChaosJobExperiment(options);
-    if (chaosExperiment) {
-        chaosExperiment = chaosExperiment.get();
-    }
-    return chaosExperiment;
+    const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
+    const allChaosJobExperiments = await chaosJobExperimentModel.findAll(options);
+    return allChaosJobExperiments;
 }
 
 async function getFutureJobExperiments(timestamp, contextId) {

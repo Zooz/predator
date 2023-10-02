@@ -6,6 +6,7 @@ const rewire = require('rewire');
 const logger = require('../../../../src/common/logger');
 const aggregateReportGenerator = rewire('../../../../src/reports/models/aggregateReportGenerator');
 const aggregateReportManager = rewire('../../../../src/reports/models/aggregateReportManager');
+const chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
 const reportsManager = require('../../../../src/reports/models/reportsManager');
 
@@ -17,17 +18,26 @@ const REPORT = {
     test_name: 'some_test_name',
     webhooks: ['http://www.zooz.com'],
     arrival_rate: 100,
+    job_id: 'job_id',
     duration: 10,
     environment: 'test'
 };
 
 describe('Artillery report generator test', () => {
-    let sandbox, databaseConnectorGetStatsStub, loggerErrorStub, loggerWarnStub, reportsManagerGetReportStub;
+    let sandbox,
+        databaseConnectorGetStatsStub,
+        getJobExperimentsStubByJobIdStub,
+        getChaosExperimentsByIdsStub,
+        loggerErrorStub,
+        loggerWarnStub,
+        reportsManagerGetReportStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
         databaseConnectorGetStatsStub = sandbox.stub(databaseConnector, 'getStats');
         reportsManagerGetReportStub = sandbox.stub(reportsManager, 'getReport');
+        getJobExperimentsStubByJobIdStub = sandbox.stub(chaosExperimentsManager, 'getChaosJobExperimentsByJobId');
+        getChaosExperimentsByIdsStub = sandbox.stub(chaosExperimentsManager, 'getChaosExperimentsByIds');
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerWarnStub = sandbox.stub(logger, 'warn');
     });
@@ -48,6 +58,7 @@ describe('Artillery report generator test', () => {
 
         it('create aggregate report when there is only intermediate rows', async () => {
             databaseConnectorGetStatsStub.resolves(SINGLE_RUNNER_INTERMEDIATE_ROWS);
+            getJobExperimentsStubByJobIdStub.resolves([]);
 
             const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             should(reportOutput.parallelism).eql(1);
@@ -57,6 +68,7 @@ describe('Artillery report generator test', () => {
             const statsWithUnknownData = JSON.parse(JSON.stringify(SINGLE_RUNNER_INTERMEDIATE_ROWS));
             statsWithUnknownData.push({ phase_status: 'some_unknown_phase', data: JSON.stringify({}) });
             databaseConnectorGetStatsStub.resolves(statsWithUnknownData);
+            getJobExperimentsStubByJobIdStub.resolves([]);
 
             const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
             should(reportOutput.parallelism).eql(1);
@@ -72,6 +84,38 @@ describe('Artillery report generator test', () => {
 
             loggerWarnStub.callCount.should.eql(1);
         });
+
+        it('create final report successfully with chaos experiments', async function() {
+            const statsWithUnknownData = JSON.parse(JSON.stringify(SINGLE_RUNNER_INTERMEDIATE_ROWS));
+            statsWithUnknownData.push({ phase_status: 'intermediate', data: 'unsupported data type' });
+            databaseConnectorGetStatsStub.resolves(statsWithUnknownData);
+            getJobExperimentsStubByJobIdStub.resolves(JOB_EXPERIMENTS_ROWS);
+            getChaosExperimentsByIdsStub.resolves(CHAOS_EXPERIMENTS_ROWS);
+            const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
+            should(reportOutput.experiments).deepEqual([
+                {
+                    kind: CHAOS_EXPERIMENTS_ROWS[0].kubeObject.kind,
+                    name: CHAOS_EXPERIMENTS_ROWS[0].name,
+                    id: JOB_EXPERIMENTS_ROWS[0].experiment_id,
+                    start_time: JOB_EXPERIMENTS_ROWS[0].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[0].end_time
+                },
+                {
+                    kind: CHAOS_EXPERIMENTS_ROWS[1].kubeObject.kind,
+                    name: CHAOS_EXPERIMENTS_ROWS[1].name,
+                    id: JOB_EXPERIMENTS_ROWS[1].experiment_id,
+                    start_time: JOB_EXPERIMENTS_ROWS[1].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[1].end_time
+                },
+                {
+                    kind: CHAOS_EXPERIMENTS_ROWS[2].kubeObject.kind,
+                    name: CHAOS_EXPERIMENTS_ROWS[2].name,
+                    id: JOB_EXPERIMENTS_ROWS[2].experiment_id,
+                    start_time: JOB_EXPERIMENTS_ROWS[2].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[2].end_time
+                }
+            ]);
+        });
     });
 
     describe('Happy flows - With parallelism', function () {
@@ -86,6 +130,7 @@ describe('Artillery report generator test', () => {
             const firstStatsTimestamp = JSON.parse(PARALLEL_INTERMEDIATE_ROWS[0].data).timestamp;
 
             reportsManagerGetReportStub.resolves(REPORT);
+            getJobExperimentsStubByJobIdStub.resolves([]);
             REPORT.start_time = new Date(new Date(firstStatsTimestamp).getTime() - (STATS_INTERVAL * 1000));
             databaseConnectorGetStatsStub.resolves(PARALLEL_INTERMEDIATE_ROWS);
             const reportOutput = await aggregateReportGenerator.createAggregateReport(REPORT.test_id, REPORT.report_id);
@@ -233,8 +278,41 @@ describe('Artillery report generator test', () => {
 
             testShouldFail.should.eql(false, 'Test action was supposed to get exception');
         });
+
+        it('create final report fails when get experiments returns error on get job experiments', async () => {
+            databaseConnectorGetStatsStub.resolves(SINGLE_RUNNER_INTERMEDIATE_ROWS);
+            reportsManagerGetReportStub.rejects(new Error('Database failure'));
+
+            let testShouldFail = true;
+            try {
+                await aggregateReportGenerator.createAggregateReport('testId', 'reportId');
+            } catch (error) {
+                testShouldFail = false;
+                error.message.should.eql('Database failure');
+            }
+
+            testShouldFail.should.eql(false, 'Test action was supposed to get exception');
+        });
+
+        it('create final report fails when get experiments returns error on get chaos experiments', async () => {
+            databaseConnectorGetStatsStub.resolves(SINGLE_RUNNER_INTERMEDIATE_ROWS);
+            getJobExperimentsStubByJobIdStub.resolves(JOB_EXPERIMENTS_ROWS);
+            getChaosExperimentsByIdsStub.rejects(new Error('Database failure'));
+
+            let testShouldFail = true;
+            try {
+                await aggregateReportGenerator.createAggregateReport('testId', 'reportId');
+            } catch (error) {
+                testShouldFail = false;
+                error.message.should.eql('Database failure');
+            }
+
+            testShouldFail.should.eql(false, 'Test action was supposed to get exception');
+        });
     });
 });
+
+const timestamp = Date.now();
 
 const SINGLE_RUNNER_INTERMEDIATE_ROWS = [{
     test_id: 'cb7d7862-55c2-4a9b-bcec-d41d54101836',
@@ -337,3 +415,38 @@ const PARALLEL_INTERMEDIATE_ROWS = [
         data: '{"timestamp":"2019-03-10T17:24:33.043Z","scenariosCreated":300,"scenariosCompleted":300,"requestsCompleted":300,"latency":{"min":59.5,"max":98.3,"median":61.3,"p95":72.9,"p99":84},"rps":{"count":300,"mean":20},"scenarioDuration":{"min":60,"max":98.9,"median":61.9,"p95":73.5,"p99":84.5},"scenarioCounts":{"Get response code 200":300},"errors":{},"codes":{"200":300},"matches":0,"customStats":{},"counters":{},"concurrency":1,"pendingRequests":1,"scenariosAvoided":0}'
     }
 ];
+
+const JOB_EXPERIMENTS_ROWS = [{
+    job_id: REPORT.job_id,
+    experiment_id: '1234-abc-5678',
+    start_time: timestamp,
+    end_time: timestamp + 100
+},
+{
+    job_id: REPORT.job_id,
+    experiment_id: 'abcd-1234-efgh',
+    start_time: timestamp,
+    end_time: timestamp + 200
+},
+{
+    job_id: REPORT.job_id,
+    experiment_id: '4321-abc-5678',
+    start_time: timestamp,
+    end_time: timestamp + 300
+}];
+
+const CHAOS_EXPERIMENTS_ROWS = [{
+    id: '1234-abc-5678',
+    name: 'first-experiment',
+    kubeObject: { kind: 'PodChaos' }
+},
+{
+    id: 'abcd-1234-efgh',
+    name: 'second-experiment',
+    kubeObject: { kind: 'DNSChaos' }
+},
+{
+    id: '4321-abc-5678',
+    name: 'third-experiment',
+    kubeObject: { kind: 'IOChaos' }
+}];
