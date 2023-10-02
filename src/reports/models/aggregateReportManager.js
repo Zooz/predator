@@ -7,11 +7,6 @@ const logger = require('../../common/logger');
 const databaseConnector = require('./databaseConnector');
 const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager');
 const constants = require('../utils/constants');
-const configHandler = require('../../configManager/models/configHandler');
-const {
-    CONFIG,
-    KUBERNETES
-} = require('../../common/consts');
 
 const STATS_INTERVAL = 30;
 
@@ -72,11 +67,10 @@ async function aggregateReport(report) {
 }
 
 async function getChaosExperimentsByJobId(jobId) {
-    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
-    if (jobPlatform.toUpperCase() !== KUBERNETES) {
+    const chaosJobExperiments = await chaosExperimentsManager.getChaosJobExperimentsByJobId(jobId);
+    if (!chaosJobExperiments) {
         return;
     }
-    const chaosJobExperiments = await chaosExperimentsManager.getChaosJobExperimentsByJobId(jobId);
     const uniqueExperimentIds = [...new Set(chaosJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
     const chaosExperiments = await chaosExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds);
     const mappedChaosJobExperiments = chaosJobExperiments.map((jobExperiment) => {
