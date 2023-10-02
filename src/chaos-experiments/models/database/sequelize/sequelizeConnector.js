@@ -70,11 +70,10 @@ async function getChaosExperimentById(experimentId, contextId) {
         options.where.context_id = contextId;
     }
 
-    let chaosExperiment = await _getChaosExperiment(options);
+    const chaosExperiment = await _getChaosExperiment(options);
     if (chaosExperiment) {
-        chaosExperiment = chaosExperiment.get();
+        return chaosExperiment.get();
     }
-    return chaosExperiment;
 }
 
 async function getChaosExperimentsByIds(experimentIds, exclude, contextId) {
@@ -152,11 +151,10 @@ async function getChaosJobExperimentById(jobExperimentId, contextId) {
         options.where.context_id = contextId;
     }
 
-    let chaosExperiment = await _getChaosJobExperiment(options);
-    if (chaosExperiment) {
-        chaosExperiment = chaosExperiment.get();
+    const chaosJobExperiment = await _getChaosJobExperiment(options);
+    if (chaosJobExperiment) {
+        return chaosJobExperiment.get();
     }
-    return chaosExperiment;
 }
 
 async function getChaosJobExperimentsByJobId(jobId, contextId) {
