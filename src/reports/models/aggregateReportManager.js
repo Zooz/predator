@@ -67,24 +67,25 @@ async function aggregateReport(report) {
 }
 
 async function getChaosExperimentsByJobId(jobId) {
+    const mappedChaosJobExperiments = [];
     const chaosJobExperiments = await chaosExperimentsManager.getChaosJobExperimentsByJobId(jobId);
     if (!chaosJobExperiments) {
         return;
     }
     const uniqueExperimentIds = [...new Set(chaosJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
     const chaosExperiments = await chaosExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds);
-    const mappedChaosJobExperiments = chaosJobExperiments.map((jobExperiment) => {
-        const chaosExperiment = chaosExperiments.find((experiment) => experiment.id === jobExperiment.experiment_id && jobExperiment.is_triggered);
+    for (const chaosJobExperiment of chaosJobExperiments) {
+        const chaosExperiment = chaosExperiments.find((experiment) => experiment.id === chaosJobExperiment.experiment_id && chaosJobExperiment.is_triggered);
         if (chaosExperiment) {
-            return {
+            mappedChaosJobExperiments.push({
                 kind: chaosExperiment.kubeObject.kind,
                 name: chaosExperiment.name,
                 id: chaosExperiment.id,
-                start_time: jobExperiment.start_time,
-                end_time: jobExperiment.end_time
-            };
+                start_time: chaosJobExperiment.start_time,
+                end_time: chaosJobExperiment.end_time
+            });
         }
-    });
+    }
     return mappedChaosJobExperiments;
 }
 
