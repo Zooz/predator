@@ -19,3 +19,28 @@
   color: #557eff;
   margin-left: 10px;
 }
+
+.actions-style {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #557eff;
+  margin-left: 10px;
+}
+
+.list-container {
+  display: flex;
+  align-items: center;
+}
+
+.list-item {
+  margin: 10px;
+  &__title {
+    color: #557eff;
+
+  }
+}

@@ -170,7 +170,7 @@ describe('Create job specific aws fargate tests', async function () {
                         duration: 1,
                         environment: 'test',
                         cron_expresion: '* * * * * *',
-                        max_virtual_users: 100,
+                        max_virtual_users: 100
                     };
                     const response = await schedulerRequestCreator.createJob(invalidBody, {
                         'Content-Type': 'application/json'
@@ -178,7 +178,34 @@ describe('Create job specific aws fargate tests', async function () {
                     should(response.statusCode).eql(400);
                     should(response.body.message).eql('tag must be provided when JOB_PLATFORM is AWS_FARGATE');
                 });
+                it('Create job using AWS_FARGATE as a platform with experiments should fail', async () => {
+                    const validBody = {
+                        test_id: testId,
+                        arrival_rate: 1,
+                        parallelism: 2,
+                        type: 'load_test',
+                        duration: 1,
+                        experiments: [
+                            {
+                                experiment_id: '1234',
+                                start_after: 5000
+                            }
+                        ],
+                        environment: 'test',
+                        run_immediately: true,
+                        max_virtual_users: 100,
+                        proxy_url: 'http://proxy.com',
+                        debug: '*',
+                        tag: 'us-west-2'
+                    };
 
+                    const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+                        'Content-Type': 'application/json'
+                    });
+
+                    should(createJobResponse.status).eql(400);
+                    should(createJobResponse.body).deepEqual({ message: 'Chaos experiment is supported only in kubernetes jobs' });
+                });
             });
         });
     }

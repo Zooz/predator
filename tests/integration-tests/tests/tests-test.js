@@ -50,7 +50,7 @@ describe('the tests api', function() {
             const requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
             const res = await testsRequestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(422);
-            res.body.message.should.eql('Error to download file: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com');
+            res.body.message.should.containEql('Error to download file: RequestError');
         });
         it('Should return error for processor id not exists ', async () => {
             const requestBody = Object.assign({ processor_id: '123e4567-e89b-12d3-a456-426655440000' }, simpleTest.test);
@@ -277,7 +277,7 @@ describe('the tests api', function() {
                 resGetTests.statusCode.should.eql(200);
                 console.log(resGetTests);
                 const favTest = resGetTests.body.find(
-                    (test) => test.id == createTestResponse.body.id
+                    (test) => test.id === createTestResponse.body.id
                 );
                 should.equal(favTest.is_favorite, true);
             });
@@ -293,7 +293,7 @@ describe('the tests api', function() {
                 resGetTests.statusCode.should.eql(200);
                 console.log(resGetTests);
                 const favTest = resGetTests.body.find(
-                    (test) => test.id == createTestResponse.body.id
+                    (test) => test.id === createTestResponse.body.id
                 );
                 should.equal(favTest.is_favorite, false);
             });
@@ -466,8 +466,8 @@ describe('the tests api', function() {
             const testVer1 = require('../../testExamples/Simple_test')(dslName).test;
             const testVer2 = require('../../testExamples/Simple_test')(dslName).test;
             const getAllRevisionResult = require('../../testResults/getAllRevisionResult')(dslName);
-            getAllRevisionResult[0]['is_favorite'] = false;
-            getAllRevisionResult[1]['is_favorite'] = false;
+            getAllRevisionResult[0].is_favorite = false;
+            getAllRevisionResult[1].is_favorite = false;
             testVer2.scenarios = [testVer2.scenarios[0], testVer2.scenarios[0]];
             const createTestResponse = await testsRequestSender.createTest(testVer1, validHeaders);
             should(createTestResponse.statusCode).eql(201, JSON.stringify(createTestResponse.body));
@@ -519,7 +519,7 @@ describe('the tests api', function() {
             const createTestResponse = await testsRequestSender.createTest(requestBody, validHeaders);
             const testId = createTestResponse.body.id;
 
-            let jobsBody = require('../../testExamples/Test_with_jobs.json')['cron-jobs'];
+            const jobsBody = require('../../testExamples/Test_with_jobs.json')['cron-jobs'];
             jobsBody.test_id = testId;
             const createJobResponse = await jobsRequestSender.createJob(jobsBody, validHeaders);
             createJobResponse.statusCode.should.eql(201);

@@ -119,6 +119,12 @@ describe('Sequelize client tests', function () {
                 debug: '*',
                 enabled: true,
                 tag: 'eu-west-1',
+                experiments: [
+                    {
+                        experiment_id: '1234',
+                        start_after: 5000
+                    }
+                ],
                 context_id: undefined
             };
             const createdJob = {
@@ -175,6 +181,7 @@ describe('Sequelize client tests', function () {
                 proxy_url: 'http://proxy.com',
                 debug: '*',
                 tag: 'eu-west-1',
+                experiments: undefined,
                 context_id: undefined
             };
 
@@ -374,6 +381,12 @@ describe('Sequelize client tests', function () {
                     arrival_rate: 100,
                     duration: 1700,
                     ramp_to: null,
+                    experiments: [
+                        {
+                            experiment_id: '1234',
+                            start_after: 5000
+                        }
+                    ],
                     webhooks: [{
                         dataValues: {
                             id: '8138e406-0d5f-4caf-a143-a758b9545b75',
@@ -426,6 +439,12 @@ describe('Sequelize client tests', function () {
                 id: 'd6b0f076-2efb-48e1-82d2-82250818f59c',
                 ramp_to: null,
                 test_id: 'e2340c63-7828-4b69-b79d-6cbea8fec7a6',
+                experiments: [
+                    {
+                        experiment_id: '1234',
+                        start_after: 5000
+                    }
+                ],
                 webhooks: [
                     '8138e406-0d5f-4caf-a143-a758b9545b75',
                     'e38b985f-efec-4315-93bf-6f04eb2b7438'
@@ -525,6 +544,12 @@ describe('Sequelize client tests', function () {
                     debug: '*',
                     enabled: false,
                     emails: [],
+                    experiments: [
+                        {
+                            experiment_id: '1234',
+                            start_after: 5000
+                        }
+                    ],
                     notes: null,
                     tag: 'eu-west-1'
                 },
@@ -534,6 +559,7 @@ describe('Sequelize client tests', function () {
                 ...sequelizeJobResponse.dataValues,
                 cron_expression: '5 4 * *',
                 proxy_url: 'http://predator.dev',
+
                 webhooks: [webhookId]
             };
             sequelizeGetStub.resolves(sequelizeJobResponse);
@@ -580,6 +606,12 @@ describe('Sequelize client tests', function () {
                 proxy_url: 'http://proxy.com',
                 debug: '*',
                 enabled: false,
+                experiments: [
+                    {
+                        experiment_id: '4321',
+                        start_after: 2000
+                    }
+                ],
                 tag: 'eu-west-1'
             };
             const updatedJobRes = {
@@ -599,6 +631,12 @@ describe('Sequelize client tests', function () {
                 webhooks: [],
                 emails: [],
                 notes: null,
+                experiments: [
+                    {
+                        experiment_id: '4321',
+                        start_after: 2000
+                    }
+                ],
                 tag: 'eu-west-1'
             };
             const transaction = {};
@@ -632,6 +670,7 @@ describe('Sequelize client tests', function () {
                     debug: '*',
                     enabled: false,
                     notes: null,
+                    experiments: undefined,
                     emails: [{ id: uuid.v4(), address: 'a@email.com' }],
                     tag: 'eu-west-1'
                 },

@@ -38,6 +38,7 @@ export const createJobRequest = (opts) => {
     run_immediately: (opts.run_immediately === undefined) ? false : opts.run_immediately,
     emails: opts.emails,
     webhooks: opts.webhooks,
+    experiments: opts.experiments,
     notes: opts.notes,
     parallelism: opts.parallelism ? parseInt(opts.parallelism) : undefined,
     max_virtual_users: opts.max_virtual_users ? parseInt(opts.max_virtual_users) : undefined

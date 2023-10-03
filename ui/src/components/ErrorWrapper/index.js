@@ -7,7 +7,7 @@ const ErrorWrapper = (props) => {
   const hasError = !!errorText
   return (
     <span className={style['error-wrapper']}>
-      {React.cloneElement(children, { error: hasError })}
+      {React.cloneElement(children)}
       {hasError && (
         <div data-test='input-error' className={style['error-text']}>
           {errorText}
