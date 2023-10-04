@@ -17,6 +17,7 @@ const expectedTypes = {
     allow_insecure_tls: 'boolean',
     interval_cleanup_finished_containers_ms: 'int',
     minimum_wait_for_delayed_report_status_update_in_ms: 'int',
+    minimum_wait_for_chaos_experiment_deletion_in_ms: 'int',
     metrics_plugin_name: 'string',
     default_email_address: undefined,
     influx_metrics: 'json',
