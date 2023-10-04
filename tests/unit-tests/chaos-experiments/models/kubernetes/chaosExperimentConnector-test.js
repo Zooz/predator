@@ -10,10 +10,12 @@ const getAllResourcesOfKind = chaosExperimentConnector.__get__('getAllResourcesO
 const clearAllFinishedResources = chaosExperimentConnector.__get__('clearAllFinishedResources');
 describe('Chaos experiments kubernetes connector tests', function () {
     let sandbox;
-    let requestSenderSendStub;
+    let requestSenderSendStub, getAllResourcesOfKindStub, deleteResourcesOfKindStub;
     before(() => {
         sandbox = sinon.sandbox.create();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
+        getAllResourcesOfKindStub = sandbox.stub();
+        deleteResourcesOfKindStub = sandbox.stub();
         chaosExperimentConnector.__set__('kubernetesUrl', 'localhost:80');
         chaosExperimentConnector.__set__('kubernetesNamespace', 'default');
     });
@@ -120,7 +122,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
         });
     });
 
-    describe.only('Get all resources of a kind', function () {
+    describe('Get all resources of a kind', function () {
         it('Should get all resources of kind podchaos', async function () {
             const expectedResponse = [
                 {
@@ -158,12 +160,82 @@ describe('Chaos experiments kubernetes connector tests', function () {
         });
     });
     describe('Clear all finished resources', function () {
-        it('Should successfully delete specified resource', async function () {
-            await deleteResourcesOfKind('podchaos','test1');
-            requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/podchaos/test1',
-                method: 'DELETE',
-                headers: {}
+        before(() => {
+            chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKindStub);
+            chaosExperimentConnector.__set__('deleteResourcesOfKind', deleteResourcesOfKindStub);
+            chaosExperimentConnector.__set__('supportedChaosKinds', ['podchaos', 'httpchaos']);
+        })
+        after(() => {
+            chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKind);
+            chaosExperimentConnector.__set__('deleteResourcesOfKind', deleteResourcesOfKind);
+        })
+        beforeEach(() => {
+            const currentDate = new Date();
+            const HourAgoDate = new Date(currentDate.valueOf() - 3600000);
+            getAllResourcesOfKindStub.withArgs('podchaos').returns(
+                [
+                    {
+                        metadata:{
+                            name: 'test1',
+                            creationTimestamp: currentDate.toISOString(),
+                        },
+                        spec:{
+                           group: 'chaos-mesh.org',
+                           plural: 'podchaos'
+                        }   
+                       },
+                       {
+                        metadata:{
+                            name: 'test2',
+                            creationTimestamp: HourAgoDate.toISOString(),
+                        },
+                           spec:{
+                              group: 'chaos-mesh.org',
+                              plural: 'podchaos'
+                           }   
+                          },
+                ]);
+                getAllResourcesOfKindStub.withArgs('httpchaos').returns(
+                    [
+                        {
+                            metadata:{
+                                name: 'second1',
+                                creationTimestamp: currentDate.toISOString(),
+                            },
+                            spec:{
+                               group: 'chaos-mesh.org',
+                               plural: 'httpchaos',
+                            }   
+                           },
+                           {
+                            metadata:{
+                                name: 'second2',
+                                creationTimestamp: HourAgoDate.toISOString(),
+                            },
+                               spec:{
+                                  group: 'chaos-mesh.org',
+                                  plural: 'httpchaos'
+                               }   
+                              },
+                    ]);
+        })
+        describe('Trigger with gap of 0 minutes', function () {
+            it('Should delete all 4 resources', async function () {
+                await clearAllFinishedResources(0);
+                deleteResourcesOfKindStub.callCount.should.eql(4);
+            });
+        });
+        describe('Trigger with gap of 15 minutes', function () {
+            it('Should delete 2 resources that were triggered 1 hour ago', async function () {
+                await clearAllFinishedResources(900000);
+                deleteResourcesOfKindStub.callCount.should.eql(2);
+                deleteResourcesOfKindStub.args.should.eql([['podchaos','test2'], ['httpchaos','second2']]);
+            });
+        });
+        describe('Trigger with gap of more than 1 hour', function () {
+            it('should not delete any resource', async function () {
+                await clearAllFinishedResources(4600000);
+                deleteResourcesOfKindStub.callCount.should.eql(0);
             });
         });
     });
