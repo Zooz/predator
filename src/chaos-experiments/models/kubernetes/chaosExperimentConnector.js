@@ -92,7 +92,7 @@ const deleteResourcesOfKind = async (kind, resourceName) => {
     const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s/%s', kubernetesUrl, kind, resourceName);
     const options = {
         url,
-        method: 'GET',
+        method: 'DELETE',
         headers
     };
     const resources = await requestSender.send(options);
