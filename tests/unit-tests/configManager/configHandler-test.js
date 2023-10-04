@@ -35,6 +35,7 @@ describe('Manager config', function () {
         runner_memory: 256,
         smtp_server: Object.assign({}, defaultSmtpServerConfig),
         minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        minimum_wait_for_chaos_experiment_deletion_in_ms: 720000,
         benchmark_weights: {
             percentile_ninety_five: { percentage: 20 },
             percentile_fifty: { percentage: 20 },
@@ -49,6 +50,7 @@ describe('Manager config', function () {
         interval_cleanup_finished_containers_ms: 0,
         delay_runner_ms: 0,
         job_platform: 'DOCKER',
+        minimum_wait_for_chaos_experiment_deletion_in_ms: 720000,
         runner_docker_image: 'zooz/predator-runner:' + expectedRunnerVersion,
         runner_cpu: 1,
         runner_memory: 256,
@@ -80,6 +82,7 @@ describe('Manager config', function () {
         interval_cleanup_finished_containers_ms: 0,
         delay_runner_ms: 0,
         job_platform: 'DOCKER',
+        minimum_wait_for_chaos_experiment_deletion_in_ms: 720000,
         runner_docker_image: 'zooz/predator-runner:' + expectedRunnerVersion,
         runner_cpu: 5,
         runner_memory: 256,
@@ -110,6 +113,7 @@ describe('Manager config', function () {
         interval_cleanup_finished_containers_ms: 0,
         delay_runner_ms: 0,
         job_platform: 'DOCKER',
+        minimum_wait_for_chaos_experiment_deletion_in_ms: 720000,
         runner_docker_image: 'zooz/predator-runner:' + expectedRunnerVersion,
         grafana_url: 'test_grafana_url',
         runner_cpu: 2,
@@ -178,7 +182,7 @@ describe('Manager config', function () {
             databaseConnectorGetStub.resolves({ key_not_valid: 2 });
             const result = await manager.getConfig();
             const resultEscapedUndefined = escapeUndefinedValues(result);
-            should(resultEscapedUndefined).eql(defaultConfig);
+            should(resultEscapedUndefined).deepEqual(defaultConfig);
         });
     });
 
@@ -189,7 +193,7 @@ describe('Manager config', function () {
             const result = await manager.getConfig();
 
             const resultEscapedUndefined = escapeUndefinedValues(result);
-            should(resultEscapedUndefined).eql(configParseExpected);
+            should(resultEscapedUndefined).deepEqual(configParseExpected);
         });
     });
 
@@ -224,7 +228,7 @@ describe('Manager config', function () {
             const createConfigObject = manager.__get__('createConfigObject');
             const result = createConfigObject(convertObjectDBData);
             const resultEscapedUndefined = escapeUndefinedValues(result);
-            should(resultEscapedUndefined).eql(resultAfterConvert);
+            should(resultEscapedUndefined).deepEqual(resultAfterConvert);
         });
     });
 
