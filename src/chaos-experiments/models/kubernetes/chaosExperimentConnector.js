@@ -56,7 +56,7 @@ const getSupportedKinds = async () => {
         headers
     };
     const response = await requestSender.send(options);
-    const kinds = response.items.filter(crd => crd.spec.group === 'chaos-mesh.org').map(crd => crd.spec.plural);
+    const kinds = response.items.filter(crd => crd.spec.group === 'chaos-mesh.org').map(crd => crd.spec.names.plural);
     logger.info(`Supported chaos kinds that will be cleaned: ${kinds.toString()}`);
     return kinds;
 };
