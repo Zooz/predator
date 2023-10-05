@@ -96,26 +96,28 @@ describe('Chaos experiments kubernetes connector tests', function () {
     });
     describe('Get supported kinds', function () {
         it('Should successfully get supported kinds', async function () {
-            const expectedResponse = [
-                {
-                    spec: {
-                        group: 'chaos-mesh.org',
-                        plural: 'podchaos'
+            const expectedResponse = {
+                items: [
+                    {
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            plural: 'podchaos'
+                        }
+                    },
+                    {
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            plural: 'httpchaos'
+                        }
+                    },
+                    {
+                        spec: {
+                            group: 'some-test.org',
+                            plural: 'testchaos'
+                        }
                     }
-                },
-                {
-                    spec: {
-                        group: 'chaos-mesh.org',
-                        plural: 'httpchaos'
-                    }
-                },
-                {
-                    spec: {
-                        group: 'some-test.org',
-                        plural: 'testchaos'
-                    }
-                }
-            ];
+                ]
+            };
             requestSenderSendStub.resolves(expectedResponse);
             const response = await getSupportedKinds();
             response.should.eql(['podchaos', 'httpchaos']);
@@ -124,20 +126,22 @@ describe('Chaos experiments kubernetes connector tests', function () {
 
     describe('Get all resources of a kind', function () {
         it('Should get all resources of kind podchaos', async function () {
-            const expectedResponse = [
-                {
-                    spec: {
-                        group: 'chaos-mesh.org',
-                        plural: 'podchaos'
+            const expectedResponse = {
+                items: [
+                    {
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            plural: 'podchaos'
+                        }
+                    },
+                    {
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            plural: 'httpchaos'
+                        }
                     }
-                },
-                {
-                    spec: {
-                        group: 'chaos-mesh.org',
-                        plural: 'httpchaos'
-                    }
-                }
-            ];
+                ]
+            };
             requestSenderSendStub.resolves(expectedResponse);
             const response = await getAllResourcesOfKind('podchaos');
             requestSenderSendStub.args[0][0].should.eql({
