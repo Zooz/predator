@@ -6,11 +6,13 @@ const httpContext = require('express-http-context'),
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     kubernetesConnector = require('./kubernetes/chaosExperimentConnector'),
-    { ERROR_MESSAGES, CONTEXT_ID, CONFIG } = require('../../common/consts'),
+    { ERROR_MESSAGES, CONTEXT_ID, CONFIG, KUBERNETES } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     configHandler = require('../../configManager/models/configHandler');
 
 module.exports.scheduleFinishedResourcesCleanup = async function () {
+    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
+    if (jobPlatform !== KUBERNETES) return;
     const interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
     const deletionTimeThreshold = await configHandler.getConfigValue(CONFIG.MINIMUM_WAIT_FOR_CHAOS_EXPERIMENT_DELETION_IN_MS);
     await kubernetesConnector.scheduleFinishedResourcesCleanup(interval, deletionTimeThreshold);
