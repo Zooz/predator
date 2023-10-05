@@ -159,7 +159,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
                 method: 'GET',
                 headers: {}
             });
-            response.should.eql(expectedResponse);
+            response.should.eql(expectedResponse.items);
         });
     });
 

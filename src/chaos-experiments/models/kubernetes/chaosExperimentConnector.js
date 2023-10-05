@@ -92,7 +92,7 @@ const getAllResourcesOfKind = async (kind) => {
         headers
     };
     const resources = await requestSender.send(options);
-    return resources;
+    return resources.items;
 };
 
 const deleteResourcesOfKind = async (kind, resourceName) => {
