@@ -98,27 +98,27 @@ describe('Chaos experiments kubernetes connector tests', function () {
         it('Should successfully get supported kinds', async function () {
             const expectedResponse = [
                 {
-                 spec:{
-                    group: 'chaos-mesh.org',
-                    plural: 'podchaos'
-                 }   
+                    spec: {
+                        group: 'chaos-mesh.org',
+                        plural: 'podchaos'
+                    }
                 },
                 {
-                    spec:{
-                       group: 'chaos-mesh.org',
-                       plural: 'httpchaos'
-                    }   
-                   },
-                   {
-                    spec:{
-                       group: 'some-test.org',
-                       plural: 'testchaos'
-                    }   
-                   },
-            ]
+                    spec: {
+                        group: 'chaos-mesh.org',
+                        plural: 'httpchaos'
+                    }
+                },
+                {
+                    spec: {
+                        group: 'some-test.org',
+                        plural: 'testchaos'
+                    }
+                }
+            ];
             requestSenderSendStub.resolves(expectedResponse);
             const response = await getSupportedKinds();
-            response.should.eql(['podchaos','httpchaos']);
+            response.should.eql(['podchaos', 'httpchaos']);
         });
     });
 
@@ -126,18 +126,18 @@ describe('Chaos experiments kubernetes connector tests', function () {
         it('Should get all resources of kind podchaos', async function () {
             const expectedResponse = [
                 {
-                 spec:{
-                    group: 'chaos-mesh.org',
-                    plural: 'podchaos'
-                 }   
+                    spec: {
+                        group: 'chaos-mesh.org',
+                        plural: 'podchaos'
+                    }
                 },
                 {
-                    spec:{
-                       group: 'chaos-mesh.org',
-                       plural: 'httpchaos'
-                    }   
-                   },
-            ]
+                    spec: {
+                        group: 'chaos-mesh.org',
+                        plural: 'httpchaos'
+                    }
+                }
+            ];
             requestSenderSendStub.resolves(expectedResponse);
             const response = await getAllResourcesOfKind('podchaos');
             requestSenderSendStub.args[0][0].should.eql({
@@ -151,7 +151,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
 
     describe('Delete resource of a kind', function () {
         it('Should successfully delete specified resource', async function () {
-            await deleteResourcesOfKind('podchaos','test1');
+            await deleteResourcesOfKind('podchaos', 'test1');
             requestSenderSendStub.args[0][0].should.eql({
                 url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/podchaos/test1',
                 method: 'DELETE',
@@ -164,61 +164,61 @@ describe('Chaos experiments kubernetes connector tests', function () {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKindStub);
             chaosExperimentConnector.__set__('deleteResourcesOfKind', deleteResourcesOfKindStub);
             chaosExperimentConnector.__set__('supportedChaosKinds', ['podchaos', 'httpchaos']);
-        })
+        });
         after(() => {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKind);
             chaosExperimentConnector.__set__('deleteResourcesOfKind', deleteResourcesOfKind);
-        })
+        });
         beforeEach(() => {
             const currentDate = new Date();
             const HourAgoDate = new Date(currentDate.valueOf() - 3600000);
             getAllResourcesOfKindStub.withArgs('podchaos').returns(
                 [
                     {
-                        metadata:{
+                        metadata: {
                             name: 'test1',
-                            creationTimestamp: currentDate.toISOString(),
+                            creationTimestamp: currentDate.toISOString()
                         },
-                        spec:{
-                           group: 'chaos-mesh.org',
-                           plural: 'podchaos'
-                        }   
-                       },
-                       {
-                        metadata:{
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            plural: 'podchaos'
+                        }
+                    },
+                    {
+                        metadata: {
                             name: 'test2',
-                            creationTimestamp: HourAgoDate.toISOString(),
+                            creationTimestamp: HourAgoDate.toISOString()
                         },
-                           spec:{
-                              group: 'chaos-mesh.org',
-                              plural: 'podchaos'
-                           }   
-                          },
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            plural: 'podchaos'
+                        }
+                    }
                 ]);
-                getAllResourcesOfKindStub.withArgs('httpchaos').returns(
-                    [
-                        {
-                            metadata:{
-                                name: 'second1',
-                                creationTimestamp: currentDate.toISOString(),
-                            },
-                            spec:{
-                               group: 'chaos-mesh.org',
-                               plural: 'httpchaos',
-                            }   
-                           },
-                           {
-                            metadata:{
-                                name: 'second2',
-                                creationTimestamp: HourAgoDate.toISOString(),
-                            },
-                               spec:{
-                                  group: 'chaos-mesh.org',
-                                  plural: 'httpchaos'
-                               }   
-                              },
-                    ]);
-        })
+            getAllResourcesOfKindStub.withArgs('httpchaos').returns(
+                [
+                    {
+                        metadata: {
+                            name: 'second1',
+                            creationTimestamp: currentDate.toISOString()
+                        },
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            plural: 'httpchaos'
+                        }
+                    },
+                    {
+                        metadata: {
+                            name: 'second2',
+                            creationTimestamp: HourAgoDate.toISOString()
+                        },
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            plural: 'httpchaos'
+                        }
+                    }
+                ]);
+        });
         describe('Trigger with gap of 0 minutes', function () {
             it('Should delete all 4 resources', async function () {
                 await clearAllFinishedResources(0);
@@ -229,7 +229,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
             it('Should delete 2 resources that were triggered 1 hour ago', async function () {
                 await clearAllFinishedResources(900000);
                 deleteResourcesOfKindStub.callCount.should.eql(2);
-                deleteResourcesOfKindStub.args.should.eql([['podchaos','test2'], ['httpchaos','second2']]);
+                deleteResourcesOfKindStub.args.should.eql([['podchaos', 'test2'], ['httpchaos', 'second2']]);
             });
         });
         describe('Trigger with gap of more than 1 hour', function () {
