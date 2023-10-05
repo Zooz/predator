@@ -26,6 +26,7 @@ module.exports.scheduleFinishedResourcesCleanup = async function (interval, dele
     setInterval(async () => {
         await clearAllFinishedResources(deletionTimeThreshold);
     }, interval);
+    logger.info(`K8S Finished chaos experiments cleanup - interval of ${interval} was set with deletion time threshold of ${deletionTimeThreshold}`);
 };
 
 module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
@@ -56,23 +57,29 @@ const getSupportedKinds = async () => {
     };
     const response = await requestSender.send(options);
     const kinds = response.items.filter(crd => crd.spec.group === 'chaos-mesh.org').map(crd => crd.spec.plural);
+    logger.info(`Supported chaos kinds that will be cleaned: ${kinds.toString()}`);
     return kinds;
 };
 
 const clearAllFinishedResources = async (deletionTimeThreshold) => {
     for (const kind of supportedChaosKinds){
-        const resourcesOfKind = await getAllResourcesOfKind(kind);
-        const resourcesToBeDeleted = resourcesOfKind.filter(resource => {
-            const experimentTimestamp = new Date(resource.metadata.creationTimestamp).valueOf();
-            const thresholdTimestamp = Date.now() - deletionTimeThreshold;
-            return experimentTimestamp < thresholdTimestamp;
-        });
-        for (const resource of resourcesToBeDeleted){
-            try {
-                await deleteResourcesOfKind(kind, resource.metadata.name);
-            } catch (error){
-                logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
+        try{
+            const resourcesOfKind = await getAllResourcesOfKind(kind);
+            const resourcesToBeDeleted = resourcesOfKind.filter(resource => {
+                const experimentTimestamp = new Date(resource.metadata.creationTimestamp).valueOf();
+                const thresholdTimestamp = Date.now() - deletionTimeThreshold;
+                return experimentTimestamp < thresholdTimestamp;
+            });
+            for (const resource of resourcesToBeDeleted){
+                try {
+                    await deleteResourcesOfKind(kind, resource.metadata.name);
+                } catch (error){
+                    logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
+                }
             }
+        }
+        catch(error){
+            logger.error(error, `Failed to get resources of kind ${kind} from k8s`);
         }
     }
 };
