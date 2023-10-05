@@ -101,19 +101,25 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         spec: {
                             group: 'chaos-mesh.org',
-                            plural: 'podchaos'
+                            names: {
+                                plural: 'podchaos'
+                            }
                         }
                     },
                     {
                         spec: {
                             group: 'chaos-mesh.org',
-                            plural: 'httpchaos'
+                            names: {
+                                plural: 'httpchaos'
+                            }
                         }
                     },
                     {
                         spec: {
                             group: 'some-test.org',
-                            plural: 'testchaos'
+                            names: {
+                                plural: 'testchaos'
+                            }
                         }
                     }
                 ]
@@ -131,13 +137,17 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         spec: {
                             group: 'chaos-mesh.org',
-                            plural: 'podchaos'
+                            names: {
+                                plural: 'podchaos'
+                            }
                         }
                     },
                     {
                         spec: {
                             group: 'chaos-mesh.org',
-                            plural: 'httpchaos'
+                            names: {
+                                plural: 'httpchaos'
+                            }
                         }
                     }
                 ]
