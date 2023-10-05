@@ -207,9 +207,9 @@ describe('update and get config', () => {
                 const requestWithInvalidBucketSizeType = {
                     prometheus_metrics: {
                         push_gateway_url: 'string_value',
-                        buckets_sizes: "invalid_string_type_and_not_an_array",
+                        buckets_sizes: 'invalid_string_type_and_not_an_array',
                         labels: { key1: 'value1', key2: 'value2' }
-                    },
+                    }
                 };
 
                 const response = await configRequestCreator.updateConfig(requestWithInvalidBucketSizeType);

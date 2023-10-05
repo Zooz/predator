@@ -170,14 +170,14 @@ describe('Chaos experiments kubernetes connector tests', function () {
             chaosExperimentConnector.__set__('deleteResourcesOfKind', deleteResourcesOfKind);
         });
         beforeEach(() => {
-            const currentDate = new Date();
-            const HourAgoDate = new Date(currentDate.valueOf() - 3600000);
+            const currentDateTime = new Date(Date.now() - 100);
+            const HourAgoDateTime = new Date(currentDateTime.valueOf() - 3600000);
             getAllResourcesOfKindStub.withArgs('podchaos').returns(
                 [
                     {
                         metadata: {
                             name: 'test1',
-                            creationTimestamp: currentDate.toISOString()
+                            creationTimestamp: currentDateTime.toISOString()
                         },
                         spec: {
                             group: 'chaos-mesh.org',
@@ -187,7 +187,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         metadata: {
                             name: 'test2',
-                            creationTimestamp: HourAgoDate.toISOString()
+                            creationTimestamp: HourAgoDateTime.toISOString()
                         },
                         spec: {
                             group: 'chaos-mesh.org',
@@ -200,7 +200,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         metadata: {
                             name: 'second1',
-                            creationTimestamp: currentDate.toISOString()
+                            creationTimestamp: currentDateTime.toISOString()
                         },
                         spec: {
                             group: 'chaos-mesh.org',
@@ -210,7 +210,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         metadata: {
                             name: 'second2',
-                            creationTimestamp: HourAgoDate.toISOString()
+                            creationTimestamp: HourAgoDateTime.toISOString()
                         },
                         spec: {
                             group: 'chaos-mesh.org',

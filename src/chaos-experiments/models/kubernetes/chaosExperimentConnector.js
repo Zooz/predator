@@ -55,7 +55,7 @@ const getSupportedKinds = async () => {
         headers
     };
     const response = await requestSender.send(options);
-    const kinds = response.filter(crd => crd.spec.group === 'chaos-mesh.org').map(crd => crd.spec.plural);
+    const kinds = response.items.filter(crd => crd.spec.group === 'chaos-mesh.org').map(crd => crd.spec.plural);
     return kinds;
 };
 
