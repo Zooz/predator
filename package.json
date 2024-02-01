@@ -60,7 +60,7 @@
     "mariadb": "^2.4.2",
     "mathjs": "^7.5.1",
     "mysql2": "^2.2.5",
-    "nodemailer": "^6.7.3",
+    "nodemailer": "^6.9.9",
     "pg": "^8.4.1",
     "pg-hstore": "^2.3.3",
     "pino": "^6.3.2",
