@@ -37,7 +37,6 @@ module.exports.getAllChaosExperiments = async function (from, limit, exclude) {
 
 module.exports.getChaosExperimentById = async function (experimentId) {
     const contextId = httpContext.get(CONTEXT_ID);
-
     const processor = await databaseConnector.getChaosExperimentById(experimentId, contextId);
     if (processor) {
         return processor;
