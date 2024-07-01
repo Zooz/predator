@@ -191,6 +191,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         metadata: {
                             name: 'test1',
+                            namespace: 'apps',
                             creationTimestamp: currentDateTime.toISOString()
                         },
                         spec: {
@@ -201,6 +202,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         metadata: {
                             name: 'test2',
+                            namespace: 'apps',
                             creationTimestamp: HourAgoDateTime.toISOString()
                         },
                         spec: {
@@ -243,7 +245,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
             it('Should delete 2 resources that were triggered 1 hour ago', async function () {
                 await clearAllFinishedResources(900000);
                 deleteResourcesOfKindStub.callCount.should.eql(2);
-                deleteResourcesOfKindStub.args.should.eql([['podchaos', 'test2'], ['httpchaos', 'second2']]);
+                deleteResourcesOfKindStub.args.should.eql([['podchaos', 'test2', 'apps'], ['httpchaos', 'second2', 'apps']]);
             });
         });
         describe('Trigger with gap of more than 1 hour', function () {
