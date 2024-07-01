@@ -26,7 +26,7 @@ module.exports.scheduleFinishedResourcesCleanup = async function (interval, dele
     setInterval(async () => {
         await clearAllFinishedResources(deletionTimeThreshold);
     }, interval);
-    logger.info(`K8S Finished chaos experiments cleanup - interval of ${interval} was set with deletion time threshold of ${deletionTimeThreshold}`);
+    logger.info(`K8S Finished chaos experiments cleanup setup - interval of ${interval}ms was set with deletion time threshold of ${deletionTimeThreshold}ms`);
 };
 
 module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {

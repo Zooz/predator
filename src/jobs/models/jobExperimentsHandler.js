@@ -25,9 +25,9 @@ async function setChaosExperimentsIfExist(jobId, jobExperiments) {
     }
 };
 
-async function setSingleJobExperiment(experimentRequest, chaoExperimentsFromDb, baseTimestamp, jobId) {
+async function setSingleJobExperiment(experimentRequest, chaosExperimentsFromDb, baseTimestamp, jobId) {
     try {
-        const experiment = chaoExperimentsFromDb.find(e => e.id === experimentRequest.experiment_id);
+        const experiment = chaosExperimentsFromDb.find(e => e.id === experimentRequest.experiment_id);
         const startTime = baseTimestamp + experimentRequest.start_after;
         const endTime = startTime + convertDurationStringToMillisecond(experiment.kubeObject.spec.duration);
         const jobExperimentId = uuid();
