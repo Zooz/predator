@@ -46,7 +46,6 @@ module.exports.getAllChaosExperiments = async function (from, limit, exclude) {
 
 module.exports.getChaosExperimentById = async function (experimentId) {
     const contextId = httpContext.get(CONTEXT_ID);
-
     const processor = await databaseConnector.getChaosExperimentById(experimentId, contextId);
     if (processor) {
         return processor;
@@ -101,5 +100,9 @@ module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentI
 };
 
 module.exports.getFutureJobExperiments = async function (timestamp, contextId) {
-    return databaseConnector.getFutureJobExperiments(contextId);
+    return databaseConnector.getFutureJobExperiments(timestamp, contextId);
+};
+
+module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
+    return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
 };
