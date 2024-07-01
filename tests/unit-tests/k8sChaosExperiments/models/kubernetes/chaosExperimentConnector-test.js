@@ -216,6 +216,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         metadata: {
                             name: 'second1',
+                            namespace: 'apps',
                             creationTimestamp: currentDateTime.toISOString()
                         },
                         spec: {
@@ -226,6 +227,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
                     {
                         metadata: {
                             name: 'second2',
+                            namespace: 'apps',
                             creationTimestamp: HourAgoDateTime.toISOString()
                         },
                         spec: {
