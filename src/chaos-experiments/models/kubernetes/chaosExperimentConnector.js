@@ -63,7 +63,7 @@ const getSupportedKinds = async () => {
 
 const clearAllFinishedResources = async (deletionTimeThreshold) => {
     for (const kind of supportedChaosKinds){
-        try{
+        try {
             const resourcesOfKind = await getAllResourcesOfKind(kind);
             const resourcesToBeDeleted = resourcesOfKind.filter(resource => {
                 const experimentTimestamp = new Date(resource.metadata.creationTimestamp).valueOf();
@@ -77,8 +77,7 @@ const clearAllFinishedResources = async (deletionTimeThreshold) => {
                     logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
                 }
             }
-        }
-        catch(error){
+        } catch (error){
             logger.error(error, `Failed to get resources of kind ${kind} from k8s`);
         }
     }
