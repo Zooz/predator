@@ -165,9 +165,9 @@ describe('Chaos experiments kubernetes connector tests', function () {
 
     describe('Delete resource of a kind', function () {
         it('Should successfully delete specified resource', async function () {
-            await deleteResourcesOfKind('podchaos', 'test1');
+            await deleteResourcesOfKind('podchaos', 'test1', 'apps');
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/podchaos/test1',
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos/test1',
                 method: 'DELETE',
                 headers: {}
             });

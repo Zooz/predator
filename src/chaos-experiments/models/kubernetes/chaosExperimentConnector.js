@@ -72,7 +72,7 @@ const clearAllFinishedResources = async (deletionTimeThreshold) => {
             });
             for (const resource of resourcesToBeDeleted){
                 try {
-                    await deleteResourcesOfKind(kind, resource.metadata.name);
+                    await deleteResourcesOfKind(kind, resource.metadata.name, resource.metadata.namespace);
                 } catch (error){
                     logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
                 }
@@ -94,8 +94,8 @@ const getAllResourcesOfKind = async (kind) => {
     return resources.items;
 };
 
-const deleteResourcesOfKind = async (kind, resourceName) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s/%s', kubernetesUrl, kind, resourceName);
+const deleteResourcesOfKind = async (kind, resourceName, namespace) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind, resourceName);
     const options = {
         url,
         method: 'DELETE',
