@@ -70,7 +70,7 @@
     "sequelize": "^5.22.3",
     "slack-emojis": "^1.1.1",
     "sqlite3": "^5.0.3",
-    "tedious": "^9.2.2",
+    "tedious": "^13.0.0",
     "umzug": "^2.3.0",
     "uuid": "^3.4.0"
   },
