@@ -47,7 +47,7 @@ describe('the tests api', function() {
                 });
         });
         it('Should return error for file url not exists ', async () => {
-            const requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl.com' }, simpleTest.test);
+            const requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl123.com' }, simpleTest.test);
             const res = await testsRequestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(422);
             res.body.message.should.containEql('Error to download file: RequestError');
