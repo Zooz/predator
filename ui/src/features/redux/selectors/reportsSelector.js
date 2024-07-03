@@ -108,38 +108,45 @@ function buildAggregateReportData (reports, withPrefix, startFromZeroTime, lastB
     const offset = startFromZeroTime ? new Date(report.start_time).getTime() : 0;
 
     const startTime = new Date(report.start_time).getTime() - offset;
+    const endTime = new Date(report.end_time).getTime() - offset;
+    const startDate = new Date(startTime);
+    const endDate = endTime ? new Date(endTime) : undefined;
     // intermediates
-    report.intermediates.forEach((bucket, index) => {
-      const latency = bucket.latency;
-      const time = new Date(startTime + (bucket.bucket * 1000));
-      const timeMills = time.getTime();
-      latencyGraph.push({
-        name: buildDateFormat(time),
-        [`${prefix}median`]: latency.median.toFixed(),
-        [`${prefix}p95`]: latency.p95.toFixed(),
-        [`${prefix}p99`]: latency.p99.toFixed(),
-        ...lastBenchmark.latency,
-        timeMills
-      });
-      rps.push({
-        name: buildDateFormat(time),
-        timeMills,
-        [`${prefix}mean`]: bucket.rps.mean,
-        ...lastBenchmark.rps
-      });
+    if (report.intermediates && report.intermediates.length) {
+      report.intermediates.forEach((bucket, index) => {
+        const latency = bucket.latency;
+        const time = new Date(startTime + (bucket.bucket * 1000));
+        const timeMills = time.getTime();
+        latencyGraph.push({
+          name: buildDateFormat(time),
+          [`${prefix}median`]: latency.median && latency.median.toFixed(),
+          [`${prefix}p95`]: latency.p95 && latency.p95.toFixed(),
+          [`${prefix}p99`]: latency.p99 && latency.p99.toFixed(),
+          ...lastBenchmark.latency,
+          timeMills
+        });
 
-      const errorsData = buildErrorDataObject(bucket, prefix);
-      errorsCodeGraphKeysAsObjectAcc = Object.assign(errorsCodeGraphKeysAsObjectAcc, errorsData);
-      errorsCodeGraph.push({
-        name: buildDateFormat(time),
-        timeMills,
-        ...errorsData
+        rps.push({
+          name: buildDateFormat(time),
+          timeMills,
+          [`${prefix}mean`]: bucket.rps.mean,
+          ...lastBenchmark.rps
+        });
+
+        const errorsData = buildErrorDataObject(bucket, prefix);
+        errorsCodeGraphKeysAsObjectAcc = Object.assign(errorsCodeGraphKeysAsObjectAcc, errorsData);
+        errorsCodeGraph.push({
+          name: buildDateFormat(time),
+          timeMills,
+          ...errorsData
+        });
       });
-    });
+    }
+    addStartEndTimeToGraphs([latencyGraph, rps, errorsCodeGraph], startDate, endDate);
 
     // aggregate data
     buildErrorBars(errorsBar, report.aggregate, lastBenchmark, prefix);
-    const experimentReferenceLines = getExperimentReferenceLines(report.experiments);
+    const referenceAreas = getReferenceAreas(report);
 
     Object.keys(report.aggregate.scenarioCounts).forEach((key) => {
       scenarios.push({ name: `${prefix}${key}`, value: report.aggregate.scenarioCounts[key] })
@@ -172,7 +179,6 @@ function buildAggregateReportData (reports, withPrefix, startFromZeroTime, lastB
       rpsKeys.push(...lastBenchmark.rpsKeys);
       errorsBarKeys.push('benchmark_count');
     }
-
     return {
       alias,
       latencyGraph,
@@ -193,7 +199,7 @@ function buildAggregateReportData (reports, withPrefix, startFromZeroTime, lastB
       duration: report.duration,
       notes: report.notes,
       isBenchmarkExist: Object.keys(lastBenchmark).length > 0,
-      referenceLines: { experiments: experimentReferenceLines }
+      referenceAreas: referenceAreas
     }
   })
 }
@@ -202,12 +208,18 @@ function buildDateFormat (time, format = 'h:MM:ss') {
   return `${dateFormat(time, format)}`
 }
 
-function getExperimentReferenceLines (experiments) {
-  return experiments.map((experiment) => ({
-    startTime: buildDateFormat(experiment.start_time),
-    endTime: buildDateFormat(experiment.end_time),
-    label: `${experiment.kind}.${experiment.name}`
-  }));
+function getReferenceAreas (report) {
+  const referenceAreas = {};
+  if (report.experiments) {
+    referenceAreas['experiments'] =
+        report.experiments.map((experiment) => ({
+          startTime: buildDateFormat(experiment.start_time),
+          endTime: buildDateFormat(experiment.end_time),
+          label: `${experiment.kind}.${experiment.name}`
+        }));
+  }
+
+  return referenceAreas;
 }
 
 function buildErrorDataObject (bucket, prefix) {
@@ -216,6 +228,21 @@ function buildErrorDataObject (bucket, prefix) {
     return acc;
   }, {});
   return errorsData;
+}
+
+function addStartEndTimeToGraphs (reports, startDate, endDate) {
+  if (startDate && endDate) {
+    for (const report of reports) {
+      report.unshift({
+        name: buildDateFormat(startDate),
+        timeMills: startDate.getTime()
+      });
+      report.push({
+        name: buildDateFormat(endDate),
+        timeMills: endDate.getTime()
+      });
+    }
+  }
 }
 
 function buildErrorBars (errorsBar, data, benchmark, prefix) {

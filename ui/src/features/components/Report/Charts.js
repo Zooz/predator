@@ -6,10 +6,11 @@ import {
   Line,
   LineChart,
   ResponsiveContainer,
-  ReferenceLine,
   Tooltip,
   XAxis,
-  YAxis, Label
+  YAxis,
+  ReferenceArea,
+  ReferenceLine
 } from 'recharts';
 import React from 'react';
 import _ from 'lodash';
@@ -101,59 +102,82 @@ export const BarChartPredator = ({ data = [], keys = [], graphType, onSelectedGr
   )
 };
 
-export const LineChartPredator = ({ data = [], keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys, referenceLines = {}, connectNulls = true }) => {
+export const LineChartPredator = ({ data = [], keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys, referenceAreas = {}, connectNulls = true }) => {
+  const { experiments = [] } = referenceAreas;
   const filteredData = filterKeysFromArrayOfObject(data, graphType, filteredKeys);
-  const { experiments = [] } = referenceLines;
+  return <ResponsiveContainer width='100%' height={300}>
+    <LineChart
+      width={700}
+      height={400}
+      data={filteredData}
+      margin={{
+        top: 10, right: 30, left: 0, bottom: 0
+      }}
+    >
+      <CartesianGrid strokeDasharray='3 3' />
+      <XAxis dataKey='name' allowDuplicatedCategory={false} />
+      <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]} />
+      <Legend content={(props) => renderLegend({
+        ...props,
+        graphType,
+        onSelectedGraphPropertyFilter,
+        filteredKeys
+      })} />
+      {
+        experiments.map((experiment, index) => {
+          const key = `experiment-${index}`;
+          return (
+            renderExperimentsReferenceLine(experiment, key)
+          )
+        })
+      }
+      {
+        experiments.map((experiment, index) => {
+          const key = `experiment-${index}`;
+          const color = getColor(key, index);
+          return (
+            renderExperimentsReferenceArea(experiment, color, key)
+          )
+        })
+      }
+      <Tooltip />
+      {
+        keys.map((key, index) => {
+          const color = getColor(key, index);
+          return <Line connectNulls={connectNulls} key={index} type='monotone' dataKey={key} dot={null}
+            stroke={color.stroke} />
+        })
+      }
+    </LineChart>
+  </ResponsiveContainer>
+}
+
+const renderExperimentsReferenceLine = (experiment, index) => {
   return (
-    <ResponsiveContainer width='100%' height={300}>
-      <LineChart
-        width={700}
-        height={400}
-        data={filteredData}
-        margin={{
-          top: 10, right: 30, left: 0, bottom: 0
-        }}
-      >
-        <CartesianGrid strokeDasharray='3 3' />
-        <XAxis dataKey='name' allowDuplicatedCategory={false} />
-        <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]} />
-        <Legend content={(props) => renderLegend({
-          ...props,
-          graphType,
-          onSelectedGraphPropertyFilter,
-          filteredKeys
-        })} />
-        {
-          experiments.map((experiment, index) => {
-            return (
-              <ReferenceLine
-                x={experiment.startTime}
-                stroke='red'
-                key={`start-exp-${index}`}
-              >
-                <Label value={experiment.label} position='insideLeft' offset={10} />
-              </ReferenceLine>
-            )
-          })
-        }
-        {
-          experiments.map((experiment, index) => {
-            return (
-              <ReferenceLine x={experiment.endTime} stroke='red' key={`start-end-${index}`} />
-            )
-          })
-        }
-        <Tooltip />
-        {
-          keys.map((key, index) => {
-            const color = getColor(key, index);
-            return (<Line connectNulls={connectNulls} key={index} type='monotone' dataKey={key} dot={null}
-              stroke={color.stroke} />)
-          })
-        }
-      </LineChart>
-    </ResponsiveContainer>
-  )
+    <ReferenceLine
+      key={`experiment-${index}-line`}
+      isFront
+      x={experiment.startTime}
+      stro
+      stroke='red'
+      strokeDasharray='2 2'
+      label={experiment.label}
+    />
+  );
+}
+
+const renderExperimentsReferenceArea = (experiment, index) => {
+  return (
+    <ReferenceArea
+      key={`experiment-${index}-area`}
+      x1={experiment.startTime}
+      x2={experiment.endTime}
+      stroke='red'
+      strokeOpacity={0.3}
+      fillOpacity={0.1}
+      isFront
+    />
+  );
 }
 
 const renderLegend = (props) => {

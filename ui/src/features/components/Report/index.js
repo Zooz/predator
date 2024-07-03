@@ -164,7 +164,7 @@ class Report extends React.Component {
                     labelY={'ms'} graphType={'latency'}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                     filteredKeys={filteredKeys}
-                    referenceLines={aggregateReport.referenceLines}
+                    referenceAreas={aggregateReport.referenceAreas}
                   />
                 </Card>
                 <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
@@ -176,7 +176,7 @@ class Report extends React.Component {
                     connectNulls={false}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                     filteredKeys={filteredKeys}
-                    referenceLines={aggregateReport.referenceLines}
+                    referenceAreas={aggregateReport.referenceAreas}
                   />
                 </Card>
 
@@ -188,7 +188,7 @@ class Report extends React.Component {
                     graphType={'rps'}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                     filteredKeys={filteredKeys}
-                    referenceLines={aggregateReport.referenceLines}
+                    referenceAreas={aggregateReport.referenceAreas}
                   />
                 </Card>
                 <Card style={{
