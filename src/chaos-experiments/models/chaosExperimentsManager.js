@@ -8,6 +8,7 @@ const logger = require('../../common/logger'),
     kubernetesConnector = require('./kubernetes/chaosExperimentConnector'),
     { ERROR_MESSAGES, CONTEXT_ID, CONFIG, KUBERNETES } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
+    jobExperimentHandler = require('../../jobs/models/kubernetes/jobExperimentsHandler'),
     configHandler = require('../../configManager/models/configHandler');
 
 module.exports.scheduleFinishedResourcesCleanup = async function () {
@@ -44,7 +45,7 @@ module.exports.getAllChaosExperiments = async function (from, limit, exclude) {
     return allChaosExperiments;
 };
 
-module.exports.getChaosExperimentById = async function (experimentId) {
+const getChaosExperimentById = module.exports.getChaosExperimentById = async function (experimentId) {
     const contextId = httpContext.get(CONTEXT_ID);
     const processor = await databaseConnector.getChaosExperimentById(experimentId, contextId);
     if (processor) {
@@ -99,10 +100,33 @@ module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentI
     }
 };
 
-module.exports.getFutureJobExperiments = async function (timestamp, contextId) {
+module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
+    return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
+};
+
+const getFutureJobExperiments = async function (timestamp, contextId) {
     return databaseConnector.getFutureJobExperiments(timestamp, contextId);
 };
 
-module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
-    return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
+const reloadSingleChaosExperiment = async function (futureJobExperiment, timestamp){
+    try {
+        const calculatedStartAfter = futureJobExperiment.start_time - timestamp;
+        const chaosExperiment = await getChaosExperimentById(futureJobExperiment.experiment_id);
+        jobExperimentHandler.scheduleChaosExperiment(chaosExperiment.kubeObject, futureJobExperiment.job_id, futureJobExperiment.id, calculatedStartAfter);
+    } catch (error) {
+        throw new Error('Unable to reload job experiments ' + futureJobExperiment.id + ' , error: ' + error);
+    }
+}
+
+module.exports.reloadChaosExperiments = async () => {
+    const contextId = httpContext.get(CONTEXT_ID);
+    try {
+        const timestamp = Date.now();
+        const futureJobExperiments = await getFutureJobExperiments(timestamp, contextId);
+        for (const futureJobExperiment of futureJobExperiments) {
+            await reloadSingleChaosExperiment(futureJobExperiment, timestamp);
+        }
+    } catch (error) {
+        throw new Error('Unable to reload job experiments , error: ' + error);
+    }
 };

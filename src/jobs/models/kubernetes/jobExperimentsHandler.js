@@ -1,7 +1,7 @@
 
-const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager'),
+const chaosExperimentsManager = require('../../../chaos-experiments/models/chaosExperimentsManager'),
     { v4: uuid } = require('uuid'),
-    logger = require('../../common/logger');
+    logger = require('../../../common/logger');
 
 const SEC_TO_MS = 1000;
 const MIN_TO_MS = 60 * 1000;
