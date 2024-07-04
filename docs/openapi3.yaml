@@ -2940,6 +2940,11 @@ components:
           description: >-
             The minimum of time waiting for runner to report before the test
             considered as finished. configured only by using API.
+        minimum_wait_for_chaos_experiment_deletion_in_ms:
+          minimum: 0
+          type: number
+          description: >-
+            The minimum of time waiting before cleaning chaos experiment resource from kubernetes after it is created.
         delay_runner_ms:
           type: number
           minimum: 0

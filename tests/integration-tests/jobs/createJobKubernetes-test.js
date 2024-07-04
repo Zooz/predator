@@ -246,7 +246,7 @@ describe('Create job specific kubernetes tests', async function () {
                         });
 
                         should(createJobResponse.status).eql(500);
-
+                        await sleep(4000);
                         const getReportByTestIdResponse = await reportsRequestCreator.getReports(testId);
                         expect(getReportByTestIdResponse.status).to.be.eql(200);
                         const lastReport = getReportByTestIdResponse.body[0];
