@@ -62,12 +62,13 @@ const getSupportedKinds = async () => {
 };
 
 const clearAllFinishedResources = async (deletionTimeThreshold) => {
+    supportedChaosKinds = supportedChaosKinds || await getSupportedKinds();
     for (const kind of supportedChaosKinds){
         try {
             const resourcesOfKind = await getAllResourcesOfKind(kind);
+            const thresholdTimestamp = Date.now() - deletionTimeThreshold;
             const resourcesToBeDeleted = resourcesOfKind.filter(resource => {
                 const experimentTimestamp = new Date(resource.metadata.creationTimestamp).valueOf();
-                const thresholdTimestamp = Date.now() - deletionTimeThreshold;
                 return experimentTimestamp < thresholdTimestamp;
             });
             for (const resource of resourcesToBeDeleted){
