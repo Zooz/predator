@@ -116,7 +116,7 @@ const reloadSingleChaosExperiment = async function (futureJobExperiment, timesta
     } catch (error) {
         throw new Error('Unable to reload job experiments ' + futureJobExperiment.id + ' , error: ' + error);
     }
-}
+};
 
 module.exports.reloadChaosExperiments = async () => {
     const contextId = httpContext.get(CONTEXT_ID);

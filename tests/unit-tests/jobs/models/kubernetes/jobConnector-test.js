@@ -28,7 +28,8 @@ describe('Kubernetes job connector tests', function () {
     describe('Run new job', () => {
         it('Success to create a job and running it immediately', async () => {
             requestSenderSendStub.resolves({ metadata: { name: 'Predator', uid: 'some_uuid' }, namespace: 'default' });
-            const jobResponse = await jobConnector.runJob({ metadata: { name: 'predator' } });
+            const job = { id: 'test_id' };
+            const jobResponse = await jobConnector.runJob({ metadata: { name: 'predator' } }, job);
             jobResponse.should.eql({
                 id: 'some_uuid',
                 jobName: 'Predator',

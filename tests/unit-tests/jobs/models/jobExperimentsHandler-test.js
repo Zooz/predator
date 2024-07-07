@@ -1,5 +1,5 @@
 const sinon = require('sinon'),
-    jobExperimentHandler = require('../../../../src/jobs/models/jobExperimentsHandler'),
+    jobExperimentHandler = require('../../../../src/jobs/models/kubernetes/jobExperimentsHandler'),
     chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
 ;
 const { v4: uuid } = require('uuid');
