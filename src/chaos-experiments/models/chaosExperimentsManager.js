@@ -5,18 +5,17 @@ const httpContext = require('express-http-context'),
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
-    kubernetesConnector = require('./kubernetes/chaosExperimentConnector'),
     { ERROR_MESSAGES, CONTEXT_ID, CONFIG, KUBERNETES } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     jobExperimentHandler = require('../../jobs/models/kubernetes/jobExperimentsHandler'),
     configHandler = require('../../configManager/models/configHandler');
 
-module.exports.scheduleFinishedResourcesCleanup = async function () {
-    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
-    if (jobPlatform !== KUBERNETES) return;
+let connector;
+
+const scheduleFinishedResourcesCleanup = module.exports.scheduleFinishedResourcesCleanup = async function() {
     const interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
     const deletionTimeThreshold = await configHandler.getConfigValue(CONFIG.MINIMUM_WAIT_FOR_CHAOS_EXPERIMENT_DELETION_IN_MS);
-    await kubernetesConnector.scheduleFinishedResourcesCleanup(interval, deletionTimeThreshold);
+    await connector.scheduleFinishedResourcesCleanup(interval, deletionTimeThreshold);
 };
 
 module.exports.createChaosExperiment = async function (chaosExperiment) {
@@ -93,7 +92,7 @@ module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experim
 
 module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentId) => {
     try {
-        await kubernetesConnector.runChaosExperiment(kubernetesChaosConfig);
+        await connector.runChaosExperiment(kubernetesChaosConfig);
         await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
     } catch (error){
         logger.error(error, `Error while running chaos job experiment ${jobExperimentId}`);
@@ -118,7 +117,7 @@ const reloadSingleChaosExperiment = async function (futureJobExperiment, timesta
     }
 };
 
-module.exports.reloadChaosExperiments = async () => {
+const reloadChaosExperiments = module.exports.reloadChaosExperiments = async function() {
     const contextId = httpContext.get(CONTEXT_ID);
     try {
         const timestamp = Date.now();
@@ -129,4 +128,12 @@ module.exports.reloadChaosExperiments = async () => {
     } catch (error) {
         throw new Error('Unable to reload job experiments , error: ' + error);
     }
+};
+
+module.exports.init = async function () {
+    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
+    if (jobPlatform !== KUBERNETES) return;
+    connector = require(`./${jobPlatform.toLowerCase()}/chaosExperimentConnector`);
+    await reloadChaosExperiments();
+    await scheduleFinishedResourcesCleanup();
 };
