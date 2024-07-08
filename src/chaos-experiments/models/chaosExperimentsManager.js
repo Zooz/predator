@@ -91,7 +91,6 @@ module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experim
 
 module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentId) => {
     try {
-        console.log('connector: ' + connector);
         await connector.runChaosExperiment(kubernetesChaosConfig);
         await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
     } catch (error){
