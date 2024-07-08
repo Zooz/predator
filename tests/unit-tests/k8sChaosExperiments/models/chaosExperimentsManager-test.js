@@ -2,16 +2,15 @@
 const should = require('should');
 const sinon = require('sinon');
 const uuid = require('uuid');
-const rewire = require('rewire');
 
 const database = require('../../../../src/chaos-experiments/models/database/databaseConnector');
-const manager = rewire('../../../../src/chaos-experiments/models/chaosExperimentsManager');
+const manager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
 const chaosExperimentConnector = require('../../../../src/chaos-experiments/models/kubernetes/chaosExperimentConnector');
+const configManager = require('../../../../src/configManager/models/configHandler');
 
 describe('Chaos experiments manager tests', function () {
     let sandbox;
     let deleteStub;
-    let getChaosExperimentByIdStub;
     let getChaosExperimentByNameStub;
     let getChaosExperimentsStub;
     let getChaosExperimentsByIdsStub;
@@ -19,6 +18,9 @@ describe('Chaos experiments manager tests', function () {
     let insertStub;
     let setChaosJobExperimentTriggeredStub;
     let runChaosExperimentConnectorStub;
+    let getFutureJobExperimentsStub;
+    let getChaosExperimentByIdStub;
+    let getConfigValueStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -31,12 +33,16 @@ describe('Chaos experiments manager tests', function () {
         updatedChaosExperimentStub = sandbox.stub(database, 'updateChaosExperiment');
         setChaosJobExperimentTriggeredStub = sandbox.stub(database, 'setChaosJobExperimentTriggered');
         runChaosExperimentConnectorStub = sandbox.stub(chaosExperimentConnector, 'runChaosExperiment');
+        getFutureJobExperimentsStub = sandbox.stub(database, 'getFutureJobExperiments');
+        getConfigValueStub = sandbox.stub(configManager, 'getConfigValue');
     });
     after(() => {
         sandbox.restore();
     });
 
-    beforeEach(() => {
+    beforeEach(async() => {
+        getConfigValueStub.resolves('KUBERNETES');
+        await manager.setPlatform();
         sandbox.reset();
     });
 
@@ -377,6 +383,32 @@ describe('Chaos experiments manager tests', function () {
             runChaosExperimentConnectorStub.args[0][0].should.eql(kubernetesJobConfig);
             setChaosJobExperimentTriggeredStub.calledOnce.should.eql(true);
             setChaosJobExperimentTriggeredStub.args[0][0].should.eql(chaosJobExperimentId);
+        });
+    });
+
+    describe('Reload job experiments', function () {
+        it('found future experiments to reload', async () => {
+            const timestamp = 500;
+            const jobExperiment = { start_time: timestamp, job_id: '1234', experiment_id: '4321', id: '2468' };
+            const chaosExperiment = { kubeObject: { hello: 1 }, experiment_id: '4321' };
+            getFutureJobExperimentsStub.resolves([jobExperiment]);
+            getChaosExperimentByIdStub.resolves(chaosExperiment);
+            runChaosExperimentConnectorStub.returns();
+
+            const clock = sinon.useFakeTimers();
+            clock.tick(1000);
+            await manager.reloadChaosExperiments();
+            clock.tick(3000);
+            sinon.assert.calledOnce(runChaosExperimentConnectorStub);
+            sinon.assert.calledWith(runChaosExperimentConnectorStub, chaosExperiment.kubeObject);
+            clock.restore();
+        });
+        it('future experiments not found - nothing to reload', async () => {
+            getFutureJobExperimentsStub.resolves([]);
+            runChaosExperimentConnectorStub.returns();
+            await manager.reloadChaosExperiments();
+            sinon.assert.notCalled(getChaosExperimentByIdStub);
+            sinon.assert.notCalled(runChaosExperimentConnectorStub);
         });
     });
 });

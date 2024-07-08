@@ -5,17 +5,16 @@ const httpContext = require('express-http-context'),
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
-    kubernetesConnector = require('./kubernetes/chaosExperimentConnector'),
     { ERROR_MESSAGES, CONTEXT_ID, CONFIG, KUBERNETES } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     configHandler = require('../../configManager/models/configHandler');
 
-module.exports.scheduleFinishedResourcesCleanup = async function () {
-    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
-    if (jobPlatform !== KUBERNETES) return;
+let connector, jobExperimentHandler;
+
+const scheduleFinishedResourcesCleanup = module.exports.scheduleFinishedResourcesCleanup = async function() {
     const interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
     const deletionTimeThreshold = await configHandler.getConfigValue(CONFIG.MINIMUM_WAIT_FOR_CHAOS_EXPERIMENT_DELETION_IN_MS);
-    await kubernetesConnector.scheduleFinishedResourcesCleanup(interval, deletionTimeThreshold);
+    await connector.scheduleFinishedResourcesCleanup(interval, deletionTimeThreshold);
 };
 
 module.exports.createChaosExperiment = async function (chaosExperiment) {
@@ -44,7 +43,7 @@ module.exports.getAllChaosExperiments = async function (from, limit, exclude) {
     return allChaosExperiments;
 };
 
-module.exports.getChaosExperimentById = async function (experimentId) {
+const getChaosExperimentById = module.exports.getChaosExperimentById = async function (experimentId) {
     const contextId = httpContext.get(CONTEXT_ID);
     const processor = await databaseConnector.getChaosExperimentById(experimentId, contextId);
     if (processor) {
@@ -92,17 +91,56 @@ module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experim
 
 module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentId) => {
     try {
-        await kubernetesConnector.runChaosExperiment(kubernetesChaosConfig);
+        await connector.runChaosExperiment(kubernetesChaosConfig);
         await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
     } catch (error){
         logger.error(error, `Error while running chaos job experiment ${jobExperimentId}`);
     }
 };
 
-module.exports.getFutureJobExperiments = async function (timestamp, contextId) {
+module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
+    return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
+};
+
+const getFutureJobExperiments = async function (timestamp, contextId) {
     return databaseConnector.getFutureJobExperiments(timestamp, contextId);
 };
 
-module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
-    return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
+const reloadSingleChaosExperiment = async function (futureJobExperiment, timestamp){
+    try {
+        const calculatedStartAfter = futureJobExperiment.start_time - timestamp;
+        const chaosExperiment = await getChaosExperimentById(futureJobExperiment.experiment_id);
+        jobExperimentHandler.scheduleChaosExperiment(chaosExperiment.kubeObject, futureJobExperiment.job_id, futureJobExperiment.id, calculatedStartAfter);
+    } catch (error) {
+        throw new Error('Unable to reload job experiments ' + futureJobExperiment.id + ' , error: ' + error);
+    }
+};
+
+const reloadChaosExperiments = module.exports.reloadChaosExperiments = async function() {
+    const contextId = httpContext.get(CONTEXT_ID);
+    try {
+        const timestamp = Date.now();
+        const futureJobExperiments = await getFutureJobExperiments(timestamp, contextId);
+        for (const futureJobExperiment of futureJobExperiments) {
+            await reloadSingleChaosExperiment(futureJobExperiment, timestamp);
+        }
+    } catch (error) {
+        throw new Error('Unable to reload job experiments , error: ' + error);
+    }
+};
+
+const setPlatform = module.exports.setPlatform = async function () {
+    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
+    if (jobPlatform !== KUBERNETES) return;
+    const platform = jobPlatform.toLowerCase();
+    connector = require(`./${platform}/chaosExperimentConnector`);
+    jobExperimentHandler = require(`./../../jobs/models/${platform}/jobExperimentsHandler`);
+    return jobPlatform;
+};
+
+module.exports.init = async function () {
+    const platform = await setPlatform();
+    if (!platform) return;
+    await reloadChaosExperiments();
+    await scheduleFinishedResourcesCleanup();
 };
