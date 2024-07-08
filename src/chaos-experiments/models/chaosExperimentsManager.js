@@ -10,7 +10,8 @@ const logger = require('../../common/logger'),
     jobExperimentHandler = require('../../jobs/models/kubernetes/jobExperimentsHandler'),
     configHandler = require('../../configManager/models/configHandler');
 
-let connector;
+const defaultPlatform = KUBERNETES.toLocaleLowerCase();
+let connector = require(`./${defaultPlatform}/chaosExperimentConnector`);
 
 const scheduleFinishedResourcesCleanup = module.exports.scheduleFinishedResourcesCleanup = async function() {
     const interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
@@ -92,6 +93,7 @@ module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experim
 
 module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentId) => {
     try {
+        console.log('connector: ' + connector);
         await connector.runChaosExperiment(kubernetesChaosConfig);
         await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
     } catch (error){

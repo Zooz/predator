@@ -3,6 +3,7 @@ const should = require('should');
 const sinon = require('sinon');
 const rewire = require('rewire');
 const requestSender = require('../../../../../src/common/requestSender');
+const jobExperimentsHandler = require('../../../../../src/jobs/models/kubernetes/jobExperimentsHandler');
 const config = require('../../../../../src/config/kubernetesConfig');
 config.kubernetesNamespace = 'default';
 const jobConnector = rewire('../../../../../src/jobs/models/kubernetes/jobConnector');
@@ -10,11 +11,13 @@ const jobConnector = rewire('../../../../../src/jobs/models/kubernetes/jobConnec
 describe('Kubernetes job connector tests', function () {
     let sandbox;
     let requestSenderSendStub;
+    let getChaosExperimentHandlerStub;
 
     before(() => {
         jobConnector.__set__('kubernetesUrl', 'localhost:80');
         sandbox = sinon.sandbox.create();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
+        getChaosExperimentHandlerStub = sandbox.stub(jobExperimentsHandler, 'setChaosExperimentsIfExist');
     });
 
     beforeEach(() => {
@@ -42,6 +45,27 @@ describe('Kubernetes job connector tests', function () {
                 body: { metadata: { name: 'predator' } },
                 headers: {}
             });
+            getChaosExperimentHandlerStub.callCount.should.eql(1);
+        });
+
+        it('Success to create a job and running it immediately - with experiments', async () => {
+            requestSenderSendStub.resolves({ metadata: { name: 'Predator', uid: 'some_uuid' }, namespace: 'default' });
+            getChaosExperimentHandlerStub.resolves();
+            const job = { id: 'test_id', experiments: ['abc123'] };
+            const jobResponse = await jobConnector.runJob({ metadata: { name: 'predator' } }, job);
+            jobResponse.should.eql({
+                id: 'some_uuid',
+                jobName: 'Predator',
+                namespace: 'default'
+            });
+            requestSenderSendStub.callCount.should.eql(1);
+            requestSenderSendStub.args[0][0].should.eql({
+                url: 'localhost:80/apis/batch/v1/namespaces/default/jobs',
+                method: 'POST',
+                body: { metadata: { name: 'predator' } },
+                headers: {}
+            });
+            getChaosExperimentHandlerStub.callCount.should.eql(1);
         });
 
         it('Fail to create a job', async () => {

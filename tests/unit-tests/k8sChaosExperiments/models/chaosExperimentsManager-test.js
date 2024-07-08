@@ -33,12 +33,13 @@ describe('Chaos experiments manager tests', function () {
         setChaosJobExperimentTriggeredStub = sandbox.stub(database, 'setChaosJobExperimentTriggered');
         runChaosExperimentConnectorStub = sandbox.stub(chaosExperimentConnector, 'runChaosExperiment');
         getFutureJobExperimentsStub = sandbox.stub(database, 'getFutureJobExperiments');
+        manager.__set__('connector', require('../../../../src/chaos-experiments/models/kubernetes/chaosExperimentConnector'));
     });
     after(() => {
         sandbox.restore();
     });
 
-    beforeEach(() => {
+    beforeEach(async() => {
         sandbox.reset();
     });
 
@@ -402,7 +403,6 @@ describe('Chaos experiments manager tests', function () {
         it('future experiments not found - nothing to reload', async () => {
             getFutureJobExperimentsStub.resolves([]);
             runChaosExperimentConnectorStub.returns();
-
             await manager.reloadChaosExperiments();
             sinon.assert.notCalled(getChaosExperimentByIdStub);
             sinon.assert.notCalled(runChaosExperimentConnectorStub);
