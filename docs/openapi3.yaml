@@ -657,7 +657,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/job_update'
+              allOf:
+                - $ref: '#/components/schemas/job_update'
+                - properties:
+                    experiments:
+                      $ref: '#/components/schemas/job_experiments'
         description: The job to add
         required: true
     delete:
@@ -2619,21 +2623,7 @@ components:
             The number of runners that will be allocated to executing the test.
             The `arrival_rate`, `duration` and `max_virtual_users` will be split
             between the specified number of runners.
-          example: 5
-        experiments:
-          description: An array of objects that describe experiments to run during the job running, and timing
-          type: array
-          items:
-            type: object
-            required:
-              - experiment_id
-              - start_after
-            properties: 
-              experiment_id:
-                type: string
-              start_after:
-                type: number
-                description: time in milliseconds in which the experiment starts after job started
+          example:
         emails:
           type: array
           description: >-
@@ -2887,6 +2877,8 @@ components:
             tag of the machine type/region that the job will run on (currently
             supported in aws fargate)
           example: eu-west-1
+        experiments:
+          $ref: '#/components/schemas/report_experiments'
     config_body:
       additionalProperties: false
       properties:
@@ -3239,15 +3231,7 @@ components:
           enum:
             - "chaos-mesh.org/v1alpha1"
         kind:
-          type: string
-          enum:
-            - 'DNSChaos'
-            - 'PodChaos'
-            - 'AWSChaos'
-            - 'HTTPChaos'
-            - 'StressChaos'
-          description: A description of the experiment.
-          example: 'PodChaos'
+          $ref: '#/components/schemas/experiment_kind'
         metadata:
           required:
             - name
@@ -3280,3 +3264,56 @@ components:
             mode: all
             action: pod-kill
             duration: 1m
+    job_experiments:
+      description: An array of objects that describe experiments to run during the job running, and timing
+      type: array
+      items:
+        type: object
+        required:
+          - experiment_id
+          - start_after
+        properties:
+          experiment_id:
+            type: string
+          start_after:
+            type: number
+            description: time in milliseconds in which the experiment starts after job started
+    report_experiments:
+      description: An array of objects that describe experiments to run during the job running, and timing
+      type: array
+      items:
+        type: object
+        required:
+          - experiment_id
+          - start_after
+        properties:
+          name:
+            type: string
+            example: 'my-chaos'
+          kind:
+            $ref: '#/components/schemas/experiment_kind'
+          start_time:
+            type: string
+            format: date
+            description: The date and time that the experiment started its execution.
+          end_time:
+            type: string
+            format: experiment
+            description: The date and time that the test execution ended.
+    experiment_kind:
+      type: string
+      enum:
+        - 'DNSChaos'
+        - 'PodChaos'
+        - 'AWSChaos'
+        - 'GCPChaos'
+        - 'AzureChaos:'
+        - 'HTTPChaos'
+        - 'StressChaos'
+        - 'IOChaos'
+        - 'TimeChaos'
+        - 'KernelChaos'
+        - 'JVMChaos'
+        - 'PhysicalMachineChaos'
+      description: A description of the experiment.
+      example: 'PodChaos'
