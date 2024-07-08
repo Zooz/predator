@@ -208,7 +208,7 @@ function getReportResponse(summaryRow, config, experiments) {
         last_success_rate: successRate,
         score: summaryRow.score ? summaryRow.score : undefined,
         benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined,
-        experiments: experiments.length ? experiments : undefined
+        experiments: experiments && experiments.length ? experiments : undefined
     };
 
     report.status = reportsStatusCalculator.calculateReportStatus(report, config);
