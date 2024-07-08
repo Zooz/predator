@@ -135,10 +135,12 @@ const setPlatform = module.exports.setPlatform = async function () {
     const platform = jobPlatform.toLowerCase();
     connector = require(`./${platform}/chaosExperimentConnector`);
     jobExperimentHandler = require(`./../../jobs/models/${platform}/jobExperimentsHandler`);
-}
+    return jobPlatform;
+};
 
 module.exports.init = async function () {
-    if (!setPlatform()) return;
+    const platform = await setPlatform();
+    if (!platform) return;
     await reloadChaosExperiments();
     await scheduleFinishedResourcesCleanup();
 };
