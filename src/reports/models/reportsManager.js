@@ -11,7 +11,6 @@ const databaseConnector = require('./databaseConnector'),
     reportsStatusCalculator = require('./reportStatusCalculator'),
     generateError = require('../../common/generateError');
 const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager');
-const constConfig = require('../../common/consts');
 
 const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
@@ -19,7 +18,6 @@ const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, c
 module.exports.getReport = async (testId, reportId) => {
     const contextId = httpContext.get(CONTEXT_ID);
     const config = await configHandler.getConfig();
-    let experiments = [];
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
 
     if (reportSummary.length !== 1) {
@@ -27,10 +25,7 @@ module.exports.getReport = async (testId, reportId) => {
         error.statusCode = 404;
         throw error;
     }
-    const platform = await configHandler.getConfigValue(constConfig.CONFIG.JOB_PLATFORM);
-    if (platform === constConfig.KUBERNETES) {
-        experiments = await getChaosExperimentsByJobId(reportSummary[0].job_id);
-    }
+    const experiments = await getChaosExperimentsByJobId(reportSummary[0].job_id);
     const report = getReportResponse(reportSummary[0], config, experiments);
     return report;
 };
