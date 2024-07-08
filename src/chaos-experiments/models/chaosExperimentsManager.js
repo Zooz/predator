@@ -7,11 +7,9 @@ const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     { ERROR_MESSAGES, CONTEXT_ID, CONFIG, KUBERNETES } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
-    jobExperimentHandler = require('../../jobs/models/kubernetes/jobExperimentsHandler'),
     configHandler = require('../../configManager/models/configHandler');
 
-const defaultPlatform = KUBERNETES.toLocaleLowerCase();
-let connector = require(`./${defaultPlatform}/chaosExperimentConnector`);
+let connector, jobExperimentHandler;
 
 const scheduleFinishedResourcesCleanup = module.exports.scheduleFinishedResourcesCleanup = async function() {
     const interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
@@ -132,10 +130,16 @@ const reloadChaosExperiments = module.exports.reloadChaosExperiments = async fun
     }
 };
 
-module.exports.init = async function () {
+const setPlatform = module.exports.setPlatform = async function () {
     const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     if (jobPlatform !== KUBERNETES) return;
-    connector = require(`./${jobPlatform.toLowerCase()}/chaosExperimentConnector`);
+    const platform = jobPlatform.toLowerCase();
+    connector = require(`./${platform}/chaosExperimentConnector`);
+    jobExperimentHandler = require(`./../../jobs/models/${platform}/jobExperimentsHandler`);
+}
+
+module.exports.init = async function () {
+    if (!setPlatform()) return;
     await reloadChaosExperiments();
     await scheduleFinishedResourcesCleanup();
 };
