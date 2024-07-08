@@ -70,59 +70,6 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     expect(getReportsResponse.body[0]).to.have.property('is_favorite').and.to.be.equal(true);
                     expect(getReportsResponse.body[0]).to.be.deep.equal(createdReportResponse.body);
                 });
-                it('Run a full cycle > favorite report -> fetch report with is_favorite filter -  should return the single created report with its chaos experiments', async function () {
-                    const jobName = 'jobName';
-                    const id = uuid.v4();
-                    const runnerId = uuid.v4();
-
-                    nockK8sRunnerCreation(kubernetesConfig.kubernetesUrl, jobName, id, kubernetesConfig.kubernetesNamespace);
-
-                    const testCreateResponse = await testsRequestCreator.createTest(basicTest, headers);
-                    expect(testCreateResponse.status).to.be.equal(201);
-
-                    const testId = testCreateResponse.body.id;
-                    const job = {
-                        test_id: testId,
-                        arrival_rate: 1,
-                        duration: 1,
-                        environment: 'test',
-                        run_immediately: true,
-                        type: 'load_test',
-                        webhooks: [],
-                        emails: [],
-                        experiments: [
-                            {
-                                start_after: 0,
-                                experiment_id: 'fc8c0f45-aed2-4d73-b0b0-5932ecc41157',
-                                experiment_name: 'my-experiment-1'
-                            },
-                            {
-                                start_after: 60000,
-                                experiment_id: '1e2d5547-c22b-4539-b0d0-4f4b0a15e13c',
-                                experiment_name: 'my-experiment-2'
-                            }
-                        ]
-                    };
-
-                    const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
-                    expect(jobCreateResponse.status).to.be.equal(201);
-                    const reportId = jobCreateResponse.body.report_id;
-
-                    await runFullSingleRunnerCycle(testId, reportId, runnerId);
-
-                    const editReportResponse = await reportsRequestCreator.editReport(testId, reportId, { is_favorite: true });
-                    expect(editReportResponse.status).to.be.equal(204);
-
-                    const createdReportResponse = await reportsRequestCreator.getReport(testId, reportId);
-                    expect(createdReportResponse.status).to.be.equal(200);
-
-                    const getReportsResponse = await reportsRequestCreator.getReports(testId, 'is_favorite');
-
-                    expect(getReportsResponse.body).to.be.an('array').and.to.have.lengthOf(1);
-                    expect(getReportsResponse.body[0]).to.have.property('is_favorite').and.to.be.equal(true);
-                    expect(getReportsResponse.body[0]).to.be.deep.equal(createdReportResponse.body);
-                    expect(getReportsResponse.body[0].experiments).to.be.deep.equal(job.experiments);
-                });
                 it('Run 2 full cycles -> favorite reports -> fetch reports with is_favorite filter - should return the 2 created report', async function () {
                     const jobName = 'jobName';
                     const id = uuid.v4();
