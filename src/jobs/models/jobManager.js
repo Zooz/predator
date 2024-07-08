@@ -13,15 +13,12 @@ const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
     streamingManager = require('../../streaming/manager'),
-    chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager'),
     { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common'),
     {
-        CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST,
-        KUBERNETES
+        CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST
     } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
-    { version: PREDATOR_VERSION } = require('../../../package.json'),
-    jobExperimentHandler = require('./jobExperimentsHandler');
+    { version: PREDATOR_VERSION } = require('../../../package.json');
 
 let jobConnector;
 const cronJobs = {};
@@ -45,23 +42,6 @@ module.exports.reloadCronJobs = async () => {
         });
     } catch (error) {
         throw new Error('Unable to reload scheduled jobs, error: ' + error);
-    }
-};
-
-module.exports.reloadChaosExperiments = async () => {
-    const contextId = httpContext.get(CONTEXT_ID);
-    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
-    if (jobPlatform.toUpperCase() !== KUBERNETES) {
-        return;
-    }
-    try {
-        const timestamp = Date.now();
-        const futureJobExperiments = await chaosExperimentsManager.getFutureJobExperiments(timestamp, contextId);
-        for (const futureJobExperiment of futureJobExperiments) {
-            await reloadSingleChaosExperiment(futureJobExperiment, timestamp);
-        }
-    } catch (error) {
-        throw new Error('Unable to reload job experiments , error: ' + error);
     }
 };
 
@@ -385,7 +365,6 @@ async function runJob(job, configData) {
         report = await createReportForJob(test, job);
         const jobSpecificPlatformRequest = await createJobRequest(job.id, report.report_id, job, latestDockerImage, configData);
         await jobConnector.runJob(jobSpecificPlatformRequest, job);
-        await jobExperimentHandler.setChaosExperimentsIfExist(job.id, job.experiments);
     } catch (error) {
         logger.error({ id: job.id, error: error }, 'Unable to run scheduled job.');
         await failReport(report);
@@ -401,14 +380,4 @@ function produceJobToStreamingPlatform(jobResponse) {
         ...jobResponse
     };
     streamingManager.produce({}, STREAMING_EVENT_TYPES.JOB_CREATED, streamingResource);
-}
-
-async function reloadSingleChaosExperiment(futureJobExperiment, timestamp){
-    try {
-        const calculatedStartAfter = futureJobExperiment.start_time - timestamp;
-        const chaosExperiment = await chaosExperimentsManager.getChaosExperimentById(futureJobExperiment.experiment_id);
-        jobExperimentHandler.scheduleChaosExperiment(chaosExperiment.kubeObject, futureJobExperiment.job_id, futureJobExperiment.id, calculatedStartAfter);
-    } catch (error) {
-        throw new Error('Unable to reload job experiments ' + futureJobExperiment.id + ' , error: ' + error);
-    }
 }

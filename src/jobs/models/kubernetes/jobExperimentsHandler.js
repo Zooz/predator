@@ -1,7 +1,7 @@
 
-const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager'),
+const chaosExperimentsManager = require('../../../chaos-experiments/models/chaosExperimentsManager'),
     { v4: uuid } = require('uuid'),
-    logger = require('../../common/logger');
+    logger = require('../../../common/logger');
 
 const SEC_TO_MS = 1000;
 const MIN_TO_MS = 60 * 1000;
@@ -16,9 +16,9 @@ async function setChaosExperimentsIfExist(jobId, jobExperiments) {
     try {
         const baseTimestamp = Date.now();
         const experimentIds = jobExperiments.map(experiment => experiment.experiment_id);
-        const chaoExperimentsFromDb = await chaosExperimentsManager.getChaosExperimentsByIds(experimentIds);
+        const chaosExperimentsFromDb = await chaosExperimentsManager.getChaosExperimentsByIds(experimentIds);
         await Promise.all(jobExperiments.map(async(experimentRequest) =>
-            await setSingleJobExperiment(experimentRequest, chaoExperimentsFromDb, baseTimestamp, jobId)
+            await setSingleJobExperiment(experimentRequest, chaosExperimentsFromDb, baseTimestamp, jobId)
         ));
     } catch (error){
         logger.error(error, `error while setting chaos experiments for job ${jobId}`);
