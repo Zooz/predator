@@ -121,9 +121,13 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                     const now = Date.now();
                     const jobExperiment1 = uuid.v4();
-                    await databaseConnector.insertChaosJobExperiment(jobExperiment1, jobCreateResponse.body.id, chaosExperimentsInserted[0].body.id, now, now + 60000);
+                    const jobExperiment1StartTime = now;
+                    const jobExperiment1EndTime = now + 60000;
+                    await databaseConnector.insertChaosJobExperiment(jobExperiment1, jobCreateResponse.body.id, chaosExperimentsInserted[0].body.id, jobExperiment1StartTime, jobExperiment1EndTime);
                     const jobExperiment2 = uuid.v4();
-                    await databaseConnector.insertChaosJobExperiment(jobExperiment2, jobCreateResponse.body.id, chaosExperimentsInserted[0].body.id, now + 60000, now + (2 * 60000));
+                    const jobExperiment2StartTime = now + 60000;
+                    const jobExperiment2EndTime = now + 2 * 60000;
+                    await databaseConnector.insertChaosJobExperiment(jobExperiment2, jobCreateResponse.body.id, chaosExperimentsInserted[1].body.id, jobExperiment2StartTime, jobExperiment2EndTime);
 
                     await runFullSingleRunnerCycle(testId, reportId, runnerId);
                     await databaseConnector.setChaosJobExperimentTriggered(jobExperiment1, true);
@@ -131,7 +135,23 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
                     console.log(getReportsResponse.body);
-                    expect(getReportsResponse.body[0].experiments.length).to.eql(2);
+                    expect(getReportsResponse.body.experiments.length).to.eql(2);
+                    expect(getReportsResponse.body.experiments).to.deep.equal([
+                        {
+                            kind: chaosExperimentsInserted[0].body.kind,
+                            name: chaosExperimentsInserted[0].body.name,
+                            id: chaosExperimentsInserted[0].body.id,
+                            start_time: jobExperiment1StartTime,
+                            end_time: jobExperiment1EndTime
+                        },
+                        {
+                            kind: chaosExperimentsInserted[1].body.kind,
+                            name: chaosExperimentsInserted[1].body.name,
+                            id: chaosExperimentsInserted[1].body.id,
+                            start_time: jobExperiment2StartTime,
+                            end_time: jobExperiment2EndTime
+                        }
+                    ]);
                 });
                 it('Run 2 full cycles -> favorite reports -> fetch reports with is_favorite filter - should return the 2 created report', async function () {
                     const jobName = 'jobName';
