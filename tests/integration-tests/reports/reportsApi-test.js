@@ -134,8 +134,6 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     await databaseConnector.setChaosJobExperimentTriggered(jobExperiment2, true);
 
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
-                    console.log(getReportsResponse.body);
-                    expect(getReportsResponse.body.experiments.length).to.eql(2);
                     expect(getReportsResponse.body.experiments).to.deep.equal([
                         {
                             kind: chaosExperimentsInserted[0].body.kubeObject.kind,
