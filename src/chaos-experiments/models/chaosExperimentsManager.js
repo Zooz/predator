@@ -5,11 +5,7 @@ const httpContext = require('express-http-context'),
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
-    { ERROR_MESSAGES, CONTEXT_ID, CONFIG, KUBERNETES,
-        CHAOS_EXECUTION_PLATFORM,
-        PREDATOR_RUNNER_PREFIX,
-        CHAOS_EXPERIMENT_LABELS
-    } = require('../../common/consts'),
+    { ERROR_MESSAGES, CONTEXT_ID, CONFIG, KUBERNETES } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     configHandler = require('../../configManager/models/configHandler');
 
@@ -93,14 +89,9 @@ module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experim
     await databaseConnector.insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId);
 };
 
-module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobId, jobExperimentId) => {
+module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentId) => {
     try {
-        const labels = {
-            [CHAOS_EXPERIMENT_LABELS.APP]: PREDATOR_RUNNER_PREFIX,
-            [CHAOS_EXPERIMENT_LABELS.APP]: jobId
-        };
-        const mappedResource = buildExperimentResource(kubernetesChaosConfig, labels);
-        await connector.runChaosExperiment(mappedResource);
+        await connector.runChaosExperiment(kubernetesChaosConfig);
         await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
     } catch (error){
         logger.error(error, `Error while running chaos job experiment ${jobExperimentId}`);
@@ -109,16 +100,6 @@ module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobId, jobExpe
 
 module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
     return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
-};
-
-const buildExperimentResource = (kubernetesChaosConfig, labels) => {
-    return {
-        ...kubernetesChaosConfig,
-        metadata: {
-            ...kubernetesChaosConfig.metadata,
-            labels: labels
-        }
-    };
 };
 
 const getFutureJobExperiments = async function (timestamp, contextId) {
