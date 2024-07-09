@@ -138,16 +138,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         {
                             kind: chaosExperimentsInserted[0].body.kubeObject.kind,
                             name: chaosExperimentsInserted[0].body.name,
-                            id: chaosExperimentsInserted[0].body.id,
-                            start_time: new Date(jobExperiment1StartTime),
-                            end_time: new Date(jobExperiment1EndTime)
+                            start_time: new Date(jobExperiment1StartTime).toISOString(),
+                            end_time: new Date(jobExperiment1EndTime).toISOString()
                         },
                         {
                             kind: chaosExperimentsInserted[1].body.kubeObject.kind,
                             name: chaosExperimentsInserted[1].body.name,
-                            id: chaosExperimentsInserted[1].body.id,
-                            start_time: new Date(jobExperiment2StartTime),
-                            end_time: new Date(jobExperiment2EndTime)
+                            start_time: new Date(jobExperiment2StartTime).toISOString(),
+                            end_time: new Date(jobExperiment2EndTime).toISOString()
                         }
                     ]);
                 });
