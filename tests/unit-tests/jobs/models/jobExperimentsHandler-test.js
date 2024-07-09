@@ -1,6 +1,7 @@
 const sinon = require('sinon'),
     jobExperimentHandler = require('../../../../src/jobs/models/kubernetes/jobExperimentsHandler'),
     chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
+const should = require('should');
 const { v4: uuid } = require('uuid');
 
 function generateExperiment(id = uuid()){
