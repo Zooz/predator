@@ -15,6 +15,8 @@ const kubernetesConfig = require('../../../src/config/kubernetesConfig');
 const basicTest = require('../../testExamples/Basic_test');
 const { KUBERNETES } = require('../../../src/common/consts');
 const mailhogHelper = require('./mailhog/mailhogHelper');
+const chaosExperimentsRequestSender = require('../chaos-experiments/helpers/requestCreator');
+const databaseConnector = require('../../../src/chaos-experiments/models/database/databaseConnector');
 
 const headers = { 'Content-Type': 'application/json' };
 
@@ -69,6 +71,64 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     expect(getReportsResponse.body).to.be.an('array').and.to.have.lengthOf(1);
                     expect(getReportsResponse.body[0]).to.have.property('is_favorite').and.to.be.equal(true);
                     expect(getReportsResponse.body[0]).to.be.deep.equal(createdReportResponse.body);
+                });
+                it('Run a full cycle with chaos experiments -  should return the single created report with its chaos experiments', async function () {
+                    const jobName = 'jobName';
+                    const id = uuid.v4();
+                    const runnerId = uuid.v4();
+                    let chaosExperimentResponse;
+                    const chaosExperimentsInserted = [];
+                    const headersWithContext = Object.assign({}, headers, { 'x-context-id': id });
+
+                    nockK8sRunnerCreation(kubernetesConfig.kubernetesUrl, jobName, id, kubernetesConfig.kubernetesNamespace);
+
+                    for (let i = 0; i < 2; i++) {
+                        const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(uuid.v4(), id);
+                        chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
+                        chaosExperimentsInserted.push(chaosExperimentResponse);
+                    }
+
+                    const testCreateResponse = await testsRequestCreator.createTest(basicTest, headersWithContext);
+                    expect(testCreateResponse.status).to.be.equal(201);
+
+                    const testId = testCreateResponse.body.id;
+                    const job = {
+                        test_id: testId,
+                        arrival_rate: 1,
+                        duration: 1,
+                        environment: 'test',
+                        run_immediately: true,
+                        type: 'load_test',
+                        webhooks: [],
+                        emails: [],
+                        experiments: [
+                            {
+                                start_after: 0,
+                                experiment_id: chaosExperimentsInserted[0].body.id,
+                                experiment_name: chaosExperimentsInserted[0].body.name
+                            },
+                            {
+                                start_after: 60000,
+                                experiment_id: chaosExperimentsInserted[1].body.id,
+                                experiment_name: chaosExperimentsInserted[1].body.name
+                            }
+                        ]
+                    };
+
+                    const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
+                    expect(jobCreateResponse.status).to.be.equal(201);
+                    const reportId = jobCreateResponse.body.report_id;
+
+                    await runFullSingleRunnerCycle(testId, reportId, runnerId);
+                    await databaseConnector.setChaosJobExperimentTriggered(jobCreateResponse.body.experiments[0].id, true);
+                    await databaseConnector.setChaosJobExperimentTriggered(jobCreateResponse.body.experiments[1].id, true);
+
+                    const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
+
+                    expect(getReportsResponse.body).to.be.an('array').and.to.have.lengthOf(1);
+                    expect(getReportsResponse.body[0]).to.have.property('is_favorite').and.to.be.equal(true);
+                    console.log(getReportsResponse.body);
+                    expect(getReportsResponse.body[0].experiments.length).to.eql(1);
                 });
                 it('Run 2 full cycles -> favorite reports -> fetch reports with is_favorite filter - should return the 2 created report', async function () {
                     const jobName = 'jobName';
