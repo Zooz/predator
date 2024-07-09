@@ -119,13 +119,19 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     expect(jobCreateResponse.status).to.be.equal(201);
                     const reportId = jobCreateResponse.body.report_id;
 
+                    const now = Date.now();
+                    const jobExperiment1 = uuid.v4();
+                    await databaseConnector.insertChaosJobExperiment(jobExperiment1, jobCreateResponse.body.id, chaosExperimentsInserted[0].body.id, now, now + 60000);
+                    const jobExperiment2 = uuid.v4();
+                    await databaseConnector.insertChaosJobExperiment(jobExperiment2, jobCreateResponse.body.id, chaosExperimentsInserted[0].body.id, now + 60000, now + (2 * 60000));
+
                     await runFullSingleRunnerCycle(testId, reportId, runnerId);
-                    await databaseConnector.setChaosJobExperimentTriggered(jobCreateResponse.body.experiments[0].id, true);
-                    await databaseConnector.setChaosJobExperimentTriggered(jobCreateResponse.body.experiments[1].id, true);
+                    await databaseConnector.setChaosJobExperimentTriggered(jobExperiment1, true);
+                    await databaseConnector.setChaosJobExperimentTriggered(jobExperiment2, true);
 
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
                     console.log(getReportsResponse.body);
-                    expect(getReportsResponse.body[0].experiments.length).to.eql(1);
+                    expect(getReportsResponse.body[0].experiments.length).to.eql(2);
                 });
                 it('Run 2 full cycles -> favorite reports -> fetch reports with is_favorite filter - should return the 2 created report', async function () {
                     const jobName = 'jobName';
