@@ -138,18 +138,18 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     expect(getReportsResponse.body.experiments.length).to.eql(2);
                     expect(getReportsResponse.body.experiments).to.deep.equal([
                         {
-                            kind: chaosExperimentsInserted[0].body.kind,
+                            kind: chaosExperimentsInserted[0].body.kubeObject.kind,
                             name: chaosExperimentsInserted[0].body.name,
                             id: chaosExperimentsInserted[0].body.id,
-                            start_time: jobExperiment1StartTime,
-                            end_time: jobExperiment1EndTime
+                            start_time: new Date(jobExperiment1StartTime),
+                            end_time: new Date(jobExperiment1EndTime)
                         },
                         {
-                            kind: chaosExperimentsInserted[1].body.kind,
+                            kind: chaosExperimentsInserted[1].body.kubeObject.kind,
                             name: chaosExperimentsInserted[1].body.name,
                             id: chaosExperimentsInserted[1].body.id,
-                            start_time: jobExperiment2StartTime,
-                            end_time: jobExperiment2EndTime
+                            start_time: new Date(jobExperiment2StartTime),
+                            end_time: new Date(jobExperiment2EndTime)
                         }
                     ]);
                 });
