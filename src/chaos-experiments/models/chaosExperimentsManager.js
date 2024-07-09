@@ -54,7 +54,7 @@ const getChaosExperimentById = module.exports.getChaosExperimentById = async fun
     }
 };
 
-module.exports.getChaosExperimentsByIds = (experimentIds, exclude, contextId) => {
+const getChaosExperimentsByIds = module.exports.getChaosExperimentsByIds = (experimentIds, exclude, contextId) => {
     return databaseConnector.getChaosExperimentsByIds(experimentIds, exclude, contextId);
 };
 
@@ -98,12 +98,35 @@ module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobExperimentI
     }
 };
 
-module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
+const getChaosJobExperimentsByJobId = module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
     return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
 };
 
 const getFutureJobExperiments = async function (timestamp, contextId) {
     return databaseConnector.getFutureJobExperiments(timestamp, contextId);
+};
+
+module.exports.stopJobExperimentsByJobId = async function(jobId, contextId){
+    const jobExperiments = await getChaosJobExperimentsByJobId(jobId, contextId);
+    const now = Date.now();
+    const relevantJobExperiments = jobExperiments.filter(experiment => experiment.startTime < now);
+    const experimentIds = relevantJobExperiments.map(jobExperiment => jobExperiment.experiment_id);
+    const experiments = await getChaosExperimentsByIds(experimentIds);
+    await Promise.all(experiments.map(async(experiment) => {
+        const { kind, namespace } = experiment.kubeObject;
+        try {
+            const names = await connector.getAllResourceNamesOfKindAndJob(kind, jobId);
+            await Promise.all(names.map(async(name) => {
+                try {
+                    await connector.deleteResourcesOfKind(kind, name, namespace);
+                } catch (e){
+                    logger.error(`Failed to delete job experiment ${name} of kind ${kind}: ${e}`);
+                }
+            }));
+        } catch (e){
+            logger.error(`Failed to get resources of kind ${kind} of jobId ${jobId}: ${e}`);
+        }
+    }));
 };
 
 const reloadSingleChaosExperiment = async function (futureJobExperiment, timestamp){

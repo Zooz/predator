@@ -40,12 +40,12 @@ module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
         headers
     };
     const response = await requestSender.send(options);
-    const genericJobResponse = {
-        jobName: response.metadata.name,
+    const genericResponse = {
+        name: response.metadata.name,
         id: response.metadata.uid,
         namespace: response.namespace
     };
-    return genericJobResponse;
+    return genericResponse;
 };
 
 const getSupportedKinds = async () => {
@@ -95,7 +95,18 @@ const getAllResourcesOfKind = async (kind) => {
     return resources.items;
 };
 
-const deleteResourcesOfKind = async (kind, resourceName, namespace) => {
+module.exports.getAllResourceNamesOfKindAndJob = async (kind, jobId) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s?labelSelector=jobId=%s', kubernetesUrl, kind, jobId);
+    const options = {
+        url,
+        method: 'GET',
+        headers
+    };
+    const resources = await requestSender.send(options);
+    return resources.items.map(container => container.metadata.name);
+};
+
+const deleteResourcesOfKind = module.exports.deleteResourcesOfKind = async (kind, resourceName, namespace) => {
     const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind, resourceName);
     const options = {
         url,
