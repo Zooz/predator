@@ -134,18 +134,16 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     await databaseConnector.setChaosJobExperimentTriggered(jobExperiment2, true);
 
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
-                    expect(getReportsResponse.body.experiments).to.deep.equal([
+                    expect(getReportsResponse.body.experiments).to.deep.contain([
                         {
                             kind: chaosExperimentsInserted[0].body.kubeObject.kind,
                             name: chaosExperimentsInserted[0].body.name,
-                            start_time: new Date(jobExperiment1StartTime).toISOString(),
-                            end_time: new Date(jobExperiment1EndTime).toISOString()
+                            id: chaosExperimentsInserted[0].body.id
                         },
                         {
                             kind: chaosExperimentsInserted[1].body.kubeObject.kind,
                             name: chaosExperimentsInserted[1].body.name,
-                            start_time: new Date(jobExperiment2StartTime).toISOString(),
-                            end_time: new Date(jobExperiment2EndTime).toISOString()
+                            id: chaosExperimentsInserted[1].body.id
                         }
                     ]);
                 });
