@@ -1,7 +1,7 @@
 const sinon = require('sinon'),
     jobExperimentHandler = require('../../../../src/jobs/models/kubernetes/jobExperimentsHandler'),
     chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
-const should = require('should');
+;
 const { v4: uuid } = require('uuid');
 
 function generateExperiment(id = uuid()){
@@ -72,8 +72,8 @@ describe('Job experiments handler tests', function () {
         clock.tick(1000);
         await jobExperimentHandler.setChaosExperimentsIfExist(jobId, jobExperiments);
         clock.tick(3000);
-        (experimentsManagerRunJobStub.callCount).should.eql(2);
-        experimentsManagerRunJobStub.args[0][0].metadata.name.should.eql(`${firstExperimentName}-${experimentsManagerRunJobStub.args[0][2]}`);
+        experimentsManagerRunJobStub.callCount.should.eql(2);
+        experimentsManagerRunJobStub.args[0][0].metadata.name.should.eql(`${firstExperimentName}-${experimentsManagerRunJobStub.args[0][1]}`);
         experimentsManagerGetStub.callCount.should.eql(1);
         experimentsManagerInsertStub.callCount.should.eql(2);
         experimentsManagerInsertStub.args[0][1].should.eql(jobId);
