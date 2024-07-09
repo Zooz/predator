@@ -134,18 +134,21 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     await databaseConnector.setChaosJobExperimentTriggered(jobExperiment2, true);
 
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
-                    expect(getReportsResponse.body.experiments).to.deep.contain([
-                        {
-                            kind: chaosExperimentsInserted[0].body.kubeObject.kind,
-                            name: chaosExperimentsInserted[0].body.name,
-                            id: chaosExperimentsInserted[0].body.id
-                        },
-                        {
-                            kind: chaosExperimentsInserted[1].body.kubeObject.kind,
-                            name: chaosExperimentsInserted[1].body.name,
-                            id: chaosExperimentsInserted[1].body.id
-                        }
-                    ]);
+
+                    expect(getReportsResponse.body.experiments.length).eql(2);
+                    const experiment1 = getReportsResponse.body.experiments.find(exp => exp.id === chaosExperimentsInserted[0].body.id);
+                    expect(experiment1).to.deep.contain({
+                        kind: chaosExperimentsInserted[0].body.kubeObject.kind,
+                        name: chaosExperimentsInserted[0].body.name,
+                        id: chaosExperimentsInserted[0].body.id
+                    });
+
+                    const experiment2 = getReportsResponse.body.experiments.find(exp => exp.id === chaosExperimentsInserted[1].body.id);
+                    expect(experiment2).to.deep.contain({
+                        kind: chaosExperimentsInserted[1].body.kubeObject.kind,
+                        name: chaosExperimentsInserted[1].body.name,
+                        id: chaosExperimentsInserted[1].body.id
+                    });
                 });
                 it('Run 2 full cycles -> favorite reports -> fetch reports with is_favorite filter - should return the 2 created report', async function () {
                     const jobName = 'jobName';
