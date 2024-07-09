@@ -379,9 +379,20 @@ describe('Chaos experiments manager tests', function () {
         const chaosJobExperimentId = uuid();
         const jobId = uuid();
         it('should call k8s connector and write to db', async function() {
-            await manager.runChaosExperiment(kubernetesJobConfig, jobId, chaosJobExperimentId);
+            const mappedChaosExperiment = {
+                ...chaosJobExperimentId,
+                metadata: {
+                    ...chaosJobExperimentId.metadata,
+                    labels: {
+                        app: 'predator',
+                        job_id: jobId
+                    }
+                }
+            };
+
+            await manager.runChaosExperiment(mappedChaosExperiment, jobId, chaosJobExperimentId);
             runChaosExperimentConnectorStub.calledOnce.should.eql(true);
-            runChaosExperimentConnectorStub.args[0][0].should.eql(kubernetesJobConfig);
+            runChaosExperimentConnectorStub.args[0][0].should.eql(mappedChaosExperiment);
             setChaosJobExperimentTriggeredStub.calledOnce.should.eql(true);
             setChaosJobExperimentTriggeredStub.args[0][0].should.eql(chaosJobExperimentId);
         });
@@ -390,8 +401,11 @@ describe('Chaos experiments manager tests', function () {
     describe('Reload job experiments', function () {
         it('found future experiments to reload', async () => {
             const timestamp = 500;
-            const jobExperiment = { start_time: timestamp, job_id: '1234', experiment_id: '4321', id: '2468' };
-            const chaosExperiment = { kubeObject: { hello: 1 }, experiment_id: '4321' };
+            const jobId = '1234';
+            const kubeObject = { hello: 1 };
+            const mappedKubeObject = { ...kubeObject, metadata: { labels: { app: 'predator', job_id: jobId } } };
+            const jobExperiment = { start_time: timestamp, job_id: jobId, experiment_id: '4321', id: '2468' };
+            const chaosExperiment = { kubeObject: kubeObject, experiment_id: '4321' };
             getFutureJobExperimentsStub.resolves([jobExperiment]);
             getChaosExperimentByIdStub.resolves(chaosExperiment);
             runChaosExperimentConnectorStub.returns();
@@ -401,7 +415,7 @@ describe('Chaos experiments manager tests', function () {
             await manager.reloadChaosExperiments();
             clock.tick(3000);
             sinon.assert.calledOnce(runChaosExperimentConnectorStub);
-            sinon.assert.calledWith(runChaosExperimentConnectorStub, chaosExperiment.kubeObject);
+            sinon.assert.calledWith(runChaosExperimentConnectorStub, mappedKubeObject);
             clock.restore();
         });
         it('future experiments not found - nothing to reload', async () => {

@@ -15,8 +15,8 @@ const WEBHOOK_DEFAULT_REPORTER_NAME = 'Predator';
 const WEBHOOK_TEAMS_DEFAULT_THEME_COLOR = '957c58';
 const PREDATOR_RUNNER_PREFIX = 'predator';
 const CHAOS_EXPERIMENT_LABELS = {
-    JOB_ID: 'ob-id',
-    APP: 'app',
+    JOB_ID: 'job_id',
+    APP: 'app'
 };
 
 module.exports = {
