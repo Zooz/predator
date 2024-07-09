@@ -411,4 +411,14 @@ describe('Chaos experiments manager tests', function () {
             sinon.assert.notCalled(runChaosExperimentConnectorStub);
         });
     });
+
+
+    describe('stop job experiments by job id', function () {
+        it('found future experiments to reload', async () => {
+            
+            await manager.stopJobExperimentsByJobId();
+            
+
+        });
+    });
 });
