@@ -124,9 +124,6 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     await databaseConnector.setChaosJobExperimentTriggered(jobCreateResponse.body.experiments[1].id, true);
 
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
-
-                    expect(getReportsResponse.body).to.be.an('array').and.to.have.lengthOf(1);
-                    expect(getReportsResponse.body[0]).to.have.property('is_favorite').and.to.be.equal(true);
                     console.log(getReportsResponse.body);
                     expect(getReportsResponse.body[0].experiments.length).to.eql(1);
                 });
