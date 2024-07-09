@@ -97,7 +97,7 @@ module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobId, jobExpe
     try {
         const labels = {
             [CHAOS_EXPERIMENT_LABELS.APP]: PREDATOR_RUNNER_PREFIX,
-            [CHAOS_EXPERIMENT_LABELS.JOB_ID]: jobId
+            [CHAOS_EXPERIMENT_LABELS.APP]: jobId
         };
         const mappedResource = buildExperimentResource(kubernetesChaosConfig, labels);
         await connector.runChaosExperiment(mappedResource);
@@ -115,7 +115,7 @@ const buildExperimentResource = (kubernetesChaosConfig, labels) => {
     return {
         ...kubernetesChaosConfig,
         metadata: {
-            ...(kubernetesChaosConfig.metadata && kubernetesChaosConfig.metadata),
+            ...kubernetesChaosConfig.metadata,
             labels: labels
         }
     };
