@@ -377,8 +377,9 @@ describe('Chaos experiments manager tests', function () {
             }
         };
         const chaosJobExperimentId = uuid();
+        const jobId = uuid();
         it('should call k8s connector and write to db', async function() {
-            await manager.runChaosExperiment(kubernetesJobConfig, chaosJobExperimentId);
+            await manager.runChaosExperiment(kubernetesJobConfig, jobId, chaosJobExperimentId);
             runChaosExperimentConnectorStub.calledOnce.should.eql(true);
             runChaosExperimentConnectorStub.args[0][0].should.eql(kubernetesJobConfig);
             setChaosJobExperimentTriggeredStub.calledOnce.should.eql(true);
