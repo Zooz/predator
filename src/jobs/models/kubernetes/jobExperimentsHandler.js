@@ -52,6 +52,7 @@ function scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, startAfter)
 
 async function stopChaosExperimentsForJob(jobId){
     const timeoutsOfJob = jobIdsToTimeouts.get(jobId);
+    if (!timeoutsOfJob) return;
     timeoutsOfJob.map(timeout => clearTimeout(timeout));
     jobIdsToTimeouts.delete(jobId);
     await chaosExperimentsManager.stopJobExperimentsByJobId(jobId);
