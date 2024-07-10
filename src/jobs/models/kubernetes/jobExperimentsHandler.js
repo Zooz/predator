@@ -41,7 +41,7 @@ async function setSingleJobExperiment(experimentRequest, chaosExperimentsFromDb,
 }
 
 function scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, startAfter) {
-    const timeout = setTimeout(() => chaosExperimentsManager.runChaosExperiment(kubeObject, jobExperimentId), startAfter);
+    const timeout = setTimeout(() => chaosExperimentsManager.runChaosExperiment(kubeObject, jobId, jobExperimentId), startAfter);
     const timeoutsArray = jobIdsToTimeouts.get(jobId);
     if (timeoutsArray){
         timeoutsArray.push(timeout);
