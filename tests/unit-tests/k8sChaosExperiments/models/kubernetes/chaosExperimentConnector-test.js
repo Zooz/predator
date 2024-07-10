@@ -178,7 +178,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
         it('Should successfully delete all relevant resources', async function () {
             await chaosExperimentConnector.deleteAllResourcesOfKindAndJob('podchaos', 'apps', 'test1');
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos?labelSelector=jobId=test1',
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos?labelSelector=job_id=test1',
                 method: 'DELETE',
                 headers: {}
             });
