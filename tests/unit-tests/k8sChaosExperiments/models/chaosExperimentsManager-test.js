@@ -390,13 +390,12 @@ describe('Chaos experiments manager tests', function () {
                 }
             };
 
-            await manager.runChaosExperiment(chaosJobExperimentId, jobId, chaosJobExperimentId);
+            await manager.runChaosExperiment(kubernetesJobConfig, jobId, chaosJobExperimentId);
             runChaosExperimentConnectorStub.calledOnce.should.eql(true);
             runChaosExperimentConnectorStub.args[0][0].should.eql(mappedChaosExperiment);
             setChaosJobExperimentTriggeredStub.calledOnce.should.eql(true);
         });
     });
-
     describe('Reload job experiments', function () {
         it('found future experiments to reload', async () => {
             const timestamp = 500;
