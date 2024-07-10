@@ -12,12 +12,14 @@ describe('Kubernetes job connector tests', function () {
     let sandbox;
     let requestSenderSendStub;
     let getChaosExperimentHandlerStub;
+    let stopChaosExperimentsForJobStub;
 
     before(() => {
         jobConnector.__set__('kubernetesUrl', 'localhost:80');
         sandbox = sinon.sandbox.create();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
         getChaosExperimentHandlerStub = sandbox.stub(jobExperimentsHandler, 'setChaosExperimentsIfExist');
+        stopChaosExperimentsForJobStub = sandbox.stub(jobExperimentsHandler, 'stopChaosExperimentsForJob');
     });
 
     beforeEach(() => {
@@ -90,6 +92,7 @@ describe('Kubernetes job connector tests', function () {
                 method: 'DELETE',
                 headers: {}
             });
+            stopChaosExperimentsForJobStub.calledOnce.should.eql(true);
         });
 
         it('Failure Stopping a running run of specific job', async () => {
