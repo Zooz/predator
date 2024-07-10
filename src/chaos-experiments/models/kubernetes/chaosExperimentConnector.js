@@ -96,7 +96,7 @@ const getAllResourcesOfKind = async (kind) => {
 };
 
 module.exports.deleteAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=jobId=%s', kubernetesUrl, namespace, kind, jobId);
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=job_id=%s', kubernetesUrl, namespace, kind, jobId);
     const options = {
         url,
         method: 'DELETE',
