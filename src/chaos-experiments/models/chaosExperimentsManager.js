@@ -145,10 +145,9 @@ module.exports.init = async function () {
     await scheduleFinishedResourcesCleanup();
 };
 
-const stopResourcesOfJobIdAndExperiment = async (jobId, experiment) => {
-    const { kind, namespace } = experiment.kubeObject;
+const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {
     try {
-        await connector.deleteAllResourcesOfKindAndJob(kind, jobId, namespace);
+        await connector.deleteAllResourcesOfKindAndJob(kind, namespace, jobId);
     } catch (e){
         logger.error(`Failed to get resources of kind ${kind} of jobId ${jobId}: ${e}`);
     }
@@ -157,8 +156,9 @@ const stopResourcesOfJobIdAndExperiment = async (jobId, experiment) => {
 module.exports.stopJobExperimentsByJobId = async function(jobId, contextId) {
     const jobExperiments = await getChaosJobExperimentsByJobId(jobId, contextId);
     const now = Date.now();
-    const relevantJobExperiments = jobExperiments.filter(experiment => experiment.startTime < now);
+    const relevantJobExperiments = jobExperiments.filter(experiment => experiment.start_time <= now);
     const experimentIds = relevantJobExperiments.map(jobExperiment => jobExperiment.experiment_id);
     const experiments = await getChaosExperimentsByIds(experimentIds);
-    await Promise.all(experiments.map(async(experiment) => await stopResourcesOfJobIdAndExperiment(jobId, experiment)));
+    const kindNamespacePairs = experiments.map(ex => { return { kind: ex.kubeObject.kind, namespace: ex.kubeObject.metadata.namespace } });
+    await Promise.all(kindNamespacePairs.map(async(pair) => await stopResourcesOfJobIdAndExperiment(jobId, pair.kind, pair.namespace)));
 };

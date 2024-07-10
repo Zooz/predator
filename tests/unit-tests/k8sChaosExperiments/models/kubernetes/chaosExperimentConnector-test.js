@@ -173,6 +173,17 @@ describe('Chaos experiments kubernetes connector tests', function () {
             });
         });
     });
+
+    describe('Delete all resources of a kind and job', function () {
+        it('Should successfully delete all relevant resources', async function () {
+            await chaosExperimentConnector.deleteAllResourcesOfKindAndJob('podchaos', 'apps', 'test1');
+            requestSenderSendStub.args[0][0].should.eql({
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos?labelSelector=jobId=test1',
+                method: 'DELETE',
+                headers: {}
+            });
+        });
+    });
     describe('Clear all finished resources', function () {
         before(() => {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKindStub);

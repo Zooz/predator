@@ -20,6 +20,8 @@ describe('Chaos experiments manager tests', function () {
     let runChaosExperimentConnectorStub;
     let getFutureJobExperimentsStub;
     let getChaosExperimentByIdStub;
+    let getChaosJobExperimentsByJobIdStub;
+    let deleteAllResourcesOfKindAndJobStub;
     let getConfigValueStub;
 
     before(() => {
@@ -34,6 +36,8 @@ describe('Chaos experiments manager tests', function () {
         setChaosJobExperimentTriggeredStub = sandbox.stub(database, 'setChaosJobExperimentTriggered');
         runChaosExperimentConnectorStub = sandbox.stub(chaosExperimentConnector, 'runChaosExperiment');
         getFutureJobExperimentsStub = sandbox.stub(database, 'getFutureJobExperiments');
+        getChaosJobExperimentsByJobIdStub = sandbox.stub(database, 'getChaosJobExperimentsByJobId');
+        deleteAllResourcesOfKindAndJobStub = sandbox.stub(chaosExperimentConnector, 'deleteAllResourcesOfKindAndJob');
         getConfigValueStub = sandbox.stub(configManager, 'getConfigValue');
     });
     after(() => {
@@ -412,13 +416,68 @@ describe('Chaos experiments manager tests', function () {
         });
     });
 
-
     describe('stop job experiments by job id', function () {
-        it('found future experiments to reload', async () => {
-            
-            await manager.stopJobExperimentsByJobId();
-            
+        it('should stop relevant experiments', async () => {
+            const jobId = uuid();
+            const firstExId = uuid();
+            const secondExId = uuid();
+            const thirdExId = uuid();
+            const firstExperiment = {
+                id: firstExId,
+                kubeObject: {
+                    kind: 'PodChaos',
+                    apiVersion: 'chaos-mesh.org/v1alpha1',
+                    metadata: {
+                        namespace: 'apps',
+                        name: 'first pod fault',
+                        annotations: {}
+                    },
+                    spec: {}
+                },
+                name: 'mickey1'
+            };
 
+            const secondExperiment = {
+                id: secondExId,
+                kubeObject: {
+                    kind: 'PodChaos',
+                    apiVersion: 'chaos-mesh.org/v1alpha1',
+                    metadata: {
+                        namespace: 'apps',
+                        name: 'second pod fault',
+                        annotations: {}
+                    },
+                    spec: {}
+                },
+                name: 'mickey2'
+            };
+            getChaosJobExperimentsByJobIdStub.resolves([{
+                jobId,
+                experiment_id: firstExId,
+                start_time: Date.now()
+            }, {
+
+                jobId,
+                experiment_id: secondExId,
+                start_time: Date.now()
+            }, {
+
+                jobId,
+                experiment_id: thirdExId,
+                start_time: Date.now() + 10000
+            }
+            ]);
+            getChaosExperimentsByIdsStub.resolves([
+                firstExperiment,
+                secondExperiment
+            ]);
+            await manager.stopJobExperimentsByJobId(jobId);
+            sinon.assert.calledOnce(getChaosJobExperimentsByJobIdStub);
+            sinon.assert.calledWith(getChaosJobExperimentsByJobIdStub, jobId);
+            sinon.assert.calledOnce(getChaosExperimentsByIdsStub);
+            sinon.assert.calledWith(getChaosExperimentsByIdsStub, [firstExId, secondExId]);
+            // sinon.assert.calledOnce(deleteAllResourcesOfKindAndJobStub);
+            sinon.assert.calledWith(deleteAllResourcesOfKindAndJobStub, 'PodChaos', 'apps', jobId);
         });
     });
 });
