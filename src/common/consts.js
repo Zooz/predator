@@ -13,6 +13,11 @@ const WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED = 'benchmark_failed';
 const WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON = ':muscle:';
 const WEBHOOK_DEFAULT_REPORTER_NAME = 'Predator';
 const WEBHOOK_TEAMS_DEFAULT_THEME_COLOR = '957c58';
+const PREDATOR_RUNNER_PREFIX = 'predator';
+const CHAOS_EXPERIMENT_LABELS = {
+    JOB_ID: 'job_id',
+    APP: 'app'
+};
 
 module.exports = {
     CONTEXT_ID: 'context_id',
@@ -93,5 +98,7 @@ module.exports = {
         BENCHMARK_WEIGHTS: 'benchmark_weights',
         CUSTOM_RUNNER_DEFINITION: 'custom_runner_definition',
         STREAMING_EXCLUDED_ATTRIBUTES: 'streaming_excluded_attributes'
-    }
+    },
+    PREDATOR_RUNNER_PREFIX,
+    CHAOS_EXPERIMENT_LABELS
 };
