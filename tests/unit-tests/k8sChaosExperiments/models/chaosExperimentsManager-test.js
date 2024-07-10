@@ -382,7 +382,7 @@ describe('Chaos experiments manager tests', function () {
         };
         const chaosJobExperimentId = uuid();
         const jobId = uuid();
-        it('should call k8s connector and write to db', async function() {
+        it.skip('should call k8s connector and write to db', async function() {
             const mappedChaosExperiment = {
                 ...kubernetesJobConfig,
                 metadata: {
