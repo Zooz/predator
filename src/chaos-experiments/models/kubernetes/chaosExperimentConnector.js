@@ -95,11 +95,11 @@ const getAllResourcesOfKind = async (kind) => {
     return resources.items;
 };
 
-module.exports.getAllResourceNamesOfKindAndJob = async (kind, jobId) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s?labelSelector=jobId=%s', kubernetesUrl, kind, jobId);
+module.exports.deleteAllResourcesOfKindAndJob = async (kind, jobId, namespace) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=jobId=%s', kubernetesUrl, namespace, kind, jobId);
     const options = {
         url,
-        method: 'GET',
+        method: 'DELETE',
         headers
     };
     const resources = await requestSender.send(options);
