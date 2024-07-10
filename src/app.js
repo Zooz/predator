@@ -22,6 +22,7 @@ const chaosExperimentsRouter = require('./chaos-experiments/routes/chaosExperime
 const swaggerValidator = require('express-ajv-swagger-validation');
 const database = require('./database/database');
 const jobsManager = require('./jobs/models/jobManager');
+const chaosExperimentsManager = require('./chaos-experiments/models/chaosExperimentsManager');
 const streamingManager = require('./streaming/manager');
 const streamingConfig = require('./config/streamingConfig');
 const contexts = require('./middlewares/context');
@@ -31,8 +32,8 @@ module.exports = async () => {
     await database.init();
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
-    await jobsManager.reloadChaosExperiments();
     await jobsManager.scheduleFinishedContainersCleanup();
+    await chaosExperimentsManager.init();
     if (streamingConfig.platform) {
         const eventStreamerPlatformConfig = require(`./config/${streamingConfig.platform}Config`);
         await streamingManager.init(eventStreamerPlatformConfig);

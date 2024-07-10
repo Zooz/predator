@@ -5,6 +5,7 @@ const fs = require('fs');
 const requestSender = require('../../../common/requestSender');
 const logger = require('../../../common/logger');
 const kubernetesConfig = require('../../../config/kubernetesConfig');
+const jobExperimentHandler = require('./jobExperimentsHandler');
 const kubernetesUrl = kubernetesConfig.kubernetesUrl;
 const kubernetesNamespace = kubernetesConfig.kubernetesNamespace;
 const headers = {};
@@ -24,7 +25,7 @@ if (kubernetesConfig.kubernetesToken) {
     }
 }
 
-module.exports.runJob = async (kubernetesJobConfig) => {
+module.exports.runJob = async (kubernetesJobConfig, job) => {
     const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs', kubernetesUrl, kubernetesNamespace);
     const options = {
         url,
@@ -38,6 +39,7 @@ module.exports.runJob = async (kubernetesJobConfig) => {
         id: jobResponse.metadata.uid,
         namespace: jobResponse.namespace
     };
+    await jobExperimentHandler.setChaosExperimentsIfExist(job.id, job.experiments);
     return genericJobResponse;
 };
 module.exports.stopRun = async (jobPlatformName) => {

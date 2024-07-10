@@ -7,6 +7,7 @@ const kubernetesUrl = kubernetesConfig.kubernetesUrl;
 
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 const headers = {};
+let supportedChaosKinds;
 
 if (kubernetesConfig.kubernetesToken) {
     logger.info('Using kubernetes token from env var');
@@ -20,6 +21,13 @@ if (kubernetesConfig.kubernetesToken) {
         logger.warn(error, 'Failed to get kubernetes token from: ' + TOKEN_PATH);
     }
 }
+module.exports.scheduleFinishedResourcesCleanup = async function (interval, deletionTimeThreshold) {
+    supportedChaosKinds = await getSupportedKinds();
+    setInterval(async () => {
+        await clearAllFinishedResources(deletionTimeThreshold);
+    }, interval);
+    logger.info(`K8S Finished chaos experiments cleanup setup - interval of ${interval}ms was set with deletion time threshold of ${deletionTimeThreshold}ms`);
+};
 
 module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
     const resourceKindName = kubernetesExperimentConfig.kind.toLowerCase();
@@ -38,4 +46,62 @@ module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
         namespace: response.namespace
     };
     return genericJobResponse;
+};
+
+const getSupportedKinds = async () => {
+    const url = util.format('%s/apis/apiextensions.k8s.io/v1/customresourcedefinitions', kubernetesUrl);
+    const options = {
+        url,
+        method: 'GET',
+        headers
+    };
+    const response = await requestSender.send(options);
+    const kinds = response.items.filter(crd => crd.spec.group === 'chaos-mesh.org').map(crd => crd.spec.names.plural);
+    logger.info(`Supported chaos kinds that will be cleaned: ${kinds.toString()}`);
+    return kinds;
+};
+
+const clearAllFinishedResources = async (deletionTimeThreshold) => {
+    supportedChaosKinds = supportedChaosKinds || await getSupportedKinds();
+    for (const kind of supportedChaosKinds){
+        try {
+            const resourcesOfKind = await getAllResourcesOfKind(kind);
+            const thresholdTimestamp = Date.now() - deletionTimeThreshold;
+            const resourcesToBeDeleted = resourcesOfKind.filter(resource => {
+                const experimentTimestamp = new Date(resource.metadata.creationTimestamp).valueOf();
+                return experimentTimestamp < thresholdTimestamp;
+            });
+            for (const resource of resourcesToBeDeleted){
+                try {
+                    await deleteResourcesOfKind(kind, resource.metadata.name, resource.metadata.namespace);
+                } catch (error){
+                    logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
+                }
+            }
+        } catch (error){
+            logger.error(error, `Failed to get resources of kind ${kind} from k8s`);
+        }
+    }
+};
+
+const getAllResourcesOfKind = async (kind) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s', kubernetesUrl, kind);
+    const options = {
+        url,
+        method: 'GET',
+        headers
+    };
+    const resources = await requestSender.send(options);
+    return resources.items;
+};
+
+const deleteResourcesOfKind = async (kind, resourceName, namespace) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind, resourceName);
+    const options = {
+        url,
+        method: 'DELETE',
+        headers
+    };
+    const resources = await requestSender.send(options);
+    return resources;
 };

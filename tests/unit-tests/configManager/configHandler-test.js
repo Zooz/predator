@@ -35,6 +35,7 @@ describe('Manager config', function () {
         runner_memory: 256,
         smtp_server: Object.assign({}, defaultSmtpServerConfig),
         minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        minimum_wait_for_chaos_experiment_deletion_in_ms: 720000,
         benchmark_weights: {
             percentile_ninety_five: { percentage: 20 },
             percentile_fifty: { percentage: 20 },
@@ -54,6 +55,7 @@ describe('Manager config', function () {
         runner_memory: 256,
         smtp_server: Object.assign({}, defaultSmtpServerConfig),
         minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        minimum_wait_for_chaos_experiment_deletion_in_ms: 720000,
         benchmark_weights: {
             percentile_ninety_five: { percentage: 20 },
             percentile_fifty: { percentage: 20 },
@@ -91,6 +93,7 @@ describe('Manager config', function () {
             timeout: 'test'
         },
         minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        minimum_wait_for_chaos_experiment_deletion_in_ms: 720000,
         benchmark_weights: {
             percentile_ninety_five: { percentage: 20 },
             percentile_fifty: { percentage: 20 },
@@ -116,6 +119,7 @@ describe('Manager config', function () {
         runner_memory: 256,
         smtp_server: Object.assign({}, defaultSmtpServerConfig),
         minimum_wait_for_delayed_report_status_update_in_ms: 30000,
+        minimum_wait_for_chaos_experiment_deletion_in_ms: 720000,
         benchmark_weights: {
             percentile_ninety_five: { percentage: 20 },
             percentile_fifty: { percentage: 20 },

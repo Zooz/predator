@@ -13,6 +13,11 @@ const WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED = 'benchmark_failed';
 const WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON = ':muscle:';
 const WEBHOOK_DEFAULT_REPORTER_NAME = 'Predator';
 const WEBHOOK_TEAMS_DEFAULT_THEME_COLOR = '957c58';
+const PREDATOR_RUNNER_PREFIX = 'predator';
+const CHAOS_EXPERIMENT_LABELS = {
+    JOB_ID: 'job_id',
+    APP: 'app'
+};
 
 module.exports = {
     CONTEXT_ID: 'context_id',
@@ -81,6 +86,7 @@ module.exports = {
         ALLOW_INSECURE_TLS: 'allow_insecure_tls',
         INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS: 'interval_cleanup_finished_containers_ms',
         MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS: 'minimum_wait_for_delayed_report_status_update_in_ms',
+        MINIMUM_WAIT_FOR_CHAOS_EXPERIMENT_DELETION_IN_MS: 'minimum_wait_for_chaos_experiment_deletion_in_ms',
         METRICS_PLUGIN_NAME: 'metrics_plugin_name',
         DEFAULT_EMAIL_ADDRESS: 'default_email_address',
         DEFAULT_WEBHOOK_URL: 'default_webhook_url',
@@ -92,5 +98,7 @@ module.exports = {
         BENCHMARK_WEIGHTS: 'benchmark_weights',
         CUSTOM_RUNNER_DEFINITION: 'custom_runner_definition',
         STREAMING_EXCLUDED_ATTRIBUTES: 'streaming_excluded_attributes'
-    }
+    },
+    PREDATOR_RUNNER_PREFIX,
+    CHAOS_EXPERIMENT_LABELS
 };
