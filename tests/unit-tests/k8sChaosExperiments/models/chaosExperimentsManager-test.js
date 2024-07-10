@@ -385,7 +385,7 @@ describe('Chaos experiments manager tests', function () {
                     ...kubernetesJobConfig.metadata,
                     labels: {
                         app: 'predator',
-                        job_id: jobId
+                        'predator/job-id': jobId
                     }
                 }
             };
@@ -401,7 +401,7 @@ describe('Chaos experiments manager tests', function () {
             const timestamp = 500;
             const jobId = '1234';
             const kubeObject = { hello: 1 };
-            const mappedKubeObject = { ...kubeObject, metadata: { labels: { app: 'predator', job_id: jobId } } };
+            const mappedKubeObject = { ...kubeObject, metadata: { labels: { app: 'predator', 'predator/job_id': jobId } } };
             const jobExperiment = { start_time: timestamp, job_id: jobId, experiment_id: '4321', id: '2468' };
             const chaosExperiment = { kubeObject: kubeObject, experiment_id: '4321' };
             getFutureJobExperimentsStub.resolves([jobExperiment]);
