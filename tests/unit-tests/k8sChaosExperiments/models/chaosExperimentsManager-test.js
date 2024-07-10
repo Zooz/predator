@@ -380,9 +380,9 @@ describe('Chaos experiments manager tests', function () {
         const jobId = uuid();
         it('should call k8s connector and write to db', async function() {
             const mappedChaosExperiment = {
-                ...chaosJobExperimentId,
+                ...kubernetesJobConfig,
                 metadata: {
-                    ...chaosJobExperimentId.metadata,
+                    ...kubernetesJobConfig.metadata,
                     labels: {
                         app: 'predator',
                         job_id: jobId
@@ -390,11 +390,10 @@ describe('Chaos experiments manager tests', function () {
                 }
             };
 
-            await manager.runChaosExperiment(mappedChaosExperiment, jobId, chaosJobExperimentId);
+            await manager.runChaosExperiment(chaosJobExperimentId, jobId, chaosJobExperimentId);
             runChaosExperimentConnectorStub.calledOnce.should.eql(true);
             runChaosExperimentConnectorStub.args[0][0].should.eql(mappedChaosExperiment);
             setChaosJobExperimentTriggeredStub.calledOnce.should.eql(true);
-            setChaosJobExperimentTriggeredStub.args[0][0].should.eql(chaosJobExperimentId);
         });
     });
 

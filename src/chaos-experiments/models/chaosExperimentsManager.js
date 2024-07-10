@@ -95,8 +95,8 @@ module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experim
 
 module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobId, jobExperimentId) => {
     try {
-        const mappedResource = buildExperimentResource(kubernetesChaosConfig, jobId);
-        await connector.runChaosExperiment(mappedResource);
+        const mappedKubernetesChaosConfig = buildExperimentResource(kubernetesChaosConfig, jobId);
+        await connector.runChaosExperiment(mappedKubernetesChaosConfig);
         await databaseConnector.setChaosJobExperimentTriggered(jobExperimentId, true);
     } catch (error){
         logger.error(error, `Error while running chaos job experiment ${jobExperimentId}`);
@@ -112,11 +112,15 @@ const buildExperimentResource = (kubernetesChaosConfig, jobId) => {
         [CHAOS_EXPERIMENT_LABELS.APP]: PREDATOR_RUNNER_PREFIX,
         [CHAOS_EXPERIMENT_LABELS.JOB_ID]: jobId
     };
+    const { metadata = {} } = kubernetesChaosConfig;
     return {
         ...kubernetesChaosConfig,
         metadata: {
-            ...kubernetesChaosConfig.metadata,
-            labels: labels
+            ...metadata,
+            labels: {
+                ...metadata.labels,
+                ...labels
+            }
         }
     };
 };
