@@ -490,7 +490,7 @@ describe('Chaos experiments manager tests', function () {
             sinon.assert.calledWith(getChaosJobExperimentsByJobIdStub, jobId);
             sinon.assert.calledOnce(getChaosExperimentsByIdsStub);
             sinon.assert.calledWith(getChaosExperimentsByIdsStub, [firstExId, secondExId]);
-            // sinon.assert.calledOnce(deleteAllResourcesOfKindAndJobStub);
+            sinon.assert.calledOnce(deleteAllResourcesOfKindAndJobStub);
             sinon.assert.calledWith(deleteAllResourcesOfKindAndJobStub, 'PodChaos', 'apps', jobId);
         });
     });
