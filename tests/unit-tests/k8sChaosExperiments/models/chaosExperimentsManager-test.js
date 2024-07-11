@@ -487,13 +487,13 @@ describe('Chaos experiments manager tests', function () {
                 secondExperiment
             ]);
             getAllResourcesOfKindAndJobStub.resolves([{
-                name: firstExperiment.kubeObject.metadata.name,
                 metadata: {
+                    name: firstExperiment.kubeObject.metadata.name,
                     namespace: firstExperiment.kubeObject.metadata.namespace
                 }
             }, {
-                name: secondExperiment.kubeObject.metadata.name,
                 metadata: {
+                    name: secondExperiment.kubeObject.metadata.name,
                     namespace: secondExperiment.kubeObject.metadata.namespace
                 }
             }]);
