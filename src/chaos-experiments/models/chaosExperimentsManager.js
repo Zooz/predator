@@ -170,14 +170,7 @@ module.exports.init = async function () {
 
 const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {
     try {
-        const resources = await connector.getAllResourcesOfKindAndJob(kind, namespace, jobId);
-        await Promise.all(resources.map(async(resource) => {
-            try {
-                await connector.deleteResourceOfKind(kind, resource.metadata.name, namespace);
-            } catch (e){
-                logger.error(`Failed to delete job experiment ${resource.name} of kind ${kind}: ${e}`);
-            }
-        }));
+        await connector.deleteAllResourcesOfKindAndJob(kind, namespace, jobId);
     } catch (e){
         logger.error(`Failed to get resources of kind ${kind} of jobId ${jobId}: ${e}`);
     }

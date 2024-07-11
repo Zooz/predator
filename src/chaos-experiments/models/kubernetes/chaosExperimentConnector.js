@@ -108,6 +108,17 @@ module.exports.getAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
     return resources.items;
 };
 
+module.exports.deleteAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=%s=%s', kubernetesUrl, namespace, kind.toLowerCase(), JOB_ID_LABEL, jobId);
+    const options = {
+        url,
+        method: 'DELETE',
+        headers
+    };
+    const resources = await requestSender.send(options);
+    return resources;
+};
+
 const deleteResourceOfKind = module.exports.deleteResourceOfKind = async (kind, resourceName, namespace) => {
     const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind.toLowerCase(), resourceName);
     const options = {

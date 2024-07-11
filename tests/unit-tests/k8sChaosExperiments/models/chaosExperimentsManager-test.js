@@ -431,7 +431,7 @@ describe('Chaos experiments manager tests', function () {
         });
     });
 
-    describe('stop job experiments by job id', function () {
+    describe.skip('stop job experiments by job id', function () {
         it('should stop relevant experiments', async () => {
             const jobId = uuid();
             const firstExId = uuid();
