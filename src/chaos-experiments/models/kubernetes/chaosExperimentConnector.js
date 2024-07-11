@@ -98,7 +98,7 @@ const getAllResourcesOfKind = async (kind) => {
 };
 
 module.exports.getAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=%s=%s', kubernetesUrl, namespace, kind, JOB_ID_LABEL, jobId);
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=%s=%s', kubernetesUrl, namespace, kind.toLowerCase(), JOB_ID_LABEL, jobId);
     const options = {
         url,
         method: 'GET',
@@ -109,7 +109,7 @@ module.exports.getAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
 };
 
 const deleteResourceOfKind = module.exports.deleteResourceOfKind = async (kind, resourceName, namespace) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind, resourceName);
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind.toLowerCase(), resourceName);
     const options = {
         url,
         method: 'DELETE',
