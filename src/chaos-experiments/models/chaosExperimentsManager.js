@@ -173,7 +173,7 @@ const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {
         const resources = await connector.getAllResourcesOfKindAndJob(kind, namespace, jobId);
         await Promise.all(resources.map(async(resource) => {
             try {
-                await connector.deleteResourceOfKind(kind, resource.name, namespace);
+                await connector.deleteResourceOfKind(kind, resource.metadata.name, namespace);
             } catch (e){
                 logger.error(`Failed to delete job experiment ${resource.name} of kind ${kind}: ${e}`);
             }
