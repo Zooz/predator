@@ -5,17 +5,17 @@ const requestSender = require('../../../../../src/common/requestSender');
 const chaosExperimentConnector = rewire('../../../../../src/chaos-experiments/models/kubernetes/chaosExperimentConnector');
 
 const getSupportedKinds = chaosExperimentConnector.__get__('getSupportedKinds');
-const deleteResourcesOfKind = chaosExperimentConnector.__get__('deleteResourcesOfKind');
+const deleteResourceOfKind = chaosExperimentConnector.__get__('deleteResourceOfKind');
 const getAllResourcesOfKind = chaosExperimentConnector.__get__('getAllResourcesOfKind');
 const clearAllFinishedResources = chaosExperimentConnector.__get__('clearAllFinishedResources');
 describe('Chaos experiments kubernetes connector tests', function () {
     let sandbox;
-    let requestSenderSendStub, getAllResourcesOfKindStub, deleteResourcesOfKindStub;
+    let requestSenderSendStub, getAllResourcesOfKindStub, deleteResourceOfKindStub;
     before(() => {
         sandbox = sinon.sandbox.create();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
         getAllResourcesOfKindStub = sandbox.stub();
-        deleteResourcesOfKindStub = sandbox.stub();
+        deleteResourceOfKindStub = sandbox.stub();
         chaosExperimentConnector.__set__('kubernetesUrl', 'localhost:80');
         chaosExperimentConnector.__set__('kubernetesNamespace', 'default');
     });
@@ -162,15 +162,50 @@ describe('Chaos experiments kubernetes connector tests', function () {
             response.should.eql(expectedResponse.items);
         });
     });
-
-    describe('Delete resource of a kind', function () {
-        it('Should successfully delete specified resource', async function () {
-            await deleteResourcesOfKind('podchaos', 'test1', 'apps');
+    describe('get all resources of a kind and job', function () {
+        it('Should successfully get all relevant resources', async function () {
+            const expectedResponse = {
+                items: [
+                    {
+                        name: 'test1',
+                        metadata: {
+                            namespace: 'apps'
+                        },
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            names: {
+                                plural: 'podchaos'
+                            },
+                            labelSelectors: {
+                                'predator/job-id': 'jobId'
+                            }
+                        }
+                    },
+                    {
+                        name: 'test2',
+                        metadata: {
+                            namespace: 'apps'
+                        },
+                        spec: {
+                            group: 'chaos-mesh.org',
+                            names: {
+                                plural: 'podchaos'
+                            },
+                            labelSelectors: {
+                                'predator/job-id': 'jobId'
+                            }
+                        }
+                    }
+                ]
+            };
+            requestSenderSendStub.resolves(expectedResponse);
+            const response = await chaosExperimentConnector.getAllResourcesOfKindAndJob('podchaos', 'jobId');
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos/test1',
-                method: 'DELETE',
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=job_id=jobId',
+                method: 'GET',
                 headers: {}
             });
+            response.should.eql(expectedResponse.items);
         });
     });
 
@@ -187,12 +222,12 @@ describe('Chaos experiments kubernetes connector tests', function () {
     describe('Clear all finished resources', function () {
         before(() => {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKindStub);
-            chaosExperimentConnector.__set__('deleteResourcesOfKind', deleteResourcesOfKindStub);
+            chaosExperimentConnector.__set__('deleteResourceOfKind', deleteResourceOfKindStub);
             chaosExperimentConnector.__set__('supportedChaosKinds', ['podchaos', 'httpchaos']);
         });
         after(() => {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKind);
-            chaosExperimentConnector.__set__('deleteResourcesOfKind', deleteResourcesOfKind);
+            chaosExperimentConnector.__set__('deleteResourceOfKind', deleteResourceOfKind);
         });
         beforeEach(() => {
             const currentDateTime = new Date(Date.now() - 100);
@@ -251,20 +286,20 @@ describe('Chaos experiments kubernetes connector tests', function () {
         describe('Trigger with gap of 0 minutes', function () {
             it('Should delete all 4 resources', async function () {
                 await clearAllFinishedResources(0);
-                deleteResourcesOfKindStub.callCount.should.eql(4);
+                deleteResourceOfKindStub.callCount.should.eql(4);
             });
         });
         describe('Trigger with gap of 15 minutes', function () {
             it('Should delete 2 resources that were triggered 1 hour ago', async function () {
                 await clearAllFinishedResources(900000);
-                deleteResourcesOfKindStub.callCount.should.eql(2);
-                deleteResourcesOfKindStub.args.should.eql([['podchaos', 'test2', 'apps'], ['httpchaos', 'second2', 'apps']]);
+                deleteResourceOfKindStub.callCount.should.eql(2);
+                deleteResourceOfKindStub.args.should.eql([['podchaos', 'test2', 'apps'], ['httpchaos', 'second2', 'apps']]);
             });
         });
         describe('Trigger with gap of more than 1 hour', function () {
             it('should not delete any resource', async function () {
                 await clearAllFinishedResources(4600000);
-                deleteResourcesOfKindStub.callCount.should.eql(0);
+                deleteResourceOfKindStub.callCount.should.eql(0);
             });
         });
     });

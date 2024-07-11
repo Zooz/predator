@@ -168,11 +168,18 @@ module.exports.init = async function () {
     await scheduleFinishedResourcesCleanup();
 };
 
-const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {
+const stopResourcesOfJobIdAndExperiment = async (jobId, kind) => {
     try {
-        await connector.deleteAllResourcesOfKindAndJob(kind, namespace, jobId);
+        const resources = await connector.getAllResourcesOfKindAndJob(kind, jobId);
+        await Promise.all(resources.map(async(resource) => {
+            try {
+                await connector.deleteResourceOfKind(kind, resource.name, resource.metadata.namespace);
+            } catch (e){
+                logger.error(`Failed to delete job experiment ${resource.name} of kind ${kind}: ${e}`);
+            }
+        }));
     } catch (e){
-        logger.error(`Failed to delete resources of kind ${kind} of jobId ${jobId}: ${e}`);
+        logger.error(`Failed to get resources of kind ${kind} of jobId ${jobId}: ${e}`);
     }
 };
 
@@ -180,14 +187,10 @@ module.exports.stopJobExperimentsByJobId = async function(jobId, contextId) {
     const jobExperiments = await getChaosJobExperimentsByJobId(jobId, contextId);
     const now = Date.now();
     const relevantJobExperiments = jobExperiments.filter(experiment => experiment.start_time <= now);
-    const experimentIds = relevantJobExperiments.map(jobExperiment => jobExperiment.experiment_id);
+    const experimentIds = [...new Set(relevantJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
     const experiments = await getChaosExperimentsByIds(experimentIds);
-    const uniqueKindNamespaceList = [...new Set(experiments.map(ex => `${ex.kubeObject.kind}_${ex.kubeObject.metadata.namespace}`))];
-    await Promise.all(uniqueKindNamespaceList.map(async(kindAndNamespace) => {
-        const splitted = kindAndNamespace.split('_');
-        const kind = splitted[0];
-        const namespace = splitted[1];
-        await stopResourcesOfJobIdAndExperiment(jobId, kind, namespace);
-    })
+    const kinds = [...new Set(experiments.map(experiment => experiment.kubeObject.kind))];
+    await Promise.all(kinds.map(async(kind) =>
+        await stopResourcesOfJobIdAndExperiment(jobId, kind))
     );
 };
