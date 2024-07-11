@@ -12,7 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { PREDATOR_DOCS_URL } from '../App/common/env';
-import { KUBERNETES } from '../../../src/common/consts';
+import { KUBERNETES } from '../constants';
 
 export default function getMenuList (platform) {
   const baseMenuItems = [

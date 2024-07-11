@@ -31,7 +31,7 @@ import Button from '../../../components/Button';
 import SimpleTable from '../SimpleTable';
 import { chaosExperimentsForDropdown } from '../../redux/selectors/chaosExperimentsSelector';
 import Dropdown from '../../../components/Dropdown/Dropdown.export';
-import { KUBERNETES } from '../../../../../src/common/consts';
+import { KUBERNETES } from '../../../constants'
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const ONE_SEC_MS = 1000;
@@ -158,7 +158,7 @@ class Form extends React.Component {
     }
 
     render () {
-      const { closeDialog, processingAction, serverError, clearErrorOnCreateJob, editMode, jobPlatform } = this.props;
+      const { closeDialog, processingAction, serverError, clearErrorOnCreateJob, editMode } = this.props;
       return (
         <Modal maxWidth={'760px'} onExit={closeDialog}>
           <FormWrapper style={{ height: null }} title={editMode ? 'Edit job' : 'Create a new job'} description={DESCRIPTION}>
