@@ -3,10 +3,12 @@ const fs = require('fs');
 const kubernetesConfig = require('../../../config/kubernetesConfig');
 const logger = require('../../../common/logger');
 const requestSender = require('../../../common/requestSender');
+const { CHAOS_EXPERIMENT_LABELS } = require('../../../../src/common/consts');
 const kubernetesUrl = kubernetesConfig.kubernetesUrl;
 
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 const headers = {};
+const JOB_ID_LABEL = CHAOS_EXPERIMENT_LABELS.JOB_ID;
 let supportedChaosKinds;
 
 if (kubernetesConfig.kubernetesToken) {
@@ -96,7 +98,7 @@ const getAllResourcesOfKind = async (kind) => {
 };
 
 module.exports.getAllResourcesOfKindAndJob = async (kind, jobId) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s?labelSelector=job_id=%s', kubernetesUrl, kind, jobId);
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s?labelSelector=%s=%s', kubernetesUrl, kind, JOB_ID_LABEL, jobId);
     const options = {
         url,
         method: 'GET',
