@@ -154,7 +154,6 @@ export const LineChartPredator = ({ data = [], keys = [], labelY, graphType, onS
 }
 
 const renderExperimentsReferenceLine = (experiment, index) => {
-  debugger;
   return (
     <ReferenceLine
       key={`experiment-${index}-line`}
