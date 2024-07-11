@@ -135,9 +135,8 @@ export const LineChartPredator = ({ data = [], keys = [], labelY, graphType, onS
       {
         experiments.map((experiment, index) => {
           const key = `experiment-${index}`;
-          const color = getColor(key, index);
           return (
-            renderExperimentsReferenceArea(experiment, color, key)
+            renderExperimentsReferenceArea(experiment, key)
           )
         })
       }
