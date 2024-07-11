@@ -382,7 +382,7 @@ describe('Chaos experiments manager tests', function () {
         };
         const chaosJobExperimentId = uuid();
         const jobId = uuid();
-        it.skip('should call k8s connector and write to db', async function() {
+        it('should call k8s connector and write to db', async function() {
             const mappedChaosExperiment = {
                 ...kubernetesJobConfig,
                 metadata: {
@@ -430,12 +430,13 @@ describe('Chaos experiments manager tests', function () {
     });
 
     describe('stop job experiments by job id', function () {
-        it('should stop relevant experiments', async () => {
-            const jobId = uuid();
-            const firstExId = uuid();
-            const secondExId = uuid();
-            const thirdExId = uuid();
-            const firstExperiment = {
+        let jobId, firstExId, secondExId, thirdExId, firstExperiment, secondExperiment;
+        beforeEach(() => {
+            jobId = uuid();
+            firstExId = uuid();
+            secondExId = uuid();
+            thirdExId = uuid();
+            firstExperiment = {
                 id: firstExId,
                 kubeObject: {
                     kind: 'PodChaos',
@@ -450,7 +451,7 @@ describe('Chaos experiments manager tests', function () {
                 name: 'mickey1'
             };
 
-            const secondExperiment = {
+            secondExperiment = {
                 id: secondExId,
                 kubeObject: {
                     kind: 'PodChaos',
@@ -464,6 +465,8 @@ describe('Chaos experiments manager tests', function () {
                 },
                 name: 'mickey2'
             };
+        });
+        it('happy flow - should stop relevant experiments', async () => {
             getChaosJobExperimentsByJobIdStub.resolves([{
                 jobId,
                 experiment_id: firstExId,
@@ -491,6 +494,73 @@ describe('Chaos experiments manager tests', function () {
             sinon.assert.calledWith(getChaosExperimentsByIdsStub, [firstExId, secondExId]);
             sinon.assert.calledOnce(deleteAllResourcesOfKindAndJobStub);
             sinon.assert.calledWith(deleteAllResourcesOfKindAndJobStub, 'PodChaos', 'apps', jobId);
+        });
+        it('getChaosJobExperimentsByJobId throws - should stop flow and not throw', async () => {
+            const jobId = uuid();
+            getChaosJobExperimentsByJobIdStub.rejects();
+            await manager.stopJobExperimentsByJobId(jobId);
+            // not throwing
+            sinon.assert.calledOnce(getChaosJobExperimentsByJobIdStub);
+            sinon.assert.calledWith(getChaosJobExperimentsByJobIdStub, jobId);
+            sinon.assert.notCalled(getChaosExperimentsByIdsStub);
+            sinon.assert.notCalled(deleteAllResourcesOfKindAndJobStub);
+        });
+        it('getChaosExperimentsByIds throws - should stop flow and not throw', async () => {
+            getChaosJobExperimentsByJobIdStub.resolves([{
+                jobId,
+                experiment_id: firstExId,
+                start_time: Date.now()
+            }, {
+
+                jobId,
+                experiment_id: secondExId,
+                start_time: Date.now()
+            }, {
+
+                jobId,
+                experiment_id: thirdExId,
+                start_time: Date.now() + 10000
+            }
+            ]);
+            getChaosExperimentsByIdsStub.rejects();
+            await manager.stopJobExperimentsByJobId(jobId);
+            // not throwing
+            sinon.assert.calledOnce(getChaosJobExperimentsByJobIdStub);
+            sinon.assert.calledWith(getChaosJobExperimentsByJobIdStub, jobId);
+            sinon.assert.calledOnce(getChaosExperimentsByIdsStub);
+            sinon.assert.calledWith(getChaosExperimentsByIdsStub, [firstExId, secondExId]);
+            sinon.assert.notCalled(deleteAllResourcesOfKindAndJobStub);
+        });
+        it('deleteAllResourcesOfKindAndJob throws - should stop flow and not throw', async () => {
+            getChaosJobExperimentsByJobIdStub.resolves([{
+                jobId,
+                experiment_id: firstExId,
+                start_time: Date.now()
+            }, {
+
+                jobId,
+                experiment_id: secondExId,
+                start_time: Date.now()
+            }, {
+
+                jobId,
+                experiment_id: thirdExId,
+                start_time: Date.now() + 10000
+            }
+            ]);
+            getChaosExperimentsByIdsStub.rejects();
+            getChaosExperimentsByIdsStub.resolves([
+                firstExperiment,
+                secondExperiment
+            ]);
+            deleteAllResourcesOfKindAndJobStub.rejects();
+            await manager.stopJobExperimentsByJobId(jobId);
+            // not throwing
+            sinon.assert.calledOnce(getChaosJobExperimentsByJobIdStub);
+            sinon.assert.calledWith(getChaosJobExperimentsByJobIdStub, jobId);
+            sinon.assert.calledOnce(getChaosExperimentsByIdsStub);
+            sinon.assert.calledWith(getChaosExperimentsByIdsStub, [firstExId, secondExId]);
+            sinon.assert.calledOnce(deleteAllResourcesOfKindAndJobStub);
         });
     });
 });
