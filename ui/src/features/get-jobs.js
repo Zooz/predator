@@ -15,7 +15,6 @@ import {
 } from './redux/selectors/jobsSelector';
 import { tests } from './redux/selectors/testsSelector';
 import { reports } from './redux/selectors/reportsSelector';
-import style from './style.scss';
 import Dialog from './components/Dialog';
 import DeleteDialog from './components/DeleteDialog';
 import * as Actions from './redux/action';
@@ -88,11 +87,11 @@ class getJobs extends React.Component {
 
     onEdit = (data) => {
       const { match: { params, path }, history } = this.props;
-        history.replace(`/jobs/${data.id}/edit`);
-       this.openEditMode(data)
+      history.replace(`/jobs/${data.id}/edit`);
+      this.openEditMode(data)
     };
 
-    openEditMode = (data)=>{
+    openEditMode = (data) => {
       this.setState({ openViewEditJob: true, jobForEdit: data });
     }
 
@@ -175,7 +174,7 @@ class getJobs extends React.Component {
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
       const { sortedJobs, jobForEdit } = this.state;
-      const { errorOnJobAction } = this.props;
+      const { errorOnJobAction, jobPlatform } = this.props;
 
       const columns = getColumns({
         columnsNames,
@@ -188,7 +187,6 @@ class getJobs extends React.Component {
       });
       const feedbackMessage = this.generateFeedbackMessage();
       const error = errorOnJobAction;
-
       return (
         <Page title={'Scheduled Jobs'} description={DESCRIPTION}>
           <ReactTableComponent
@@ -209,7 +207,7 @@ class getJobs extends React.Component {
             ? <Dialog title_key={'id'} data={this.state.openViewJob}
               closeDialog={this.closeViewJobDialog} /> : null}
           {this.state.openViewEditJob &&
-          <JobForm history={history} editMode data={jobForEdit} closeDialog={this.closeViewEditJobDialog}
+          <JobForm history={history} editMode data={jobForEdit} closeDialog={this.closeViewEditJobDialog} jobPlatform={jobPlatform}
           />}
           {this.state.deleteDialog && !this.props.deleteJobSuccess
             ? <DeleteDialog loader={this.props.processingDeleteJob}

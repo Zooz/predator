@@ -28,9 +28,8 @@ import ErrorDialog from './components/ErrorDialog';
 import _ from 'lodash';
 import { isTestValid } from '../validators/validate-test';
 import { INVALID_TEST_MESSAGE } from '../constants';
-import UiSwitcher from "../components/UiSwitcher";
-import TitleInput from "../components/TitleInput";
-import { filter } from '../../config/rules';
+import UiSwitcher from '../components/UiSwitcher';
+import TitleInput from '../components/TitleInput';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetTests = 'Error occurred while trying to get all tests.';
@@ -51,17 +50,17 @@ class getTests extends React.Component {
       testActionError: null,
       sortedTests: [],
       sortHeader: '',
-      onlyFavorites: false,
+      onlyFavorites: false
     }
   }
 
   filterByFavoriteState = () => {
-    const {onlyFavorites, sortedTests} = this.state;
+    const { onlyFavorites, sortedTests } = this.state;
     let filteredTests = sortedTests;
     if (onlyFavorites) {
       filteredTests = sortedTests.filter((test) => (test.is_favorite));
     }
-    this.setState({sortedTests: filteredTests, sortHeader: 'updated_at-'}, () => {
+    this.setState({ sortedTests: filteredTests, sortHeader: 'updated_at-' }, () => {
       this.onSort('updated_at');
     });
   };
@@ -270,7 +269,7 @@ class getTests extends React.Component {
 
     render () {
       const { sortedTests, sortHeader, testForEdit, testForClone, onlyFavorites } = this.state;
-      const { errorOnDeleteTest, history } = this.props;
+      const { errorOnDeleteTest, history, jobPlatform } = this.props;
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
       const columns = getColumns({
         columnsNames,
@@ -287,25 +286,25 @@ class getTests extends React.Component {
       const error = this.state.testActionError || errorOnDeleteTest;
       const searchSections = [
         <TitleInput key={1}
-                    style={{flexGrow: 0}}
-                    width={'130px'} height={'33px'} title={'Favorites'}
+          style={{ flexGrow: 0 }}
+          width={'130px'} height={'33px'} title={'Favorites'}
         >
-            <UiSwitcher
-                onChange={(value) => {
-                  this.setState({
-                      onlyFavorites: value,
-                      sortedTests: [...this.props.tests]
-                  }, () => {
-                      this.filterByFavoriteState();
-                  });
-              }}
-                activeState={onlyFavorites}
-                height={12}
-                width={22}
-                style={{alignSelf: 'center'}}
-            />
+          <UiSwitcher
+            onChange={(value) => {
+              this.setState({
+                onlyFavorites: value,
+                sortedTests: [...this.props.tests]
+              }, () => {
+                this.filterByFavoriteState();
+              });
+            }}
+            activeState={onlyFavorites}
+            height={12}
+            width={22}
+            style={{ alignSelf: 'center' }}
+          />
         </TitleInput>
-    ];
+      ];
       return (
         <Page title={'Tests'} description={DESCRIPTION}>
           <Button className={style['create-button']} onClick={() => {
@@ -335,7 +334,7 @@ class getTests extends React.Component {
           <TestForm history={history} data={testForEdit || testForClone} closeDialog={this.closeCreateTest}
             cloneMode={!!testForClone} />}
           {(this.state.openViewCreateJob)
-            ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog} /> : null}
+            ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog} jobPlatform={jobPlatform} /> : null}
 
           {(this.state.deleteDialog && !this.props.deleteTestSuccess)
             ? <DeleteDialog loader={this.props.processingDeleteTest}
