@@ -97,8 +97,8 @@ const getAllResourcesOfKind = async (kind) => {
     return resources.items;
 };
 
-module.exports.getAllResourcesOfKindAndJob = async (kind, jobId) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s?labelSelector=%s=%s', kubernetesUrl, kind, JOB_ID_LABEL, jobId);
+module.exports.getAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=%s=%s', kubernetesUrl, namespace, kind, JOB_ID_LABEL, jobId);
     const options = {
         url,
         method: 'GET',

@@ -503,10 +503,10 @@ describe('Chaos experiments manager tests', function () {
             sinon.assert.calledOnce(getChaosExperimentsByIdsStub);
             sinon.assert.calledWith(getChaosExperimentsByIdsStub, [firstExId, secondExId]);
             sinon.assert.calledOnce(getAllResourcesOfKindAndJobStub);
-            sinon.assert.calledWith(getAllResourcesOfKindAndJobStub, 'PodChaos', jobId);
+            sinon.assert.calledWith(getAllResourcesOfKindAndJobStub, 'PodChaos', 'apps', jobId);
             deleteResourceOfKindStub.callCount.should.eql(2);
-            sinon.assert.calledWith(deleteResourceOfKindStub, 'PodChaos', firstExperiment.kubeObject.metadata.name, firstExperiment.kubeObject.metadata.namespace);
-            sinon.assert.calledWith(deleteResourceOfKindStub, 'PodChaos', secondExperiment.kubeObject.metadata.name, secondExperiment.kubeObject.metadata.namespace);
+            sinon.assert.calledWith(deleteResourceOfKindStub, 'PodChaos', firstExperiment.kubeObject.metadata.name, 'apps');
+            sinon.assert.calledWith(deleteResourceOfKindStub, 'PodChaos', secondExperiment.kubeObject.metadata.name, 'apps');
         });
     });
 });

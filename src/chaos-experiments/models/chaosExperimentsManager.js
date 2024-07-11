@@ -168,9 +168,9 @@ module.exports.init = async function () {
     await scheduleFinishedResourcesCleanup();
 };
 
-const stopResourcesOfJobIdAndExperiment = async (jobId, kind) => {
+const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {
     try {
-        const resources = await connector.getAllResourcesOfKindAndJob(kind, jobId);
+        const resources = await connector.getAllResourcesOfKindAndJob(kind, namespace, jobId);
         await Promise.all(resources.map(async(resource) => {
             try {
                 await connector.deleteResourceOfKind(kind, resource.name, resource.metadata.namespace);
@@ -189,8 +189,10 @@ module.exports.stopJobExperimentsByJobId = async function(jobId, contextId) {
     const relevantJobExperiments = jobExperiments.filter(experiment => experiment.start_time <= now);
     const experimentIds = [...new Set(relevantJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
     const experiments = await getChaosExperimentsByIds(experimentIds);
-    const kinds = [...new Set(experiments.map(experiment => experiment.kubeObject.kind))];
-    await Promise.all(kinds.map(async(kind) =>
-        await stopResourcesOfJobIdAndExperiment(jobId, kind))
-    );
+    const kindNamespaceStrings = [...new Set(experiments.map(ex => `${ex.kubeObject.kind}_${ex.kubeObject.metadata.namespace}`))];
+    await Promise.all(kindNamespaceStrings.map(async(kindNamespaceString) => {
+        const splittedString = kindNamespaceString.split('_');
+        await stopResourcesOfJobIdAndExperiment(jobId, splittedString[0], splittedString[1]);
+    }
+    ));
 };
