@@ -21,8 +21,7 @@ describe('Chaos experiments manager tests', function () {
     let getFutureJobExperimentsStub;
     let getChaosExperimentByIdStub;
     let getChaosJobExperimentsByJobIdStub;
-    let getAllResourcesOfKindAndJobStub;
-    let deleteResourceOfKindStub;
+    let deleteAllResourcesOfKindAndJobStub;
     let getConfigValueStub;
 
     before(() => {
@@ -38,8 +37,7 @@ describe('Chaos experiments manager tests', function () {
         runChaosExperimentConnectorStub = sandbox.stub(chaosExperimentConnector, 'runChaosExperiment');
         getFutureJobExperimentsStub = sandbox.stub(database, 'getFutureJobExperiments');
         getChaosJobExperimentsByJobIdStub = sandbox.stub(database, 'getChaosJobExperimentsByJobId');
-        getAllResourcesOfKindAndJobStub = sandbox.stub(chaosExperimentConnector, 'getAllResourcesOfKindAndJob');
-        deleteResourceOfKindStub = sandbox.stub(chaosExperimentConnector, 'deleteResourceOfKind');
+        deleteAllResourcesOfKindAndJobStub = sandbox.stub(chaosExperimentConnector, 'deleteAllResourcesOfKindAndJob');
         getConfigValueStub = sandbox.stub(configManager, 'getConfigValue');
     });
     after(() => {
@@ -431,7 +429,7 @@ describe('Chaos experiments manager tests', function () {
         });
     });
 
-    describe.skip('stop job experiments by job id', function () {
+    describe('stop job experiments by job id', function () {
         it('should stop relevant experiments', async () => {
             const jobId = uuid();
             const firstExId = uuid();
@@ -486,27 +484,13 @@ describe('Chaos experiments manager tests', function () {
                 firstExperiment,
                 secondExperiment
             ]);
-            getAllResourcesOfKindAndJobStub.resolves([{
-                metadata: {
-                    name: firstExperiment.kubeObject.metadata.name,
-                    namespace: firstExperiment.kubeObject.metadata.namespace
-                }
-            }, {
-                metadata: {
-                    name: secondExperiment.kubeObject.metadata.name,
-                    namespace: secondExperiment.kubeObject.metadata.namespace
-                }
-            }]);
             await manager.stopJobExperimentsByJobId(jobId);
             sinon.assert.calledOnce(getChaosJobExperimentsByJobIdStub);
             sinon.assert.calledWith(getChaosJobExperimentsByJobIdStub, jobId);
             sinon.assert.calledOnce(getChaosExperimentsByIdsStub);
             sinon.assert.calledWith(getChaosExperimentsByIdsStub, [firstExId, secondExId]);
-            sinon.assert.calledOnce(getAllResourcesOfKindAndJobStub);
-            sinon.assert.calledWith(getAllResourcesOfKindAndJobStub, 'PodChaos', 'apps', jobId);
-            deleteResourceOfKindStub.callCount.should.eql(2);
-            sinon.assert.calledWith(deleteResourceOfKindStub, 'PodChaos', firstExperiment.kubeObject.metadata.name, 'apps');
-            sinon.assert.calledWith(deleteResourceOfKindStub, 'PodChaos', secondExperiment.kubeObject.metadata.name, 'apps');
+            sinon.assert.calledOnce(deleteAllResourcesOfKindAndJobStub);
+            sinon.assert.calledWith(deleteAllResourcesOfKindAndJobStub, 'PodChaos', 'apps', jobId);
         });
     });
 });

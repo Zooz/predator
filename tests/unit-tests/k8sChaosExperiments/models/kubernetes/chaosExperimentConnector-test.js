@@ -162,50 +162,15 @@ describe('Chaos experiments kubernetes connector tests', function () {
             response.should.eql(expectedResponse.items);
         });
     });
-    describe('get all resources of a kind and job', function () {
-        it('Should successfully get all relevant resources', async function () {
-            const expectedResponse = {
-                items: [
-                    {
-                        name: 'test1',
-                        metadata: {
-                            namespace: 'apps'
-                        },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            names: {
-                                plural: 'podchaos'
-                            },
-                            labelSelectors: {
-                                'predator/job-id': 'jobId'
-                            }
-                        }
-                    },
-                    {
-                        name: 'test2',
-                        metadata: {
-                            namespace: 'apps'
-                        },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            names: {
-                                plural: 'podchaos'
-                            },
-                            labelSelectors: {
-                                'predator/job-id': 'jobId'
-                            }
-                        }
-                    }
-                ]
-            };
-            requestSenderSendStub.resolves(expectedResponse);
-            const response = await chaosExperimentConnector.getAllResourcesOfKindAndJob('podchaos', 'apps', 'jobId');
+
+    describe('Delete all resources of a kind and job', function () {
+        it('Should successfully delete all relevant resources', async function () {
+            await chaosExperimentConnector.deleteAllResourcesOfKindAndJob('podchaos', 'apps', 'test1');
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos?labelSelector=predator/job-id=jobId',
-                method: 'GET',
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos?labelSelector=predator/job-id=test1',
+                method: 'DELETE',
                 headers: {}
             });
-            response.should.eql(expectedResponse.items);
         });
     });
     describe('Clear all finished resources', function () {
