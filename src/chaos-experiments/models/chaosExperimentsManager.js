@@ -190,6 +190,6 @@ module.exports.stopJobExperimentsByJobId = async function(jobId) {
         }
         ));
     } catch (e) {
-        logger.error(`Error while trying to stop job experiments for job ${jobId}`);
+        logger.error(`Error while trying to stop job experiments for job ${jobId} : ${e}`);
     }
 };

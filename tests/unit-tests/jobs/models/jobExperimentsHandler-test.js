@@ -115,7 +115,7 @@ describe('Job experiments handler tests', function () {
             clock.restore();
         });
 
-        it('set chaos experiments with no experiments', async () => {
+        it('set chaos experiments without experiments', async () => {
             await jobExperimentHandler.setChaosExperimentsIfExist(uuid(), []);
             experimentsManagerGetStub.callCount.should.eql(1);
             experimentsManagerInsertStub.callCount.should.eql(0);
@@ -123,12 +123,14 @@ describe('Job experiments handler tests', function () {
     });
     describe('stop chaos experiments for job', function () {
         const jobExperimentHandlerRewire = rewire('../../../../src/jobs/models/kubernetes/jobExperimentsHandler');
-        it('set chaos experiments with 2 experiments', async () => {
+        it('timeouts should be removed from map, stopJobExperimentsByJobId should be called', async () => {
             const jobId = uuid();
             const map = new Map();
             const timeouts = [setTimeout(() => true, 10000), setTimeout(() => true, 50000)];
             map.set(jobId, timeouts);
             jobExperimentHandlerRewire.__set__('jobIdsToTimeouts', map);
+            const checkMap = jobExperimentHandlerRewire.__get__('jobIdsToTimeouts', timeouts);
+            should(checkMap.has(jobId)).be.eql(true);
             stopJobExperimentsByJobIdStub.resolves();
             await jobExperimentHandlerRewire.stopChaosExperimentsForJob(jobId);
             const updatedMap = jobExperimentHandlerRewire.__get__('jobIdsToTimeouts', timeouts);
