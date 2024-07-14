@@ -228,7 +228,7 @@ function generateGrafanaUrl(report, grafanaUrl) {
 async function getChaosExperimentsByJobId(jobId) {
     const mappedChaosJobExperiments = [];
     const chaosJobExperiments = await chaosExperimentsManager.getChaosJobExperimentsByJobId(jobId);
-    if (!chaosJobExperiments) {
+    if (!chaosJobExperiments || chaosJobExperiments.length === 0) {
         return;
     }
     const uniqueExperimentIds = [...new Set(chaosJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
