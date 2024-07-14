@@ -353,14 +353,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
                         await assertReportStatus(testId, reportId, constants.REPORT_STARTED_STATUS);
 
-                        const timedStart = 30; // make an entry at 30 seconds in the report
+                        const timedStart = 30; //make an entry at 30 seconds in the report
                         const numEntries = 5;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
                         expect(getReport.statusCode).to.be.equal(200);
                         const testStartTime = new Date(getReport.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries; timeKey++){
-                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart * timeKey);
-                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -372,9 +372,9 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         const reportLines = getExportedReportResponse.text.split('\n');
                         console.log(reportLines);
-                        const splitData = [];
+                        let splitData = [];
                         for (let i = 1; i < reportLines.length; i++){
-                            splitData.push(reportLines[i].split(','));
+                            splitData.push(reportLines[i].split(","));
                         }
 
                         const parsedStandardStat = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId).data);
@@ -384,16 +384,17 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const RPS = parsedStandardStat.rps.mean.toString();
                         const STATUS200 = parsedStandardStat.requestsCompleted.toString();
 
-                        const DATA_ROW = [MEDIAN, P95, P99, RPS, STATUS200];
-                        const STRING_DATA_ROW = DATA_ROW.join(',');
+                        const DATA_ROW = [MEDIAN,P95,P99,RPS,STATUS200];
+                        const STRING_DATA_ROW = DATA_ROW.join(",");
 
                         const firstDataLine = splitData[1];
                         const firstTime = parseInt(firstDataLine[1]);
 
                         for (let index = 1; index < splitData.length; index++){
-                            expect(parseInt(splitData[index][1])).to.be.equal(firstTime + 30000 * (index - 1));
-                            expect(splitData[index].slice(2).join(',')).to.be.deep.equal(STRING_DATA_ROW);
+                            expect(parseInt(splitData[index][1])).to.be.equal(firstTime+30000*(index-1));
+                            expect(splitData[index].slice(2).join(",")).to.be.deep.equal(STRING_DATA_ROW);
                         }
+
                     });
 
                     describe('export report of non existent report', function () {
@@ -459,14 +460,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
 
-                        const timedStart = 30; // make an entry at 30 seconds in the report
+                        const timedStart = 30; //make an entry at 30 seconds in the report
                         const numEntries = 3;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
                         expect(getReport.statusCode).to.be.equal(200);
                         const testStartTime = new Date(getReport.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries; timeKey++){
-                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart * timeKey);
-                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -474,14 +475,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_STARTED_STAGE);
 
-                        const timedStart2 = 30; // make an entry at 30 seconds in the report
+                        const timedStart2 = 30; //make an entry at 30 seconds in the report
                         const numEntries2 = 3;
                         const getReport2 = await reportsRequestCreator.getReport(testId2, reportId2);
                         expect(getReport2.statusCode).to.be.equal(200);
                         const testStartTime2 = new Date(getReport2.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries2; timeKey++){
-                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2 * timeKey);
-                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
+                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -561,14 +562,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
 
-                        const timedStart = 30; // make an entry at 30 seconds in the report
+                        const timedStart = 30; //make an entry at 30 seconds in the report
                         const numEntries = 5;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
                         expect(getReport.statusCode).to.be.equal(200);
                         const testStartTime = new Date(getReport.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries; timeKey++){
-                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart * timeKey);
-                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -576,14 +577,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_STARTED_STAGE);
 
-                        const timedStart2 = 30; // make an entry at 30 seconds in the report
+                        const timedStart2 = 30; //make an entry at 30 seconds in the report
                         const numEntries2 = 5;
                         const getReport2 = await reportsRequestCreator.getReport(testId2, reportId2);
                         expect(getReport2.statusCode).to.be.equal(200);
                         const testStartTime2 = new Date(getReport2.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries2; timeKey++){
-                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2 * timeKey);
-                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
+                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2*timeKey);
+                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -600,12 +601,12 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const reportLines = getExportedCompareResponse.text.split('\n');
 
                         for (let index = 1; index < reportLines.length; index++){
-                            console.log(reportLines[index].split(','));
+                            console.log(reportLines[index].split(","));
                         }
 
-                        const splitData = [];
+                        let splitData = [];
                         for (let i = 1; i < reportLines.length; i++){
-                            splitData.push(reportLines[i].split(','));
+                            splitData.push(reportLines[i].split(","));
                         }
 
                         const parsedStandardStat = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId).data);
@@ -622,15 +623,16 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const RPS_2 = parsedStandardStat_2.rps.mean.toString();
                         const STATUS200_2 = parsedStandardStat_2.requestsCompleted.toString();
 
-                        const DATA_ROW = [MEDIAN, P95, P99, RPS, STATUS200, MEDIAN_2, P95_2, P99_2, RPS_2, STATUS200_2];
-                        const STRING_DATA_ROW = DATA_ROW.join(',');
+                        const DATA_ROW = [MEDIAN,P95,P99,RPS,STATUS200,MEDIAN_2,P95_2,P99_2,RPS_2,STATUS200_2];
+                        const STRING_DATA_ROW = DATA_ROW.join(",");
                         const firstDataLine = splitData[1];
                         const firstTime = parseInt(firstDataLine[1]);
 
                         for (let index = 1; index < splitData.length; index++){
-                            expect(parseInt(splitData[index][1])).to.be.eql(firstTime + 30000 * (index - 1));
-                            expect(splitData[index].slice(2).join(',')).to.be.deep.eql(STRING_DATA_ROW);
+                            expect(parseInt(splitData[index][1])).to.be.eql(firstTime+30000*(index-1));
+                            expect(splitData[index].slice(2).join(",")).to.be.deep.eql(STRING_DATA_ROW);
                         }
+
                     });
 
                     it('Post full cycle stats for both reports and give an unknown report', async function () {

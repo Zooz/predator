@@ -1,4 +1,5 @@
 const request = require('supertest');
+const appInitUtils = require('../../testUtils');
 const uri = '/v1/config';
 let testApp;
 
@@ -10,7 +11,6 @@ module.exports = {
 };
 
 async function init() {
-    const appInitUtils = require('../../testUtils');
     testApp = await appInitUtils.getCreateTestApp();
 }
 

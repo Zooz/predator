@@ -1,5 +1,5 @@
-
 const request = require('supertest');
+const appInitUtils = require('../../testUtils');
 const should = require('should');
 let app;
 module.exports = {
@@ -23,7 +23,6 @@ module.exports = {
 };
 async function init() {
     try {
-        const appInitUtils = require('../../testUtils');
         app = await appInitUtils.getCreateTestApp();
     } catch (err){
         console.log(err);

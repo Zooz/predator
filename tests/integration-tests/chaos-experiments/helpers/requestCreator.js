@@ -1,5 +1,5 @@
-
 const request = require('supertest');
+const appInitUtils = require('../../testUtils');
 const nock = require('nock');
 
 let app;
@@ -17,7 +17,6 @@ module.exports = {
 async function init() {
     try {
         nockK8sChaosExperimentSupportedKinds();
-        const appInitUtils = require('../../testUtils');
         app = await appInitUtils.getCreateTestApp();
     } catch (err){
         console.log(err);
@@ -40,54 +39,8 @@ function nockK8sChaosExperimentSupportedKinds(url) {
                     name: 'stresschaos.chaos-mesh.org',
                     uid: 'abcd1234-5678-90ef-ghij-klmn12345678',
                     resourceVersion: '987654',
-                    generation: 1,
                     creationTimestamp: '2023-01-01T00:00:00Z',
-                    annotations: {
-                        'kubectl.kubernetes.io/last-applied-configuration': '...'
-                    }
-                },
-                spec: {
-                    group: 'chaos-mesh.org',
-                    names: {
-                        plural: 'stresschaos',
-                        singular: 'stresschaos',
-                        kind: 'StressChaos',
-                        shortNames: ['sc']
-                    },
-                    scope: 'Namespaced',
-                    versions: [
-                        {
-                            name: 'v1alpha1',
-                            served: true,
-                            storage: true,
-                            schema: {
-                                openAPIV3Schema: {
-                                    type: 'object',
-                                    properties: {
-                                        // schema details
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                },
-                status: {
-                    conditions: [
-                        {
-                            type: 'NamesAccepted',
-                            status: 'True',
-                            lastTransitionTime: '2023-01-01T00:00:00Z',
-                            reason: 'NoConflicts',
-                            message: 'No conflicts found'
-                        },
-                        {
-                            type: 'Established',
-                            status: 'True',
-                            lastTransitionTime: '2023-01-01T00:00:00Z',
-                            reason: 'InitialNamesAccepted',
-                            message: 'The CRD has been successfully established'
-                        }
-                    ]
+                    generation: 1
                 }
             },
             {
@@ -99,53 +52,7 @@ function nockK8sChaosExperimentSupportedKinds(url) {
                     resourceVersion: '876543',
                     generation: 1,
                     creationTimestamp: '2023-01-01T00:00:00Z',
-                    annotations: {
-                        'kubectl.kubernetes.io/last-applied-configuration': '...'
-                    }
                 },
-                spec: {
-                    group: 'chaos-mesh.org',
-                    names: {
-                        plural: 'podchaos',
-                        singular: 'podchaos',
-                        kind: 'PodChaos',
-                        shortNames: ['pc']
-                    },
-                    scope: 'Namespaced',
-                    versions: [
-                        {
-                            name: 'v1alpha1',
-                            served: true,
-                            storage: true,
-                            schema: {
-                                openAPIV3Schema: {
-                                    type: 'object',
-                                    properties: {
-                                        // schema details
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                },
-                status: {
-                    conditions: [
-                        {
-                            type: 'NamesAccepted',
-                            status: 'True',
-                            lastTransitionTime: '2023-01-01T00:00:00Z',
-                            reason: 'NoConflicts',
-                            message: 'No conflicts found'
-                        },
-                        {
-                            type: 'Established',
-                            status: 'True',
-                            lastTransitionTime: '2023-01-01T00:00:00Z',
-                            reason: 'InitialNamesAccepted',
-                            message: 'The CRD has been successfully established'
-                        }
-                    ]
-                }
             }
             // Additional CRDs can be listed here
         ]
