@@ -1,7 +1,6 @@
 
 const request = require('supertest');
 const nock = require('nock');
-const kubernetesConfig = require('../../../../src/config/kubernetesConfig');
 
 let app;
 
@@ -17,9 +16,7 @@ module.exports = {
 
 async function init() {
     try {
-        if (kubernetesConfig.kubernetesUrl) {
-            nockK8sChaosExperimentSupportedKinds(kubernetesConfig.kubernetesUrl);
-        }
+        nockK8sChaosExperimentSupportedKinds();
         const appInitUtils = require('../../testUtils');
         app = await appInitUtils.getCreateTestApp();
     } catch (err){
@@ -154,7 +151,7 @@ function nockK8sChaosExperimentSupportedKinds(url) {
         ]
     };
 
-    nock(url).persist()
+    nock('https://kubernetes').persist()
         .get('/apis/apiextensions.k8s.io/v1/customresourcedefinitions')
         .reply(200, response);
 }
