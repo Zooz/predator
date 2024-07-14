@@ -17,7 +17,9 @@ module.exports = {
 
 async function init() {
     try {
-        nockK8sChaosExperimentSupportedKinds(kubernetesConfig.kubernetesUrl);
+        if (kubernetesConfig.kubernetesUrl) {
+            nockK8sChaosExperimentSupportedKinds(kubernetesConfig.kubernetesUrl);
+        }
         const appInitUtils = require('../../testUtils');
         app = await appInitUtils.getCreateTestApp();
     } catch (err){
