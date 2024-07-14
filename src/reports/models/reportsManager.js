@@ -10,13 +10,14 @@ const databaseConnector = require('./databaseConnector'),
     constants = require('../utils/constants'),
     reportsStatusCalculator = require('./reportStatusCalculator'),
     generateError = require('../../common/generateError');
+const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager');
 
 const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
 
 module.exports.getReport = async (testId, reportId) => {
     const contextId = httpContext.get(CONTEXT_ID);
-
+    const config = await configHandler.getConfig();
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
 
     if (reportSummary.length !== 1) {
@@ -24,8 +25,8 @@ module.exports.getReport = async (testId, reportId) => {
         error.statusCode = 404;
         throw error;
     }
-    const config = await configHandler.getConfig();
-    const report = await getReportResponse(reportSummary[0], config);
+    const experiments = await getChaosExperimentsByJobId(reportSummary[0].job_id);
+    const report = getReportResponse(reportSummary[0], config, experiments);
     return report;
 };
 
@@ -74,7 +75,7 @@ module.exports.deleteReport = async (testId, reportId) => {
     }
 
     const config = await configHandler.getConfig();
-    const report = await getReportResponse(reportSummary[0], config);
+    const report = getReportResponse(reportSummary[0], config);
 
     if (!FINAL_REPORT_STATUSES_WITH_END_TIME.includes(report.status)) {
         const error = new Error(`Can't delete running test with status ${report.status}`);
@@ -147,7 +148,7 @@ module.exports.failReport = async function failReport(report) {
     return databaseConnector.subscribeRunner(report.test_id, report.report_id, uuid.v4(), constants.SUBSCRIBER_FAILED_STAGE);
 };
 
-function getReportResponse(summaryRow, config) {
+function getReportResponse(summaryRow, config, experiments) {
     const lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;
 
     const testConfiguration = summaryRow.test_configuration ? JSON.parse(summaryRow.test_configuration) : {};
@@ -201,7 +202,8 @@ function getReportResponse(summaryRow, config) {
         avg_rps: Number((totalRequests / reportDurationSeconds).toFixed(2)) || 0,
         last_success_rate: successRate,
         score: summaryRow.score ? summaryRow.score : undefined,
-        benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined
+        benchmark_weights_data: summaryRow.benchmark_weights_data ? JSON.parse(summaryRow.benchmark_weights_data) : undefined,
+        experiments: experiments && experiments.length ? experiments : undefined
     };
 
     report.status = reportsStatusCalculator.calculateReportStatus(report, config);
@@ -221,4 +223,27 @@ function generateGrafanaUrl(report, grafanaUrl) {
         const grafanaReportUrl = encodeURI(grafanaUrl + `&var-Name=${report.test_name}&var-TestRunId=${report.report_id}&from=${new Date(report.start_time).getTime()}${endTimeGrafanafaQuery}`);
         return grafanaReportUrl;
     }
+}
+
+async function getChaosExperimentsByJobId(jobId) {
+    const mappedChaosJobExperiments = [];
+    const chaosJobExperiments = await chaosExperimentsManager.getChaosJobExperimentsByJobId(jobId);
+    if (!chaosJobExperiments || chaosJobExperiments.length === 0) {
+        return;
+    }
+    const uniqueExperimentIds = [...new Set(chaosJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
+    const chaosExperiments = await chaosExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds);
+    for (const chaosJobExperiment of chaosJobExperiments) {
+        const chaosExperiment = chaosExperiments.find((experiment) => experiment.id === chaosJobExperiment.experiment_id && chaosJobExperiment.is_triggered);
+        if (chaosExperiment) {
+            mappedChaosJobExperiments.push({
+                kind: chaosExperiment.kubeObject.kind,
+                name: chaosExperiment.name,
+                id: chaosExperiment.id,
+                start_time: chaosJobExperiment.start_time,
+                end_time: chaosJobExperiment.end_time
+            });
+        }
+    }
+    return mappedChaosJobExperiments;
 }

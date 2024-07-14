@@ -15,6 +15,7 @@ const kubernetesConfig = require('../../../src/config/kubernetesConfig');
 const basicTest = require('../../testExamples/Basic_test');
 const { KUBERNETES } = require('../../../src/common/consts');
 const mailhogHelper = require('./mailhog/mailhogHelper');
+const chaosExperimentsRequestSender = require('../chaos-experiments/helpers/requestCreator');
 
 const headers = { 'Content-Type': 'application/json' };
 
@@ -26,6 +27,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
         await testsRequestCreator.init();
         await jobRequestCreator.init();
         await configRequestCreator.init();
+        await chaosExperimentsRequestSender.init();
     });
     describe('Happy flow', function() {
         describe('Reports', function () {
@@ -69,6 +71,73 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     expect(getReportsResponse.body).to.be.an('array').and.to.have.lengthOf(1);
                     expect(getReportsResponse.body[0]).to.have.property('is_favorite').and.to.be.equal(true);
                     expect(getReportsResponse.body[0]).to.be.deep.equal(createdReportResponse.body);
+                });
+                it('Run a full cycle with chaos experiments -  should return the single created report with its chaos experiments', async function () {
+                    const jobName = 'jobName';
+                    const id = uuid.v4();
+                    const runnerId = uuid.v4();
+                    let chaosExperimentResponse;
+                    const chaosExperimentsInserted = [];
+                    const headersWithContext = Object.assign({}, headers, { 'x-context-id': id });
+
+                    nockK8sRunnerCreation(kubernetesConfig.kubernetesUrl, jobName, id, kubernetesConfig.kubernetesNamespace);
+                    nockK8sChaosExperimentApply(kubernetesConfig.kubernetesUrl, 'apps', 'podchaos');
+                    for (let i = 0; i < 2; i++) {
+                        const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(uuid.v4(), id);
+                        chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
+                        chaosExperimentsInserted.push(chaosExperimentResponse);
+                    }
+
+                    const testCreateResponse = await testsRequestCreator.createTest(basicTest, headersWithContext);
+                    expect(testCreateResponse.status).to.be.equal(201);
+
+                    const testId = testCreateResponse.body.id;
+                    const job = {
+                        test_id: testId,
+                        arrival_rate: 1,
+                        duration: 1,
+                        environment: 'test',
+                        run_immediately: true,
+                        type: 'load_test',
+                        webhooks: [],
+                        emails: [],
+                        experiments: [
+                            {
+                                start_after: 0,
+                                experiment_id: chaosExperimentsInserted[0].body.id,
+                                experiment_name: chaosExperimentsInserted[0].body.name
+                            },
+                            {
+                                start_after: 2000,
+                                experiment_id: chaosExperimentsInserted[1].body.id,
+                                experiment_name: chaosExperimentsInserted[1].body.name
+                            }
+                        ]
+                    };
+
+                    const jobCreateResponse = await jobRequestCreator.createJob(job, headers);
+                    expect(jobCreateResponse.status).to.be.equal(201);
+                    const reportId = jobCreateResponse.body.report_id;
+
+                    await sleep(3 * 1000); // 5 seconds
+                    await runFullSingleRunnerCycle(testId, reportId, runnerId);
+
+                    const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
+
+                    expect(getReportsResponse.body.experiments.length).eql(2);
+                    const experiment1 = getReportsResponse.body.experiments.find(exp => exp.id === chaosExperimentsInserted[0].body.id);
+                    expect(experiment1).to.deep.contain({
+                        kind: chaosExperimentsInserted[0].body.kubeObject.kind,
+                        name: chaosExperimentsInserted[0].body.name,
+                        id: chaosExperimentsInserted[0].body.id
+                    });
+
+                    const experiment2 = getReportsResponse.body.experiments.find(exp => exp.id === chaosExperimentsInserted[1].body.id);
+                    expect(experiment2).to.deep.contain({
+                        kind: chaosExperimentsInserted[1].body.kubeObject.kind,
+                        name: chaosExperimentsInserted[1].body.name,
+                        id: chaosExperimentsInserted[1].body.id
+                    });
                 });
                 it('Run 2 full cycles -> favorite reports -> fetch reports with is_favorite filter - should return the 2 created report', async function () {
                     const jobName = 'jobName';
@@ -250,7 +319,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const headers = reportLines[0];
                         expect(headers).to.be.deep.equal(EXPORTED_REPORT_HEADER);
                     });
-                    
+
                     it('Create job -> Post full cycle stats -> export report -> check report contents', async function () {
                         const runnerId = uuid.v4();
                         const jobName = 'jobName';
@@ -299,14 +368,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         const getExportedReportResponse = await reportsRequestCreator.getExportedReport(testId, reportId, 'csv');
                         expect(getExportedReportResponse.statusCode).to.be.equal(200);
-                    
+
                         const reportLines = getExportedReportResponse.text.split('\n');
                         console.log(reportLines);
                         let splitData = [];
                         for (let i = 1; i < reportLines.length; i++){
                             splitData.push(reportLines[i].split(","));
                         }
-                        
+
                         const parsedStandardStat = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId).data);
                         const MEDIAN = parsedStandardStat.latency.median.toString();
                         const P95 = parsedStandardStat.latency.p95.toString();
@@ -316,15 +385,15 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         const DATA_ROW = [MEDIAN,P95,P99,RPS,STATUS200];
                         const STRING_DATA_ROW = DATA_ROW.join(",");
-                        
+
                         const firstDataLine = splitData[1];
                         const firstTime = parseInt(firstDataLine[1]);
-                    
+
                         for (let index = 1; index < splitData.length; index++){
                             expect(parseInt(splitData[index][1])).to.be.equal(firstTime+30000*(index-1));
                             expect(splitData[index].slice(2).join(",")).to.be.deep.equal(STRING_DATA_ROW);
                         }
-                    
+
                     });
 
                     describe('export report of non existent report', function () {
@@ -389,7 +458,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertRunnerSubscriptionToReport(testId2, reportId2, runnerId2);
 
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
-                       
+
                         const timedStart = 30; //make an entry at 30 seconds in the report
                         const numEntries = 3;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
@@ -404,7 +473,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_DONE_STAGE);
 
                         await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_STARTED_STAGE);
-                       
+
                         const timedStart2 = 30; //make an entry at 30 seconds in the report
                         const numEntries2 = 3;
                         const getReport2 = await reportsRequestCreator.getReport(testId2, reportId2);
@@ -491,7 +560,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertRunnerSubscriptionToReport(testId2, reportId2, runnerId2);
 
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
-                       
+
                         const timedStart = 30; //make an entry at 30 seconds in the report
                         const numEntries = 5;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
@@ -506,7 +575,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_DONE_STAGE);
 
                         await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_STARTED_STAGE);
-                       
+
                         const timedStart2 = 30; //make an entry at 30 seconds in the report
                         const numEntries2 = 5;
                         const getReport2 = await reportsRequestCreator.getReport(testId2, reportId2);
@@ -527,18 +596,18 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         const getExportedCompareResponse = await reportsRequestCreator.getExportedCompareReport('csv', reportMetaData);
                         expect(getExportedCompareResponse.statusCode).to.be.equal(200);
-                        
+
                         const reportLines = getExportedCompareResponse.text.split('\n');
-                        
+
                         for (let index = 1; index < reportLines.length; index++){
                             console.log(reportLines[index].split(","));
                         }
-                    
+
                         let splitData = [];
                         for (let i = 1; i < reportLines.length; i++){
                             splitData.push(reportLines[i].split(","));
                         }
-                    
+
                         const parsedStandardStat = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId).data);
                         const MEDIAN = parsedStandardStat.latency.median.toString();
                         const P95 = parsedStandardStat.latency.p95.toString();
@@ -557,7 +626,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const STRING_DATA_ROW = DATA_ROW.join(",");
                         const firstDataLine = splitData[1];
                         const firstTime = parseInt(firstDataLine[1]);
-                    
+
                         for (let index = 1; index < splitData.length; index++){
                             expect(parseInt(splitData[index][1])).to.be.eql(firstTime+30000*(index-1));
                             expect(splitData[index].slice(2).join(",")).to.be.deep.eql(STRING_DATA_ROW);
@@ -1992,6 +2061,23 @@ function nockK8sRunnerCreation(url, name, uid, namespace) {
             metadata: { name, uid },
             namespace: namespace
         });
+}
+
+function nockK8sChaosExperimentApply(url, namespace, kind) {
+    nock(url).persist()
+        .post(`/apis/chaos-mesh.org/v1alpha1/namespaces/${namespace}/${kind}`)
+        .reply(200,
+            {
+                apiVersion: 'chaos-mesh.org/v1alpha1',
+                kind: kind,
+                metadata: {
+                    name: 'example-podchaos',
+                    namespace: 'apps',
+                    uid: uuid(),
+                    resourceVersion: '123456',
+                    creationTimestamp: '2024-07-14T12:34:56Z'
+                }
+            });
 }
 
 async function sleep(timeInMs) {
