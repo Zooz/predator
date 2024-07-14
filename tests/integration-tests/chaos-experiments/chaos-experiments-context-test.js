@@ -4,8 +4,6 @@ const should = require('should'),
 const validHeaders = { 'Content-Type': 'application/json' };
 const chaosExperimentsRequestSender = require('./helpers/requestCreator');
 const { ERROR_MESSAGES } = require('../../../src/common/consts');
-const kubernetesConfig = require('../../../src/config/kubernetesConfig');
-const nock = require('nock');
 
 describe('Chaos experiments api - with contexts', function () {
     let contextId;
