@@ -1,3 +1,4 @@
+
 const request = require('supertest');
 const appInitUtils = require('../../testUtils');
 const nock = require('nock');
@@ -39,11 +40,17 @@ function nockK8sChaosExperimentSupportedKinds(url) {
                     name: 'stresschaos.chaos-mesh.org',
                     uid: 'abcd1234-5678-90ef-ghij-klmn12345678',
                     resourceVersion: '987654',
-                    creationTimestamp: '2023-01-01T00:00:00Z',
                     generation: 1
                 },
                 spec: {
-                    group: 'chaos-mesh.org'
+                    group: 'chaos-mesh.org',
+                    names: {
+                        plural: 'stresschaos',
+                        singular: 'stresschaos',
+                        kind: 'StressChaos',
+                        shortNames: ['sc']
+                    },
+                    scope: 'Namespaced'
                 }
             },
             {
@@ -54,10 +61,20 @@ function nockK8sChaosExperimentSupportedKinds(url) {
                     uid: 'efgh5678-1234-abcd-ijkl-901234567890',
                     resourceVersion: '876543',
                     generation: 1,
-                    creationTimestamp: '2023-01-01T00:00:00Z'
+                    creationTimestamp: '2023-01-01T00:00:00Z',
+                    annotations: {
+                        'kubectl.kubernetes.io/last-applied-configuration': '...'
+                    }
                 },
                 spec: {
-                    group: 'chaos-mesh.org'
+                    group: 'chaos-mesh.org',
+                    names: {
+                        plural: 'podchaos',
+                        singular: 'podchaos',
+                        kind: 'PodChaos',
+                        shortNames: ['pc']
+                    },
+                    scope: 'Namespaced'
                 }
             }
             // Additional CRDs can be listed here
