@@ -119,9 +119,8 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     expect(jobCreateResponse.status).to.be.equal(201);
                     const reportId = jobCreateResponse.body.report_id;
 
-                    await sleep(5 * 1000); // 5 seconds
+                    await sleep(3 * 1000); // 5 seconds
                     await runFullSingleRunnerCycle(testId, reportId, runnerId);
-                    await sleep(5 * 1000); // 5 seconds
 
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
 
