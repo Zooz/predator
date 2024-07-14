@@ -162,6 +162,7 @@ class Report extends React.Component {
                     data={aggregateReport.latencyGraph}
                     keys={aggregateReport.latencyGraphKeys}
                     labelY={'ms'} graphType={'latency'}
+                    maxY={aggregateReport.latencyGraphMax}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                     filteredKeys={filteredKeys}
                     referenceAreas={aggregateReport.referenceAreas}
@@ -172,6 +173,7 @@ class Report extends React.Component {
                   <LineChartPredator
                     data={aggregateReport.errorsCodeGraph}
                     keys={aggregateReport.errorsCodeGraphKeys}
+                    maxY={aggregateReport.errorsGraphMax}
                     graphType={'status_codes'}
                     connectNulls={false}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
@@ -184,7 +186,9 @@ class Report extends React.Component {
                   <h3>RPS</h3>
                   <LineChartPredator
                     data={aggregateReport.rps}
-                    keys={aggregateReport.rpsKeys} labelY={'rps'}
+                    keys={aggregateReport.rpsKeys}
+                    labelY={'rps'}
+                    maxY={aggregateReport.rpsGraphMax}
                     graphType={'rps'}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
                     filteredKeys={filteredKeys}

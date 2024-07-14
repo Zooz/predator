@@ -179,12 +179,19 @@ function buildAggregateReportData (reports, withPrefix, startFromZeroTime, lastB
       rpsKeys.push(...lastBenchmark.rpsKeys);
       errorsBarKeys.push('benchmark_count');
     }
+    const latencyGraphMax = findMaxY(latencyGraph, latencyGraphKeys);
+    const rpsGraphMax = findMaxY(rps, rpsKeys);
+    const errorsGraphMax = findMaxY(errorsCodeGraph, errorsCodeGraphKeys);
+
     return {
       alias,
       latencyGraph,
       latencyGraphKeys,
+      latencyGraphMax,
+      rpsGraphMax,
       errorsCodeGraph,
       errorsCodeGraphKeys,
+      errorsGraphMax,
       errorsGraph,
       errors,
       rps,
@@ -204,6 +211,12 @@ function buildAggregateReportData (reports, withPrefix, startFromZeroTime, lastB
   })
 }
 
+function findMaxY (data, keys) {
+  const allValues = data
+    .flatMap(d => keys.map(key => parseFloat(d[key])))
+    .filter(d => d && !isNaN(d))
+  return Math.max(...allValues);
+};
 function buildDateFormat (time, format = 'h:MM:ss') {
   return `${dateFormat(time, format)}`
 }
