@@ -15,7 +15,7 @@ module.exports = {
 async function init() {
     try {
         const appInitUtils = require('../../testUtils');
-        app = appInitUtils.getCreateTestApp();
+        app = await appInitUtils.getCreateTestApp();
     } catch (err){
         console.log(err);
         process.exit(1);
