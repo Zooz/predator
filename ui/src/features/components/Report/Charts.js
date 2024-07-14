@@ -103,7 +103,7 @@ export const BarChartPredator = ({ data = [], keys = [], graphType, onSelectedGr
   )
 };
 
-export const LineChartPredator = ({ data = [], keys = [], labelY, graphType, onSelectedGraphPropertyFilter, filteredKeys, referenceAreas = {}, connectNulls = true }) => {
+export const LineChartPredator = ({ data = [], keys = [], labelY, maxY, graphType, onSelectedGraphPropertyFilter, filteredKeys, referenceAreas = {}, connectNulls = true }) => {
   const { experiments = [] } = referenceAreas;
   const filteredData = filterKeysFromArrayOfObject(data, graphType, filteredKeys);
   return <ResponsiveContainer width='100%' height={300}>
@@ -117,7 +117,15 @@ export const LineChartPredator = ({ data = [], keys = [], labelY, graphType, onS
     >
       <CartesianGrid strokeDasharray='3 3' />
       <XAxis dataKey='name' allowDuplicatedCategory={false} />
-      <YAxis label={labelY} domain={[0, dataMax => Math.round(dataMax * 1.1)]} />
+      <YAxis
+        label={{
+          value: labelY,
+          angle: 0,
+          position: 'bottom',
+          offset: 20,
+          style: { textAnchor: 'middle' }
+        }}
+        domain={[0, Math.round(maxY * 1.1)]} />
       <Legend content={(props) => renderLegend({
         ...props,
         graphType,
