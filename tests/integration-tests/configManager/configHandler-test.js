@@ -7,7 +7,7 @@ const configValues = require('../../../src/common/consts').CONFIG;
 const packageJson = require('../../../package');
 const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.length - 2);
 const defaultBody = {
-    interval_cleanup_finished_containers_ms: 90000,
+    interval_cleanup_finished_containers_ms: 900000,
     allow_insecure_tls: false,
     internal_address: 'http://localhost:80',
     runner_docker_image: `zooz/predator-runner:${RUNNER_VERSION}`,
