@@ -7,7 +7,7 @@ const SEC_TO_MS = 1000;
 const MIN_TO_MS = 60 * 1000;
 const HOUR_TO_MS = 60 * 1000;
 const DAY_TO_MS = 60 * 1000;
-const jobExperimentsIdToTimeout = new Map();
+const jobIdsToTimeouts = new Map();
 
 async function setChaosExperimentsIfExist(jobId, jobExperiments) {
     if (!jobExperiments) {
@@ -42,7 +42,20 @@ async function setSingleJobExperiment(experimentRequest, chaosExperimentsFromDb,
 
 function scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, startAfter) {
     const timeout = setTimeout(() => chaosExperimentsManager.runChaosExperiment(kubeObject, jobId, jobExperimentId), startAfter);
-    jobExperimentsIdToTimeout.set(jobExperimentId, timeout);
+    const timeoutsArray = jobIdsToTimeouts.get(jobId);
+    if (timeoutsArray){
+        timeoutsArray.push(timeout);
+    } else {
+        jobIdsToTimeouts.set(jobId, [timeout]);
+    }
+}
+
+async function stopChaosExperimentsForJob(jobId){
+    const timeoutsOfJob = jobIdsToTimeouts.get(jobId);
+    if (!timeoutsOfJob) return;
+    timeoutsOfJob.map(timeout => clearTimeout(timeout));
+    jobIdsToTimeouts.delete(jobId);
+    await chaosExperimentsManager.stopJobExperimentsByJobId(jobId);
 }
 
 function convertDurationStringToMillisecond(durationString) {
@@ -62,7 +75,7 @@ function convertDurationStringToMillisecond(durationString) {
 }
 
 module.exports = {
-    jobExperimentsIdToTimeout,
     setChaosExperimentsIfExist,
-    scheduleChaosExperiment
+    scheduleChaosExperiment,
+    stopChaosExperimentsForJob
 };

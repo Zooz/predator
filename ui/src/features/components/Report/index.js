@@ -158,27 +158,42 @@ class Report extends React.Component {
               <>
                 <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
                   <h3>Overall Latency</h3>
-                  <LineChartPredator data={aggregateReport.latencyGraph} keys={aggregateReport.latencyGraphKeys}
+                  <LineChartPredator
+                    data={aggregateReport.latencyGraph}
+                    keys={aggregateReport.latencyGraphKeys}
                     labelY={'ms'} graphType={'latency'}
+                    maxY={aggregateReport.latencyGraphMax}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                    filteredKeys={filteredKeys} />
+                    filteredKeys={filteredKeys}
+                    referenceAreas={aggregateReport.referenceAreas}
+                  />
                 </Card>
                 <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
                   <h3>Status Codes</h3>
-                  <LineChartPredator data={aggregateReport.errorsCodeGraph}
+                  <LineChartPredator
+                    data={aggregateReport.errorsCodeGraph}
                     keys={aggregateReport.errorsCodeGraphKeys}
+                    maxY={aggregateReport.errorsGraphMax}
                     graphType={'status_codes'}
                     connectNulls={false}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                    filteredKeys={filteredKeys} />
+                    filteredKeys={filteredKeys}
+                    referenceAreas={aggregateReport.referenceAreas}
+                  />
                 </Card>
 
                 <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
                   <h3>RPS</h3>
-                  <LineChartPredator data={aggregateReport.rps} keys={aggregateReport.rpsKeys} labelY={'rps'}
+                  <LineChartPredator
+                    data={aggregateReport.rps}
+                    keys={aggregateReport.rpsKeys}
+                    labelY={'rps'}
+                    maxY={aggregateReport.rpsGraphMax}
                     graphType={'rps'}
                     onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
-                    filteredKeys={filteredKeys} />
+                    filteredKeys={filteredKeys}
+                    referenceAreas={aggregateReport.referenceAreas}
+                  />
                 </Card>
                 <Card style={{
                   display: 'flex',
@@ -251,7 +266,7 @@ class Report extends React.Component {
         const loadingMode = this.isLoadingMode(this.props.report.status);
 
         if (!loadingMode) {
-          const {report} = this.props;
+          const { report } = this.props;
           this.props.getAggregateReports([{ testId: report.test_id, reportId: report.report_id }])
           this.setState({ finishLoadingMode: prevState.loadingMode });
         }

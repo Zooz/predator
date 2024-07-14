@@ -23,7 +23,7 @@ import MultiSelect from '../../../components/MultiSelect/MultiSelect.export';
 import NumericInput from '../../../components/NumericInput';
 import InfoToolTip from '../InfoToolTip';
 import { faClock, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconButton from '../../../components/IconButton';
 import { createJobRequest, createStateForEditJob } from './utils';
@@ -31,6 +31,7 @@ import Button from '../../../components/Button';
 import SimpleTable from '../SimpleTable';
 import { chaosExperimentsForDropdown } from '../../redux/selectors/chaosExperimentsSelector';
 import Dropdown from '../../../components/Dropdown/Dropdown.export';
+import { KUBERNETES } from '../../../constants'
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const ONE_SEC_MS = 1000;
@@ -39,297 +40,6 @@ const ONE_MIN_MS = 60 * 1000;
 class Form extends React.Component {
   constructor (props) {
     super(props);
-    this.FormList = [
-      {
-        name: 'test_name',
-        key: 'test_name',
-        disabled: true,
-        floatingLabelText: 'Test Name',
-        info: 'The test name that you are going to run.'
-      },
-      {
-        name: 'type',
-        key: 'type',
-        disabled: false,
-        floatingLabelText: 'Test Type',
-        info: 'The type of test that you are going to run.',
-        type: inputTypes.RADIO,
-        options: ['Load test', 'Functional test'],
-        optionToValue: { 'Load test': 'load_test', 'Functional test': 'functional_test' },
-        valueToOption: { load_test: 'Load test', functional_test: 'Functional test' }
-      },
-      {
-        group: 'section_a',
-        bottom: [
-          {
-            name: 'mode',
-            key: 'mode',
-            floatingLabelText: 'Mode',
-            info: 'Override calculated parallelism and max virtual users',
-            type: inputTypes.SWITCHER_TWO_SIDES,
-            justifyContent: 'flex-end',
-            leftOption: 'Simple',
-            rightOption: 'Expert',
-            onChange: (value) => {
-              const { disabled } = this.state;
-
-              if (value === 'Expert') {
-                this.setState({
-                  disabled: {
-                    ...disabled,
-                    parallelism: false,
-                    max_virtual_users: false
-                  }
-                })
-              } else {
-                this.setState({
-                  disabled: {
-                    ...disabled,
-                    parallelism: true,
-                    max_virtual_users: true
-                  }
-                })
-              }
-            }
-          }
-        ],
-        children: [
-          {
-            name: 'arrival_rate',
-            key: 'arrival_rate',
-            floatingLabelText: 'Arrival rate',
-            info: 'Number of scenarios per second that the test fires.',
-            type: inputTypes.NUMERIC_INPUT,
-            hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST
-          },
-          {
-            name: 'arrival_count',
-            key: 'arrival_count',
-            floatingLabelText: 'Arrival count',
-            info: 'Fixed count of arrivals in the tests duration. Resembles the number of scenarios that will be run by the end of the test.',
-            type: inputTypes.NUMERIC_INPUT,
-            hiddenCondition: (state) => state.type === testTypes.LOAD_TEST,
-            newState: (arrivalCount) => {
-              const parallel = Math.ceil(arrivalCount / ONE_SEC_MS);
-              const maxVirtualUsers = parallel * 250;
-              return { parallelism: parallel, max_virtual_users: maxVirtualUsers };
-            }
-          },
-          {
-            name: 'duration',
-            key: 'duration',
-            floatingLabelText: 'Duration (Minutes)',
-            info: 'The duration of the test in minutes.',
-            type: inputTypes.NUMERIC_INPUT
-
-          },
-          {
-            name: 'ramp_to',
-            key: 'ramp_to',
-            floatingLabelText: 'Ramp to',
-            info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.',
-            hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST,
-            type: inputTypes.NUMERIC_WITH_SWITCH,
-            switcherName: 'enable_ramp_to',
-            onChangeSwitcher: (value) => {
-              const { disabled } = this.state;
-              if (value) {
-                this.setState({
-                  disabled: {
-                    ...disabled,
-                    ramp_to: false
-                  }
-                })
-              } else {
-                this.setState({
-                  ramp_to: undefined,
-                  disabled: {
-                    ...disabled,
-                    ramp_to: true
-                  }
-                })
-              }
-            }
-
-          },
-          {
-            name: 'parallelism',
-            key: 'parallelism',
-            floatingLabelText: 'Parallelism',
-            info: 'The amount of runners predator will start, arrival rate, ramp to and max virtual users will split between them.',
-            type: inputTypes.NUMERIC_INPUT
-
-          },
-          {
-            name: 'max_virtual_users',
-            key: 'max_virtual_users',
-            floatingLabelText: 'Max VUsers',
-            info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
-            type: inputTypes.NUMERIC_INPUT,
-            defaultValue: '250'
-          }
-        ]
-      },
-      {
-        group: 'section_b',
-        children: [
-          {
-            name: 'emails',
-            key: 'emails',
-            floatingLabelText: 'Emails',
-            info: 'When the test finishes, a report will be sent to the emails included.',
-            element: 'Email',
-            type: inputTypes.INPUT_LIST,
-            values: (state) => state['emails'].map((value) => ({ value, label: value })),
-            flexBasis: '49%'
-          },
-          {
-            name: 'webhooks',
-            key: 'webhooks',
-            floatingLabelText: 'Webhooks',
-            info: 'Send test reports to Slack.',
-            element: 'Webhook',
-            type: inputTypes.MULTI_SELECT,
-            options: (props) => props.webhooks,
-            flexBasis: '49%'
-          }
-        ]
-      },
-      {
-        group: 'section_c',
-        children:
-            [
-              {
-                name: 'experiments',
-                key: 'experiments',
-                floatingLabelText: 'Running Experiments',
-                info: 'Chaos experiments running within the test',
-                element: 'RunningExperiments',
-                type: inputTypes.LIST,
-                rows: (state) => state.experiments.map((experiment, index) => {
-                  return [
-                    <div key={'header' + index} className={style['list-container']}>
-                      <span className={style['list-item__title']}>experiment name:</span>
-                      <span className={style['list-item']}> {experiment.experiment_name}</span>
-                      <span className={style['list-item__title']}>start after:</span>
-                      <span className={style['list-item']}> {experiment.start_after / ONE_MIN_MS} minutes</span>
-                      <FontAwesomeIcon
-                        icon={faTimes}
-                        size='1px'
-                        onClick={() => {
-                          this.setState({ experiment: state.experiments.splice(index, 1) })
-                        }
-                        } />
-                    </div>
-                  ]
-                }),
-                flexBasis: '80%'
-              },
-              {
-                name: 'add_experiment_option',
-                key: 'add_experiment_option',
-                floatingLabelText: '+New Experiment',
-                onClick: () => {
-                  this.setState({
-                    add_experiment_form_experiment_name: '',
-                    add_experiment_form_experiment_id: '',
-                    add_experiment_form_start_after: 0,
-                    add_experiment_form_hidden: false
-                  })
-                },
-                type: inputTypes.LINK_ACTION,
-                justifyContent: 'flex-end'
-              },
-              {
-                name: 'add_experiment_form_experiment_name',
-                key: 'add_experiment_form_experiment_name',
-                floatingLabelText: 'Experiment',
-                list: (props) => props.experiments,
-                placeholder: 'Select experiment to run',
-                element: 'new_experiment',
-                selectedOption: (state) => ({ key: state.add_experiment_form_experiment_id, value: state.add_experiment_form_experiment_name }),
-                type: inputTypes.DROPDOWN,
-                onChange: ({ value, key }) => {
-                  this.setState({
-                    add_experiment_form_experiment_name: value,
-                    add_experiment_form_experiment_id: key
-                  })
-                },
-                flexBasis: '49%',
-                hiddenCondition: (state) => state.add_experiment_form_hidden === true
-              },
-              {
-                name: 'add_experiment_form_start_after',
-                key: 'add_experiment_form_start_after',
-                floatingLabelText: 'Start After (Minutes)',
-                info: 'When to start the experiment within the test timeframe (Minutes)',
-                element: 'StartAfter',
-                type: inputTypes.NUMERIC_INPUT,
-                justifyContent: 'flex-end',
-                height: '35px',
-                hiddenCondition: (state) => state.add_experiment_form_hidden === true
-              },
-              {
-                name: 'add_experiment_submit',
-                key: 'add_experiment_submit',
-                floatingLabelText: 'Add',
-                element: 'AddExperiment',
-                type: inputTypes.SUBMIT_BUTTON,
-                inverted: true,
-                justifyContent: 'flex-end',
-                paddingTop: '22px',
-                height: '35px',
-                onClick: () => {
-                  const newExperiment = {
-                    experiment_id: this.state.add_experiment_form_experiment_id,
-                    experiment_name: this.state.add_experiment_form_experiment_name,
-                    start_after: this.state.add_experiment_form_start_after * ONE_MIN_MS // adjust to milliseconds
-                  }
-                  const experiments = [...this.state.experiments, newExperiment]
-                  this.state.experiments.push(newExperiment)
-                  this.setState((prevState) => {
-                    return {
-                      ...prevState,
-                      experiments: experiments,
-                      add_experiment_form_hidden: true
-                    }
-                  })
-                },
-                disabled: (state) => state.add_experiment_form_experiment_name.trim().length === 0,
-                hiddenCondition: (state) => state.add_experiment_form_hidden === true
-              }
-            ]
-      },
-      {
-        group: 'section_d',
-        flexDirection: 'column',
-        children: [
-          {
-            name: 'debug',
-            key: 'debug',
-            label: 'Debug',
-            info: 'Turn on debug to log request and response in the load generators',
-            type: inputTypes.SWITCHER
-          },
-          {
-            name: 'cron_expression',
-            key: 'cron_expression',
-            floatingLabelText: 'Cron expression',
-            info: 'Schedule a reoccurring job using this. For example, cron expression: "0 0 22 * * *" runs the test every day at 22:00 UTC.'
-          },
-
-          {
-            name: 'notes',
-            key: 'notes',
-            floatingLabelText: 'Notes',
-            element: 'notes',
-            info: 'Add notes about the test.',
-            type: inputTypes.TEXT_FIELD
-          }
-        ]
-      }
-
-    ];
     this.state = {
       test_id: this.props.data ? this.props.data.id : '',
       test_name: this.props.data ? this.props.data.name : '',
@@ -368,6 +78,7 @@ class Form extends React.Component {
       add_experiment_form_experiment_name: '',
       add_experiment_form_start_after: 0
     };
+    this.FormList = this.getFormList(this.props.jobPlatform);
 
     if (this.props.editMode) {
       const editProps = createStateForEditJob(this.props.data);
@@ -780,6 +491,315 @@ class Form extends React.Component {
         this.props.createJob(createJobRequest(jobData));
       }
     };
+
+   getFormList = (platform) => {
+     const baseFormList = [
+       {
+         name: 'test_name',
+         key: 'test_name',
+         disabled: true,
+         floatingLabelText: 'Test Name',
+         info: 'The test name that you are going to run.'
+       },
+       {
+         name: 'type',
+         key: 'type',
+         disabled: false,
+         floatingLabelText: 'Test Type',
+         info: 'The type of test that you are going to run.',
+         type: inputTypes.RADIO,
+         options: ['Load test', 'Functional test'],
+         optionToValue: { 'Load test': 'load_test', 'Functional test': 'functional_test' },
+         valueToOption: { load_test: 'Load test', functional_test: 'Functional test' }
+       },
+       {
+         group: 'section_a',
+         bottom: [
+           {
+             name: 'mode',
+             key: 'mode',
+             floatingLabelText: 'Mode',
+             info: 'Override calculated parallelism and max virtual users',
+             type: inputTypes.SWITCHER_TWO_SIDES,
+             justifyContent: 'flex-end',
+             leftOption: 'Simple',
+             rightOption: 'Expert',
+             onChange: (value) => {
+               const { disabled } = this.state;
+
+               if (value === 'Expert') {
+                 this.setState({
+                   disabled: {
+                     ...disabled,
+                     parallelism: false,
+                     max_virtual_users: false
+                   }
+                 })
+               } else {
+                 this.setState({
+                   disabled: {
+                     ...disabled,
+                     parallelism: true,
+                     max_virtual_users: true
+                   }
+                 })
+               }
+             }
+           }
+         ],
+         children: [
+           {
+             name: 'arrival_rate',
+             key: 'arrival_rate',
+             floatingLabelText: 'Arrival rate',
+             info: 'Number of scenarios per second that the test fires.',
+             type: inputTypes.NUMERIC_INPUT,
+             hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST
+           },
+           {
+             name: 'arrival_count',
+             key: 'arrival_count',
+             floatingLabelText: 'Arrival count',
+             info: 'Fixed count of arrivals in the tests duration. Resembles the number of scenarios that will be run by the end of the test.',
+             type: inputTypes.NUMERIC_INPUT,
+             hiddenCondition: (state) => state.type === testTypes.LOAD_TEST,
+             newState: (arrivalCount) => {
+               const parallel = Math.ceil(arrivalCount / ONE_SEC_MS);
+               const maxVirtualUsers = parallel * 250;
+               return { parallelism: parallel, max_virtual_users: maxVirtualUsers };
+             }
+           },
+           {
+             name: 'duration',
+             key: 'duration',
+             floatingLabelText: 'Duration (Minutes)',
+             info: 'The duration of the test in minutes.',
+             type: inputTypes.NUMERIC_INPUT
+
+           },
+           {
+             name: 'ramp_to',
+             key: 'ramp_to',
+             floatingLabelText: 'Ramp to',
+             info: 'A linear ramp up phase where the number of new arrivals increases linearly over the duration of the phase. The test starts with the Arrival Rate value until reaching this value.',
+             hiddenCondition: (state) => state.type === testTypes.FUNCTIONAL_TEST,
+             type: inputTypes.NUMERIC_WITH_SWITCH,
+             switcherName: 'enable_ramp_to',
+             onChangeSwitcher: (value) => {
+               const { disabled } = this.state;
+               if (value) {
+                 this.setState({
+                   disabled: {
+                     ...disabled,
+                     ramp_to: false
+                   }
+                 })
+               } else {
+                 this.setState({
+                   ramp_to: undefined,
+                   disabled: {
+                     ...disabled,
+                     ramp_to: true
+                   }
+                 })
+               }
+             }
+
+           },
+           {
+             name: 'parallelism',
+             key: 'parallelism',
+             floatingLabelText: 'Parallelism',
+             info: 'The amount of runners predator will start, arrival rate, ramp to and max virtual users will split between them.',
+             type: inputTypes.NUMERIC_INPUT
+
+           },
+           {
+             name: 'max_virtual_users',
+             key: 'max_virtual_users',
+             floatingLabelText: 'Max VUsers',
+             info: 'Max concurrent number of users doing requests, if there is more requests that have not returned yet, requests will be dropped',
+             type: inputTypes.NUMERIC_INPUT,
+             defaultValue: '250'
+           }
+         ]
+       },
+       {
+         group: 'section_b',
+         children: [
+           {
+             name: 'emails',
+             key: 'emails',
+             floatingLabelText: 'Emails',
+             info: 'When the test finishes, a report will be sent to the emails included.',
+             element: 'Email',
+             type: inputTypes.INPUT_LIST,
+             values: (state) => state['emails'].map((value) => ({ value, label: value })),
+             flexBasis: '49%'
+           },
+           {
+             name: 'webhooks',
+             key: 'webhooks',
+             floatingLabelText: 'Webhooks',
+             info: 'Send test reports to Slack.',
+             element: 'Webhook',
+             type: inputTypes.MULTI_SELECT,
+             options: (props) => props.webhooks,
+             flexBasis: '49%'
+           }
+         ]
+       },
+       {
+         group: 'section_d',
+         flexDirection: 'column',
+         children: [
+           {
+             name: 'debug',
+             key: 'debug',
+             label: 'Debug',
+             info: 'Turn on debug to log request and response in the load generators',
+             type: inputTypes.SWITCHER
+           },
+           {
+             name: 'cron_expression',
+             key: 'cron_expression',
+             floatingLabelText: 'Cron expression',
+             info: 'Schedule a reoccurring job using this. For example, cron expression: "0 0 22 * * *" runs the test every day at 22:00 UTC.'
+           },
+
+           {
+             name: 'notes',
+             key: 'notes',
+             floatingLabelText: 'Notes',
+             element: 'notes',
+             info: 'Add notes about the test.',
+             type: inputTypes.TEXT_FIELD
+           }
+         ]
+       }
+
+     ];
+     if (platform === KUBERNETES) {
+       const chaosExperimentsSection = {
+         children:
+            [
+              {
+                name: 'experiments',
+                key: 'experiments',
+                floatingLabelText: 'Running Experiments',
+                info: 'Chaos experiments running within the test',
+                element: 'RunningExperiments',
+                type: inputTypes.LIST,
+                rows: (state) => state.experiments.map((experiment, index) => {
+                  return [
+                    <div key={'header' + index} className={style['list-container']}>
+                      <span className={style['list-item__title']}>experiment name:</span>
+                      <span className={style['list-item']}> {experiment.experiment_name}</span>
+                      <span className={style['list-item__title']}>start after:</span>
+                      <span className={style['list-item']}> {experiment.start_after / ONE_MIN_MS} minutes</span>
+                      <FontAwesomeIcon
+                        icon={faTimes}
+                        size='1px'
+                        onClick={() => {
+                          this.setState({ experiment: state.experiments.splice(index, 1) })
+                        }
+                        } />
+                    </div>
+                  ]
+                }),
+                flexBasis: '80%'
+              },
+              {
+                name: 'add_experiment_option',
+                key: 'add_experiment_option',
+                floatingLabelText: '+New Experiment',
+                onClick: () => {
+                  debugger;
+                  this.setState({
+                    add_experiment_form_experiment_name: '',
+                    add_experiment_form_experiment_id: '',
+                    add_experiment_form_start_after: 0,
+                    add_experiment_form_hidden: false
+                  })
+                },
+                type: inputTypes.LINK_ACTION,
+                justifyContent: 'flex-end'
+              },
+              {
+                name: 'add_experiment_form_experiment_name',
+                key: 'add_experiment_form_experiment_name',
+                floatingLabelText: 'Experiment',
+                list: (props) => props.experiments,
+                placeholder: 'Select experiment to run',
+                element: 'new_experiment',
+                selectedOption: (state) => ({ key: state.add_experiment_form_experiment_id, value: state.add_experiment_form_experiment_name }),
+                type: inputTypes.DROPDOWN,
+                onChange: ({ value, key }) => {
+                  this.setState({
+                    add_experiment_form_experiment_name: value,
+                    add_experiment_form_experiment_id: key
+                  })
+                },
+                flexBasis: '49%',
+                hiddenCondition: (state) => state.add_experiment_form_hidden === true
+              },
+              {
+                name: 'add_experiment_form_start_after',
+                key: 'add_experiment_form_start_after',
+                floatingLabelText: 'Start After (Minutes)',
+                info: 'When to start the experiment within the test timeframe (Minutes)',
+                element: 'StartAfter',
+                type: inputTypes.NUMERIC_INPUT,
+                justifyContent: 'flex-end',
+                height: '35px',
+                hiddenCondition: (state) => state.add_experiment_form_hidden === true
+              },
+              {
+                name: 'add_experiment_submit',
+                key: 'add_experiment_submit',
+                floatingLabelText: 'Add',
+                element: 'AddExperiment',
+                type: inputTypes.SUBMIT_BUTTON,
+                inverted: true,
+                justifyContent: 'flex-end',
+                paddingTop: '22px',
+                height: '35px',
+                onClick: () => {
+                  const newExperiment = {
+                    experiment_id: this.state.add_experiment_form_experiment_id,
+                    experiment_name: this.state.add_experiment_form_experiment_name,
+                    start_after: this.state.add_experiment_form_start_after * ONE_MIN_MS // adjust to milliseconds
+                  }
+                  const experiments = [...this.state.experiments, newExperiment]
+                  this.state.experiments.push(newExperiment)
+                  this.setState((prevState) => {
+                    return {
+                      ...prevState,
+                      experiments: experiments,
+                      add_experiment_form_hidden: true
+                    }
+                  })
+                },
+                disabled: (state) => state.add_experiment_form_experiment_name.trim().length === 0,
+                hiddenCondition: (state) => state.add_experiment_form_hidden === true
+              }
+            ]
+       };
+       baseFormList.splice(3, 0, chaosExperimentsSection); // Insert the chaos item at the 4th index
+     }
+
+     // Assign keys dynamically based on the final list
+     let sessionIndex = 1;
+     return baseFormList.map((item, index) => {
+       if (!item.children) return item;
+       const mappedItem = {
+         ...item,
+         group: `section_${sessionIndex}`
+       }
+       sessionIndex++;
+       return mappedItem;
+     });
+   };
 }
 
 function mapStateToProps (state) {

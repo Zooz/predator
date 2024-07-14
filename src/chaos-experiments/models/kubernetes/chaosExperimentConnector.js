@@ -3,10 +3,12 @@ const fs = require('fs');
 const kubernetesConfig = require('../../../config/kubernetesConfig');
 const logger = require('../../../common/logger');
 const requestSender = require('../../../common/requestSender');
+const { CHAOS_EXPERIMENT_LABELS } = require('../../../../src/common/consts');
 const kubernetesUrl = kubernetesConfig.kubernetesUrl;
 
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 const headers = {};
+const JOB_ID_LABEL = CHAOS_EXPERIMENT_LABELS.JOB_ID;
 let supportedChaosKinds;
 
 if (kubernetesConfig.kubernetesToken) {
@@ -40,12 +42,12 @@ module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
         headers
     };
     const response = await requestSender.send(options);
-    const genericJobResponse = {
-        jobName: response.metadata.name,
+    const genericResponse = {
+        name: response.metadata.name,
         id: response.metadata.uid,
         namespace: response.namespace
     };
-    return genericJobResponse;
+    return genericResponse;
 };
 
 const getSupportedKinds = async () => {
@@ -73,7 +75,7 @@ const clearAllFinishedResources = async (deletionTimeThreshold) => {
             });
             for (const resource of resourcesToBeDeleted){
                 try {
-                    await deleteResourcesOfKind(kind, resource.metadata.name, resource.metadata.namespace);
+                    await deleteResourceOfKind(kind, resource.metadata.name, resource.metadata.namespace);
                 } catch (error){
                     logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
                 }
@@ -95,8 +97,19 @@ const getAllResourcesOfKind = async (kind) => {
     return resources.items;
 };
 
-const deleteResourcesOfKind = async (kind, resourceName, namespace) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind, resourceName);
+module.exports.deleteAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=%s=%s', kubernetesUrl, namespace, kind.toLowerCase(), JOB_ID_LABEL, jobId);
+    const options = {
+        url,
+        method: 'DELETE',
+        headers
+    };
+    const resources = await requestSender.send(options);
+    return resources;
+};
+
+const deleteResourceOfKind = module.exports.deleteResourceOfKind = async (kind, resourceName, namespace) => {
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind.toLowerCase(), resourceName);
     const options = {
         url,
         method: 'DELETE',

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import GetTests from '../features/get-tests';
 import GetProcessors from '../features/get-processors';
 import GetChaosExperiments from '../features/get-chaos-experiments';
@@ -14,8 +14,12 @@ import { ConnectedRouter } from 'react-router-redux';
 import history from '../store/history';
 import { hot } from 'react-hot-loader';
 import DrawerE from '../features/components/DrawerE';
-import menuList from '../features/mainMenu';
+import getMenuList from '../features/mainMenu';
 import get from 'lodash/get'
+import { config, errorOnGetConfig, processingGetConfig } from '../features/redux/selectors/configSelector';
+import * as Actions from '../features/redux/action';
+import Loader from '../features/components/Loader';
+import { ERROR_GET_CONFIG_MESSAGE } from '../constants';
 
 class App extends React.Component {
     state = {
@@ -28,62 +32,84 @@ class App extends React.Component {
       });
     };
 
+    componentDidMount () {
+      this.props.getConfig();
+    }
+
     render () {
-      return (
-        <ConnectedRouter history={history}>
-          <DrawerE history={history} open listItemData={menuList}>
-            <Route exact path='/' render={() => (
-              <Redirect to='/last_reports' />
-            )} />
-            <Route exact path='/tests' render={props => (
-              <GetTests {...props} />
-            )} />
-            <Route exact path='/tests/:testId/run' render={props => (
-              <GetTests {...props} />
-            )} />
-            <Route exact path='/tests/:testId/edit' render={props => (
-              <GetTests {...props} />
-            )} />
-            <Route exact path='/jobs' render={props => (
-              <GetJobs {...props} />
-            )} />
-            <Route exact path='/jobs/:jobId/edit' render={props => (
-              <GetJobs {...props} />
-            )} />
-            <Route exact path='/tests/:testId/reports' render={props => (
-              <GetTestReports {...props} />
-            )} />
-            <Route exact path='/last_reports' render={props => (
-              <GetReports {...props} />
-            )} />
-            <Route exact path='/processors' render={props => (
-              <GetProcessors {...props} />
-            )} />
-            <Route exact path='/chaos_experiments' render={props => (
-              <GetChaosExperiments {...props} />
-            )} />
-            <Route exact path='/webhooks' render={props => (
-              <Webhooks {...props} />
-            )} />
-            <Route exact path='/settings' render={props => (
-              <Configuration {...props} />
-            )} />
-            <Route exact path='/tests/:testId/reports/:reportId' render={props => (
-              <ReportPage {...props} />
-            )} />
-          </DrawerE>
-        </ConnectedRouter>
-      )
+      const {
+        config,
+        errorOnGetConfig,
+        processingGetConfig
+      } = this.props;
+      if (errorOnGetConfig) return <div>{ERROR_GET_CONFIG_MESSAGE}</div>;
+      if (processingGetConfig) return <div><Loader /></div>
+      if (config && !errorOnGetConfig && !processingGetConfig) {
+        const jobPlatform = config.job_platform;
+        const menuList = getMenuList(config.job_platform);
+
+        return (
+          <ConnectedRouter history={history}>
+            <DrawerE history={history} open listItemData={menuList}>
+              <Route exact path='/' render={() => (
+                <Redirect to='/last_reports' />
+              )} />
+              <Route exact path='/tests' render={props => (
+                <GetTests {... { ...props, jobPlatform }} />
+              )} />
+              <Route exact path='/tests/:testId/run' render={props => (
+                <GetTests {... { ...props, jobPlatform }} />
+              )} />
+              <Route exact path='/tests/:testId/edit' render={props => (
+                <GetTests {...props} />
+              )} />
+              <Route exact path='/jobs' render={props => (
+                <GetJobs {... { ...props, jobPlatform }} />
+              )} />
+              <Route exact path='/jobs/:jobId/edit' render={props => (
+                <GetJobs {... { ...props, jobPlatform }} />
+              )} />
+              <Route exact path='/tests/:testId/reports' render={props => (
+                <GetTestReports {...props} />
+              )} />
+              <Route exact path='/last_reports' render={props => (
+                <GetReports {...props} />
+              )} />
+              <Route exact path='/processors' render={props => (
+                <GetProcessors {...props} />
+              )} />
+              <Route exact path='/chaos_experiments' render={props => (
+                <GetChaosExperiments {...props} />
+              )} />
+              <Route exact path='/webhooks' render={props => (
+                <Webhooks {...props} />
+              )} />
+              <Route exact path='/settings' render={props => (
+                <Configuration {...props} />
+              )} />
+              <Route exact path='/tests/:testId/reports/:reportId' render={props => (
+                <ReportPage {...props} />
+              )} />
+            </DrawerE>
+          </ConnectedRouter>
+        )
+      } else {
+        return null;
+      }
     }
 }
 
 function mapStateToProps (state) {
   return {
-    location: get(state, 'router.location.pathname')
+    location: get(state, 'router.location.pathname'),
+    config: config(state),
+    processingGetConfig: processingGetConfig(state),
+    errorOnGetConfig: errorOnGetConfig(state)
   }
 }
 
 const mapDispatchToProps = {
+  getConfig: Actions.getConfig
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(hot(module)(App));
