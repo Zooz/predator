@@ -2196,7 +2196,6 @@ function nockK8sChaosExperimentSupportedKinds(url) {
 }
 
 function nockK8sChaosExperimentApply(url, namespace, kind) {
-    //https://kubernetes/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos
     nock(url).persist()
         .post(`/apis/chaos-mesh.org/v1alpha1/namespaces/${namespace}/${kind}`)
         .reply(200,
