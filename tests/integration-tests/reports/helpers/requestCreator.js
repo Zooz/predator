@@ -2,8 +2,6 @@
 
 const request = require('supertest');
 
-const app = require('../../../../src/app');
-
 let testApp;
 
 module.exports = {
@@ -21,9 +19,9 @@ module.exports = {
 };
 
 async function init() {
-    testApp = await app();
+    const appInitUtils = require('../../testUtils');
+    testApp = await appInitUtils.getCreateTestApp();
 }
-
 function postStats(testId, reportId, body, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp).post(`/v1/tests/${testId}/reports/${reportId}/stats`)
         .send(body)

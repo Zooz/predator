@@ -1,5 +1,4 @@
 const request = require('supertest');
-const app = require('../../../../src/app');
 let testApp;
 module.exports = {
     init,
@@ -15,7 +14,8 @@ module.exports = {
 };
 
 async function init() {
-    testApp = await app();
+    const appInitUtils = require('../../testUtils');
+    testApp = await appInitUtils.getCreateTestApp();
 }
 
 function deletePredatorRunnerContainers() {

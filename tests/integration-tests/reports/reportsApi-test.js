@@ -16,7 +16,6 @@ const basicTest = require('../../testExamples/Basic_test');
 const { KUBERNETES } = require('../../../src/common/consts');
 const mailhogHelper = require('./mailhog/mailhogHelper');
 const chaosExperimentsRequestSender = require('../chaos-experiments/helpers/requestCreator');
-const databaseConnector = require('../../../src/chaos-experiments/models/database/databaseConnector');
 
 const headers = { 'Content-Type': 'application/json' };
 
@@ -24,10 +23,13 @@ const jobPlatform = process.env.JOB_PLATFORM;
 // I did this to save an indentation level
 (jobPlatform.toUpperCase() === KUBERNETES ? describe : describe.skip)('Reports integration tests', function() {
     before('Init requestCreators', async function() {
+        nockK8sChaosExperimentSupportedKinds(kubernetesConfig.kubernetesUrl);
+
         await reportsRequestCreator.init();
         await testsRequestCreator.init();
         await jobRequestCreator.init();
         await configRequestCreator.init();
+        await chaosExperimentsRequestSender.init();
     });
     describe('Happy flow', function() {
         describe('Reports', function () {
@@ -81,7 +83,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const headersWithContext = Object.assign({}, headers, { 'x-context-id': id });
 
                     nockK8sRunnerCreation(kubernetesConfig.kubernetesUrl, jobName, id, kubernetesConfig.kubernetesNamespace);
-
+                    nockK8sChaosExperimentApply(kubernetesConfig.kubernetesUrl, 'apps', 'podchaos');
                     for (let i = 0; i < 2; i++) {
                         const chaosExperiment = chaosExperimentsRequestSender.generateRawChaosExperiment(uuid.v4(), id);
                         chaosExperimentResponse = await chaosExperimentsRequestSender.createChaosExperiment(chaosExperiment, headersWithContext);
@@ -119,21 +121,9 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     expect(jobCreateResponse.status).to.be.equal(201);
                     const reportId = jobCreateResponse.body.report_id;
 
-                    // const now = Date.now();
-                    // const jobExperiment1 = uuid.v4();
-                    // const jobExperiment1StartTime = now;
-                    // const jobExperiment1EndTime = now + 60000;
-                    // await databaseConnector.insertChaosJobExperiment(jobExperiment1, jobCreateResponse.body.id, chaosExperimentsInserted[0].body.id, jobExperiment1StartTime, jobExperiment1EndTime);
-                    // const jobExperiment2 = uuid.v4();
-                    // const jobExperiment2StartTime = now + 60000;
-                    // const jobExperiment2EndTime = now + 2 * 60000;
-                    // await databaseConnector.insertChaosJobExperiment(jobExperiment2, jobCreateResponse.body.id, chaosExperimentsInserted[1].body.id, jobExperiment2StartTime, jobExperiment2EndTime);
-
                     await sleep(5 * 1000); // 5 seconds
                     await runFullSingleRunnerCycle(testId, reportId, runnerId);
                     await sleep(5 * 1000); // 5 seconds
-                    // await databaseConnector.setChaosJobExperimentTriggered(jobExperiment1, true);
-                    // await databaseConnector.setChaosJobExperimentTriggered(jobExperiment2, true);
 
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
 
@@ -365,14 +355,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
                         await assertReportStatus(testId, reportId, constants.REPORT_STARTED_STATUS);
 
-                        const timedStart = 30; //make an entry at 30 seconds in the report
+                        const timedStart = 30; // make an entry at 30 seconds in the report
                         const numEntries = 5;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
                         expect(getReport.statusCode).to.be.equal(200);
                         const testStartTime = new Date(getReport.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries; timeKey++){
-                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
-                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart * timeKey);
+                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -384,9 +374,9 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         const reportLines = getExportedReportResponse.text.split('\n');
                         console.log(reportLines);
-                        let splitData = [];
+                        const splitData = [];
                         for (let i = 1; i < reportLines.length; i++){
-                            splitData.push(reportLines[i].split(","));
+                            splitData.push(reportLines[i].split(','));
                         }
 
                         const parsedStandardStat = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId).data);
@@ -396,17 +386,16 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const RPS = parsedStandardStat.rps.mean.toString();
                         const STATUS200 = parsedStandardStat.requestsCompleted.toString();
 
-                        const DATA_ROW = [MEDIAN,P95,P99,RPS,STATUS200];
-                        const STRING_DATA_ROW = DATA_ROW.join(",");
+                        const DATA_ROW = [MEDIAN, P95, P99, RPS, STATUS200];
+                        const STRING_DATA_ROW = DATA_ROW.join(',');
 
                         const firstDataLine = splitData[1];
                         const firstTime = parseInt(firstDataLine[1]);
 
                         for (let index = 1; index < splitData.length; index++){
-                            expect(parseInt(splitData[index][1])).to.be.equal(firstTime+30000*(index-1));
-                            expect(splitData[index].slice(2).join(",")).to.be.deep.equal(STRING_DATA_ROW);
+                            expect(parseInt(splitData[index][1])).to.be.equal(firstTime + 30000 * (index - 1));
+                            expect(splitData[index].slice(2).join(',')).to.be.deep.equal(STRING_DATA_ROW);
                         }
-
                     });
 
                     describe('export report of non existent report', function () {
@@ -472,14 +461,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
 
-                        const timedStart = 30; //make an entry at 30 seconds in the report
+                        const timedStart = 30; // make an entry at 30 seconds in the report
                         const numEntries = 3;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
                         expect(getReport.statusCode).to.be.equal(200);
                         const testStartTime = new Date(getReport.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries; timeKey++){
-                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
-                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart * timeKey);
+                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -487,14 +476,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_STARTED_STAGE);
 
-                        const timedStart2 = 30; //make an entry at 30 seconds in the report
+                        const timedStart2 = 30; // make an entry at 30 seconds in the report
                         const numEntries2 = 3;
                         const getReport2 = await reportsRequestCreator.getReport(testId2, reportId2);
                         expect(getReport2.statusCode).to.be.equal(200);
                         const testStartTime2 = new Date(getReport2.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries2; timeKey++){
-                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2*timeKey);
-                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
+                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2 * timeKey);
+                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -574,14 +563,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         await assertPostStats(testId, reportId, runnerId, constants.SUBSCRIBER_STARTED_STAGE);
 
-                        const timedStart = 30; //make an entry at 30 seconds in the report
+                        const timedStart = 30; // make an entry at 30 seconds in the report
                         const numEntries = 5;
                         const getReport = await reportsRequestCreator.getReport(testId, reportId);
                         expect(getReport.statusCode).to.be.equal(200);
                         const testStartTime = new Date(getReport.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries; timeKey++){
-                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart*timeKey);
-                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
+                            const statDate = new Date(testStartTime).setSeconds(testStartTime.getSeconds() + timedStart * timeKey);
+                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId, reportId, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -589,14 +578,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                         await assertPostStats(testId2, reportId2, runnerId2, constants.SUBSCRIBER_STARTED_STAGE);
 
-                        const timedStart2 = 30; //make an entry at 30 seconds in the report
+                        const timedStart2 = 30; // make an entry at 30 seconds in the report
                         const numEntries2 = 5;
                         const getReport2 = await reportsRequestCreator.getReport(testId2, reportId2);
                         expect(getReport2.statusCode).to.be.equal(200);
                         const testStartTime2 = new Date(getReport2.body.start_time);
                         for (let timeKey = 1; timeKey <= numEntries2; timeKey++){
-                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2*timeKey);
-                            let intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
+                            const statDate = new Date(testStartTime2).setSeconds(testStartTime2.getSeconds() + timedStart2 * timeKey);
+                            const intermediateStatsResponse = await reportsRequestCreator.postStats(testId2, reportId2, statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId2, statDate));
                             expect(intermediateStatsResponse.statusCode).to.be.equal(204);
                         }
 
@@ -613,12 +602,12 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const reportLines = getExportedCompareResponse.text.split('\n');
 
                         for (let index = 1; index < reportLines.length; index++){
-                            console.log(reportLines[index].split(","));
+                            console.log(reportLines[index].split(','));
                         }
 
-                        let splitData = [];
+                        const splitData = [];
                         for (let i = 1; i < reportLines.length; i++){
-                            splitData.push(reportLines[i].split(","));
+                            splitData.push(reportLines[i].split(','));
                         }
 
                         const parsedStandardStat = JSON.parse(statsGenerator.generateStats(constants.SUBSCRIBER_INTERMEDIATE_STAGE, runnerId).data);
@@ -635,16 +624,15 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         const RPS_2 = parsedStandardStat_2.rps.mean.toString();
                         const STATUS200_2 = parsedStandardStat_2.requestsCompleted.toString();
 
-                        const DATA_ROW = [MEDIAN,P95,P99,RPS,STATUS200,MEDIAN_2,P95_2,P99_2,RPS_2,STATUS200_2];
-                        const STRING_DATA_ROW = DATA_ROW.join(",");
+                        const DATA_ROW = [MEDIAN, P95, P99, RPS, STATUS200, MEDIAN_2, P95_2, P99_2, RPS_2, STATUS200_2];
+                        const STRING_DATA_ROW = DATA_ROW.join(',');
                         const firstDataLine = splitData[1];
                         const firstTime = parseInt(firstDataLine[1]);
 
                         for (let index = 1; index < splitData.length; index++){
-                            expect(parseInt(splitData[index][1])).to.be.eql(firstTime+30000*(index-1));
-                            expect(splitData[index].slice(2).join(",")).to.be.deep.eql(STRING_DATA_ROW);
+                            expect(parseInt(splitData[index][1])).to.be.eql(firstTime + 30000 * (index - 1));
+                            expect(splitData[index].slice(2).join(',')).to.be.deep.eql(STRING_DATA_ROW);
                         }
-
                     });
 
                     it('Post full cycle stats for both reports and give an unknown report', async function () {
@@ -2074,6 +2062,155 @@ function nockK8sRunnerCreation(url, name, uid, namespace) {
             metadata: { name, uid },
             namespace: namespace
         });
+}
+
+function nockK8sChaosExperimentSupportedKinds(url) {
+    const response = {
+        kind: 'CustomResourceDefinitionList',
+        apiVersion: 'apiextensions.k8s.io/v1',
+        metadata: {
+            resourceVersion: '123456'
+        },
+        items: [
+            {
+                apiVersion: 'apiextensions.k8s.io/v1',
+                kind: 'CustomResourceDefinition',
+                metadata: {
+                    name: 'stresschaos.chaos-mesh.org',
+                    uid: 'abcd1234-5678-90ef-ghij-klmn12345678',
+                    resourceVersion: '987654',
+                    generation: 1,
+                    creationTimestamp: '2023-01-01T00:00:00Z',
+                    annotations: {
+                        'kubectl.kubernetes.io/last-applied-configuration': '...'
+                    }
+                },
+                spec: {
+                    group: 'chaos-mesh.org',
+                    names: {
+                        plural: 'stresschaos',
+                        singular: 'stresschaos',
+                        kind: 'StressChaos',
+                        shortNames: ['sc']
+                    },
+                    scope: 'Namespaced',
+                    versions: [
+                        {
+                            name: 'v1alpha1',
+                            served: true,
+                            storage: true,
+                            schema: {
+                                openAPIV3Schema: {
+                                    type: 'object',
+                                    properties: {
+                                        // schema details
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                status: {
+                    conditions: [
+                        {
+                            type: 'NamesAccepted',
+                            status: 'True',
+                            lastTransitionTime: '2023-01-01T00:00:00Z',
+                            reason: 'NoConflicts',
+                            message: 'No conflicts found'
+                        },
+                        {
+                            type: 'Established',
+                            status: 'True',
+                            lastTransitionTime: '2023-01-01T00:00:00Z',
+                            reason: 'InitialNamesAccepted',
+                            message: 'The CRD has been successfully established'
+                        }
+                    ]
+                }
+            },
+            {
+                apiVersion: 'apiextensions.k8s.io/v1',
+                kind: 'CustomResourceDefinition',
+                metadata: {
+                    name: 'podchaos.chaos-mesh.org',
+                    uid: 'efgh5678-1234-abcd-ijkl-901234567890',
+                    resourceVersion: '876543',
+                    generation: 1,
+                    creationTimestamp: '2023-01-01T00:00:00Z',
+                    annotations: {
+                        'kubectl.kubernetes.io/last-applied-configuration': '...'
+                    }
+                },
+                spec: {
+                    group: 'chaos-mesh.org',
+                    names: {
+                        plural: 'podchaos',
+                        singular: 'podchaos',
+                        kind: 'PodChaos',
+                        shortNames: ['pc']
+                    },
+                    scope: 'Namespaced',
+                    versions: [
+                        {
+                            name: 'v1alpha1',
+                            served: true,
+                            storage: true,
+                            schema: {
+                                openAPIV3Schema: {
+                                    type: 'object',
+                                    properties: {
+                                        // schema details
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                status: {
+                    conditions: [
+                        {
+                            type: 'NamesAccepted',
+                            status: 'True',
+                            lastTransitionTime: '2023-01-01T00:00:00Z',
+                            reason: 'NoConflicts',
+                            message: 'No conflicts found'
+                        },
+                        {
+                            type: 'Established',
+                            status: 'True',
+                            lastTransitionTime: '2023-01-01T00:00:00Z',
+                            reason: 'InitialNamesAccepted',
+                            message: 'The CRD has been successfully established'
+                        }
+                    ]
+                }
+            }
+            // Additional CRDs can be listed here
+        ]
+    };
+
+    nock(url).persist()
+        .get('/apis/apiextensions.k8s.io/v1/customresourcedefinitions')
+        .reply(200, response);
+}
+
+function nockK8sChaosExperimentApply(url, namespace, kind) {
+    //https://kubernetes/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos
+    nock(url).persist()
+        .post(`/apis/chaos-mesh.org/v1alpha1/namespaces/${namespace}/${kind}`)
+        .reply(200,
+            {
+                apiVersion: 'chaos-mesh.org/v1alpha1',
+                kind: kind,
+                metadata: {
+                    name: 'example-podchaos',
+                    namespace: 'apps',
+                    uid: uuid(),
+                    resourceVersion: '123456',
+                    creationTimestamp: '2024-07-14T12:34:56Z'
+                }
+            });
 }
 
 async function sleep(timeInMs) {

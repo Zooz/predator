@@ -1,6 +1,5 @@
 const request = require('supertest');
 const uri = '/v1/config';
-const app = require('../../../../src/app');
 let testApp;
 
 module.exports = {
@@ -11,7 +10,8 @@ module.exports = {
 };
 
 async function init() {
-    testApp = await app();
+    const appInitUtils = require('../../testUtils');
+    testApp = await appInitUtils.getCreateTestApp();
 }
 
 function updateConfig(body) {
