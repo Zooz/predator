@@ -42,7 +42,7 @@ module.exports.runJob = async (kubernetesJobConfig, job) => {
     await jobExperimentHandler.setChaosExperimentsIfExist(job.id, job.experiments);
     return genericJobResponse;
 };
-module.exports.stopRun = async (jobPlatformName) => {
+module.exports.stopRun = async (jobPlatformName, job) => {
     const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, jobPlatformName);
 
     const options = {
@@ -52,6 +52,7 @@ module.exports.stopRun = async (jobPlatformName) => {
     };
 
     await requestSender.send(options);
+    await jobExperimentHandler.stopChaosExperimentsForJob(job.id);
 };
 
 module.exports.getLogs = async (jobPlatformName, predatorRunnerPrefix) => {
