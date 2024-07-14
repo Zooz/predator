@@ -41,6 +41,9 @@ function nockK8sChaosExperimentSupportedKinds(url) {
                     resourceVersion: '987654',
                     creationTimestamp: '2023-01-01T00:00:00Z',
                     generation: 1
+                },
+                spec: {
+                    group: 'chaos-mesh.org'
                 }
             },
             {
@@ -51,8 +54,11 @@ function nockK8sChaosExperimentSupportedKinds(url) {
                     uid: 'efgh5678-1234-abcd-ijkl-901234567890',
                     resourceVersion: '876543',
                     generation: 1,
-                    creationTimestamp: '2023-01-01T00:00:00Z',
+                    creationTimestamp: '2023-01-01T00:00:00Z'
                 },
+                spec: {
+                    group: 'chaos-mesh.org'
+                }
             }
             // Additional CRDs can be listed here
         ]
