@@ -129,11 +129,11 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     // const jobExperiment2EndTime = now + 2 * 60000;
                     // await databaseConnector.insertChaosJobExperiment(jobExperiment2, jobCreateResponse.body.id, chaosExperimentsInserted[1].body.id, jobExperiment2StartTime, jobExperiment2EndTime);
 
+                    await sleep(5 * 1000); // 3 seconds
                     await runFullSingleRunnerCycle(testId, reportId, runnerId);
                     // await databaseConnector.setChaosJobExperimentTriggered(jobExperiment1, true);
                     // await databaseConnector.setChaosJobExperimentTriggered(jobExperiment2, true);
 
-                    await sleep(3 * 1000); // 3 seconds
                     const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
 
                     expect(getReportsResponse.body.experiments.length).eql(2);
