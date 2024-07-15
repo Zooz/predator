@@ -238,6 +238,21 @@ describe('Reports manager tests', function () {
             ]);
         });
 
+        it('Database connector returns an array with one report - related job fails to enrich with experiments', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { grafana_url: 'http://www.grafana.com' };
+                }
+            });
+            databaseGetReportStub.resolves([REPORT]);
+            getChaosJobExperimentsByJobIdStub.rejects(new Error('db error'));
+            const report = await manager.getReport();
+            should.exist(report);
+            should.exist(report.grafana_report);
+            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&var-TestRunId=report_id&from=1527533459591&to=now');
+            should.not.exist(report.experiments);
+        });
+
         it('Database connector returns an array with one report and score ', async () => {
             manager.__set__('configHandler', {
                 getConfig: () => {
@@ -458,6 +473,33 @@ describe('Reports manager tests', function () {
             getChaosJobExperimentsByJobIdStub
                 .onFirstCall().resolves(JOB_EXPERIMENTS_ROWS)
                 .onSecondCall().resolves([]);
+            getChaosExperimentsByIdsStub.resolves([firstExperiment, secondExperiment]);
+            const reports = await manager.getReports();
+            should.exist(reports);
+            should(reports[0].experiments).deepEqual([
+                {
+                    kind: firstExperiment.kubeObject.kind,
+                    name: firstExperiment.name,
+                    id: firstExperiment.id,
+                    start_time: JOB_EXPERIMENTS_ROWS[0].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[0].end_time
+                },
+                {
+                    kind: secondExperiment.kubeObject.kind,
+                    name: secondExperiment.name,
+                    id: secondExperiment.id,
+                    start_time: JOB_EXPERIMENTS_ROWS[1].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[1].end_time
+                }
+            ]);
+            should.not.exist(reports[1].experiments);
+        });
+
+        it('Database connector returns an array with 2 report - fails to enrich with experiments on second call', async () => {
+            databaseGetReportStub.resolves([REPORT, [REPORT]]);
+            getChaosJobExperimentsByJobIdStub
+                .onFirstCall().resolves(JOB_EXPERIMENTS_ROWS)
+                .onSecondCall().rejects(new Error('db error'));
             getChaosExperimentsByIdsStub.resolves([firstExperiment, secondExperiment]);
             const reports = await manager.getReports();
             should.exist(reports);
