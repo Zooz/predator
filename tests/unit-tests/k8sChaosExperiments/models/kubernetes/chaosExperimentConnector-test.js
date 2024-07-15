@@ -194,7 +194,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
             chaosExperimentConnector.__set__('deleteResourceOfKind', deleteResourceOfKind);
         });
         describe('When all resources are stopped', function () {
-            it('Should delete all 4 resources', async function () {
+            it('happy flow - Should delete all 4 resources', async function () {
                 getAllResourcesOfKindStub.withArgs('podchaos').returns(
                     [
                         {
@@ -266,6 +266,48 @@ describe('Chaos experiments kubernetes connector tests', function () {
                 getAllResourcesOfKindStub.args.should.eql([['podchaos'], ['httpchaos']]);
                 deletedCount.should.eql(4);
                 deleteResourceOfKindStub.callCount.should.eql(4);
+            });
+            it('get resources for httpchaos rejects - should delete only podchaos', async function () {
+                getAllResourcesOfKindStub.withArgs('podchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'test1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
+                        },
+                        {
+                            metadata: {
+                                name: 'test2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
+                        }
+                    ]);
+                getAllResourcesOfKindStub.withArgs('httpchaos').rejects();
+                const deletedCount = await chaosExperimentConnector.clearAllFinishedResources();
+                getAllResourcesOfKindStub.callCount.should.eql(2);
+                getAllResourcesOfKindStub.args.should.eql([['podchaos'], ['httpchaos']]);
+                deletedCount.should.eql(2);
+                deleteResourceOfKindStub.callCount.should.eql(2);
+                deleteResourceOfKindStub.args.should.eql([['podchaos', 'test1', 'apps'], ['podchaos', 'test2', 'apps']]);
             });
         });
         describe('When 2 experiments are stopped and 2 are running', function () {
@@ -339,6 +381,17 @@ describe('Chaos experiments kubernetes connector tests', function () {
                 await chaosExperimentConnector.clearAllFinishedResources();
                 deleteResourceOfKindStub.args.should.eql([['podchaos', 'test2', 'apps'], ['httpchaos', 'second2', 'apps']]);
                 deleteResourceOfKindStub.callCount.should.eql(2);
+            });
+        });
+
+        describe('When its first time and get all experiment kinds rejects', function () {
+            it('should not delete any resource and return 0', async function () {
+                chaosExperimentConnector.__set__('supportedChaosKinds', undefined);
+                requestSenderSendStub.rejects();
+                const clearedResources = await chaosExperimentConnector.clearAllFinishedResources();
+                deleteResourceOfKindStub.callCount.should.eql(0);
+                getAllResourcesOfKindStub.callCount.should.eql(0);
+                clearedResources.should.eql(0);
             });
         });
     });

@@ -59,24 +59,28 @@ const getSupportedKinds = async () => {
 
 module.exports.clearAllFinishedResources = async () => {
     let clearedCount = 0;
-    supportedChaosKinds = supportedChaosKinds || await getSupportedKinds();
-    for (const kind of supportedChaosKinds){
-        try {
-            const resourcesOfKind = await getAllResourcesOfKind(kind);
-            const resourcesToBeDeleted = resourcesOfKind.filter(resource => {
-                return resource.status.experiment.desiredPhase === STATUS_TO_CLEAN;
-            });
-            for (const resource of resourcesToBeDeleted){
-                try {
-                    await deleteResourceOfKind(kind, resource.metadata.name, resource.metadata.namespace);
-                    clearedCount++;
-                } catch (error){
-                    logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
+    try {
+        supportedChaosKinds = supportedChaosKinds || await getSupportedKinds();
+        for (const kind of supportedChaosKinds){
+            try {
+                const resourcesOfKind = await getAllResourcesOfKind(kind);
+                const resourcesToBeDeleted = resourcesOfKind.filter(resource => {
+                    return resource.status.experiment.desiredPhase === STATUS_TO_CLEAN;
+                });
+                for (const resource of resourcesToBeDeleted){
+                    try {
+                        await deleteResourceOfKind(kind, resource.metadata.name, resource.metadata.namespace);
+                        clearedCount++;
+                    } catch (error){
+                        logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
+                    }
                 }
+            } catch (error){
+                logger.error(error, `Failed to get resources of kind ${kind} from k8s`);
             }
-        } catch (error){
-            logger.error(error, `Failed to get resources of kind ${kind} from k8s`);
         }
+    } catch (e){
+        logger.error(`Failed to get supported chaos kinds: ${e}`);
     }
     return clearedCount;
 };
