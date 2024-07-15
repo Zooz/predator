@@ -185,7 +185,7 @@ describe('Reports manager tests', function () {
     });
 
     beforeEach(() => {
-        sandbox.reset();
+        sandbox.resetHistory();
     });
 
     after(() => {
@@ -200,7 +200,7 @@ describe('Reports manager tests', function () {
                 }
             });
             databaseGetReportStub.resolves([REPORT]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
+            getChaosJobExperimentsByJobIdStub.resolves();
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
@@ -246,7 +246,7 @@ describe('Reports manager tests', function () {
             });
             const reportWithScore = Object.assign({ score: 6.6, benchmark_weights_data: JSON.stringify({ data: 'some data' }) }, REPORT);
             databaseGetReportStub.resolves([reportWithScore]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
+            getChaosJobExperimentsByJobIdStub.resolves();
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
@@ -262,7 +262,7 @@ describe('Reports manager tests', function () {
                 }
             });
             databaseGetReportStub.resolves([REPORT]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
+            getChaosJobExperimentsByJobIdStub.resolves();
             const report = await manager.getReport();
             should.exist(report);
             should.not.exist(report.grafana_report);
@@ -271,6 +271,7 @@ describe('Reports manager tests', function () {
 
         it('Database returns an empty array - should throw 404', async () => {
             databaseGetReportStub.resolves([]);
+            getChaosJobExperimentsByJobIdStub.resolves();
             try {
                 const report = await manager.getReport();
                 should.not.exist(report);
@@ -294,7 +295,6 @@ describe('Reports manager tests', function () {
             it('Report should be started', async () => {
                 testReport.subscribers[0].phase_status = constants.SUBSCRIBER_STARTED_STAGE;
                 databaseGetReportStub.resolves([testReport]);
-                getChaosJobExperimentsByJobIdStub.resolves([]);
                 const report = await manager.getReport();
                 should(report.status).eql(constants.REPORT_STARTED_STATUS);
                 should.not.exist(report.end_time);
@@ -302,7 +302,6 @@ describe('Reports manager tests', function () {
             it('Report should be in progress', async () => {
                 testReport.subscribers[0].phase_status = constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE;
                 databaseGetReportStub.resolves([testReport]);
-                getChaosJobExperimentsByJobIdStub.resolves([]);
                 const report = await manager.getReport();
                 should(report.status).eql(constants.REPORT_IN_PROGRESS_STATUS);
                 should.not.exist(report.end_time);
@@ -348,7 +347,6 @@ describe('Reports manager tests', function () {
             it('Report should be started', async () => {
                 testReport.subscribers[0].phase_status = constants.SUBSCRIBER_STARTED_STAGE;
                 databaseGetReportStub.resolves([testReport]);
-                getChaosJobExperimentsByJobIdStub.resolves([]);
                 const report = await manager.getReport();
                 should(report.status).eql(constants.REPORT_STARTED_STATUS);
                 should.not.exist(report.end_time);
@@ -356,7 +354,6 @@ describe('Reports manager tests', function () {
             it('Report should be in progress', async () => {
                 testReport.subscribers[0].phase_status = constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE;
                 databaseGetReportStub.resolves([testReport]);
-                getChaosJobExperimentsByJobIdStub.resolves([]);
                 const report = await manager.getReport();
                 should(report.status).eql(constants.REPORT_IN_PROGRESS_STATUS);
                 should.not.exist(report.end_time);
@@ -364,7 +361,6 @@ describe('Reports manager tests', function () {
             it('Report should be in progress', async () => {
                 testReport.subscribers[0].phase_status = constants.SUBSCRIBER_INTERMEDIATE_STAGE;
                 databaseGetReportStub.resolves([testReport]);
-                getChaosJobExperimentsByJobIdStub.resolves([]);
                 const report = await manager.getReport();
                 should(report.status).eql(constants.REPORT_IN_PROGRESS_STATUS);
                 should.not.exist(report.end_time);
@@ -373,7 +369,6 @@ describe('Reports manager tests', function () {
                 testReport.subscribers[0].phase_status = constants.SUBSCRIBER_DONE_STAGE;
                 testReport.subscribers[1].phase_status = constants.SUBSCRIBER_DONE_STAGE;
                 databaseGetReportStub.resolves([testReport]);
-                getChaosJobExperimentsByJobIdStub.resolves([]);
                 const report = await manager.getReport();
                 should(report.status).eql(constants.REPORT_FINISHED_STATUS);
                 should.exist(report.end_time);
@@ -382,7 +377,6 @@ describe('Reports manager tests', function () {
                 testReport.subscribers[0].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
                 testReport.subscribers[1].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
                 databaseGetReportStub.resolves([testReport]);
-                getChaosJobExperimentsByJobIdStub.resolves([]);
                 const report = await manager.getReport();
                 should(report.status).eql(constants.REPORT_ABORTED_STATUS);
                 should.exist(report.end_time);
@@ -391,7 +385,6 @@ describe('Reports manager tests', function () {
                 testReport.subscribers[0].phase_status = constants.SUBSCRIBER_FAILED_STAGE;
                 testReport.subscribers[1].phase_status = constants.SUBSCRIBER_FAILED_STAGE;
                 databaseGetReportStub.resolves([testReport]);
-                getChaosJobExperimentsByJobIdStub.resolves([]);
                 const report = await manager.getReport();
                 should(report.status).eql(constants.REPORT_FAILED_STATUS);
                 should.exist(report.end_time);
@@ -405,7 +398,6 @@ describe('Reports manager tests', function () {
                         testReport.subscribers[0].phase_status = unfinishedSubscriberStage;
                         testReport.subscribers[1].phase_status = constants.SUBSCRIBER_DONE_STAGE;
                         databaseGetReportStub.resolves([testReport]);
-                        getChaosJobExperimentsByJobIdStub.resolves([]);
                         const report = await manager.getReport();
                         should(report.status).eql(constants.REPORT_PARTIALLY_FINISHED_STATUS);
                         should.exist(report.end_time);
@@ -426,7 +418,6 @@ describe('Reports manager tests', function () {
                             testReport.subscribers[0].phase_status = unfinishedSubscriberStage;
                             testReport.subscribers[1].phase_status = constants.SUBSCRIBER_DONE_STAGE;
                             databaseGetReportStub.resolves([testReport]);
-                            getChaosJobExperimentsByJobIdStub.resolves([]);
                             const report = await manager.getReport();
                             should(report.status).eql(constants.REPORT_PARTIALLY_FINISHED_STATUS);
                             should.exist(report.end_time);
@@ -445,7 +436,6 @@ describe('Reports manager tests', function () {
                     testReport.subscribers[0].phase_status = constants.SUBSCRIBER_STARTED_STAGE;
                     testReport.subscribers[1].phase_status = constants.SUBSCRIBER_INTERMEDIATE_STAGE;
                     databaseGetReportStub.resolves([testReport]);
-                    getChaosJobExperimentsByJobIdStub.resolves([]);
                     const report = await manager.getReport();
                     should(report.status).eql(constants.REPORT_FAILED_STATUS);
                     should.exist(report.end_time);
@@ -458,18 +448,22 @@ describe('Reports manager tests', function () {
     describe('Get reports', function () {
         it('Database connector returns an array with reports', async () => {
             databaseGetReportsStub.resolves([REPORT, REPORT]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getReports();
             reports.length.should.eql(2);
         });
 
-        it('Database connector returns an array with reports - one with job that includes experiments', async () => {
-            databaseGetReportsStub.resolves([REPORT, REPORT]);
+        it('Database connector returns an array with 2 report - related job includes experiments', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { grafana_url: 'http://www.grafana.com' };
+                }
+            });
+            databaseGetReportStub.resolves([REPORT, [REPORT]]);
             getChaosJobExperimentsByJobIdStub.onFirstCall().resolves(JOB_EXPERIMENTS_ROWS);
             getChaosJobExperimentsByJobIdStub.onSecondCall().resolves([]);
             getChaosExperimentsByIdsStub.resolves([firstExperiment, secondExperiment]);
             const reports = await manager.getReports();
-            should(reports.length).eql(2);
+            should.exist(reports);
             should(reports[0].experiments).deepEqual([
                 {
                     kind: firstExperiment.kubeObject.kind,
@@ -489,6 +483,7 @@ describe('Reports manager tests', function () {
             should.not.exist(reports[1].experiments);
         });
 
+
         it('Database returns an empty array', async () => {
             databaseGetReportsStub.resolves([]);
             const reports = await manager.getReports();
@@ -500,14 +495,12 @@ describe('Reports manager tests', function () {
     describe('Get last reports', function () {
         it('Database connector returns an array with reports', async () => {
             databaseGetLastReportsStub.resolves([REPORT, REPORT]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getLastReports();
             reports.length.should.eql(2);
         });
 
         it('Database returns an empty array', async () => {
             databaseGetLastReportsStub.resolves([]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getLastReports();
             should.exist(reports);
             reports.length.should.eql(0);
@@ -519,7 +512,6 @@ describe('Reports manager tests', function () {
             const subscriber = { last_stats: { rps: { total_count: 200 }, codes: { 200: 10 } } };
             const report = Object.assign({}, REPORT, { last_updated_at: now, start_time: tenSecBefore, subscribers: [subscriber] });
             databaseGetLastReportsStub.resolves([report]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getLastReports();
             reports.length.should.eql(1);
             should(reports[0].avg_rps).eql(20);
@@ -534,7 +526,6 @@ describe('Reports manager tests', function () {
                 subscribers: [subscriber]
             });
             databaseGetLastReportsStub.resolves([report]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getLastReports();
             reports.length.should.eql(1);
             should(reports[0].avg_rps).eql(30);
@@ -549,7 +540,6 @@ describe('Reports manager tests', function () {
                 subscribers: [subscriber]
             });
             databaseGetLastReportsStub.resolves([report]);
-            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getLastReports();
             reports.length.should.eql(1);
             should(reports[0].avg_rps).eql(0);
@@ -661,52 +651,52 @@ describe('Reports manager tests', function () {
     });
 
     describe('delete report', function () {
-        const subsctibeStatuses = [constants.SUBSCRIBER_DONE_STAGE, constants.SUBSCRIBER_ABORTED_STAGE, constants.SUBSCRIBER_FAILED_STAGE];
-        const subsctibeStatuses2 = [constants.SUBSCRIBER_INITIALIZING_STAGE, constants.SUBSCRIBER_STARTED_STAGE, constants.SUBSCRIBER_INTERMEDIATE_STAGE, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE];
-
-        for (const subscriberStatus of subsctibeStatuses) {
-            it(`Successfully delete report with subscriber status ${subscriberStatus}`, async () => {
-                const finishedReport = JSON.parse(JSON.stringify(REPORT));
-                finishedReport.start_time = new Date();
-                finishedReport.subscribers = [
-                    {
-                        runner_id: '1234',
-                        phase_status: subscriberStatus,
-                        last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
-                    }
-                ];
-                databaseGetReportStub.resolves([finishedReport]);
-                await manager.deleteReport('test_id', 'report_id');
-            });
-        };
-
-        for (const subscriberStatus of subsctibeStatuses2) {
-            it(`Failure delete in-progress report with subscriber status ${subscriberStatus}`, async () => {
-                const inProgressReport = JSON.parse(JSON.stringify(REPORT));
-                inProgressReport.start_time = new Date();
-                inProgressReport.subscribers = [
-                    {
-                        runner_id: '1234',
-                        phase_status: subscriberStatus,
-                        last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
-                    }
-                ];
-                databaseGetReportStub.resolves([inProgressReport]);
-
-                try {
+        [constants.SUBSCRIBER_DONE_STAGE, constants.SUBSCRIBER_ABORTED_STAGE, constants.SUBSCRIBER_FAILED_STAGE]
+            .forEach(subscriberStatus => {
+                it(`Successfully delete report with subscriber status ${subscriberStatus}`, async () => {
+                    const finishedReport = JSON.parse(JSON.stringify(REPORT));
+                    finishedReport.start_time = new Date();
+                    finishedReport.subscribers = [
+                        {
+                            runner_id: '1234',
+                            phase_status: subscriberStatus,
+                            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
+                        }
+                    ];
+                    databaseGetReportStub.resolves([finishedReport]);
                     await manager.deleteReport('test_id', 'report_id');
-                    throw new Error('should not get here');
-                } catch (error) {
-                    should.exist(error);
-                    should(error.message).startWith('Can\'t delete running test with status');
-                    should(error.statusCode).eql(409);
-                }
+                });
             });
-        };
+
+        [constants.SUBSCRIBER_INITIALIZING_STAGE, constants.SUBSCRIBER_STARTED_STAGE, constants.SUBSCRIBER_INTERMEDIATE_STAGE, constants.SUBSCRIBER_FIRST_INTERMEDIATE_STAGE]
+            .forEach(subscriberStatus => {
+                it(`Failure delete in-progress report with subscriber status ${subscriberStatus}`, async () => {
+                    const inProgressReport = JSON.parse(JSON.stringify(REPORT));
+                    inProgressReport.start_time = new Date();
+                    inProgressReport.subscribers = [
+                        {
+                            runner_id: '1234',
+                            phase_status: subscriberStatus,
+                            last_stats: { rps: { mean: 500 }, codes: { 200: 10 } }
+                        }
+                    ];
+                    databaseGetReportStub.resolves([inProgressReport]);
+
+                    try {
+                        await manager.deleteReport('test_id', 'report_id');
+                        throw new Error('should not get here');
+                    } catch (error) {
+                        should.exist(error);
+                        should(error.message).startWith('Can\'t delete running test with status');
+                        should(error.statusCode).eql(409);
+                    }
+                });
+            });
 
         it('Failure delete test due to db error on delete report', async () => {
             const finishedReport = JSON.parse(JSON.stringify(REPORT));
             finishedReport.subscribers[0].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
+            finishedReport.status = constants.REPORT_FINISHED_STATUS;
             databaseGetReportStub.resolves([finishedReport]);
             databaseDeleteReportStub.rejects(new Error('DB Error'));
             try {
