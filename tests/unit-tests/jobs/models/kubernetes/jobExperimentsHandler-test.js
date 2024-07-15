@@ -1,8 +1,8 @@
 const sinon = require('sinon'),
     rewire = require('rewire'),
     should = require('should'),
-    jobExperimentHandler = require('../../../../src/jobs/models/kubernetes/jobExperimentsHandler'),
-    chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
+    jobExperimentHandler = require('../../../../../src/jobs/models/kubernetes/jobExperimentsHandler'),
+    chaosExperimentsManager = require('../../../../../src/chaos-experiments/models/chaosExperimentsManager');
 const { v4: uuid } = require('uuid');
 
 function generateExperiment(id = uuid()){
@@ -28,6 +28,7 @@ describe('Job experiments handler tests', function () {
     let experimentsManagerGetStub;
     let experimentsManagerRunJobStub;
     let stopJobExperimentsByJobIdStub;
+    let clearAllFinishedResourcesStub;
     let sandbox;
     let clock;
 
@@ -37,6 +38,7 @@ describe('Job experiments handler tests', function () {
         experimentsManagerGetStub = sandbox.stub(chaosExperimentsManager, 'getChaosExperimentsByIds');
         experimentsManagerRunJobStub = sandbox.stub(chaosExperimentsManager, 'runChaosExperiment');
         stopJobExperimentsByJobIdStub = sandbox.stub(chaosExperimentsManager, 'stopJobExperimentsByJobId');
+        clearAllFinishedResourcesStub = sandbox.stub(chaosExperimentsManager, 'clearAllFinishedResources');
     });
     beforeEach(async () => {
         sandbox.reset();
@@ -121,8 +123,18 @@ describe('Job experiments handler tests', function () {
             experimentsManagerInsertStub.callCount.should.eql(0);
         });
     });
+
+    describe('Clear all finished job experiments', function () {
+        it('should call experiments manager and return its response of deleted number', async () => {
+            clearAllFinishedResourcesStub.resolves(3);
+            const numberOfCleaned = await jobExperimentHandler.clearAllFinishedJobExperiments();
+            clearAllFinishedResourcesStub.callCount.should.eql(1);
+            numberOfCleaned.should.eql(3);
+        });
+    });
+
     describe('stop chaos experiments for job', function () {
-        const jobExperimentHandlerRewire = rewire('../../../../src/jobs/models/kubernetes/jobExperimentsHandler');
+        const jobExperimentHandlerRewire = rewire('../../../../../src/jobs/models/kubernetes/jobExperimentsHandler');
         it('timeouts should be removed from map, stopJobExperimentsByJobId should be called', async () => {
             const jobId = uuid();
             const map = new Map();

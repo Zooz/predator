@@ -162,6 +162,17 @@ describe('Chaos experiments kubernetes connector tests', function () {
         });
     });
 
+    describe('Delete resource of a kind', function () {
+        it('Should successfully delete relevant resource', async function () {
+            await chaosExperimentConnector.deleteResourceOfKind('podchaos', 'testName1', 'apps');
+            requestSenderSendStub.args[0][0].should.eql({
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos/testName1',
+                method: 'DELETE',
+                headers: {}
+            });
+        });
+    });
+
     describe('Delete all resources of a kind and job', function () {
         it('Should successfully delete all relevant resources', async function () {
             await chaosExperimentConnector.deleteAllResourcesOfKindAndJob('podchaos', 'apps', 'test1');
