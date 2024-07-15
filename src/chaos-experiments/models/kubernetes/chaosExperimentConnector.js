@@ -77,8 +77,8 @@ module.exports.clearAllFinishedResources = async () => {
         } catch (error){
             logger.error(error, `Failed to get resources of kind ${kind} from k8s`);
         }
-        return clearedCount;
     }
+    return clearedCount;
 };
 
 const getAllResourcesOfKind = async (kind) => {

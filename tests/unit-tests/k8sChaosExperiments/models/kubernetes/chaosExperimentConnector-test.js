@@ -172,7 +172,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
             });
         });
     });
-    describe.skip('Clear all finished resources', function () {
+    describe.only('Clear all finished resources', function () {
         before(() => {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKindStub);
             chaosExperimentConnector.__set__('deleteResourceOfKind', deleteResourceOfKindStub);
@@ -182,82 +182,152 @@ describe('Chaos experiments kubernetes connector tests', function () {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKind);
             chaosExperimentConnector.__set__('deleteResourceOfKind', deleteResourceOfKind);
         });
-        beforeEach(() => {
-            const currentDateTime = new Date(Date.now() - 100);
-            const HourAgoDateTime = new Date(currentDateTime.valueOf() - 3600000);
-            getAllResourcesOfKindStub.withArgs('podchaos').returns(
-                [
-                    {
-                        metadata: {
-                            name: 'test1',
-                            namespace: 'apps',
-                            creationTimestamp: currentDateTime.toISOString()
+        describe('When all resources are stopped', function () {
+            it('Should delete all 4 resources', async function () {
+                getAllResourcesOfKindStub.withArgs('podchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'test1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
                         },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            plural: 'podchaos'
-                        },
-                        status: {
-                            experiment: {
-                                desiredPhase: 'Stop'
+                        {
+                            metadata: {
+                                name: 'test2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
                             }
                         }
-                    },
-                    {
-                        metadata: {
-                            name: 'test2',
-                            namespace: 'apps',
-                            creationTimestamp: HourAgoDateTime.toISOString()
+                    ]);
+                getAllResourcesOfKindStub.withArgs('httpchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'second1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'httpchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
                         },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            plural: 'podchaos'
+                        {
+                            metadata: {
+                                name: 'second2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'httpchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
                         }
-                    }
-                ]);
-            getAllResourcesOfKindStub.withArgs('httpchaos').returns(
-                [
-                    {
-                        metadata: {
-                            name: 'second1',
-                            namespace: 'apps',
-                            creationTimestamp: currentDateTime.toISOString()
-                        },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            plural: 'httpchaos'
-                        }
-                    },
-                    {
-                        metadata: {
-                            name: 'second2',
-                            namespace: 'apps',
-                            creationTimestamp: HourAgoDateTime.toISOString()
-                        },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            plural: 'httpchaos'
-                        }
-                    }
-                ]);
-        });
-        describe('Trigger with gap of 0 minutes', function () {
-            it('Should delete all 4 resources', async function () {
-                await chaosExperimentConnector.clearAllFinishedResources(0);
+                    ]);
+                const deletedCount = await chaosExperimentConnector.clearAllFinishedResources();
+                getAllResourcesOfKindStub.callCount.should.eql(2);
+                getAllResourcesOfKindStub.args.should.eql([['podchaos'], ['httpchaos']]);
+                deletedCount.should.eql(4);
                 deleteResourceOfKindStub.callCount.should.eql(4);
             });
         });
-        describe('Trigger with gap of 15 minutes', function () {
-            it('Should delete 2 resources that were triggered 1 hour ago', async function () {
-                await chaosExperimentConnector.clearAllFinishedResources(900000);
-                deleteResourceOfKindStub.callCount.should.eql(2);
+        describe('When 2 experiments are stopped and 2 are running', function () {
+            it('Should delete 2 stopped resources', async function () {
+                getAllResourcesOfKindStub.withArgs('podchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'test1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Run'
+                                }
+                            }
+                        },
+                        {
+                            metadata: {
+                                name: 'test2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
+                        }
+                    ]);
+                getAllResourcesOfKindStub.withArgs('httpchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'second1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'httpchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Run'
+                                }
+                            }
+                        },
+                        {
+                            metadata: {
+                                name: 'second2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'httpchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
+                        }
+                    ]);
+                await chaosExperimentConnector.clearAllFinishedResources();
                 deleteResourceOfKindStub.args.should.eql([['podchaos', 'test2', 'apps'], ['httpchaos', 'second2', 'apps']]);
-            });
-        });
-        describe('Trigger with gap of more than 1 hour', function () {
-            it('should not delete any resource', async function () {
-                await chaosExperimentConnector.clearAllFinishedResources(4600000);
-                deleteResourceOfKindStub.callCount.should.eql(0);
+                deleteResourceOfKindStub.callCount.should.eql(2);
             });
         });
     });
