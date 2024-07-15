@@ -85,7 +85,7 @@ class App extends React.Component {
                 <Webhooks {...props} />
               )} />
               <Route exact path='/settings' render={props => (
-                <Configuration {...props} />
+                <Configuration {... { ...props, config }} />
               )} />
               <Route exact path='/tests/:testId/reports/:reportId' render={props => (
                 <ReportPage {...props} />
