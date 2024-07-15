@@ -93,6 +93,32 @@ describe('Artillery report generator test', () => {
             configHandlerStub.withArgs(consts.CONFIG.JOB_PLATFORM).resolves('KUBERNETES');
             const statsWithUnknownData = JSON.parse(JSON.stringify(SINGLE_RUNNER_INTERMEDIATE_ROWS));
             statsWithUnknownData.push({ phase_status: 'intermediate', data: 'unsupported data type' });
+            reportsManagerGetReportStub.resolves({
+                ...REPORT,
+                experiments: [
+                    {
+                        kind: CHAOS_EXPERIMENTS_ROWS[0].kubeObject.kind,
+                        name: CHAOS_EXPERIMENTS_ROWS[0].name,
+                        id: JOB_EXPERIMENTS_ROWS[0].experiment_id,
+                        start_time: JOB_EXPERIMENTS_ROWS[0].start_time,
+                        end_time: JOB_EXPERIMENTS_ROWS[0].end_time
+                    },
+                    {
+                        kind: CHAOS_EXPERIMENTS_ROWS[1].kubeObject.kind,
+                        name: CHAOS_EXPERIMENTS_ROWS[1].name,
+                        id: JOB_EXPERIMENTS_ROWS[1].experiment_id,
+                        start_time: JOB_EXPERIMENTS_ROWS[1].start_time,
+                        end_time: JOB_EXPERIMENTS_ROWS[1].end_time
+                    },
+                    {
+                        kind: CHAOS_EXPERIMENTS_ROWS[2].kubeObject.kind,
+                        name: CHAOS_EXPERIMENTS_ROWS[2].name,
+                        id: JOB_EXPERIMENTS_ROWS[2].experiment_id,
+                        start_time: JOB_EXPERIMENTS_ROWS[2].start_time,
+                        end_time: JOB_EXPERIMENTS_ROWS[2].end_time
+                    }
+                ]
+            });
             databaseConnectorGetStatsStub.resolves(statsWithUnknownData);
             getJobExperimentsByJobIdStub.resolves(JOB_EXPERIMENTS_ROWS);
             getChaosExperimentsByIdsStub.resolves(CHAOS_EXPERIMENTS_ROWS);

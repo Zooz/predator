@@ -152,7 +152,7 @@ const reloadChaosExperiments = module.exports.reloadChaosExperiments = async fun
 
 const setPlatform = module.exports.setPlatform = async function () {
     const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
-    if (jobPlatform !== KUBERNETES) return;
+    if (jobPlatform.toUpperCase() !== KUBERNETES) return;
     const platform = jobPlatform.toLowerCase();
     connector = require(`./${platform}/chaosExperimentConnector`);
     jobExperimentHandler = require(`./../../jobs/models/${platform}/jobExperimentsHandler`);
