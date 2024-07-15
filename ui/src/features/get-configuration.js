@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-  config,
   errorOnGetConfig,
   processingGetConfig,
   processingUpdateConfig,
@@ -41,62 +40,61 @@ class getConfiguration extends React.Component {
     super(props);
   }
 
-  componentDidMount () {
-    this.props.getConfig();
-  }
-
-  componentWillUnmount () {
-  }
-
   render () {
     const { config, errorOnGetConfig, processingGetConfig, cleanFinishedContainersSuccess, cleanFinishedContainersFailure } = this.props;
     const currentError = cleanFinishedContainersFailure || errorOnGetConfig;
-    return (
-      <Page title={'Settings'} description={'Customize Predator behavior'}>
-        <div>
-          {errorOnGetConfig ? ERROR_GET_CONFIG_MESSAGE : null}
-          {processingGetConfig && <Loader />}
-          {(config && !errorOnGetConfig && !processingGetConfig) &&
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <CardWithTitle title={'Configuration'}>
-              <ConfigurationForm history={this.props.history} config={config} />
-            </CardWithTitle>
-            <CardWithTitle title={'Housekeeping'}>
-              <div className={style['configuration-item-wrapper']}>
-                <TitleInput title={'Clean up finished containers'} />
-                <FontAwesomeIcon
-                  className={classnames(style['icon'], {
-                    [style['action-style']]: true,
-                    [style['disabled-button']]: false
-                  })}
-                  onClick={this.props.cleanFinishedContainers} icon={faTrashAlt} />
+    if (processingGetConfig) return <div><Loader /></div>
+    if (config && !errorOnGetConfig && !processingGetConfig) {
+      return (
+        <Page title={'Settings'} description={'Customize Predator behavior'}>
+          <div>
+            {errorOnGetConfig ? ERROR_GET_CONFIG_MESSAGE : null}
+            {processingGetConfig && <Loader />}
+            {(config && !errorOnGetConfig && !processingGetConfig) &&
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+                <CardWithTitle title={'Configuration'}>
+                  <ConfigurationForm history={this.props.history} config={config} />
+                </CardWithTitle>
+                <CardWithTitle title={'Housekeeping'}>
+                  <div className={style['configuration-item-wrapper']}>
+                    <TitleInput title={'Clean up finished containers'} />
+                    <FontAwesomeIcon
+                      className={classnames(style['icon'], {
+                        [style['action-style']]: true,
+                        [style['disabled-button']]: false
+                      })}
+                      onClick={this.props.cleanFinishedContainers} icon={faTrashAlt} />
+                  </div>
+                </CardWithTitle>
               </div>
-            </CardWithTitle>
+            }
           </div>
-          }
-        </div>
-        {cleanFinishedContainersSuccess && <Snackbar
-          open={cleanFinishedContainersSuccess}
-          bodyStyle={{ backgroundColor: '#2fbb67' }}
-          message={`${cleanFinishedContainersSuccess.deleted} containers were deleted`}
-          autoHideDuration={4000}
-          onRequestClose={() => this.props.setCleanFinishedContainersSuccess(undefined)}
-        />}
+          {cleanFinishedContainersSuccess && <Snackbar
+            open={cleanFinishedContainersSuccess}
+            bodyStyle={{ backgroundColor: '#2fbb67' }}
+            message={`${cleanFinishedContainersSuccess.deleted} containers were deleted`}
+            autoHideDuration={4000}
+            onRequestClose={() => this.props.setCleanFinishedContainersSuccess(undefined)}
+          />}
 
-        {currentError &&
-        <ErrorDialog closeDialog={() => {
-          this.props.setCleanFinishedContainersFailure(undefined);
-          this.props.getConfigFailure(undefined);
-        }} showMessage={currentError.message} />}
+          {currentError &&
+            <ErrorDialog closeDialog={() => {
+              this.props.setCleanFinishedContainersFailure(undefined);
+              this.props.getConfigFailure(undefined);
+            }} showMessage={currentError.message} />}
 
-      </Page>
-    )
+        </Page>
+      )
+    }
   }
 }
 
 function mapStateToProps (state) {
   return {
-    config: config(state),
     processingGetConfig: processingGetConfig(state),
     processingUpdateConfig: processingUpdateConfig(state),
     errorOnGetConfig: errorOnGetConfig(state),
@@ -106,11 +104,6 @@ function mapStateToProps (state) {
 }
 
 const mapDispatchToProps = {
-  getConfig: Actions.getConfig,
-  getConfigSuccess: Actions.getConfigSuccess,
-  updateConfigFailure: Actions.updateConfigFailure,
-  updateConfigSuccess: Actions.updateConfigSuccess,
-  getConfigFailure: Actions.getConfigFailure,
   cleanFinishedContainers: Actions.cleanFinishedContainers,
   setCleanFinishedContainersFailure: Actions.cleanFinishedContainersFailure,
   setCleanFinishedContainersSuccess: Actions.cleanFinishedContainersSuccess
