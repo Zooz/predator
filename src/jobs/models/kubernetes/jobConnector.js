@@ -84,7 +84,8 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
             deleted++;
         }
     }
-    return { deleted };
+    const jobExperimentsDeleted = jobExperimentHandler.clearAllFinishedJobExperiments();
+    return { deleted, internal_resources_deleted: jobExperimentsDeleted };
 };
 
 async function getAllPredatorRunnerJobs(jobPlatformName) {

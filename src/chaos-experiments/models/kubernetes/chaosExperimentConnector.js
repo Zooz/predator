@@ -9,6 +9,7 @@ const kubernetesUrl = kubernetesConfig.kubernetesUrl;
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 const headers = {};
 const JOB_ID_LABEL = CHAOS_EXPERIMENT_LABELS.JOB_ID;
+const STATUS_TO_CLEAN = 'Stop';
 let supportedChaosKinds;
 
 if (kubernetesConfig.kubernetesToken) {
@@ -23,13 +24,6 @@ if (kubernetesConfig.kubernetesToken) {
         logger.warn(error, 'Failed to get kubernetes token from: ' + TOKEN_PATH);
     }
 }
-module.exports.scheduleFinishedResourcesCleanup = async function (interval, deletionTimeThreshold) {
-    supportedChaosKinds = await getSupportedKinds();
-    setInterval(async () => {
-        await clearAllFinishedResources(deletionTimeThreshold);
-    }, interval);
-    logger.info(`K8S Finished chaos experiments cleanup setup - interval of ${interval}ms was set with deletion time threshold of ${deletionTimeThreshold}ms`);
-};
 
 module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
     const resourceKindName = kubernetesExperimentConfig.kind.toLowerCase();
@@ -63,19 +57,19 @@ const getSupportedKinds = async () => {
     return kinds;
 };
 
-const clearAllFinishedResources = async (deletionTimeThreshold) => {
+module.exports.clearAllFinishedResources = async () => {
+    let clearedCount = 0;
     supportedChaosKinds = supportedChaosKinds || await getSupportedKinds();
     for (const kind of supportedChaosKinds){
         try {
             const resourcesOfKind = await getAllResourcesOfKind(kind);
-            const thresholdTimestamp = Date.now() - deletionTimeThreshold;
             const resourcesToBeDeleted = resourcesOfKind.filter(resource => {
-                const experimentTimestamp = new Date(resource.metadata.creationTimestamp).valueOf();
-                return experimentTimestamp < thresholdTimestamp;
+                return resource.status.experiment.desiredPhase === STATUS_TO_CLEAN;
             });
             for (const resource of resourcesToBeDeleted){
                 try {
                     await deleteResourceOfKind(kind, resource.metadata.name, resource.metadata.namespace);
+                    clearedCount++;
                 } catch (error){
                     logger.error(error, `Failed to delete resource ${resource.metadata.name} of kind ${kind} from k8s`);
                 }
@@ -83,6 +77,7 @@ const clearAllFinishedResources = async (deletionTimeThreshold) => {
         } catch (error){
             logger.error(error, `Failed to get resources of kind ${kind} from k8s`);
         }
+        return clearedCount;
     }
 };
 
