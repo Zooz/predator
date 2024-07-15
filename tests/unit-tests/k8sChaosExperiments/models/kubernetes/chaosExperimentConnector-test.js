@@ -172,7 +172,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
             });
         });
     });
-    describe.only('Clear all finished resources', function () {
+    describe('Clear all finished resources', function () {
         before(() => {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKindStub);
             chaosExperimentConnector.__set__('deleteResourceOfKind', deleteResourceOfKindStub);
