@@ -35,9 +35,11 @@ module.exports.getReports = async (testId, filter) => {
 
     const reportSummaries = await databaseConnector.getReports(testId, filter, contextId);
     const config = await configHandler.getConfig();
-    const reports = reportSummaries.map((summaryRow) => {
-        return getReportResponse(summaryRow, config);
-    });
+    const reports = await Promise.all(reportSummaries.map(async (summaryRow) => {
+        const experiments = await getChaosExperimentsByJobId(summaryRow.job_id);
+        return getReportResponse(summaryRow, config, experiments);
+    }));
+
     reports.sort((a, b) => b.start_time - a.start_time);
     return reports;
 };
@@ -47,9 +49,10 @@ module.exports.getLastReports = async (limit, filter) => {
 
     const reportSummaries = await databaseConnector.getLastReports(limit, filter, contextId);
     const config = await configHandler.getConfig();
-    const reports = reportSummaries.map((summaryRow) => {
-        return getReportResponse(summaryRow, config);
-    });
+    const reports = await Promise.all(reportSummaries.map(async (summaryRow) => {
+        const experiments = await getChaosExperimentsByJobId(summaryRow.job_id);
+        return getReportResponse(summaryRow, config, experiments);
+    }));
     return reports;
 };
 
