@@ -7,7 +7,7 @@ site_author: ZOOZ
 google_analytics: ['UA-40865650-4', 'auto']
 
 nav:
-  - About: about.md
+  - About: index.md
   - Installation: installation.md
   - My First Test: myfirsttest.md
   - Advanced Test Setup: tests.md
