@@ -448,19 +448,16 @@ describe('Reports manager tests', function () {
     describe('Get reports', function () {
         it('Database connector returns an array with reports', async () => {
             databaseGetReportsStub.resolves([REPORT, REPORT]);
+            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getReports();
             reports.length.should.eql(2);
         });
 
         it('Database connector returns an array with 2 report - related job includes experiments', async () => {
-            manager.__set__('configHandler', {
-                getConfig: () => {
-                    return { grafana_url: 'http://www.grafana.com' };
-                }
-            });
             databaseGetReportStub.resolves([REPORT, [REPORT]]);
-            getChaosJobExperimentsByJobIdStub.onFirstCall().resolves(JOB_EXPERIMENTS_ROWS);
-            getChaosJobExperimentsByJobIdStub.onSecondCall().resolves([]);
+            getChaosJobExperimentsByJobIdStub
+                .onFirstCall().resolves(JOB_EXPERIMENTS_ROWS)
+                .onSecondCall().resolves([]);
             getChaosExperimentsByIdsStub.resolves([firstExperiment, secondExperiment]);
             const reports = await manager.getReports();
             should.exist(reports);
@@ -483,7 +480,6 @@ describe('Reports manager tests', function () {
             should.not.exist(reports[1].experiments);
         });
 
-
         it('Database returns an empty array', async () => {
             databaseGetReportsStub.resolves([]);
             const reports = await manager.getReports();
@@ -495,6 +491,7 @@ describe('Reports manager tests', function () {
     describe('Get last reports', function () {
         it('Database connector returns an array with reports', async () => {
             databaseGetLastReportsStub.resolves([REPORT, REPORT]);
+            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getLastReports();
             reports.length.should.eql(2);
         });
