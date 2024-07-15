@@ -23,11 +23,11 @@ const jobPlatform = process.env.JOB_PLATFORM;
 // I did this to save an indentation level
 (jobPlatform.toUpperCase() === KUBERNETES ? describe : describe.skip)('Reports integration tests', function() {
     before('Init requestCreators', async function() {
+        await chaosExperimentsRequestSender.init();
         await reportsRequestCreator.init();
         await testsRequestCreator.init();
         await jobRequestCreator.init();
         await configRequestCreator.init();
-        await chaosExperimentsRequestSender.init();
     });
     describe('Happy flow', function() {
         describe('Reports', function () {
@@ -142,14 +142,14 @@ const jobPlatform = process.env.JOB_PLATFORM;
 
                     const getReportsResponse = await reportsRequestCreator.getReports(testId);
                     expect(getReportsResponse.body[0].experiments.length).eql(2);
-                    experiment1 = getReportResponse.body[0].experiments.find(exp => exp.id === chaosExperimentsInserted[0].body.id);
+                    experiment1 = getReportsResponse.body[0].experiments.find(exp => exp.id === chaosExperimentsInserted[0].body.id);
                     expect(experiment1).to.deep.contain({
                         kind: chaosExperimentsInserted[0].body.kubeObject.kind,
                         name: chaosExperimentsInserted[0].body.name,
                         id: chaosExperimentsInserted[0].body.id
                     });
 
-                    experiment2 = getReportResponse.body[0].experiments.find(exp => exp.id === chaosExperimentsInserted[1].body.id);
+                    experiment2 = getReportsResponse.body[0].experiments.find(exp => exp.id === chaosExperimentsInserted[1].body.id);
                     expect(experiment2).to.deep.contain({
                         kind: chaosExperimentsInserted[1].body.kubeObject.kind,
                         name: chaosExperimentsInserted[1].body.name,
