@@ -13,6 +13,7 @@ describe('Kubernetes job connector tests', function () {
     let requestSenderSendStub;
     let getChaosExperimentHandlerStub;
     let stopChaosExperimentsForJobStub;
+    let clearAllFinishedJobExperimentsStub;
 
     before(() => {
         jobConnector.__set__('kubernetesUrl', 'localhost:80');
@@ -20,6 +21,7 @@ describe('Kubernetes job connector tests', function () {
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
         getChaosExperimentHandlerStub = sandbox.stub(jobExperimentsHandler, 'setChaosExperimentsIfExist');
         stopChaosExperimentsForJobStub = sandbox.stub(jobExperimentsHandler, 'stopChaosExperimentsForJob');
+        clearAllFinishedJobExperimentsStub = sandbox.stub(jobExperimentsHandler, 'clearAllFinishedJobExperiments');
     });
 
     beforeEach(() => {
@@ -160,6 +162,7 @@ describe('Kubernetes job connector tests', function () {
                 }
 
             });
+            clearAllFinishedJobExperimentsStub.resolves(3);
 
             const result = await jobConnector.deleteAllContainers('predator-runner');
 
@@ -169,7 +172,10 @@ describe('Kubernetes job connector tests', function () {
                 headers: {}
             });
 
+            clearAllFinishedJobExperimentsStub.calledOnce.should.eql(true);
+
             should(result.deleted).eql(1);
+            should(result.internal_resources_deleted).eql({ chaos_mesh: 3 });
         });
 
         it('Fails due to error in kubernetes', async () => {

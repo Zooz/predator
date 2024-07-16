@@ -15,10 +15,8 @@ const logger = require('../../common/logger'),
 
 let connector, jobExperimentHandler;
 
-const scheduleFinishedResourcesCleanup = module.exports.scheduleFinishedResourcesCleanup = async function() {
-    const interval = await configHandler.getConfigValue(CONFIG.INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS);
-    const deletionTimeThreshold = await configHandler.getConfigValue(CONFIG.MINIMUM_WAIT_FOR_CHAOS_EXPERIMENT_DELETION_IN_MS);
-    await connector.scheduleFinishedResourcesCleanup(interval, deletionTimeThreshold);
+module.exports.clearAllFinishedResources = async function() {
+    return await connector.clearAllFinishedResources();
 };
 
 module.exports.createChaosExperiment = async function (chaosExperiment) {
@@ -165,7 +163,6 @@ module.exports.init = async function () {
     const platform = await setPlatform();
     if (!platform) return;
     await reloadChaosExperiments();
-    await scheduleFinishedResourcesCleanup();
 };
 
 const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {

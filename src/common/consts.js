@@ -86,7 +86,6 @@ module.exports = {
         ALLOW_INSECURE_TLS: 'allow_insecure_tls',
         INTERVAL_CLEANUP_FINISHED_CONTAINERS_MS: 'interval_cleanup_finished_containers_ms',
         MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS: 'minimum_wait_for_delayed_report_status_update_in_ms',
-        MINIMUM_WAIT_FOR_CHAOS_EXPERIMENT_DELETION_IN_MS: 'minimum_wait_for_chaos_experiment_deletion_in_ms',
         METRICS_PLUGIN_NAME: 'metrics_plugin_name',
         DEFAULT_EMAIL_ADDRESS: 'default_email_address',
         DEFAULT_WEBHOOK_URL: 'default_webhook_url',

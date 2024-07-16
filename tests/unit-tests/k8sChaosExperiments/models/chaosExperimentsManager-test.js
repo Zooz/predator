@@ -22,6 +22,7 @@ describe('Chaos experiments manager tests', function () {
     let getChaosExperimentByIdStub;
     let getChaosJobExperimentsByJobIdStub;
     let deleteAllResourcesOfKindAndJobStub;
+    let clearAllFinishedResourcesStub;
     let getConfigValueStub;
 
     before(() => {
@@ -38,6 +39,7 @@ describe('Chaos experiments manager tests', function () {
         getFutureJobExperimentsStub = sandbox.stub(database, 'getFutureJobExperiments');
         getChaosJobExperimentsByJobIdStub = sandbox.stub(database, 'getChaosJobExperimentsByJobId');
         deleteAllResourcesOfKindAndJobStub = sandbox.stub(chaosExperimentConnector, 'deleteAllResourcesOfKindAndJob');
+        clearAllFinishedResourcesStub = sandbox.stub(chaosExperimentConnector, 'clearAllFinishedResources');
         getConfigValueStub = sandbox.stub(configManager, 'getConfigValue');
     });
     after(() => {
@@ -426,6 +428,15 @@ describe('Chaos experiments manager tests', function () {
             await manager.reloadChaosExperiments();
             sinon.assert.notCalled(getChaosExperimentByIdStub);
             sinon.assert.notCalled(runChaosExperimentConnectorStub);
+        });
+    });
+
+    describe('stop job experiments by job id', function () {
+        it('stop job experiments by job id', async () => {
+            clearAllFinishedResourcesStub.resolves(3);
+            const clearedNumber = await manager.clearAllFinishedResources();
+            sinon.assert.calledOnce(clearAllFinishedResourcesStub);
+            clearedNumber.should.be.eql(3);
         });
     });
 

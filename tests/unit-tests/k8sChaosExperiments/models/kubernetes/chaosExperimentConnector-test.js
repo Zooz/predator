@@ -7,7 +7,6 @@ const chaosExperimentConnector = rewire('../../../../../src/chaos-experiments/mo
 const getSupportedKinds = chaosExperimentConnector.__get__('getSupportedKinds');
 const deleteResourceOfKind = chaosExperimentConnector.__get__('deleteResourceOfKind');
 const getAllResourcesOfKind = chaosExperimentConnector.__get__('getAllResourcesOfKind');
-const clearAllFinishedResources = chaosExperimentConnector.__get__('clearAllFinishedResources');
 describe('Chaos experiments kubernetes connector tests', function () {
     let sandbox;
     let requestSenderSendStub, getAllResourcesOfKindStub, deleteResourceOfKindStub;
@@ -155,11 +154,22 @@ describe('Chaos experiments kubernetes connector tests', function () {
             requestSenderSendStub.resolves(expectedResponse);
             const response = await getAllResourcesOfKind('podchaos');
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/podchaos',
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator',
                 method: 'GET',
                 headers: {}
             });
             response.should.eql(expectedResponse.items);
+        });
+    });
+
+    describe('Delete resource of a kind', function () {
+        it('Should successfully delete relevant resource', async function () {
+            await chaosExperimentConnector.deleteResourceOfKind('podchaos', 'testName1', 'apps');
+            requestSenderSendStub.args[0][0].should.eql({
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/namespaces/apps/podchaos/testName1',
+                method: 'DELETE',
+                headers: {}
+            });
         });
     });
 
@@ -183,77 +193,205 @@ describe('Chaos experiments kubernetes connector tests', function () {
             chaosExperimentConnector.__set__('getAllResourcesOfKind', getAllResourcesOfKind);
             chaosExperimentConnector.__set__('deleteResourceOfKind', deleteResourceOfKind);
         });
-        beforeEach(() => {
-            const currentDateTime = new Date(Date.now() - 100);
-            const HourAgoDateTime = new Date(currentDateTime.valueOf() - 3600000);
-            getAllResourcesOfKindStub.withArgs('podchaos').returns(
-                [
-                    {
-                        metadata: {
-                            name: 'test1',
-                            namespace: 'apps',
-                            creationTimestamp: currentDateTime.toISOString()
+        describe('When all resources are stopped', function () {
+            it('happy flow - Should delete all 4 resources', async function () {
+                getAllResourcesOfKindStub.withArgs('podchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'test1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
                         },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            plural: 'podchaos'
+                        {
+                            metadata: {
+                                name: 'test2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
                         }
-                    },
-                    {
-                        metadata: {
-                            name: 'test2',
-                            namespace: 'apps',
-                            creationTimestamp: HourAgoDateTime.toISOString()
+                    ]);
+                getAllResourcesOfKindStub.withArgs('httpchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'second1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'httpchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
                         },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            plural: 'podchaos'
+                        {
+                            metadata: {
+                                name: 'second2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'httpchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
                         }
-                    }
-                ]);
-            getAllResourcesOfKindStub.withArgs('httpchaos').returns(
-                [
-                    {
-                        metadata: {
-                            name: 'second1',
-                            namespace: 'apps',
-                            creationTimestamp: currentDateTime.toISOString()
-                        },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            plural: 'httpchaos'
-                        }
-                    },
-                    {
-                        metadata: {
-                            name: 'second2',
-                            namespace: 'apps',
-                            creationTimestamp: HourAgoDateTime.toISOString()
-                        },
-                        spec: {
-                            group: 'chaos-mesh.org',
-                            plural: 'httpchaos'
-                        }
-                    }
-                ]);
-        });
-        describe('Trigger with gap of 0 minutes', function () {
-            it('Should delete all 4 resources', async function () {
-                await clearAllFinishedResources(0);
+                    ]);
+                const deletedCount = await chaosExperimentConnector.clearAllFinishedResources();
+                getAllResourcesOfKindStub.callCount.should.eql(2);
+                getAllResourcesOfKindStub.args.should.eql([['podchaos'], ['httpchaos']]);
+                deletedCount.should.eql(4);
                 deleteResourceOfKindStub.callCount.should.eql(4);
             });
-        });
-        describe('Trigger with gap of 15 minutes', function () {
-            it('Should delete 2 resources that were triggered 1 hour ago', async function () {
-                await clearAllFinishedResources(900000);
+            it('get resources for httpchaos rejects - should delete only podchaos', async function () {
+                getAllResourcesOfKindStub.withArgs('podchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'test1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
+                        },
+                        {
+                            metadata: {
+                                name: 'test2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
+                        }
+                    ]);
+                getAllResourcesOfKindStub.withArgs('httpchaos').rejects();
+                const deletedCount = await chaosExperimentConnector.clearAllFinishedResources();
+                getAllResourcesOfKindStub.callCount.should.eql(2);
+                getAllResourcesOfKindStub.args.should.eql([['podchaos'], ['httpchaos']]);
+                deletedCount.should.eql(2);
                 deleteResourceOfKindStub.callCount.should.eql(2);
-                deleteResourceOfKindStub.args.should.eql([['podchaos', 'test2', 'apps'], ['httpchaos', 'second2', 'apps']]);
+                deleteResourceOfKindStub.args.should.eql([['podchaos', 'test1', 'apps'], ['podchaos', 'test2', 'apps']]);
             });
         });
-        describe('Trigger with gap of more than 1 hour', function () {
-            it('should not delete any resource', async function () {
-                await clearAllFinishedResources(4600000);
+        describe('When 2 experiments are stopped and 2 are running', function () {
+            it('Should delete 2 stopped resources', async function () {
+                getAllResourcesOfKindStub.withArgs('podchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'test1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Run'
+                                }
+                            }
+                        },
+                        {
+                            metadata: {
+                                name: 'test2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'podchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
+                        }
+                    ]);
+                getAllResourcesOfKindStub.withArgs('httpchaos').returns(
+                    [
+                        {
+                            metadata: {
+                                name: 'second1',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'httpchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Run'
+                                }
+                            }
+                        },
+                        {
+                            metadata: {
+                                name: 'second2',
+                                namespace: 'apps'
+                            },
+                            spec: {
+                                group: 'chaos-mesh.org',
+                                plural: 'httpchaos'
+                            },
+                            status: {
+                                experiment: {
+                                    desiredPhase: 'Stop'
+                                }
+                            }
+                        }
+                    ]);
+                await chaosExperimentConnector.clearAllFinishedResources();
+                deleteResourceOfKindStub.args.should.eql([['podchaos', 'test2', 'apps'], ['httpchaos', 'second2', 'apps']]);
+                deleteResourceOfKindStub.callCount.should.eql(2);
+            });
+        });
+
+        describe('When its first time and get all experiment kinds rejects', function () {
+            it('should not delete any resource and return 0', async function () {
+                chaosExperimentConnector.__set__('supportedChaosKinds', undefined);
+                requestSenderSendStub.rejects();
+                const clearedResources = await chaosExperimentConnector.clearAllFinishedResources();
                 deleteResourceOfKindStub.callCount.should.eql(0);
+                getAllResourcesOfKindStub.callCount.should.eql(0);
+                clearedResources.should.eql(0);
             });
         });
     });

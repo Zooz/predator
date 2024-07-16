@@ -26,10 +26,6 @@ const configDataMap = {
         value: process.env.MINIMUM_WAIT_FOR_DELAYED_REPORT_STATUS_UPDATE_IN_MS || 30000,
         type: 'int'
     },
-    [constConfig.MINIMUM_WAIT_FOR_CHAOS_EXPERIMENT_DELETION_IN_MS]: {
-        value: process.env.MINIMUM_WAIT_FOR_CHAOS_EXPERIMENT_DELETION_IN_MS || 720000,
-        type: 'int'
-    },
     [constConfig.METRICS_PLUGIN_NAME]: { value: process.env.METRICS_PLUGIN_NAME, type: 'string' },
     [constConfig.PROMETHEUS_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },
     [constConfig.INFLUX_METRICS]: { value: process.env.METRICS_EXPORT_CONFIG, type: 'json' },

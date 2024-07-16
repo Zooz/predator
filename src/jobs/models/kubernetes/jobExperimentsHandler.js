@@ -58,6 +58,10 @@ async function stopChaosExperimentsForJob(jobId){
     await chaosExperimentsManager.stopJobExperimentsByJobId(jobId);
 }
 
+async function clearAllFinishedJobExperiments(){
+    return await chaosExperimentsManager.clearAllFinishedResources();
+}
+
 function convertDurationStringToMillisecond(durationString) {
     if (durationString.endsWith('s')){
         return durationString.split('s')[0] * SEC_TO_MS;
@@ -77,5 +81,6 @@ function convertDurationStringToMillisecond(durationString) {
 module.exports = {
     setChaosExperimentsIfExist,
     scheduleChaosExperiment,
-    stopChaosExperimentsForJob
+    stopChaosExperimentsForJob,
+    clearAllFinishedJobExperiments
 };
