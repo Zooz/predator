@@ -15,11 +15,11 @@ const logger = require('../../common/logger'),
 
 let connector, jobExperimentHandler;
 
-module.exports.clearAllFinishedResources = async function() {
+async function clearAllFinishedResources() {
     return await connector.clearAllFinishedResources();
 };
 
-module.exports.createChaosExperiment = async function (chaosExperiment) {
+async function createChaosExperiment(chaosExperiment) {
     const contextId = httpContext.get(CONTEXT_ID);
 
     const chaosExperimentWithTheSameName = await databaseConnector.getChaosExperimentByName(chaosExperiment.name, contextId);
@@ -38,14 +38,14 @@ module.exports.createChaosExperiment = async function (chaosExperiment) {
     }
 };
 
-module.exports.getAllChaosExperiments = async function (from, limit, exclude) {
+async function getAllChaosExperiments(from, limit, exclude) {
     const contextId = httpContext.get(CONTEXT_ID);
 
     const allChaosExperiments = await databaseConnector.getAllChaosExperiments(from, limit, exclude, contextId);
     return allChaosExperiments;
 };
 
-const getChaosExperimentById = module.exports.getChaosExperimentById = async function (experimentId) {
+async function getChaosExperimentById(experimentId) {
     const contextId = httpContext.get(CONTEXT_ID);
     const processor = await databaseConnector.getChaosExperimentById(experimentId, contextId);
     if (processor) {
@@ -56,11 +56,11 @@ const getChaosExperimentById = module.exports.getChaosExperimentById = async fun
     }
 };
 
-const getChaosExperimentsByIds = module.exports.getChaosExperimentsByIds = (experimentIds, exclude, contextId) => {
+function getChaosExperimentsByIds(experimentIds, exclude, contextId) {
     return databaseConnector.getChaosExperimentsByIds(experimentIds, exclude, contextId);
 };
 
-module.exports.deleteChaosExperiment = async function (experimentId) {
+async function deleteChaosExperiment (experimentId) {
     const contextId = httpContext.get(CONTEXT_ID);
 
     const chaosExperiment = await databaseConnector.getChaosExperimentById(experimentId, contextId);
@@ -71,7 +71,7 @@ module.exports.deleteChaosExperiment = async function (experimentId) {
     return databaseConnector.deleteChaosExperiment(experimentId);
 };
 
-module.exports.updateChaosExperiment = async function (experimentId, chaosExperiment) {
+async function updateChaosExperiment(experimentId, chaosExperiment) {
     const contextId = httpContext.get(CONTEXT_ID);
 
     const oldChaosExperiment = await databaseConnector.getChaosExperimentById(experimentId, contextId);
@@ -86,12 +86,11 @@ module.exports.updateChaosExperiment = async function (experimentId, chaosExperi
     await databaseConnector.updateChaosExperiment(experimentId, chaosExperiment);
     return chaosExperiment;
 };
-
-module.exports.insertChaosJobExperiment = async (jobExperimentId, jobId, experimentId, startTime, endTime, contextId) => {
+async function insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId) {
     await databaseConnector.insertChaosJobExperiment(jobExperimentId, jobId, experimentId, startTime, endTime, contextId);
 };
 
-module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobId, jobExperimentId) => {
+const runChaosExperiment = async (kubernetesChaosConfig, jobId, jobExperimentId) => {
     try {
         const mappedKubernetesChaosConfig = buildExperimentResource(kubernetesChaosConfig, jobId);
         await connector.runChaosExperiment(mappedKubernetesChaosConfig);
@@ -101,7 +100,7 @@ module.exports.runChaosExperiment = async (kubernetesChaosConfig, jobId, jobExpe
     }
 };
 
-const getChaosJobExperimentsByJobId = module.exports.getChaosJobExperimentsByJobId = async function (jobId, contextId) {
+async function getChaosJobExperimentsByJobId(jobId, contextId) {
     return databaseConnector.getChaosJobExperimentsByJobId(jobId, contextId);
 };
 
@@ -123,11 +122,11 @@ const buildExperimentResource = (kubernetesChaosConfig, jobId) => {
     };
 };
 
-const getFutureJobExperiments = async function (timestamp, contextId) {
+async function getFutureJobExperiments(timestamp, contextId) {
     return databaseConnector.getFutureJobExperiments(timestamp, contextId);
 };
 
-const reloadSingleChaosExperiment = async function (futureJobExperiment, timestamp){
+async function reloadSingleChaosExperiment(futureJobExperiment, timestamp){
     try {
         const calculatedStartAfter = futureJobExperiment.start_time - timestamp;
         const chaosExperiment = await getChaosExperimentById(futureJobExperiment.experiment_id);
@@ -137,7 +136,7 @@ const reloadSingleChaosExperiment = async function (futureJobExperiment, timesta
     }
 };
 
-const reloadChaosExperiments = module.exports.reloadChaosExperiments = async function() {
+async function reloadChaosExperiments() {
     const contextId = httpContext.get(CONTEXT_ID);
     try {
         const timestamp = Date.now();
@@ -150,7 +149,7 @@ const reloadChaosExperiments = module.exports.reloadChaosExperiments = async fun
     }
 };
 
-const setPlatform = module.exports.setPlatform = async function () {
+async function setPlatform() {
     const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     if (jobPlatform.toUpperCase() !== KUBERNETES) return;
     const platform = jobPlatform.toLowerCase();
@@ -159,13 +158,13 @@ const setPlatform = module.exports.setPlatform = async function () {
     return jobPlatform;
 };
 
-module.exports.init = async function () {
+async function init() {
     const platform = await setPlatform();
     if (!platform) return;
     await reloadChaosExperiments();
 };
 
-const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {
+async function stopResourcesOfJobIdAndExperiment(jobId, kind, namespace) {
     try {
         await connector.deleteAllResourcesOfKindAndJob(kind, namespace, jobId);
     } catch (e){
@@ -173,7 +172,7 @@ const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {
     }
 };
 
-module.exports.stopJobExperimentsByJobId = async function(jobId) {
+async function stopJobExperimentsByJobId(jobId) {
     try {
         const jobExperiments = await getChaosJobExperimentsByJobId(jobId);
         const now = Date.now();
@@ -189,4 +188,21 @@ module.exports.stopJobExperimentsByJobId = async function(jobId) {
     } catch (e) {
         logger.error(`Error while trying to stop job experiments for job ${jobId} : ${e}`);
     }
+};
+
+module.exports = {
+    init,
+    clearAllFinishedResources,
+    createChaosExperiment,
+    getAllChaosExperiments,
+    deleteChaosExperiment,
+    updateChaosExperiment,
+    insertChaosJobExperiment,
+    runChaosExperiment,
+    getChaosJobExperimentsByJobId,
+    reloadChaosExperiments,
+    setPlatform,
+    getChaosExperimentById,
+    getChaosExperimentsByIds,
+    stopJobExperimentsByJobId
 };

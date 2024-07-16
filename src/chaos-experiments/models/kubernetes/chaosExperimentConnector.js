@@ -25,7 +25,7 @@ if (kubernetesConfig.kubernetesToken) {
     }
 }
 
-module.exports.runChaosExperiment = async (kubernetesExperimentConfig) => {
+const runChaosExperiment = async (kubernetesExperimentConfig) => {
     const resourceKindName = kubernetesExperimentConfig.kind.toLowerCase();
     const kubernetesNamespace = kubernetesExperimentConfig.metadata.namespace;
     const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s', kubernetesUrl, kubernetesNamespace, resourceKindName);
@@ -57,7 +57,7 @@ const getSupportedKinds = async () => {
     return kinds;
 };
 
-module.exports.clearAllFinishedResources = async () => {
+const clearAllFinishedResources = async () => {
     let clearedCount = 0;
     try {
         supportedChaosKinds = supportedChaosKinds || await getSupportedKinds();
@@ -96,7 +96,7 @@ const getAllResourcesOfKind = async (kind) => {
     return resources.items;
 };
 
-module.exports.deleteAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
+const deleteAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
     const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=%s=%s', kubernetesUrl, namespace, kind.toLowerCase(), JOB_ID_LABEL, jobId);
     const options = {
         url,
@@ -107,7 +107,7 @@ module.exports.deleteAllResourcesOfKindAndJob = async (kind, namespace, jobId) =
     return resources;
 };
 
-const deleteResourceOfKind = module.exports.deleteResourceOfKind = async (kind, resourceName, namespace) => {
+const deleteResourceOfKind = async(kind, resourceName, namespace) => {
     const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s/%s', kubernetesUrl, namespace, kind.toLowerCase(), resourceName);
     const options = {
         url,
@@ -116,4 +116,12 @@ const deleteResourceOfKind = module.exports.deleteResourceOfKind = async (kind, 
     };
     const resources = await requestSender.send(options);
     return resources;
+};
+
+module.exports = {
+    deleteAllResourcesOfKindAndJob,
+    deleteResourceOfKind,
+    getAllResourcesOfKind,
+    clearAllFinishedResources,
+    runChaosExperiment
 };
