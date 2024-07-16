@@ -11,6 +11,7 @@ const databaseConnector = require('./databaseConnector'),
     reportsStatusCalculator = require('./reportStatusCalculator'),
     generateError = require('../../common/generateError');
 const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager');
+const logger = require('../../common/logger');
 
 const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
@@ -18,39 +19,41 @@ const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, c
 module.exports.getReport = async (testId, reportId) => {
     const contextId = httpContext.get(CONTEXT_ID);
     const config = await configHandler.getConfig();
-    const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
+    const reports = await databaseConnector.getReport(testId, reportId, contextId);
 
-    if (reportSummary.length !== 1) {
+    if (reports.length !== 1) {
         const error = new Error('Report not found');
         error.statusCode = 404;
         throw error;
     }
-    const experiments = await getChaosExperimentsByJobId(reportSummary[0].job_id);
-    const report = getReportResponse(reportSummary[0], config, experiments);
+    const experiments = await enrichReportWithExperiments(reports[0]);
+    const report = getReportResponse(reports[0], config, experiments);
     return report;
 };
 
 module.exports.getReports = async (testId, filter) => {
     const contextId = httpContext.get(CONTEXT_ID);
 
-    const reportSummaries = await databaseConnector.getReports(testId, filter, contextId);
+    const reports = await databaseConnector.getReports(testId, filter, contextId);
     const config = await configHandler.getConfig();
-    const reports = reportSummaries.map((summaryRow) => {
-        return getReportResponse(summaryRow, config);
-    });
-    reports.sort((a, b) => b.start_time - a.start_time);
-    return reports;
+
+    const mappedReports = await Promise.all(reports.map(async (report) => {
+        const experiments = await enrichReportWithExperiments(report);
+        return getReportResponse(report, config, experiments);
+    }));
+
+    return mappedReports;
 };
 
 module.exports.getLastReports = async (limit, filter) => {
     const contextId = httpContext.get(CONTEXT_ID);
-
-    const reportSummaries = await databaseConnector.getLastReports(limit, filter, contextId);
+    const reports = await databaseConnector.getLastReports(limit, filter, contextId);
     const config = await configHandler.getConfig();
-    const reports = reportSummaries.map((summaryRow) => {
-        return getReportResponse(summaryRow, config);
-    });
-    return reports;
+    const mappedReports = await Promise.all(reports.map(async (report) => {
+        const experiments = await enrichReportWithExperiments(report);
+        return getReportResponse(report, config, experiments);
+    }));
+    return mappedReports;
 };
 
 module.exports.editReport = async (testId, reportId, reportBody) => {
@@ -147,6 +150,15 @@ module.exports.postReportDeprecated = async function (testId, reportBody) {
 module.exports.failReport = async function failReport(report) {
     return databaseConnector.subscribeRunner(report.test_id, report.report_id, uuid.v4(), constants.SUBSCRIBER_FAILED_STAGE);
 };
+
+async function enrichReportWithExperiments(report) {
+    try {
+        const experiments = await getChaosExperimentsByJobId(report.job_id);
+        return experiments;
+    } catch (error) {
+        logger.error(error, `Error occurred enrich report  ${report.id}, and job ${report.job_id} with attached chaos experiments`);
+    }
+}
 
 function getReportResponse(summaryRow, config, experiments) {
     const lastUpdateTime = summaryRow.end_time || summaryRow.last_updated_at;

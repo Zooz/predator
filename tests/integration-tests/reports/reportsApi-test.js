@@ -23,11 +23,11 @@ const jobPlatform = process.env.JOB_PLATFORM;
 // I did this to save an indentation level
 (jobPlatform.toUpperCase() === KUBERNETES ? describe : describe.skip)('Reports integration tests', function() {
     before('Init requestCreators', async function() {
+        await chaosExperimentsRequestSender.init();
         await reportsRequestCreator.init();
         await testsRequestCreator.init();
         await jobRequestCreator.init();
         await configRequestCreator.init();
-        await chaosExperimentsRequestSender.init();
     });
     describe('Happy flow', function() {
         describe('Reports', function () {
@@ -77,6 +77,8 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const id = uuid.v4();
                     const runnerId = uuid.v4();
                     let chaosExperimentResponse;
+                    let experiment1;
+                    let experiment2;
                     const chaosExperimentsInserted = [];
                     const headersWithContext = Object.assign({}, headers, { 'x-context-id': id });
 
@@ -122,17 +124,32 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     await sleep(3 * 1000); // 5 seconds
                     await runFullSingleRunnerCycle(testId, reportId, runnerId);
 
-                    const getReportsResponse = await reportsRequestCreator.getReport(testId, reportId);
-
-                    expect(getReportsResponse.body.experiments.length).eql(2);
-                    const experiment1 = getReportsResponse.body.experiments.find(exp => exp.id === chaosExperimentsInserted[0].body.id);
+                    const getReportResponse = await reportsRequestCreator.getReport(testId, reportId);
+                    expect(getReportResponse.body.experiments.length).eql(2);
+                    experiment1 = getReportResponse.body.experiments.find(exp => exp.id === chaosExperimentsInserted[0].body.id);
                     expect(experiment1).to.deep.contain({
                         kind: chaosExperimentsInserted[0].body.kubeObject.kind,
                         name: chaosExperimentsInserted[0].body.name,
                         id: chaosExperimentsInserted[0].body.id
                     });
 
-                    const experiment2 = getReportsResponse.body.experiments.find(exp => exp.id === chaosExperimentsInserted[1].body.id);
+                    experiment2 = getReportResponse.body.experiments.find(exp => exp.id === chaosExperimentsInserted[1].body.id);
+                    expect(experiment2).to.deep.contain({
+                        kind: chaosExperimentsInserted[1].body.kubeObject.kind,
+                        name: chaosExperimentsInserted[1].body.name,
+                        id: chaosExperimentsInserted[1].body.id
+                    });
+
+                    const getReportsResponse = await reportsRequestCreator.getReports(testId);
+                    expect(getReportsResponse.body[0].experiments.length).eql(2);
+                    experiment1 = getReportsResponse.body[0].experiments.find(exp => exp.id === chaosExperimentsInserted[0].body.id);
+                    expect(experiment1).to.deep.contain({
+                        kind: chaosExperimentsInserted[0].body.kubeObject.kind,
+                        name: chaosExperimentsInserted[0].body.name,
+                        id: chaosExperimentsInserted[0].body.id
+                    });
+
+                    experiment2 = getReportsResponse.body[0].experiments.find(exp => exp.id === chaosExperimentsInserted[1].body.id);
                     expect(experiment2).to.deep.contain({
                         kind: chaosExperimentsInserted[1].body.kubeObject.kind,
                         name: chaosExperimentsInserted[1].body.name,
