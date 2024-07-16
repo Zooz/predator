@@ -154,7 +154,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
             requestSenderSendStub.resolves(expectedResponse);
             const response = await getAllResourcesOfKind('podchaos');
             requestSenderSendStub.args[0][0].should.eql({
-                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/podchaos',
+                url: 'localhost:80/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator',
                 method: 'GET',
                 headers: {}
             });

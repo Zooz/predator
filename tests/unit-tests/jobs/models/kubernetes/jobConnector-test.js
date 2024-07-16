@@ -175,6 +175,7 @@ describe('Kubernetes job connector tests', function () {
             clearAllFinishedJobExperimentsStub.calledOnce.should.eql(true);
 
             should(result.deleted).eql(1);
+            should(result.internal_resources_deleted).eql({ chaos_mesh: 3 });
         });
 
         it('Fails due to error in kubernetes', async () => {

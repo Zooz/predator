@@ -84,8 +84,12 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
             deleted++;
         }
     }
-    const jobExperimentsDeleted = jobExperimentHandler.clearAllFinishedJobExperiments();
-    return { deleted, internal_resources_deleted: jobExperimentsDeleted };
+    const jobExperimentsDeleted = await jobExperimentHandler.clearAllFinishedJobExperiments();
+    let internalResourcesDeleted;
+    if (jobExperimentsDeleted) {
+        internalResourcesDeleted = { chaos_mesh: jobExperimentsDeleted };
+    }
+    return { deleted, internal_resources_deleted: internalResourcesDeleted };
 };
 
 async function getAllPredatorRunnerJobs(jobPlatformName) {

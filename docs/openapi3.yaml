@@ -2665,8 +2665,10 @@ components:
           type: number
           description: Number of deleted containers.
         internal_resources_deleted:
-          type: number
-          description: Number of deleted additional internal resources.
+            description: Number of deleted additional internal resources.
+            properties:
+              chaos_mesh:
+                type: number
     job_response:
       allOf:
         - $ref: '#/components/schemas/job'
