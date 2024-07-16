@@ -3,12 +3,12 @@ const fs = require('fs');
 const kubernetesConfig = require('../../../config/kubernetesConfig');
 const logger = require('../../../common/logger');
 const requestSender = require('../../../common/requestSender');
-const { CHAOS_EXPERIMENT_LABELS } = require('../../../../src/common/consts');
+const { CHAOS_EXPERIMENT_LABELS, PREDATOR_RUNNER_PREFIX } = require('../../../../src/common/consts');
 const kubernetesUrl = kubernetesConfig.kubernetesUrl;
 
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 const headers = {};
-const JOB_ID_LABEL = CHAOS_EXPERIMENT_LABELS.JOB_ID;
+const { APP, JOB_ID } = CHAOS_EXPERIMENT_LABELS;
 const STATUS_TO_CLEAN = 'Stop';
 let supportedChaosKinds;
 
@@ -86,7 +86,7 @@ module.exports.clearAllFinishedResources = async () => {
 };
 
 const getAllResourcesOfKind = async (kind) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s', kubernetesUrl, kind);
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/%s?labelSelector=%s=%s', kubernetesUrl, kind, APP, PREDATOR_RUNNER_PREFIX);
     const options = {
         url,
         method: 'GET',
@@ -97,7 +97,7 @@ const getAllResourcesOfKind = async (kind) => {
 };
 
 module.exports.deleteAllResourcesOfKindAndJob = async (kind, namespace, jobId) => {
-    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=%s=%s', kubernetesUrl, namespace, kind.toLowerCase(), JOB_ID_LABEL, jobId);
+    const url = util.format('%s/apis/chaos-mesh.org/v1alpha1/namespaces/%s/%s?labelSelector=%s=%s', kubernetesUrl, namespace, kind.toLowerCase(), JOB_ID, jobId);
     const options = {
         url,
         method: 'DELETE',
