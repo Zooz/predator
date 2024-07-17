@@ -12,7 +12,8 @@ module.exports = {
     getChaosExperiment,
     updateChaosExperiment,
     deleteChaosExperiment,
-    generateRawChaosExperiment
+    generateRawChaosExperiment,
+    nockK8sChaosExperimentSupportedKinds
 };
 
 async function init() {
@@ -129,7 +130,7 @@ function getChaosExperiment(experimentId, headers = { 'Content-Type': 'applicati
         });
 }
 
-function generateRawChaosExperiment(name, contextId) {
+function generateRawChaosExperiment(name, contextId, namespace = 'apps') {
     return {
         name,
         context_id: contextId,
@@ -138,16 +139,16 @@ function generateRawChaosExperiment(name, contextId) {
                 kind: 'PodChaos',
                 apiVersion: 'chaos-mesh.org/v1alpha1',
                 metadata: {
-                    namespace: 'apps',
+                    namespace,
                     name: `${name}`,
                     annotations: {
-                        'kubectl.kubernetes.io/last-applied-configuration': '{"apiVersion":"chaos-mesh.org/v1alpha1","kind":"PodChaos","metadata":{"annotations":{},"name":"pod-fault-keren3","namespace":"apps"},"spec":{"action":"pod-kill","duration":"1m","mode":"all","selector":{"labelSelectors":{"app":"live-balances-api"},"namespaces":["apps"]}}}\n'
+                        'kubectl.kubernetes.io/last-applied-configuration': '{"apiVersion":"chaos-mesh.org/v1alpha1","kind":"PodChaos","metadata":{"annotations":{},"name":"pod-fault-test3","namespace":"apps"},"spec":{"action":"pod-kill","duration":"1m","mode":"all","selector":{"labelSelectors":{"app":"live-balances-api"},"namespaces":["apps"]}}}\n'
                     }
                 },
                 spec: {
                     selector: {
                         namespaces: [
-                            'apps'
+                            namespace
                         ],
                         labelSelectors: {
                             app: 'live-balances-api'
@@ -155,7 +156,7 @@ function generateRawChaosExperiment(name, contextId) {
                     },
                     mode: 'all',
                     action: 'pod-kill',
-                    duration: '1m'
+                    duration: '1s'
                 }
             }
     };
