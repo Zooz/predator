@@ -18,7 +18,6 @@ module.exports = {
 
 async function init() {
     try {
-        nockK8sChaosExperimentSupportedKinds();
         app = await appInitUtils.getCreateTestApp();
     } catch (err){
         console.log(err);
@@ -26,7 +25,7 @@ async function init() {
     }
 }
 
-function nockK8sChaosExperimentSupportedKinds(url) {
+function nockK8sChaosExperimentSupportedKinds() {
     const response = {
         kind: 'CustomResourceDefinitionList',
         apiVersion: 'apiextensions.k8s.io/v1',
