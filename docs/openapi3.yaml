@@ -2574,6 +2574,8 @@ components:
             - functional_test
           description: The type of the job to run.
           example: load_test
+        experiments:
+          $ref: '#/components/schemas/job_experiments'
     job_update:
       properties:
         test_id:
