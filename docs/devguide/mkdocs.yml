@@ -20,6 +20,7 @@ nav:
   - Plugins: plugins.md
   - Configuration: configuration.md
   - Runner's Performance: performance.md
+  - Integrating Chaos Mesh with Predator: chaosmesh.md
   - FAQ: faq.md
   - Contributing: contributing.md
   - API Reference: apireference.md
