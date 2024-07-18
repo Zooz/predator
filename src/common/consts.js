@@ -96,7 +96,8 @@ module.exports = {
         BENCHMARK_THRESHOLD_WEBHOOK_URL: 'benchmark_threshold_webhook_url',
         BENCHMARK_WEIGHTS: 'benchmark_weights',
         CUSTOM_RUNNER_DEFINITION: 'custom_runner_definition',
-        STREAMING_EXCLUDED_ATTRIBUTES: 'streaming_excluded_attributes'
+        STREAMING_EXCLUDED_ATTRIBUTES: 'streaming_excluded_attributes',
+        CHAOS_MESH_ENABLED: 'chaos_mesh_enabled'
     },
     PREDATOR_RUNNER_PREFIX,
     CHAOS_EXPERIMENT_LABELS
