@@ -9,6 +9,7 @@ const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.leng
 const defaultBody = {
     interval_cleanup_finished_containers_ms: 900000,
     allow_insecure_tls: false,
+    chaos_mesh_enabled: false,
     internal_address: 'http://localhost:80',
     runner_docker_image: `zooz/predator-runner:${RUNNER_VERSION}`,
     job_platform: process.env.JOB_PLATFORM || 'DOCKER',
