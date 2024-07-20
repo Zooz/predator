@@ -45,12 +45,12 @@ class getTests extends React.Component {
         };
     }
 
-    onRunTest = (job) => {
-        const request = createJobRequest(job);
+    onRunTest = (report) => {
+        const request = createJobRequest(report, true);
         delete request.cron_expression;
         request.run_immediately = true;
         this.props.createJob(request);
-        this.setState({rerunJob: job});
+        this.setState({rerunJob: report});
     };
 
     filterFavorites = () => {
