@@ -38,7 +38,6 @@ export const createJobRequest = (options, isReport = false) => {
     run_immediately: (options.run_immediately === undefined) ? false : options.run_immediately,
     emails: options.emails,
     webhooks: options.webhooks,
-    experiments: options.experiments,
     notes: options.notes,
     parallelism: options.parallelism ? parseInt(options.parallelism) : undefined,
     max_virtual_users: options.max_virtual_users ? parseInt(options.max_virtual_users) : undefined
@@ -57,9 +56,12 @@ export const createJobRequest = (options, isReport = false) => {
     body.cron_expression = options.cron_expression
   }
 
-  if (options.experiments && isReport) {
-    body.experiments = mapExperimentsFromReportOptions(options.experiments, options.start_time)
+  if (options.experiments) {
+    body.experiments = isReport
+      ? mapExperimentsFromReportOptions(options.experiments, options.start_time)
+      : options.experiments;
   }
+
   const mappedBody = JSON.parse(JSON.stringify(body));
   return mappedBody;
 };

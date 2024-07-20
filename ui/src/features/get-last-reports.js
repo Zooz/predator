@@ -67,12 +67,12 @@ class getReports extends React.Component {
       this.setState({ openViewReport: report });
     };
 
-    onRunTest = (job) => {
-      const requestBody = createJobRequest(job);
+    onRunTest = (report) => {
+      const requestBody = createJobRequest(report, true);
       delete requestBody.cron_expression;
       requestBody.run_immediately = true;
       this.props.createJob(requestBody);
-      this.setState({ rerunJob: job });
+      this.setState({ rerunJob: report });
     };
 
     onEditNote = (testId, reportId, notes) => {
