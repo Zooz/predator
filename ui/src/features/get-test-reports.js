@@ -46,7 +46,6 @@ class getTests extends React.Component {
     }
 
     onRunTest = (report) => {
-        debugger;
         const request = createJobRequest(report, true);
         delete request.cron_expression;
         request.run_immediately = true;
