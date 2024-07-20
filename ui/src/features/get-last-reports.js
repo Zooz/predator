@@ -10,7 +10,7 @@ import Page from '../components/Page';
 import _ from 'lodash';
 import Report from './components/Report';
 import CompareReports from './components/Report/compareReports';
-import { createJobRequest } from './components/JobForm/utils';
+import { createJobRequestFromReport } from './components/JobForm/utils';
 
 import { ReactTableComponent } from './../components/ReactTable';
 import { getColumns } from './configurationColumn'
@@ -68,7 +68,7 @@ class getReports extends React.Component {
     };
 
     onRunTest = (report) => {
-      const requestBody = createJobRequest(report, true);
+      const requestBody = createJobRequestFromReport(report);
       delete requestBody.cron_expression;
       requestBody.run_immediately = true;
       this.props.createJob(requestBody);
