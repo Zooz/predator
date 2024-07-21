@@ -31,11 +31,11 @@ const { CONFIG: { CHAOS_MESH_ENABLED } } = require('./common/consts');
 
 module.exports = async () => {
     swaggerValidator.init('./docs/openapi3.yaml', { beautifyErrors: true });
-    const isChaosEnabled = configHandler.getConfigValue(CHAOS_MESH_ENABLED);
     await database.init();
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
     await jobsManager.scheduleFinishedContainersCleanup();
+    const isChaosEnabled = configHandler.getConfigValue(CHAOS_MESH_ENABLED);
     if (isChaosEnabled){
         await chaosExperimentsManager.init();
     }
