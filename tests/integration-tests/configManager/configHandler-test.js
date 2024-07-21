@@ -59,6 +59,7 @@ const updateBodyWithTypes = {
 const requestBody = {
     interval_cleanup_finished_containers_ms: 0,
     allow_insecure_tls: false,
+    chaos_mesh_enabled: false,
     grafana_url: 'string_value_grafana_url',
     internal_address: 'string_value_internal_address',
     runner_docker_image: 'string_value_docker_name:1.0.0',
