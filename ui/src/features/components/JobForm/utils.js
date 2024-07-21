@@ -27,7 +27,7 @@ export const createStateForEditJob = (job, dropdownWebhooks) => {
   }
 };
 
-export const createJobRequest = (options, isReport = false) => {
+export const createJobRequest = (options) => {
   // job_type is for rerun
   const body = {
     test_id: options.test_id,
@@ -38,10 +38,10 @@ export const createJobRequest = (options, isReport = false) => {
     run_immediately: (options.run_immediately === undefined) ? false : options.run_immediately,
     emails: options.emails,
     webhooks: options.webhooks,
-    experiments: options.experiments,
     notes: options.notes,
     parallelism: options.parallelism ? parseInt(options.parallelism) : undefined,
-    max_virtual_users: options.max_virtual_users ? parseInt(options.max_virtual_users) : undefined
+    max_virtual_users: options.max_virtual_users ? parseInt(options.max_virtual_users) : undefined,
+    experiments: options.experiments
   };
 
   if (body.type === 'load_test') {
@@ -57,11 +57,20 @@ export const createJobRequest = (options, isReport = false) => {
     body.cron_expression = options.cron_expression
   }
 
-  if (options.experiments && isReport) {
-    body.experiments = mapExperimentsFromReportOptions(options.experiments, options.start_time)
+  return body;
+};
+
+export const createJobRequestFromReport = (options) => {
+  // job_type is for rerun
+  const body = {
+    ...createJobRequest(options)
+  };
+
+  if (options.experiments) {
+    body.experiments = mapExperimentsFromReportOptions(options.experiments, options.start_time);
   }
-  const mappedBody = JSON.parse(JSON.stringify(body));
-  return mappedBody;
+
+  return body;
 };
 
 function mapExperimentsFromReportOptions (experiments, startTime) {

@@ -714,7 +714,6 @@ class Form extends React.Component {
                 key: 'add_experiment_option',
                 floatingLabelText: '+New Experiment',
                 onClick: () => {
-                  debugger;
                   this.setState({
                     add_experiment_form_experiment_name: '',
                     add_experiment_form_experiment_id: '',
