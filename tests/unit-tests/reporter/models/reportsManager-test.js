@@ -738,6 +738,11 @@ describe('Reports manager tests', function () {
             });
 
         it('Failure delete test due to db error on delete report', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { minimum_wait_for_delayed_report_status_update_in_ms: 10 };
+                }
+            });
             const finishedReport = JSON.parse(JSON.stringify(REPORT));
             finishedReport.subscribers[0].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
             finishedReport.status = constants.REPORT_FINISHED_STATUS;
