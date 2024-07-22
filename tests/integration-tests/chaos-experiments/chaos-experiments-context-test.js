@@ -5,7 +5,7 @@ const validHeaders = { 'Content-Type': 'application/json' };
 const chaosExperimentsRequestSender = require('./helpers/requestCreator');
 const { ERROR_MESSAGES } = require('../../../src/common/consts');
 
-describe('Chaos experiments api - with contexts', function () {
+(process.env.CHAOS_MESH_ENABLED ? describe : describe.skip)('Chaos experiments api - with contexts', function () {
     let contextId;
     this.timeout(5000000);
     before(async function () {
