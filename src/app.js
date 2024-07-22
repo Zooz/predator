@@ -27,6 +27,7 @@ const streamingManager = require('./streaming/manager');
 const streamingConfig = require('./config/streamingConfig');
 const contexts = require('./middlewares/context');
 const configHandler = require('./configManager/models/configHandler');
+const { CONFIG: { CHAOS_MESH_ENABLED } } = require('./common/consts');
 
 module.exports = async () => {
     swaggerValidator.init('./docs/openapi3.yaml', { beautifyErrors: true });
@@ -34,10 +35,7 @@ module.exports = async () => {
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
     await jobsManager.scheduleFinishedContainersCleanup();
-    const { chaos_mesh_enabled: isChaosEnabled } = await configHandler.getConfig();
-    if (isChaosEnabled){
-        await chaosExperimentsManager.init();
-    }
+    const isChaosEnabled = await configHandler.getConfigValue(CHAOS_MESH_ENABLED);
     if (streamingConfig.platform) {
         const eventStreamerPlatformConfig = require(`./config/${streamingConfig.platform}Config`);
         await streamingManager.init(eventStreamerPlatformConfig);
@@ -91,6 +89,7 @@ module.exports = async () => {
     app.use('/v1/files', filesRouter);
     app.use('/v1/webhooks', webhooksRouter);
     if (isChaosEnabled){
+        await chaosExperimentsManager.init();
         app.use('/v1/chaos-experiments', chaosExperimentsRouter);
     }
 
