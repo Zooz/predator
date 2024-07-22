@@ -210,7 +210,7 @@ describe('Reports manager tests', function () {
         it('Database connector returns an array with one report - related job includes experiments', async () => {
             manager.__set__('configHandler', {
                 getConfig: () => {
-                    return { grafana_url: 'http://www.grafana.com' };
+                    return { grafana_url: 'http://www.grafana.com', chaos_mesh_enabled: true };
                 }
             });
             databaseGetReportStub.resolves([REPORT]);
@@ -469,7 +469,12 @@ describe('Reports manager tests', function () {
         });
 
         it('Database connector returns an array with 2 report - related job includes experiments', async () => {
-            databaseGetReportStub.resolves([REPORT, [REPORT]]);
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { chaos_mesh_enabled: true };
+                }
+            });
+            databaseGetReportsStub.resolves([REPORT, REPORT]);
             getChaosJobExperimentsByJobIdStub
                 .onFirstCall().resolves(JOB_EXPERIMENTS_ROWS)
                 .onSecondCall().resolves([]);
@@ -733,6 +738,11 @@ describe('Reports manager tests', function () {
             });
 
         it('Failure delete test due to db error on delete report', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { minimum_wait_for_delayed_report_status_update_in_ms: 10 };
+                }
+            });
             const finishedReport = JSON.parse(JSON.stringify(REPORT));
             finishedReport.subscribers[0].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
             finishedReport.status = constants.REPORT_FINISHED_STATUS;

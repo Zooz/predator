@@ -2922,6 +2922,9 @@ components:
           description: >-
             Interval (in ms) to search and delete finished tests containers.
             Value of 0 means no auto clearing enabled.
+        chaos_mesh_enabled:
+          type: boolean
+          description: If true, allow chaos mesh experiments
         metrics_plugin_name:
           type: string
           enum:

@@ -28,6 +28,10 @@ const JOB_PLATFORM_NAME = PREDATOR_RUNNER_PREFIX + '.%s';
 module.exports.init = async () => {
     const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     jobConnector = require(`./${jobPlatform.toLowerCase()}/jobConnector`);
+    if (jobConnector.init){
+        await jobConnector.init();
+    }
+    module.exports.isChaosEnabled = await configHandler.getConfigValue(CONFIG.CHAOS_MESH_ENABLED);
 };
 
 module.exports.reloadCronJobs = async () => {
