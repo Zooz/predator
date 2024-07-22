@@ -26,7 +26,7 @@ module.exports.getReport = async (testId, reportId) => {
         error.statusCode = 404;
         throw error;
     }
-    const experiments = await enrichReportWithExperiments(reports[0]);
+    const experiments = await enrichReportWithExperiments(reports[0], config);
     const report = getReportResponse(reports[0], config, experiments);
     return report;
 };
@@ -38,7 +38,7 @@ module.exports.getReports = async (testId, filter) => {
     const config = await configHandler.getConfig();
 
     const mappedReports = await Promise.all(reports.map(async (report) => {
-        const experiments = await enrichReportWithExperiments(report);
+        const experiments = await enrichReportWithExperiments(report, config);
         return getReportResponse(report, config, experiments);
     }));
 
@@ -50,7 +50,7 @@ module.exports.getLastReports = async (limit, filter) => {
     const reports = await databaseConnector.getLastReports(limit, filter, contextId);
     const config = await configHandler.getConfig();
     const mappedReports = await Promise.all(reports.map(async (report) => {
-        const experiments = await enrichReportWithExperiments(report);
+        const experiments = await enrichReportWithExperiments(report, config);
         return getReportResponse(report, config, experiments);
     }));
     return mappedReports;
@@ -151,7 +151,8 @@ module.exports.failReport = async function failReport(report) {
     return databaseConnector.subscribeRunner(report.test_id, report.report_id, uuid.v4(), constants.SUBSCRIBER_FAILED_STAGE);
 };
 
-async function enrichReportWithExperiments(report) {
+async function enrichReportWithExperiments(report, config) {
+    if (!config.chaos_mesh_enabled) return;
     try {
         const experiments = await getChaosExperimentsByJobId(report.job_id);
         return experiments;

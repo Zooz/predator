@@ -16,4 +16,5 @@ fi
 echo Running integration tests with "$DATABASE_TYPE" db and "$JOB_PLATFORM" integration
 source $CURR_DIR/tests/configurations/"$DATABASE_TYPE"Configuration.sh
 source $CURR_DIR/tests/configurations/"$JOB_PLATFORM"Configuration.sh
+export CHAOS_MESH_ENABLED=true
 node_modules/.bin/_mocha $CURR_DIR/tests/integration-tests --recursive --timeout=40000 --retries=2 --exit
