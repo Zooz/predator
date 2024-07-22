@@ -210,7 +210,7 @@ describe('Reports manager tests', function () {
         it('Database connector returns an array with one report - related job includes experiments', async () => {
             manager.__set__('configHandler', {
                 getConfig: () => {
-                    return { grafana_url: 'http://www.grafana.com' };
+                    return { grafana_url: 'http://www.grafana.com', chaos_mesh_enabled: true };
                 }
             });
             databaseGetReportStub.resolves([REPORT]);
@@ -469,7 +469,12 @@ describe('Reports manager tests', function () {
         });
 
         it('Database connector returns an array with 2 report - related job includes experiments', async () => {
-            databaseGetReportStub.resolves([REPORT, [REPORT]]);
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { chaos_mesh_enabled: true };
+                }
+            });
+            databaseGetReportsStub.resolves([REPORT, REPORT]);
             getChaosJobExperimentsByJobIdStub
                 .onFirstCall().resolves(JOB_EXPERIMENTS_ROWS)
                 .onSecondCall().resolves([]);
