@@ -64,6 +64,9 @@ tags:
   - name: Webhooks
     description: |
       This resource allows you to configure webhooks.
+  - name: Chaos Experiments
+    description: |
+      This resource allows you to add chaos mesh experiments as part of the running job
 x-tagGroups:
   - name: Reference
     tags:
@@ -654,7 +657,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/job_update'
+              allOf:
+                - $ref: '#/components/schemas/job_update'
+                - properties:
+                    experiments:
+                      $ref: '#/components/schemas/job_experiments'
         description: The job to add
         required: true
     delete:
@@ -1890,6 +1897,228 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/upload_file_response'
+  /v1/chaos-experiments:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
+    post:
+      operationId: create-chaos-experiment
+      tags:
+        - Chaos Experiments
+      summary: Create chaos file
+      description: >-
+        Create a chaos experiment.
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chaosExperiment'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chaosExperiment'
+        description: The chaos experiment to create
+        required: true
+    get:
+      operationId: retrieve-all-choos-experiments
+      tags:
+        - Chaos Experiments
+      summary: Retrieve all chaos experiments
+      description: Retrieve all chaos experiments
+      parameters:
+        - in: query
+          name: from
+          description: From which result to start retrieve data - pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: limit
+          description: Max results to return from this query ( Limit to 100 )
+          required: false
+          schema:
+            type: integer
+            maximum: 200
+            default: 100
+        - in: query
+          name: template
+          description: filter to get templates only
+          required: false
+          schema:
+            type: boolean
+            example: true
+        - in: query
+          name: exclude
+          description: fields to exclude from response
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - kubeObject
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/chaosExperiment'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+  /v1/chaos-experiments/{experiment_id}:
+    parameters:
+      - $ref: '#/components/parameters/context_id'
+    get:
+      operationId: retrieve-chaos-experiment
+      tags:
+        - Chaos Experiments
+      summary: Retrieve chaos experiment
+      description: Retrieve a specific chaos experiment.
+      parameters:
+        - in: path
+          name: experiment_id
+          description: The id of the experiment to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chaosExperiment'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    put:
+      operationId: update-chaos-experiment
+      tags:
+        - Chaos Experiments
+      summary: Update chaos experiment
+      description: Update a specific chaos experiment
+      parameters:
+        - in: path
+          name: experiment_id
+          description: The id of the experiment to retrieve.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chaosExperiment'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chaosExperiment'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+    delete:
+      operationId: delete-chaos-experiment
+      tags:
+        - Chaos Experiments
+      summary: Delete chaos experiment
+      description: Delete a specific chaos experiment
+      parameters:
+        - in: path
+          name: experiment_id
+          description: The id of the experiment to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
 components:
   parameters:
     context_id:
@@ -2345,6 +2574,8 @@ components:
             - functional_test
           description: The type of the job to run.
           example: load_test
+        experiments:
+          $ref: '#/components/schemas/job_experiments'
     job_update:
       properties:
         test_id:
@@ -2394,7 +2625,7 @@ components:
             The number of runners that will be allocated to executing the test.
             The `arrival_rate`, `duration` and `max_virtual_users` will be split
             between the specified number of runners.
-          example: 5
+          example:
         emails:
           type: array
           description: >-
@@ -2435,6 +2666,11 @@ components:
         deleted:
           type: number
           description: Number of deleted containers.
+        internal_resources_deleted:
+            description: Number of deleted additional internal resources.
+            properties:
+              chaos_mesh:
+                type: number
     job_response:
       allOf:
         - $ref: '#/components/schemas/job'
@@ -2648,6 +2884,8 @@ components:
             tag of the machine type/region that the job will run on (currently
             supported in aws fargate)
           example: eu-west-1
+        experiments:
+          $ref: '#/components/schemas/report_experiments'
     config_body:
       additionalProperties: false
       properties:
@@ -2684,6 +2922,9 @@ components:
           description: >-
             Interval (in ms) to search and delete finished tests containers.
             Value of 0 means no auto clearing enabled.
+        chaos_mesh_enabled:
+          type: boolean
+          description: If true, allow chaos mesh experiments
         metrics_plugin_name:
           type: string
           enum:
@@ -2956,3 +3197,128 @@ components:
         url:
           type: string
           description: Webhook url to post events
+    chaosExperiment:
+      required:
+        - name
+        - kubeObject
+      properties:
+        id:
+          description: Unique experiment identifier
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          minLength: 1
+          description: The name of the experiment.
+          example: Custom javascript for logging
+        kubeObject:
+          $ref: '#/components/schemas/kubeObject'
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time that the chaos experiment file was updated.
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time that the chaos experiment was created.
+          readOnly: true
+    kubeObject:
+      required:
+        - apiVersion
+        - kind
+        - metadata
+        - spec
+      properties:
+        apiVersion:
+          type: string
+          enum:
+            - "chaos-mesh.org/v1alpha1"
+        kind:
+          $ref: '#/components/schemas/experiment_kind'
+        metadata:
+          required:
+            - name
+            - namespace
+          properties:
+            namespace:
+              type: string
+              example: 'apps'
+            name:
+              type: string
+              example: "my-pod-chaos"
+            annotations:
+              type: object
+              additionalProperties:
+                type: string
+        namespace:
+          type: string
+          example: "apps"
+        name:
+          type: string
+          example: "my-pod-chaos"
+        spec:
+          type: object
+          example:
+            selector:
+              namespaces:
+                - apps
+              labelSelectors:
+                app: live-balances-api
+            mode: all
+            action: pod-kill
+            duration: 1m
+    job_experiments:
+      description: An array of objects that describe experiments to run during the job running, and timing
+      type: array
+      items:
+        type: object
+        required:
+          - experiment_id
+          - start_after
+        properties:
+          experiment_id:
+            type: string
+          start_after:
+            type: number
+            description: time in milliseconds in which the experiment starts after job started
+    report_experiments:
+      description: An array of objects that describe experiments to run during the job running, and timing
+      type: array
+      items:
+        type: object
+        required:
+          - experiment_id
+          - start_after
+        properties:
+          name:
+            type: string
+            example: 'my-chaos'
+          kind:
+            $ref: '#/components/schemas/experiment_kind'
+          start_time:
+            type: string
+            format: date
+            description: The date and time that the experiment started its execution.
+          end_time:
+            type: string
+            format: experiment
+            description: The date and time that the test execution ended.
+    experiment_kind:
+      type: string
+      enum:
+        - 'DNSChaos'
+        - 'PodChaos'
+        - 'AWSChaos'
+        - 'GCPChaos'
+        - 'AzureChaos:'
+        - 'HTTPChaos'
+        - 'StressChaos'
+        - 'IOChaos'
+        - 'TimeChaos'
+        - 'KernelChaos'
+        - 'JVMChaos'
+        - 'PhysicalMachineChaos'
+      description: A description of the experiment.
+      example: 'PodChaos'

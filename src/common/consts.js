@@ -13,6 +13,11 @@ const WEBHOOK_EVENT_TYPE_BENCHMARK_FAILED = 'benchmark_failed';
 const WEBHOOK_SLACK_DEFAULT_MESSAGE_ICON = ':muscle:';
 const WEBHOOK_DEFAULT_REPORTER_NAME = 'Predator';
 const WEBHOOK_TEAMS_DEFAULT_THEME_COLOR = '957c58';
+const PREDATOR_RUNNER_PREFIX = 'predator';
+const CHAOS_EXPERIMENT_LABELS = {
+    JOB_ID: 'predator/job-id',
+    APP: 'app'
+};
 
 module.exports = {
     CONTEXT_ID: 'context_id',
@@ -55,6 +60,9 @@ module.exports = {
     ERROR_MESSAGES: {
         NOT_FOUND: 'Not found',
         DSL_DEF_ALREADY_EXIST: 'Definition already exists',
+        CHAOS_EXPERIMENT_NAME_ALREADY_EXIST: 'Chaos experiment name already exists',
+        CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES: 'Chaos experiment is supported only in kubernetes jobs',
+        CHAOS_EXPERIMENTS_NOT_EXIST_FOR_JOB: 'One or more chaos experiments are not configured. Job can not be created',
         PROCESSOR_NAME_ALREADY_EXIST: 'Processor name already exists',
         PROCESSOR_DELETION_FORBIDDEN: 'Processor is used by tests'
     },
@@ -88,6 +96,9 @@ module.exports = {
         BENCHMARK_THRESHOLD_WEBHOOK_URL: 'benchmark_threshold_webhook_url',
         BENCHMARK_WEIGHTS: 'benchmark_weights',
         CUSTOM_RUNNER_DEFINITION: 'custom_runner_definition',
-        STREAMING_EXCLUDED_ATTRIBUTES: 'streaming_excluded_attributes'
-    }
+        STREAMING_EXCLUDED_ATTRIBUTES: 'streaming_excluded_attributes',
+        CHAOS_MESH_ENABLED: 'chaos_mesh_enabled'
+    },
+    PREDATOR_RUNNER_PREFIX,
+    CHAOS_EXPERIMENT_LABELS
 };
