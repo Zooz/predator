@@ -3,7 +3,7 @@ info:
   version: 1.6.3
   title: Predator
   x-logo:
-    url: favicon.png
+    url: logo.png
     backgroundColor: white
   description: >
     # Overview
@@ -27,15 +27,15 @@ info:
     For an introduction to Predator and its concepts, see the <a
     href="https://www.predator.dev" target="_blank">Predator Website</a>.
 tags:
+  - name: Tests
+    description: >
+      Tests include end-to-end scenarios that are executed at pre-configured
+      intervals to provide in-depth performance metrics of your API.
   - name: DSL Definitions
     description: >
       Predator's Domain Specific Language (DSL) allows you to generate request
       templates, which you can then reuse in the same test and in other tests,
       reducing replication.
-  - name: Tests
-    description: >
-      Tests include end-to-end scenarios that are executed at pre-configured
-      intervals to provide in-depth performance metrics of your API.
   - name: Processors
     description: >
       Processor files allow Predator to execute custom javascript code during
@@ -70,8 +70,8 @@ tags:
 x-tagGroups:
   - name: Reference
     tags:
-      - DSL Definitions
       - Tests
+      - DSL Definitions
       - Processors
       - Jobs
       - Reports
