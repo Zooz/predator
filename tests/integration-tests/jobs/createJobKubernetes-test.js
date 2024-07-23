@@ -144,9 +144,10 @@ describe('Create job specific kubernetes tests', async function () {
                     let getJobsFromService;
                     let cronJobId;
                     let oneTimeJobId;
+                    let firstJobReportId;
 
                     before(async () => {
-                        const chaosExperiment = chaosExperimentsRequestCreator.generateRawChaosExperiment(uuid.v4());
+                        const chaosExperiment = chaosExperimentsRequestCreator.generateRawChaosExperiment(uuid.v4(), undefined, kubernetesConfig.kubernetesNamespace);
                         const chaosExperimentResponse = await chaosExperimentsRequestCreator.createChaosExperiment(chaosExperiment, { 'Content-Type': 'application/json' });
                         chaosExperimentId = chaosExperimentResponse.body.id;
                     });
@@ -168,6 +169,10 @@ describe('Create job specific kubernetes tests', async function () {
                             experiments: [
                                 {
                                     experiment_id: chaosExperimentId,
+                                    start_after: 0
+                                },
+                                {
+                                    experiment_id: chaosExperimentId,
                                     start_after: 5000
                                 }
                             ]
@@ -179,6 +184,7 @@ describe('Create job specific kubernetes tests', async function () {
 
                         should(createJobResponse.status).eql(201);
                         oneTimeJobId = createJobResponse.body.id;
+                        firstJobReportId = createJobResponse.body.report_id;
                     });
 
                     it('Create second job which is cron functional_test', async () => {
@@ -218,9 +224,147 @@ describe('Create job specific kubernetes tests', async function () {
                         should(relevantJobs[0].id).eql(cronJobId);
                     });
 
+                    it('stop job with experiments', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.${firstJobReportId}?propagationPolicy=Foreground`)
+                            .reply(200);
+
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos?labelSelector=predator/job-id=${oneTimeJobId}`)
+                            .reply(200);
+
+                        const stopRunResponse = await schedulerRequestCreator.stopRun(oneTimeJobId, firstJobReportId, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(stopRunResponse.status).eql(204);
+                        should(nock.pendingMocks().length).eql(0);
+                    });
                     it('Delete jobs', async () => {
                         await schedulerRequestCreator.deleteJobFromScheduler(cronJobId);
                         await schedulerRequestCreator.deleteJobFromScheduler(oneTimeJobId);
+                    });
+                });
+
+                describe('Create a job with experiments and use delete all containers to clear them after finished', () => {
+                    let createJobResponse;
+                    let chaosExperimentId;
+
+                    before(async () => {
+                        const chaosExperiment = chaosExperimentsRequestCreator.generateRawChaosExperiment(uuid.v4(), undefined, kubernetesConfig.kubernetesNamespace);
+                        const chaosExperimentResponse = await chaosExperimentsRequestCreator.createChaosExperiment(chaosExperiment, { 'Content-Type': 'application/json' });
+                        chaosExperimentId = chaosExperimentResponse.body.id;
+                    });
+
+                    it('Create job which is one time load_test', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
+                            .reply(200, {
+                                metadata: { name: 'jobName', uid: 'uid' },
+                                namespace: kubernetesConfig.kubernetesNamespace
+                            });
+
+                        const jobBody = {
+                            test_id: testId,
+                            arrival_rate: 1,
+                            duration: 1,
+                            environment: 'test',
+                            run_immediately: true,
+                            type: 'load_test',
+                            experiments: [
+                                {
+                                    experiment_id: chaosExperimentId,
+                                    start_after: 0
+                                },
+                                {
+                                    experiment_id: chaosExperimentId,
+                                    start_after: 2
+                                }
+                            ]
+                        };
+
+                        createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
+                            'Content-Type': 'application/json'
+                        });
+
+                        should(createJobResponse.status).eql(201);
+                        jobId = createJobResponse.body.id;
+                    });
+
+                    it('use delete all containers', async () => {
+                        nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs?labelSelector=app=predator`)
+                            .reply(200, {
+                                items: [{ metadata: { uid: 'x' } }]
+                            });
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods?labelSelector=controller-uid=x`)
+                            .reply(200, {
+                                items: [{ metadata: { name: 'podA' } }]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).get(`/api/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/pods/podA`)
+                            .reply(200, {
+                                metadata: { labels: { 'job-name': 'predator.job' } },
+                                status: {
+                                    containerStatuses: [{
+                                        name: 'predator-runner',
+                                        state: { terminated: { finishedAt: '2020' } }
+                                    }, {
+                                        name: 'podB',
+                                        state: {}
+                                    }]
+                                }
+
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job?propagationPolicy=Foreground`)
+                            .reply(200);
+
+                        chaosExperimentsRequestCreator.nockK8sChaosExperimentSupportedKinds();
+
+                        nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
+                            .reply(200, {
+                                items: [{
+                                    metadata: { name: 'first-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                    status: {
+                                        experiment: {
+                                            desiredPhase: 'Stop'
+                                        }
+                                    }
+
+                                },
+                                {
+                                    metadata: { name: 'second-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                    status: {
+                                        experiment: {
+                                            desiredPhase: 'Stop'
+                                        }
+                                    }
+                                }
+                                ]
+                            });
+                        nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
+                            .reply(200, {
+                                items: [
+                                    {
+                                        metadata: { name: 'running-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                        status: {
+                                            experiment: {
+                                                desiredPhase: 'Run'
+                                            }
+                                        }
+                                    }
+                                ]
+                            });
+
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/first-exp`)
+                            .reply(200);
+                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/second-exp`)
+                            .reply(200);
+                        const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+
+                        should(deleteAllContainersResponse.status).eql(200);
+                        // should(nock.pendingMocks().length).eql(0);
+                        should(deleteAllContainersResponse.body).eql({
+                            deleted: 1,
+                            internal_resources_deleted: { chaos_mesh: 2 }
+                        });
                     });
                 });
 
