@@ -31,7 +31,6 @@ import Button from '../../../components/Button';
 import SimpleTable from '../SimpleTable';
 import { chaosExperimentsForDropdown } from '../../redux/selectors/chaosExperimentsSelector';
 import Dropdown from '../../../components/Dropdown/Dropdown.export';
-import { KUBERNETES } from '../../../constants'
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const ONE_SEC_MS = 1000;
@@ -78,7 +77,7 @@ class Form extends React.Component {
       add_experiment_form_experiment_name: '',
       add_experiment_form_start_after: 0
     };
-    this.FormList = this.getFormList(this.props.jobPlatform);
+    this.FormList = this.getFormList(this.props.featureToggles);
 
     if (this.props.editMode) {
       const editProps = createStateForEditJob(this.props.data);
@@ -492,7 +491,7 @@ class Form extends React.Component {
       }
     };
 
-   getFormList = (platform) => {
+   getFormList = ({ CHAOS_MESH_ENABLED }) => {
      const baseFormList = [
        {
          name: 'test_name',
@@ -679,7 +678,7 @@ class Form extends React.Component {
        }
 
      ];
-     if (platform === KUBERNETES) {
+     if (CHAOS_MESH_ENABLED) {
        const chaosExperimentsSection = {
          children:
             [

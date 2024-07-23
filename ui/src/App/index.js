@@ -19,7 +19,7 @@ import get from 'lodash/get'
 import { config, errorOnGetConfig, processingGetConfig } from '../features/redux/selectors/configSelector';
 import * as Actions from '../features/redux/action';
 import Loader from '../features/components/Loader';
-import { ERROR_GET_CONFIG_MESSAGE } from '../constants';
+import { ERROR_GET_CONFIG_MESSAGE, CHAOS_MESH_ENABLED } from '../constants';
 
 class App extends React.Component {
     state = {
@@ -45,8 +45,10 @@ class App extends React.Component {
       if (errorOnGetConfig) return <div>{ERROR_GET_CONFIG_MESSAGE}</div>;
       if (processingGetConfig) return <div><Loader /></div>
       if (config && !errorOnGetConfig && !processingGetConfig) {
-        const jobPlatform = config.job_platform;
-        const menuList = getMenuList(config.job_platform);
+        const featureToggles = {
+          CHAOS_MESH_ENABLED: false
+        };
+        const menuList = getMenuList(featureToggles);
 
         return (
           <ConnectedRouter history={history}>
@@ -55,40 +57,40 @@ class App extends React.Component {
                 <Redirect to='/last_reports' />
               )} />
               <Route exact path='/tests' render={props => (
-                <GetTests {... { ...props, jobPlatform }} />
+                <GetTests {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/tests/:testId/run' render={props => (
-                <GetTests {... { ...props, jobPlatform }} />
+                <GetTests {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/tests/:testId/edit' render={props => (
-                <GetTests {...props} />
+                <GetTests{... { ...props, featureToggles }} />
               )} />
               <Route exact path='/jobs' render={props => (
-                <GetJobs {... { ...props, jobPlatform }} />
+                <GetJobs {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/jobs/:jobId/edit' render={props => (
-                <GetJobs {... { ...props, jobPlatform }} />
+                <GetJobs {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/tests/:testId/reports' render={props => (
-                <GetTestReports {...props} />
+                <GetTestReports {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/last_reports' render={props => (
-                <GetReports {...props} />
+                <GetReports {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/processors' render={props => (
-                <GetProcessors {...props} />
+                <GetProcessors {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/chaos_experiments' render={props => (
-                <GetChaosExperiments {...props} />
+                <GetChaosExperiments {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/webhooks' render={props => (
-                <Webhooks {...props} />
+                <Webhooks {... { ...props, featureToggles }} />
               )} />
               <Route exact path='/settings' render={props => (
                 <Configuration {... { ...props, config }} />
               )} />
               <Route exact path='/tests/:testId/reports/:reportId' render={props => (
-                <ReportPage {...props} />
+                <ReportPage {... { ...props, featureToggles }} />
               )} />
             </DrawerE>
           </ConnectedRouter>

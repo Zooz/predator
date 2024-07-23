@@ -6,6 +6,7 @@ const INVALID_URL_MESSAGE = 'URL should begin with a protocol';
 const ERROR_GET_CONFIG_MESSAGE = 'Error occurred while trying to get Predator configuration.';
 const URL_WITH_PROTOCOL_REGEX = /^((http)|(https))(:\/\/)(.*)$/;
 const KUBERNETES = 'KUBERNETES';
+const CHAOS_MESH_ENABLED = 'chaos_mesh_enabled';
 
 export {
   EMPTY_STRING,
@@ -15,5 +16,6 @@ export {
   INVALID_URL_MESSAGE,
   OK_BUTTON_MESSAGE,
   URL_WITH_PROTOCOL_REGEX,
-  KUBERNETES
+  KUBERNETES,
+  CHAOS_MESH_ENABLED
 }

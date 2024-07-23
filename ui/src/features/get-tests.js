@@ -269,7 +269,7 @@ class getTests extends React.Component {
 
     render () {
       const { sortedTests, sortHeader, testForEdit, testForClone, onlyFavorites } = this.state;
-      const { errorOnDeleteTest, history, jobPlatform } = this.props;
+      const { errorOnDeleteTest, history, featureToggles } = this.props;
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
       const columns = getColumns({
         columnsNames,
@@ -334,7 +334,7 @@ class getTests extends React.Component {
           <TestForm history={history} data={testForEdit || testForClone} closeDialog={this.closeCreateTest}
             cloneMode={!!testForClone} />}
           {(this.state.openViewCreateJob)
-            ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog} jobPlatform={jobPlatform} /> : null}
+            ? <JobForm data={this.state.openViewCreateJob} closeDialog={this.closeViewCreateJobDialog} featureToggles={featureToggles} /> : null}
 
           {(this.state.deleteDialog && !this.props.deleteTestSuccess)
             ? <DeleteDialog loader={this.props.processingDeleteTest}

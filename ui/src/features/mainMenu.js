@@ -12,9 +12,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { PREDATOR_DOCS_URL } from '../App/common/env';
-import { KUBERNETES } from '../constants';
 
-export default function getMenuList (platform) {
+export default function getMenuList ({ CHAOS_MESH_ENABLED }) {
   const baseMenuItems = [
     {
       primaryText: 'Tests',
@@ -64,7 +63,7 @@ export default function getMenuList (platform) {
     }
   ];
 
-  if (platform === KUBERNETES) {
+  if (CHAOS_MESH_ENABLED) {
     const chaosItem = {
       primaryText: 'Chaos',
       navigateTo: 'chaos_experiments',
