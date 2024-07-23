@@ -2,12 +2,11 @@
 
 !!! TIP "Supported from version zooz/predator:1.7.0"
 !!! TIP "Supported only in Kubernetes"
-
+<img src="images/chaos-mesh-logo.png" align="right" alt="Logo" width="150"/>
 ## Introduction
 
 **Overview**:  
-Chaos Mesh is an open source cloud-native Chaos Engineering platform. 
-It allows you to conduct chaos experiments by injecting various faults into Kubernetes applications to test their resilience and robustness.
+Chaos Mesh is an open-source, cloud-native Chaos Engineering platform. It allows you to conduct chaos experiments by injecting various faults into Kubernetes applications to test their resilience and robustness.
 
 **Purpose**:  
 Chaos Mesh helps Kubernetes users identify and fix potential issues by simulating real-world failures. This ensures applications can handle disruptions and maintain a seamless user experience. It integrates natively with Kubernetes for efficient chaos engineering experiments.
@@ -30,9 +29,10 @@ Chaos Mesh supports various kinds of chaos experiments, including but not limite
 - **HTTP Chaos**: Simulate HTTP faults like delays, aborts, and status code modifications.
 - **Stress Chaos**: Inject CPU and memory stress to test the application's behavior under high resource usage.
 
-!!! TIP "For further knowledge please read chaos mesh [chaos mesh docs](https://chaos-mesh.org/docs/)"
+!!! TIP "For further information, please read the [Chaos Mesh documentation](https://chaos-mesh.org/docs/)"
 
 ## Installation
+
 **Prerequisites**:  
 Before integrating Chaos Mesh with Predator, ensure you have the following prerequisites:
 
@@ -42,10 +42,12 @@ To install Chaos Mesh in your Kubernetes cluster, follow the instructions provid
 **Verifying Installation**:  
 Ensure that Chaos Mesh is correctly installed and running in your Kubernetes cluster. Refer to the [verification steps](https://chaos-mesh.org/docs/quick-start/#verify-the-installation) in the quick start guide for more details.
 
-**Integrating Chaos Mesh with Predator**: Update service configuration helm with option
-- Using Helm
+**Integrating Chaos Mesh with Predator**:  
+Update your service configuration Helm with the following option:
+- Using Helm:
   ```bash
   # chaosMesh.enabled=true
+
   ```
 This option will create cluster role and cluster role binding to perform actions like: create / get / delete on chaos CRDS
 
@@ -53,10 +55,10 @@ This option will create cluster role and cluster role binding to perform actions
 Chaos experiments management is available under *Chaos* tab
 ![Screenshot](images/chaos-mesh-management.png)
 
-Create experiment is done by creating a json formatted kubernetes resource
+Create an experiment by creating a JSON-formatted Kubernetes resource.
 ![Screenshot](images/chaos-mesh-create.png)
 
-It is advised to use chaos mesh dashboard to generate the appropriate resource
+It is advised to use the Chaos Mesh dashboard to generate the appropriate resource. For more details, see the guide on
 [create and run chaos experiments](https://chaos-mesh.org/docs/run-a-chaos-experiment/)
 
 ## Adding Chaos Experiments to Predator Tests
@@ -65,7 +67,7 @@ The test can include a list of experiments by selecting an experiment to add and
 ![Screenshot](images/chaos-mesh-add.png)
 
 ## Viewing and Interpreting Reports
-Experiments time range and its implications on test results are visible in the reports
+The time range of experiments and their implications on test results are visible in the reports.
 
 ![Screenshot](images/reports-chaos-mesh.png)
 
