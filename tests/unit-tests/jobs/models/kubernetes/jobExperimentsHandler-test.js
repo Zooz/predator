@@ -77,7 +77,7 @@ describe('Job experiments handler tests', function () {
             clock = sinon.useFakeTimers();
             clock.tick(1000);
             await jobExperimentHandler.setChaosExperimentsIfExist(jobId, jobExperiments);
-            clock.tick(3000);
+            clock.tick(60 * 1000 * 2);
             (experimentsManagerRunJobStub.callCount).should.eql(2);
             experimentsManagerRunJobStub.args[0][0].metadata.name.should.eql(`${firstExperimentName}-${experimentsManagerRunJobStub.args[0][2]}`);
             experimentsManagerGetStub.callCount.should.eql(1);
