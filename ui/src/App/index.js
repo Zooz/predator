@@ -46,7 +46,7 @@ class App extends React.Component {
       if (processingGetConfig) return <div><Loader /></div>
       if (config && !errorOnGetConfig && !processingGetConfig) {
         const featureToggles = {
-          CHAOS_MESH_ENABLED: false
+          CHAOS_MESH_ENABLED: config[CHAOS_MESH_ENABLED]
         };
         const menuList = getMenuList(featureToggles);
 
