@@ -31,6 +31,7 @@ import Button from '../../../components/Button';
 import SimpleTable from '../SimpleTable';
 import { chaosExperimentsForDropdown } from '../../redux/selectors/chaosExperimentsSelector';
 import Dropdown from '../../../components/Dropdown/Dropdown.export';
+import { CHAOS_MESH_ENABLED } from '../../../constants';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const ONE_SEC_MS = 1000;
@@ -81,6 +82,15 @@ class Form extends React.Component {
 
     if (this.props.editMode) {
       const editProps = createStateForEditJob(this.props.data);
+      if (this.props.featureToggles[CHAOS_MESH_ENABLED] && this.props.data?.experiments?.length) {
+        const experiments = this.props.data.experiments.map((experiment) => ({
+          experiment_id: experiment.experiment_id,
+          experiment_name: experiment.experiment_name,
+          start_after: experiment.start_after / ONE_MIN_SEC // adjust to minutes
+        }));
+        editProps.experiments = experiments
+      }
+
       this.state = {
         ...this.state,
         ...editProps
@@ -767,7 +777,7 @@ class Form extends React.Component {
                   const newExperiment = {
                     experiment_id: this.state.add_experiment_form_experiment_id,
                     experiment_name: this.state.add_experiment_form_experiment_name,
-                    start_after: this.state.add_experiment_form_start_after * ONE_MIN_SEC// adjust to seconds
+                    start_after: this.state.add_experiment_form_start_after * ONE_MIN_SEC // adjust to seconds
                   }
                   const experiments = [...this.state.experiments, newExperiment]
                   this.state.experiments.push(newExperiment)
