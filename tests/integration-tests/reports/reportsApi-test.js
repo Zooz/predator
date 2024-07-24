@@ -97,7 +97,7 @@ const jobPlatform = process.env.JOB_PLATFORM;
                     const job = {
                         test_id: testId,
                         arrival_rate: 1,
-                        duration: 1,
+                        duration: 3,
                         environment: 'test',
                         run_immediately: true,
                         type: 'load_test',
@@ -105,12 +105,12 @@ const jobPlatform = process.env.JOB_PLATFORM;
                         emails: [],
                         experiments: [
                             {
-                                start_after: 0,
+                                start_after: 1,
                                 experiment_id: chaosExperimentsInserted[0].body.id,
                                 experiment_name: chaosExperimentsInserted[0].body.name
                             },
                             {
-                                start_after: 2000,
+                                start_after: 2,
                                 experiment_id: chaosExperimentsInserted[1].body.id,
                                 experiment_name: chaosExperimentsInserted[1].body.name
                             }

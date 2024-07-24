@@ -66,11 +66,11 @@ describe('Job experiments handler tests', function () {
             const jobExperiments = [
                 {
                     experiment_id: firstExperiment.id,
-                    start_after: 1000
+                    start_after: 60
                 },
                 {
                     experiment_id: secondExperiment.id,
-                    start_after: 2000
+                    start_after: 120
                 }
             ];
             const jobId = uuid();
@@ -87,7 +87,7 @@ describe('Job experiments handler tests', function () {
             (experimentsManagerInsertStub.args[0][4] - experimentsManagerInsertStub.args[0][3]).should.eql(60000);
             experimentsManagerInsertStub.args[1][1].should.eql(jobId);
             experimentsManagerInsertStub.args[1][2].should.eql(secondExperiment.id);
-            (experimentsManagerInsertStub.args[1][3] - experimentsManagerInsertStub.args[0][3]).should.eql(1000);
+            (experimentsManagerInsertStub.args[1][3] - experimentsManagerInsertStub.args[0][3]).should.eql(60000);
         });
 
         it('set chaos experiments with same experiment in different times', async () => {
@@ -97,11 +97,11 @@ describe('Job experiments handler tests', function () {
             const jobExperiments = [
                 {
                     experiment_id: experiment.id,
-                    start_after: 1000
+                    start_after: 60
                 },
                 {
                     experiment_id: experiment.id,
-                    start_after: 2000
+                    start_after: 120
                 }
             ];
             const jobId = uuid();

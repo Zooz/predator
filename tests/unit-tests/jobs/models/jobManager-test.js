@@ -226,7 +226,7 @@ describe('Manager jobs', function () {
                 id: JOB_ID,
                 test_id: TEST_ID,
                 arrival_rate: 1,
-                duration: 1,
+                duration: 120,
                 run_immediately: true,
                 type: 'load_test',
                 emails: ['dina@niv.eli'],
@@ -234,7 +234,7 @@ describe('Manager jobs', function () {
                 experiments: [
                     {
                         experiment_id: '1234',
-                        start_after: 5000
+                        start_after: 60
                     }
                 ],
                 webhooks: webhooks.map(({ id }) => id),
@@ -250,13 +250,13 @@ describe('Manager jobs', function () {
                 emails: ['dina@niv.eli'],
                 webhooks: webhooks.map(({ id }) => id),
                 arrival_rate: 1,
-                duration: 1,
+                duration: 120,
                 max_virtual_users: 100,
                 enabled: true,
                 experiments: [
                     {
                         experiment_id: '1234',
-                        start_after: 5000
+                        start_after: 60
                     }
                 ],
                 custom_env_vars: {
@@ -285,7 +285,7 @@ describe('Manager jobs', function () {
                 ARRIVAL_RATE: '1',
                 REPORT_ID: reportId,
                 PREDATOR_VERSION,
-                DURATION: '1',
+                DURATION: '120',
                 CUSTOM_KEY1: 'A',
                 CUSTOM_KEY2: 'B'
             });
@@ -979,14 +979,14 @@ describe('Manager jobs', function () {
                 test_id: TEST_ID,
                 id: JOB_ID,
                 arrival_rate: 1,
-                duration: 1,
+                duration: 120,
                 enabled: true,
                 cron_expression: '* * * * * *',
                 run_immediately: false,
                 experiments: [
                     {
                         experiment_id: '1234',
-                        start_after: 5000
+                        start_after: 60
                     }
                 ],
                 emails: ['dina@niv.eli'],
@@ -1018,7 +1018,7 @@ describe('Manager jobs', function () {
                 experiments: [
                     {
                         experiment_id: '1234',
-                        start_after: 3000
+                        start_after: 60
                     }
                 ]
             });

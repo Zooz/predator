@@ -28,13 +28,15 @@ async function setChaosExperimentsIfExist(jobId, jobExperiments) {
 async function setSingleJobExperiment(experimentRequest, chaosExperimentsFromDb, baseTimestamp, jobId) {
     try {
         const experiment = chaosExperimentsFromDb.find(e => e.id === experimentRequest.experiment_id);
-        const startTime = baseTimestamp + experimentRequest.start_after;
+        // Date.now() + start_after in millis
+        const experimentStartTimeMs = experimentRequest.start_after * SEC_TO_MS; // experimentRequest.start_after is in seconds - we want to convert to milliseconds
+        const startTime = baseTimestamp + experimentStartTimeMs;
         const endTime = startTime + convertDurationStringToMillisecond(experiment.kubeObject.spec.duration);
         const jobExperimentId = uuid();
         await chaosExperimentsManager.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
         const kubeObject = experiment.kubeObject;
         kubeObject.metadata.name = kubeObject.metadata.name.concat(`-${jobExperimentId}`);
-        scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, experimentRequest.start_after);
+        scheduleChaosExperiment(kubeObject, jobId, jobExperimentId, experimentStartTimeMs);
     } catch (error){
         logger.error(error, `error while setting chaos experiment ${experimentRequest.experiment_id} for job ${jobId}`);
     }

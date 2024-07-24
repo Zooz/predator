@@ -184,11 +184,11 @@ describe('Create job specific aws fargate tests', async function () {
                         arrival_rate: 1,
                         parallelism: 2,
                         type: 'load_test',
-                        duration: 1,
+                        duration: 3,
                         experiments: [
                             {
                                 experiment_id: '1234',
-                                start_after: 5000
+                                start_after: 1
                             }
                         ],
                         environment: 'test',
