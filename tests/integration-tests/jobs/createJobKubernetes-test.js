@@ -244,7 +244,7 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                 });
 
-                describe.only('Delete all containers with chaos experiments', () => {
+                describe('Delete all containers with chaos experiments', () => {
                     beforeEach(() => {
                         nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs?labelSelector=app=predator`)
                             .reply(200, {
@@ -271,6 +271,53 @@ describe('Create job specific kubernetes tests', async function () {
 
                         nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job?propagationPolicy=Foreground`)
                             .reply(200);
+                    });
+                    describe('Fails to get supported kinds', async() => {
+                        beforeEach(async() => {
+                            chaosExperimentsRequestCreator.nockK8sChaosExperimentSupportedKinds(false);
+                            // should not get to these following nocks
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [{
+                                        metadata: { name: 'first-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                        status: {
+                                            experiment: {
+                                                desiredPhase: 'Stop'
+                                            }
+                                        }
+
+                                    },
+                                    {
+                                        metadata: { name: 'second-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                        status: {
+                                            experiment: {
+                                                desiredPhase: 'Stop'
+                                            }
+                                        }
+                                    }
+                                    ]
+                                });
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [
+                                        {
+                                            metadata: { name: 'running-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                            status: {
+                                                experiment: {
+                                                    desiredPhase: 'Run'
+                                                }
+                                            }
+                                        }
+                                    ]
+                                });
+                        });
+                        it('flow should continue without experiments', async () => {
+                            const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                            should(deleteAllContainersResponse.body).eql({
+                                deleted: 1
+                            });
+                            should(nock.pendingMocks().length).eql(2);
+                        });
                     });
                     describe('happy flow - all responses are positive', async () => {
                         beforeEach(async() => {
@@ -326,56 +373,8 @@ describe('Create job specific kubernetes tests', async function () {
                             });
                         });
                     });
-                    describe('Fails to get supported kinds', async() => {
-                        beforeEach(async() => {
-                            chaosExperimentsRequestCreator.nockK8sChaosExperimentSupportedKinds(false);
-                            // should not get to these following nocks
-                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
-                                .reply(200, {
-                                    items: [{
-                                        metadata: { name: 'first-exp', namespace: kubernetesConfig.kubernetesNamespace },
-                                        status: {
-                                            experiment: {
-                                                desiredPhase: 'Stop'
-                                            }
-                                        }
-
-                                    },
-                                    {
-                                        metadata: { name: 'second-exp', namespace: kubernetesConfig.kubernetesNamespace },
-                                        status: {
-                                            experiment: {
-                                                desiredPhase: 'Stop'
-                                            }
-                                        }
-                                    }
-                                    ]
-                                });
-                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
-                                .reply(200, {
-                                    items: [
-                                        {
-                                            metadata: { name: 'running-exp', namespace: kubernetesConfig.kubernetesNamespace },
-                                            status: {
-                                                experiment: {
-                                                    desiredPhase: 'Run'
-                                                }
-                                            }
-                                        }
-                                    ]
-                                });
-                        });
-                        it('flow should continue without experiments', async () => {
-                            const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
-                            should(deleteAllContainersResponse.body).eql({
-                                deleted: 1
-                            });
-                            should(nock.pendingMocks().length).eql(2);
-                        });
-                    });
                     describe('Fails to get podchaos instances', async() => {
                         beforeEach(async() => {
-                            chaosExperimentsRequestCreator.nockK8sChaosExperimentSupportedKinds();
                             nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
                                 .reply(403);
                             nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
@@ -405,7 +404,7 @@ describe('Create job specific kubernetes tests', async function () {
                             nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/stresschaos/stopping-exp`)
                                 .reply(200);
                         });
-                        it('flow should continue without experiments', async () => {
+                        it('Should continue with deleting other type chaoses', async () => {
                             const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
                             should(deleteAllContainersResponse.body).eql({
                                 deleted: 1,
@@ -416,7 +415,6 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                     describe('Fails to delete one podchaos', async() => {
                         beforeEach(async() => {
-                            chaosExperimentsRequestCreator.nockK8sChaosExperimentSupportedKinds();
                             nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
                                 .reply(200, {
                                     items: [{
@@ -460,7 +458,7 @@ describe('Create job specific kubernetes tests', async function () {
                             nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/stresschaos/running-exp`)
                                 .reply(200);
                         });
-                        it('flow should continue without experiments', async () => {
+                        it('Should delete other chaoses that should be deleted', async () => {
                             const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
                             should(deleteAllContainersResponse.body).eql({
                                 deleted: 1,
