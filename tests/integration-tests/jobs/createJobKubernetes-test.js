@@ -162,7 +162,7 @@ describe('Create job specific kubernetes tests', async function () {
                         const jobBody = {
                             test_id: testId,
                             arrival_rate: 1,
-                            duration: 1,
+                            duration: 2,
                             environment: 'test',
                             run_immediately: true,
                             type: 'load_test',
@@ -173,7 +173,7 @@ describe('Create job specific kubernetes tests', async function () {
                                 },
                                 {
                                     experiment_id: chaosExperimentId,
-                                    start_after: 5000
+                                    start_after: 1
                                 }
                             ]
                         };
@@ -191,7 +191,7 @@ describe('Create job specific kubernetes tests', async function () {
                         const jobBody = {
                             test_id: testId,
                             arrival_count: 1,
-                            duration: 1,
+                            duration: 2,
                             environment: 'test',
                             run_immediately: false,
                             cron_expression: '* 10 * * * *',
@@ -199,7 +199,7 @@ describe('Create job specific kubernetes tests', async function () {
                             experiments: [
                                 {
                                     experiment_id: chaosExperimentId,
-                                    start_after: 5000
+                                    start_after: 1
                                 }
                             ]
                         };
@@ -264,7 +264,7 @@ describe('Create job specific kubernetes tests', async function () {
                         const jobBody = {
                             test_id: testId,
                             arrival_rate: 1,
-                            duration: 1,
+                            duration: 2,
                             environment: 'test',
                             run_immediately: true,
                             type: 'load_test',
@@ -275,7 +275,7 @@ describe('Create job specific kubernetes tests', async function () {
                                 },
                                 {
                                     experiment_id: chaosExperimentId,
-                                    start_after: 2
+                                    start_after: 1
                                 }
                             ]
                         };
@@ -1058,7 +1058,7 @@ describe('Create job specific kubernetes tests', async function () {
                             experiments: [
                                 {
                                     experiment_id: uuid.v4(),
-                                    start_after: 5000
+                                    start_after: 0
                                 }
                             ]
                         };

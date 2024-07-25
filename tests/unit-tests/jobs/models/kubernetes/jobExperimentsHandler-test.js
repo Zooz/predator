@@ -66,18 +66,18 @@ describe('Job experiments handler tests', function () {
             const jobExperiments = [
                 {
                     experiment_id: firstExperiment.id,
-                    start_after: 1000
+                    start_after: 60
                 },
                 {
                     experiment_id: secondExperiment.id,
-                    start_after: 2000
+                    start_after: 120
                 }
             ];
             const jobId = uuid();
             clock = sinon.useFakeTimers();
             clock.tick(1000);
             await jobExperimentHandler.setChaosExperimentsIfExist(jobId, jobExperiments);
-            clock.tick(3000);
+            clock.tick(60 * 1000 * 2);
             (experimentsManagerRunJobStub.callCount).should.eql(2);
             experimentsManagerRunJobStub.args[0][0].metadata.name.should.eql(`${firstExperimentName}-${experimentsManagerRunJobStub.args[0][2]}`);
             experimentsManagerGetStub.callCount.should.eql(1);
@@ -87,7 +87,7 @@ describe('Job experiments handler tests', function () {
             (experimentsManagerInsertStub.args[0][4] - experimentsManagerInsertStub.args[0][3]).should.eql(60000);
             experimentsManagerInsertStub.args[1][1].should.eql(jobId);
             experimentsManagerInsertStub.args[1][2].should.eql(secondExperiment.id);
-            (experimentsManagerInsertStub.args[1][3] - experimentsManagerInsertStub.args[0][3]).should.eql(1000);
+            (experimentsManagerInsertStub.args[1][3] - experimentsManagerInsertStub.args[0][3]).should.eql(60000);
         });
 
         it('set chaos experiments with same experiment in different times', async () => {
@@ -97,11 +97,11 @@ describe('Job experiments handler tests', function () {
             const jobExperiments = [
                 {
                     experiment_id: experiment.id,
-                    start_after: 1000
+                    start_after: 60
                 },
                 {
                     experiment_id: experiment.id,
-                    start_after: 2000
+                    start_after: 120
                 }
             ];
             const jobId = uuid();
