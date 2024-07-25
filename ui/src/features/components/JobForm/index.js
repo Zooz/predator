@@ -31,10 +31,11 @@ import Button from '../../../components/Button';
 import SimpleTable from '../SimpleTable';
 import { chaosExperimentsForDropdown } from '../../redux/selectors/chaosExperimentsSelector';
 import Dropdown from '../../../components/Dropdown/Dropdown.export';
+import { CHAOS_MESH_ENABLED } from '../../../constants';
 
 const DESCRIPTION = 'Predator executes tests through jobs. Use this form to specify the parameters for the job you want to execute.';
 const ONE_SEC_MS = 1000;
-const ONE_MIN_MS = 60 * 1000;
+const ONE_MIN_SEC = 60;
 
 class Form extends React.Component {
   constructor (props) {
@@ -81,6 +82,10 @@ class Form extends React.Component {
 
     if (this.props.editMode) {
       const editProps = createStateForEditJob(this.props.data);
+      if (this.props.featureToggles.CHAOS_MESH_ENABLED && this.props.data?.experiments?.length) {
+        editProps.experiments = [ ...this.props.data.experiments ]
+      }
+
       this.state = {
         ...this.state,
         ...editProps
@@ -466,10 +471,11 @@ class Form extends React.Component {
     whenSubmit = (runImmediate) => {
       const convertedArgs = {
         test_id: this.props.editMode ? this.state.test_id : this.props.data.id,
-        duration: parseInt(this.state.duration) * 60,
+        duration: parseInt(this.state.duration) * ONE_MIN_SEC, // conversion minutes to seconds
         run_immediately: runImmediate,
         ramp_to: this.state.enable_ramp_to ? this.state.ramp_to : undefined
       };
+
       if (this.state.debug) {
         convertedArgs.debug = '*';
       }
@@ -695,7 +701,7 @@ class Form extends React.Component {
                       <span className={style['list-item__title']}>experiment name:</span>
                       <span className={style['list-item']}> {experiment.experiment_name}</span>
                       <span className={style['list-item__title']}>start after:</span>
-                      <span className={style['list-item']}> {experiment.start_after / ONE_MIN_MS} minutes</span>
+                      <span className={style['list-item']}> {experiment.start_after / ONE_MIN_SEC} minutes</span>
                       <FontAwesomeIcon
                         icon={faTimes}
                         size='1px'
@@ -766,7 +772,7 @@ class Form extends React.Component {
                   const newExperiment = {
                     experiment_id: this.state.add_experiment_form_experiment_id,
                     experiment_name: this.state.add_experiment_form_experiment_name,
-                    start_after: this.state.add_experiment_form_start_after * ONE_MIN_MS // adjust to milliseconds
+                    start_after: this.state.add_experiment_form_start_after * ONE_MIN_SEC // adjust to seconds
                   }
                   const experiments = [...this.state.experiments, newExperiment]
                   this.state.experiments.push(newExperiment)
