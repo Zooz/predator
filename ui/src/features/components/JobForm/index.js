@@ -83,14 +83,7 @@ class Form extends React.Component {
     if (this.props.editMode) {
       const editProps = createStateForEditJob(this.props.data);
       if (this.props.featureToggles.CHAOS_MESH_ENABLED) {
-        const experiments = this.props.data.experiments.map((experiment) => {
-          return {
-            experiment_id: experiment.experiment_id,
-            experiment_name: experiment.experiment_name,
-            start_after: experiment.start_after
-          }
-        });
-        editProps.experiments = experiments
+        editProps.experiments = [ ...this.props.data.experiments ]
       }
 
       this.state = {
