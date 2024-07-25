@@ -82,12 +82,14 @@ class Form extends React.Component {
 
     if (this.props.editMode) {
       const editProps = createStateForEditJob(this.props.data);
-      if (this.props.featureToggles[CHAOS_MESH_ENABLED] && this.props.data?.experiments?.length) {
-        const experiments = this.props.data.experiments.map((experiment) => ({
-          experiment_id: experiment.experiment_id,
-          experiment_name: experiment.experiment_name,
-          start_after: experiment.start_after / ONE_MIN_SEC // adjust to minutes
-        }));
+      if (this.props.featureToggles.CHAOS_MESH_ENABLED) {
+        const experiments = this.props.data.experiments.map((experiment) => {
+          return {
+            experiment_id: experiment.experiment_id,
+            experiment_name: experiment.experiment_name,
+            start_after: experiment.start_after
+          }
+        });
         editProps.experiments = experiments
       }
 
@@ -706,7 +708,7 @@ class Form extends React.Component {
                       <span className={style['list-item__title']}>experiment name:</span>
                       <span className={style['list-item']}> {experiment.experiment_name}</span>
                       <span className={style['list-item__title']}>start after:</span>
-                      <span className={style['list-item']}> {experiment.start_after / ONE_SEC_MS} minutes</span>
+                      <span className={style['list-item']}> {experiment.start_after / ONE_MIN_SEC} minutes</span>
                       <FontAwesomeIcon
                         icon={faTimes}
                         size='1px'
