@@ -25,7 +25,7 @@ async function init() {
     }
 }
 
-function nockK8sChaosExperimentSupportedKinds() {
+function nockK8sChaosExperimentSupportedKinds(success = true) {
     const response = {
         kind: 'CustomResourceDefinitionList',
         apiVersion: 'apiextensions.k8s.io/v1',
@@ -80,10 +80,10 @@ function nockK8sChaosExperimentSupportedKinds() {
             // Additional CRDs can be listed here
         ]
     };
-
+    const status = success ? 200 : 403;
     nock('https://kubernetes').persist()
         .get('/apis/apiextensions.k8s.io/v1/customresourcedefinitions')
-        .reply(200, response);
+        .reply(status, response);
 }
 
 function createChaosExperiment(body, headers = { 'Content-Type': 'application/json' }) {
