@@ -82,7 +82,7 @@ class Form extends React.Component {
 
     if (this.props.editMode) {
       const editProps = createStateForEditJob(this.props.data);
-      if (this.props.featureToggles.CHAOS_MESH_ENABLED) {
+      if (this.props.featureToggles.CHAOS_MESH_ENABLED && this.props.data?.experiments?.length) {
         editProps.experiments = [ ...this.props.data.experiments ]
       }
 
