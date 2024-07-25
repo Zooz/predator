@@ -3282,7 +3282,7 @@ components:
             type: string
           start_after:
             type: number
-            description: time in milliseconds in which the experiment starts after job started
+            description: time in seconds in which the experiment starts after job started
     report_experiments:
       description: An array of objects that describe experiments to run during the job running, and timing
       type: array

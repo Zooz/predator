@@ -174,7 +174,7 @@ class getJobs extends React.Component {
       const noDataText = this.props.errorOnGetJobs ? errorMsgGetTests : this.loader();
 
       const { sortedJobs, jobForEdit } = this.state;
-      const { errorOnJobAction, jobPlatform } = this.props;
+      const { errorOnJobAction, featureToggles } = this.props;
 
       const columns = getColumns({
         columnsNames,
@@ -207,7 +207,7 @@ class getJobs extends React.Component {
             ? <Dialog title_key={'id'} data={this.state.openViewJob}
               closeDialog={this.closeViewJobDialog} /> : null}
           {this.state.openViewEditJob &&
-          <JobForm history={history} editMode data={jobForEdit} closeDialog={this.closeViewEditJobDialog} jobPlatform={jobPlatform}
+          <JobForm history={history} editMode data={jobForEdit} closeDialog={this.closeViewEditJobDialog} featureToggles={featureToggles}
           />}
           {this.state.deleteDialog && !this.props.deleteJobSuccess
             ? <DeleteDialog loader={this.props.processingDeleteJob}
