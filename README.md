@@ -19,26 +19,37 @@ It has a simple, one-click installation, built with support for Kubernetes, DC/O
 &nbsp; [**API Tests Examples**](https://documenter.getpostman.com/view/220627/S1TYTvP2?version=latest)
 
 ## Features
-|                                 |                    |          |
-|-------------------------------- |:------------------:|:---------|
-| Distributed Load                | :sparkle:          |Predator supports an unlimited number of load generators that produce multiple load runners concurrently.
-| Functional Testing              | :new:              |Run functional tests with various types of assertions and later on see the results in the report page.
-| Streaming Integration           | :new:              |Produce predator resources to Kafka easily and seamlessly.
-| Rich UI                         | :sparkle:          |Predator offers a rich UI where you can write tests, run them and compare results.
-| Reports && Tests Persistence    | :sparkle:          |Predator provides out-of-the box functionality for persisting data in Postgres, MySQL, MSSQL and SQLITE.
-| Real time reports               | :sparkle:          |Predator aggregates all concurrent runs into a single beautiful report in real time (latency, rps, status codes and more).
-| CSV Datasets                    | :sparkle:          |Predator support uploading files like csv to provide dataset for test inputs
-| Scheduled runs                  | :sparkle:          |Predator can run recurring tests using cron expressions.
-| REST API                        | :sparkle:          |Full REST API to integrate Predator with CI/CD frameworks
-| Benchmarks                      | :sparkle:          |Set benchmarks to compare test runs to ensure performance degradation is discovered early in development. Allows to measure every build and release against specified baseline results guaranteeing safer releases to production.|
-| Cloud Native                    | :sparkle:          |Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
-| Prometheus/Influx integration   | :sparkle:          |Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
-| Compare Multiple tests results  | :sparkle:          |Built-in dashboard to compare multiple test runs at once.
-| Webhooks API                    | :new:              |Supported in Slack, Microsoft Teams, Discord or JSON format for an easy server to server integration.
+|                                |                    |          |
+|--------------------------------|:------------------:|:---------|
+| Distributed Load               | :sparkle:          |Predator supports an unlimited number of load generators that produce multiple load runners concurrently.
+| Functional Testing             | :new:              |Run functional tests with various types of assertions and later on see the results in the report page.
+| Streaming Integration          | :new:              |Produce predator resources to Kafka easily and seamlessly.
+| Rich UI                        | :sparkle:          |Predator offers a rich UI where you can write tests, run them and compare results.
+| Reports && Tests Persistence   | :sparkle:          |Predator provides out-of-the box functionality for persisting data in Postgres, MySQL, MSSQL and SQLITE.
+| Real time reports              | :sparkle:          |Predator aggregates all concurrent runs into a single beautiful report in real time (latency, rps, status codes and more).
+| CSV Datasets                   | :sparkle:          |Predator support uploading files like csv to provide dataset for test inputs
+| Scheduled runs                 | :sparkle:          |Predator can run recurring tests using cron expressions.
+| REST API                       | :sparkle:          |Full REST API to integrate Predator with CI/CD frameworks
+| Benchmarks                     | :sparkle:          |Set benchmarks to compare test runs to ensure performance degradation is discovered early in development. Allows to measure every build and release against specified baseline results guaranteeing safer releases to production.|
+| Cloud Native                   | :sparkle:          |Predator is built to take advantage of Kubernetes and DC/OS. It's integrated with those platforms and can manage the load generators lifecycles by itself.
+| Prometheus/Influx integration  | :sparkle:          |Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
+| Compare Multiple tests results | :sparkle:          |Built-in dashboard to compare multiple test runs at once.
+| Webhooks API                   | :new:              |Supported in Slack, Microsoft Teams, Discord or JSON format for an easy server to server integration.
+| Chaos Mesh integration         | :new:              |Integration with Kubernetes Chaos Mesh, to create chaos experiments and integrate them with your performence/load tests.
 
 -----------------------------------------------------
 
 ## Major Updates Notes
+### v1.7.0
+#### Integration with Kubernetes Chaos Mesh
+1. Chaos Mesh integration for conducting chaos experiments in Kubernetes environments. This enhancement improves testing by simulating faults and failures to ensure application resilience. 
+Results of these experiments are now visible in the reporting section, offering insights into the impact on test outcomes
+
+#### Chaos Experiments API
+Create Chaos experiments by submitting Kubernetes JSON formatted CRD, check out our [API documentation](https://zooz.github.io/predator/indexapiref.html#operation/create-a-job) for more details.
+3. New Webhooks API will break the current webhooks feature implemented in <= v1.4. `POST /jobs` API will now include in the body `webhook_id` field instead of `webhook_url`.
+
+To see the progress of `v1.5.0` [click here](https://github.com/Zooz/predator/issues?q=is%3Aissue+is%3Aopen+label%3A1.5.0)
 ### v1.5.0 - Breaking changes
 #### DB Support
 1. Predator's support of **Cassandra** will be dropped. Before opensourcing Predator and using an ORM abstraction in order to support multiple databases, Predator was only integrated with Cassandra as a backend storage. Since Cassandra's pros are not fully leveraged in the usecases of Predator's integration with a database and because it was delaying our development on new features, we decided to fully drop support of it. We plan to provide migration scripts to our other supported databases.  

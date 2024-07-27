@@ -22,7 +22,7 @@ Predator is a performance platform that can be configured to automatically load 
 
 - **Scheduled jobs**: Predator can run recurring tests using cron expressions.
 
-- **3rd partry metrics**: Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
+- **3rd party metrics**: Predator comes integrated with Prometheus and Influx. Simply configure it through the predator REST API or using the UI.
 
 - **Rich UI**: Predator offers a rich UI along with a powerful REST API.
 
