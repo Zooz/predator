@@ -441,12 +441,11 @@ describe('Chaos experiments manager tests', function () {
     });
 
     describe('stop job experiments by job id', function () {
-        let jobId, firstExId, secondExId, thirdExId, firstExperiment, secondExperiment;
+        let jobId, firstExId, secondExId, firstExperiment, secondExperiment;
         beforeEach(() => {
             jobId = uuid();
             firstExId = uuid();
             secondExId = uuid();
-            thirdExId = uuid();
             firstExperiment = {
                 id: firstExId,
                 kubeObject: {
@@ -486,11 +485,11 @@ describe('Chaos experiments manager tests', function () {
 
                 jobId,
                 experiment_id: secondExId,
-                start_time: Date.now()
+                start_time: Date.now() + 10000
             }, {
 
                 jobId,
-                experiment_id: thirdExId,
+                experiment_id: firstExId,
                 start_time: Date.now() + 10000
             }
             ]);
@@ -525,12 +524,12 @@ describe('Chaos experiments manager tests', function () {
 
                 jobId,
                 experiment_id: secondExId,
-                start_time: Date.now()
+                start_time: Date.now() - 1000
             }, {
 
                 jobId,
-                experiment_id: thirdExId,
-                start_time: Date.now() + 10000
+                experiment_id: firstExId,
+                start_time: Date.now() + 1000
             }
             ]);
             getChaosExperimentsByIdsStub.rejects();
@@ -551,12 +550,12 @@ describe('Chaos experiments manager tests', function () {
 
                 jobId,
                 experiment_id: secondExId,
-                start_time: Date.now()
+                start_time: Date.now() - 1000
             }, {
 
                 jobId,
-                experiment_id: thirdExId,
-                start_time: Date.now() + 10000
+                experiment_id: firstExId,
+                start_time: Date.now() + 1000
             }
             ]);
             getChaosExperimentsByIdsStub.rejects();
