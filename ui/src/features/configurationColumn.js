@@ -88,7 +88,8 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
         </TableHeader>
       ),
       accessor: 'description'
-    }, {
+    },
+    {
       id: 'kind',
       Header: () => (
         <TableHeader padding={'8px'} sortable={false}>
@@ -361,6 +362,17 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
         </TableHeader>
       ),
       accessor: 'parallelism',
+      width: largeSize,
+      className: css['center-flex']
+    },
+    {
+      id: 'chaos_experiments',
+      Header: () => (
+        <TableHeader padding={'8px'} sortable={false}>
+          Experiments
+        </TableHeader>
+      ),
+      accessor: data => data.experiments?.length || 0,
       width: largeSize,
       className: css['center-flex']
     },

@@ -170,8 +170,13 @@ class getReports extends React.Component {
         errorEditReport,
         deleteReportFailure,
         selectedReports,
-        selectedReportsAsArray
+        selectedReportsAsArray,
+        featureToggles
       } = this.props;
+      if (featureToggles.CHAOS_MESH_ENABLED) {
+        columnsNames.push('chaos_experiments')
+      }
+
       const columns = getColumns({
         columnsNames,
         sortHeader,
