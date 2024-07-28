@@ -244,51 +244,8 @@ describe('Create job specific kubernetes tests', async function () {
                     });
                 });
 
-                describe('Create a job with experiments and use delete all containers to clear them after finished', () => {
-                    let createJobResponse;
-                    let chaosExperimentId;
-
-                    before(async () => {
-                        const chaosExperiment = chaosExperimentsRequestCreator.generateRawChaosExperiment(uuid.v4(), undefined, kubernetesConfig.kubernetesNamespace);
-                        const chaosExperimentResponse = await chaosExperimentsRequestCreator.createChaosExperiment(chaosExperiment, { 'Content-Type': 'application/json' });
-                        chaosExperimentId = chaosExperimentResponse.body.id;
-                    });
-
-                    it('Create job which is one time load_test', async () => {
-                        nock(kubernetesConfig.kubernetesUrl).post(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs`)
-                            .reply(200, {
-                                metadata: { name: 'jobName', uid: 'uid' },
-                                namespace: kubernetesConfig.kubernetesNamespace
-                            });
-
-                        const jobBody = {
-                            test_id: testId,
-                            arrival_rate: 1,
-                            duration: 2,
-                            environment: 'test',
-                            run_immediately: true,
-                            type: 'load_test',
-                            experiments: [
-                                {
-                                    experiment_id: chaosExperimentId,
-                                    start_after: 0
-                                },
-                                {
-                                    experiment_id: chaosExperimentId,
-                                    start_after: 1
-                                }
-                            ]
-                        };
-
-                        createJobResponse = await schedulerRequestCreator.createJob(jobBody, {
-                            'Content-Type': 'application/json'
-                        });
-
-                        should(createJobResponse.status).eql(201);
-                        jobId = createJobResponse.body.id;
-                    });
-
-                    it('use delete all containers', async () => {
+                describe('Delete all containers with chaos experiments', () => {
+                    beforeEach(() => {
                         nock(kubernetesConfig.kubernetesUrl).get(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs?labelSelector=app=predator`)
                             .reply(200, {
                                 items: [{ metadata: { uid: 'x' } }]
@@ -310,60 +267,204 @@ describe('Create job specific kubernetes tests', async function () {
                                         state: {}
                                     }]
                                 }
-
                             });
 
                         nock(kubernetesConfig.kubernetesUrl).delete(`/apis/batch/v1/namespaces/${kubernetesConfig.kubernetesNamespace}/jobs/predator.job?propagationPolicy=Foreground`)
                             .reply(200);
-
-                        chaosExperimentsRequestCreator.nockK8sChaosExperimentSupportedKinds();
-
-                        nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
-                            .reply(200, {
-                                items: [{
-                                    metadata: { name: 'first-exp', namespace: kubernetesConfig.kubernetesNamespace },
-                                    status: {
-                                        experiment: {
-                                            desiredPhase: 'Stop'
-                                        }
-                                    }
-
-                                },
-                                {
-                                    metadata: { name: 'second-exp', namespace: kubernetesConfig.kubernetesNamespace },
-                                    status: {
-                                        experiment: {
-                                            desiredPhase: 'Stop'
-                                        }
-                                    }
-                                }
-                                ]
-                            });
-                        nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
-                            .reply(200, {
-                                items: [
-                                    {
-                                        metadata: { name: 'running-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                    });
+                    describe('Fails to get supported kinds', async() => {
+                        beforeEach(async() => {
+                            chaosExperimentsRequestCreator.nockK8sChaosExperimentSupportedKinds(false);
+                            // should not get to these following nocks
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [{
+                                        metadata: { name: 'first-exp', namespace: kubernetesConfig.kubernetesNamespace },
                                         status: {
                                             experiment: {
-                                                desiredPhase: 'Run'
+                                                desiredPhase: 'Stop'
+                                            }
+                                        }
+
+                                    },
+                                    {
+                                        metadata: { name: 'second-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                        status: {
+                                            experiment: {
+                                                desiredPhase: 'Stop'
                                             }
                                         }
                                     }
-                                ]
+                                    ]
+                                });
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [
+                                        {
+                                            metadata: { name: 'running-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                            status: {
+                                                experiment: {
+                                                    desiredPhase: 'Run'
+                                                }
+                                            }
+                                        }
+                                    ]
+                                });
+                        });
+                        it('flow should continue without experiments', async () => {
+                            const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                            should(deleteAllContainersResponse.body).eql({
+                                deleted: 1
                             });
+                            should(nock.pendingMocks().length).eql(2);
+                        });
+                    });
+                    describe('happy flow - all responses are positive', async () => {
+                        beforeEach(async() => {
+                            chaosExperimentsRequestCreator.nockK8sChaosExperimentSupportedKinds();
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [{
+                                        metadata: { name: 'first-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                        status: {
+                                            experiment: {
+                                                desiredPhase: 'Stop'
+                                            }
+                                        }
 
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/first-exp`)
-                            .reply(200);
-                        nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/second-exp`)
-                            .reply(200);
-                        const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                                    },
+                                    {
+                                        metadata: { name: 'second-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                        status: {
+                                            experiment: {
+                                                desiredPhase: 'Stop'
+                                            }
+                                        }
+                                    }
+                                    ]
+                                });
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [
+                                        {
+                                            metadata: { name: 'running-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                            status: {
+                                                experiment: {
+                                                    desiredPhase: 'Run'
+                                                }
+                                            }
+                                        }
+                                    ]
+                                });
 
-                        should(deleteAllContainersResponse.status).eql(200);
-                        // should(nock.pendingMocks().length).eql(0);
-                        should(deleteAllContainersResponse.body).eql({
-                            deleted: 1,
-                            internal_resources_deleted: { chaos_mesh: 2 }
+                            nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/first-exp`)
+                                .reply(200);
+                            nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/second-exp`)
+                                .reply(200);
+                        });
+                        it('should delete all finished containers', async () => {
+                            const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+
+                            should(deleteAllContainersResponse.status).eql(200);
+                            should(nock.pendingMocks().length).eql(0);
+                            should(deleteAllContainersResponse.body).eql({
+                                deleted: 1,
+                                internal_resources_deleted: { chaos_mesh: 2 }
+                            });
+                        });
+                    });
+                    describe('Fails to get podchaos instances', async() => {
+                        beforeEach(async() => {
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
+                                .reply(403);
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [
+                                        {
+                                            metadata: { name: 'stopping-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                            status: {
+                                                experiment: {
+                                                    desiredPhase: 'Stop'
+                                                }
+                                            }
+                                        },
+                                        {
+                                            metadata: { name: 'running-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                            status: {
+                                                experiment: {
+                                                    desiredPhase: 'Run'
+                                                }
+                                            }
+                                        }
+                                    ]
+                                });
+
+                            nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/first-exp`)
+                                .reply(200);
+                            nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/stresschaos/stopping-exp`)
+                                .reply(200);
+                        });
+                        it('Should continue with deleting other type chaoses', async () => {
+                            const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                            should(deleteAllContainersResponse.body).eql({
+                                deleted: 1,
+                                internal_resources_deleted: { chaos_mesh: 1 }
+                            });
+                            should(nock.pendingMocks().length).eql(1);
+                        });
+                    });
+                    describe('Fails to delete one podchaos', async() => {
+                        beforeEach(async() => {
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/podchaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [{
+                                        metadata: { name: 'first-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                        status: {
+                                            experiment: {
+                                                desiredPhase: 'Stop'
+                                            }
+                                        }
+
+                                    },
+                                    {
+                                        metadata: { name: 'second-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                        status: {
+                                            experiment: {
+                                                desiredPhase: 'Stop'
+                                            }
+                                        }
+                                    }
+                                    ]
+                                });
+                            nock(kubernetesConfig.kubernetesUrl).get('/apis/chaos-mesh.org/v1alpha1/stresschaos?labelSelector=app=predator')
+                                .reply(200, {
+                                    items: [
+                                        {
+                                            metadata: { name: 'running-exp', namespace: kubernetesConfig.kubernetesNamespace },
+                                            status: {
+                                                experiment: {
+                                                    desiredPhase: 'Run'
+                                                }
+                                            }
+                                        }
+                                    ]
+                                });
+
+                            nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/first-exp`)
+                                .reply(200);
+
+                            nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/podchaos/second-exp`)
+                                .reply(500);
+                            nock(kubernetesConfig.kubernetesUrl).delete(`/apis/chaos-mesh.org/v1alpha1/namespaces/${kubernetesConfig.kubernetesNamespace}/stresschaos/running-exp`)
+                                .reply(200);
+                        });
+                        it('Should delete other chaoses that should be deleted', async () => {
+                            const deleteAllContainersResponse = await schedulerRequestCreator.deletePredatorRunnerContainers();
+                            should(deleteAllContainersResponse.body).eql({
+                                deleted: 1,
+                                internal_resources_deleted: { chaos_mesh: 1 }
+                            });
+                            should(nock.pendingMocks().length).eql(1);
                         });
                     });
                 });
