@@ -26,7 +26,7 @@ async function init() {
 }
 
 function nockK8sChaosExperimentSupportedKinds(success = true) {
-    const response = {
+    const positiveResponse = {
         kind: 'CustomResourceDefinitionList',
         apiVersion: 'apiextensions.k8s.io/v1',
         metadata: {
@@ -80,7 +80,9 @@ function nockK8sChaosExperimentSupportedKinds(success = true) {
             // Additional CRDs can be listed here
         ]
     };
+    const negativeResponse = 'No sufficient permissions to apply action';
     const status = success ? 200 : 403;
+    const response = success ? positiveResponse : negativeResponse;
     nock('https://kubernetes').persist()
         .get('/apis/apiextensions.k8s.io/v1/customresourcedefinitions')
         .reply(status, response);
