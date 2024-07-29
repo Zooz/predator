@@ -16,7 +16,7 @@ describe('Processors api - with contexts', function () {
         let processorContextResponse, processorNoContextResponse, processorRandomContextResponse;
         const processorsInserted = [];
         describe('GET /v1/processors', function () {
-            beforeEach(async function () {
+            before(async function () {
                 const headersWithContext = Object.assign({}, validHeaders, { 'x-context-id': contextId });
                 const headersWithRandomContext = Object.assign({}, validHeaders, { 'x-context-id': 'mickey' });
                 const headersNoContext = Object.assign({}, validHeaders);
@@ -33,12 +33,7 @@ describe('Processors api - with contexts', function () {
                 processorNoContextResponse = await processorRequestSender.createProcessor(processor, headersNoContext);
                 processorsInserted.push(processorNoContextResponse);
             });
-            afterEach(async function () {
-                const processorIds = processorsInserted.map(processor => processor.body.id);
-                for (const processorId of processorIds) {
-                    await processorRequestSender.deleteProcessor(processorId, { 'Content-Type': 'application/json' });
-                }
-            });
+
             it('get processors with context_id should return all processors created with specific context', async function () {
                 const headers = { 'Content-Type': 'application/json', 'x-context-id': contextId };
                 const getProcessorsResponse = await processorRequestSender.getProcessors(undefined, undefined, undefined, headers);
@@ -50,6 +45,7 @@ describe('Processors api - with contexts', function () {
                 const contextAResponse = getProcessorsResponse.body.find(o => o.id === processorContextResponse.body.id);
                 should(contextAResponse).not.be.undefined();
             });
+
             it('get processors with wrong context_id should no processors', async function () {
                 const headers = { 'Content-Type': 'application/json', 'x-context-id': uuid.v4() };
                 const getProcessorsResponse = await processorRequestSender.getProcessors(undefined, undefined, undefined, headers);
@@ -58,6 +54,7 @@ describe('Processors api - with contexts', function () {
                 const processors = getProcessorsResponse.body;
                 should(processors.length).equal(0);
             });
+
             it('get processors without context_id should return all processors created', async function () {
                 const headers = { 'Content-Type': 'application/json' };
                 const getProcessorsResponse = await processorRequestSender.getProcessors(undefined, undefined, undefined, headers);
@@ -65,6 +62,13 @@ describe('Processors api - with contexts', function () {
                 should(getProcessorsResponse.statusCode).equal(200);
                 const processors = getProcessorsResponse.body;
                 should(processors.length).equal(3);
+            });
+
+            after(async function () {
+                const processorIds = processorsInserted.map(processor => processor.body.id);
+                for (const processorId of processorIds) {
+                    await processorRequestSender.deleteProcessor(processorId, { 'Content-Type': 'application/json' });
+                }
             });
         });
         describe('DELETE /v1/processors/{processor_id}', () => {
@@ -76,9 +80,11 @@ describe('Processors api - with contexts', function () {
                 processorContextResponse = await processorRequestSender.createProcessor(processor, headersWithContext);
                 processorId = processorContextResponse.body.id;
             });
+
             afterEach(async function () {
                 await processorRequestSender.deleteProcessor(processorId, { 'Content-Type': 'application/json' });
             });
+
             it('insert a processor and then delete it with same context', async () => {
                 const headers = { 'Content-Type': 'application/json', 'x-context-id': contextId };
 
@@ -97,15 +103,11 @@ describe('Processors api - with contexts', function () {
         });
         describe('GET /v1/processors/{processor_id}', function () {
             let processorData, processor, headers;
-            beforeEach(async function () {
+            before(async function () {
                 headers = { 'Content-Type': 'application/json', 'x-context-id': contextId };
                 processorData = generateRawJSProcessor('mickeys-processor');
                 const processorResponse = await processorRequestSender.createProcessor(processorData, headers);
                 processor = processorResponse.body;
-            });
-            afterEach(async function () {
-                const deleteResponse = await processorRequestSender.deleteProcessor(processor.id, { 'Content-Type': 'application/json' });
-                should(deleteResponse.statusCode).equal(204);
             });
             it('Get processor by id with context should return 200', async () => {
                 const getProcessorResponse = await processorRequestSender.getProcessor(processor.id, headers);
@@ -124,6 +126,10 @@ describe('Processors api - with contexts', function () {
                 should(getProcessorResponse.body).containDeep(processorData);
                 should(getProcessorResponse.body.exported_functions).eql(['simple']);
             });
+            after(async function () {
+                const deleteResponse = await processorRequestSender.deleteProcessor(processor.id, { 'Content-Type': 'application/json' });
+                should(deleteResponse.statusCode).equal(204);
+            });
         });
         describe('PUT /v1/processors/{processor_id}', function () {
             let processorData, processor, processorId, headers;
@@ -133,10 +139,6 @@ describe('Processors api - with contexts', function () {
                 const processorResponse = await processorRequestSender.createProcessor(processorData, headers);
                 processor = processorResponse.body;
                 processorId = processorResponse.body.id;
-            });
-            afterEach(async function () {
-                const deleteResponse = await processorRequestSender.deleteProcessor(processor.id, { 'Content-Type': 'application/json' });
-                should(deleteResponse.statusCode).equal(204);
             });
             it('update a processor with context', async function () {
                 processorData.javascript = 'module.exports.add = (a,b) => a + b;';
@@ -163,6 +165,10 @@ describe('Processors api - with contexts', function () {
                 should(updateResponse.body.javascript).equal(processorData.javascript);
                 should(updateResponse.body.description).equal(processorData.description);
                 should(updateResponse.body.exported_functions).eql(['add']);
+            });
+            afterEach(async function () {
+                const deleteResponse = await processorRequestSender.deleteProcessor(processor.id, { 'Content-Type': 'application/json' });
+                should(deleteResponse.statusCode).equal(204);
             });
         });
     });
