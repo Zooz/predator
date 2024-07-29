@@ -4,8 +4,9 @@ const should = require('should'),
 const validHeaders = { 'Content-Type': 'application/json' };
 const processorRequestSender = require('./helpers/requestCreator');
 const testsRequestSender = require('../tests/helpers/requestCreator');
+
+const contextId = uuid.v4();
 describe('Processors api - with contexts', function () {
-    const contextId = uuid.v4().toString();
     this.timeout(5000000);
     before(async function () {
         await processorRequestSender.init();
