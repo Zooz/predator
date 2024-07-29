@@ -31,7 +31,6 @@ module.exports.init = async () => {
     if (jobConnector.init){
         await jobConnector.init();
     }
-    module.exports.isChaosEnabled = await configHandler.getConfigValue(CONFIG.CHAOS_MESH_ENABLED);
 };
 
 module.exports.reloadCronJobs = async () => {
