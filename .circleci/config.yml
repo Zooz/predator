@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   setup:
     docker:
-    - image: circleci/node:16:20.2
+    - image: circleci/node:16.20.2
     steps:
     - checkout
     - setup_remote_docker:
@@ -16,7 +16,7 @@ jobs:
         - node_modules
   npm-audit:
     docker:
-    - image: circleci/node:16:20.2
+    - image: circleci/node:16.20.2
       environment:
         TZ: "Asia/Jerusalem"
     steps:
