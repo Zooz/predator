@@ -5,12 +5,16 @@ const fs = require('fs');
 const requestSender = require('../../../common/requestSender');
 const logger = require('../../../common/logger');
 const kubernetesConfig = require('../../../config/kubernetesConfig');
+const jobExperimentHandler = require('./jobExperimentsHandler');
+const configHandler = require('../../../configManager/models/configHandler');
+const { CONFIG: { CHAOS_MESH_ENABLED } } = require('../../../common/consts');
+
 const kubernetesUrl = kubernetesConfig.kubernetesUrl;
 const kubernetesNamespace = kubernetesConfig.kubernetesNamespace;
 const headers = {};
+let isChaosEnabled;
 
 const TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
-
 if (kubernetesConfig.kubernetesToken) {
     logger.info('Using kubernetes token from env var');
     headers.Authorization = 'bearer ' + kubernetesConfig.kubernetesToken;
@@ -23,8 +27,11 @@ if (kubernetesConfig.kubernetesToken) {
         logger.warn(error, 'Failed to get kubernetes token from: ' + TOKEN_PATH);
     }
 }
+module.exports.init = async () => {
+    isChaosEnabled = await configHandler.getConfigValue(CHAOS_MESH_ENABLED);
+};
 
-module.exports.runJob = async (kubernetesJobConfig) => {
+module.exports.runJob = async (kubernetesJobConfig, job) => {
     const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs', kubernetesUrl, kubernetesNamespace);
     const options = {
         url,
@@ -38,9 +45,12 @@ module.exports.runJob = async (kubernetesJobConfig) => {
         id: jobResponse.metadata.uid,
         namespace: jobResponse.namespace
     };
+    if (isChaosEnabled) {
+        await jobExperimentHandler.setChaosExperimentsIfExist(job.id, job.experiments);
+    }
     return genericJobResponse;
 };
-module.exports.stopRun = async (jobPlatformName) => {
+module.exports.stopRun = async (jobPlatformName, job) => {
     const url = util.format('%s/apis/batch/v1/namespaces/%s/jobs/%s?propagationPolicy=Foreground', kubernetesUrl, kubernetesNamespace, jobPlatformName);
 
     const options = {
@@ -50,6 +60,9 @@ module.exports.stopRun = async (jobPlatformName) => {
     };
 
     await requestSender.send(options);
+    if (isChaosEnabled) {
+        await jobExperimentHandler.stopChaosExperimentsForJob(job.id);
+    }
 };
 
 module.exports.getLogs = async (jobPlatformName, predatorRunnerPrefix) => {
@@ -81,7 +94,15 @@ module.exports.deleteAllContainers = async (jobPlatformName) => {
             deleted++;
         }
     }
-    return { deleted };
+    let internalResourcesDeleted;
+
+    if (isChaosEnabled){
+        const jobExperimentsDeleted = await jobExperimentHandler.clearAllFinishedJobExperiments();
+        if (jobExperimentsDeleted) {
+            internalResourcesDeleted = { chaos_mesh: jobExperimentsDeleted };
+        }
+    }
+    return { deleted, internal_resources_deleted: internalResourcesDeleted };
 };
 
 async function getAllPredatorRunnerJobs(jobPlatformName) {

@@ -8,6 +8,7 @@ const uuid = require('uuid');
 const databaseConnector = require('../../../../src/reports/models/databaseConnector');
 const testManager = require('../../../../src/tests/models/manager');
 const aggregateReportManager = require('../../../../src/reports/models/aggregateReportManager');
+const chaosExperimentsManager = require('../../../../src/chaos-experiments/models/chaosExperimentsManager');
 const benchmarkCalculator = require('../../../../src/reports/models/benchmarkCalculator');
 const jobsManager = require('../../../../src/jobs/models/jobManager');
 const logger = require('../../../../src/common/logger');
@@ -22,6 +23,7 @@ let statsManager;
 
 const REPORT = {
     test_id: 'test_id',
+    job_id: 'job_id',
     revision_id: 'revision_id',
     report_id: 'report_id',
     test_name: 'test name',
@@ -49,7 +51,6 @@ const REPORT_DONE = {
     test_name: 'test name',
     report_url: 'http://www.zooz.com',
     status: constants.REPORT_INITIALIZING_STATUS,
-    start_time: 1527533459591,
     grafana_report: 'http://www.grafana.com&var-Name=test%20name&from=1527533459591&to=1527533519591',
     subscribers: [
         {
@@ -74,6 +75,55 @@ const JOB = {
     environment: 'test'
 };
 
+const JOB_EXPERIMENTS_ROWS = [
+    {
+        job_id: REPORT.job_id,
+        experiment_id: '1234-abc-5678',
+        start_time: new Date(REPORT.start_time),
+        end_time: new Date(REPORT.start_time + 60000),
+        experiment_name: 'first pod fault',
+        is_triggered: true
+    },
+    {
+        experiment_id: '1234-cde-5678',
+        start_after: 60000,
+        start_time: new Date(REPORT.start_time + 60000),
+        end_time: new Date(REPORT.start_time + (60000 * 2)),
+        experiment_name: 'second pod fault',
+        is_triggered: true
+    }
+];
+
+const firstExperiment = {
+    id: '1234-abc-5678',
+    kubeObject: {
+        kind: 'PodChaos',
+        apiVersion: 'chaos-mesh.org/v1alpha1',
+        metadata: {
+            namespace: 'apps',
+            name: 'first pod fault',
+            annotations: {}
+        },
+        spec: {}
+    },
+    name: 'first pod fault'
+};
+
+const secondExperiment = {
+    id: '1234-cde-5678',
+    kubeObject: {
+        kind: 'PodChaos',
+        apiVersion: 'chaos-mesh.org/v1alpha1',
+        metadata: {
+            namespace: 'apps',
+            name: 'second pod fault',
+            annotations: {}
+        },
+        spec: {}
+    },
+    name: 'second pod fault'
+};
+
 describe('Reports manager tests', function () {
     let sandbox;
     let databaseGetReportsStub;
@@ -94,6 +144,8 @@ describe('Reports manager tests', function () {
     let benchmarkCalculatorStub;
     let updateReportBenchmarkStub;
     let testManagerGetTestStub;
+    let getChaosJobExperimentsByJobIdStub;
+    let getChaosExperimentsByIdsStub;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -113,6 +165,8 @@ describe('Reports manager tests', function () {
         databaseUpdateReportStub = sandbox.stub(databaseConnector, 'updateReport');
         databaseDeleteReportStub = sandbox.stub(databaseConnector, 'deleteReport');
         testManagerGetTestStub = sandbox.stub(testManager, 'getTest');
+        getChaosJobExperimentsByJobIdStub = sandbox.stub(chaosExperimentsManager, 'getChaosJobExperimentsByJobId');
+        getChaosExperimentsByIdsStub = sandbox.stub(chaosExperimentsManager, 'getChaosExperimentsByIds');
         sandbox.stub(logger, 'error');
         sandbox.stub(logger, 'info');
         getJobStub = sandbox.stub(jobsManager, 'getJob');
@@ -146,10 +200,57 @@ describe('Reports manager tests', function () {
                 }
             });
             databaseGetReportStub.resolves([REPORT]);
+            getChaosJobExperimentsByJobIdStub.resolves();
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
             should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&var-TestRunId=report_id&from=1527533459591&to=now');
+        });
+
+        it('Database connector returns an array with one report - related job includes experiments', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { grafana_url: 'http://www.grafana.com', chaos_mesh_enabled: true };
+                }
+            });
+            databaseGetReportStub.resolves([REPORT]);
+            getChaosJobExperimentsByJobIdStub.resolves(JOB_EXPERIMENTS_ROWS);
+            getChaosExperimentsByIdsStub.resolves([firstExperiment, secondExperiment]);
+            const report = await manager.getReport();
+            should.exist(report);
+            should.exist(report.grafana_report);
+            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&var-TestRunId=report_id&from=1527533459591&to=now');
+            should(report.experiments).deepEqual([
+                {
+                    kind: firstExperiment.kubeObject.kind,
+                    name: firstExperiment.name,
+                    id: firstExperiment.id,
+                    start_time: JOB_EXPERIMENTS_ROWS[0].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[0].end_time
+                },
+                {
+                    kind: secondExperiment.kubeObject.kind,
+                    name: secondExperiment.name,
+                    id: secondExperiment.id,
+                    start_time: JOB_EXPERIMENTS_ROWS[1].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[1].end_time
+                }
+            ]);
+        });
+
+        it('Database connector returns an array with one report - related job fails to enrich with experiments', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { grafana_url: 'http://www.grafana.com' };
+                }
+            });
+            databaseGetReportStub.resolves([REPORT]);
+            getChaosJobExperimentsByJobIdStub.rejects(new Error('db error'));
+            const report = await manager.getReport();
+            should.exist(report);
+            should.exist(report.grafana_report);
+            should(report.grafana_report).eql('http://www.grafana.com&var-Name=test%20name&var-TestRunId=report_id&from=1527533459591&to=now');
+            should.not.exist(report.experiments);
         });
 
         it('Database connector returns an array with one report and score ', async () => {
@@ -160,6 +261,7 @@ describe('Reports manager tests', function () {
             });
             const reportWithScore = Object.assign({ score: 6.6, benchmark_weights_data: JSON.stringify({ data: 'some data' }) }, REPORT);
             databaseGetReportStub.resolves([reportWithScore]);
+            getChaosJobExperimentsByJobIdStub.resolves();
             const report = await manager.getReport();
             should.exist(report);
             should.exist(report.grafana_report);
@@ -175,6 +277,7 @@ describe('Reports manager tests', function () {
                 }
             });
             databaseGetReportStub.resolves([REPORT]);
+            getChaosJobExperimentsByJobIdStub.resolves();
             const report = await manager.getReport();
             should.exist(report);
             should.not.exist(report.grafana_report);
@@ -183,6 +286,7 @@ describe('Reports manager tests', function () {
 
         it('Database returns an empty array - should throw 404', async () => {
             databaseGetReportStub.resolves([]);
+            getChaosJobExperimentsByJobIdStub.resolves();
             try {
                 const report = await manager.getReport();
                 should.not.exist(report);
@@ -359,8 +463,68 @@ describe('Reports manager tests', function () {
     describe('Get reports', function () {
         it('Database connector returns an array with reports', async () => {
             databaseGetReportsStub.resolves([REPORT, REPORT]);
+            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getReports();
             reports.length.should.eql(2);
+        });
+
+        it('Database connector returns an array with 2 report - related job includes experiments', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { chaos_mesh_enabled: true };
+                }
+            });
+            databaseGetReportsStub.resolves([REPORT, REPORT]);
+            getChaosJobExperimentsByJobIdStub
+                .onFirstCall().resolves(JOB_EXPERIMENTS_ROWS)
+                .onSecondCall().resolves([]);
+            getChaosExperimentsByIdsStub.resolves([firstExperiment, secondExperiment]);
+            const reports = await manager.getReports();
+            should.exist(reports);
+            should(reports[0].experiments).deepEqual([
+                {
+                    kind: firstExperiment.kubeObject.kind,
+                    name: firstExperiment.name,
+                    id: firstExperiment.id,
+                    start_time: JOB_EXPERIMENTS_ROWS[0].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[0].end_time
+                },
+                {
+                    kind: secondExperiment.kubeObject.kind,
+                    name: secondExperiment.name,
+                    id: secondExperiment.id,
+                    start_time: JOB_EXPERIMENTS_ROWS[1].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[1].end_time
+                }
+            ]);
+            should.not.exist(reports[1].experiments);
+        });
+
+        it('Database connector returns an array with 2 report - fails to enrich with experiments on second call', async () => {
+            databaseGetReportStub.resolves([REPORT, [REPORT]]);
+            getChaosJobExperimentsByJobIdStub
+                .onFirstCall().resolves(JOB_EXPERIMENTS_ROWS)
+                .onSecondCall().rejects(new Error('db error'));
+            getChaosExperimentsByIdsStub.resolves([firstExperiment, secondExperiment]);
+            const reports = await manager.getReports();
+            should.exist(reports);
+            should(reports[0].experiments).deepEqual([
+                {
+                    kind: firstExperiment.kubeObject.kind,
+                    name: firstExperiment.name,
+                    id: firstExperiment.id,
+                    start_time: JOB_EXPERIMENTS_ROWS[0].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[0].end_time
+                },
+                {
+                    kind: secondExperiment.kubeObject.kind,
+                    name: secondExperiment.name,
+                    id: secondExperiment.id,
+                    start_time: JOB_EXPERIMENTS_ROWS[1].start_time,
+                    end_time: JOB_EXPERIMENTS_ROWS[1].end_time
+                }
+            ]);
+            should.not.exist(reports[1].experiments);
         });
 
         it('Database returns an empty array', async () => {
@@ -374,6 +538,7 @@ describe('Reports manager tests', function () {
     describe('Get last reports', function () {
         it('Database connector returns an array with reports', async () => {
             databaseGetLastReportsStub.resolves([REPORT, REPORT]);
+            getChaosJobExperimentsByJobIdStub.resolves([]);
             const reports = await manager.getLastReports();
             reports.length.should.eql(2);
         });
@@ -573,8 +738,14 @@ describe('Reports manager tests', function () {
             });
 
         it('Failure delete test due to db error on delete report', async () => {
+            manager.__set__('configHandler', {
+                getConfig: () => {
+                    return { minimum_wait_for_delayed_report_status_update_in_ms: 10 };
+                }
+            });
             const finishedReport = JSON.parse(JSON.stringify(REPORT));
             finishedReport.subscribers[0].phase_status = constants.SUBSCRIBER_ABORTED_STAGE;
+            finishedReport.status = constants.REPORT_FINISHED_STATUS;
             databaseGetReportStub.resolves([finishedReport]);
             databaseDeleteReportStub.rejects(new Error('DB Error'));
             try {

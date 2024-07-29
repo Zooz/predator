@@ -1,8 +1,14 @@
 'use strict';
 const testsManager = require('../../tests/models/manager');
+const choasExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager');
 const CronTime = require('cron').CronTime;
 const configHandler = require('../../configManager/models/configHandler');
 const consts = require('../../common/consts');
+const {
+    ERROR_MESSAGES,
+    KUBERNETES,
+    CONFIG
+} = require('../../common/consts');
 
 /**
  * Validates a cron expression and returns error message if the expression is invalid
@@ -11,6 +17,7 @@ const consts = require('../../common/consts');
  */
 function verifyCronExpression(exp) {
     try {
+        // eslint-disable-next-line no-unused-vars
         const ct = new CronTime(exp);
     } catch (err) {
         return err.message;
@@ -67,4 +74,27 @@ module.exports.verifyTestExists = async (req, res, next) => {
         }
     }
     next(errorToThrow);
+};
+
+module.exports.verifyExperimentsExist = async (req, res, next) => {
+    const jobBody = req.body;
+    let errorToThrow;
+    const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
+    const experiments = jobBody.experiments;
+    if (!experiments || experiments.length === 0) {
+        next();
+    } else if (experiments.length > 0 && jobPlatform.toUpperCase() !== KUBERNETES) {
+        errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENT_SUPPORTED_ONLY_IN_KUBERNETES);
+        errorToThrow.statusCode = 400;
+        next(errorToThrow);
+    } else {
+        const uniqueExperimentIds = [...new Set(experiments.map(experiment => experiment.experiment_id))];
+        const chaosExperiments = await choasExperimentsManager.getChaosExperimentsByIds(uniqueExperimentIds, ['kubeObject']);
+
+        if (chaosExperiments.length !== uniqueExperimentIds.length) {
+            errorToThrow = new Error(ERROR_MESSAGES.CHAOS_EXPERIMENTS_NOT_EXIST_FOR_JOB);
+            errorToThrow.statusCode = 400;
+        }
+        next(errorToThrow);
+    }
 };

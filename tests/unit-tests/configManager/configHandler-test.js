@@ -27,6 +27,7 @@ describe('Manager config', function () {
 
     const defaultConfig = {
         allow_insecure_tls: false,
+        chaos_mesh_enabled: false,
         interval_cleanup_finished_containers_ms: 0,
         delay_runner_ms: 0,
         job_platform: 'DOCKER',
@@ -46,6 +47,7 @@ describe('Manager config', function () {
 
     const defaultConfigNotEscaped = {
         allow_insecure_tls: false,
+        chaos_mesh_enabled: false,
         interval_cleanup_finished_containers_ms: 0,
         delay_runner_ms: 0,
         job_platform: 'DOCKER',
@@ -77,6 +79,7 @@ describe('Manager config', function () {
 
     const configParseExpected = {
         allow_insecure_tls: false,
+        chaos_mesh_enabled: false,
         interval_cleanup_finished_containers_ms: 0,
         delay_runner_ms: 0,
         job_platform: 'DOCKER',
@@ -107,6 +110,7 @@ describe('Manager config', function () {
     };
     const resultAfterConvert = {
         allow_insecure_tls: false,
+        chaos_mesh_enabled: false,
         interval_cleanup_finished_containers_ms: 0,
         delay_runner_ms: 0,
         job_platform: 'DOCKER',

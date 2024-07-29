@@ -15,7 +15,6 @@ module.exports = {
 
 async function aggregateReport(report) {
     let stats = await databaseConnector.getStats(report.test_id, report.report_id);
-
     if (stats.length === 0) {
         const errorMessage = `Can not generate aggregate report as there are no statistics yet for testId: ${report.test_id} and reportId: ${report.report_id}`;
         logger.error(errorMessage);
@@ -35,6 +34,7 @@ async function aggregateReport(report) {
     reportInput.revision_id = report.revision_id;
     reportInput.score = report.score;
     reportInput.benchmark_weights_data = report.benchmark_weights_data;
+    reportInput.experiments = report.experiments;
     reportInput.notes = report.notes;
 
     reportInput.status = mapReportStatus(report.status);
@@ -62,7 +62,6 @@ async function aggregateReport(report) {
     reportInput.aggregate.rps.mean = reportInput.aggregate.rps.mean / reportInput.intermediates.length;
     return reportInput;
 }
-
 function createAggregateManually(listOfStats) {
     const requestMedians = [], requestMaxs = [], requestMins = [], scenario95 = [], scenario99 = [], request95 = [],
         request99 = [], scenarioMins = [], scenarioMaxs = [], scenarioMedians = [];

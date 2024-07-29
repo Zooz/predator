@@ -1,8 +1,7 @@
 'use strict';
 
 const request = require('supertest');
-
-const app = require('../../../../src/app');
+const appInitUtils = require('../../testUtils');
 
 let testApp;
 
@@ -21,9 +20,8 @@ module.exports = {
 };
 
 async function init() {
-    testApp = await app();
+    testApp = await appInitUtils.getCreateTestApp();
 }
-
 function postStats(testId, reportId, body, headers = { 'Content-Type': 'application/json' }) {
     return request(testApp).post(`/v1/tests/${testId}/reports/${reportId}/stats`)
         .send(body)

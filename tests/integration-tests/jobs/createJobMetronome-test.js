@@ -204,6 +204,36 @@ describe('Create job specific metronome tests', async function () {
                     });
                 });
             });
+
+            describe('Bad requests', () => {
+                it('Create job using METRONOME as a platform with experiments should fail', async () => {
+                    const validBody = {
+                        test_id: testId,
+                        arrival_rate: 1,
+                        parallelism: 2,
+                        type: 'load_test',
+                        duration: 120,
+                        experiments: [
+                            {
+                                experiment_id: '1234',
+                                start_after: 60
+                            }
+                        ],
+                        environment: 'test',
+                        run_immediately: true,
+                        max_virtual_users: 100,
+                        proxy_url: 'http://proxy.com',
+                        debug: '*'
+                    };
+
+                    const createJobResponse = await schedulerRequestCreator.createJob(validBody, {
+                        'Content-Type': 'application/json'
+                    });
+
+                    should(createJobResponse.status).eql(400);
+                    should(createJobResponse.body).deepEqual({ message: 'Chaos experiment is supported only in kubernetes jobs' });
+                });
+            });
         });
     }
 });

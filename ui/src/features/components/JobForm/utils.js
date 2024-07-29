@@ -27,34 +27,62 @@ export const createStateForEditJob = (job, dropdownWebhooks) => {
   }
 };
 
-export const createJobRequest = (opts) => {
+export const createJobRequest = (options) => {
   // job_type is for rerun
-  let body = {
-    test_id: opts.test_id,
-    type: opts.type || opts.job_type,
-    debug: opts.debug ? opts.debug : undefined,
-    duration: parseInt(opts.duration),
-    environment: opts.environment,
-    run_immediately: (opts.run_immediately === undefined) ? false : opts.run_immediately,
-    emails: opts.emails,
-    webhooks: opts.webhooks,
-    notes: opts.notes,
-    parallelism: opts.parallelism ? parseInt(opts.parallelism) : undefined,
-    max_virtual_users: opts.max_virtual_users ? parseInt(opts.max_virtual_users) : undefined
+  const body = {
+    test_id: options.test_id,
+    type: options.type || options.job_type,
+    debug: options.debug ? options.debug : undefined,
+    duration: parseInt(options.duration),
+    environment: options.environment,
+    run_immediately: (options.run_immediately === undefined) ? false : options.run_immediately,
+    emails: options.emails,
+    webhooks: options.webhooks,
+    notes: options.notes,
+    parallelism: options.parallelism ? parseInt(options.parallelism) : undefined,
+    max_virtual_users: options.max_virtual_users ? parseInt(options.max_virtual_users) : undefined,
+    experiments: options.experiments
   };
 
   if (body.type === 'load_test') {
-    body.ramp_to = opts.ramp_to ? parseInt(opts.ramp_to) : undefined;
-    body.arrival_rate = parseInt(opts.arrival_rate);
+    body.ramp_to = options.ramp_to ? parseInt(options.ramp_to) : undefined;
+    body.arrival_rate = parseInt(options.arrival_rate);
   }
 
   if (body.type === 'functional_test') {
-    body.arrival_count = parseInt(opts.arrival_count);
+    body.arrival_count = parseInt(options.arrival_count);
   }
 
-  if (opts.cron_expression) { // should exist and not empty
-    body.cron_expression = opts.cron_expression
+  if (options.cron_expression) { // should exist and not empty
+    body.cron_expression = options.cron_expression
   }
-  body = JSON.parse(JSON.stringify(body));
+
   return body;
 };
+
+export const createJobRequestFromReport = (options) => {
+  // job_type is for rerun
+  const body = {
+    ...createJobRequest(options)
+  };
+
+  if (options.experiments) {
+    body.experiments = mapExperimentsFromReportOptions(options.experiments, options.start_time);
+  }
+
+  return body;
+};
+
+function mapExperimentsFromReportOptions (experiments, startTime) {
+  const testStartTime = new Date(startTime).getTime();
+  const transformedExperiments = experiments.map(experiment => {
+    const experimentStartTime = new Date(experiment.start_time).getTime();
+    const startAfter = experimentStartTime - testStartTime;
+    return {
+      experiment_id: experiment.id,
+      start_after: startAfter
+    };
+  });
+
+  return transformedExperiments;
+}
