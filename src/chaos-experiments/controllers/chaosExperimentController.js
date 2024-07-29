@@ -1,8 +1,8 @@
 'use strict';
-const processorManager = require('../models/chaosExperimentsManager');
+const chaosManager = require('../models/chaosExperimentsManager');
 
 module.exports.createChaosExperiment = function (req, res, next) {
-    return processorManager.createChaosExperiment(req.body)
+    return chaosManager.createChaosExperiment(req.body)
         .then(function (result) {
             return res.status(201).json(result);
         })
@@ -17,7 +17,7 @@ module.exports.getAllChaosExperiments = async function (req, res, next) {
     try {
         from = parseInt(from);
         limit = parseInt(limit);
-        processors = await processorManager.getAllChaosExperiments(from, limit, req.query.exclude);
+        processors = await chaosManager.getAllChaosExperiments(from, limit, req.query.exclude);
         return res.status(200).json(processors);
     } catch (err) {
         return next(err);
@@ -28,7 +28,7 @@ module.exports.getChaosExperimentById = async function (req, res, next) {
     let chaosExperiment;
     const { params: { experiment_id: experimentId } } = req;
     try {
-        chaosExperiment = await processorManager.getChaosExperimentById(experimentId);
+        chaosExperiment = await chaosManager.getChaosExperimentById(experimentId);
         return res.status(200).json(chaosExperiment);
     } catch (err) {
         return next(err);
@@ -38,7 +38,7 @@ module.exports.getChaosExperimentById = async function (req, res, next) {
 module.exports.deleteChaosExperiment = async function (req, res, next) {
     const { params: { experiment_id: experimentId } } = req;
     try {
-        await processorManager.deleteChaosExperiment(experimentId);
+        await chaosManager.deleteChaosExperiment(experimentId);
         return res.status(204).json();
     } catch (err) {
         return next(err);
@@ -48,7 +48,7 @@ module.exports.deleteChaosExperiment = async function (req, res, next) {
 module.exports.updateChaosExperiment = async function (req, res, next) {
     const { body: chaosExperiment, params: { experiment_id: experimentId } } = req;
     try {
-        const processor = await processorManager.updateChaosExperiment(experimentId, chaosExperiment);
+        const processor = await chaosManager.updateChaosExperiment(experimentId, chaosExperiment);
         res.status(200).json(processor);
     } catch (e) {
         next(e);
