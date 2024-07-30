@@ -1,8 +1,7 @@
 'use strict';
 
 const request = require('supertest');
-
-const app = require('../../../../src/app');
+const appInitUtils = require('../../testUtils');
 
 let testApp;
 
@@ -21,7 +20,7 @@ module.exports = {
 };
 
 async function init() {
-    testApp = await app();
+    testApp = await appInitUtils.getCreateTestApp();
 }
 
 function postStats(testId, reportId, body, headers = { 'Content-Type': 'application/json' }) {
@@ -53,15 +52,6 @@ function getExportedReport(testId, reportId, fileFormat, headers = { 'Content-Ty
             return res;
         });
 }
-
-/*
-    reportMetaData: Data related to a report:
-    Structure:
-        {
-            report_ids:[],
-            test_ids:[],
-        }
-*/
 function getExportedCompareReport(fileFormat, reportMetaData, headers = { 'Content-Type': 'application/json' }) {
     let url = `/v1/tests/reports/compare/export/${fileFormat}`;
     let reportIdsAsCSV = "";

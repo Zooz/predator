@@ -1,6 +1,7 @@
 const request = require('supertest');
 const uri = '/v1/files';
-const app = require('../../../../src/app');
+const appInitUtils = require('../../testUtils');
+
 let testApp;
 
 module.exports = {
@@ -11,7 +12,7 @@ module.exports = {
 };
 
 async function init() {
-    testApp = await app();
+    testApp = await appInitUtils.getCreateTestApp();
 }
 
 function uploadFile(fileKey, filePath, headers = {}) {
