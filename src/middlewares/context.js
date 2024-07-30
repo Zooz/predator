@@ -5,9 +5,7 @@ const {
 } = require('../common/consts');
 
 module.exports.middleware = (req, res, next) => {
-    const contextId = req.get('x-context-id');
-    if (contextId) {
-        httpContext.set(CONTEXT_ID, contextId);
-    }
+    const contextId = req.get('x-context-id') || undefined;
+    httpContext.set(CONTEXT_ID, contextId);
     next();
 };
