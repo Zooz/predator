@@ -10,12 +10,7 @@ const BIG_CSV_PATH = path.join(__dirname, 'helpers', 'big.csv');
 
 describe('Upload and download file', () => {
     before(async () => {
-        process.env.MAX_UPLOAD_FILE_SIZE_MB = 0.5;
         await requestCreator.init();
-    });
-
-    after(() => {
-        delete process.env.MAX_UPLOAD_FILE_SIZE_MB;
     });
 
     describe('upload file', () => {

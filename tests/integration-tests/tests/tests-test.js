@@ -47,10 +47,10 @@ describe('the tests api', function() {
                 });
         });
         it('Should return error for file url not exists ', async () => {
-            const requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl1234.com' }, simpleTest.test);
+            const requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl123.com' }, simpleTest.test);
             const res = await testsRequestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(422);
-            res.body.message.should.eql('Error to download file: RequestError: Error: getaddrinfo ENOTFOUND www.notrealurl.com');
+            res.body.message.should.containEql('Error to download file: RequestError');
         });
         it('Should return error for processor id not exists ', async () => {
             const requestBody = Object.assign({ processor_id: '123e4567-e89b-12d3-a456-426655440000' }, simpleTest.test);

@@ -15,3 +15,4 @@ export SMTP_PASSWORD=password
 export SMTP_USERNAME=username
 
 export INTERNAL_ADDRESS='http://localhost:80'
+export MAX_UPLOAD_FILE_SIZE_MB=0.5
