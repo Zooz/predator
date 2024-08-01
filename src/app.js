@@ -1,12 +1,12 @@
 'use strict';
 require('./env').init();
+const httpContext = require('express-http-context');
 const express = require('express');
 const audit = require('express-requests-logger');
 const bodyParser = require('body-parser');
 const path = require('path');
 const zip = require('express-easy-zip');
 const fileUpload = require('express-fileupload');
-const httpContext = require('express-http-context');
 
 const logger = require('./common/logger');
 const healthRouter = require('./common/routes/healthRoute.js');
