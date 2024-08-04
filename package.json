@@ -44,8 +44,9 @@
   "dependencies": {
     "artillery": "^1.7.9",
     "async_hooks": "^1.0.0",
-    "aws-sdk": "^2.814.0",
+    "aws-sdk": "^2.1667.0",
     "body-parser": "^1.19.0",
+    "core-js": "^3.37.1",
     "cron": "^1.8.1",
     "dockerode": "^2.5.8",
     "express": "^4.17.1",
