@@ -5,7 +5,7 @@
   "description": "Framework that manages the entire lifecycle of load testing a server, from creating test files, running scheduled and on-demand tests, and viewing test results.",
   "main": "server.js",
   "engines": {
-    "node": ">=18.x",
+    "node": ">=16.x",
     "npm": ">=8.x"
   },
   "directories": {
@@ -40,6 +40,7 @@
   "bugs": {
     "url": "https://github.com/Zooz/predator/issues"
   },
+  "homepage": "https://github.com/Zooz/predator#readme",
   "dependencies": {
     "artillery": "^1.7.9",
     "aws-sdk": "^2.814.0",
@@ -91,7 +92,7 @@
     "eslint-plugin-standard": "^4.0.1",
     "husky": "^1.3.1",
     "mocha": "^7.1.1",
-    "mochawesome": "^7.1.3",
+    "mochawesome": "^4.1.0",
     "nock": "^10.0.6",
     "nyc": "^14.1.1",
     "rewire": "^5.0.0",
