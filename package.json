@@ -69,6 +69,7 @@
     "semver": "^7.6.3",
     "sequelize": "^5.22.3",
     "slack-emojis": "^1.1.1",
+    "sqlite3": "^5.0.3",
     "tedious": "^9.2.2",
     "umzug": "^2.3.0",
     "uuid": "^3.4.0"
@@ -97,7 +98,6 @@
     "rewire": "^5.0.0",
     "should": "^13.2.1",
     "sinon": "^4.5.0",
-    "sqlite3": "^5.1.7",
     "standard-version": "^9.5.0",
     "supertest": "^3.4.2",
     "yaml": "^1.10.0"
