@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const zip = require('express-easy-zip');
 const fileUpload = require('express-fileupload');
-const httpContext = require('express-http-context');
+const contextMiddleware = require('./middlewares/context');
 
 const logger = require('./common/logger');
 const healthRouter = require('./common/routes/healthRoute.js');
@@ -69,10 +69,9 @@ module.exports = async () => {
 
     app.use(zip());
 
-    app.use(httpContext.middleware);
-    app.use(contexts.middleware);
+    app.use(contextMiddleware.middleware);
 
-    app.set('json replacer', (k, v) => (v === null ? undefined : v))
+    app.set('json replacer', (k, v) => (v === null ? undefined : v));
 
     app.use('/health', healthRouter);
     app.use('/v1/config', configRouter);

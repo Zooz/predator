@@ -1,5 +1,5 @@
 'use strict';
-const httpContext = require('express-http-context'),
+const { getContextId } = require('../../common/context/contextUtil'),
     uuid = require('uuid');
 
 const testGenerator = require('./testGenerator'),
@@ -7,7 +7,7 @@ const testGenerator = require('./testGenerator'),
     fileManager = require('../../files/models/fileManager'),
     downloadManager = require('./downloadManager'),
     { ERROR_MESSAGES } = require('../../common/consts'),
-    { TEST_TYPE_DSL, CONTEXT_ID } = require('./../../common/consts');
+    { TEST_TYPE_DSL } = require('./../../common/consts');
 
 module.exports = {
     upsertTest,
@@ -21,7 +21,7 @@ module.exports = {
 };
 
 async function upsertTest(testRawData, existingTestId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     if (existingTestId) {
         const test = await database.getTest(existingTestId, contextId);
@@ -48,7 +48,7 @@ async function upsertTest(testRawData, existingTestId) {
 }
 
 async function insertTestBenchmark(benchmarkRawData, testId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const dataParse = JSON.stringify(benchmarkRawData);
     await database.insertTestBenchmark(testId, dataParse, contextId);
@@ -56,7 +56,7 @@ async function insertTestBenchmark(benchmarkRawData, testId) {
 }
 
 async function getBenchmark(testId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const benchmark = await database.getTestBenchmark(testId, contextId);
     if (!benchmark) {
@@ -68,7 +68,7 @@ async function getBenchmark(testId) {
 }
 
 async function getTest(testId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const test = await database.getTest(testId, contextId);
     if (!test) {
@@ -86,7 +86,7 @@ async function getTest(testId) {
 }
 
 async function getAllTestRevisions(testId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const rows = await database.getAllTestRevisions(testId, contextId);
     const testRevisions = [];
@@ -105,7 +105,7 @@ async function getAllTestRevisions(testId) {
 }
 
 async function getTests(filter) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const rows = await database.getTests(contextId, filter);
     const testsById = {};
@@ -125,7 +125,7 @@ async function getTests(filter) {
 }
 
 async function deleteTest(testId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const test = await database.getTest(testId, contextId);
     if (!test) {

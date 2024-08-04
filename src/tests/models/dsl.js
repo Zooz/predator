@@ -1,9 +1,9 @@
-const httpContext = require('express-http-context');
+const { getContextId } = require('../../common/context/contextUtil');
 
 const database = require('./database'),
     logger = require('../../common/logger'),
     utils = require('../helpers/utils'),
-    { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts');
+    { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
     createDefinition,
@@ -14,7 +14,7 @@ module.exports = {
 };
 
 async function getDefinitions(dslName) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const result = await database.getDslDefinitions(dslName, contextId);
     return result.map((definition) => ({
@@ -24,7 +24,7 @@ async function getDefinitions(dslName) {
 }
 
 async function getDefinition(dslName, definitionName) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const result = await database.getDslDefinition(dslName, definitionName, contextId);
     if (result) {
@@ -40,7 +40,7 @@ async function getDefinition(dslName, definitionName) {
 }
 
 async function createDefinition(dslName, body) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     utils.addDefaultsToStep(body.request);
     const result = await database.insertDslDefinition(dslName, body.name, body.request, contextId);
@@ -58,7 +58,7 @@ async function createDefinition(dslName, body) {
 }
 
 async function updateDefinition(dslName, definitionName, body) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     utils.addDefaultsToStep(body.request);
     const result = await database.updateDslDefinition(dslName, definitionName, body.request, contextId);
@@ -75,7 +75,7 @@ async function updateDefinition(dslName, definitionName, body) {
     }
 }
 async function deleteDefinition(dslName, definitionName, body) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const result = await database.deleteDefinition(dslName, definitionName, contextId);
     if (result){

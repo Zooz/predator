@@ -1,6 +1,6 @@
 'use strict';
 const uuid = require('uuid'),
-    httpContext = require('express-http-context');
+    { getContextId } = require('../../common/context/contextUtil');
 
 const database = require('./database'),
     { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts');
@@ -11,7 +11,7 @@ module.exports = {
 };
 
 async function getFile(fileId, isIncludeContent) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const file = await database.getFile(fileId, isIncludeContent, contextId);
     if (file) {
@@ -28,7 +28,7 @@ async function getFile(fileId, isIncludeContent) {
 }
 
 async function saveFile(fileName, fileContent) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const id = uuid();
     const fileBase64Value = Buffer.from(fileContent).toString('base64');
