@@ -84,11 +84,11 @@ jobs:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: awsFargate
     - run:
-      name: Integration tests with docker engine and sqlite configuration
-      command: npm run integration-tests
-      environment:
-        DATABASE_TYPE: sqlite
-        JOB_PLATFORM: docker
+        name: Integration tests with docker engine and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: docker
   integration-tests-with-streaming:
     docker:
       - image: cimg/node:12.20.1
