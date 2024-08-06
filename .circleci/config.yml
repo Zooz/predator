@@ -60,12 +60,6 @@ jobs:
     - restore_cache:
         key: dependency-cache-{{ checksum "package.json" }}
     - run:
-        name: Integration tests with docker engine and sqlite configuration
-        command: npm run integration-tests
-        environment:
-          DATABASE_TYPE: sqlite
-          JOB_PLATFORM: docker
-    - run:
         name: Integration tests with kubernetes and mysql configuration
         command: npm run integration-tests
         environment:
@@ -89,6 +83,12 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: awsFargate
+    - run:
+      name: Integration tests with docker engine and sqlite configuration
+      command: npm run integration-tests
+      environment:
+        DATABASE_TYPE: sqlite
+        JOB_PLATFORM: docker
   integration-tests-with-streaming:
     docker:
       - image: cimg/node:12.20.1
