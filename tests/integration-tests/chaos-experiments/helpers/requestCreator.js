@@ -18,6 +18,7 @@ module.exports = {
 
 async function init() {
     try {
+        nockK8sChaosExperimentSupportedKinds();
         app = await appInitUtils.getCreateTestApp();
     } catch (err){
         console.log(err);

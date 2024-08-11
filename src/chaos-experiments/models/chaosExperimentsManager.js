@@ -162,6 +162,7 @@ const setPlatform = module.exports.setPlatform = async function () {
 module.exports.init = async function () {
     const platform = await setPlatform();
     if (!platform) return;
+    await connector.init();
     await reloadChaosExperiments();
 };
 
@@ -176,9 +177,7 @@ const stopResourcesOfJobIdAndExperiment = async (jobId, kind, namespace) => {
 module.exports.stopJobExperimentsByJobId = async function(jobId) {
     try {
         const jobExperiments = await getChaosJobExperimentsByJobId(jobId);
-        const now = Date.now();
-        const relevantJobExperiments = jobExperiments.filter(experiment => experiment.start_time <= now);
-        const experimentIds = [...new Set(relevantJobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
+        const experimentIds = [...new Set(jobExperiments.map(jobExperiment => jobExperiment.experiment_id))];
         const experiments = await getChaosExperimentsByIds(experimentIds);
         const kindNamespaceStrings = [...new Set(experiments.map(ex => `${ex.kubeObject.kind}_${ex.kubeObject.metadata.namespace}`))];
         await Promise.all(kindNamespaceStrings.map(async(kindNamespaceString) => {
