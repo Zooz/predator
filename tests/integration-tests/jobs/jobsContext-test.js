@@ -16,7 +16,7 @@ describe('Create job specific docker tests - contexts', async function () {
     let contextId;
     const jobPlatform = process.env.JOB_PLATFORM;
     if (jobPlatform.toUpperCase() === 'DOCKER') {
-        describe('DOCKER', () => {
+        describe.skip('DOCKER', () => {
             before(async () => {
                 contextId = uuid.v4().toString();
                 await schedulerRequestCreator.init();

@@ -85,7 +85,7 @@ jobs:
           JOB_PLATFORM: awsFargate
     - run:
         name: Integration tests with docker engine and sqlite configuration
-        command: npm run integration-tests || true
+        command: npm run integration-tests
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: docker
