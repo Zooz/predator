@@ -30,7 +30,6 @@ function mysql() {
     COMMAND="docker run \
                     -d \
                     --name mysql \
-                    --platform=linux/amd64 \
                     -p 3306:3306 \
                     -e MYSQL_ROOT_PASSWORD=password \
                     -e MYSQL_DATABASE=predator \
