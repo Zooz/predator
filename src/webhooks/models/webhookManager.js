@@ -1,8 +1,8 @@
 'use strict';
-const httpContext = require('express-http-context');
+const { getContextId } = require('../../common/context/contextUtil');
 
 const databaseConnector = require('./database/sequelize/sequelizeConnector');
-const { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts');
+const { ERROR_MESSAGES } = require('../../common/consts');
 const generateError = require('../../common/generateError');
 const requestSender = require('../../common/requestSender');
 const logger = require('../../common/logger');
@@ -13,14 +13,14 @@ const webhookDefaultValues = {
 };
 
 async function getAllWebhooks() {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const getAllWebhooks = await databaseConnector.getAllWebhooks(contextId);
     return getAllWebhooks;
 }
 
 async function getWebhook(webhookId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const webhook = await databaseConnector.getWebhook(webhookId, contextId);
     if (!webhook) {
@@ -30,7 +30,7 @@ async function getWebhook(webhookId) {
 }
 
 async function createWebhook(webhookInfo) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const webhook = {
         ...webhookDefaultValues,
@@ -40,7 +40,7 @@ async function createWebhook(webhookInfo) {
 }
 
 async function deleteWebhook(webhookId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const webhook = await databaseConnector.getWebhook(webhookId, contextId);
     if (!webhook) {
@@ -59,7 +59,7 @@ async function updateWebhook(webhookId, webhook) {
 }
 
 async function getAllGlobalWebhooks() {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     return databaseConnector.getAllGlobalWebhooks(contextId);
 }

@@ -30,6 +30,7 @@ function mysql() {
     COMMAND="docker run \
                     -d \
                     --name mysql \
+                    --platform=linux/amd64 \
                     -p 3306:3306 \
                     -e MYSQL_ROOT_PASSWORD=password \
                     -e MYSQL_DATABASE=predator \
@@ -55,6 +56,7 @@ function postgres() {
     COMMAND="docker run \
                     -d \
                     --name $APP \
+                    --platform=linux/amd64 \
                     -e POSTGRES_PASSWORD=password \
                     -e POSTGRES_USER=root \
                     -p 5432:5432 \
@@ -79,6 +81,7 @@ function mailhog() {
     COMMAND="docker run \
                     -d \
                     --name $APP \
+                    --platform=linux/amd64 \
                     -p 8025:8025 \
                     -p 1025:1025 \
                     $IMAGE_NAME"

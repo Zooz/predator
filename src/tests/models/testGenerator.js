@@ -1,8 +1,8 @@
 'use strict';
 const _ = require('lodash');
-const httpContext = require('express-http-context');
+const { getContextId } = require('../../common/context/contextUtil');
 
-const { TEST_TYPE_BASIC, CONTEXT_ID} = require('./../../common/consts');
+const { TEST_TYPE_BASIC } = require('./../../common/consts');
 const database = require('./database');
 const utils = require('../helpers/utils');
 const { get, cloneDeep } = require('lodash');
@@ -80,7 +80,7 @@ function calculateWeights(scenarios, weightsSum, missingWeightCount) {
 }
 
 async function getDslDefinitionsAsMap(dslName) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const result = {};
     const definitions = await database.getDslDefinitions(dslName, contextId);

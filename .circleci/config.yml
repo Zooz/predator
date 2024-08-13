@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   setup:
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
     steps:
     - checkout
     - setup_remote_docker:
@@ -16,7 +16,7 @@ jobs:
         - node_modules
   npm-audit:
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -28,7 +28,7 @@ jobs:
       - run: npm audit --only=prod --audit-level=moderate || true
   unit-tests:
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -43,7 +43,7 @@ jobs:
           path: ./coverage
   integration-tests:
     docker:
-    - image: cimg/node:16.14
+    - image: cimg/node:12.22.9
     - image: mailhog/mailhog
     - image: mysql:5.7
       environment:
@@ -59,12 +59,6 @@ jobs:
         docker_layer_caching: false
     - restore_cache:
         key: dependency-cache-{{ checksum "package.json" }}
-    - run:
-        name: Integration tests with docker engine and sqlite configuration
-        command: npm run integration-tests
-        environment:
-          DATABASE_TYPE: sqlite
-          JOB_PLATFORM: docker
     - run:
         name: Integration tests with kubernetes and mysql configuration
         command: npm run integration-tests
@@ -89,9 +83,15 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: awsFargate
+    - run:
+        name: Integration tests with docker engine and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: docker
   integration-tests-with-streaming:
     docker:
-      - image: circleci/node:12.16
+      - image: cimg/node:12.22.9
       - image: wurstmeister/zookeeper
         name: zookeeper
       - image: wurstmeister/kafka:2.13-2.7.0
@@ -112,7 +112,7 @@ jobs:
           command: npm run integration-tests-with-streaming
           environment:
             DATABASE_TYPE: sqlite
-            JOB_PLATFORM: docker
+            JOB_PLATFORM: kubernetes
             STREAMING_PLATFORM: kafka
   build:
     docker:
@@ -127,7 +127,7 @@ jobs:
       version:
         type: string
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
     steps:
     - checkout
     - setup_remote_docker:
@@ -141,7 +141,7 @@ jobs:
     - run: .circleci/tag-latest-image.sh
   tag-latest-image:
     docker:
-      - image: circleci/node:12.16
+      - image: cimg/node:12.22.9
     steps:
       - checkout
       - setup_remote_docker:
