@@ -116,8 +116,7 @@ module.exports.getLogs = async function (jobId, reportId) {
 };
 
 module.exports.getJobs = async (getOneTimeJobs) => {
-    const context = asyncLocalStorage.getStore();
-    const contextId = context ? context[CONTEXT_ID] : undefined;
+    const contextId = getContextId();
     try {
         let jobs = await databaseConnector.getJobs(contextId);
         logger.info('Got jobs list from database successfully');
@@ -140,8 +139,7 @@ module.exports.getJob = async (jobId) => {
 };
 
 module.exports.updateJob = async (jobId, jobConfig) => {
-    const context = asyncLocalStorage.getStore();
-    const contextId = context ? context[CONTEXT_ID] : undefined;
+    const contextId = getContextId();
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(jobConfig.webhooks);
     let [job] = await databaseConnector.getJob(jobId, contextId);
