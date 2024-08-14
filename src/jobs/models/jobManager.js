@@ -3,7 +3,7 @@
 const uuid = require('uuid');
 const util = require('util');
 const { CronJob } = require('cron');
-const httpContext = require('express-http-context');
+const asyncLocalStorage = require('../../common/context/contextStorage');
 
 const logger = require('../../common/logger'),
     configHandler = require('../../configManager/models/configHandler'),
@@ -18,7 +18,8 @@ const logger = require('../../common/logger'),
         CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST
     } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
-    { version: PREDATOR_VERSION } = require('../../../package.json');
+    { version: PREDATOR_VERSION } = require('../../../package.json'),
+    { getContextId } = require('../../common/context/contextUtil');
 
 let jobConnector;
 const cronJobs = {};
@@ -34,7 +35,7 @@ module.exports.init = async () => {
 };
 
 module.exports.reloadCronJobs = async () => {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
     const configData = await configHandler.getConfig();
     try {
         const jobs = await databaseConnector.getJobs(contextId);
@@ -61,7 +62,7 @@ module.exports.scheduleFinishedContainersCleanup = async () => {
 };
 
 module.exports.createJob = async (job) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
     let report;
     const jobId = uuid.v4();
     const configData = await configHandler.getConfig();
@@ -90,7 +91,7 @@ module.exports.createJob = async (job) => {
 };
 
 module.exports.deleteJob = (jobId) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
     if (cronJobs[jobId]) {
         cronJobs[jobId].stop();
         delete cronJobs[jobId];
@@ -119,7 +120,7 @@ module.exports.getLogs = async function (jobId, reportId) {
 };
 
 module.exports.getJobs = async (getOneTimeJobs) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
     try {
         let jobs = await databaseConnector.getJobs(contextId);
         logger.info('Got jobs list from database successfully');
@@ -142,7 +143,7 @@ module.exports.getJob = async (jobId) => {
 };
 
 module.exports.updateJob = async (jobId, jobConfig) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
     const configData = await configHandler.getConfig();
     await validateWebhooksAssignment(jobConfig.webhooks);
     let [job] = await databaseConnector.getJob(jobId, contextId);
@@ -329,7 +330,7 @@ async function createReportForJob(test, job) {
 }
 
 async function getJobInternal(jobId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
     try {
         let error;
         const job = await databaseConnector.getJob(jobId, contextId);

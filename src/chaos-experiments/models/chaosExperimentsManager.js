@@ -1,17 +1,17 @@
 'use strict';
 
-const httpContext = require('express-http-context'),
-    uuid = require('uuid');
+const uuid = require('uuid');
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     {
-        ERROR_MESSAGES, CONTEXT_ID, CONFIG, KUBERNETES,
+        ERROR_MESSAGES, CONFIG, KUBERNETES,
         PREDATOR_RUNNER_PREFIX,
         CHAOS_EXPERIMENT_LABELS
     } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
-    configHandler = require('../../configManager/models/configHandler');
+    configHandler = require('../../configManager/models/configHandler'),
+    { getContextId } = require('../../common/context/contextUtil');
 
 let connector, jobExperimentHandler;
 
@@ -20,7 +20,7 @@ module.exports.clearAllFinishedResources = async function() {
 };
 
 module.exports.createChaosExperiment = async function (chaosExperiment) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const chaosExperimentWithTheSameName = await databaseConnector.getChaosExperimentByName(chaosExperiment.name, contextId);
     if (chaosExperimentWithTheSameName) {
@@ -39,14 +39,14 @@ module.exports.createChaosExperiment = async function (chaosExperiment) {
 };
 
 module.exports.getAllChaosExperiments = async function (from, limit, exclude) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const allChaosExperiments = await databaseConnector.getAllChaosExperiments(from, limit, exclude, contextId);
     return allChaosExperiments;
 };
 
 const getChaosExperimentById = module.exports.getChaosExperimentById = async function (experimentId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
     const processor = await databaseConnector.getChaosExperimentById(experimentId, contextId);
     if (processor) {
         return processor;
@@ -61,7 +61,7 @@ const getChaosExperimentsByIds = module.exports.getChaosExperimentsByIds = (expe
 };
 
 module.exports.deleteChaosExperiment = async function (experimentId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const chaosExperiment = await databaseConnector.getChaosExperimentById(experimentId, contextId);
     if (!chaosExperiment) {
@@ -72,7 +72,7 @@ module.exports.deleteChaosExperiment = async function (experimentId) {
 };
 
 module.exports.updateChaosExperiment = async function (experimentId, chaosExperiment) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const oldChaosExperiment = await databaseConnector.getChaosExperimentById(experimentId, contextId);
     if (!oldChaosExperiment) {
@@ -138,7 +138,7 @@ const reloadSingleChaosExperiment = async function (futureJobExperiment, timesta
 };
 
 const reloadChaosExperiments = module.exports.reloadChaosExperiments = async function() {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
     try {
         const timestamp = Date.now();
         const futureJobExperiments = await getFutureJobExperiments(timestamp, contextId);

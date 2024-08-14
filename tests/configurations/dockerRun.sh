@@ -79,6 +79,7 @@ function mailhog() {
     COMMAND="docker run \
                     -d \
                     --name $APP \
+                    --platform=linux/amd64 \
                     -p 8025:8025 \
                     -p 1025:1025 \
                     $IMAGE_NAME"

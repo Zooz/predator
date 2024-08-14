@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   setup:
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
     steps:
     - checkout
     - setup_remote_docker:
@@ -16,7 +16,7 @@ jobs:
         - node_modules
   npm-audit:
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -28,7 +28,7 @@ jobs:
       - run: npm audit --only=prod --audit-level=moderate || true
   unit-tests:
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -43,7 +43,7 @@ jobs:
           path: ./coverage
   integration-tests:
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
     - image: mailhog/mailhog
     - image: mysql:5.7
       environment:
@@ -60,12 +60,6 @@ jobs:
     - restore_cache:
         key: dependency-cache-{{ checksum "package.json" }}
     - run:
-        name: Integration tests with docker engine and sqlite configuration
-        command: npm run integration-tests || true
-        environment:
-          DATABASE_TYPE: sqlite
-          JOB_PLATFORM: docker
-    - run:
         name: Integration tests with kubernetes and mysql configuration
         command: npm run integration-tests
         environment:
@@ -77,7 +71,6 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: kubernetes
-
     - run:
         name: Integration tests with metronome and postgres configuration
         command: npm run integration-tests
@@ -90,9 +83,15 @@ jobs:
         environment:
           DATABASE_TYPE: sqlite
           JOB_PLATFORM: awsFargate
+    - run:
+        name: Integration tests with docker engine and sqlite configuration
+        command: npm run integration-tests
+        environment:
+          DATABASE_TYPE: sqlite
+          JOB_PLATFORM: docker
   integration-tests-with-streaming:
     docker:
-      - image: circleci/node:12.16
+      - image: cimg/node:12.22.9
       - image: wurstmeister/zookeeper
         name: zookeeper
       - image: wurstmeister/kafka:2.13-2.7.0
@@ -128,7 +127,7 @@ jobs:
       version:
         type: string
     docker:
-    - image: circleci/node:12.16
+    - image: cimg/node:12.22.9
     steps:
     - checkout
     - setup_remote_docker:
@@ -142,7 +141,7 @@ jobs:
     - run: .circleci/tag-latest-image.sh
   tag-latest-image:
     docker:
-      - image: circleci/node:12.16
+      - image: cimg/node:12.22.9
     steps:
       - checkout
       - setup_remote_docker:

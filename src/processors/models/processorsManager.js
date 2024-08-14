@@ -1,16 +1,16 @@
 'use strict';
 
-const httpContext = require('express-http-context'),
+const { getContextId } = require('../../common/context/contextUtil'),
     uuid = require('uuid');
 
 const logger = require('../../common/logger'),
     databaseConnector = require('./database/databaseConnector'),
     testsManager = require('../../tests/models/manager'),
-    { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts'),
+    { ERROR_MESSAGES } = require('../../common/consts'),
     generateError = require('../../common/generateError');
 
 module.exports.createProcessor = async function (processor) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const processorWithTheSameName = await databaseConnector.getProcessorByName(processor.name, contextId);
     if (processorWithTheSameName) {
@@ -31,14 +31,14 @@ module.exports.createProcessor = async function (processor) {
 };
 
 module.exports.getAllProcessors = async function (from, limit, exclude) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const allProcessors = await databaseConnector.getAllProcessors(from, limit, exclude, contextId);
     return allProcessors;
 };
 
 module.exports.getProcessor = async function (processorId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const processor = await databaseConnector.getProcessorById(processorId, contextId);
     if (processor) {
@@ -50,7 +50,7 @@ module.exports.getProcessor = async function (processorId) {
 };
 
 module.exports.deleteProcessor = async function (processorId) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const processor = await databaseConnector.getProcessorById(processorId, contextId);
     if (!processor) {
@@ -67,7 +67,7 @@ module.exports.deleteProcessor = async function (processorId) {
 };
 
 module.exports.updateProcessor = async function (processorId, processor) {
-    const contextId = httpContext.get(CONTEXT_ID);
+    const contextId = getContextId();
 
     const oldProcessor = await databaseConnector.getProcessorById(processorId, contextId);
     if (!oldProcessor) {

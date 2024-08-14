@@ -1,23 +1,23 @@
 'use strict';
 
-const httpContext = require('express-http-context');
 const uuid = require('uuid');
 
 const databaseConnector = require('./databaseConnector'),
     jobConnector = require('../../jobs/models/jobManager'),
     configHandler = require('../../configManager/models/configHandler'),
-    { JOB_TYPE_FUNCTIONAL_TEST, CONTEXT_ID, ERROR_MESSAGES } = require('../../common/consts'),
+    { JOB_TYPE_FUNCTIONAL_TEST, ERROR_MESSAGES } = require('../../common/consts'),
     constants = require('../utils/constants'),
     reportsStatusCalculator = require('./reportStatusCalculator'),
     generateError = require('../../common/generateError');
 const chaosExperimentsManager = require('../../chaos-experiments/models/chaosExperimentsManager');
 const logger = require('../../common/logger');
+const { getContextId } = require('../../common/context/contextUtil');
 
 const FINAL_REPORT_STATUSES_WITH_END_TIME = [constants.REPORT_FINISHED_STATUS, constants.REPORT_PARTIALLY_FINISHED_STATUS,
     constants.REPORT_FAILED_STATUS, constants.REPORT_ABORTED_STATUS];
 
 module.exports.getReport = async (testId, reportId) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+     const contextId = getContextId();
     const config = await configHandler.getConfig();
     const reports = await databaseConnector.getReport(testId, reportId, contextId);
 
@@ -32,7 +32,7 @@ module.exports.getReport = async (testId, reportId) => {
 };
 
 module.exports.getReports = async (testId, filter) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+     const contextId = getContextId();
 
     const reports = await databaseConnector.getReports(testId, filter, contextId);
     const config = await configHandler.getConfig();
@@ -46,7 +46,7 @@ module.exports.getReports = async (testId, filter) => {
 };
 
 module.exports.getLastReports = async (limit, filter) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+     const contextId = getContextId();
     const reports = await databaseConnector.getLastReports(limit, filter, contextId);
     const config = await configHandler.getConfig();
     const mappedReports = await Promise.all(reports.map(async (report) => {
@@ -58,7 +58,7 @@ module.exports.getLastReports = async (limit, filter) => {
 
 module.exports.editReport = async (testId, reportId, reportBody) => {
     // currently we support only edit for notes
-    const contextId = httpContext.get(CONTEXT_ID);
+     const contextId = getContextId();
 
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
     if (!reportSummary) {
@@ -70,7 +70,7 @@ module.exports.editReport = async (testId, reportId, reportBody) => {
 };
 
 module.exports.deleteReport = async (testId, reportId) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+     const contextId = getContextId();
 
     const reportSummary = await databaseConnector.getReport(testId, reportId, contextId);
     if (!reportSummary) {
@@ -90,7 +90,7 @@ module.exports.deleteReport = async (testId, reportId) => {
 };
 
 module.exports.postReport = async (reportId, test, job, startTime) => {
-    const contextId = httpContext.get(CONTEXT_ID);
+     const contextId = getContextId();
 
     const phase = '0';
 
