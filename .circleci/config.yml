@@ -136,7 +136,7 @@ jobs:
         key: dependency-cache-{{ checksum "package.json" }}
     - add_ssh_keys:
         fingerprints:
-        - "17:11:78:7b:e4:ed:ca:1a:fc:a8:a2:0d:92:d4:32:e6"
+        - "SHA256:drMsuz096waRX+P0NO5aQzJDNDXUMtInw1VbAMBAsRM"
     - run: .circleci/release-<< parameters.version >>.sh
     - run: .circleci/tag-latest-image.sh
   tag-latest-image:
