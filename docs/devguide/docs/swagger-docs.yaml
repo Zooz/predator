@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 1.6.3
+  version: 1.6.4
   title: Predator
   x-logo:
     url: logo.png

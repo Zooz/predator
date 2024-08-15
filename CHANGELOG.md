@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.4](https://github.com/Zooz/predator/compare/v1.6.3...v1.6.4) (2024-08-15)
+
+
+### Bug Fixes
+
+* Adjust request-context to use async_hooks ([#697](https://github.com/Zooz/predator/issues/697)) ([d6baf76](https://github.com/Zooz/predator/commit/d6baf7608f8ab899c514784ff4165768ec7e7e84))
+* package.json & package-lock.json to reduce vulnerabilities ([#596](https://github.com/Zooz/predator/issues/596)) ([e7ce17b](https://github.com/Zooz/predator/commit/e7ce17b8f9ceded879cbc9e74e73f7fe462b200d))
+* round up the values of latency on report pages. ([#573](https://github.com/Zooz/predator/issues/573)) ([e7216eb](https://github.com/Zooz/predator/commit/e7216eb8f93af876fa758dd34c5e0522aa0651ba))
+* update package.json to fix vulnerabilities ([1a8103f](https://github.com/Zooz/predator/commit/1a8103f0ade8dda0250093e009ab6d9504919851))
+
 ### [1.6.3](https://github.com/Zooz/predator/compare/v1.6.2...v1.6.3) (2021-09-23)
 
 
