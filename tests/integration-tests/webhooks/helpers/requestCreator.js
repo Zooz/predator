@@ -1,5 +1,5 @@
 const request = require('supertest');
-const expressApp = require('../../../../src/app');
+const appInitUtils = require('../../testUtils');
 
 let app;
 const resourceUri = '/v1/webhooks';
@@ -16,7 +16,7 @@ module.exports = {
 
 async function init() {
     try {
-        app = await expressApp();
+        app = await appInitUtils.getCreateTestApp();
     } catch (err){
         console.log(err);
         process.exit(1);

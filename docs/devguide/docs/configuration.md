@@ -121,3 +121,8 @@ Applicable when STREAMING_PLATFORM = Kafka
 | SMTP_TIMEOUT         	| smtp_server.timeout  	| How many milliseconds to wait for the connection to establish to SMTP server                   	| ✓                        	| 200              	|
 | SMTP_SECURE         	| smtp_server.secure  	|  if true the connection will use TLS when connecting to server. [Nodemailer SMTP options](https://nodemailer.com/smtp/)                   	| ✓                        	| false           	|
 | SMTP_REJECT_UNAUTH_CERTS         	| smtp_server.rejectUnauthCerts  	| should fail or succeed on unauthorized certificate                 	| ✓                        	| false              	|
+
+#### Feature toggles
+| Environment Variable 	    | Description          	                              | Configurable from UI/API 	| Default value 	     |
+|---------------------------|-----------------------------------------------------|--------------------------	|---------------------|
+| CHAOS_MESH_ENABELD      	 | if true, chaos mesh is integrated with predator   	 | ✓                        	| false             	 |

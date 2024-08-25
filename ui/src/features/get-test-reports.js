@@ -11,7 +11,7 @@ import Report from "./components/Report";
 import CompareReports from "./components/Report/compareReports";
 import {ReactTableComponent} from "../components/ReactTable";
 import {getColumns} from "./configurationColumn";
-import {createJobRequest} from "./components/JobForm/utils";
+import { createJobRequestFromReport } from './components/JobForm/utils';
 import {createJobSuccess} from "./redux/selectors/jobsSelector";
 import Snackbar from 'material-ui/Snackbar';
 import ErrorDialog from "./components/ErrorDialog";
@@ -45,12 +45,12 @@ class getTests extends React.Component {
         };
     }
 
-    onRunTest = (job) => {
-        const request = createJobRequest(job);
+    onRunTest = (report) => {
+        const request = createJobRequestFromReport(report);
         delete request.cron_expression;
         request.run_immediately = true;
         this.props.createJob(request);
-        this.setState({rerunJob: job});
+        this.setState({rerunJob: report});
     };
 
     filterFavorites = () => {

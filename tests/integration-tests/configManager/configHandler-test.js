@@ -7,7 +7,7 @@ const configValues = require('../../../src/common/consts').CONFIG;
 const packageJson = require('../../../package');
 const RUNNER_VERSION = packageJson.version.substring(0, packageJson.version.length - 2);
 const defaultBody = {
-    interval_cleanup_finished_containers_ms: 0,
+    interval_cleanup_finished_containers_ms: 900000,
     allow_insecure_tls: false,
     internal_address: 'http://localhost:80',
     runner_docker_image: `zooz/predator-runner:${RUNNER_VERSION}`,
@@ -58,6 +58,7 @@ const updateBodyWithTypes = {
 const requestBody = {
     interval_cleanup_finished_containers_ms: 0,
     allow_insecure_tls: false,
+    chaos_mesh_enabled: false,
     grafana_url: 'string_value_grafana_url',
     internal_address: 'string_value_internal_address',
     runner_docker_image: 'string_value_docker_name:1.0.0',
@@ -119,6 +120,7 @@ describe('update and get config', () => {
             const response = await configRequestCreator.getConfig();
             should(response.statusCode).eql(200);
             delete response.body.smtp_server;
+            delete response.body.chaos_mesh_enabled;
             should(response.body).eql(defaultBody);
         });
     });
@@ -205,9 +207,9 @@ describe('update and get config', () => {
                 const requestWithInvalidBucketSizeType = {
                     prometheus_metrics: {
                         push_gateway_url: 'string_value',
-                        buckets_sizes: "invalid_string_type_and_not_an_array",
+                        buckets_sizes: 'invalid_string_type_and_not_an_array',
                         labels: { key1: 'value1', key2: 'value2' }
-                    },
+                    }
                 };
 
                 const response = await configRequestCreator.updateConfig(requestWithInvalidBucketSizeType);

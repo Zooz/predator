@@ -3,7 +3,7 @@ const uuid = require('uuid'),
     { getContextId } = require('../../common/context/contextUtil');
 
 const database = require('./database'),
-    { ERROR_MESSAGES, CONTEXT_ID } = require('../../common/consts');
+    { ERROR_MESSAGES } = require('../../common/consts');
 
 module.exports = {
     saveFile,

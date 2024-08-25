@@ -26,7 +26,8 @@ const expectedTypes = {
     benchmark_threshold: 'int',
     custom_runner_definition: 'json',
     benchmark_weights: 'json',
-    streaming_excluded_attributes: 'array'
+    streaming_excluded_attributes: 'array',
+    chaos_mesh_enabled: 'boolean'
 };
 
 function changeAllEnvData() {

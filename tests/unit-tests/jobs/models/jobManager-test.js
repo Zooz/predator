@@ -22,7 +22,7 @@ let manager;
 const TEST_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaa';
 const JOB_ID = '5a9eee73-cf56-47aa-ac77-fad59e961aaf';
 
-describe('Manager tests', function () {
+describe('Manager jobs', function () {
     let sandbox;
     let databaseConnectorInsertStub;
     let loggerErrorStub;
@@ -226,11 +226,17 @@ describe('Manager tests', function () {
                 id: JOB_ID,
                 test_id: TEST_ID,
                 arrival_rate: 1,
-                duration: 1,
+                duration: 120,
                 run_immediately: true,
                 type: 'load_test',
                 emails: ['dina@niv.eli'],
                 environment: 'test',
+                experiments: [
+                    {
+                        experiment_id: '1234',
+                        start_after: 60
+                    }
+                ],
                 webhooks: webhooks.map(({ id }) => id),
                 custom_env_vars: { KEY1: 'A', KEY2: 'B' },
                 max_virtual_users: 100
@@ -244,9 +250,15 @@ describe('Manager tests', function () {
                 emails: ['dina@niv.eli'],
                 webhooks: webhooks.map(({ id }) => id),
                 arrival_rate: 1,
-                duration: 1,
+                duration: 120,
                 max_virtual_users: 100,
                 enabled: true,
+                experiments: [
+                    {
+                        experiment_id: '1234',
+                        start_after: 60
+                    }
+                ],
                 custom_env_vars: {
                     KEY1: 'A',
                     KEY2: 'B'
@@ -273,7 +285,7 @@ describe('Manager tests', function () {
                 ARRIVAL_RATE: '1',
                 REPORT_ID: reportId,
                 PREDATOR_VERSION,
-                DURATION: '1',
+                DURATION: '120',
                 CUSTOM_KEY1: 'A',
                 CUSTOM_KEY2: 'B'
             });
@@ -967,10 +979,16 @@ describe('Manager tests', function () {
                 test_id: TEST_ID,
                 id: JOB_ID,
                 arrival_rate: 1,
-                duration: 1,
+                duration: 120,
                 enabled: true,
                 cron_expression: '* * * * * *',
                 run_immediately: false,
+                experiments: [
+                    {
+                        experiment_id: '1234',
+                        start_after: 60
+                    }
+                ],
                 emails: ['dina@niv.eli'],
                 environment: 'test',
                 ramp_to: '1',
@@ -995,7 +1013,15 @@ describe('Manager tests', function () {
             postReportStub.resolves({ report_id: Date.now() });
 
             await manager.createJob(jobBodyWithCron);
-            await manager.updateJob(JOB_ID, { cron_expression: '20 * * * *' });
+            await manager.updateJob(JOB_ID, {
+                cron_expression: '20 * * * *',
+                experiments: [
+                    {
+                        experiment_id: '1234',
+                        start_after: 60
+                    }
+                ]
+            });
 
             loggerInfoStub.callCount.should.eql(4);
             manager.__get__('cronJobs')[JOB_ID].cronTime.source.should.eql('20 * * * *');
@@ -1024,7 +1050,9 @@ describe('Manager tests', function () {
                 postReportStub.resolves({ report_id: Date.now() });
 
                 await manager.createJob(jobBodyWithCron);
-                await manager.updateJob(JOB_ID, { cron_expression: '20 * * * *' });
+                await manager.updateJob(JOB_ID, {
+                    cron_expression: '20 * * * *'
+                });
             } catch (error) {
                 error.should.eql({ error: 'error' });
                 loggerInfoStub.callCount.should.eql(2);
@@ -1152,6 +1180,7 @@ describe('Manager tests', function () {
                 max_virtual_users: undefined,
                 parallelism: undefined,
                 report_id: undefined,
+                experiments: undefined,
                 notes: 'some notes',
                 proxy_url: 'http://proxyUrl.com',
                 debug: '*',
@@ -1173,6 +1202,7 @@ describe('Manager tests', function () {
                 max_virtual_users: undefined,
                 parallelism: undefined,
                 report_id: undefined,
+                experiments: undefined,
                 notes: 'some other notes',
                 proxy_url: 'http://proxyUrl.com',
                 tag: undefined,
@@ -1180,7 +1210,7 @@ describe('Manager tests', function () {
                 enabled: true,
                 webhooks: null,
                 cron_expression: null
-        }];
+            }];
             const jobs = await manager.getJobs(true);
             jobs.should.eql(expectedResult);
             databaseConnectorGetStub.callCount.should.eql(1);
@@ -1233,6 +1263,7 @@ describe('Manager tests', function () {
                 proxy_url: undefined,
                 debug: undefined,
                 tag: undefined,
+                experiments: undefined,
                 enabled: false,
                 emails: null
             }];
@@ -1297,6 +1328,7 @@ describe('Manager tests', function () {
                 max_virtual_users: undefined,
                 parallelism: undefined,
                 report_id: undefined,
+                experiments: undefined,
                 tag: undefined,
                 notes: 'some nice notes',
                 proxy_url: 'http://proxyUrl.com',

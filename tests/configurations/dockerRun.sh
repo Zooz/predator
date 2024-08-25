@@ -27,7 +27,7 @@ function mysql() {
     IMAGE_NAME=mysql:5.7
     APP=mysql
     stop $APP
-    COMMAND="docker run \
+    COMMAND="docker run --platform linux/amd64\
                     -d \
                     --name mysql \
                     -p 3306:3306 \
@@ -55,7 +55,6 @@ function postgres() {
     COMMAND="docker run \
                     -d \
                     --name $APP \
-                    --platform=linux/amd64 \
                     -e POSTGRES_PASSWORD=password \
                     -e POSTGRES_USER=root \
                     -p 5432:5432 \

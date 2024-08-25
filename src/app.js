@@ -18,12 +18,16 @@ const testsRouter = require('./tests/routes/testsRoute.js');
 const processorsRouter = require('./processors/routes/processorsRoute.js');
 const filesRouter = require('./files/routes/filesRoute.js');
 const webhooksRouter = require('./webhooks/routes/webhooksRouter');
+const chaosExperimentsRouter = require('./chaos-experiments/routes/chaosExperimentsRoute');
 const swaggerValidator = require('express-ajv-swagger-validation');
 const database = require('./database/database');
 const jobsManager = require('./jobs/models/jobManager');
+const chaosExperimentsManager = require('./chaos-experiments/models/chaosExperimentsManager');
 const streamingManager = require('./streaming/manager');
 const streamingConfig = require('./config/streamingConfig');
 const contexts = require('./middlewares/context');
+const configHandler = require('./configManager/models/configHandler');
+const { CONFIG: { CHAOS_MESH_ENABLED } } = require('./common/consts');
 
 module.exports = async () => {
     swaggerValidator.init('./docs/openapi3.yaml', { beautifyErrors: true });
@@ -31,6 +35,7 @@ module.exports = async () => {
     await jobsManager.init();
     await jobsManager.reloadCronJobs();
     await jobsManager.scheduleFinishedContainersCleanup();
+    const isChaosEnabled = await configHandler.getConfigValue(CHAOS_MESH_ENABLED);
     if (streamingConfig.platform) {
         const eventStreamerPlatformConfig = require(`./config/${streamingConfig.platform}Config`);
         await streamingManager.init(eventStreamerPlatformConfig);
@@ -82,6 +87,10 @@ module.exports = async () => {
     app.use('/v1/processors', processorsRouter);
     app.use('/v1/files', filesRouter);
     app.use('/v1/webhooks', webhooksRouter);
+    if (isChaosEnabled){
+        await chaosExperimentsManager.init();
+        app.use('/v1/chaos-experiments', chaosExperimentsRouter);
+    }
 
     app.use('/', function (req, res, next) {
         res.redirect('/ui');

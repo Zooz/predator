@@ -1,69 +1,80 @@
 import {
-    faVial,
-    faBriefcase,
-    faFlagCheckered,
-    faFileAlt,
-    faBook,
-    faPassport,
-    faWrench,
-    faMicrochip,
-    faExternalLinkAlt
+  faVial,
+  faBriefcase,
+  faFlagCheckered,
+  faFileAlt,
+  faBook,
+  faPassport,
+  faWrench,
+  faMicrochip,
+  faFlask,
+  faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 
 import { PREDATOR_DOCS_URL } from '../App/common/env';
 
-export default [
+export default function getMenuList ({ CHAOS_MESH_ENABLED }) {
+  const baseMenuItems = [
     {
-        key: 0,
-        primaryText: 'Tests',
-        navigateTo: 'tests',
-        icon: faVial
+      primaryText: 'Tests',
+      navigateTo: 'tests',
+      icon: faVial
     },
     {
-        key: 1,
-        primaryText: 'Scheduled Runs',
-        navigateTo: 'jobs',
-        icon: faBriefcase
+      primaryText: 'Scheduled Runs',
+      navigateTo: 'jobs',
+      icon: faBriefcase
     },
     {
-        key: 2,
-        primaryText: 'Last Reports',
-        navigateTo: 'last_reports',
-        icon: faFlagCheckered
+      primaryText: 'Last Reports',
+      navigateTo: 'last_reports',
+      icon: faFlagCheckered
     },
     {
-        key: 3,
-        primaryText: 'Processors',
-        navigateTo: 'processors',
-        icon: faMicrochip
+      primaryText: 'Processors',
+      navigateTo: 'processors',
+      icon: faMicrochip
     },
     {
-        key: 4,
-        primaryText: 'Webhooks',
-        navigateTo: 'webhooks',
-        icon: faExternalLinkAlt
+      primaryText: 'Webhooks',
+      navigateTo: 'webhooks',
+      icon: faExternalLinkAlt
     },
     {
-        key: 5,
-        primaryText: 'Settings',
-        navigateTo: 'settings',
-        icon: faWrench,
+      primaryText: 'Settings',
+      navigateTo: 'settings',
+      icon: faWrench
     },
     {
-        key: 6,
-        primaryText: 'Docs',
-        icon: faFileAlt,
-        nestedItems: [
-            {
-                key: 0,
-                primaryText: 'Documentation',
-                linkUrl: `${PREDATOR_DOCS_URL}/about.html`,
-                icon: faBook
-            }, {
-                key: 1,
-                primaryText: 'API Reference',
-                linkUrl: `${PREDATOR_DOCS_URL}/indexapiref.html`,
-                icon: faPassport
-            }]
+      primaryText: 'Docs',
+      icon: faFileAlt,
+      nestedItems: [
+        {
+          primaryText: 'Documentation',
+          linkUrl: `${PREDATOR_DOCS_URL}/about.html`,
+          icon: faBook
+        },
+        {
+          primaryText: 'API Reference',
+          linkUrl: `${PREDATOR_DOCS_URL}/indexapiref.html`,
+          icon: faPassport
+        }
+      ]
     }
-];
+  ];
+
+  if (CHAOS_MESH_ENABLED) {
+    const chaosItem = {
+      primaryText: 'Chaos',
+      navigateTo: 'chaos_experiments',
+      icon: faFlask
+    };
+    baseMenuItems.splice(4, 0, chaosItem); // Insert the chaos item at the 4th index
+  }
+
+  // Assign keys dynamically based on the final list
+  return baseMenuItems.map((item, index) => ({
+    ...item,
+    key: index
+  }));
+};

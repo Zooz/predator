@@ -14,7 +14,9 @@ const logger = require('../../common/logger'),
     webhooksManager = require('../../webhooks/models/webhookManager'),
     streamingManager = require('../../streaming/manager'),
     { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common'),
-    { CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST } = require('../../common/consts'),
+    {
+        CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST
+    } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     { version: PREDATOR_VERSION } = require('../../../package.json'),
     { getContextId } = require('../../common/context/contextUtil');
@@ -27,6 +29,9 @@ const JOB_PLATFORM_NAME = PREDATOR_RUNNER_PREFIX + '.%s';
 module.exports.init = async () => {
     const jobPlatform = await configHandler.getConfigValue(CONFIG.JOB_PLATFORM);
     jobConnector = require(`./${jobPlatform.toLowerCase()}/jobConnector`);
+    if (jobConnector.init){
+        await jobConnector.init();
+    }
 };
 
 module.exports.reloadCronJobs = async () => {
@@ -111,7 +116,6 @@ module.exports.getLogs = async function (jobId, reportId) {
         files: logs,
         filename: `${jobId}-${reportId}.zip`
     };
-
     return response;
 };
 
@@ -201,6 +205,7 @@ function createResponse(jobId, jobBody, report) {
         environment: jobBody.environment || 'test',
         notes: jobBody.notes,
         proxy_url: jobBody.proxy_url,
+        experiments: jobBody.experiments,
         debug: jobBody.debug,
         enabled: jobBody.enabled !== false,
         tag: jobBody.tag
