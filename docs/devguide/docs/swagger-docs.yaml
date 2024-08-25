@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 1.6.4
+  version: 1.7.0
   title: Predator
   x-logo:
     url: logo.png
@@ -65,8 +65,9 @@ tags:
     description: |
       This resource allows you to configure webhooks.
   - name: Chaos Experiments
-    description: |
-      This resource allows you to add chaos mesh experiments as part of the running job
+    description: >
+      This resource allows you to add chaos mesh experiments as part of the
+      running job
 x-tagGroups:
   - name: Reference
     tags:
@@ -1905,8 +1906,7 @@ paths:
       tags:
         - Chaos Experiments
       summary: Create chaos file
-      description: >-
-        Create a chaos experiment.
+      description: Create a chaos experiment.
       responses:
         '201':
           description: Success
@@ -2118,7 +2118,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-
 components:
   parameters:
     context_id:
@@ -3226,7 +3225,7 @@ components:
         apiVersion:
           type: string
           enum:
-            - "chaos-mesh.org/v1alpha1"
+            - chaos-mesh.org/v1alpha1
         kind:
           $ref: '#/components/schemas/experiment_kind'
         metadata:
@@ -3236,20 +3235,20 @@ components:
           properties:
             namespace:
               type: string
-              example: 'apps'
+              example: apps
             name:
               type: string
-              example: "my-pod-chaos"
+              example: my-pod-chaos
             annotations:
               type: object
               additionalProperties:
                 type: string
         namespace:
           type: string
-          example: "apps"
+          example: apps
         name:
           type: string
-          example: "my-pod-chaos"
+          example: my-pod-chaos
         spec:
           type: object
           example:
@@ -3262,7 +3261,9 @@ components:
             action: pod-kill
             duration: 1m
     job_experiments:
-      description: An array of objects that describe experiments to run during the job running, and timing
+      description: >-
+        An array of objects that describe experiments to run during the job
+        running, and timing
       type: array
       items:
         type: object
@@ -3274,9 +3275,13 @@ components:
             type: string
           start_after:
             type: number
-            description: time in milliseconds in which the experiment starts after job started
+            description: >-
+              time in milliseconds in which the experiment starts after job
+              started
     report_experiments:
-      description: An array of objects that describe experiments to run during the job running, and timing
+      description: >-
+        An array of objects that describe experiments to run during the job
+        running, and timing
       type: array
       items:
         type: object
@@ -3286,7 +3291,7 @@ components:
         properties:
           name:
             type: string
-            example: 'my-chaos'
+            example: my-chaos
           kind:
             $ref: '#/components/schemas/experiment_kind'
           start_time:
@@ -3300,17 +3305,17 @@ components:
     experiment_kind:
       type: string
       enum:
-        - 'DNSChaos'
-        - 'PodChaos'
-        - 'AWSChaos'
-        - 'GCPChaos'
+        - DNSChaos
+        - PodChaos
+        - AWSChaos
+        - GCPChaos
         - 'AzureChaos:'
-        - 'HTTPChaos'
-        - 'StressChaos'
-        - 'IOChaos'
-        - 'TimeChaos'
-        - 'KernelChaos'
-        - 'JVMChaos'
-        - 'PhysicalMachineChaos'
+        - HTTPChaos
+        - StressChaos
+        - IOChaos
+        - TimeChaos
+        - KernelChaos
+        - JVMChaos
+        - PhysicalMachineChaos
       description: A description of the experiment.
-      example: 'PodChaos'
+      example: PodChaos

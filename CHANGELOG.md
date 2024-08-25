@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/Zooz/predator/compare/v1.6.4...v1.7.0) (2024-08-25)
+
+
+### Features
+
+* integrate predator with chaos mesh ([#646](https://github.com/Zooz/predator/issues/646)) ([29a8625](https://github.com/Zooz/predator/commit/29a8625ebf2070a22c122d500baac7ff1f49b5e9))
+
 ### [1.6.4](https://github.com/Zooz/predator/compare/v1.6.3...v1.6.4) (2024-08-15)
 
 
