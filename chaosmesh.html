@@ -12,13 +12,13 @@
         <meta name="author" content="ZOOZ">
       
       
-        <link rel="canonical" href="https://predator.dev/installation.html">
+        <link rel="canonical" href="https://predator.dev/chaosmesh.html">
       
       
-        <link rel="prev" href="index.html">
+        <link rel="prev" href="performance.html">
       
       
-        <link rel="next" href="myfirsttest.html">
+        <link rel="next" href="faq.html">
       
       
       <link rel="icon" href="assets/images/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Installation - Predator</title>
+        <title>Integrating Chaos Mesh with Predator - Predator</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installing-predator" class="md-skip">
+        <a href="#integrating-chaos-mesh-with-predator" class="md-skip">
           Skip to content
         </a>
       
@@ -107,7 +107,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Installation
+              Integrating Chaos Mesh with Predator
             
           </span>
         </div>
@@ -240,30 +240,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Installation
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="installation.html" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="installation.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -272,62 +252,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#important-deployment-tips" class="md-nav__link">
-    <span class="md-ellipsis">
-      Important Deployment Tips
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kubernetes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Kubernetes
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dcos" class="md-nav__link">
-    <span class="md-ellipsis">
-      DC/OS
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#docker" class="md-nav__link">
-    <span class="md-ellipsis">
-      Docker
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -556,10 +480,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="chaosmesh.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Integrating Chaos Mesh with Predator
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="chaosmesh.html" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -568,6 +512,71 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-your-first-chaos-experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating Your First Chaos Experiment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-chaos-experiments-to-predator-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Chaos Experiments to Predator Tests
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#viewing-and-interpreting-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      Viewing and Interpreting Reports
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -659,36 +668,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#important-deployment-tips" class="md-nav__link">
+  <a href="#introduction" class="md-nav__link">
     <span class="md-ellipsis">
-      Important Deployment Tips
+      Introduction
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#kubernetes" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      Kubernetes
+      Installation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dcos" class="md-nav__link">
+  <a href="#creating-your-first-chaos-experiment" class="md-nav__link">
     <span class="md-ellipsis">
-      DC/OS
+      Creating Your First Chaos Experiment
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#docker" class="md-nav__link">
+  <a href="#adding-chaos-experiments-to-predator-tests" class="md-nav__link">
     <span class="md-ellipsis">
-      Docker
+      Adding Chaos Experiments to Predator Tests
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#viewing-and-interpreting-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      Viewing and Interpreting Reports
     </span>
   </a>
   
@@ -712,65 +730,68 @@
   
 
 
-<h1 id="installing-predator">Installing Predator<a class="headerlink" href="#installing-predator" title="Permanent link">#</a></h1>
-<p>Before Predator, running two or more tests simultaneously was limited due to third party limitations. Now, you are able to scale tests using our own resources. With support for both Kubernetes and Metronome, all you need to do is provide the platform configuration, sit back, and let Predator deploy runners that load your API from your chosen platform. </p>
-<p>You're probably eager to get your hands dirty, so let's go ahead and install Predator.</p>
-<h2 id="important-deployment-tips">Important Deployment Tips<a class="headerlink" href="#important-deployment-tips" title="Permanent link">#</a></h2>
-<p>Predator is production ready and fully tested and can be deployed in all of the following platforms listed. Please follow these guidelines when deploying Predator:</p>
-<ol>
-<li>
-<p>Deploy Predator using only tagged releases and not <code>latest</code>.</p>
-</li>
-<li>
-<p>Predator-Runner docker image version (<code>zooz/predator-runner:$TAGGED_VERSION</code>) must match the Predator's <code>major.minor</code> version running in order to be fully compatible with all features. Patched versions don't have to match, but it is recommended to use latest patch version.</p>
-<ul>
-<li>For example, Predator version 1.6 (<code>zooz/predator:1.6</code>) should run Predator-Runner version 1.6 as well (<code>zooz/predator-runner:1.6</code>). </li>
-</ul>
-</li>
-</ol>
-<h2 id="kubernetes">Kubernetes<a class="headerlink" href="#kubernetes" title="Permanent link">#</a></h2>
-<p>Install Predator from the <a href="https://hub.helm.sh/charts/zooz/predator">Helm Hub</a>  </p>
-<h2 id="dcos">DC/OS<a class="headerlink" href="#dcos" title="Permanent link">#</a></h2>
-<p>Predator can be installed through DC/OS Universe within the cluster.
-<br>
-For examples and more info check <a href="https://universe.dcos.io/#/package/predator/version/latest">Universe Catalog</a></p>
-<h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">#</a></h2>
-<p>Predator runs in a docker and when installing it using <code>Docker</code>, Predator creates and runs other dockers which actually create the load (predator-runner).
-In order to avoid DIND, Predator will start its runners as siblings using the docker daemon socket.</p>
-<p><b>Command:</b></p>
-<p><b>Without persisted storage:</b></p>
-<p><code>docker run -d -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock zooz/predator:1.5</code></p>
-<p><b>With persisted storage:</b></p>
-<p><code>docker run -d -e SQLITE_STORAGE=db/predator -e JOB_PLATFORM=DOCKER -e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1 -p 80:80 --name predator -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/predator:/usr/db zooz/predator:1.5</code></p>
-<p>Explanations:</p>
-<ol>
-<li>
-<p>When starting Predator in a docker we will mount the docker socket to the container. This will allow Predator to start the siblings dockers (Predator-Runner). This is done as so:
-<br>
-<code>-v /var/run/docker.sock:/var/run/docker.sock</code> </p>
-</li>
-<li>
-<p>When running tests, the Predator-Runners will have to reach the main Predator to report test results through their internal API. Therefore, Predator has to know it's own accessible address and pass it to the Predator-Runners for them to access Predator's API. This is done by setting the enviornment variable <code>INTERNAL_ADDRESS</code> as so:
-<br> 
- <code>-e INTERNAL_ADDRESS=http://$MACHINE_IP:80/v1</code>
-   where <code>$MACHINE_IP</code> is the local ip address of your machine (not localhost, but actual ip address - it is your local network address).
-   <br>In unix or mac this command should give you the ip address and set it to the MACHINE_IP variable:
-   <code>export MACHINE_IP=$(ipconfig getifaddr en0 || ifconfig eth0|grep 'inet addr:'|cut -d':' -f2|awk '{ print $1}')</code></p>
-</li>
-<li>
-<p>The environment variable <code>JOB_PLATFORM</code> is set to <code>DOCKER</code> so that Predator deploys the Predator-Runners as dockers on the machine it is running.</p>
-</li>
-</ol>
-<p>After successfully starting the Predator docker image, access Predator by typing the following URL in your browser:</p>
-<p><code>http://{$MACHINE_IP}/ui</code></p>
-<div class="admonition note">
-<p class="admonition-title">If you don't see test reports</p>
-<p>This usually means that the predator-runner couldn't reach the main Predator's API and update it about test progress;
-<br>
-<code>docker logs $(docker ps -a -f name=predator -n 1 --format='{{ .ID }}')</code>
-<br>
-Will help to understand what went wrong.</p>
+<h1 id="integrating-chaos-mesh-with-predator">Integrating Chaos Mesh with Predator<a class="headerlink" href="#integrating-chaos-mesh-with-predator" title="Permanent link">#</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">Supported from version zooz/predator:1.7.0</p>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Supported only in Kubernetes</p>
+</div>
+<p><img src="images/chaos-mesh-logo.png" align="right" alt="Logo" width="150"/></p>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h2>
+<p><strong>Overview</strong>:<br />
+Chaos Mesh is an open-source, cloud-native Chaos Engineering platform. It allows you to conduct chaos experiments by injecting various faults into Kubernetes applications to test their resilience and robustness.</p>
+<p><strong>Purpose</strong>:<br />
+Chaos Mesh helps Kubernetes users identify and fix potential issues by simulating real-world failures. This ensures applications can handle disruptions and maintain a seamless user experience. It integrates natively with Kubernetes for efficient chaos engineering experiments.</p>
+<p><strong>Target Audience</strong>:</p>
+<ol>
+<li><strong>Kubernetes Administrators</strong>: Managing Kubernetes clusters.</li>
+<li><strong>DevOps Engineers</strong>: Implementing CI/CD pipelines and infrastructure stability.</li>
+<li><strong>SREs</strong>: Ensuring the reliability of Kubernetes-based applications.</li>
+<li><strong>Developers</strong>: Building and deploying resilient applications on Kubernetes.</li>
+</ol>
+<p><strong>Supported Chaos Kinds</strong>:<br />
+Chaos Mesh supports various kinds of chaos experiments, including but not limited to:</p>
+<ul>
+<li><strong>Pod Chaos</strong>: Simulate pod failures and delays.</li>
+<li><strong>Network Chaos</strong>: Simulate network latency, packet loss, and network partitions.</li>
+<li><strong>File System Chaos</strong>: Simulate file system errors such as I/O delays and read/write errors.</li>
+<li><strong>Kernel Chaos</strong>: Inject faults into kernel functions.</li>
+<li><strong>Time Chaos</strong>: Manipulate the system time of containers.</li>
+<li><strong>HTTP Chaos</strong>: Simulate HTTP faults like delays, aborts, and status code modifications.</li>
+<li><strong>Stress Chaos</strong>: Inject CPU and memory stress to test the application's behavior under high resource usage.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">For further information, please read the <a href="https://chaos-mesh.org/docs/">Chaos Mesh documentation</a></p>
+</div>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
+<p><strong>Prerequisites</strong>:<br />
+Before integrating Chaos Mesh with Predator, ensure you have the following prerequisites:</p>
+<p><strong>Installing Chaos Mesh</strong>:<br />
+To install Chaos Mesh in your Kubernetes cluster, follow the instructions provided in the <a href="https://chaos-mesh.org/docs/quick-start/">Chaos Mesh quick start guide</a>.</p>
+<p><strong>Verifying Installation</strong>:<br />
+Ensure that Chaos Mesh is correctly installed and running in your Kubernetes cluster. Refer to the <a href="https://chaos-mesh.org/docs/quick-start/#verify-the-installation">verification steps</a> in the quick start guide for more details.</p>
+<p><strong>Integrating Chaos Mesh with Predator</strong>:<br />
+Update your service configuration Helm with the following option:
+- Using Helm:
+  <div class="highlight"><pre><span></span><code><span class="c1"># chaosMesh.enabled=true</span>
+</code></pre></div>
+This option will create cluster role and cluster role binding to perform actions like: create / get / delete on chaos CRDS</p>
+<h2 id="creating-your-first-chaos-experiment">Creating Your First Chaos Experiment<a class="headerlink" href="#creating-your-first-chaos-experiment" title="Permanent link">#</a></h2>
+<p>Chaos experiments management is available under <em>Chaos</em> tab
+<img alt="Screenshot" src="images/chaos-mesh-management.png" /></p>
+<p>Create an experiment by creating a JSON-formatted Kubernetes resource.
+<img alt="Screenshot" src="images/chaos-mesh-create.png" /></p>
+<p>It is advised to use the Chaos Mesh dashboard to generate the appropriate resource. For more details, see the guide on
+<a href="https://chaos-mesh.org/docs/run-a-chaos-experiment/">create and run chaos experiments</a></p>
+<h2 id="adding-chaos-experiments-to-predator-tests">Adding Chaos Experiments to Predator Tests<a class="headerlink" href="#adding-chaos-experiments-to-predator-tests" title="Permanent link">#</a></h2>
+<p>An experiment can be added to a test through the job creation form.
+The test can include a list of experiments by selecting an experiment to add and specifying the time at which the experiment should be initiated.
+<img alt="Screenshot" src="images/chaos-mesh-add.png" /></p>
+<h2 id="viewing-and-interpreting-reports">Viewing and Interpreting Reports<a class="headerlink" href="#viewing-and-interpreting-reports" title="Permanent link">#</a></h2>
+<p>The time range of experiments and their implications on test results are visible in the reports.</p>
+<p><img alt="Screenshot" src="images/reports-chaos-mesh.png" /></p>
+<p><img alt="Screenshot" src="images/reports-status-code-chaos-mesh.png" /></p>
 
 
 
