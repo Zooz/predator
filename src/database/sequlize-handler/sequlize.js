@@ -46,6 +46,7 @@ async function createClient() {
         dialect: databaseConfig.type.toLowerCase(),
         logging: false,
         host: databaseConfig.address,
+        port: databaseConfig.port,
         define: {
             underscored: true,
             createdAt: 'created_at',

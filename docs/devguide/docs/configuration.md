@@ -29,6 +29,7 @@ Below are variables Predator can be configured with.
 | DATABASE_TYPE        	| Database to integrate Predator with [Postgres, MySQL, MSSQL, SQLITE] 	| x                        	| SQLITE        	|
 | DATABASE_NAME        	| Database/Keyspace name                                                          	| x                        	|               	|
 | DATABASE_ADDRESS     	| Database address                                                                	| x                        	|               	|
+| DATABASE_PORT     	| Database port                                                                	| x                        	|               	|
 | DATABASE_USERNAME    	| Database username                                                               	| x                        	|               	|
 | DATABASE_PASSWORD    	| Database password                                                               	| x                        	|               	|
 
