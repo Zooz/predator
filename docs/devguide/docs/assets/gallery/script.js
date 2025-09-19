@@ -300,9 +300,13 @@
     });
 
     $window.on('hide.bs.modal', function(e) {
-        players.map(function(player, i) {
-            player.pauseVideo ? player.pauseVideo() : player.pause();
-        });
+        for (const player of players) {
+            if (player.pauseVideo) {
+                player.pauseVideo();
+            } else {
+                player.pause();
+            }
+        }
 
         flagShowLightBox = false;
     });
