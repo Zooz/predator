@@ -1,101 +1,99 @@
-@import "../styles/colors";
-
-$primary-color: $glowing-blue;
-$secondary-color: $white;
-$disabled-primary-color: $border-grey;
-$disabled-secondary-color: $disabled-grey-text;
-$transition-duration: 0.25s;
-$shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.15);
-$padding-sides: 28px;
+// Instrument buttons: a control on a machined panel — tight radius, one clear
+// primary per view, and a hairline border so the secondary variant still reads as
+// a physical control rather than floating text.
 
 .button {
-  font-weight: normal;
-  line-height: 1;
-  transition: color $transition-duration,
-  width $transition-duration,
-  background-color $transition-duration,
-  border $transition-duration,
-  box-shadow $transition-duration;
-  cursor: pointer;
-  outline: none;
-  font-size: 13px;
-  border-radius: 3px;
-  padding: 0 $padding-sides;
-  text-align: center;
-  text-decoration: none;
-  position: relative;
-  min-width: 110px;
-  height: 26px;
-  overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    padding: 0 var(--space-4);
+    min-width: 0;
+    height: 34px;
+    text-align: center;
+    text-decoration: none;
+    position: relative;
+    white-space: nowrap;
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out),
+        box-shadow var(--dur-fast) var(--ease-out);
 
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
-
-  &:not([data-inverted=true]) {
-    color: $secondary-color;
-    background-color: $primary-color;
-    border: 1px solid transparent;
-  }
-
-  &[data-inverted=true] {
-    color: $primary-color;
-    background-color: $secondary-color;
-    border: 1px solid $primary-color;
-  }
-
-  &[data-spinner=true] {
-    pointer-events: none;
-  }
-
-  &[data-hover=true]:not([data-inverted=true]):hover {
-    box-shadow: $shadow;
-    background: darken($primary-color, 10%);
-  }
-
-  &[data-hover=true][data-inverted=true]:hover {
-    box-shadow: $shadow;
-  }
-
-  &[data-spinner=true] {
-    &[data-icon=false] {
-      padding: 0 calc(#{$padding-sides} - 7px);
+    // Primary
+    &:not([data-inverted='true']) {
+        color: var(--fg-on-accent);
+        background-color: var(--accent);
+        border: 1px solid var(--accent);
+        box-shadow: var(--shadow-sm);
     }
 
-    .icon {
-      display: none;
+    // Secondary / outlined
+    &[data-inverted='true'] {
+        color: var(--fg-primary);
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-default);
     }
-  }
 
-  &:disabled {
-    pointer-events: none;
-    box-shadow: none;
-    color: $disabled-secondary-color;
-    background-color: $disabled-primary-color;
-    border: 1px solid $disabled-primary-color;
-  }
+    &[data-hover='true']:not([data-inverted='true']):hover {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
+    }
+
+    &[data-hover='true'][data-inverted='true']:hover {
+        background-color: var(--bg-hover);
+        border-color: var(--border-strong);
+    }
+
+    // Press feedback that does not move surrounding content
+    &:active:not(:disabled) {
+        transform: translateY(0.5px);
+    }
+
+    &[data-spinner='true'] {
+        pointer-events: none;
+    }
+
+    &:disabled {
+        pointer-events: none;
+        box-shadow: none;
+        cursor: not-allowed;
+        color: var(--fg-muted);
+        background-color: var(--bg-sunken);
+        border: 1px solid var(--border-subtle);
+    }
+}
+
+// Touch pointers need a larger target than a desktop mouse.
+@media (pointer: coarse) {
+    .button {
+        height: 44px;
+        padding: 0 var(--space-5);
+    }
 }
 
 .button__text {
-  display: inline-block;
+    display: inline-block;
 }
 
 .button-spinner {
-  display: inline-block;
+    display: inline-block;
 }
 
 .button__inner {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
-.icon:not(:last-child) {
-  margin-right: 9px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+    height: 100%;
 }
 
 .button-spinner:not(:last-child) {
-  margin-right: 5px;
+    margin-right: var(--space-1);
 }

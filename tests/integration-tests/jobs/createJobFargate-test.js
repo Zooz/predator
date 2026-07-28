@@ -15,6 +15,9 @@ describe('Create job specific aws fargate tests', async function () {
     if (jobPlatform.toUpperCase() === 'AWS_FARGATE') {
         describe('AWS FARGATE', () => {
             before(async () => {
+                // aws-sdk v3 skips the env-var credential provider entirely when AWS_PROFILE is
+                // set, and would try to resolve the developer's real profile instead of these.
+                delete process.env.AWS_PROFILE;
                 process.env.AWS_ACCESS_KEY_ID = 'AWS_ACCESS_KEY_ID';
                 process.env.AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY';
                 await schedulerRequestCreator.init();
@@ -106,14 +109,14 @@ describe('Create job specific aws fargate tests', async function () {
                             .post('/', { tasks: ['1', '2', '3'], include: ['TAGS'] })
                             .reply(200, {
                                 tasks: [{
-                                    taskArn: 1,
+                                    taskArn: '1',
                                     tags: [{
                                         key: 'job_identifier',
                                         value: `predator.${createJobResponse.body.report_id}`
                                     }]
                                 },
                                 {
-                                    taskArn: 2,
+                                    taskArn: '2',
                                     tags: [{
                                         key: 'job_identifier',
                                         value: `predator.${createJobResponse.body.report_id}`

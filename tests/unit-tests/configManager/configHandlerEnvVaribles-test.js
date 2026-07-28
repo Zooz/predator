@@ -14,7 +14,7 @@ describe('Manager config with env variables', function () {
     let databaseConnectorGetStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getConfigAsObject');
 
         process.env.SMTP_FROM = 'smtp_from_test';

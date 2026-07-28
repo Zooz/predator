@@ -22,7 +22,7 @@ const SMTP_MANDATORY_VARS = [
 
 describe.skip('Env Suite', function () {
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         sandbox.stub(process, 'exit');
         logErrorStub = sandbox.stub(logger, 'error');
         sandbox.stub(process, 'on');

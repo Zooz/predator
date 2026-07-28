@@ -10,7 +10,7 @@ describe('Scenario generator tests', function () {
     let getFileStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         getFileStub = sandbox.stub(database, 'getFile');
         saveFileStub = sandbox.stub(database, 'saveFile');
     });

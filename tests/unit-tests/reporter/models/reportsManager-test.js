@@ -148,7 +148,7 @@ describe('Reports manager tests', function () {
     let getChaosExperimentsByIdsStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
 
         databaseGetReportStub = sandbox.stub(databaseConnector, 'getReport');
         databaseGetReportsStub = sandbox.stub(databaseConnector, 'getReports');

@@ -1,26 +1,38 @@
-
+// Filter bar. Was a hardcoded #ffffff slab, so in dark mode it sat on the page as a
+// white block with unreadable labels. It now sits on the surface token and reads as
+// part of the table it filters.
 
 .wrapper {
-    display:flex;
+    display: flex;
     width: 100%;
-    height: 97px;
-    border-radius: 6px;
-    box-shadow: 0 1px 9px 0 rgba(0, 0, 0, 0.05);
-    background-color: #ffffff;
-    align-items: center;
-    padding:15px;
+    align-items: flex-end;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    background-color: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
 }
 
 .input {
-  max-width:99%;
+    max-width: 100%;
 }
 
 .title-wrapper {
-    flex:1;
-    display:flex;
+    flex: 1;
+    display: flex;
+    min-width: 0;
 }
-.button{
-    margin-top:23px;
-    width: 100px;
-    height: 35px !important;
+
+.button {
+    margin-top: 0;
+    flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+    .wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }

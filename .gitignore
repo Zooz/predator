@@ -16,3 +16,6 @@ docs/.idea/workspace.xml
 .env
 *.sqlite
 ui/.env
+.husky/_
+ui/dist/
+tests/logs/

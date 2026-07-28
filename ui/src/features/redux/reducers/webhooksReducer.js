@@ -1,7 +1,7 @@
-import Immutable from 'immutable';
+import { Map } from 'immutable';
 import * as Types from '../types/webhooks'
 
-const initialState = Immutable.Map({
+const initialState = Map({
     webhooks: [],
     create_webhook_success: false,
     edit_webhook_success: false,

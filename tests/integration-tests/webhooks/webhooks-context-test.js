@@ -1,7 +1,8 @@
 const { expect } = require('chai');
 const uuid = require('uuid');
 
-const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPES, WEBHOOK_EVENT_TYPE_API_FAILURE, WEBHOOK_EVENT_TYPE_FAILED } = require('../../../src/common/consts');
+const should = require('should');
+const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON } = require('../../../src/common/consts');
 
 const webhookRequestSender = require('./helpers/requestCreator');
 
@@ -33,7 +34,7 @@ describe('Webhooks api', function () {
             await Promise.all(webhooksResponse.body.map(hook => webhookRequestSender.deleteWebhook(hook.id)));
         });
 
-        describe('GET webhook',async function() {
+        describe('GET webhook', async function() {
             it('retrieve the webhook with context_id header should return 200', async function() {
                 const webhookId = createWebhookWithContextResponse.body.id;
                 const getWebhookResponse = await webhookRequestSender.getWebhook(webhookId, headersWithContext);
@@ -60,8 +61,8 @@ describe('Webhooks api', function () {
 
                 expect(getWebhookResponse.statusCode).to.equal(404);
             });
-        })
-        describe('GET webhooks',async function() {
+        });
+        describe('GET webhooks', async function() {
             it('retrieve webhooks with context_id should return 1 webhook', async function() {
                 const webhookId = createWebhookWithContextResponse.body.id;
                 const getWebhookResponse = await webhookRequestSender.getWebhooks(headersWithContext);
@@ -86,8 +87,8 @@ describe('Webhooks api', function () {
                 should(webhookWithContext).not.be.undefined();
                 should(webhookWithoutContext).not.be.undefined();
             });
-        })
-        describe('PUT webhooks',async function() {
+        });
+        describe('PUT webhooks', async function() {
             it('edit webhook with context-id header should return 200', async function() {
                 const webhook = createWebhookWithContextResponse.body;
                 const updatedName = `updated-name-${uuid.v4()}`;
@@ -123,8 +124,8 @@ describe('Webhooks api', function () {
                 const updateWebhookResponse = await webhookRequestSender.updateWebhook(webhook.id, webhook, headersWithContext);
                 expect(updateWebhookResponse.statusCode).to.equal(404);
             });
-        })
-        describe('DELETE webhook',async function() {
+        });
+        describe('DELETE webhook', async function() {
             it('delete webhook with context_id should return 204', async function() {
                 const webhookId = createWebhookWithContextResponse.body.id;
                 const getWebhookResponse = await webhookRequestSender.deleteWebhook(webhookId, headersWithContext);
@@ -143,7 +144,7 @@ describe('Webhooks api', function () {
 
                 expect(getWebhookResponse.statusCode).to.equal(404);
             });
-        })
+        });
     });
 });
 

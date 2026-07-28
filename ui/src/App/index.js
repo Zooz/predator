@@ -12,7 +12,6 @@ import { Route, Redirect } from 'react-router';
 import { connect } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
 import history from '../store/history';
-import { hot } from 'react-hot-loader';
 import DrawerE from '../features/components/DrawerE';
 import getMenuList from '../features/mainMenu';
 import get from 'lodash/get'
@@ -114,4 +113,4 @@ const mapDispatchToProps = {
   getConfig: Actions.getConfig
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(hot(module)(App));
+export default connect(mapStateToProps, mapDispatchToProps)(App);

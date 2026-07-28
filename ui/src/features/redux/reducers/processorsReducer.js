@@ -1,7 +1,7 @@
-import Immutable from 'immutable';
+import { Map } from 'immutable';
 import * as Types from '../types/processorsTypes'
 
-const initialState = Immutable.Map({
+const initialState = Map({
     processors: [],
     processors_loading: false,
     processor_error: undefined,

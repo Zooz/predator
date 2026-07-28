@@ -1,0 +1,297 @@
+// ─── Predator design tokens ────────────────────────────────────────────────
+// Direction: "Instrument" — the product is a measuring device for systems under
+// load, so the chrome is deliberately neutral and colour is spent only where it
+// reports a measurement (held / straining / breached). That restraint is what
+// makes a red pill mean something at a glance during an incident.
+//
+// Everything is a CSS custom property so light and dark are one token flip, and
+// the legacy $variables in components/styles/_colors.scss point here — which is
+// how ~35 existing stylesheets inherit this system without being touched.
+
+:root {
+    // Neutrals: cool graphite, not pure grey. Reads as machined metal next to
+    // the measurement hues rather than muddying them.
+    --ink-950: #080b14;
+    --ink-900: #0d1220;
+    --ink-850: #131a2b;
+    --ink-800: #1b2438;
+    --ink-700: #29354f;
+    --ink-600: #3d4c6b;
+    --ink-500: #5a6b8c;
+    --ink-400: #8695b0;
+    --ink-300: #b3bfd2;
+    --ink-200: #d5dce7;
+    --ink-150: #e4e9f1;
+    --ink-100: #eef1f7;
+    --ink-50: #f6f8fb;
+    --ink-0: #ffffff;
+
+    // Instrument accent — the trace colour. Descended from Predator's blue but
+    // deepened so it holds its own against the signal hues instead of competing.
+    --trace-700: #1f3bb3;
+    --trace-600: #2b4ede;
+    --trace-500: #4468f5;
+    --trace-400: #6e88f8;
+    --trace-300: #a5b5fb;
+    --trace-100: #e5eafe;
+
+    // Measurement signals. Only these three carry state. Each is tuned to clear
+    // 4.5:1 on its own surface token in both themes.
+    --held-600: #067a55;      // within threshold
+    --held-500: #0a9e6e;
+    --held-300: #6edcb4;
+    --held-100: #dcf6ec;
+
+    --strain-600: #96530a;    // approaching threshold
+    --strain-500: #c47512;
+    --strain-300: #f0bc63;
+    --strain-100: #fdf1dc;
+
+    --breach-600: #b3242c;    // threshold exceeded
+    --breach-500: #dc3b45;
+    --breach-300: #f39aa0;
+    --breach-100: #fdeaeb;
+
+    // Series palette. The same six hues appear in both themes, stepped per mode
+    // rather than flipped, and are assigned in this fixed order — never cycled.
+    // Verified with the dataviz validator: lightness band, chroma floor,
+    // adjacent-pair CVD separation, normal-vision floor and 3:1 contrast against
+    // the plot surface all pass in light and dark. The breach red is deliberately
+    // absent: status hues stay reserved so a red mark never means "series 6".
+    --series-1: #4468f5;   // blue
+    --series-2: #0a9e6e;   // green
+    --series-3: #c47512;   // amber
+    --series-4: #c92d86;   // magenta
+    --series-5: #8b5cf6;   // violet
+    --series-6: #0e9bb5;   // aqua
+
+    // ── Spacing: 4px rhythm ──
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    // ── Radius: small and consistent. An instrument case has tight corners. ──
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 10px;
+    --radius-pill: 999px;
+
+    // ── Type ──
+    --font-ui: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-readout: 'Archivo Expanded', 'Archivo', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    --text-2xs: 11px;
+    --text-xs: 12px;
+    --text-sm: 13px;
+    --text-base: 14px;
+    --text-md: 16px;
+    --text-lg: 20px;
+    --text-xl: 26px;
+    --text-2xl: 34px;
+    --text-3xl: 46px;
+
+    --leading-tight: 1.2;
+    --leading-snug: 1.4;
+    --leading-normal: 1.55;
+
+    // Eyebrow/label treatment: the small caps rule used on every instrument face
+    --tracking-label: 0.08em;
+    --tracking-readout: -0.01em;
+
+    // ── Elevation: one scale, used sparingly. ──
+    --shadow-sm: 0 1px 2px rgba(8, 11, 20, 0.06);
+    --shadow-md: 0 2px 4px rgba(8, 11, 20, 0.06), 0 6px 16px rgba(8, 11, 20, 0.06);
+    --shadow-lg: 0 8px 24px rgba(8, 11, 20, 0.10), 0 2px 6px rgba(8, 11, 20, 0.06);
+
+    // ── Motion ──
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-fast: 120ms;
+    --dur-base: 180ms;
+    --dur-slow: 280ms;
+
+    --z-base: 0;
+    --z-sticky: 20;
+    --z-rail: 40;
+    --z-scrim: 90;
+    --z-modal: 100;
+    --z-tooltip: 200;
+    --z-toast: 300;
+}
+
+// ─── Light theme (semantic layer) ───
+:root,
+:root[data-theme='light'] {
+    color-scheme: light;
+
+    --bg-app: var(--ink-50);
+    --bg-surface: var(--ink-0);
+    --bg-surface-raised: var(--ink-0);
+    --bg-sunken: var(--ink-100);
+    --bg-hover: var(--ink-100);
+    --bg-active: var(--ink-150);
+    --bg-chrome: var(--ink-950);          // sidebar / instrument case
+
+    --fg-primary: var(--ink-900);
+    --fg-secondary: var(--ink-500);
+    --fg-muted: var(--ink-400);
+    --fg-on-chrome: var(--ink-100);
+    --fg-on-chrome-muted: var(--ink-400);
+    --fg-on-accent: #ffffff;
+    --fg-link: var(--trace-600);
+
+    --border-subtle: var(--ink-150);
+    --border-default: var(--ink-200);
+    --border-strong: var(--ink-300);
+
+    --accent: var(--trace-600);
+    --accent-hover: var(--trace-700);
+    --accent-soft: var(--trace-100);
+    --accent-fg: var(--trace-700);
+
+    --held-fg: var(--held-600);
+    --held-bg: var(--held-100);
+    --held-border: var(--held-300);
+    --strain-fg: var(--strain-600);
+    --strain-bg: var(--strain-100);
+    --strain-border: var(--strain-300);
+    --breach-fg: var(--breach-600);
+    --breach-bg: var(--breach-100);
+    --breach-border: var(--breach-300);
+
+    --plot-surface: var(--ink-0);
+    --plot-grid: var(--ink-150);
+    --plot-axis: var(--ink-400);
+    --plot-tick: var(--ink-500);
+
+    --scrim: rgba(8, 11, 20, 0.48);
+    --focus-ring: var(--trace-500);
+}
+
+// ─── Dark theme ───
+// Not an inversion: surfaces are desaturated blue-graphite and every signal hue
+// is lifted to its 300/500 step so contrast is re-earned rather than assumed.
+:root[data-theme='dark'] {
+    color-scheme: dark;
+
+    --bg-app: var(--ink-950);
+    --bg-surface: var(--ink-900);
+    --bg-surface-raised: var(--ink-850);
+    --bg-sunken: #05070e;
+    --bg-hover: var(--ink-850);
+    --bg-active: var(--ink-800);
+    --bg-chrome: #05070e;
+
+    --fg-primary: #e8edf6;
+    --fg-secondary: var(--ink-400);
+    --fg-muted: var(--ink-500);
+    --fg-on-chrome: #e8edf6;
+    --fg-on-chrome-muted: var(--ink-500);
+    --fg-on-accent: #ffffff;
+    --fg-link: var(--trace-300);
+
+    --border-subtle: var(--ink-800);
+    --border-default: var(--ink-700);
+    --border-strong: var(--ink-600);
+
+    --accent: var(--trace-500);
+    --accent-hover: var(--trace-400);
+    --accent-soft: rgba(68, 104, 245, 0.16);
+    --accent-fg: var(--trace-300);
+
+    --held-fg: var(--held-300);
+    --held-bg: rgba(10, 158, 110, 0.16);
+    --held-border: rgba(110, 220, 180, 0.32);
+    --strain-fg: var(--strain-300);
+    --strain-bg: rgba(196, 117, 18, 0.18);
+    --strain-border: rgba(240, 188, 99, 0.32);
+    --breach-fg: var(--breach-300);
+    --breach-bg: rgba(220, 59, 69, 0.18);
+    --breach-border: rgba(243, 154, 160, 0.32);
+
+    --series-1: #5f7ee8;
+    --series-2: #17a97a;
+    --series-3: #bd8226;
+    --series-4: #d0559b;
+    --series-5: #8f6ef0;
+    --series-6: #1f9fbb;
+
+    --plot-surface: var(--ink-900);
+    --plot-grid: var(--ink-800);
+    --plot-axis: var(--ink-600);
+    --plot-tick: var(--ink-400);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.32);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+
+    --scrim: rgba(0, 0, 0, 0.66);
+    --focus-ring: var(--trace-400);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+        color-scheme: dark;
+
+        --bg-app: var(--ink-950);
+        --bg-surface: var(--ink-900);
+        --bg-surface-raised: var(--ink-850);
+        --bg-sunken: #05070e;
+        --bg-hover: var(--ink-850);
+        --bg-active: var(--ink-800);
+        --bg-chrome: #05070e;
+
+        --fg-primary: #e8edf6;
+        --fg-secondary: var(--ink-400);
+        --fg-muted: var(--ink-500);
+        --fg-on-chrome: #e8edf6;
+        --fg-on-chrome-muted: var(--ink-500);
+        --fg-link: var(--trace-300);
+
+        --border-subtle: var(--ink-800);
+        --border-default: var(--ink-700);
+        --border-strong: var(--ink-600);
+
+        --accent: var(--trace-500);
+        --accent-hover: var(--trace-400);
+        --accent-soft: rgba(68, 104, 245, 0.16);
+        --accent-fg: var(--trace-300);
+
+        --held-fg: var(--held-300);
+        --held-bg: rgba(10, 158, 110, 0.16);
+        --held-border: rgba(110, 220, 180, 0.32);
+        --strain-fg: var(--strain-300);
+        --strain-bg: rgba(196, 117, 18, 0.18);
+        --strain-border: rgba(240, 188, 99, 0.32);
+        --breach-fg: var(--breach-300);
+        --breach-bg: rgba(220, 59, 69, 0.18);
+        --breach-border: rgba(243, 154, 160, 0.32);
+
+        --series-1: #5f7ee8;
+        --series-2: #17a97a;
+        --series-3: #bd8226;
+        --series-4: #d0559b;
+        --series-5: #8f6ef0;
+        --series-6: #1f9fbb;
+
+        --plot-surface: var(--ink-900);
+        --plot-grid: var(--ink-800);
+        --plot-axis: var(--ink-600);
+        --plot-tick: var(--ink-400);
+
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.32);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+
+        --scrim: rgba(0, 0, 0, 0.66);
+        --focus-ring: var(--trace-400);
+    }
+}

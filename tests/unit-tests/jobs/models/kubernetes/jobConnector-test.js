@@ -18,7 +18,7 @@ describe('Kubernetes job connector tests', function () {
     before(() => {
         jobConnector.__set__('kubernetesUrl', 'localhost:80');
         jobConnector.__set__('isChaosEnabled', true);
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
         getChaosExperimentHandlerStub = sandbox.stub(jobExperimentsHandler, 'setChaosExperimentsIfExist');
         stopChaosExperimentsForJobStub = sandbox.stub(jobExperimentsHandler, 'stopChaosExperimentsForJob');

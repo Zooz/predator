@@ -7,9 +7,10 @@ LATEST_MINOR_TAG=$V1.$V2
 
 echo tagging version: $LATEST_MINOR_TAG
 LATEST_MINOR_TAG_IMAGE=zooz/predator:$LATEST_MINOR_TAG
-CONTAINER_IMAGE=zooz/predator:$TAG
+
+PLATFORMS=${PLATFORMS:-linux/amd64,linux/arm64}
 
 echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
-docker build . -t $LATEST_MINOR_TAG_IMAGE
-docker push $LATEST_MINOR_TAG_IMAGE
+docker buildx create --use --name predator-builder 2>/dev/null || docker buildx use predator-builder
+docker buildx build --platform "$PLATFORMS" -t $LATEST_MINOR_TAG_IMAGE --push .

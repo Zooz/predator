@@ -30,7 +30,7 @@ describe('webhooksFormatter', function () {
     let sandbox;
     let statsFormatterStub;
     before('Setup', function() {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         statsFormatterStub = sandbox.stub();
         webhooksFormatter.__set__('statsFormatter.getStatsFormatted', statsFormatterStub);
     });

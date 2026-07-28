@@ -7,7 +7,7 @@ const should = require('should'),
 describe('Testing dsl model', function () {
     let sandbox, getDslDefinitionsStub, getDslDefinitionStub, insertDslDefinitionStub, updateDslDefinitionStub, deleteDefinitionStub;
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         getDslDefinitionsStub = sandbox.stub(database, 'getDslDefinitions')
             .returns([{ artillery_json: 'artillery_json', definition_name: 'definition_name' }]);
         getDslDefinitionStub = sandbox.stub(database, 'getDslDefinition');

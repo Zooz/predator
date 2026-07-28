@@ -12,7 +12,7 @@ describe('Metronome job connector tests', function () {
 
     before(() => {
         jobConnector.__set__('metronomeUrl', 'localhost:80');
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
     });
 

@@ -353,7 +353,7 @@ class Form extends React.Component {
                 {this.Menu.map((oneItem, index) => {
                     return (
                         <div key={index}>
-                            {oneItem.category && <h3 style={{marginTop: '0'}}>{oneItem.category}</h3>}
+                            {oneItem.category && <h3 className={style['group-title']}>{oneItem.category}</h3>}
                             {oneItem.category && oneItem.inputs.map(((oneItem, index) => {
                                 if (oneItem.isHidden && oneItem.isHidden(this.state)) {
                                     return null;

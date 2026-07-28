@@ -11,22 +11,30 @@ module.exports = (webpackEnv) => {
     const env = require('../src/App/common/env');
     const entries = require('./entries');
     const rules = require('./rules');
+    const isProduction = process.env.NODE_ENV === 'production';
 
     return {
+        mode: isProduction ? 'production' : 'development',
         entry: entries,
         output: {
-            publicPath: env.BUCKET_PATH,
-            path: path.join(__dirname, '/../dist'), // or path: path.join(__dirname, "dist/js"),
-            filename: process.env.NODE_ENV === 'production' ? 'bundle.[chunkhash:8].js' : 'bundle.js'
+            publicPath: env.BUCKET_PATH || '/',
+            path: path.join(__dirname, '/../dist'),
+            filename: isProduction ? 'bundle.[chunkhash:8].js' : 'bundle.js',
+            clean: true
         },
         resolve: {
             extensions: ['.js', '.jsx', '.ts', '.tsx']
         },
         // Emit source maps so we can debug our code in the browser
-        devtool: 'source-map',
+        devtool: isProduction ? 'source-map' : 'eval-source-map',
         // Tell webpack to run our source code through Babel
         module: {
-            rules: rules
+            rules
+        },
+        devServer: {
+            historyApiFallback: true,
+            hot: true,
+            port: 8080
         },
         // Since Webpack only understands JavaScript, we need to
         // add a plugin to tell it how to handle html files.
@@ -37,9 +45,15 @@ module.exports = (webpackEnv) => {
                 inject: true,
                 BUCKET_PATH: env.BUCKET_PATH || '/'
             }),
-            new webpack.NamedModulesPlugin(),
-            new webpack.EnvironmentPlugin(['NODE_ENV', 'BUCKET_PATH', 'PREDATOR_URL', 'PREDATOR_DOCS_URL', 'VERSION']),
-            new MonacoWebpackPlugin(),
+            // object form so an unset variable falls back to '' instead of failing the build
+            new webpack.EnvironmentPlugin({
+                NODE_ENV: 'development',
+                BUCKET_PATH: '',
+                PREDATOR_URL: '',
+                PREDATOR_DOCS_URL: '',
+                VERSION: ''
+            }),
+            new MonacoWebpackPlugin()
         ]
     };
 };

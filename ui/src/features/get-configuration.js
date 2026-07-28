@@ -25,8 +25,8 @@ import Snackbar from 'material-ui/Snackbar';
 import { ERROR_GET_CONFIG_MESSAGE } from '../constants';
 const CardWithTitle = ({ children, title, className }) => {
   return (
-    <div className={className} style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
-      <h1 style={{ marginTop: '0px' }} color={'#555555'}>{title}</h1>
+    <div className={classnames(className, style['section'])}>
+      <h2 className={style['section__title']}>{title}</h2>
       <Card className={style['card-wrapper']}>
         {children}
       </Card>
@@ -51,11 +51,7 @@ class getConfiguration extends React.Component {
             {errorOnGetConfig ? ERROR_GET_CONFIG_MESSAGE : null}
             {processingGetConfig && <Loader />}
             {(config && !errorOnGetConfig && !processingGetConfig) &&
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-              }}>
+              <div className={style['sections']}>
                 <CardWithTitle title={'Configuration'}>
                   <ConfigurationForm history={this.props.history} config={config} />
                 </CardWithTitle>

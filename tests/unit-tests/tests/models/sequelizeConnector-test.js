@@ -1,4 +1,3 @@
-
 const should = require('should'),
     sinon = require('sinon'),
     rewire = require('rewire'),
@@ -9,14 +8,13 @@ describe('Testing sequelize connector', function () {
     let sandbox, sequelizeStub,
         syncStub,
         createStub,
-        clock,
         destroyStub,
         findAllStub,
         findStub,
         updateStub,
         authenticateStub;
     before(async function () {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         syncStub = sandbox.stub();
         createStub = sandbox.stub();
         findStub = sandbox.stub();
@@ -38,8 +36,10 @@ describe('Testing sequelize connector', function () {
         sequelizeStub.DataTypes = { UUID: 'uuid', STRING: 'string', DATE: 'date', TEXT: () => ('long') };
         sequelizeConnector.__set__('Sequelize', sequelizeStub);
         await sequelizeConnector.init(sequelizeStub);
-        clock = sinon.useFakeTimers(123456789);
-        sandbox.stub(uuid, 'v4').returns('uuid');
+        // rewire isolates the module's globals, so fake timers don't reach it - stub Date.now itself
+        sandbox.stub(Date, 'now').returns(123456789);
+        // uuid's CJS export exposes v4 as a getter, so replace the getter itself
+        sandbox.stub(uuid, 'v4').get(() => () => 'uuid');
     });
     beforeEach(function () {
         createStub.resolves();
@@ -48,11 +48,10 @@ describe('Testing sequelize connector', function () {
     });
     after(function () {
         sandbox.restore();
-        clock.restore();
     });
     describe('insertTest', function () {
         it('when succeed insert test', async function () {
-            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', processor_id: '1234', csv_file_id: '5678', scenarios: { s: '1' }}, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' }}, 'id', 'revisionId', '1234');
+            await sequelizeConnector.insertTest({ name: 'name', description: 'desc', type: 'type', processor_id: '1234', csv_file_id: '5678', scenarios: { s: '1' } }, { name: 'name', description: 'desc', type: 'type', scenarios: { s: '1' } }, 'id', 'revisionId', '1234');
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['test']]);
             should(createStub.args).eql([
@@ -88,7 +87,7 @@ describe('Testing sequelize connector', function () {
     });
     describe('benchmark', function () {
         it('when succeed to insert benchmark', async function () {
-            const testId = uuid();
+            const testId = uuid.v4();
             await sequelizeConnector.insertTestBenchmark(testId, 'benchmark data');
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['benchmark']]);
@@ -97,7 +96,7 @@ describe('Testing sequelize connector', function () {
         });
         it('when succeed to get benchmark', async function () {
             findStub.resolves({ data: 'some_data' });
-            const testId = uuid();
+            const testId = uuid.v4();
             const res = await sequelizeConnector.getTestBenchmark(testId);
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['benchmark']]);
@@ -106,7 +105,7 @@ describe('Testing sequelize connector', function () {
         });
         it('when no benchmark to get ', async function () {
             findStub.resolves();
-            const testId = uuid();
+            const testId = uuid.v4();
             const res = await sequelizeConnector.getTestBenchmark(testId);
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['benchmark']]);

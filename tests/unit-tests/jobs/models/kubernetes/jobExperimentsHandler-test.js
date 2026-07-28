@@ -7,7 +7,7 @@ const { v4: uuid } = require('uuid');
 
 function generateExperiment(id = uuid()){
     return {
-        id: id,
+        id,
         kubeObject: {
             kind: 'PodChaos',
             apiVersion: 'chaos-mesh.org/v1alpha1',
@@ -33,7 +33,7 @@ describe('Job experiments handler tests', function () {
     let clock;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         experimentsManagerInsertStub = sandbox.stub(chaosExperimentsManager, 'insertChaosJobExperiment');
         experimentsManagerGetStub = sandbox.stub(chaosExperimentsManager, 'getChaosExperimentsByIds');
         experimentsManagerRunJobStub = sandbox.stub(chaosExperimentsManager, 'runChaosExperiment');

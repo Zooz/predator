@@ -135,7 +135,7 @@ describe('Manager config', function () {
     let databaseConnectorUpdateStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getConfigAsObject');
         databaseConnectorGetValueStub = sandbox.stub(databaseConnector, 'getConfigValue');
         databaseConnectorUpdateStub = sandbox.stub(databaseConnector, 'updateConfig');

@@ -1,4 +1,3 @@
-
 const Sequelize = require('sequelize'),
     uuid = require('uuid');
 

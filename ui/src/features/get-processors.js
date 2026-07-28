@@ -135,12 +135,9 @@ class getProcessors extends React.Component {
       });
       const error = this.props.processorFailure || this.props.deleteProcessorFailure;
       return (
-        <Page title={'Processors'} description={DESCRIPTION}>
-          <Button className={style['create-button']} onClick={() => {
-            this.setState({
-              createProcessor: true
-            });
-          }}>Create Processor</Button>
+        <Page title={'Processors'} description={DESCRIPTION} actions={
+          <Button onClick={() => this.setState({ createProcessor: true })}>Create Processor</Button>
+        }>
           <ReactTableComponent
             onSearch={this.onSearch}
             rowHeight={'46px'}

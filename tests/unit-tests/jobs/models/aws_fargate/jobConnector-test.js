@@ -1,50 +1,21 @@
 'use strict';
 const should = require('should');
 const sinon = require('sinon');
-const rewire = require('rewire');
-const jobConnector = rewire('../../../../../src/jobs/models/aws_fargate/jobConnector');
-const AWS = require('aws-sdk');
+const { ECSClient, RunTaskCommand, ListTasksCommand, DescribeTasksCommand, StopTaskCommand } = require('@aws-sdk/client-ecs');
+const jobConnector = require('../../../../../src/jobs/models/aws_fargate/jobConnector');
+
 describe('aws fargate job connector tests', function () {
-    let sandbox, ecsStub, runTaskStub,
-        listTasksStub, describeTasksStub, stopTaskStub;
+    let sandbox, sendStub;
 
     const farGateJobConfig = {
         hello: 'fargate'
     };
 
+    const sentCommands = (type) => sendStub.args.map(args => args[0]).filter(command => command instanceof type);
+
     before(() => {
-        sandbox = sinon.sandbox.create();
-        runTaskStub = sandbox.stub();
-        listTasksStub = sandbox.stub();
-        describeTasksStub = sandbox.stub();
-        stopTaskStub = sandbox.stub();
-
-        listTasksStub.returns({
-            promise: () => {
-            }
-        });
-        describeTasksStub.returns({
-            promise: () => {
-            }
-        });
-        stopTaskStub.returns({
-            promise: () => {
-            }
-        });
-
-        runTaskStub.returns({
-            promise: () => {
-            }
-        });
-
-        ecsStub = sandbox.stub(AWS, 'ECS')
-            .returns({
-                runTask: runTaskStub,
-                listTasks: listTasksStub,
-                describeTasks: describeTasksStub,
-                stopTask: stopTaskStub
-            }
-            );
+        sandbox = sinon.createSandbox();
+        sendStub = sandbox.stub(ECSClient.prototype, 'send');
     });
 
     after(() => {
@@ -52,26 +23,24 @@ describe('aws fargate job connector tests', function () {
     });
 
     afterEach(() => {
-        sandbox.resetHistory();
+        sendStub.reset();
     });
 
     describe('Run new job', () => {
         it('Success to create a job and running it immediately', async () => {
+            sendStub.resolves({});
+
             await jobConnector.runJob(farGateJobConfig, { tag: 'eu-west-1' });
 
-            should(ecsStub.callCount).eql(1);
-            should(ecsStub.args[0][0]).eql({ region: 'eu-west-1' });
-
-            should(runTaskStub.callCount).eql(1);
-            should(runTaskStub.args[0][0]).eql(farGateJobConfig);
+            const runTasks = sentCommands(RunTaskCommand);
+            should(runTasks.length).eql(1);
+            should(runTasks[0].input).eql(farGateJobConfig);
+            // the v3 client resolves its region lazily, so read it back off the instance under test
+            should(await sendStub.thisValues[0].config.region()).eql('eu-west-1');
         });
 
         it('Fail to run job', async () => {
-            runTaskStub.returns({
-                promise: () => {
-                    throw new Error('failure');
-                }
-            });
+            sendStub.rejects(new Error('failure'));
             try {
                 await jobConnector.runJob(farGateJobConfig, { tag: 'eu-west-1' });
                 throw new Error('should not get here');
@@ -83,63 +52,43 @@ describe('aws fargate job connector tests', function () {
 
     describe('Stop running job which is found', () => {
         it('Stop a running run of specific job', async () => {
-            listTasksStub.returns({
-                promise: () => {
-                    return { taskArns: ['1', '2', '3'] };
-                }
+            sendStub.withArgs(sinon.match.instanceOf(ListTasksCommand)).resolves({ taskArns: ['1', '2', '3'] });
+            sendStub.withArgs(sinon.match.instanceOf(DescribeTasksCommand)).resolves({
+                tasks: [{ taskArn: 1, tags: [{ key: 'job_identifier', value: 'jobPlatformName' }] },
+                    { taskArn: 2, tags: [{ key: 'job_identifier', value: 'jobPlatformName' }] }]
             });
+            sendStub.withArgs(sinon.match.instanceOf(StopTaskCommand)).resolves({});
 
-            describeTasksStub.returns({
-                promise: () => {
-                    return {
-                        tasks: [{ taskArn: 1, tags: [{ key: 'job_identifier', value: 'jobPlatformName' }] },
-                            { taskArn: 2, tags: [{ key: 'job_identifier', value: 'jobPlatformName' }] }]
-                    };
-                }
-            });
             await jobConnector.stopRun('jobPlatformName', { tag: 'eu-west-1' });
 
-            should(stopTaskStub.args[0][0]).eql({ task: 1 });
-            should(stopTaskStub.args[1][0]).eql({ task: 2 });
+            const stopTasks = sentCommands(StopTaskCommand);
+            should(stopTasks.length).eql(2);
+            should(stopTasks[0].input).eql({ task: 1 });
+            should(stopTasks[1].input).eql({ task: 2 });
         });
 
         it('No running jobs found', async () => {
-            listTasksStub.returns({
-                promise: () => {
-                    return { taskArns: [] };
-                }
-            });
+            sendStub.withArgs(sinon.match.instanceOf(ListTasksCommand)).resolves({ taskArns: [] });
 
             await jobConnector.stopRun('jobPlatformName', { tag: 'eu-west-1' });
 
-            should(stopTaskStub.called).eql(false);
+            should(sentCommands(StopTaskCommand).length).eql(0);
         });
 
         it('No running jobs found with matched jobPlatform identifier', async () => {
-            listTasksStub.returns({
-                promise: () => {
-                    return { taskArns: ['1', '2', '3'] };
-                }
+            sendStub.withArgs(sinon.match.instanceOf(ListTasksCommand)).resolves({ taskArns: ['1', '2', '3'] });
+            sendStub.withArgs(sinon.match.instanceOf(DescribeTasksCommand)).resolves({
+                tasks: [{ taskArn: 1, tags: [{ key: 'job_identifier', value: 'notMatched' }] },
+                    { taskArn: 2, tags: [{ key: 'job_identifier', value: 'notMatched' }] }]
             });
 
-            describeTasksStub.returns({
-                promise: () => {
-                    return {
-                        tasks: [{ taskArn: 1, tags: [{ key: 'job_identifier', value: 'notMatched' }] },
-                            { taskArn: 2, tags: [{ key: 'job_identifier', value: 'notMatched' }] }]
-                    };
-                }
-            });
             await jobConnector.stopRun('jobPlatformName', { tag: 'eu-west-1' });
-            should(stopTaskStub.called).eql(false);
+
+            should(sentCommands(StopTaskCommand).length).eql(0);
         });
 
         it('Failure Stopping a running run of specific job', async () => {
-            listTasksStub.returns({
-                promise: () => {
-                    throw new Error('failure');
-                }
-            });
+            sendStub.withArgs(sinon.match.instanceOf(ListTasksCommand)).rejects(new Error('failure'));
 
             try {
                 await jobConnector.stopRun('jobPlatformName', { tag: 'eu-west-1' });

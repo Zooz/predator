@@ -1,0 +1,66 @@
+// Chart section headings: the same engraved-label rule as the rest of the
+// instrument, so a chart title reads as a caption on a panel rather than a
+// document heading competing with the report title.
+.benchmark-label {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-secondary);
+}
+
+// One control strip: favourite, benchmark comparison, exports — everything that
+// acts on the whole report, so the charts below stay uninterrupted.
+.toolbar__left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+.benchmark-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+    user-select: none;
+}
+
+:global(.report-chart-title) {
+    text-align: left;
+    align-self: flex-start;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-secondary);
+    margin: 0 0 var(--space-4);
+}
+
+// Report actions. Previously a bare flex row floating between the hero and the first
+// chart with no surface of its own; now a defined strip so the page reads as
+// hero → controls → detail.
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    margin-bottom: var(--space-5);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.toolbar > div:last-child {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+@media (max-width: 900px) {
+    .toolbar {
+        flex-wrap: wrap;
+    }
+}

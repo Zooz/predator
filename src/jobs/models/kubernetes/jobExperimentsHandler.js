@@ -1,6 +1,5 @@
-
 const chaosExperimentsManager = require('../../../chaos-experiments/models/chaosExperimentsManager'),
-    { v4: uuid } = require('uuid'),
+    uuid = require('uuid'),
     logger = require('../../../common/logger');
 
 const SEC_TO_MS = 1000;
@@ -23,7 +22,7 @@ async function setChaosExperimentsIfExist(jobId, jobExperiments) {
     } catch (error){
         logger.error(error, `error while setting chaos experiments for job ${jobId}`);
     }
-};
+}
 
 async function setSingleJobExperiment(experimentRequest, chaosExperimentsFromDb, baseTimestamp, jobId) {
     try {
@@ -32,7 +31,7 @@ async function setSingleJobExperiment(experimentRequest, chaosExperimentsFromDb,
         const experimentStartTimeMs = experimentRequest.start_after * SEC_TO_MS; // experimentRequest.start_after is in seconds - we want to convert to milliseconds
         const startTime = baseTimestamp + experimentStartTimeMs;
         const endTime = startTime + convertDurationStringToMillisecond(experiment.kubeObject.spec.duration);
-        const jobExperimentId = uuid();
+        const jobExperimentId = uuid.v4();
         await chaosExperimentsManager.insertChaosJobExperiment(jobExperimentId, jobId, experiment.id, startTime, endTime);
         const kubeObject = experiment.kubeObject;
         kubeObject.metadata.name = kubeObject.metadata.name.concat(`-${jobExperimentId}`);

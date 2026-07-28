@@ -2,11 +2,7 @@ const should = require('should'),
     schedulerRequestCreator = require('./helpers/requestCreator'),
     testsRequestCreator = require('../tests/helpers/requestCreator'),
     configRequestCreator = require('../configManager/helpers/requestCreator'),
-    Docker = require('dockerode'),
-    uuid = require('uuid'),
-    dockerConnection = ({ socketPath: '/var/run/docker.sock' });
-
-const docker = new Docker(dockerConnection);
+    uuid = require('uuid');
 
 describe('Create job specific docker tests - contexts', async function () {
     this.timeout(20000);

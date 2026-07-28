@@ -5,7 +5,7 @@ $pressed-button-color: #dce0e0;
 
 .arrow {
   display: flex !important;
-  background: white;
+  background: var(--bg-surface);
   justify-content: center;
   align-items: center;
   flex: 1;

@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  lint-and-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run unit-tests
+
+  ui-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - run: npm ci
+        working-directory: ui
+      - run: npm run build
+        working-directory: ui
+
+  integration:
+    # Same five database/platform combos the project has always gated on,
+    # driven through the existing tests/integration-tests/run.sh scripts.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - db: mysql
+            platform: kubernetes
+          - db: sqlite
+            platform: kubernetes
+          - db: postgres
+            platform: metronome
+          - db: sqlite
+            platform: docker
+          - db: sqlite
+            platform: awsFargate
+    name: integration (${{ matrix.db }} / ${{ matrix.platform }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: ./tests/integration-tests/run.sh
+        env:
+          LOCAL_TEST: 'true'
+          DATABASE_TYPE: ${{ matrix.db }}
+          JOB_PLATFORM: ${{ matrix.platform }}

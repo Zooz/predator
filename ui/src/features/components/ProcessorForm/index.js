@@ -1,4 +1,5 @@
 import React from 'react';
+import { getEditorTheme } from '../useEditorTheme';
 import style from './style.scss';
 import * as Actions from '../../redux/action';
 import * as Selectors from '../../redux/selectors/processorsSelector';
@@ -123,7 +124,7 @@ export class ProcessorForm extends React.Component {
                 readOnly: false,
                 cursorStyle: 'line',
                 automaticLayout: false,
-                theme: 'vs'
+                theme: getEditorTheme()
             }
         ;
         const {javascript} = this.state;

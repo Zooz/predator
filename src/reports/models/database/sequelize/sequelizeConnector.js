@@ -1,7 +1,6 @@
 'use strict';
 
 const Sequelize = require('sequelize');
-const uuid = require('uuid');
 
 const constants = require('../../../utils/constants');
 
@@ -41,7 +40,7 @@ async function insertReport(reportId, testId, revisionId, jobId, testType, phase
         last_updated_at: lastUpdatedAt,
         start_time: startTime,
         notes: notes || '',
-        phase: phase,
+        phase,
         test_configuration: testConfiguration,
         runners_subscribed: [],
         is_favorite: isFavorite,
@@ -60,7 +59,7 @@ async function insertStats(runnerId, testId, reportId, statsId, statsTime, phase
         stats_time: statsTime,
         phase_index: phaseIndex,
         phase_status: phaseStatus,
-        data: data
+        data
     };
 
     return stats.create(params);
@@ -122,7 +121,7 @@ async function deleteReport(testId, reportId) {
 
 async function updateReportBenchmark(testId, reportId, score, benchmarkData) {
     const benchmark = client.model('report');
-    const params = { score: score, benchmark_weights_data: benchmarkData };
+    const params = { score, benchmark_weights_data: benchmarkData };
     const options = {
         where: {
             test_id: testId,

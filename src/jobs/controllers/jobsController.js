@@ -1,4 +1,5 @@
 'use strict';
+const { ZipArchive } = require('archiver');
 const jobManager = require('../models/jobManager');
 
 module.exports.createJob = function (req, res, next) {
@@ -62,13 +63,18 @@ module.exports.stopRun = function (req, res, next) {
         });
 };
 
-module.exports.getLogs = function (req, res, next) {
-    return jobManager.getLogs(req.params.job_id, req.params.report_id)
-        .then(function (result) {
-            return res.zip(result);
-        }).catch(function (err) {
-            return next(err);
-        });
+module.exports.getLogs = async function (req, res, next) {
+    try {
+        const { files, filename } = await jobManager.getLogs(req.params.job_id, req.params.report_id);
+        res.attachment(filename);
+        const archive = new ZipArchive();
+        archive.on('error', next);
+        archive.pipe(res);
+        files.forEach(file => archive.append(asZipEntry(file.content), { name: file.name }));
+        await archive.finalize();
+    } catch (err) {
+        next(err);
+    }
 };
 
 module.exports.deleteAllContainers = function (req, res, next) {
@@ -80,3 +86,12 @@ module.exports.deleteAllContainers = function (req, res, next) {
             return next(err);
         });
 };
+
+// Runner logs are normally plain text, but a job platform can hand back a parsed JSON body.
+// archiver only accepts a string/Buffer/stream, so coerce anything else rather than 500.
+function asZipEntry(content) {
+    if (typeof content === 'string' || Buffer.isBuffer(content)) {
+        return content;
+    }
+    return content === undefined || content === null ? '' : JSON.stringify(content);
+}

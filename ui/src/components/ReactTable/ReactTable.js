@@ -92,7 +92,9 @@ export default class ReactTableComponent extends React.Component {
                     PaginationComponent={numericPagination ? NumericPagination : PaginationComponent}
                     pageSize={pageSize}
                     resizable={resizable}
-                    minRows={data.length ? pageSize || 0 : 5}
+                    // No filler rows: padding a 3-row result out to pageSize produced a
+                    // column of empty striped rows that read as broken data.
+                    minRows={0}
                     totalDataCount={totalDataCount}
                     noDataText={noDataText || 'There is no data'}
                     getTheadProps={() => ({
@@ -218,15 +220,15 @@ ReactTableComponent.defaultProps = {
     cellPadding: '8px',
     colors: {
         background: {
-            default: '#fff',
-            selected: '#108ee9'
+            default: 'var(--bg-surface)',
+            selected: 'var(--accent-soft)'
         },
         text: {
-            default: '#000',
-            selected: '#fff'
+            default: 'var(--fg-primary)',
+            selected: 'var(--fg-primary)'
         },
         header: {
-            default: '#108ee9'
+            default: 'var(--fg-secondary)'
         }
     }
 }

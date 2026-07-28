@@ -1,12 +1,131 @@
-body {
-    font-family: 'Bai Jamjuree', sans-serif;
-    margin: 0;
-    padding:0
-}
-* {
+@import './styles/tokens';
+
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
-* > * {
-    box-sizing: border-box;
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--fg-primary);
+    background: var(--bg-app);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    // Numbers sit in columns all over this product; tabular figures stop them
+    // jittering as values update mid-run.
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'cv05' 1;
+}
+
+// ── Instrument type roles ─────────────────────────────────────────────────
+// .readout is the gauge face: wide, tight-tracked, used only for measured values.
+.readout {
+    font-family: var(--font-readout);
+    font-weight: 600;
+    letter-spacing: var(--tracking-readout);
+    font-variant-numeric: tabular-nums;
+}
+
+// .label is the engraved caption beside a dial. Small caps rule, never a link colour.
+.label {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-secondary);
+}
+
+.mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin: 0;
+    line-height: var(--leading-tight);
+    color: var(--fg-primary);
+    font-weight: 600;
+}
+
+a {
+    color: var(--fg-link);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+// ── Quality floor ─────────────────────────────────────────────────────────
+// Keyboard focus is always visible; :focus-visible keeps it off mouse clicks.
+:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+// material-ui v0 and react-table both strip outlines; put them back.
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+::selection {
+    background: var(--accent-soft);
+    color: var(--fg-primary);
+}
+
+// Scrollbars styled as part of the case, not the OS default.
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border: 2px solid transparent;
+    background-clip: content-box;
+    border-radius: var(--radius-pill);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+    background-clip: content-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

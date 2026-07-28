@@ -1,7 +1,7 @@
-import Immutable from 'immutable';
+import { Map } from 'immutable';
 import * as Types from '../types/reportsTypes'
 
-const initialState = Immutable.Map({
+const initialState = Map({
     reports: [],
     report: undefined,
     processing_get_reports: false,

@@ -56,8 +56,7 @@ module.exports.testWebhook = async function(req, res, next) {
     try {
         const response = await webhookManager.testWebhook(req.body);
         return res.status(200).json(response);
-    }
-    catch (err) {
+    } catch (err) {
         return next(err);
     }
 };

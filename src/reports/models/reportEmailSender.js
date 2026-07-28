@@ -53,7 +53,7 @@ module.exports.sendAggregateReport = async (aggregatedResults, job, emails, repo
 };
 
 async function createSMTPClient(configSmtp) {
-    var options = {
+    const options = {
         port: configSmtp.port,
         host: configSmtp.host,
         connectionTimeout: configSmtp.timeout,

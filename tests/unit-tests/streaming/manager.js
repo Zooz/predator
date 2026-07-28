@@ -11,7 +11,6 @@ describe('health check', function() {
     let sandbox;
     let kafkaManagerInitStub, kafkaManagerHealthStub, kafkaManagerCloseStub, kafkaManagerProduceStub;
     let configGetValueStub;
-    let newDateStub;
 
     before(function() {
         sandbox = sinon.createSandbox();
@@ -20,7 +19,6 @@ describe('health check', function() {
         kafkaManagerCloseStub = sandbox.stub(kafkaManager, 'close');
         kafkaManagerProduceStub = sandbox.stub(kafkaManager, 'produce');
         configGetValueStub = sandbox.stub(configHandler, 'getConfigValue');
-        newDateStub = sandbox.stub(Date.prototype, 'constructor');
     });
     afterEach(() => {
         sandbox.resetHistory();
@@ -144,8 +142,6 @@ describe('health check', function() {
             });
             configGetValueStub.resolves();
             kafkaManagerProduceStub.resolves();
-            const newDate = new Date();
-            newDateStub.returns(newDate);
 
             const metadata = {
                 'load-testing': 'v4'
@@ -193,10 +189,15 @@ describe('health check', function() {
                     }
                 }
             };
+            const beforeProduce = new Date();
             await streamingManager.produce(metadata, event, resource);
             expect(kafkaManagerProduceStub.calledOnce).eql(true);
-            should(JSON.parse(kafkaManagerProduceStub.args[0][0])).containDeep({
-                published_at: newDate.toISOString(),
+            const producedMessage = JSON.parse(kafkaManagerProduceStub.args[0][0]);
+            // Stubbing Date.prototype.constructor never intercepted new Date(), so
+            // comparing against a timestamp taken in the test raced the clock and
+            // flaked whenever the two landed on different milliseconds.
+            should(new Date(producedMessage.published_at).getTime()).be.aboveOrEqual(beforeProduce.getTime());
+            should(producedMessage).containDeep({
                 metadata: {
                     'load-testing': 'v4'
                 },

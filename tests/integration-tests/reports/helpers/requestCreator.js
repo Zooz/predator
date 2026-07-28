@@ -61,19 +61,19 @@ function getExportedReport(testId, reportId, fileFormat, headers = { 'Content-Ty
         }
 */
 function getExportedCompareReport(fileFormat, reportMetaData, headers = { 'Content-Type': 'application/json' }) {
-    let url = `/v1/tests/reports/compare/export/${fileFormat}`;
-    let reportIdsAsCSV = "";
-    let testIdsAsCSV = "";
+    const url = `/v1/tests/reports/compare/export/${fileFormat}`;
+    let reportIdsAsCSV = '';
+    let testIdsAsCSV = '';
     for (let index = 0; index < reportMetaData.report_ids.length; index++){
-        reportIdsAsCSV+=reportMetaData["report_ids"][index];
-        testIdsAsCSV+=reportMetaData["test_ids"][index];
-        if (index < reportMetaData.report_ids.length -1){
-            reportIdsAsCSV+=",";
-            testIdsAsCSV+=",";
+        reportIdsAsCSV += reportMetaData['report_ids'][index];
+        testIdsAsCSV += reportMetaData['test_ids'][index];
+        if (index < reportMetaData.report_ids.length - 1){
+            reportIdsAsCSV += ',';
+            testIdsAsCSV += ',';
         }
     }
-    let request_string = "report_ids="+reportIdsAsCSV+"&test_ids="+testIdsAsCSV;
-    return request(testApp).get(url+"?"+request_string)
+    const request_string = 'report_ids=' + reportIdsAsCSV + '&test_ids=' + testIdsAsCSV;
+    return request(testApp).get(url + '?' + request_string)
         .set(headers)
         .expect(function (res) {
             return res;

@@ -1,0 +1,62 @@
+// The spine sits on the instrument's graph substrate: a faint tick grid that
+// appears here and nowhere else, so the one place you read a measurement looks
+// like a measuring surface.
+
+.spine {
+    // Neutral by default: the trace only takes a verdict hue when there is a
+    // benchmark to be measured against.
+    --spine-hue: var(--series-1);
+
+    position: relative;
+    padding: var(--space-4) 0 0;
+    background-image:
+        linear-gradient(to right, var(--plot-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--plot-grid) 1px, transparent 1px);
+    background-size: 40px 20px;
+    background-position: 0 0;
+    // Fade the substrate out at the edges so it reads as a surface, not a texture.
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+}
+
+.spine[data-over='true'] {
+    --spine-hue: var(--breach-fg);
+}
+
+.spine__svg {
+    display: block;
+    width: 100%;
+    height: 96px;
+}
+
+.spine__axis {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-2) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--fg-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.spine__threshold {
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.spine__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 96px;
+    font-size: var(--text-sm);
+    color: var(--fg-muted);
+}
+
+@media (max-width: 900px) {
+    .spine__svg {
+        height: 72px;
+    }
+}

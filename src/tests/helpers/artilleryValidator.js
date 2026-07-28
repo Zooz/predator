@@ -1,7 +1,9 @@
 const consts = require('../../common/consts');
 const JSCK = require('jsck');
 JSCK.Draft4 = JSCK.draft4;
-const artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
+// ponytail: schema vendored from artillery@1.7.9 core/lib/schemas/artillery_test_script.json.
+// The whole artillery package (and its vulnerable dep tree) was only ever required for this one file.
+const artilleryCheck = new JSCK.Draft4(require('./artillery-test-script.schema.json'));
 
 module.exports = {
     verifyArtillery

@@ -1,40 +1,49 @@
-@import "../styles/colors";
+// Shared field mixins. Every input in the product picks up its border, focus and
+// disabled treatment from here, so theming them is a single edit.
+//
+// Keeps re-exporting the colour variables: several field stylesheets import only
+// this file and rely on getting $text-grey and friends transitively.
+@import "./colors";
 
-$default-border-color: $border-grey;
+$border-radius: var(--radius-md);
+$box-padding: 0 var(--space-3);
 
-$active-border-color: $default-blue;
-$active-box-shadow: inset 0 0 5px 0 rgba(13, 145, 189, 0.25);
-
-$border-radius: 6px;
-
-$hover-border-color: rgba(121, 194, 219, 0.27);
-
-$error-border-color: $error-red;
-
-$disabled-color: $greyout;
-
-$placeholder-color: $disabled-grey-text;
-
-$box-padding: 0 5px;
+// Still referenced directly by a few field stylesheets.
+$default-border-color: var(--border-default);
+$active-border-color: var(--accent);
+$placeholder-color: var(--fg-muted);
 
 @mixin default {
-  border-radius: $border-radius;
-  border: 1px solid $default-border-color;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+    color: var(--fg-primary);
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    transition:
+        border-color var(--dur-fast) var(--ease-out),
+        box-shadow var(--dur-fast) var(--ease-out);
 }
 
+// Focus is a ring, not an inner glow — it has to survive both themes and stay
+// visible against a dark surface.
 @mixin active {
-  border-color: $active-border-color;
-  box-shadow: $active-box-shadow;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    outline: none;
 }
 
 @mixin hover {
-  border-color: $hover-border-color;
+    border-color: var(--border-strong);
 }
 
 @mixin error {
-  border-color: $error-border-color;
+    border-color: var(--breach-fg);
+    box-shadow: 0 0 0 3px var(--breach-bg);
 }
 
 @mixin disabled {
-  background: $disabled-color;
+    background: var(--bg-sunken);
+    color: var(--fg-muted);
+    cursor: not-allowed;
 }

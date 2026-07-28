@@ -1,5 +1,6 @@
-# NODE container which runs this service
-FROM node:12.16-slim as builder
+# NODE container which runs this service.
+# node:24-slim publishes linux/amd64 and linux/arm64, so this builds unchanged on both.
+FROM node:24-slim AS builder
 
 RUN mkdir -p /usr/ui
 
@@ -16,7 +17,7 @@ ARG PREDATOR_DOCS_URL
 
 RUN VERSION=$(node -p -e "require('./package.json').version") && BUCKET_PATH=$BUCKET_PATH PREDATOR_DOCS_URL=$PREDATOR_DOCS_URL VERSION=$VERSION npm run build
 
-FROM node:12.16-slim as production
+FROM node:24-slim AS production
 
 RUN mkdir -p /usr/src
 
@@ -24,7 +25,7 @@ WORKDIR /usr
 
 # Install app dependencies
 COPY package*.json /usr/
-RUN npm ci --production --silent
+RUN npm ci --omit=dev --silent
 ## Bundle app source
 COPY /src /usr/src
 COPY /docs /usr/docs

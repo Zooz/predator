@@ -1,4 +1,3 @@
-
 module.exports = function (dslName, id, revision_id) {
     return {
         artillery_test: {
@@ -113,7 +112,7 @@ module.exports = function (dslName, id, revision_id) {
             ]
         },
         description: 'test',
-        id: id,
+        id,
         revision_id,
         name: 'test',
         is_favorite: false,

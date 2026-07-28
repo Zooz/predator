@@ -4,7 +4,6 @@ const express = require('express');
 const audit = require('express-requests-logger');
 const bodyParser = require('body-parser');
 const path = require('path');
-const zip = require('express-easy-zip');
 const fileUpload = require('express-fileupload');
 const contextMiddleware = require('./middlewares/context');
 
@@ -25,7 +24,6 @@ const jobsManager = require('./jobs/models/jobManager');
 const chaosExperimentsManager = require('./chaos-experiments/models/chaosExperimentsManager');
 const streamingManager = require('./streaming/manager');
 const streamingConfig = require('./config/streamingConfig');
-const contexts = require('./middlewares/context');
 const configHandler = require('./configManager/models/configHandler');
 const { CONFIG: { CHAOS_MESH_ENABLED } } = require('./common/consts');
 
@@ -65,14 +63,12 @@ module.exports = async () => {
     app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use(audit({
-        logger: logger,
+        logger,
         excludeURLs: ['health', 'ui', 'favicon.png', 'files'],
         response: {
             excludeBody: ['*']
         }
     }));
-
-    app.use(zip());
 
     app.use(contextMiddleware.middleware);
 

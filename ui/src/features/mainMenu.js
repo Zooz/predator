@@ -1,14 +1,16 @@
+// Icons name what the destination does, not a loose metaphor: a clock for things
+// that run on a schedule, a chart for results, a plug for outbound notifications.
 import {
   faVial,
-  faBriefcase,
-  faFlagCheckered,
-  faFileAlt,
+  faClock,
+  faChartLine,
+  faBookOpen,
   faBook,
-  faPassport,
-  faWrench,
-  faMicrochip,
+  faCode,
+  faSliders,
+  faCodeBranch,
   faFlask,
-  faExternalLinkAlt
+  faPlug
 } from '@fortawesome/free-solid-svg-icons';
 
 import { PREDATOR_DOCS_URL } from '../App/common/env';
@@ -23,31 +25,31 @@ export default function getMenuList ({ CHAOS_MESH_ENABLED }) {
     {
       primaryText: 'Scheduled Runs',
       navigateTo: 'jobs',
-      icon: faBriefcase
+      icon: faClock
     },
     {
       primaryText: 'Last Reports',
       navigateTo: 'last_reports',
-      icon: faFlagCheckered
+      icon: faChartLine
     },
     {
       primaryText: 'Processors',
       navigateTo: 'processors',
-      icon: faMicrochip
+      icon: faCodeBranch
     },
     {
       primaryText: 'Webhooks',
       navigateTo: 'webhooks',
-      icon: faExternalLinkAlt
+      icon: faPlug
     },
     {
       primaryText: 'Settings',
       navigateTo: 'settings',
-      icon: faWrench
+      icon: faSliders
     },
     {
       primaryText: 'Docs',
-      icon: faFileAlt,
+      icon: faBookOpen,
       nestedItems: [
         {
           primaryText: 'Documentation',
@@ -57,7 +59,7 @@ export default function getMenuList ({ CHAOS_MESH_ENABLED }) {
         {
           primaryText: 'API Reference',
           linkUrl: `${PREDATOR_DOCS_URL}/indexapiref.html`,
-          icon: faPassport
+          icon: faCode
         }
       ]
     }

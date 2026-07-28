@@ -60,21 +60,22 @@
 }
 
 .actions-style {
-  margin-left: 20;
-  @extend .link-style;
+    @extend .link-style;
+    white-space: nowrap;
 }
 
 .link-style {
-  cursor: pointer;
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.62;
-  letter-spacing: normal;
-  text-align: center;
-  color: #eba205;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--fg-link);
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .fileDropTarget {
@@ -85,7 +86,6 @@
 }
 
 .download-button {
-  @extend .link-style;
-  color: #557eff;
-
+    @extend .link-style;
+    color: var(--fg-link);
 }

@@ -1,4 +1,3 @@
-
 const should = require('should'),
     sinon = require('sinon'),
     rewire = require('rewire'),
@@ -15,7 +14,7 @@ describe('Testing sequelize connector', function () {
         findAllStub,
         updateStub;
     before(async function () {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         syncStub = sandbox.stub();
         createStub = sandbox.stub();
         findStub = sandbox.stub();
@@ -37,7 +36,8 @@ describe('Testing sequelize connector', function () {
         sequelizeStub.DataTypes = { UUID: 'uuid', STRING: 'string', DATE: 'date', TEXT: () => ('long') };
         sequelizeConnector.__set__('Sequelize', sequelizeStub);
         await sequelizeConnector.init(sequelizeStub);
-        sandbox.stub(uuid, 'v4').returns('uuid');
+        // uuid's CJS export exposes v4 as a getter, so replace the getter itself
+        sandbox.stub(uuid, 'v4').get(() => () => 'uuid');
     });
     beforeEach(function () {
         createStub.resolves();
@@ -49,7 +49,7 @@ describe('Testing sequelize connector', function () {
     });
     describe('handle file insert and get', function () {
         it('when succeed insert file', async function () {
-            const fileId = uuid();
+            const fileId = uuid.v4();
             await sequelizeConnector.saveFile(fileId, 'data.csv', 'File for test content');
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['file']]);
@@ -60,7 +60,7 @@ describe('Testing sequelize connector', function () {
         it('when fail to insert file', async function () {
             const error = new Error('error');
             createStub.rejects(error);
-            const fileId = uuid();
+            const fileId = uuid.v4();
             try {
                 await sequelizeConnector.saveFile(fileId, 'data.csv', 'File for test content');
                 throw new Error('should not get here');
@@ -70,7 +70,7 @@ describe('Testing sequelize connector', function () {
         });
         it('when succeed to get file', async function () {
             findStub.returns({ file: 'mickey the predator', name: 'mickey.csv' });
-            const fileId = uuid();
+            const fileId = uuid.v4();
             const file = await sequelizeConnector.getFile(fileId);
             const client = sequelizeConnector.__get__('client');
             should(client.model.args).eql([['file']]);
@@ -82,7 +82,7 @@ describe('Testing sequelize connector', function () {
         it('when fail to get file', async function () {
             const error = new Error('error');
             findStub.rejects(error);
-            const fileId = uuid();
+            const fileId = uuid.v4();
             try {
                 await sequelizeConnector.getFile(fileId);
                 throw new Error('should not get here');

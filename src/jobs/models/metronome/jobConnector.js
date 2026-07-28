@@ -33,7 +33,7 @@ module.exports.stopRun = async (jobPlatformName) => {
     const url = util.format('%s/v1/jobs/%s/runs', metronomeUrl, jobPlatformName);
     const options = {
         method: 'GET',
-        url: url,
+        url,
         headers
     };
 
@@ -45,7 +45,7 @@ module.exports.stopRun = async (jobPlatformName) => {
             const url = util.format('%s/v1/jobs/%s/runs/%s/actions/stop', metronomeUrl, jobPlatformName, jobRun.id);
             const options = {
                 method: 'POST',
-                url: url,
+                url,
                 headers
             };
             await requestSender.send(options);
@@ -92,7 +92,7 @@ async function runJob(jobId) {
     const url = util.format('%s/v1/jobs/%s/runs', metronomeUrl, jobId);
 
     const options = {
-        url: url,
+        url,
         headers,
         method: 'POST'
     };

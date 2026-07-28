@@ -89,7 +89,7 @@ async function deleteProcessor(processorId) {
         where: {
             id: processorId
         }
-    }
+    };
 
     return processorsModel.destroy(options);
 }

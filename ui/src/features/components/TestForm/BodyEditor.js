@@ -4,17 +4,41 @@ import React, { useEffect, useState } from 'react';
 import MonacoEditor from '@uiw/react-monacoeditor';
 import { CONTENT_TYPES } from './constants'
 import DynamicKeyValueInput from './DynamicKeyValueInput';
+import useEditorTheme from '../useEditorTheme';
+
+// react-json-editor-ajrm applies these as inline styles and cannot resolve var(),
+// so read the computed token values off the document root.
+const token = (name, fallback) => {
+  if (typeof window === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+};
+
+const jsonColors = (editorTheme) => {
+  const dark = editorTheme === 'vs-dark';
+  return {
+    default: token('--fg-primary', dark ? '#e8edf6' : '#0d1220'),
+    background: token('--bg-surface', dark ? '#0d1220' : '#ffffff'),
+    background_warning: token('--breach-bg', dark ? '#3a1417' : '#fdeaeb'),
+    string: token('--series-2', dark ? '#17a97a' : '#0a9e6e'),
+    number: token('--series-3', dark ? '#bd8226' : '#c47512'),
+    colon: token('--fg-muted', '#8695b0'),
+    keys: token('--series-1', dark ? '#5f7ee8' : '#4468f5'),
+    keys_whiteSpace: token('--series-5', dark ? '#8f6ef0' : '#8b5cf6'),
+    primitive: token('--series-6', dark ? '#1f9fbb' : '#0e9bb5')
+  };
+};
 
 const monacoOptions = {
   selectOnLineNumbers: true,
   roundedSelection: false,
   readOnly: false,
   cursorStyle: 'line',
-  automaticLayout: true,
-  theme: 'vs'
+  automaticLayout: true
 };
 
 const BodyEditor = ({ type, content, placeHolder, onChange, boxMinHeight }) => {
+  const editorTheme = useEditorTheme();
   let jsonEditorContent;
   if (typeof content !== 'object') {
     try {
@@ -39,18 +63,23 @@ const BodyEditor = ({ type, content, placeHolder, onChange, boxMinHeight }) => {
     return (
       <JSONInput
         style={{
-          outerBox: { height: null, minHeight: boxMinHeight || '200px' },
-          container: { height: null, border: '1px solid #557EFF', minHeight: boxMinHeight || '200px' }
+          outerBox: { height: null, minHeight: boxMinHeight || '200px', borderRadius: 'var(--radius-md)', overflow: 'hidden' },
+          container: {
+            height: null,
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-md)',
+            minHeight: boxMinHeight || '200px',
+            fontFamily: 'var(--font-mono)'
+          },
+          body: { fontFamily: 'var(--font-mono)', fontSize: '13px' },
+          labelColumn: { color: 'var(--fg-muted)' }
         }}
         // key={key}
         id='a_unique_id'
         placeholder={jsonEditorContent || placeHolder || {}}
-        colors={{
-          default: 'black',
-          background: 'white',
-          string: 'red',
-          keys: 'blue'
-        }}
+        // This library takes literal colour values rather than CSS, so the syntax
+        // palette is resolved from the tokens at render time instead of hardcoded.
+        colors={jsonColors(editorTheme)}
         locale={locale}
         width={'100%'}
         onChange={(value) => onChange(CONTENT_TYPES.APPLICATION_JSON, value)}
@@ -64,7 +93,7 @@ const BodyEditor = ({ type, content, placeHolder, onChange, boxMinHeight }) => {
         <MonacoEditor
           language='html'
           value={monacoContent}
-          options={monacoOptions}
+          options={{ ...monacoOptions, theme: editorTheme }}
           height={'200px'}
           width='100%'
           onChange={(value) => onChange(CONTENT_TYPES.OTHER, value)}

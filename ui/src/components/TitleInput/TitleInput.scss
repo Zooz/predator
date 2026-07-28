@@ -1,40 +1,38 @@
-@import "../styles/colors";
-
-$title-color: $default-blue;
-$title-color-disabled: #c2c2c2;
-$suffix-color: $text-grey;
+// This component supplies the label for nearly every field in the product, and it
+// was rendering them in the link blue. A blue label reads as "clickable", so on
+// Settings the whole form looked like a list of links. Labels are ink; only real
+// links and the primary action wear the accent.
 
 .title_wrapper {
-  display: grid;
-  grid-row-gap: 5px;
-  flex:1;
+    display: grid;
+    grid-row-gap: var(--space-2);
+    flex: 1;
 }
 
 .title {
-  font-size: 13px;
-  text-align: left;
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: normal;
-  letter-spacing: normal;
-  color: $title-color;
-  display: block;
+    font-size: var(--text-xs);
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: var(--leading-snug);
+    color: var(--fg-primary);
+    display: block;
 
-  &.title--disabled {
-    color: $title-color-disabled;
-  }
+    &.title--disabled {
+        color: var(--fg-muted);
+    }
 
-  &.title--alert {
-    color: $error-red;
-  }
+    &.title--alert {
+        color: var(--breach-fg);
+    }
 }
 
 .suffix {
-  color: $suffix-color;
-  font-weight: 300;
+    color: var(--fg-secondary);
+    font-weight: 400;
 }
 
 .prefix {
-  font-weight: 300;
+    color: var(--fg-secondary);
+    font-weight: 400;
 }

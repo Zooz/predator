@@ -188,7 +188,7 @@ class getJobs extends React.Component {
       const feedbackMessage = this.generateFeedbackMessage();
       const error = errorOnJobAction;
       return (
-        <Page title={'Scheduled Jobs'} description={DESCRIPTION}>
+        <Page title={'Scheduled Runs'} description={DESCRIPTION}>
           <ReactTableComponent
             // tableRowId={'report_id'}
             onSearch={this.onSearch}

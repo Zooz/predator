@@ -1,20 +1,25 @@
-@import "../../styles/colors";
+// Range readout + two square stepper buttons. The count is a measured value, so
+// it wears the mono face; a disabled arrow keeps its footprint but loses its ink
+// so the control doesn't shift when a page boundary is reached.
 
 .pagination {
   display: flex;
   justify-content: flex-end;
-  align-items: baseline;
+  align-items: center;
+  gap: var(--space-4);
   cursor: default;
-  padding-right: 20px;
-  margin: 16px 0;
+  padding-right: var(--space-2);
+  margin: var(--space-4) 0;
   user-select: none;
 }
 
 .description {
   position: relative;
   line-height: 1.5;
-  font-size: 12px;
-  color: $text-grey;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-secondary);
 
   &:not(:hover) {
     overflow: hidden;
@@ -29,17 +34,19 @@
 
 .page-switcher {
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--dur-fast) var(--ease-out);
   pointer-events: none;
   position: absolute;
   right: 0;
-  border-radius: 3px;
-  background-color: $white;
-  box-shadow: 0 7px 40px 0 rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
   text-align: right;
-  padding: 16px;
+  padding: var(--space-2);
   white-space: nowrap;
-  color: $text-grey;
+  color: var(--fg-secondary);
 
   &[position='top'] {
     bottom: -16px;
@@ -56,30 +63,53 @@
   }
 
   div {
-    line-height: 20px;
+    line-height: 24px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-sm);
     cursor: pointer;
+
+    &:hover {
+      background: var(--bg-hover);
+      color: var(--fg-primary);
+    }
   }
 
   [currentpage=true] {
-    font-weight: bold;
+    color: var(--fg-primary);
+    font-weight: 600;
   }
 }
 
 .arrows {
-  display: inline-block;
-  i {
-    cursor: default;
-    font-size: 23px;
-    color: #dbdbdb;
+  display: inline-flex;
+  gap: var(--space-2);
 
-    &:first-child {
-      margin-right: 30px;
-      margin-left: 30px;
-    }
+  i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--fg-muted);
+    cursor: not-allowed;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
 
     &[enabled=true] {
-      color: $text-black;
+      color: var(--fg-secondary);
+      border-color: var(--border-default);
       cursor: pointer;
+
+      &:hover {
+        color: var(--fg-primary);
+        background: var(--bg-hover);
+        border-color: var(--border-strong);
+      }
     }
   }
 }

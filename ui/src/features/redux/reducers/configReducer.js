@@ -1,7 +1,7 @@
-import Immutable from 'immutable';
+import { Map } from 'immutable';
 import * as Types from '../types/configTypes'
 
-const initialState = Immutable.Map({
+const initialState = Map({
     config: undefined,
     processing_get_config: false,
     processing_update_config: false,

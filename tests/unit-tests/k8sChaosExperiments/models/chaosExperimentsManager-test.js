@@ -26,7 +26,7 @@ describe('Chaos experiments manager tests', function () {
     let getConfigValueStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         insertStub = sandbox.stub(database, 'insertChaosExperiment');
         getChaosExperimentByIdStub = sandbox.stub(database, 'getChaosExperimentById');
         getChaosExperimentByNameStub = sandbox.stub(database, 'getChaosExperimentByName');
@@ -128,7 +128,7 @@ describe('Chaos experiments manager tests', function () {
 
             getChaosExperimentByIdStub.resolves(firstExperiment);
             deleteStub.resolves();
-            const existingChaosExperimentId = uuid();
+            const existingChaosExperimentId = uuid.v4();
             await manager.deleteChaosExperiment(existingChaosExperimentId);
             deleteStub.calledOnce.should.eql(true);
         });
@@ -159,7 +159,7 @@ describe('Chaos experiments manager tests', function () {
             let exception;
             getChaosExperimentByIdStub.resolves();
             try {
-                await manager.getChaosExperimentById(uuid());
+                await manager.getChaosExperimentById(uuid.v4());
             } catch (e) {
                 exception = e;
             }
@@ -382,8 +382,8 @@ describe('Chaos experiments manager tests', function () {
                 }
             }
         };
-        const chaosJobExperimentId = uuid();
-        const jobId = uuid();
+        const chaosJobExperimentId = uuid.v4();
+        const jobId = uuid.v4();
         it('should call k8s connector and write to db', async function() {
             const mappedChaosExperiment = {
                 ...kubernetesJobConfig,
@@ -409,7 +409,7 @@ describe('Chaos experiments manager tests', function () {
             const kubeObject = { hello: 1 };
             const mappedKubeObject = { ...kubeObject, metadata: { labels: { app: 'predator', 'predator/job-id': jobId } } };
             const jobExperiment = { start_time: timestamp, job_id: jobId, experiment_id: '4321', id: '2468' };
-            const chaosExperiment = { kubeObject: kubeObject, experiment_id: '4321' };
+            const chaosExperiment = { kubeObject, experiment_id: '4321' };
             getFutureJobExperimentsStub.resolves([jobExperiment]);
             getChaosExperimentByIdStub.resolves(chaosExperiment);
             runChaosExperimentConnectorStub.returns();
@@ -443,9 +443,9 @@ describe('Chaos experiments manager tests', function () {
     describe('stop job experiments by job id', function () {
         let jobId, firstExId, secondExId, firstExperiment, secondExperiment;
         beforeEach(() => {
-            jobId = uuid();
-            firstExId = uuid();
-            secondExId = uuid();
+            jobId = uuid.v4();
+            firstExId = uuid.v4();
+            secondExId = uuid.v4();
             firstExperiment = {
                 id: firstExId,
                 kubeObject: {
@@ -506,7 +506,7 @@ describe('Chaos experiments manager tests', function () {
             sinon.assert.calledWith(deleteAllResourcesOfKindAndJobStub, 'PodChaos', 'apps', jobId);
         });
         it('getChaosJobExperimentsByJobId throws - should stop flow and not throw', async () => {
-            const jobId = uuid();
+            const jobId = uuid.v4();
             getChaosJobExperimentsByJobIdStub.rejects();
             await manager.stopJobExperimentsByJobId(jobId);
             // not throwing

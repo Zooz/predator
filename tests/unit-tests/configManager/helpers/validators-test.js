@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const validators = require('../../../../src/configManager/helpers/validators');
 
 describe('configManager validators tests', function() {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let nextStub;
     beforeEach(() => {
         nextStub = sandbox.stub();

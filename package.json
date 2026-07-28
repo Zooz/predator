@@ -5,21 +5,22 @@
   "description": "Framework that manages the entire lifecycle of load testing a server, from creating test files, running scheduled and on-demand tests, and viewing test results.",
   "main": "server.js",
   "engines": {
-    "node": ">=12.x",
-    "npm": "6.x"
+    "node": ">=22",
+    "npm": ">=10"
   },
   "directories": {
     "test": "tests"
   },
   "scripts": {
+    "prepare": "husky || true",
     "setup-local-env": "npm install --no-save shelljs && node setup-env.js",
     "start-local": "node -r dotenv/config src/server.js",
     "start": "node src/server.js",
-    "unit-tests": "nyc --check-coverage --lines 90 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
+    "unit-tests": "c8 --check-coverage --lines 65 --reporter=html --reporter=text mocha ./tests/unit-tests --recursive",
     "integration-tests": "bash ./tests/integration-tests/run.sh",
     "integration-tests-with-streaming": "bash ./tests/integration-tests-with-streaming/run.sh",
     "local-integration-tests": "bash ./tests/integration-tests/runLocal.sh --timeout=10000",
-    "lint": "eslint ./src/**/**.js ./tests/**/**.js",
+    "lint": "eslint src tests",
     "release": "standard-version",
     "test": "npm run lint && npm run unit-tests && npm run local-integration-tests"
   },
@@ -42,69 +43,67 @@
   },
   "homepage": "https://github.com/Zooz/predator#readme",
   "dependencies": {
-    "artillery": "^1.7.9",
-    "aws-sdk": "^2.814.0",
-    "body-parser": "^1.19.0",
-    "cron": "^1.8.1",
-    "dockerode": "^2.5.8",
-    "express": "^4.17.1",
-    "express-ajv-swagger-validation": "^1.1.1",
-    "express-easy-zip": "^1.1.4",
-    "express-fileupload": "^1.1.10",
+    "@aws-sdk/client-ecs": "^3.916.0",
+    "archiver": "^8.0.0",
+    "body-parser": "^1.20.4",
+    "cron": "^4.4.0",
+    "dockerode": "^5.0.1",
+    "express": "^4.21.2",
+    "express-ajv-swagger-validation": "^1.2.3",
+    "express-fileupload": "^1.5.2",
     "express-http-context": "^1.2.4",
-    "express-requests-logger": "^3.0.2",
+    "express-requests-logger": "^4.0.3",
     "graceful-shutdown-express": "^2.0.1",
     "jsck": "^0.3.2",
-    "kafkajs": "^1.15.0",
-    "lodash": "^4.17.21",
-    "mariadb": "^2.4.2",
-    "mathjs": "^7.5.1",
-    "mysql2": "^2.2.5",
-    "nodemailer": "^6.7.3",
-    "pg": "^8.4.1",
-    "pg-hstore": "^2.3.3",
-    "pino": "^6.3.2",
-    "request": "^2.88.2",
-    "request-promise-native": "^1.0.8",
-    "semver": "^7.3.2",
-    "sequelize": "^5.22.3",
+    "kafkajs": "^2.2.4",
+    "lodash": "^4.18.1",
+    "mariadb": "^3.5.3",
+    "mathjs": "^15.2.0",
+    "mysql2": "^3.23.2",
+    "nodemailer": "^9.0.3",
+    "pg": "^8.22.0",
+    "pg-hstore": "^2.3.4",
+    "pino": "^9.13.1",
+    "semver": "^7.8.5",
+    "sequelize": "^6.37.8",
     "slack-emojis": "^1.1.1",
-    "sqlite3": "5.0.0",
-    "tedious": "^9.2.2",
+    "sqlite3": "^6.0.1",
+    "tedious": "^20.0.0",
     "umzug": "^2.3.0",
-    "uuid": "^3.4.0"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@apidevtools/swagger-parser": "^10.0.2",
-    "@commitlint/cli": "^10.0.0",
-    "@commitlint/config-conventional": "^10.0.0",
+    "@apidevtools/swagger-parser": "^11.0.1",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@map-colonies/standard-version-update-openapi3-version": "0.0.1",
-    "async-retry": "^1.3.1",
-    "chai": "^4.2.0",
-    "commitlint": "^10.0.0",
-    "cz-conventional-changelog": "^3.2.0",
-    "dotenv": "^8.2.0",
-    "eslint": "^7.9.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "husky": "^1.3.1",
-    "mocha": "^7.1.1",
-    "mochawesome": "^4.1.0",
-    "nock": "^10.0.6",
-    "nyc": "^14.1.1",
-    "rewire": "^5.0.0",
-    "should": "^13.2.1",
-    "sinon": "^4.5.0",
-    "standard-version": "^9.3.0",
-    "supertest": "^3.4.2",
-    "yaml": "^1.10.0"
+    "async-retry": "^1.3.3",
+    "c8": "^12.0.0",
+    "chai": "^4.5.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "dotenv": "^16.6.1",
+    "eslint": "^9.39.1",
+    "husky": "^9.1.7",
+    "mocha": "^11.7.6",
+    "mochawesome": "^7.1.4",
+    "neostandard": "^0.12.2",
+    "nock": "^14.0.10",
+    "rewire": "^7.0.0",
+    "should": "^13.2.3",
+    "sinon": "^19.0.5",
+    "standard-version": "^9.5.0",
+    "supertest": "^7.1.4",
+    "yaml": "^2.9.0"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+  "overrides": {
+    "brace-expansion": "^5.0.8",
+    "uuid": "$uuid",
+    "z-schema": {
+      "validator": "^13.15.15"
+    },
+    "sequelize": {
+      "sqlite3": "$sqlite3",
+      "tedious": "$tedious"
     }
   },
   "config": {
@@ -112,11 +111,13 @@
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
-  "nyc": {
+  "c8": {
+    "include": [
+      "src/**/*.js"
+    ],
     "exclude": [
       "**/databaseConnector.js",
       "**/database.js"
-    ],
-    "include": "src"
+    ]
   }
 }

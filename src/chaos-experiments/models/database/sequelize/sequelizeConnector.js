@@ -126,7 +126,7 @@ async function updateChaosExperiment(processorId, updatedChaosMesh) {
 async function insertChaosJobExperiment(id, jobId, experimentId, startTime, endTime, contextId) {
     const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
     const params = {
-        id: id,
+        id,
         job_id: jobId,
         experiment_id: experimentId,
         start_time: new Date(startTime).valueOf(),
@@ -191,7 +191,7 @@ async function getFutureJobExperiments(timestamp, contextId) {
 async function setChaosJobExperimentTriggered(id, isTriggered, contextId) {
     const chaosJobExperimentModel = client.model(CHAOS_JOB_EXPERIMENTS_TABLE_NAME);
     const options = {
-        where: { id: id }
+        where: { id }
     };
 
     if (contextId) {

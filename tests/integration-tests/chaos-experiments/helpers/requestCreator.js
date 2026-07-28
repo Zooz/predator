@@ -1,4 +1,3 @@
-
 const request = require('supertest');
 const appInitUtils = require('../../testUtils');
 const nock = require('nock');

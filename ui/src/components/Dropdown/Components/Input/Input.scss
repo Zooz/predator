@@ -33,7 +33,7 @@
   }
 
   &.input--disabled {
-    background: #f7f7f7;
+    background: var(--bg-sunken);
     color: #c2c2c2;
     pointer-events: none;
   }

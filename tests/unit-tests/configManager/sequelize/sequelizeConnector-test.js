@@ -14,7 +14,7 @@ describe('Sequelize client tests', function () {
         sequelizeGetStub;
 
     before(async () => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     beforeEach(async () => {

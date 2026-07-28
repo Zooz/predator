@@ -13,6 +13,8 @@ import { BarChartPredator, LineChartPredator, AssertionsReport } from './Charts'
 import _ from 'lodash';
 import Checkbox from '../../../components/Checkbox/Checkbox';
 import Card from '../../../components/Card';
+import ReportHero from './ReportHero';
+import css from './style.scss';
 import { faStar as emptyStar } from '@fortawesome/free-regular-svg-icons';
 import { faStar as fullStar, faInfo } from '@fortawesome/free-solid-svg-icons';
 import env from '../../../App/common/env';
@@ -96,54 +98,36 @@ class Report extends React.Component {
       const { disabledCreateBenchmark, filteredKeys, enableBenchmark, isFavorite, loadingMode, finishLoadingMode, passedTime } = this.state;
       return (
         <div>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <h1 style={{ marginTop: '0px', minWidth: '310px' }}>{report.test_name.charAt(0).toUpperCase() + report.test_name.slice(1)}</h1>
-            <SummeryTable report={report} />
-          </div>
-          <span>Started at {dateFormat(new Date(report.start_time), 'dddd, mmmm dS, yyyy, h:MM:ss TT')}</span>
-          {
-            aggregateReport.isBenchmarkExist && <div style={{
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <div style={{ color: 'rgb(87, 125, 254)', marginRight: '5px' }}>Enable benchmark</div>
-              <Checkbox
-                indeterminate={false}
-                checked={enableBenchmark}
-                // disabled={}
-                onChange={(value) => {
-                  this.onSelectedGraphPropertyFilter('latency', ['benchmark_p99', 'benchmark_p95', 'benchmark_median'], value);
-                  this.onSelectedGraphPropertyFilter('rps', ['benchmark_mean'], value);
-                  this.onSelectedGraphPropertyFilter('status_codes_errors', ['benchmark_count'], value);
-                  this.setState({ enableBenchmark: value });
-                }}
-              />
-
-            </div>
-          }
+          <ReportHero report={report} aggregateReport={aggregateReport} />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '5px',
-              marginBottom: '15px'
-            }}>
-              <div onClick={this.onStar}>
-                <InfoToolTip data={{
-                  key: 'star-info',
-                  info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
-                }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'} />
+            <div className={css.toolbar}>
+              <div className={css['toolbar__left']}>
+                <div onClick={this.onStar}>
+                  <InfoToolTip data={{
+                    key: 'star-info',
+                    info: isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                  }} icon={isFavorite ? fullStar : emptyStar} iconSize={'25px'} />
+                </div>
+                {aggregateReport.isBenchmarkExist && (
+                  <label className={css['benchmark-toggle']}>
+                    <Checkbox
+                      indeterminate={false}
+                      checked={enableBenchmark}
+                      onChange={(value) => {
+                        this.onSelectedGraphPropertyFilter('latency', ['benchmark_p99', 'benchmark_p95', 'benchmark_median'], value);
+                        this.onSelectedGraphPropertyFilter('rps', ['benchmark_mean'], value);
+                        this.onSelectedGraphPropertyFilter('status_codes_errors', ['benchmark_count'], value);
+                        this.setState({ enableBenchmark: value });
+                      }}
+                    />
+                    <span className={css['benchmark-label']}>Compare against benchmark</span>
+                  </label>
+                )}
               </div>
               <div>
-                <Button style={{ padding: '0px 5px', marginRight: '5px' }} hover disabled={report.status !== 'finished'}
+                <Button inverted hover disabled={report.status !== 'finished'}
                   onClick={this.exportCSV}>Export to CSV</Button>
-                <Button style={{ padding: '0px 5px' }}hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
+                <Button hover disabled={disabledCreateBenchmark || report.status !== 'finished'}
                   onClick={this.createBenchmark}>Set as Benchmark</Button>
               </div>
             </div>
@@ -157,7 +141,7 @@ class Report extends React.Component {
               (report.status === 'failed' && <div style={{ marginTop: '10px', alignSelf: 'center' }}>{TEST_FAIL_ERROR}</div>) ||
               <>
                 <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
-                  <h3>Overall Latency</h3>
+                  <h3 className='report-chart-title'>Overall Latency</h3>
                   <LineChartPredator
                     data={aggregateReport.latencyGraph}
                     keys={aggregateReport.latencyGraphKeys}
@@ -169,7 +153,7 @@ class Report extends React.Component {
                   />
                 </Card>
                 <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
-                  <h3>Status Codes</h3>
+                  <h3 className='report-chart-title'>Status Codes</h3>
                   <LineChartPredator
                     data={aggregateReport.errorsCodeGraph}
                     keys={aggregateReport.errorsCodeGraphKeys}
@@ -183,7 +167,7 @@ class Report extends React.Component {
                 </Card>
 
                 <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
-                  <h3>RPS</h3>
+                  <h3 className='report-chart-title'>RPS</h3>
                   <LineChartPredator
                     data={aggregateReport.rps}
                     keys={aggregateReport.rpsKeys}
@@ -209,7 +193,7 @@ class Report extends React.Component {
                     marginRight: '10px',
                     flex: 1
                   }}>
-                    <h3>Status Codes And Errors Distribution</h3>
+                    <h3 className='report-chart-title'>Status Codes And Errors Distribution</h3>
                     <BarChartPredator data={aggregateReport.errorsBar} keys={aggregateReport.errorsBarKeys}
                       graphType={'status_codes_errors'}
                       onSelectedGraphPropertyFilter={this.onSelectedGraphPropertyFilter}
@@ -221,14 +205,14 @@ class Report extends React.Component {
                     justifyContent: 'space-between',
                     height: '100%'
                   }}>
-                    <h3>Scenarios</h3>
+                    <h3 className='report-chart-title'>Scenarios</h3>
                     <PieChart data={aggregateReport.scenarios} />
                   </div>
                 </Card>
                 {
                   (aggregateReport.assertionsTable && aggregateReport.assertionsTable.rows.length) > 0 &&
                   <Card style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
-                    <h3>Assertions</h3>
+                    <h3 className='report-chart-title'>Assertions</h3>
                     <AssertionsReport data={aggregateReport.assertionsTable} />
                   </Card>
                 }

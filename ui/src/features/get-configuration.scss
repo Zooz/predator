@@ -1,25 +1,66 @@
 
 
 .card-wrapper {
-  margin-bottom: 80px;
+    margin-bottom: 0;
+    align-items: stretch;
+}
+
+// Settings is a stack of reading-width sections, left-aligned with the page header.
+.sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    max-width: 720px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+// Section headings sit a step below the page title in the same scale.
+.section__title {
+    font-family: var(--font-readout);
+    font-size: var(--text-md);
+    font-weight: 600;
+    letter-spacing: var(--tracking-readout);
+    color: var(--fg-primary);
+    margin: 0;
 }
 
 .action-style {
-  color:#557eff;
-  cursor: pointer;
-  height:46px;
-  display:flex;
-  align-items: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    color: var(--fg-secondary);
+    cursor: pointer;
+
+    &:hover {
+        color: var(--breach-fg);
+        background: var(--breach-bg);
+    }
 }
 
 .disabled-button {
-  color: #b4c9d3;
-  cursor: not-allowed;
+    color: var(--fg-muted);
+    opacity: 0.45;
+    cursor: not-allowed;
+
+    &:hover {
+        color: var(--fg-muted);
+        background: transparent;
+    }
 }
 
 
 .icon {
-  font-size:20px;
+    width: 15px !important;
+    height: 15px !important;
+    font-size: 15px;
 }
 
 .configuration-item-wrapper {

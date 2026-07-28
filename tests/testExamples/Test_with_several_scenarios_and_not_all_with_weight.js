@@ -1,4 +1,3 @@
-
 module.exports = function (dslName) {
     return {
         name: 'test',

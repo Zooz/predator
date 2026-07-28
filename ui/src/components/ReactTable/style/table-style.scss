@@ -1,62 +1,113 @@
-@import "../../styles/colors";
-
-$left-spacing: 0.7rem;
-
-@mixin header-border {
-  border-bottom: solid 1px $border-grey !important;
-}
+// The data surface. Zebra striping is dropped in favour of a single hairline rule
+// per row: with 15 columns of measurements, alternating fills fight the status
+// pills and rate bars for attention. The head is sticky so column meaning survives
+// a long scroll.
 
 .table {
-  background: white;
-  margin-top:10px;
+    background: var(--bg-surface);
+    margin-top: 0;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
 
 .thead {
-  color: var(--header-color) !important;
-  box-shadow: none !important;
-  @include header-border;
+    color: var(--fg-secondary) !important;
+    box-shadow: none !important;
+    background: var(--bg-sunken);
+    border-bottom: 1px solid var(--border-default) !important;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
 }
 
 .th {
-  padding: 0.8rem 0rem !important;
-  border-right: none  !important;
-  cursor: var(--cursor)  !important;
-  flex: 20 0 auto !important;
-  outline: none !important;
+    padding: 0.7rem 0 !important;
+    border-right: none !important;
+    cursor: var(--cursor) !important;
+    flex: 20 0 auto !important;
+    outline: none !important;
 }
 
 .td {
-  border-right: none !important;
-  padding: 0.3rem var(--cell-side-padding) !important;
+    border-right: none !important;
+    padding: 0.35rem var(--cell-side-padding) !important;
+    color: var(--fg-primary);
+    font-size: var(--text-base);
 
-  &:not(.td--autoheight) {
-    padding: 0 var(--cell-side-padding) !important;
-    line-height: var(--row-height);
-  }
+    &:not(.td--autoheight) {
+        padding: 0 var(--cell-side-padding) !important;
+        line-height: var(--row-height);
+    }
 }
 
 .tr {
-  cursor: var(--cursor)  !important;
-  background: var(--background-default);
-  color: var(--text-default);
+    cursor: var(--cursor) !important;
+    background: var(--bg-surface);
+    color: var(--fg-primary);
+    transition: background-color var(--dur-fast) var(--ease-out);
 
-  &:not(.tr--autoheight) {
-    line-height: var(--row-height);
-  }
+    &:not(.tr--autoheight) {
+        line-height: var(--row-height);
+    }
 
-  &.tr--selected {
-    background: var(--background-selected);
-    color: var(--text-selected);
-  }
+    &.tr--selected {
+        background: var(--accent-soft);
+        color: var(--fg-primary);
+        box-shadow: inset 3px 0 0 var(--accent);
+    }
 }
 
 .tr-group {
-  @include header-border;
+    border-bottom: 1px solid var(--border-subtle) !important;
 }
 
-.tbody { overflow: visible!important;}
-
-.ReactTable .rt-tr:hover .rt-td {
-  background-color: rgba(247, 247, 247, 0.05)
+.tr-group:last-child {
+    border-bottom: 0 !important;
 }
 
+.tbody {
+    overflow: visible !important;
+}
+
+// react-table's own stylesheet ships light-mode hex values and its own striping;
+// override at the same specificity so both themes stay coherent.
+:global(.ReactTable) {
+    border: 0 !important;
+}
+
+:global(.ReactTable .rt-tbody .rt-tr-group) {
+    border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+:global(.ReactTable.-striped .rt-tr.-odd) {
+    background: transparent !important;
+}
+
+:global(.ReactTable.-highlight .rt-tbody .rt-tr:not(.-padRow):hover) {
+    background: var(--bg-hover) !important;
+}
+
+:global(.ReactTable .rt-thead.-header) {
+    box-shadow: none !important;
+}
+
+:global(.ReactTable .rt-noData) {
+    background: transparent !important;
+    color: var(--fg-secondary);
+    font-size: var(--text-base);
+}
+
+:global(.ReactTable .-loading) {
+    background: var(--bg-surface) !important;
+}
+
+:global(.ReactTable .-loading > div) {
+    color: var(--fg-secondary) !important;
+}
+
+:global(.ReactTable .rt-resizer) {
+    width: 12px;
+    right: -6px;
+}

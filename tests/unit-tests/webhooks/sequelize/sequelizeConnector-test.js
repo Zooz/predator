@@ -34,8 +34,10 @@ describe('Sequelize client tests', function () {
         uuidV4Stub;
 
     before(async () => {
-        sandbox = sinon.sandbox.create();
-        uuidV4Stub = sandbox.stub(uuid, 'v4');
+        sandbox = sinon.createSandbox();
+        // uuid's CJS export exposes v4 as a getter, so replace the getter itself
+        uuidV4Stub = sandbox.stub();
+        sandbox.stub(uuid, 'v4').get(() => uuidV4Stub);
     });
 
     beforeEach(async () => {

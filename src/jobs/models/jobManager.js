@@ -3,7 +3,6 @@
 const uuid = require('uuid');
 const util = require('util');
 const { CronJob } = require('cron');
-const asyncLocalStorage = require('../../common/context/contextStorage');
 
 const logger = require('../../common/logger'),
     configHandler = require('../../configManager/models/configHandler'),
@@ -15,7 +14,7 @@ const logger = require('../../common/logger'),
     streamingManager = require('../../streaming/manager'),
     { STREAMING_EVENT_TYPES } = require('../../streaming/entities/common'),
     {
-        CONFIG, CONTEXT_ID, JOB_TYPE_FUNCTIONAL_TEST
+        CONFIG, JOB_TYPE_FUNCTIONAL_TEST
     } = require('../../common/consts'),
     generateError = require('../../common/generateError'),
     { version: PREDATOR_VERSION } = require('../../../package.json'),
@@ -370,7 +369,7 @@ async function runJob(job, configData) {
         const jobSpecificPlatformRequest = await createJobRequest(job.id, report.report_id, job, latestDockerImage, configData);
         await jobConnector.runJob(jobSpecificPlatformRequest, job);
     } catch (error) {
-        logger.error({ id: job.id, error: error }, 'Unable to run scheduled job.');
+        logger.error({ id: job.id, error }, 'Unable to run scheduled job.');
         await failReport(report);
         throw error;
     }

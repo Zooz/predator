@@ -17,7 +17,7 @@ import Dialog from './components/Dialog';
 
 const noDataMsg = 'There is no data to display.';
 const errorMsgGetChaosExperiments = 'Error occurred while trying to get all chaos experiments.';
-const columnsNames = ['experiment_name', 'created_at', 'kind', 'duration', 'raw', 'experiment_edit', 'delete'];
+const columnsNames = ['experiment_name', 'created_at', 'kind', 'experiment_duration', 'raw', 'experiment_edit', 'delete'];
 const DESCRIPTION = 'Create chaos experiments templates to be injected as part of your running test.';
 
 class getChaosExperiments extends React.Component {
@@ -148,10 +148,9 @@ class getChaosExperiments extends React.Component {
       });
       const error = this.props.chaosExperimentFailure || this.props.deleteChaosExperimentFailure;
       return (
-        <Page title={'Chaos Experiments'} description={DESCRIPTION}>
-          <Button
-            className={style['create-button']}
-            onClick={this.onCreateExperiment}>Create Experiment</Button>
+        <Page title={'Chaos Experiments'} description={DESCRIPTION} actions={
+          <Button onClick={this.onCreateExperiment}>Create Experiment</Button>
+        }>
           <ReactTableComponent
             onSearch={this.onSearch}
             rowHeight={'46px'}

@@ -11,7 +11,7 @@ describe('Chaos experiments kubernetes connector tests', function () {
     let sandbox;
     let requestSenderSendStub, getAllResourcesOfKindStub, deleteResourceOfKindStub;
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         requestSenderSendStub = sandbox.stub(requestSender, 'send');
         getAllResourcesOfKindStub = sandbox.stub();
         deleteResourceOfKindStub = sandbox.stub();

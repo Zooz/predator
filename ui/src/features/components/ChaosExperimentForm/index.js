@@ -1,4 +1,5 @@
 import React from 'react';
+import { getEditorTheme } from '../useEditorTheme';
 import { connect } from 'react-redux';
 import style from './style.scss';
 import * as Actions from '../../redux/action';
@@ -163,7 +164,7 @@ export class ChaosExperimentForm extends React.Component {
         readOnly: false,
         cursorStyle: 'line',
         automaticLayout: false,
-        theme: 'vs'
+        theme: getEditorTheme()
       };
       return (
         <ErrorWrapper errorText={this.state.validationErrorText}>

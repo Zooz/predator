@@ -1,4 +1,3 @@
-
 'use strict';
 const aggregateReportGenerator = require('../models/aggregateReportGenerator');
 const reports = require('../models/reportsManager');

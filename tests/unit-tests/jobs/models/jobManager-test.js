@@ -48,7 +48,7 @@ describe('Manager jobs', function () {
     let testsManagerGetStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
 
         databaseConnectorInsertStub = sandbox.stub(databaseConnector, 'insertJob');
         databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getJobs');
@@ -73,7 +73,9 @@ describe('Manager jobs', function () {
         jobConnectorRunJobStub = sandbox.stub(jobConnector, 'runJob');
 
         dockerHubConnectorGetMostRecentTagStub = sandbox.stub(dockerHubConnector, 'getMostRecentRunnerTag');
-        uuidStub = sandbox.stub(uuid, 'v4');
+        // uuid's CJS export exposes v4 as a getter, so replace the getter itself
+        uuidStub = sandbox.stub();
+        sandbox.stub(uuid, 'v4').get(() => uuidStub);
 
         jobTemplateCreateJobRequestStub = sandbox.spy(jobTemplate, 'createJobRequest');
         getConfigValueStub = sandbox.stub();
@@ -277,9 +279,9 @@ describe('Manager jobs', function () {
             postReportStub.callCount.should.eql(1);
             jobConnectorRunJobStub.callCount.should.eql(1);
             jobTemplateCreateJobRequestStub.args[0][3].should.containEql({
-                JOB_ID: JOB_ID,
+                JOB_ID,
                 ENVIRONMENT: 'test',
-                TEST_ID: TEST_ID,
+                TEST_ID,
                 PREDATOR_URL: 'localhost:80',
                 JOB_TYPE: 'load_test',
                 ARRIVAL_RATE: '1',

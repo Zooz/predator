@@ -1,35 +1,60 @@
-@import "../styles/colors";
+// Row actions. Previously unconstrained, so call sites passing FontAwesome size
+// props rendered ~40px glyphs that overflowed the table off-screen. The button now
+// owns a fixed square target and the glyph is clamped to fit inside it.
 
 .icon-button {
-  cursor: pointer;
-  color: $glowing-blue;
-  transition: color 0.25s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    cursor: pointer;
+    color: var(--fg-secondary);
+    border-radius: var(--radius-sm);
+    transition:
+        color var(--dur-fast) var(--ease-out),
+        background-color var(--dur-fast) var(--ease-out);
 
-  &[data-disabled=true] {
-    pointer-events: none;
-    box-shadow: none;
-    color: $disabled-grey-button;
-    background-color: $white;
-  }
+    // Clamp whatever the call site asked for; a row action is never a display glyph.
+    & > svg {
+        width: 15px;
+        height: 15px;
+        max-width: 15px;
+        max-height: 15px;
+        font-size: 15px;
+        filter: none;
+        transition: none;
+    }
 
-  &:not([data-disabled=true]):hover {
-    color: darken($glowing-blue, 10%);
-  }
+    &[data-disabled='true'] {
+        pointer-events: none;
+        box-shadow: none;
+        color: var(--fg-muted);
+        opacity: 0.45;
+        background-color: transparent;
+    }
 
-  & > svg {
-    filter: unset;
-    transition: filter 0.2s;
-  }
+    &:not([data-disabled='true']):hover {
+        color: var(--accent);
+        background-color: var(--accent-soft);
+    }
 
-  &:not([data-disabled=true]) > svg:hover {
-    -webkit-filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.25));      
-    filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.25));  
-  }
+    &:not([data-disabled='true']):active {
+        background-color: var(--bg-active);
+    }
+}
+
+@media (pointer: coarse) {
+    .icon-button {
+        width: 44px;
+        height: 44px;
+    }
 }
 
 .spinner-span {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }

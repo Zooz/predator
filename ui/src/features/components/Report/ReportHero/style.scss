@@ -1,0 +1,210 @@
+.hero {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6) var(--space-6) var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.hero__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-5);
+}
+
+.hero__id {
+    min-width: 0;
+}
+
+.hero__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-secondary);
+    margin-bottom: var(--space-1);
+}
+
+.hero__title {
+    font-family: var(--font-readout);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    letter-spacing: var(--tracking-readout);
+    line-height: var(--leading-tight);
+    color: var(--fg-primary);
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.hero__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+}
+
+.hero__dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--border-strong);
+    flex: 0 0 auto;
+}
+
+// The verdict. Largest single piece of colour on the page, and the only thing that
+// changes hue based on outcome.
+.hero__status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: 0 0 auto;
+    height: 30px;
+    padding: 0 var(--space-4) 0 var(--space-3);
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.hero__status::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.hero__status[data-tone='held'] {
+    color: var(--held-fg);
+    background: var(--held-bg);
+    border-color: var(--held-border);
+}
+
+.hero__status[data-tone='running'] {
+    color: var(--accent-fg);
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+
+.hero__status[data-tone='running']::before {
+    animation: hero-pulse 1.8s var(--ease-in-out) infinite;
+}
+
+@keyframes hero-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.hero__status[data-tone='strain'] {
+    color: var(--strain-fg);
+    background: var(--strain-bg);
+    border-color: var(--strain-border);
+}
+
+.hero__status[data-tone='breach'] {
+    color: var(--breach-fg);
+    background: var(--breach-bg);
+    border-color: var(--breach-border);
+}
+
+.hero__status[data-tone='idle'] {
+    color: var(--fg-secondary);
+    background: var(--bg-sunken);
+    border-color: var(--border-subtle);
+}
+
+// ── Readouts ─────────────────────────────────────────────────────────────
+// Gauge faces: hairline dividers between them, values in the expanded face with
+// tabular figures so they hold their position while a run updates.
+.hero__readouts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    margin: var(--space-6) 0 var(--space-2);
+}
+
+.readout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-right: var(--space-5);
+    border-left: 1px solid var(--border-subtle);
+    padding-left: var(--space-4);
+}
+
+.readout:first-child {
+    border-left: 0;
+    padding-left: 0;
+}
+
+.readout__label {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-secondary);
+}
+
+.readout__value {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    font-family: var(--font-readout);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    letter-spacing: var(--tracking-readout);
+    line-height: 1;
+    color: var(--fg-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.readout__value[data-tone='held'] { color: var(--held-fg); }
+.readout__value[data-tone='strain'] { color: var(--strain-fg); }
+.readout__value[data-tone='breach'] { color: var(--breach-fg); }
+
+.readout__unit {
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--fg-muted);
+    letter-spacing: 0;
+}
+
+@media (max-width: 900px) {
+    .hero {
+        padding: var(--space-5) var(--space-4) var(--space-3);
+    }
+
+    .hero__head {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .hero__title {
+        font-size: var(--text-xl);
+    }
+
+    .hero__readouts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-5) 0;
+    }
+
+    // On two columns the third readout starts a new row, so it owns the left edge.
+    .readout:nth-child(odd) {
+        border-left: 0;
+        padding-left: 0;
+    }
+
+    .readout__value {
+        font-size: var(--text-xl);
+    }
+}

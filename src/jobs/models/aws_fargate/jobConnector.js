@@ -1,21 +1,20 @@
 'use strict';
 
-const AWS = require('aws-sdk');
+const { ECSClient, RunTaskCommand, ListTasksCommand, DescribeTasksCommand, StopTaskCommand } = require('@aws-sdk/client-ecs');
 
 module.exports.runJob = async (jobFargateTemplate, job) => {
-    const ecs = new AWS.ECS({ region: job.tag });
-    await ecs.runTask(jobFargateTemplate).promise();
+    const ecs = new ECSClient({ region: job.tag });
+    await ecs.send(new RunTaskCommand(jobFargateTemplate));
 };
 module.exports.stopRun = async (jobPlatformName, job) => {
-    const ecs = new AWS.ECS({ region: job.tag });
-    let runningTasks = await ecs.listTasks({ desiredStatus: 'RUNNING' }).promise();
-    let describeTaskPromise;
+    const ecs = new ECSClient({ region: job.tag });
+    const runningTasks = await ecs.send(new ListTasksCommand({ desiredStatus: 'RUNNING' }));
     if (runningTasks.taskArns.length > 0) {
-        describeTaskPromise = await ecs.describeTasks({ tasks: runningTasks.taskArns, include: ['TAGS'] }).promise();
+        const describedTasks = await ecs.send(new DescribeTasksCommand({ tasks: runningTasks.taskArns, include: ['TAGS'] }));
         const stopPromises = [];
-        for (const task of describeTaskPromise.tasks) {
+        for (const task of describedTasks.tasks) {
             if (task.tags.find(o => o.key === 'job_identifier' && o.value === jobPlatformName)) {
-                stopPromises.push(ecs.stopTask({ task: task.taskArn }).promise());
+                stopPromises.push(ecs.send(new StopTaskCommand({ task: task.taskArn })));
             }
         }
         await Promise.all(stopPromises);

@@ -30,11 +30,10 @@ const Webhhooks = ({setDeleteWebHookSuccess, deleteWebhookSuccess, loading, clea
     };
     const feedbackMsg = deleteWebhookSuccess ? 'Webhook deleted successfully' : undefined;
     return (
-        <Page title={'Webhooks'} description={DESCRIPTION}>
+        <Page title={'Webhooks'} description={DESCRIPTION} actions={
+            <Button disabled={showCreateWebhook} onClick={() => setShowCreateWebhook(true)}>Create Webhook</Button>
+        }>
             <div style={{display: 'flex', flexDirection: 'column'}}>
-                <Button style={{alignSelf:'center'}} disabled={showCreateWebhook} className={style['create-button']} onClick={() => {
-                    setShowCreateWebhook(true);
-                }}>Create Webhook</Button>
                 {!showCreateWebhook && webhooks.length === 0 && loading && <Loader/>}
                 <WebhooksList onClose={onClose} createMode={showCreateWebhook} webhooks={webhooks}/>
                 {webhookError && <ErrorDialog closeDialog={cleanErrors} showMessage={webhookError}/>}

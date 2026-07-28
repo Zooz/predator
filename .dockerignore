@@ -1,6 +1,7 @@
 .nyc_output
-tests
-.circlei
 coverage
+tests
+.circleci
 node_modules
 ui/node_modules
+ui/dist

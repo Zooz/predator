@@ -30,7 +30,7 @@ describe('Webhook/email notifier test ', () => {
         statsFormatterStub, jobsManagerStub, getConfigStub, aggregateReportGeneratorStub, reportEmailSenderStub,
         getReportsStub;
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         loggerInfoStub = sandbox.stub(logger, 'info');
         sandbox.stub(logger, 'warn');
         webhooksManagerFireWebhookStub = sandbox.stub(webhooksManager, 'fireWebhookByEvent');

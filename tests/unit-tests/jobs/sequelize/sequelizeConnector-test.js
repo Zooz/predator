@@ -25,7 +25,7 @@ describe('Sequelize client tests', function () {
     const transaction = {};
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {
@@ -75,8 +75,8 @@ describe('Sequelize client tests', function () {
         });
         sequelizeStub.DataTypes = {};
         sequelizeConnector.__set__('Sequelize', sequelizeStub);
-        sequelizeConnector.__set__('uuid', () => {
-            return 'UUIDSTUB';
+        sequelizeConnector.__set__('uuid', {
+            v4: () => 'UUIDSTUB'
         });
     });
     afterEach(() => {

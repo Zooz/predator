@@ -8,11 +8,11 @@ module.exports.createJobRequest = (jobPlatformName, reportId, parallelism, envir
             name: jobPlatformName,
             labels: {
                 app: predatorRunner,
-                reportId: reportId
+                reportId
             }
         },
         spec: {
-            parallelism: parallelism,
+            parallelism,
             template: {
                 metadata: {
                     labels: {

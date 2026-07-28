@@ -1,4 +1,3 @@
-
 const FIVE_PREFIX = '5';
 const FOUR_PREFIX = '4';
 const RPS = 'rps';

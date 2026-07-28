@@ -1,17 +1,14 @@
 const should = require('should');
-const JSCK = require('jsck');
 const uuid = require('uuid');
 const nock = require('nock');
 const { cloneDeep } = require('lodash');
-JSCK.Draft4 = JSCK.draft4;
-const artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
 const testsRequestSender = require('./helpers/requestCreator');
 const processorsRequestSender = require('../processors/helpers/requestCreator');
 
-let contextId = uuid.v4();
+const contextId = uuid.v4();
 const headersWithoutContext = { 'Content-Type': 'application/json' };
-const headersWithRandomContext = { 'Content-Type': 'application/json', 'x-context-id': 'random' }
-const headersWithContext = { 'x-context-id': contextId, 'Content-Type': 'application/json'}
+const headersWithRandomContext = { 'Content-Type': 'application/json', 'x-context-id': 'random' };
+const headersWithContext = { 'x-context-id': contextId, 'Content-Type': 'application/json' };
 
 const paymentsOsDsl = require('../../testExamples/paymentsos-dsl');
 const fileUrl = 'https://raw.githubusercontent.com/Zooz/predator/master/README.md';
@@ -131,8 +128,8 @@ describe('the tests api with contexts', function() {
         it('Get tests without context_id should return 200 with both tests', async () => {
             const getTestResponse = await testsRequestSender.getTests(headersWithoutContext);
             should(getTestResponse.statusCode).eql(200);
-            const firstTest = getTestResponse.body.find((test) => test.id === createTestWithContextResponse.body.id)
-            const secondTest = getTestResponse.body.find((test) => test.id === createTestWithoutContextResponse.body.id)
+            const firstTest = getTestResponse.body.find((test) => test.id === createTestWithContextResponse.body.id);
+            const secondTest = getTestResponse.body.find((test) => test.id === createTestWithoutContextResponse.body.id);
             should(firstTest).not.be.undefined();
             should(secondTest).not.be.undefined();
         });
@@ -164,7 +161,7 @@ describe('the tests api with contexts', function() {
 
         it('Update test created with context_id with wrong context_id header should return 404', async () => {
             const updatedName = `updated-name-${uuid.v4()}`;
-            let getTestResponse = await testsRequestSender.getTest(createTestWithContextResponse.body.id, headersWithContext);
+            const getTestResponse = await testsRequestSender.getTest(createTestWithContextResponse.body.id, headersWithContext);
             getTestResponse.body.name = updatedName;
 
             const updateTestResponse = await testsRequestSender.updateTest(getTestResponse.body, headersWithRandomContext, createTestWithContextResponse.body.id);
@@ -253,7 +250,7 @@ describe('the tests api with contexts', function() {
             describe('processors', async function() {
                 it('create test with processor with same context should succeed', async function(){
                     const processor = {
-                        name: 'some-user-processor: ' + uuid(),
+                        name: 'some-user-processor: ' + uuid.v4(),
                         description: 'This is a description',
                         javascript: 'module.exports = {\n' +
                             '    beforeRequest,\n' +
@@ -286,7 +283,7 @@ describe('the tests api with contexts', function() {
                 });
                 it('create test with processor not with same context should fail', async function(){
                     const processor = {
-                        name: 'some-user-processor: ' + uuid(),
+                        name: 'some-user-processor: ' + uuid.v4(),
                         description: 'This is a description',
                         javascript: 'module.exports = {\n' +
                             '    beforeRequest,\n' +
@@ -316,7 +313,7 @@ describe('the tests api with contexts', function() {
                 });
                 it('create test with processor without context should succeed', async function(){
                     const processor = {
-                        name: 'some-user-processor: ' + uuid(),
+                        name: 'some-user-processor: ' + uuid.v4(),
                         description: 'This is a description',
                         javascript: 'module.exports = {\n' +
                             '    beforeRequest,\n' +

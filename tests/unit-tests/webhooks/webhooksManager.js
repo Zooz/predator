@@ -7,7 +7,6 @@ const webhooksManager = require('../../../src/webhooks/models/webhookManager');
 const webhooksFormatter = require('../../../src/webhooks/models/webhooksFormatter');
 const { ERROR_MESSAGES, WEBHOOK_EVENT_TYPE_FINISHED, WEBHOOK_EVENT_TYPE_STARTED, WEBHOOK_EVENT_TYPE_FAILED } = require('../../../src/common/consts');
 const requestSender = require('../../../src/common/requestSender');
-const { stubArray } = require('lodash');
 
 describe('webhooksManager', () => {
     let sandbox;
@@ -23,7 +22,7 @@ describe('webhooksManager', () => {
     let webhooksFormatterFormatSimpleMessageStub;
     let webhooksFormatterFormatStub;
     before('tests setup', function() {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         databaseConnectorGetStub = sandbox.stub(databaseConnector, 'getWebhook');
         databaseConnectorGetAllStub = sandbox.stub(databaseConnector, 'getAllWebhooks');
         databaseConnectorCreateStub = sandbox.stub(databaseConnector, 'createWebhook');
@@ -116,7 +115,6 @@ describe('webhooksManager', () => {
         it('should delete the webhook', async function() {
             const id = uuid.v4();
 
-
             databaseConnectorDeleteStub.resolves();
             databaseConnectorGetStub.resolves({});
 
@@ -190,7 +188,7 @@ describe('webhooksManager', () => {
                     body: payload,
                     resolveWithFullResponse: true
                 });
-                expect(statusCodeWebhookResponse).eql({webhook_status_code: statusCode, is_successful: true});
+                expect(statusCodeWebhookResponse).eql({ webhook_status_code: statusCode, is_successful: true });
             });
         });
         [301, 400, 500, 502, 504].forEach(function (statusCode) {
@@ -212,7 +210,7 @@ describe('webhooksManager', () => {
                     body: payload,
                     resolveWithFullResponse: true
                 });
-                expect(response).eql({webhook_status_code: statusCode, is_successful: false});
+                expect(response).eql({ webhook_status_code: statusCode, is_successful: false });
             });
         });
         it('should throw an error for webhook not found', async function() {

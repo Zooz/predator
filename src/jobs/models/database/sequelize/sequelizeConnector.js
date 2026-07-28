@@ -1,6 +1,6 @@
 'use strict';
 
-const uuid = require('uuid/v4');
+const uuid = require('uuid');
 const _ = require('lodash');
 const Sequelize = require('sequelize');
 
@@ -40,9 +40,11 @@ async function insertJob(jobId, jobInfo, contextId) {
         enabled: jobInfo.enabled,
         debug: jobInfo.debug,
         tag: jobInfo.tag,
-        emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
-            return { id: uuid(), address: emailAddress };
-        }) : undefined,
+        emails: jobInfo.emails
+            ? jobInfo.emails.map(emailAddress => {
+                return { id: uuid.v4(), address: emailAddress };
+            })
+            : undefined,
         experiments: jobInfo.experiments,
         context_id: contextId
     };
@@ -120,9 +122,11 @@ async function updateJob(jobId, jobInfo) {
         enabled: jobInfo.enabled,
         notes: jobInfo.notes,
         experiments: jobInfo.experiments,
-        emails: jobInfo.emails ? jobInfo.emails.map(emailAddress => {
-            return { id: uuid(), address: emailAddress };
-        }) : undefined
+        emails: jobInfo.emails
+            ? jobInfo.emails.map(emailAddress => {
+                return { id: uuid.v4(), address: emailAddress };
+            })
+            : undefined
     };
     const oldJob = await job.findByPk(jobId, { include: [job.email] });
     const mergedParams = _.mergeWith(params, oldJob.dataValues, (newValue, oldJobValue) => {

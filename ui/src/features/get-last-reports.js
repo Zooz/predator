@@ -211,23 +211,19 @@ class getReports extends React.Component {
       ];
 
       return (
-        <Page title={'Last Reports'} description={DESCRIPTION}>
+        <Page title={'Last Reports'} description={DESCRIPTION} actions={
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button
+              inverted
+              disabled={!this.props.isAtLeastOneReportSelected}
+              onClick={() => this.setState({ showDeleteReportWarning: true })}>Delete Reports</Button>
+            <Button
+              disabled={!this.props.isAtLeastOneReportSelected}
+              onClick={() => this.setState({ showCompareReports: true })}>Compare Reports</Button>
+          </div>
+        }>
           <div style={{ width: '100%' }}>
             {showReport && <Report onClose={this.closeReport} key={showReport.report_id} report={showReport} />}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <Button
-                disabled={!this.props.isAtLeastOneReportSelected}
-                style={{}} onClick={() => {
-                  this.setState({
-                    showCompareReports: true
-                  });
-                }}>Compare Reports</Button>
-              <Button
-                disabled={!this.props.isAtLeastOneReportSelected}
-                style={{
-                  marginLeft: '10px'
-                }} onClick={() => this.setState({ showDeleteReportWarning: true })}>Delete Reports</Button>
-            </div>
             <ReactTableComponent
               // tableRowId={'report_id'}
               onSearch={this.onSearch}

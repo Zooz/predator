@@ -35,7 +35,7 @@ async function initSchemas() {
 async function saveFile(id, fileName, fileContent, contextId) {
     const fileClient = client.model('file');
     const params = {
-        id: id,
+        id,
         name: fileName,
         file: fileContent,
         context_id: contextId

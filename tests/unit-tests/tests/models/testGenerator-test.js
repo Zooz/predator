@@ -7,7 +7,7 @@ const should = require('should'),
 describe('Scenario generator tests', function(){
     let sandbox, getDslDefinitionsStub;
     before(function () {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         getDslDefinitionsStub = sandbox.stub(database, 'getDslDefinitions');
     });
     beforeEach(function () {

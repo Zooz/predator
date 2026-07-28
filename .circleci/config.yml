@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   setup:
     docker:
-    - image: cimg/node:12.22.9
+    - image: cimg/node:24.18.0
     steps:
     - checkout
     - setup_remote_docker:
@@ -16,7 +16,7 @@ jobs:
         - node_modules
   npm-audit:
     docker:
-    - image: cimg/node:12.22.9
+    - image: cimg/node:24.18.0
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -25,10 +25,10 @@ jobs:
           docker_layer_caching: false
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-      - run: npm audit --only=prod --audit-level=moderate || true
+      - run: npm audit --omit=dev --audit-level=moderate
   unit-tests:
     docker:
-    - image: cimg/node:12.22.9
+    - image: cimg/node:24.18.0
       environment:
         TZ: "Asia/Jerusalem"
     steps:
@@ -43,7 +43,7 @@ jobs:
           path: ./coverage
   integration-tests:
     docker:
-    - image: cimg/node:12.22.9
+    - image: cimg/node:24.18.0
     - image: mailhog/mailhog
     - image: mysql:5.7
       environment:
@@ -91,7 +91,7 @@ jobs:
           JOB_PLATFORM: docker
   integration-tests-with-streaming:
     docker:
-      - image: cimg/node:12.22.9
+      - image: cimg/node:24.18.0
       - image: wurstmeister/zookeeper
         name: zookeeper
       - image: wurstmeister/kafka:2.13-2.7.0
@@ -116,7 +116,7 @@ jobs:
             STREAMING_PLATFORM: kafka
   build:
     docker:
-    - image: docker:18
+    - image: cimg/base:current
     steps:
     - checkout
     - setup_remote_docker:
@@ -127,7 +127,7 @@ jobs:
       version:
         type: string
     docker:
-    - image: cimg/node:12.22.9
+    - image: cimg/node:24.18.0
     steps:
     - checkout
     - setup_remote_docker:
@@ -141,7 +141,7 @@ jobs:
     - run: .circleci/tag-latest-image.sh
   tag-latest-image:
     docker:
-      - image: cimg/node:12.22.9
+      - image: cimg/node:24.18.0
     steps:
       - checkout
       - setup_remote_docker:

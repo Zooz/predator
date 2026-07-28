@@ -1,7 +1,6 @@
-/* eslint-disable no-prototype-builtins */
 'use strict';
 
-const uuid = require('uuid/v4');
+const uuid = require('uuid');
 const nock = require('nock');
 const { expect } = require('chai');
 
@@ -21,7 +20,7 @@ const wrongContextHeaders = { 'Content-Type': 'application/json', 'x-context-id'
 
 (jobPlatform.toUpperCase() === KUBERNETES ? describe : describe.skip)('Reports integration tests', function() {
     before('Init requestCreators', async function() {
-        this.timeout(50000)
+        this.timeout(50000);
         await reportsRequestCreator.init();
         await testsRequestCreator.init();
         await jobRequestCreator.init();
@@ -118,7 +117,7 @@ const wrongContextHeaders = { 'Content-Type': 'application/json', 'x-context-id'
                 const editReportResponse = await reportsRequestCreator.deleteReport(testId, reportId);
                 expect(editReportResponse.status).to.be.equal(204);
             });
-        })
+        });
     });
 });
 
@@ -127,14 +126,8 @@ function nockK8sRunnerCreation(url, name, uid, namespace) {
         .post(`/apis/batch/v1/namespaces/${namespace}/jobs`)
         .reply(200, {
             metadata: { name, uid },
-            namespace: namespace
+            namespace
         });
-}
-
-async function sleep(timeInMs) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, timeInMs);
-    });
 }
 
 async function assertReportStatus(testId, reportId, status, headers) {

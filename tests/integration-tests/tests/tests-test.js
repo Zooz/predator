@@ -5,7 +5,7 @@ const JSCK = require('jsck');
 const nock = require('nock');
 const { cloneDeep } = require('lodash');
 JSCK.Draft4 = JSCK.draft4;
-const artilleryCheck = new JSCK.Draft4(require('artillery/core/lib/schemas/artillery_test_script'));
+const artilleryCheck = new JSCK.Draft4(require('../../../src/tests/helpers/artillery-test-script.schema.json'));
 const testsRequestSender = require('./helpers/requestCreator');
 const processorsRequestSender = require('../processors/helpers/requestCreator');
 const jobsRequestSender = require('../jobs/helpers/requestCreator');
@@ -50,7 +50,8 @@ describe('the tests api', function() {
             const requestBody = Object.assign({ processor_file_url: 'https://www.notRealUrl123.com' }, simpleTest.test);
             const res = await testsRequestSender.createTest(requestBody, validHeaders);
             res.statusCode.should.eql(422);
-            res.body.message.should.containEql('Error to download file: RequestError');
+            // the message wraps whatever fetch threw; assert on the part downloadManager owns
+            res.body.message.should.startWith('Error to download file:');
         });
         it('Should return error for processor id not exists ', async () => {
             const requestBody = Object.assign({ processor_id: '123e4567-e89b-12d3-a456-426655440000' }, simpleTest.test);
@@ -60,7 +61,7 @@ describe('the tests api', function() {
         });
         it('Should return error when using functions not from processor', async () => {
             const processor = {
-                name: 'some-user-processor: ' + uuid(),
+                name: 'some-user-processor: ' + uuid.v4(),
                 description: 'This is a description',
                 javascript: 'module.exports.func = 5'
             };
@@ -163,7 +164,7 @@ describe('the tests api', function() {
                 errors: {},
                 codes: {}
             };
-            const benchmarkResult = await testsRequestSender.createBenchmark(uuid(), benchmarkRequest, validHeaders);
+            const benchmarkResult = await testsRequestSender.createBenchmark(uuid.v4(), benchmarkRequest, validHeaders);
             should(benchmarkResult.body.message).eql('Not found');
             should(benchmarkResult.statusCode).eql(404);
         });
@@ -174,7 +175,7 @@ describe('the tests api', function() {
                     mean: 46.74
                 }
             };
-            const benchmarkResult = await testsRequestSender.createBenchmark(uuid(), benchmarkRequest, validHeaders);
+            const benchmarkResult = await testsRequestSender.createBenchmark(uuid.v4(), benchmarkRequest, validHeaders);
             should(benchmarkResult.body.message).eql('Input validation error');
             should(benchmarkResult.statusCode).eql(400);
         });
@@ -208,7 +209,7 @@ describe('the tests api', function() {
             should(getResult.body.message).eql('Not found');
         });
         it('get benchmark when tests not created and get 404', async () => {
-            const getResult = await testsRequestSender.getBenchmark(uuid(), validHeaders);
+            const getResult = await testsRequestSender.getBenchmark(uuid.v4(), validHeaders);
             should(getResult.statusCode).eql(404);
             should(getResult.body.message).eql('Not found');
         });
@@ -299,7 +300,7 @@ describe('the tests api', function() {
             });
             it('Create test, with a processor id', async () => {
                 const processor = {
-                    name: 'some-user-processor: ' + uuid(),
+                    name: 'some-user-processor: ' + uuid.v4(),
                     description: 'This is a description',
                     javascript: 'module.exports = {\n' +
                         '    beforeRequest,\n' +

@@ -7,7 +7,7 @@ describe('Date util helper', function () {
     let sandbox, clock;
     const fakeDate = new Date('02/22/2017');
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         clock = sinon.useFakeTimers({ now: fakeDate });
     });
 

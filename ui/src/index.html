@@ -1,15 +1,33 @@
 <html lang="en">
 <head>
     <link rel="icon" type="image/png" href='favicon.png' />
-    <link href="https://fonts.googleapis.com/css?family=Bai+Jamjuree:200,300,400,400i,500,600,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Orbitron:400,500,700,900&display=swap" rel="stylesheet">
+
+    <!-- Instrument type pairing: Archivo for UI (Expanded for gauge readouts),
+         IBM Plex Mono for measured values, ids and code. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Expanded:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <title>Predator</title>
     <base href="/" />
 
+    <script>
+      // Apply the stored theme before first paint so there is no flash of the wrong
+      // theme. No stored preference means we leave it to prefers-color-scheme.
+      (function () {
+        try {
+          var t = localStorage.getItem('predator-theme');
+          if (t === 'light' || t === 'dark') {
+            document.documentElement.setAttribute('data-theme', t);
+          }
+        } catch (e) { /* private mode: fall back to the media query */ }
+      })();
+    </script>
 </head>
 <body>
 <div id="root" style="position: relative; z-index:1; height: 100vh; overflow: hidden;"></div>

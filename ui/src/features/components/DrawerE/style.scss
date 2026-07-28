@@ -1,39 +1,359 @@
-.drawer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex-shrink: 0;
-  transition: margin-left 450ms cubic-bezier(0.23, 1, 0.32, 1);
-  &.drawer--open {
-    margin-left: 256px;
-  }
+// The instrument case: a fixed chrome rail holding the app, with the working
+// surface inset beside it. Replaces the material-ui v0 Drawer/AppBar pair, which
+// hard-docked a 256px panel and left ~130px of usable width on a phone.
+
+.shell {
+    display: flex;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg-app);
 }
 
-.menu-selected {
-  background: #242B57 !important;
+.rail {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    width: 232px;
+    background: var(--bg-chrome);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    transition: width var(--dur-slow) var(--ease-out);
+    z-index: var(--z-rail);
 }
 
-.appbar{
-  background: transparent !important;
-  flex-shrink: 0;
+.rail--collapsed {
+    width: 64px;
 }
 
-
-
-.logo-text{
-  font-weight: 700;
-  color: #ffffff;
-  font-family: Orbitron, sans-serif;
-  text-transform: lowercase;
-  margin: -4px 0 0 10px;
+// ── Brand ──
+.brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 60px;
+    padding: 0 var(--space-4);
+    flex: 0 0 auto;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden;
 }
 
-.logo-wrapper {
-  display:flex;
-  align-items: center;
+.brand__mark {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    border-radius: var(--radius-sm);
 }
 
-.icon {
-  color:white;
-  font-size: 20px;
+.brand__name {
+    font-family: var(--font-readout);
+    font-weight: 700;
+    font-size: var(--text-md);
+    letter-spacing: 0.02em;
+    color: var(--fg-on-chrome);
+    white-space: nowrap;
+    text-transform: lowercase;
+}
+
+// ── Navigation ──
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-4) var(--space-2);
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.nav__section {
+    padding: var(--space-4) var(--space-3) var(--space-2);
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-on-chrome-muted);
+    white-space: nowrap;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 38px;
+    padding: 0 var(--space-3);
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--fg-on-chrome-muted);
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out);
+}
+
+.item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--fg-on-chrome);
+}
+
+// Active state is carried by a left tick mark as well as colour — the same
+// engraved-marker language used on the report axis.
+.item--active {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--fg-on-chrome);
+}
+
+.item--active::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 18px;
+    border-radius: 0 2px 2px 0;
+    background: var(--trace-400);
+}
+
+.item__icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item__icon > svg {
+    width: 15px !important;
+    height: 15px !important;
+}
+
+.item__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rail--collapsed .item {
+    justify-content: center;
+    padding: 0;
+}
+
+.rail--collapsed .item__label,
+.rail--collapsed .nav__section,
+.rail--collapsed .brand__name,
+.rail--collapsed .foot__version {
+    display: none;
+}
+
+.sub {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: var(--space-6);
+}
+
+.rail--collapsed .sub {
+    padding-left: 0;
+}
+
+// ── Rail foot ──
+.foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    flex: 0 0 auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rail--collapsed .foot {
+    flex-direction: column;
+}
+
+.foot__version {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--fg-on-chrome-muted);
+}
+
+.chrome-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--fg-on-chrome-muted);
+    cursor: pointer;
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out);
+}
+
+.chrome-button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--fg-on-chrome);
+}
+
+.chrome-button > svg {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+// ── Working surface ──
+.main {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+}
+
+// Mobile-only chrome: on desktop the rail is always visible and the theme
+// toggle lives in its foot, so the bar would be a 52px strip of nothing.
+.topbar {
+    display: none;
+    align-items: center;
+    gap: var(--space-3);
+    height: 52px;
+    flex: 0 0 auto;
+    padding: 0 var(--space-5);
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 900px) {
+    .topbar {
+        display: flex;
+    }
+}
+
+.topbar__spacer {
+    flex: 1 1 auto;
+}
+
+.topbar-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out);
+}
+
+.topbar-button:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-subtle);
+    color: var(--fg-primary);
+}
+
+.topbar-button > svg {
+    width: 15px !important;
+    height: 15px !important;
+}
+
+.content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.scrim {
+    position: fixed;
+    inset: 0;
+    background: var(--scrim);
+    z-index: var(--z-scrim);
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    animation: scrim-in var(--dur-base) var(--ease-out);
+}
+
+@keyframes scrim-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+// Only shown where the rail becomes an overlay.
+.menu-button {
+    display: none;
+}
+
+// ── Small screens ────────────────────────────────────────────────────────
+// Below 900px the rail leaves the flow entirely and slides in over the content,
+// so the working surface always gets the full viewport width.
+@media (max-width: 900px) {
+    .rail {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform var(--dur-slow) var(--ease-out);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .rail--open {
+        transform: translateX(0);
+    }
+
+    .rail--collapsed {
+        width: 260px;
+    }
+
+    .rail--collapsed .item__label,
+    .rail--collapsed .nav__section,
+    .rail--collapsed .brand__name,
+    .rail--collapsed .foot__version {
+        display: revert;
+    }
+
+    .rail--collapsed .item {
+        justify-content: flex-start;
+        padding: 0 var(--space-3);
+    }
+
+    .rail--collapsed .sub {
+        padding-left: var(--space-6);
+    }
+
+    .rail--collapsed .foot {
+        flex-direction: row;
+    }
+
+    .menu-button {
+        display: inline-flex;
+    }
+
+    .collapse-button {
+        display: none;
+    }
+
+    .topbar {
+        padding: 0 var(--space-4);
+    }
 }

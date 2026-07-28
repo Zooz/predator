@@ -8,7 +8,7 @@ const should = require('should'),
     configRequestCreator = require('../configManager/helpers/requestCreator'),
     nock = require('nock');
 
-const { expect } = require('chai'); ;
+const { expect } = require('chai');
 
 describe('Create job global tests', function () {
     this.timeout(20000);

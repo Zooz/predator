@@ -1,34 +1,76 @@
+// Every list page runs through here, so the header rule lives here too:
+// an eyebrow that names the section, the title, and the description held to a
+// readable measure instead of stretching across a 1600px table.
+
 .page {
-  height: 100%;
-  overflow: auto;
-  background-color: #f1f3f6;
+    height: 100%;
+    overflow: auto;
+    background-color: var(--bg-app);
 }
+
 .content {
-  margin-top: 55px;
-  margin-left:20px;
-  margin-right:5px
+    padding: var(--space-8) var(--space-8) var(--space-12);
+    margin: 0;
+    max-width: 1680px;
 }
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-5);
+    // The hairline under the header is the same rule used on the report axis —
+    // it reads as a measurement baseline rather than decoration.
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.heading {
+    min-width: 0;
+}
+
+.eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-secondary);
+    margin-bottom: var(--space-2);
+}
+
 .title {
-  height: 24px;
-  font-size: 20px;
-  font-weight: 900;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: normal;
-  letter-spacing: normal;
-  color: #555555;
+    font-family: var(--font-readout);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: var(--tracking-readout);
+    line-height: var(--leading-tight);
+    color: var(--fg-primary);
+    margin: 0;
 }
 
 .description {
-  max-width: 644px;
-  min-height: 46px;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 1.62;
-  letter-spacing: normal;
-  color: #778195;
-  margin-bottom: 43px;
-  margin-top: 20px;
+    // ~70 characters at this size: the readable measure. Previously the copy ran
+    // the full width of the viewport.
+    max-width: 62ch;
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--fg-secondary);
+    margin: var(--space-3) 0 0;
+}
+
+@media (max-width: 900px) {
+    .content {
+        padding: var(--space-5) var(--space-4) var(--space-10);
+    }
+
+    .header {
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .title {
+        font-size: var(--text-lg);
+    }
 }

@@ -1,22 +1,42 @@
 .buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-
-  > :first-child {
-    margin-right: 5px;
-  }
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  padding-left: 100px;
-  .TextFieldAndCheckBoxToolTip{
-    margin-right: 110px;
-  }
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    width: 100%;
+    padding-left: 0;
+
+    .TextFieldAndCheckBoxToolTip {
+        margin-right: 0;
+    }
 }
 
 
 
+
+// Field-group heading inside a settings section: one step below the section title,
+// with a rule so groups are separated without another card.
+.group-title {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-secondary);
+    margin: var(--space-4) 0 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.form > *:first-child .group-title {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}

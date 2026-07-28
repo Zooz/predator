@@ -1,6 +1,5 @@
 const app = require('./app'),
     logger = require('./common/logger'),
-    request = require('request-promise-native'),
     configHandler = require('./configManager/models/configHandler'),
     constConfig = require('./common/consts'),
     shutdown = require('graceful-shutdown-express');
@@ -14,10 +13,10 @@ app().then(async (app) => {
     await verifyInternalAddressReachable();
 
     shutdown.registerShutdownEvent({
-        server: server,
+        server,
         newConnectionsTimeout: process.env.LOAD_BALANCER_UPDATE_PERIOD || 7000,
         shutdownTimeout: process.env.SHUTDOWN_GRACE_TIMEOUT || 10000,
-        logger: logger,
+        logger,
         events: ['SIGTERM', 'SIGINT']
     });
 }).catch(error => {
@@ -38,14 +37,13 @@ async function verifyInternalAddressReachable() {
     }
 
     try {
-        await request.get(internalConfigAddress, {
-            json: true,
-            resolveWithFullResponse: true,
-            timeout: 5000
-        });
+        const response = await fetch(internalConfigAddress, { signal: AbortSignal.timeout(5000) });
+        if (!response.ok) {
+            throw new Error(`${response.status} ${response.statusText}`);
+        }
         logger.info(`${internalConfigAddress} successfully reached`);
     } catch (error) {
-        let platform = await configHandler.getConfigValue(constConfig.CONFIG.JOB_PLATFORM);
+        const platform = await configHandler.getConfigValue(constConfig.CONFIG.JOB_PLATFORM);
         if (platform === constConfig.DOCKER) {
             throw new Error(`Failed to reach successfully INTERNAL_ADDRESS at ${internalConfigAddress}, shutting down server (to skip this check set SKIP_INTERNAL_ADDRESS_CHECK=true\nError: ${error.message}`);
         } else {

@@ -1,3 +1,37 @@
-#root{
-    height:100%;
+#root {
+    height: 100%;
+}
+
+/* ── react-tooltip ────────────────────────────────────────────────────────
+   type='light' paints a hardcoded white bubble with a white arrow, which showed as
+   a white box in dark mode. These live here rather than in style.scss because that
+   file is compiled as a CSS module and would hash these third-party class names. */
+.__react_component_tooltip.type-light {
+    background-color: var(--bg-surface-raised) !important;
+    border: 1px solid var(--border-default) !important;
+    color: var(--fg-primary) !important;
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    opacity: 1 !important;
+}
+
+/* The arrow is a separate pseudo element per placement. */
+.__react_component_tooltip.type-light.place-top::after {
+    border-top-color: var(--bg-surface-raised) !important;
+}
+
+.__react_component_tooltip.type-light.place-bottom::after {
+    border-bottom-color: var(--bg-surface-raised) !important;
+}
+
+.__react_component_tooltip.type-light.place-left::after {
+    border-left-color: var(--bg-surface-raised) !important;
+}
+
+.__react_component_tooltip.type-light.place-right::after {
+    border-right-color: var(--bg-surface-raised) !important;
 }

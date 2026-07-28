@@ -4,7 +4,6 @@ import { get } from 'lodash';
 import Checkbox from '../components/Checkbox/Checkbox';
 
 import Moment from 'moment';
-import prettySeconds from 'pretty-seconds';
 import 'font-awesome/css/font-awesome.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -39,7 +38,7 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
       id: 'compare',
       Header: () => (
         <TableHeader sortable={false}>
-          Select
+          Cmp
         </TableHeader>
       ),
       accessor: (data) => <CompareCheckbox onReportSelected={onReportSelected} selectedReports={selectedReports}
@@ -61,7 +60,8 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           Test Name
         </TableHeader>
       ),
-      accessor: 'name'
+      accessor: 'name',
+      minWidth: 170
     }, {
       id: 'processor_name',
       Header: () => (
@@ -87,7 +87,10 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           Description
         </TableHeader>
       ),
-      accessor: 'description'
+      // Ellipsis instead of a hard clip into the next column; full text on hover.
+      accessor: data => (
+        <span className={css['ellipsis-cell']} title={data.description}>{data.description}</span>
+      )
     }, {
       id: 'kind',
       Header: () => (
@@ -97,7 +100,10 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
       ),
       accessor: 'kind'
     }, {
-      id: 'duration',
+      // Chaos Mesh durations are spec strings ("1m", "30s") — shown as-is, unlike
+      // the report `duration` column below which pretty-prints seconds. Two ids,
+      // because getColumns resolves by first match.
+      id: 'experiment_duration',
       Header: () => (
         <TableHeader padding={'8px'} sortable={false}>
           Duration
@@ -225,8 +231,11 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           Test Name
         </TableHeader>
       ),
-      accessor: 'test_name'
-
+      accessor: data => (
+        <span className={css['ellipsis-cell']} title={data.test_name} style={{ color: 'var(--fg-primary)' }}>{data.test_name}</span>
+      ),
+      // The identifying column never loses space to icon columns.
+      minWidth: 170
     },
     {
       id: 'start_time',
@@ -241,7 +250,9 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           Start Time
         </TableHeader>
       ),
-      accessor: data => (<div className={css['header-time']}>{dateFormatter(data.start_time)}</div>)
+      accessor: data => (dateFormatter(data.start_time)),
+      width: extraExLargeSize,
+      className: css['center-flex']
     },
     {
       id: 'end_time',
@@ -250,7 +261,7 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           End Time
         </TableHeader>
       ),
-      accessor: data => (<div className={css['header-time']}>{dateFormatter(data.end_time)}</div>),
+      accessor: data => (dateFormatter(data.end_time)),
       width: extraExLargeSize,
       className: css['center-flex']
     },
@@ -261,7 +272,7 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           Duration
         </TableHeader>
       ),
-      accessor: data => (prettySeconds(data.duration)),
+      accessor: data => (<span className={css['time-cell']}>{shortDuration(data.duration)}</span>),
       width: largeSize
       // className: css['center-flex'],
     },
@@ -273,7 +284,7 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
         </TableHeader>
       ),
       accessor: data => statusFormatter(data.status),
-      width: largeSize
+      width: extraLargeSize + 20
     },
     {
       id: 'arrival_rate',
@@ -290,10 +301,10 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
       id: 'ramp_to',
       Header: () => (
         <TableHeader padding={'8px'} sortable={false}>
-          Ramp To
+          Ramp
         </TableHeader>
       ),
-      accessor: data => (data.ramp_to || 'N/A'),
+      accessor: data => (data.ramp_to || <span className={css['metric--muted']}>–</span>),
       width: mediumSize,
       className: css['center-flex']
     },
@@ -304,7 +315,7 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           Max Virtual Users
         </TableHeader>
       ),
-      accessor: data => (data.max_virtual_users || 'N/A'),
+      accessor: data => (data.max_virtual_users || <span className={css['metric--muted']}>–</span>),
       width: extraExLargeSize,
       className: css['center-flex']
     },
@@ -315,7 +326,7 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           Cron Expression
         </TableHeader>
       ),
-      accessor: data => (getTimeFromCronExpr(data.cron_expression) || 'N/A'),
+      accessor: data => (getTimeFromCronExpr(data.cron_expression) || <span className={css['metric--muted']}>–</span>),
       width: extraExLargeSize,
       className: css['center-flex']
     },
@@ -326,7 +337,10 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           Last Run
         </TableHeader>
       ),
-      accessor: 'last_run'
+      // The selector fills 'N/A' when a job has never run.
+      accessor: data => ((data.last_run && data.last_run !== 'N/A')
+        ? dateFormatter(data.last_run)
+        : <span className={css['metric--muted']}>–</span>)
       // minWidth: 150
     },
 
@@ -334,12 +348,11 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
       id: 'last_success_rate',
       Header: () => (
         <TableHeader sortable={false}>
-          Success Rate
+          Success
         </TableHeader>
       ),
-      accessor: data => (Math.floor(data.last_success_rate) + '%'),
-      width: extraLargeSize,
-      className: css['center-flex']
+      accessor: data => successRateFormatter(data.last_success_rate),
+      width: extraLargeSize + 10
     },
     {
       id: 'avg_rps',
@@ -348,20 +361,19 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
           RPS
         </TableHeader>
       ),
-      accessor: data => (Math.floor(data.avg_rps === undefined ? data.last_rps : data.avg_rps)),
-      width: iconsWidth,
-      className: css['center-flex']
+      accessor: data => metricFormatter(Math.floor(data.avg_rps === undefined ? data.last_rps : data.avg_rps)),
+      width: iconsWidth
     },
 
     {
       id: 'parallelism',
       Header: () => (
         <TableHeader padding={'8px'} sortable={false}>
-          Parallelism
+          Runners
         </TableHeader>
       ),
       accessor: 'parallelism',
-      width: largeSize,
+      width: semiLarge,
       className: css['center-flex']
     },
     {
@@ -382,10 +394,13 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
       ),
       accessor: (data) => {
         if (data.score) {
-          const color = get(data, 'benchmark_weights_data.benchmark_threshold', 0) <= data.score ? 'green' : 'red';
+          const held = get(data, 'benchmark_weights_data.benchmark_threshold', 0) <= data.score;
           return (
-            <span className={css['center-flex']} style={{ color }}>{Math.floor(data.score)}</span>
-          )
+            <span className={classnames(css.score, css[held ? 'score--held' : 'score--breach'])}
+              title={held ? 'Meets benchmark threshold' : 'Below benchmark threshold'}>
+              {Math.floor(data.score)}
+            </span>
+          );
         }
       },
       width: iconsWidth
@@ -413,7 +428,8 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
         e.stopPropagation();
         window.open(data.grafana_report, '_blank')
       }} />,
-      width: mediumSize
+      // "Grafana" at the header's tracking needs more than mediumSize or it clips.
+      width: semiLarge
     },
     {
       id: 'raw',
@@ -562,16 +578,32 @@ export const getColumns = ({ columnsNames, sortHeader = '', onSort, onReportView
   });
 };
 
-const dateFormatter = (cell, row) => {
-  const timePattern = 'DD-MM-YYYY hh:mm:ss a';
+// "2m 45s" instead of "2 minutes, 45 seconds": a duration is a measured value
+// and fits its column at any magnitude.
+const shortDuration = (totalSeconds) => {
+  const s = Number(totalSeconds);
+  if (!Number.isFinite(s)) {
+    return totalSeconds;
+  }
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = Math.round(s % 60);
+  return [h && `${h}h`, m && `${m}m`, (sec || (!h && !m)) && `${sec}s`].filter(Boolean).join(' ');
+};
 
+// Timestamps are data cells: one mono line ("Jul 28, 21:51") that never wraps,
+// with the full date carried on the title for anything older than this year.
+const dateFormatter = (cell, row) => {
   if (!cell) {
     return 'Still running...';
-  } else {
-    return (
-      new Moment(cell).local().format('lll')
-    );
   }
+  const m = new Moment(cell).local();
+  const sameYear = m.year() === new Moment().year();
+  return (
+    <span className={css['time-cell']} title={m.format('lll')}>
+      {m.format(sameYear ? 'MMM D, HH:mm' : 'MMM D YYYY, HH:mm')}
+    </span>
+  );
 };
 
 const ViewButton = ({ onClick, icon, disabled, text }) => {
@@ -645,14 +677,54 @@ const Notes = ({ data, onEditNote }) => {
   )
 };
 
+// Run lifecycle, not a verdict on the target. "Finished" means the run completed —
+// whether the system held is carried by the success-rate bar and the report readouts,
+// because a run can finish cleanly while the target was shedding 9% of requests.
+const STATUS_MAP = {
+  finished: { text: 'Finished', tone: 'held' },
+  in_progress: { text: 'Running', tone: 'running' },
+  started: { text: 'Starting', tone: 'running' },
+  partially_finished: { text: 'Partial', tone: 'strain' },
+  aborted: { text: 'Aborted', tone: 'idle' },
+  failed: { text: 'Failed', tone: 'breach' }
+};
+
 const statusFormatter = (cell) => {
-  let mapper = {
-    in_progress: 'Running',
-    aborted: 'Aborted',
-    finished: 'Finished',
-    started: 'Started',
-    partially_finished: 'Partially Finished',
-    failed: 'Failed'
-  };
-  return (mapper[cell] ? mapper[cell] : cell);
-}
+  const status = STATUS_MAP[cell];
+  if (!status) {
+    return cell;
+  }
+  return (
+    <span className={css['status-cell']}>
+      <span className={classnames(css.status, css[`status--${status.tone}`])}>
+        {status.text}
+      </span>
+    </span>
+  );
+};
+
+// A percentage is hard to scan in a column; pairing it with a short bar makes a
+// degraded run visible before you read a single digit.
+const successRateFormatter = (value) => {
+  if (value === undefined || value === null || isNaN(value)) {
+    return <span className={classnames(css.metric, css['metric--muted'])}>—</span>;
+  }
+  const rate = Math.floor(value);
+  const tone = rate >= 99 ? 'held' : rate >= 95 ? 'strain' : 'breach';
+  return (
+    <span className={classnames(css.rate, css[`rate--${tone}`])}
+      title={`${rate}% of requests succeeded`}>
+      <span className={css.rate__track}>
+        <span className={css.rate__fill} style={{ width: `${Math.max(0, Math.min(100, rate))}%` }} />
+      </span>
+      {rate}%
+    </span>
+  );
+};
+
+const metricFormatter = (value, suffix = '') => {
+  if (value === undefined || value === null || value === '' || isNaN(value)) {
+    return <span className={classnames(css.metric, css['metric--muted'])}>—</span>;
+  }
+  return <span className={css.metric}>{Number(value).toLocaleString()}{suffix}</span>;
+};

@@ -52,7 +52,7 @@
   overflow: hidden;
   width: var(--number-input-width);
   height: var(--number-input-height);
-  background: white;
+  background: var(--bg-surface);
   @include default;
 
   &[data-error="true"] {

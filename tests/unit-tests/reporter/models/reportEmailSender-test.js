@@ -73,7 +73,7 @@ describe('Report emails sender test', () => {
     let sandbox, loggerErrorStub, loggerInfoStub, nodemailerCreateTransportStub, sendMailStub, getConfig, aggregateReportGeneratorStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         loggerErrorStub = sandbox.stub(logger, 'error');
         loggerInfoStub = sandbox.stub(logger, 'info');
         getConfig = sandbox.stub(configHandler, 'getConfigValue');

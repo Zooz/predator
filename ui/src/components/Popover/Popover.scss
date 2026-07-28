@@ -22,7 +22,7 @@ $popover-default-offset: 5px;
   }
 
   .popper__content {
-    background-color: white;
+    background-color: var(--bg-surface-raised);
     border-radius: 6px;
   }
 

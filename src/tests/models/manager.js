@@ -33,7 +33,7 @@ async function upsertTest(testRawData, existingTestId) {
     }
 
     let testArtilleryJson = await testGenerator.createTest(testRawData);
-    const id = existingTestId || uuid();
+    const id = existingTestId || uuid.v4();
     let processorFileId;
     if (testRawData.processor_file_url) {
         const downloadedFile = await downloadManager.downloadFile(testRawData.processor_file_url);
@@ -44,7 +44,7 @@ async function upsertTest(testRawData, existingTestId) {
         testArtilleryJson = undefined;
     }
     await database.insertTest(testRawData, testArtilleryJson, id, revisionId, processorFileId, contextId);
-    return { id: id, revision_id: revisionId };
+    return { id, revision_id: revisionId };
 }
 
 async function insertTestBenchmark(benchmarkRawData, testId) {

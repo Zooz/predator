@@ -19,7 +19,7 @@ describe('Processor manager tests', function () {
     let insertStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         insertStub = sandbox.stub(database, 'insertProcessor');
         getProcessorByIdStub = sandbox.stub(database, 'getProcessorById');
         getProcessorByNameStub = sandbox.stub(database, 'getProcessorByName');
@@ -68,7 +68,7 @@ describe('Processor manager tests', function () {
                 exception = e;
             }
             should(exception.statusCode).eql(422);
-            should(exception.message).eql('javascript syntax validation failed with error: Unexpected identifier');
+            should(exception.message).startWith('javascript syntax validation failed with error: Unexpected identifier');
         });
 
         it('should throw an error of name already exists', async function() {
@@ -106,20 +106,20 @@ describe('Processor manager tests', function () {
         it('Should delete processor', async function () {
             testsManagerStub.getTestsByProcessorId.resolves([]);
             const processor = {
-                id: uuid(),
+                id: uuid.v4(),
                 description: 'first processor',
                 name: 'mickey1'
             };
 
             getProcessorByIdStub.resolves(processor);
             deleteStub.resolves();
-            const existingProcessorId = uuid();
+            const existingProcessorId = uuid.v4();
             await manager.deleteProcessor(existingProcessorId);
             deleteStub.calledOnce.should.eql(true);
         });
         it('Should throw an error for a processor that is used by a test', async function() {
             const processor = {
-                id: uuid(),
+                id: uuid.v4(),
                 description: 'first processor',
                 name: 'mickey1'
             };
@@ -128,7 +128,7 @@ describe('Processor manager tests', function () {
             testsManagerStub.getTestsByProcessorId.resolves([{ name: 'predator' }]);
             deleteStub.resolves();
             try {
-                await manager.deleteProcessor(uuid());
+                await manager.deleteProcessor(uuid.v4());
                 throw Error('Should have thrown an error');
             } catch (e) {
                 should(e.statusCode).equal(409);
@@ -138,7 +138,7 @@ describe('Processor manager tests', function () {
     describe('Get single processor', function () {
         it('Database returns one row, should return the processor', async function () {
             const firstProcessor = {
-                id: uuid(),
+                id: uuid.v4(),
                 description: 'first processor',
                 name: 'mickey1'
             };
@@ -152,7 +152,7 @@ describe('Processor manager tests', function () {
             let exception;
             getProcessorByIdStub.resolves();
             try {
-                await manager.getProcessor(uuid());
+                await manager.getProcessor(uuid.v4());
             } catch (e) {
                 exception = e;
             }
@@ -170,14 +170,14 @@ describe('Processor manager tests', function () {
             let firstProcessor, secondProcessor;
             beforeEach(() => {
                 firstProcessor = {
-                    id: uuid(),
+                    id: uuid.v4(),
                     description: 'first processor',
                     javascript: 'aaaa',
                     name: 'mickey1'
                 };
 
                 secondProcessor = {
-                    id: uuid(),
+                    id: uuid.v4(),
                     description: 'first processor',
                     javascript: 'bbbb',
                     name: 'mickey1'
@@ -200,7 +200,7 @@ describe('Processor manager tests', function () {
     });
     describe('Update processor', function () {
         const oldProcessor = {
-            id: uuid(),
+            id: uuid.v4(),
             description: 'old processor',
             name: 'old',
             javascript: 'module.exports.old = true'
@@ -248,7 +248,7 @@ describe('Processor manager tests', function () {
                 exception = e;
             }
             should(exception.statusCode).eql(422);
-            should(exception.message).eql('javascript syntax validation failed with error: Unexpected identifier');
+            should(exception.message).startWith('javascript syntax validation failed with error: Unexpected identifier');
         });
 
         it('should fail - updating a processor name to another existing processor name', async function() {

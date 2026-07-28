@@ -36,7 +36,7 @@ describe('Artillery report generator test', () => {
         reportsManagerGetReportStub;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         configHandlerStub = sandbox.stub(configHandler, 'getConfigValue');
         databaseConnectorGetStatsStub = sandbox.stub(databaseConnector, 'getStats');
         reportsManagerGetReportStub = sandbox.stub(reportsManager, 'getReport');

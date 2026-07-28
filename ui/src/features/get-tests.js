@@ -306,12 +306,9 @@ class getTests extends React.Component {
         </TitleInput>
       ];
       return (
-        <Page title={'Tests'} description={DESCRIPTION}>
-          <Button className={style['create-button']} onClick={() => {
-            this.setState({
-              createTest: true
-            });
-          }}>Create Test</Button>
+        <Page title={'Tests'} description={DESCRIPTION} actions={
+          <Button onClick={() => this.setState({ createTest: true })}>Create Test</Button>
+        }>
           <ReactTableComponent
             onSearch={this.onSearch}
             tdStyle={{ display: 'flex', alignItems: 'center' }}

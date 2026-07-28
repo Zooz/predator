@@ -18,7 +18,7 @@ describe('Docker job connector tests', function () {
     };
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {

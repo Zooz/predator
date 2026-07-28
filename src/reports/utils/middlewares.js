@@ -1,4 +1,3 @@
-
 const reportManager = require('../models/reportsManager');
 
 module.exports.verifyReportIDInRoute = async function(req, res, next){

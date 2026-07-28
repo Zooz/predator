@@ -6,7 +6,7 @@ const { CONTEXT_ID } = require('../../../common/consts'),
 const predatorTables = ['tests', 'jobs', 'reports', 'dsl_definitions', 'webhooks', 'files', 'processors', 'benchmarks'];
 
 module.exports.up = async (query) => {
-    for(const table of predatorTables) {
+    for (const table of predatorTables) {
         const transaction = await query.sequelize.transaction();
         await migrateTable(query, table, transaction);
     }
@@ -42,6 +42,6 @@ async function addIndex(query, table, transaction) {
             table,
             [CONTEXT_ID], { transaction });
     } catch (err) {
-        logger.warn(err, 'index already exists')
+        logger.warn(err, 'index already exists');
     }
 }

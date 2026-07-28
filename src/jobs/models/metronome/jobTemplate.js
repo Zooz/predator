@@ -14,7 +14,7 @@ module.exports.createJobRequest = (jobName, runId, parallelism, environmentVaria
             },
             env: environmentVariables
         },
-        parallelism: parallelism
+        parallelism
     };
 
     const jobTemplateWithCustomDefinition = _.merge(jobTemplate, customDefinition);

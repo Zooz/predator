@@ -1,12 +1,3 @@
-const entries = [
-    'babel-polyfill',
-    './src'
-]
-;
-
-if (process.env.NODE_ENV !== 'production') {
-    entries.push(...['react-hot-loader/patch',
-        'webpack-dev-server/client?http://localhost:8080/',
-        'webpack/hot/only-dev-server']);
-}
-module.exports = entries;
+// webpack-dev-server injects its own client/hot entries, and @babel/preset-env's browser
+// targets cover what babel-polyfill used to, so a single app entry is all that's left.
+module.exports = ['./src'];

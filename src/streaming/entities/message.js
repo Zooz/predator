@@ -18,7 +18,7 @@ class StreamingMessage {
         const metadata = { ...this.metadata, ...defaultMetadata };
         return JSON.stringify({
             published_at: this.published_at,
-            metadata: metadata,
+            metadata,
             event: this.event,
             resource: resourceWithoutExcludedAttributes
         });

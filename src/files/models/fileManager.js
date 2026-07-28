@@ -30,7 +30,7 @@ async function getFile(fileId, isIncludeContent) {
 async function saveFile(fileName, fileContent) {
     const contextId = getContextId();
 
-    const id = uuid();
+    const id = uuid.v4();
     const fileBase64Value = Buffer.from(fileContent).toString('base64');
     await database.saveFile(id, fileName, fileBase64Value, contextId);
     return id;

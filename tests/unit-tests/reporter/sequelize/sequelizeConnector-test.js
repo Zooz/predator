@@ -40,7 +40,7 @@ describe('Sequelize client tests', function () {
     }];
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     beforeEach(async () => {
@@ -419,9 +419,9 @@ describe('Sequelize client tests', function () {
 
     describe('Insert stats', () => {
         it('should succeed inserting stats', async () => {
-            const runnerId = uuid();
+            const runnerId = uuid.v4();
             const statsTime = Date.now();
-            const statId = uuid();
+            const statId = uuid.v4();
             const phaseIndex = 0;
             const phaseStatus = 'initiliazed';
             const data = JSON.stringify({ message: 'started' });
@@ -430,7 +430,7 @@ describe('Sequelize client tests', function () {
 
             should(sequelizeInsertStub.args[0][0]).eql({
                 runner_id: runnerId,
-                data: data,
+                data,
                 phase_index: 0,
                 phase_status: 'initiliazed',
                 report_id: reportId,
@@ -444,16 +444,16 @@ describe('Sequelize client tests', function () {
     describe('Get stats', () => {
         it('should succeed getting stats', async () => {
             const statsTime = Date.now();
-            const statId = uuid();
+            const statId = uuid.v4();
             const sequelizeResponse = [{
                 dataValues: {
                     stats_id: statId,
                     test_id: testId,
                     report_id: reportId,
-                    runner_id: uuid(),
+                    runner_id: uuid.v4(),
                     stats_time: statsTime,
-                    phase_status: uuid(),
-                    phase_index: uuid(),
+                    phase_status: uuid.v4(),
+                    phase_index: uuid.v4(),
                     data: JSON.stringify({ median: 5 })
                 }
             }];

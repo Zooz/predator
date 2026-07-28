@@ -16,8 +16,7 @@ module.exports.createJobRequest = (jobPlatformName, reportId, parallelism, envir
         },
         taskDefinition: jobTagData.task_definition,
         tags: [{ key: 'job_identifier', value: jobPlatformName }],
-        networkConfiguration: { awsvpcConfiguration: { subnets: jobTagData.subnets }
-        }
+        networkConfiguration: { awsvpcConfiguration: { subnets: jobTagData.subnets } }
     };
 
     return runTaskRequest;

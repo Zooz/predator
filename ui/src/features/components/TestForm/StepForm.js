@@ -206,18 +206,20 @@ export default (props) => {
   )
 }
 
+// Group heading inside a step. Was 20px light italic grey, which read as a leftover
+// serif caption; now the same engraved-label rule used across the product.
 const Header = ({ text, style = {} }) => {
   return (
     <div style={{
-      // fontFamily: 'Roboto',
-      fontSize: '20px',
-      fontWeight: '300',
-      fontStretch: 'normal',
-      fontStyle: 'italic',
-      color: '#778195',
+      fontFamily: 'var(--font-ui)',
+      fontSize: 'var(--text-2xs)',
+      fontWeight: '600',
+      letterSpacing: 'var(--tracking-label)',
+      textTransform: 'uppercase',
+      color: 'var(--fg-secondary)',
       lineHeight: 'normal',
-      letterSpacing: 'normal',
-      marginBottom: '11px',
+      marginBottom: 'var(--space-3)',
+      paddingTop: 'var(--space-2)',
       ...style
     }}>{text}</div>
   )

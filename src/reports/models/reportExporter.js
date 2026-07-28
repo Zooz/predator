@@ -101,7 +101,7 @@ function generateJSONCompareReport(aggregateReports){
         const result = generateJSONReport(aggregateReports[index]);
         // Update headers set
         for (const headerIndex in result.headers){
-            if (result.headers[headerIndex] != 'timestamp' && result.headers[headerIndex] != 'timemillis'){
+            if (result.headers[headerIndex] !== 'timestamp' && result.headers[headerIndex] !== 'timemillis'){
                 data.headers.push(character + '_' + result.headers[headerIndex]);
             }
         }

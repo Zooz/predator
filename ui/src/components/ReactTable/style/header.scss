@@ -1,42 +1,46 @@
-@import "../../styles/colors";
-
-$headerColor: $default-blue;
+// Column headers are captions, not links. They previously used the link blue, so a
+// dozen blue words sat above a table of blue actions and nothing read as
+// clickable-versus-not. They now use the engraved-label treatment.
 
 .header-wrapper {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
+
 .header-text {
-  position: relative;
-  color: $headerColor;
-  font-size: 13px;
-  font-weight: 500;
-  margin-left: var(--header-padding);
-  margin-right: 0.2em;
+    position: relative;
+    color: var(--fg-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-left: var(--header-padding);
+    margin-right: 0.2em;
 }
 
 .header-sorters {
-  position: relative;
-  display: inline-flex;
-  margin-left: 10px;
-  flex-direction: column;
-  justify-content: center;
+    position: relative;
+    display: inline-flex;
+    margin-left: 8px;
+    flex-direction: column;
+    justify-content: center;
 
-  i {
-    font-size: 12px;
-    color: #dbdbdb;
-    position: absolute;
+    i {
+        font-size: 10px;
+        color: var(--border-strong);
+        position: absolute;
 
-    &:first-child {
-      top: -16px;
+        &:first-child {
+            top: -14px;
+        }
+
+        &:last-child {
+            top: -5px;
+        }
+
+        &[sorted='true'] {
+            color: var(--accent);
+        }
     }
-
-    &:last-child {
-      top: -6px;
-    }
-
-    &[sorted=true] {
-      color: $headerColor;
-    }
-  }
 }

@@ -1,7 +1,7 @@
-import Immutable from 'immutable';
+import { Map } from 'immutable';
 import * as Types from '../types/testsTypes'
 
-const initialState = Immutable.Map({
+const initialState = Map({
     tests: [],
     test: undefined,
     processing_get_tests: false,

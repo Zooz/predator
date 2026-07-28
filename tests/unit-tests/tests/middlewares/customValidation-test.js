@@ -8,7 +8,7 @@ const httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
 describe('Testing customValidation', function () {
     let sandbox, reqStub, nextStub;
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         nextStub = sandbox.stub();
     });
 

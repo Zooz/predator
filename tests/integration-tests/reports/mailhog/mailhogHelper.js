@@ -1,6 +1,5 @@
 'use strict';
 
-const request = require('request-promise-native');
 const util = require('util');
 const should = require('should');
 
@@ -10,12 +9,8 @@ const smtpServerUrl = util.format('http://%s:%s', smtpConfig.host, smtpConfig.po
 module.exports.validateEmail = async () => {
     return new Promise((resolve, reject) => {
         setTimeout(async () => {
-            const messages = await request({
-                method: 'GET',
-                url: smtpServerUrl + '/api/v1/messages',
-                timeout: 2000,
-                time: true
-            });
+            const response = await fetch(smtpServerUrl + '/api/v1/messages', { signal: AbortSignal.timeout(2000) });
+            const messages = await response.text();
 
             if (messages === '[]') {
                 reject(new Error('The SMTP server did not get the email...'));
@@ -30,10 +25,5 @@ module.exports.validateEmail = async () => {
 };
 
 module.exports.clearAllOldMails = () => {
-    return request({
-        method: 'DELETE',
-        url: smtpServerUrl + '/api/v1/messages',
-        timeout: 2000,
-        time: true
-    });
+    return fetch(smtpServerUrl + '/api/v1/messages', { method: 'DELETE', signal: AbortSignal.timeout(2000) });
 };

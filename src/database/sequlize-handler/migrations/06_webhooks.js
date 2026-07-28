@@ -31,7 +31,7 @@ async function takeActionOnColumn(describedTable, newColumnName, existAsyncActio
 function createEnumRow(name) {
     return {
         name,
-        id: uuid(),
+        id: uuid.v4(),
         created_at: new Date(),
         updated_at: new Date()
     };

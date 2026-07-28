@@ -1,8 +1,8 @@
-const {expect} = require('chai');
+const { expect } = require('chai');
 const uuid = require('uuid');
 const nock = require('nock');
 
-const {WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPES, WEBHOOK_EVENT_TYPE_API_FAILURE, WEBHOOK_EVENT_TYPE_FAILED, ERROR_MESSAGES: {NOT_FOUND}} = require('../../../src/common/consts');
+const { WEBHOOK_EVENT_TYPES, EVENT_FORMAT_TYPE_JSON, EVENT_FORMAT_TYPES, WEBHOOK_EVENT_TYPE_API_FAILURE, WEBHOOK_EVENT_TYPE_FAILED } = require('../../../src/common/consts');
 
 const webhookRequestSender = require('./helpers/requestCreator');
 
@@ -89,7 +89,7 @@ describe('Webhooks api', function () {
             });
             it('Create webhook with unspecified global field, expect default value and response 201 status code', async function () {
                 const webhook = generateWebhook();
-                const {global, ...webhookWithoutGlobal} = webhook;
+                const { global, ...webhookWithoutGlobal } = webhook;
 
                 const createWebhookResponse = await webhookRequestSender.createWebhook(webhookWithoutGlobal);
 
@@ -121,12 +121,12 @@ describe('Webhooks api', function () {
         describe('PUT /v1/webhooks/:webhook_id', function () {
             it('Insert a webhook -> update global -> ensure it is updated', async function () {
                 const webhook = generateWebhook();
-                const updatedWebhook = {...webhook, global: !webhook.global};
+                const updatedWebhook = { ...webhook, global: !webhook.global };
 
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const {body: {id}} = insertResponse;
+                const { body: { id } } = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -137,12 +137,12 @@ describe('Webhooks api', function () {
             });
             it('Insert a webhook -> update url -> ensure it is updated', async function () {
                 const webhook = generateWebhook();
-                const updatedWebhook = {...webhook, url: `${webhook}/new/path`};
+                const updatedWebhook = { ...webhook, url: `${webhook}/new/path` };
 
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const {body: {id}} = insertResponse;
+                const { body: { id } } = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -154,12 +154,12 @@ describe('Webhooks api', function () {
             it('Insert a webhook -> update format_type -> ensure it is updated', async function () {
                 const webhook = generateWebhook();
                 const updatedFormatType = EVENT_FORMAT_TYPES.filter(format => format !== webhook.format_type)[0];
-                const updatedWebhook = {...webhook, format_type: updatedFormatType};
+                const updatedWebhook = { ...webhook, format_type: updatedFormatType };
 
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const {body: {id}} = insertResponse;
+                const { body: { id } } = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -170,12 +170,12 @@ describe('Webhooks api', function () {
             });
             it('Insert a webhook -> update name -> ensure it is updated', async function () {
                 const webhook = generateWebhook();
-                const updatedWebhook = {...webhook, name: webhook.name + ' added text'};
+                const updatedWebhook = { ...webhook, name: webhook.name + ' added text' };
 
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const {body: {id}} = insertResponse;
+                const { body: { id } } = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -197,7 +197,7 @@ describe('Webhooks api', function () {
                 const insertResponse = await webhookRequestSender.createWebhook(webhook);
                 expect(insertResponse.statusCode).to.equal(201);
 
-                const {body: {id}} = insertResponse;
+                const { body: { id } } = insertResponse;
                 const putResponse = await webhookRequestSender.updateWebhook(id, updatedWebhook);
 
                 expect(putResponse.statusCode).to.equal(200);
@@ -215,8 +215,8 @@ describe('Webhooks api', function () {
                 const testWebhookResponse = await webhookRequestSender.testWebhook({});
                 expect(testWebhookResponse.statusCode).to.equal(400);
                 expect(testWebhookResponse.body).to.be.deep.equal({
-                    "message": "Input validation error",
-                    "validation_errors": [
+                    message: 'Input validation error',
+                    validation_errors: [
                         "body should have required property 'format_type'",
                         "body should have required property 'url'"
                     ]

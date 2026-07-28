@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize'),
     uuid = require('uuid');
 
-
 const { WEBHOOKS_EVENTS_TABLE_NAME, WEBHOOKS_TABLE_NAME, WEBHOOKS_EVENTS_MAPPING_TABLE_NAME } = require('../../../../database/sequlize-handler/consts');
 
 let client;
@@ -108,7 +107,7 @@ async function deleteWebhook(webhookId, contextId) {
         where: {
             id: webhookId
         }
-    }
+    };
 
     if (contextId) {
         options.where.context_id = contextId;

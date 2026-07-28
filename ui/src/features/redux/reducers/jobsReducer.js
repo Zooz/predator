@@ -1,7 +1,7 @@
-import Immutable from 'immutable';
+import { Map } from 'immutable';
 import * as Types from '../types/jobsTypes'
 
-const initialState = Immutable.Map({
+const initialState = Map({
   jobs: [],
   job: undefined,
   processing_get_jobs: false,

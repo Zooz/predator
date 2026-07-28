@@ -18,18 +18,18 @@ module.exports.processCompareReportsInput = (query) => {
     const reportIds = query.report_ids[0].split(',');
     const testIds = query.test_ids[0].split(',');
     // Validate length of arrays
-    if (reportIds.length != testIds.length){
+    if (reportIds.length !== testIds.length){
         const error = new Error('Test and Report IDs length mismatch');
         error.statusCode = 400;
         throw error;
     }
-    return { reportIds: reportIds, testIds: testIds };
+    return { reportIds, testIds };
 };
 
 module.exports.getCompareReportName = (aggregateReportArray, fileFormat) => {
     let fileName = '';
     for (const index in aggregateReportArray){
-        if (index == aggregateReportArray.length - 1){
+        if (Number(index) === aggregateReportArray.length - 1){
             fileName += aggregateReportArray[index].test_name;
         } else {
             fileName += aggregateReportArray[index].test_name + '_';
@@ -37,7 +37,7 @@ module.exports.getCompareReportName = (aggregateReportArray, fileFormat) => {
     }
     fileName += '_comparison_';
     for (const index in aggregateReportArray){
-        if (index == aggregateReportArray.length - 1){
+        if (Number(index) === aggregateReportArray.length - 1){
             fileName += aggregateReportArray[index].report_id;
         } else {
             fileName += aggregateReportArray[index].report_id + '_';

@@ -449,11 +449,12 @@ export class TestForm extends React.Component {
             marginRight: '12px',
             display: 'flex',
             justifyContent: 'flex-end',
-            // width: '313px'
+            gap: '18px',
             position: 'sticky',
             top: '0px',
             zIndex: 22,
-            backgroundColor: 'white'
+            padding: '10px 0',
+            backgroundColor: 'var(--bg-surface)'
           }}>
 
             <div className={style['actions-style']} onClick={this.addScenarioHandler}>+Add Scenario</div>
